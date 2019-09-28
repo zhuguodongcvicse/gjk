@@ -1,0 +1,15 @@
+FROM anapsix/alpine-java:8_server-jre_unlimited
+
+MAINTAINER wangiegie@gmail.com
+
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+RUN mkdir -p /gjk-config
+
+WORKDIR /gjk-config
+
+EXPOSE 4001
+
+ADD ./gjk-config/target/gjk-config.jar ./
+
+CMD java -Djava.security.egd=file:/dev/./urandom -jar gjk-config.jar

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ~ Copyright (c) 2018-2025, inforbus All rights reserved. ~ ~ Redistribution 
+	and use in source and binary forms, with or without ~ modification, are permitted 
+	provided that the following conditions are met: ~ ~ Redistributions of source 
+	code must retain the above copyright notice, ~ this list of conditions and 
+	the following disclaimer. ~ Redistributions in binary form must reproduce 
+	the above copyright ~ notice, this list of conditions and the following disclaimer 
+	in the ~ documentation and/or other materials provided with the distribution. 
+	~ Neither the name of the inforbus.com developer nor the names of its ~ contributors 
+	may be used to endorse or promote products derived from ~ this software without 
+	specific prior written permission. ~ Author: inforbus -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.inforbus.gjk.pro.mapper.PartPlatformSoftwareMapper">
+
+	<resultMap id="softwareMap"
+		type="com.inforbus.gjk.pro.api.entity.PartPlatformSoftware">
+		<id property="id" column="id" />
+		<result property="softwareId" column="software_id" />
+		<result property="softwareName" column="software_name" />
+		<result property="softwareVersion" column="software_version" />
+		<result property="softwareFilePath" column="software_file_path" />
+		<result property="platformName" column="platform_name" />
+		<result property="createTime" column="create_time" />
+		<result property="procedureId" column="procedure_id" />
+	</resultMap>
+
+	<sql id="saveSoftwareSql">
+		id,
+		software_id,
+		software_name,
+		software_version,
+		software_file_path,
+		platform_name,
+		create_time,
+		procedure_id
+	</sql>
+
+
+	<!-- 保存信息 -->
+	<insert id="savePartPlatformSoftware"
+		parameterType="com.inforbus.gjk.pro.api.entity.PartPlatformSoftware">
+		INSERT INTO gjk_app_part_platform_software (
+		<include refid="saveSoftwareSql" />
+		) VALUES (
+		#{soft.id},
+		#{soft.softwareId},
+		#{soft.softwareName},
+		#{soft.softwareVersion},
+		#{soft.softwareFilePath},
+		#{soft.platformName},
+		#{soft.createTime},
+		#{soft.procedureId})
+	</insert>
+
+	<delete id="deletePartPlatformSoftware">
+		DELETE from gjk_app_part_platform_software where
+		procedure_id=#{procedureId}
+	</delete>
+
+	<select id="getByProcedureId" resultMap="softwareMap">
+		SELECT *
+		FROM
+		gjk_app_part_platform_software
+		<where>
+			<if test="procedureId != null and procedureId.trim() != ''">
+				AND procedure_id = #{procedureId}
+			</if>
+		</where>
+	</select>
+
+
+</mapper>

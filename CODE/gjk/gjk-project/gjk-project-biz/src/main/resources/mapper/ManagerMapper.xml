@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inforbus.gjk.pro.mapper.ManagerMapper">
+
+    <resultMap type="com.inforbus.gjk.pro.api.entity.ProjectFile"
+               id="projectFileMap">
+        <id property="id" column="id"/>
+        <result property="projectId" column="project_id"/>
+        <result property="fileName" column="file_name"/>
+        <result property="fileType" column="file_type"/>
+        <result property="filePath" column="file_path"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="softwareId" column="software_id"/>
+        <result property="bspId" column="bsp_id"/>
+    </resultMap>
+
+    <resultMap type="com.inforbus.gjk.pro.api.entity.ProjectPlan"
+               id="projectPlanMap">
+        <id property="id" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="fileName" column="file_name"/>
+        <result property="filePath" column="file_path"/>
+    </resultMap>
+
+    <resultMap type="com.inforbus.gjk.admin.api.entity.SysDict"
+               id="sysDictMap">
+        <id property="id" column="id"/>
+        <result property="value" column="value"/>
+        <result property="label" column="label"/>
+        <result property="type" column="type"/>
+        <result property="description" column="description"/>
+        <result property="sort" column="sort"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remarks" column="remarks"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
+
+    <resultMap
+            type="com.inforbus.gjk.pro.api.entity.Hardwarelibs" id="hardwarelibs">
+        <result property="id" column="id"/>
+        <result property="hardwareName" column="hardware_name"/>
+        <result property="flowId" column="flow_id"/>
+        <result property="modelId" column="model_id"/>
+        <result property="projectId" column="project_id"/>
+        <result property="frontJson" column="front_json"/>
+        <result property="backJson" column="back_json"/>
+        <result property="linkRelation" column="link_relation"/>
+    </resultMap>
+
+    <resultMap
+            type="com.inforbus.gjk.pro.api.entity.Chipsfromhardwarelibs"
+            id="chipsfromhardwarelibs">
+        <result property="id" column="id"/>
+        <result property="chips" column="chips"/>
+        <result property="projectId" column="projectId"/>
+        <result property="flowId" column="flowId"/>
+        <result property="modelId" column="modelId"/>
+    </resultMap>
+
+    <resultMap
+            type="com.inforbus.gjk.pro.api.entity.ChildrenNodes"
+            id="childrenNodes">
+        <result property="id" column="id"/>
+        <result property="fileName" column="file_name"/>
+    </resultMap>
+    <!--软件框架库-->
+    <resultMap id="softwareMap"
+               type="com.inforbus.gjk.pro.api.entity.Software">
+        <id property="id" column="id"/>
+        <result property="softwareName" column="software_name"/>
+        <result property="version" column="version"/>
+        <result property="filePath" column="file_path"/>
+        <result property="applyState" column="apply_state"/>
+        <result property="applyDesc" column="apply_desc"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="description" column="description"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
+    <resultMap id="platformMap"
+               type="com.inforbus.gjk.pro.api.entity.GjkPlatform">
+        <id column="platform_id" property="platformId"/>
+        <result column="name" property="name"/>
+        <result column="permission" property="permission"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="sort" property="sort"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="del_flag" property="delFlag"/>
+    </resultMap>
+    <sql id="saveSoftwareSql">
+		id,
+		software_name,
+		version,
+		file_path,
+		apply_state,
+		apply_desc,
+		create_time,
+		update_time,
+		description,
+		del_flag
+	</sql>
+
+    <sql id="projectFileSql">
+		id,
+		project_id,
+		file_name,
+		file_type,
+		file_path,
+		parent_id,
+		software_id,
+		bsp_id
+	</sql>
+
+    <sql id="saveProjectPlanSql">
+		id,
+		parent_id,
+		file_name,
+		file_path
+	</sql>
+
+    <sql id="hardwarelibs">
+		h.id,
+		h.hardware_name,
+		h.flow_id,
+		h.model_id,
+		h.project_id,
+		h.front_json,
+		h.back_json,
+		h.link_relation
+	</sql>
+
+    <sql id="saveHardwarelibs">
+		id,
+		hardware_name,
+		flow_id,
+		model_id,
+		project_id,
+		front_json,
+		back_json,
+		link_relation
+	</sql>
+
+    <sql id="saveChipsfromhardwarelibs">
+		id,
+		chips,
+		projectId,
+		flowId,
+		modelId
+	</sql>
+
+    <sql id="chips">
+		id,
+		chips,
+		projectId,
+		flowId,
+		modelId
+	</sql>
+
+    <select id="getChipsById" resultMap="chipsfromhardwarelibs">
+        SELECT
+        <include refid="chips"/>
+
+        FROM gjk_chipsfromhardwarelibs as a
+        where
+        a.modelId = #{modelId}
+    </select>
+
+    <select id="listProjectFileByProjectId"
+            resultMap="projectFileMap">
+        select
+        <include refid="projectFileSql"/>
+        from gjk_project_detail
+        <where>
+            <if test="projectId != null and projectId.trim() != ''">
+                AND project_id = #{projectId}
+            </if>
+        </where>
+        ORDER BY file_type
+    </select>
+    <select id="getProcedureListByProjectId"
+            resultMap="projectFileMap">
+        select
+        <include refid="projectFileSql"/>
+        from gjk_project_detail
+        <where>
+            <if test="projectId != null and projectId.trim() != ''">
+                AND project_id = #{projectId}
+            </if>
+            AND file_type = '9'
+        </where>
+    </select>
+    <!-- 保存项目详细信息 -->
+    <insert id="saveProDetail"
+            parameterType="com.inforbus.gjk.pro.api.entity.ProjectFile">
+        INSERT INTO gjk_project_detail (
+        <include refid="projectFileSql"/>
+        ) VALUES (#{proDetail.id},
+        #{proDetail.projectId},
+        #{proDetail.fileName},
+        #{proDetail.fileType},
+        #{proDetail.filePath},
+        #{proDetail.parentId},
+        #{proDetail.softwareId},
+        #{proDetail.bspId})
+    </insert>
+
+    <select id="getIdByProjectIdAndFileType"
+            resultMap="projectFileMap">
+        select
+        <include refid="projectFileSql"/>
+        from gjk_project_detail
+        <where>
+            <if test="projectId != null and projectId.trim() != ''">
+                AND project_id = #{projectId}
+            </if>
+            <if test="fileType != null and fileType.trim() != ''">
+                AND file_type = #{fileType}
+            </if>
+        </where>
+    </select>
+
+    <select id="getProDetailById" resultMap="projectFileMap">
+        select
+        <include refid="projectFileSql"/>
+        from gjk_project_detail
+        <where>
+            <if test="id != null and id.trim() != ''">
+                AND id = #{id}
+            </if>
+        </where>
+    </select>
+
+    <select id="getProFileListByModelId" resultMap="projectFileMap">
+        select
+        <include refid="projectFileSql"/>
+        from gjk_project_detail
+        <where>
+            <if test="modelId != null and modelId.trim() != ''">
+                AND parent_id = #{modelId}
+            </if>
+        </where>
+    </select>
+
+    <update id="editProJSON">
+		UPDATE `gjk_project_detail` SET `json_path` =
+		#{fullPath} WHERE `id` = #{proId}
+	</update>
+
+    <select id="findProJSON" resultType="map">
+        <!-- fileName select json_path from `gjk_project_detail` WHERE `id` = #{proId} -->
+
+        SELECT pro.file_name as fileName, pro.file_path as filePath,
+        pro.json_path as jsonPath, parent.file_path as parentFilePath
+        from
+        gjk_project_detail pro
+        LEFT
+        JOIN gjk_project_detail parent
+        ON
+        pro.parent_id = parent.id WHERE
+        pro.id = #{proId};
+    </select>
+
+    <!-- 根据点击项目树的id找到上级的上级的id，从而获取流程名file_name -->
+    <select id="getProcessName" resultMap="projectFileMap">
+		select * from
+		gjk_project_detail where id = #{id}
+	</select>
+
+    <!-- 根据当前软硬件映射配置的id，查找当前流程下的所有模块的文件路径 -->
+    <select id="getFilePathListById" resultMap="projectFileMap">
+		SELECT * FROM
+		gjk_project_detail
+		WHERE
+		parent_id = (
+		SELECT parent_id FROM
+		gjk_project_detail
+		WHERE id = #{id})
+	</select>
+
+    <!-- 保存软件框架信息 -->
+    <insert id="saveProjectPlan"
+            parameterType="com.inforbus.gjk.pro.api.entity.ProjectPlan">
+        INSERT INTO gjk_project_plan (
+        <include refid="saveProjectPlanSql"/>
+        ) VALUES (#{proPlan.id},
+        #{proPlan.parentId},
+        #{proPlan.fileName},
+        #{proPlan.filePath}
+        )
+    </insert>
+
+    <!-- 根据当前软硬件映射配置的parentid，查找当前流程下的所有模块的文件路径 -->
+    <select id="getPlanFilePathListByParentId"
+            resultMap="projectPlanMap">
+		SELECT * FROM gjk_project_plan
+		WHERE
+		parent_id = #{parentId}
+	</select>
+
+    <update id="saveNewFilePath">
+		UPDATE `gjk_project_detail` SET `newfile_path` =
+		#{newFilePath} WHERE `id` = #{proDetailId}
+	</update>
+
+    <!-- 拿到硬件建模 -->
+    <select id="getHardwarelibs" resultMap="hardwarelibs">
+        SELECT
+        <include refid="hardwarelibs"/>
+        FROM gjk_hardwarelibs h
+        LEFT JOIN gjk_project_detail pd
+        ON h.project_id
+        = pd.project_id
+        WHERE pd.file_type = '12'
+        AND h.id = #{id}
+    </select>
+
+    <!-- 保存硬件建模 -->
+    <insert id="saveHardwarelibs"
+            parameterType="com.inforbus.gjk.pro.api.entity.Hardwarelibs">
+        INSERT INTO
+        gjk_hardwarelibs (
+        <include refid="saveHardwarelibs"/>
+        )VALUES
+        (#{hardwarelibs.id},
+        #{hardwarelibs.hardwareName},
+        #{hardwarelibs.flowId},
+        #{hardwarelibs.modelId},
+        #{hardwarelibs.projectId},
+        #{hardwarelibs.frontJson},
+        #{hardwarelibs.backJson},
+        #{hardwarelibs.linkRelation})
+    </insert>
+
+    <!-- 保存硬件建模芯片 -->
+    <insert id="saveChipsfromhardwarelibs"
+            parameterType="com.inforbus.gjk.pro.api.entity.Chipsfromhardwarelibs">
+        INSERT INTO
+        gjk_chipsfromhardwarelibs (
+        <include refid="saveChipsfromhardwarelibs"/>
+        )VALUES
+        (#{chipsfromhardwarelibs.id},
+        #{chipsfromhardwarelibs.chips},
+        #{chipsfromhardwarelibs.projectId},
+        #{chipsfromhardwarelibs.flowId},
+        #{chipsfromhardwarelibs.modelId})
+    </insert>
+
+    <update id="updateHardwarelib">
+		UPDATE `gjk_hardwarelibs` SET
+		`front_json` =
+		#{frontJson},
+		`back_json` = #{backJson},
+		`link_relation` =
+		#{linkRelation}
+		WHERE `id` = #{id}
+	</update>
+
+    <update id="updateChipsfromhardwarelibs">
+		UPDATE `gjk_chipsfromhardwarelibs` SET
+		`chips` =
+		#{chips}
+		WHERE `id` = #{id}
+	</update>
+
+    <!-- 通过项目id拿到硬件 -->
+    <select id="getHardwarelibByProjectId" resultMap="hardwarelibs">
+		SELECT
+		pd.id
+		FROM gjk_project_detail pd
+		WHERE pd.file_type = '12'
+		AND
+		pd.project_id=#{projectId}
+	</select>
+
+    <!-- DELETE FROM table_name [WHERE Clause] -->
+    <delete id="deleteHardwarelibById">
+		DELETE FROM gjk_hardwarelibs WHERE id =
+		#{hardwarelibId}
+	</delete>
+
+    <!-- 通过模型id拿到所有子节点 -->
+    <select id="getAllChildrenNodes" resultMap="childrenNodes">
+		SELECT
+		pd.id,
+		pd.file_name
+		FROM gjk_project_detail pd
+		WHERE pd.parent_id=#{modelId}
+	</select>
+    <!--获得软件框架库列表-->
+    <select id="getAllSoftwareList" resultMap="softwareMap">
+		SELECT *
+		FROM gjk_software as gs
+		order by gs.software_name desc,gs.version desc
+	</select>
+    <!--根据多个ID查询数据列表-->
+    <select id="getAllSoftwareListByIdIn" resultMap="softwareMap">
+        SELECT *
+        FROM gjk_software as gs
+        where gs.id in (${ids})
+        order by gs.software_name desc,gs.version desc
+    </select>
+    <!--根据软件框架库ID得到平台库列表-->
+    <select id="getAllPlatformListBySoftwareId" resultMap="platformMap">
+	select * from gjk_platform gp
+	where gp.platform_id=(
+	select gsd.platform_id from gjk_software_detail gsd where gsd.software_id=#{id}
+	)
+	</select>
+</mapper>

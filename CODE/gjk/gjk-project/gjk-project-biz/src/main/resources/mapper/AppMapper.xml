@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ~ Copyright (c) 2018-2025, inforbus All rights reserved. ~ ~ Redistribution 
+	and use in source and binary forms, with or without ~ modification, are permitted 
+	provided that the following conditions are met: ~ ~ Redistributions of source 
+	code must retain the above copyright notice, ~ this list of conditions and 
+	the following disclaimer. ~ Redistributions in binary form must reproduce 
+	the above copyright ~ notice, this list of conditions and the following disclaimer 
+	in the ~ documentation and/or other materials provided with the distribution. 
+	~ Neither the name of the inforbus.com developer nor the names of its ~ contributors 
+	may be used to endorse or promote products derived from ~ this software without 
+	specific prior written permission. ~ Author: inforbus -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inforbus.gjk.pro.mapper.AppMapper">
+
+	<resultMap id="appMap"
+		type="com.inforbus.gjk.pro.api.entity.App">
+		<id property="id" column="id" />
+		<result property="filePath" column="file_path" />
+		<result property="fileName" column="file_name" />
+		<result property="processId" column="process_id" />
+		<result property="backPath" column="back_path" />
+		<result property="partnamePlatform" column="partname_platform" />
+		<result property="sysconfigFilePath"
+			column="sysconfig_file_path" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="appState" column="app_state" />
+		<result property="localDeploymentPlan"
+			column="local_deployment_plan" />
+		<result property="description" column="description" />
+		<result property="delFlag" column="del_flag" />
+	</resultMap>
+
+	<resultMap type="com.inforbus.gjk.pro.api.entity.ProjectFile"
+		id="projectFileMap">
+		<id property="id" column="id" />
+		<result property="projectId" column="project_id" />
+		<result property="fileName" column="file_name" />
+		<result property="fileType" column="file_type" />
+		<result property="filePath" column="file_path" />
+		<result property="parentId" column="parent_id" />
+		<result property="softwareId" column="software_id" />
+		<result property="bspId" column="bsp_id" />
+	</resultMap>
+
+	<resultMap id="projectMap"
+		type="com.inforbus.gjk.pro.api.entity.Project">
+		<id property="id" column="id" />
+		<result property="projectName" column="project_name" />
+		<result property="userId" column="user_id" />
+		<result property="projectImg" column="project_img" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="defaultSoftwareId"
+			column="default_software_id" />
+		<result property="defaultBspId" column="default_bsp_id" />
+		<result property="description" column="description" />
+		<result property="delFlag" column="del_flag" />
+	</resultMap>
+
+	<sql id="appSql">
+		id,
+		file_path,
+		file_name,
+		process_id,
+		back_path,
+		partname_platform,
+		sysconfig_file_path,
+		create_time,
+		update_time,
+		app_state,
+		local_deployment_plan,
+		description,
+		del_flag
+	</sql>
+
+	<sql id="saveAppSql">
+		id,
+		file_path,
+		file_name,
+		process_id,
+		back_path,
+		partname_platform,
+		sysconfig_file_path,
+		local_deployment_plan
+	</sql>
+
+	<!--app简单分页查询 -->
+	<select id="getAppPage" resultMap="appMap">
+		SELECT
+		<include refid="appSql" />
+		FROM gjk_app
+		<where>
+			<if test="app.id != null and app.id.trim() != ''">
+				AND id = #{app.id}
+			</if>
+			<if test="app.filePath != null and app.filePath.trim() != ''">
+				AND file_path = #{app.filePath}
+			</if>
+			<if test="app.fileName != null and app.fileName.trim() != ''">
+				AND file_name = #{app.fileName}
+			</if>
+			<if test="app.processId != null and app.processId.trim() != ''">
+				AND process_id = #{app.processId}
+			</if>
+			<if test="app.backPath != null and app.backPath.trim() != ''">
+				AND back_path = #{app.backPath}
+			</if>
+			<if test="app.createTime != null and app.createTime.trim() != ''">
+				AND create_time = #{app.createTime}
+			</if>
+			<if test="app.updateTime != null and app.updateTime.trim() != ''">
+				AND update_time = #{app.updateTime}
+			</if>
+			<if test="app.appState != null and app.appState.trim() != ''">
+				AND app_state = #{app.appState}
+			</if>
+			<if
+				test="app.description != null and app.description.trim() != ''">
+				AND description = #{app.description}
+			</if>
+			<if test="app.delFlag != null and app.delFlag.trim() != ''">
+				AND del_flag = #{app.delFlag}
+			</if>
+		</where>
+	</select>
+
+	<!-- 保存app -->
+	<insert id="saveApp"
+		parameterType="com.inforbus.gjk.pro.api.entity.App">
+		INSERT INTO gjk_app (
+		<include refid="saveAppSql" />
+		) VALUES (
+		#{app.id},
+		#{app.filePath},
+		#{app.fileName},
+		#{app.processId},
+		#{app.backPath},
+		#{app.partnamePlatform},
+		#{app.sysconfigFilePath},
+		#{app.localDeploymentPlan})
+	</insert>
+
+	<!-- 获取所有app组件 -->
+	<select id="getAllApp" resultMap="appMap">
+		SELECT * FROM gjk_app
+	</select>
+
+	<select id="getAppImgFile"
+		resultType="com.inforbus.gjk.pro.api.entity.App">
+		SELECT back_path FROM
+		gjk_app
+		WHERE id=#{id}
+	</select>
+
+	<!-- 根据app组件名称，模糊查询组件 -->
+	<select id="getAppVosPage" resultMap="appMap">
+		SELECT
+		r.*
+		FROM
+		gjk_app AS r
+		<where>
+			<if test="fileName != null and fileName != ''">
+				and r.file_name LIKE CONCAT('%',#{fileName},'%')
+			</if>
+			and r.del_flag = '0'
+		</where>
+		ORDER BY r.create_time DESC
+	</select>
+
+	<select id="getAppByProcessId" resultMap="appMap">
+		SELECT
+		<include refid="appSql" />
+		FROM gjk_app
+		<where>
+			process_id = #{processId}
+		</where>
+	</select>
+
+	<!-- 根据appid修改app的运行状态 -->
+	<update id="editAppState">
+		UPDATE `gjk_app` SET `app_state` =
+		#{appState} WHERE
+		`id` = #{id}
+	</update>
+
+	<!-- 通过项目id拿到流程 -->
+	<select id="getProcessByProjectId" resultMap="projectFileMap">
+		SELECT p.* FROM
+		gjk_project_detail p WHERE p.`file_type` = '11' AND p.`project_id` =
+		(SELECT pd.project_id FROM gjk_project_detail pd WHERE
+		pd.id=#{id})
+	</select>
+
+	<!-- 通过项目id拿到当前项目信息 -->
+	<select id="getprojectByProjectId" resultMap="projectMap">
+		SELECT pd.* FROM
+		gjk_project pd WHERE pd.id=#{id}
+	</select>
+
+</mapper>

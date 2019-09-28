@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ~ Copyright (c) 2018-2025, inforbus All rights reserved. ~ ~ Redistribution 
+	and use in source and binary forms, with or without ~ modification, are permitted 
+	provided that the following conditions are met: ~ ~ Redistributions of source 
+	code must retain the above copyright notice, ~ this list of conditions and 
+	the following disclaimer. ~ Redistributions in binary form must reproduce 
+	the above copyright ~ notice, this list of conditions and the following disclaimer 
+	in the ~ documentation and/or other materials provided with the distribution. 
+	~ Neither the name of the inforbus.com developer nor the names of its ~ contributors 
+	may be used to endorse or promote products derived from ~ this software without 
+	specific prior written permission. ~ Author: inforbus -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inforbus.gjk.libs.mapper.ThreeLibsMapper">
+
+	<resultMap id="componentDetailMap"
+		type="com.inforbus.gjk.libs.api.entity.ThreeLibs">
+		<id property="id" column="id" />
+		<result property="compId" column="comp_id" />
+		<result property="fileName" column="file_name" />
+		<result property="fileType" column="file_type" />
+		<result property="filePath" column="file_path" />
+		<result property="version" column="version" />
+		<result property="paraentId" column="paraent_id" />
+		<result property="paraentIds" column="paraent_ids" />
+		<result property="libsId" column="libs_id" />
+	</resultMap>
+	
+	<resultMap id="softwareMap"
+		type="com.inforbus.gjk.libs.api.entity.Software">
+		<id property="id" column="id" />
+		<result property="softwareName" column="software_name" />
+		<result property="version" column="version" />
+		<result property="filePath" column="file_path" />
+		<result property="approvalFlag" column="approval_flag" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="description" column="description" />
+		<result property="delFlag" column="del_flag" />
+	</resultMap>
+	
+	<resultMap id="softwareDetailMap"
+		type="com.inforbus.gjk.libs.api.entity.SoftwareDetail">
+		<id property="software_id" column="softwareId" />
+		<result property="platformId" column="platformId" />
+	</resultMap>
+	
+	<resultMap id="softwareFileMap"
+		type="com.inforbus.gjk.libs.api.entity.SoftwareFile">
+		<id property="software_id" column="softwareId" />
+		<result property="file_name" column="fileName" />
+		<result property="file_path" column="filePath" />
+	</resultMap>
+
+	<sql id="compDetailSql">
+		id,
+		comp_id,
+		file_name,
+		file_type,
+		file_path,
+		version,
+		paraent_id,
+		paraent_ids,
+		libs_id
+	</sql>
+
+	<!-- 通过libs_id获取算法属于哪个算法类下 -->
+	<select id="getAlgorithmByLibsId" resultMap="componentDetailMap">
+		SELECT b.* FROM
+		gjk_algorithm a LEFT JOIN gjk_component_detail b ON a.`algorithm_id` =
+		b.`libs_id`
+		WHERE a.`del_flag` = "0" AND b.`id` is not null
+	</select>
+
+	<!-- 获取算法库下面的文件 -->
+	<select id="getAlgorithmFile" resultMap="componentDetailMap">
+		SELECT
+		c.*
+		FROM
+		gjk_component_detail c
+		WHERE c.`paraent_id` IN
+		(SELECT b.`id` FROM
+		gjk_algorithm a LEFT JOIN gjk_component_detail b ON
+		a.`algorithm_id` =
+		b.`libs_id` WHERE a.`del_flag` = "0" AND b.`id` is
+		not null)
+	</select>
+
+	<!-- 通过libs_id获取平台属于哪个算法类下 -->
+	<select id="getPlatformByLibsId" resultMap="componentDetailMap">
+		SELECT b.* FROM
+		gjk_platform a LEFT JOIN gjk_component_detail b ON a.`platform_id` =
+		b.`libs_id`
+		WHERE a.`del_flag` = "0" AND b.`id` is not null
+	</select>
+
+	<!-- 获取平台库下面的文件 -->
+	<select id="getPlatformFile" resultMap="componentDetailMap">
+		SELECT
+		c.*
+		FROM
+		gjk_component_detail c
+		WHERE c.`paraent_id` IN
+		(SELECT b.`id` FROM
+		gjk_platform a LEFT JOIN gjk_component_detail b ON
+		a.`platform_id` =
+		b.`libs_id` WHERE a.`del_flag` = "0" AND b.`id` is
+		not null)
+	</select>
+
+	<!-- 通过libs_id获取测试属于哪个算法类下 -->
+	<select id="getTestByLibsId" resultMap="componentDetailMap">
+		SELECT b.* FROM
+		gjk_test a
+		LEFT JOIN gjk_component_detail b ON a.`test_id` = b.`libs_id`
+		WHERE
+		a.`del_flag` = "0" AND b.`id` is not null
+	</select>
+
+	<!-- 获取测试库下面的文件 -->
+	<select id="getTestFile" resultMap="componentDetailMap">
+		SELECT
+		c.*
+		FROM
+		gjk_component_detail c
+		WHERE c.`paraent_id` IN
+		(SELECT b.`id` FROM
+		gjk_test a LEFT JOIN gjk_component_detail b ON
+		a.`test_id` =
+		b.`libs_id` WHERE a.`del_flag` = "0" AND b.`id` is not
+		null)
+	</select>
+
+	<!-- 根据树的节点id获取当条数据，得到filePath -->
+	<select id="getAlgorithmFilePath" resultMap="componentDetailMap">
+		SELECT *
+		FROM
+		gjk_component_detail
+		WHERE id= #{id}
+	</select>
+	
+	<!-- 获取软件框架库的主表信息 -->
+	<select id="getSoftware" resultMap="softwareMap">
+		SELECT * FROM gjk_software
+		s WHERE s.id IN (SELECT b.software_id FROM gjk_software_detail b)
+	</select>
+	
+	<!-- 获取软件框架库平台id的副表信息 -->
+	<select id="getSoftwarePlatform" resultMap="softwareMap">
+		SELECT * FROM gjk_software_detail
+		s WHERE s.software_id IN (SELECT b.id FROM gjk_software b)
+	</select>
+	
+	<!-- 获取软件框架库文件夹的副表信息 -->
+	<select id="getSoftwareFile" resultMap="softwareMap">
+		SELECT * FROM gjk_software_file
+		s WHERE s.software_id IN (SELECT b.id FROM gjk_software b)
+	</select>
+</mapper>
