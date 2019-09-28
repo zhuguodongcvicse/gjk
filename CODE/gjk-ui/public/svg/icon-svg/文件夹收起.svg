@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="11px" viewBox="0 0 12 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 57 (83077) - https://sketch.com -->
+    <title>文件夹</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="0 0 13 0 13 11 0 11"></polygon>
+        <polygon id="path-3" points="-1.74490135e-16 0 12 0 12 11 -1.74490135e-16 11"></polygon>
+    </defs>
+    <g id="14所-信息构建库" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="菜单栏左侧切图" transform="translate(-320.000000, -573.000000)">
+            <g id="菜单" transform="translate(286.000000, 135.000000)">
+                <g id="分组-15-copy-2备份" transform="translate(18.000000, 432.000000)">
+                    <g id="分组-16">
+                        <g id="文件夹" transform="translate(16.000000, 6.000000)">
+                            <mask id="mask-2" fill="white">
+                                <use xlink:href="#path-1"></use>
+                            </mask>
+                            <g id="Clip-2"></g>
+                            <g id="编组" mask="url(#mask-2)">
+                                <mask id="mask-4" fill="white">
+                                    <use xlink:href="#path-3"></use>
+                                </mask>
+                                <g id="Clip-2"></g>
+                                <path d="M0.50004537,3.50003375 C0.200008249,3.50003375 0,3.70004275 0,4.00003375 L0,10.000054 C0,10.6000315 0.400016498,11 0.900061868,11 L11.1000371,11 C11.5999835,11 12,10.6000315 12,10.000054 L12,4.00003375 C12,3.70004275 11.7999918,3.50003375 11.5000536,3.50003375 L0.50004537,3.50003375 Z M0.900061868,0 C0.400016498,0 0,0.400017998 0,1 L0,2.50003825 L12,2.50003825 L12,2 C12,1.4000135 11.5999835,1 11.1000371,1 L4.19997525,1 L4.0000165,0.5 C3.80000825,0.200008999 3.50002062,0 3.1999835,0 L0.900061868,0 Z" id="Fill-1" fill="#436D9F" mask="url(#mask-4)"></path>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

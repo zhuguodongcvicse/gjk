@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ~ Copyright (c) 2018-2025, inforbus All rights reserved. ~ ~ Redistribution 
+	and use in source and binary forms, with or without ~ modification, are permitted 
+	provided that the following conditions are met: ~ ~ Redistributions of source 
+	code must retain the above copyright notice, ~ this list of conditions and 
+	the following disclaimer. ~ Redistributions in binary form must reproduce 
+	the above copyright ~ notice, this list of conditions and the following disclaimer 
+	in the ~ documentation and/or other materials provided with the distribution. 
+	~ Neither the name of the inforbus.com developer nor the names of its ~ contributors 
+	may be used to endorse or promote products derived from ~ this BSP without 
+	specific prior written permission. ~ Author: inforbus -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inforbus.gjk.libs.mapper.BSPMapper">
+
+	<resultMap id="BSPMap"
+		type="com.inforbus.gjk.libs.api.entity.BSP">
+		<id property="id" column="id" />
+		<result property="bspName" column="bsp_name" />
+		<result property="version" column="version" />
+		<result property="filePath" column="file_path" />
+		<result property="applyState" column="apply_state" />
+		<result property="applyDesc" column="apply_desc" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="description" column="description" />
+		<result property="delFlag" column="del_flag" />
+	</resultMap>
+
+	<sql id="bspSql">
+		id,
+		bsp_name,
+		version,
+		file_path,
+		apply_state,
+		apply_desc,
+		create_time,
+		update_time,
+		description,
+		del_flag
+	</sql>
+
+	<sql id="saveBSPSql">
+		id,
+		bsp_name,
+		version,
+		file_path,
+		apply_state,
+		apply_desc,
+		create_time,
+		update_time,
+		description,
+		del_flag
+	</sql>
+
+	<sql id="saveBSPDetailSql">
+		platform_id,
+		bsp_id
+	</sql>
+
+	<sql id="saveBSPFileSql">
+		file_name,
+		bsp_id,
+		file_path
+	</sql>
+
+	<!--BSP简单分页查询 -->
+	<select id="getBSPPage" resultMap="BSPMap">
+		SELECT
+		<include refid="bspSql" />
+		FROM
+		gjk_bsp
+		<where>
+			<if test="bsp.id != null and bsp.id.trim() != ''">
+				AND id = #{bsp.id}
+			</if>
+			<if test="bsp.bspName != null and bsp.bspName.trim() != ''">
+				AND bsp_name = #{bsp.bspName}
+			</if>
+			<if test="bsp.version != null and bsp.version.trim() != ''">
+				AND version = #{bsp.version}
+			</if>
+			<if test="bsp.filePath != null and bsp.filePath.trim() != ''">
+				AND file_path = #{bsp.filePath}
+			</if>
+			<if test="bsp.applyState != null and bsp.applyState.trim() != ''">
+				AND apply_state = #{bsp.applyState}
+			</if>
+			<if test="bsp.applyDesc != null and bsp.applyDesc.trim() != ''">
+				AND apply_desc = #{bsp.applyDesc}
+			</if>
+			<if test="bsp.createTime != null and bsp.createTime.trim() != ''">
+				AND create_time = #{bsp.createTime}
+			</if>
+			<if test="bsp.updateTime != null and bsp.updateTime.trim() != ''">
+				AND update_time = #{bsp.updateTime}
+			</if>
+			<if
+				test="bsp.description != null and bsp.description.trim() != ''">
+				AND description = #{bsp.description}
+			</if>
+			and del_flag = '0'
+		</where>
+	</select>
+
+	<!-- 保存bsp信息 -->
+	<insert id="saveBSP"
+		parameterType="com.inforbus.gjk.libs.api.entity.BSP">
+		INSERT INTO gjk_bsp (
+		<include refid="saveBSPSql" />
+		) VALUES (#{bs.id},
+		#{bs.bspName},
+		#{bs.version},
+		#{bs.filePath},
+		#{bs.applyState},
+		#{bs.applyDesc},
+		#{bs.createTime},
+		#{bs.updateTime},
+		#{bs.description},
+		#{bs.delFlag}
+		)
+	</insert>
+
+	<!-- 保存软件框架子表信息 -->
+	<insert id="saveBSPDetail"
+		parameterType="com.inforbus.gjk.libs.api.entity.BSPDetail">
+		INSERT INTO gjk_bsp_detail (
+		<include refid="saveBSPDetailSql" />
+		) VALUES (#{bspDetail.platformId},
+		#{bspDetail.bspId})
+	</insert>
+
+	<!-- 保存软件框架文件路径子表信息 -->
+	<insert id="saveBSPFile"
+		parameterType="com.inforbus.gjk.libs.api.entity.BSPFile">
+		INSERT INTO gjk_bsp_file (
+		<include refid="saveBSPFileSql" />
+		) VALUES (#{bspFile.fileName},
+		#{bspFile.bspId},
+		#{bspFile.filePath})
+	</insert>
+
+	<!-- 对版本进行赋值 -->
+	<select id="setVersionSize" resultMap="BSPMap">
+		SELECT * FROM gjk_bsp
+		b
+		ORDER BY b.`version` DESC LIMIT 1
+	</select>
+	
+	<!-- 根据id级联删除bsp文件表 -->
+	<delete id="removeBspFile">
+		DELETE FROM gjk_bsp_file WHERE bsp_id = #{bspId}
+	</delete>
+	
+	<!-- 根据id级联删除bsp详细表 -->
+	<delete id="removeBspDetail">
+		DELETE FROM gjk_bsp_detail WHERE bsp_id = #{bspId}
+	</delete>
+
+</mapper>

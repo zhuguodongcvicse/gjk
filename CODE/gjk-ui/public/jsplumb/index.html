@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="../jsplumb/css/font-awesome.min.css" />
+	<link rel="stylesheet" type="text/css" href="../jsplumb/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="../jsplumb/css/jquery-ui.min.css" />
+	<link rel="stylesheet" type="text/css" href="../jsplumb/css/index.css">
+	<link rel="stylesheet" type="text/css" href="../jsplumb/css/bootstrap-select.min.css">
+</head>
+
+<body onselectstart = "return false">
+	<!-- <div id="app"> -->
+		<div class="container-fluid public_jsplumb_index_14s">
+			<div class="row">
+				<div id="side-buttons" class="div_left min-height">
+
+					<div id="gjk" class="public_jsplumb_left_14s" >
+						<label>构件列表</label><br/>
+
+						<!-- <div id="accordion">
+							<h3>部分 1</h3>
+							<div>
+							 
+							</div>
+							<h3>部分 2</h3>
+							<div>
+							 
+							</div>
+							<h3>部分 3</h3>
+							<div>
+							 
+							</div>
+							<h3>部分 4</h3>
+							<div>
+							
+							</div>
+						  </div> -->
+
+						  <!-- <div class="panel-group" id="accordion">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4 class="panel-title" data-target="#collapseOne" data-toggle="collapse">
+					第 1 部分
+			</h4>
+		</div>
+		<div id="collapseOne" class="panel-collapse collapse in">
+			<div class="panel-body">
+				Nihil anim keffiyeh helvetica, craft beer labore wes anderson 
+				cred nesciunt sapiente ea proident. Ad vegan excepteur butcher 
+				vice lomo.
+			</div>
+		</div>
+	</div>
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+				<a data-toggle="collapse" data-parent="#accordion" 
+				   href="#collapseTwo">
+					第 2 部分
+				</a>
+			</h4>
+		</div>
+		<div id="collapseTwo" class="panel-collapse collapse">
+			<div class="panel-body">
+				Nihil anim keffiyeh helvetica, craft beer labore wes anderson 
+				cred nesciunt sapiente ea proident. Ad vegan excepteur butcher 
+				vice lomo.
+			</div>
+		</div>
+	</div>
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+				<a data-toggle="collapse" data-parent="#accordion" 
+				   href="#collapseThree">
+					第 3 部分
+				</a>
+			</h4>
+		</div>
+		<div id="collapseThree" class="panel-collapse collapse">
+			<div class="panel-body">
+				Nihil anim keffiyeh helvetica, craft beer labore wes anderson 
+				cred nesciunt sapiente ea proident. Ad vegan excepteur butcher 
+				vice lomo.
+			</div>
+		</div>
+	</div>
+</div> -->
+						
+					</div>
+				</div>
+				<!--中间画布-->
+				<div>
+					<div class="div_right min-height public_jsplumb_right1_14s" id="drop-bg"></div>
+					<div id="selectionRect" class="public_jsplumb_right2_14s"></div>
+				</div>
+				
+				<div class = "border">
+						<div class="line"></div>
+				</div>
+				<!--属性栏-->
+				<!-- <div class="col-md-2 bg-success min-height" id="drop-bg1">
+					<div style="display: none;" id="propertybar">
+						<ul id="myTab" class="nav nav-tabs">
+							<li class="active">
+								<a href="#basic" data-toggle="tab">基本属性</a>
+							</li>
+							<li>
+								<a href="#level" data-toggle="tab">层级属性</a>
+							</li>
+							<li>
+								<a href="#performance" data-toggle="tab">性能属性</a>
+							</li>
+							<li>
+								<a href="#resource" data-toggle="tab">资源属性</a>
+							</li>
+						</ul>
+
+						<div id="myTabContent" class="tab-content">
+							基本属性-->
+				<!-- <div class="tab-pane fade in active" id="basic">
+								<div class="input-group">
+									<span class="input-group-addon">构件名称</span>
+									<input type="text" class="form-control" readonly="readonly">
+								</div>
+								<div class="input-group">
+									<span class="input-group-addon">构件编号</span>
+									<input type="text" class="form-control" readonly="readonly">
+								</div>
+								<div class="input-group">
+									<span class="input-group-addon">函数名称</span>
+									<input type="text" class="form-control" readonly="readonly">
+								</div>
+								<div class="input-group">
+									<span class="input-group-addon">函数路径</span>
+									<input type="text" class="form-control" readonly="readonly">
+								</div>
+								<div class="input-group">
+									<span class="input-group-addon">测试文件</span>
+									<input type="text" class="form-control" readonly="readonly">
+								</div>
+								<div class="input-group">
+									<span class="input-group-addon">系数文件</span>
+									<input type="text" class="form-control" readonly="readonly">
+								</div>
+								<div id="basic_Inputtab"></div>
+								<div id="basic_Outtab"></div>
+							</div> -->
+				<!--层级属性-->
+				<!-- <div class="tab-pane fade" id="level">
+
+								<div class="input-group">
+									<span class="input-group-addon">所属部件</span>
+									<input type="text" class="form-control" readonly="readonly">
+								</div>
+
+								<h4><span class="label label-info">部署配置</span></h4>
+
+								<div class="input-group">
+									<span class="input-group-addon">属性1</span>
+									<select class="show-tick form-control" id="Attributes1">
+
+									</select>
+								</div>
+								</br>
+								<div class="input-group">
+									<span class="input-group-addon">属性2</span>
+									<input type="text" class="form-control" readonly="readonly">
+								</div>
+								</br>
+								<div class="input-group">
+									<span class="input-group-addon">属性3</span>
+									<select class="show-tick form-control" id="Attributes3">
+
+									</select>
+								</div>
+							</div> -->
+				<!--性能属性-->
+				<!-- <div class="tab-pane fade " id="performance">
+
+								<input id="t_file" type="file" onchange="f_file.value = this.value" style="display:none">
+								<input type="button" class="btn btn-default" value="选择文件" onclick="t_file.click()" />
+								<input type="text" id="f_file" class="form-control" readonly="readonly" />
+
+							</div> -->
+				<!--资源属性-->
+				<!-- <div class="tab-pane fade" id="resource">
+								<div class="input-group">
+									<span class="input-group-addon">属性1</span>
+									<input type="text" class="form-control">
+								</div>
+								</br>
+								<div class="input-group">
+									<span class="input-group-addon">属性2</span>
+									<input type="text" class="form-control">
+								</div>
+								</br>
+								<div class="input-group">
+									<span class="input-group-addon">属性3</span>
+									<input type="text" class="form-control">
+								</div>
+
+							</div> -->
+			</div>
+
+		</div>
+	</div>
+	</div>
+	</div>
+	<!-- <script>
+		function queryServer(){
+	$( "#accordion" ).accordion({
+	collapsible: true
+});
+}
+	</script> -->
+	<!-- </div> -->
+	<script src="../jsplumb/js/jquery.min.js"></script>
+	<script src="../jsplumb/js/jquery.jsPlumb.min.js"></script>
+	<script src="../jsplumb/js/jquery-ui.min.js"></script>
+	<script src="../jsplumb/js/mustache.min.js"></script>
+	<script src="../jsplumb/js/uuid.min.js"></script>
+	<script src="../jsplumb/js/graphlib.min.js"></script>
+	<script src="../jsplumb/js/data.js"></script>
+	<script src="../jsplumb/js/config.js"></script>
+	<script src="../jsplumb/js/api.js"></script>
+	<script src="../jsplumb/js/index.js"></script>
+	<script src="../jsplumb/js/bootstarp.min.js"></script>
+	<script src="../jsplumb/js/bootstrap-select.min.js"></script>
+</body>
+</html>

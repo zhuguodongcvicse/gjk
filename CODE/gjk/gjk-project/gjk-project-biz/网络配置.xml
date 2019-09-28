@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <network_in>
+        <funcConfig name="121"  cmpName="">
+            <ip name="533"/>
+            <port name="dsef"/>
+            <protocol name="0"/>
+        </funcConfig>
+		 <funcConfig name="wer"  cmpName="">
+            <ip name="5ew"/>
+            <port name="drrewwdf"/>
+            <protocol name="1"/>
+        </funcConfig>
+    </network_in>
+
+
+    <network_out>
+        <funcConfig name="ertertey"  cmpName="">
+            <ip name="062645"/>
+            <port name="89"/>
+            <protocol name="0"/>
+        </funcConfig>
+		<funcConfig name=""  cmpName="">
+            <ip name="3821"/>
+            <port name="75"/>
+            <protocol name="01"/>
+        </funcConfig>
+		<funcConfig name=""  cmpName="">
+            <ip name="kj645"/>
+            <port name="7poi"/>
+            <protocol name="002"/>
+        </funcConfig>
+    </network_out>
+</root>

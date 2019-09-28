@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<root>
+<subscribe>
+<topic name="6">
+<startCmp name="start"/>
+<endCmp name="0"/>
+<dataStream>
+<funcName name="选项1"/>
+<funcInterface name="选项2"/>
+</dataStream>
+<dataStream>
+<funcName name="选项2"/>
+<funcInterface name="选项2"/>
+</dataStream>
+<dataStream>
+<funcName name="选项1"/>
+<funcInterface name="选项1"/>
+</dataStream>
+</topic>
+<topic name="topic">
+<startCmp name="startCmp"/>
+<endCmp name="qqqq"/>
+<dataStream>
+<funcName name="wwww"/>
+<funcInterface name="rrrr"/>
+</dataStream>
+</topic>
+</subscribe>
+
+
+<publish>
+<topic name="pub">
+<startCmp name="end"/>
+<endCmp  name="1"/>
+<dataStream>
+<funcName name="选项1"/>
+<funcInterface name="选项2"/>
+</dataStream>
+<dataStream>
+<funcName name="选项2"/>
+<funcInterface name="选项2"/>
+</dataStream>
+<dataStream>
+<funcName name="选项1"/>
+<funcInterface name="abc"/>
+</dataStream>
+</topic>
+<topic name="pub">
+<startCmp name="end"/>
+<endCmp  name="2"/>
+<dataStream>
+<funcName name="cbs"/>
+<funcInterface name="rvj"/>
+</dataStream>
+<dataStream>
+<funcName name="选项1"/>
+<funcInterface name="9"/>
+</dataStream>
+</topic>
+</publish>
+</root>

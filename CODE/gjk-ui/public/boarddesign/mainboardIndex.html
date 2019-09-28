@@ -1,0 +1,430 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width">
+	<link rel="shortcut icon" href="/favicon.ico">
+	<link rel=stylesheet href=libs/bootstrap/css/bootstrap.css> <link rel=stylesheet href=libs/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css>
+	 <!-- build:css libs/graph.editor/graph.editor.css -->
+	<link rel="stylesheet" href="src/css/graph.editor.css" />
+	<!-- endbuild -->
+	<link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body class="layout">
+	<div id="editor" class="graph-editor public_boarddesign_mainboardindex_14s" data-options="region:'center'"></div>
+	<!-- calculateBoard -->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog mainboardindex_modal_14s">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+						&times;
+					</button>
+					<h4 class="modal-title" id="myModalLabel">
+						交换芯片
+					</h4>
+				</div>
+				<div class="modal-body">
+					<!-- <div class="form-group" style="height:20%">
+						<label class="col-sm-3 control-label">CPU：</label>
+						<div class="col-sm-8">
+							<select class="form-control" id="selectExchangeCpu">
+								<option>请选择CPU</option>
+							</select>
+						</div>
+					</div> -->
+					<div class="form-group">
+						<label class="col-sm-3 control-label">选择接口：</label>
+						<div class="col-sm-9">
+							<select class="form-control form-select_14s" id="selectExternalInf">
+								<option>请选择接口</option>
+							</select>
+							<input type="text" class="form-input_14s" id="vagueSelect" oninput="vagueSelectInfs(event)" onporpertychange="vagueSelectInfs(event)">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-3 control-label">linkType：</label>
+						<div class="col-sm-9">
+							<select class="form-control" id="selectlinkType">
+								<option>0</option>
+								<option>1</option>
+								<option>2</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-3 control-label">io Type：</label>
+						<div class="col-sm-9">
+							<select class="form-control" id="selectIoType">
+								<option>2</option>
+								<option>0</option>
+								<option>1</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+
+					<button type="button" class="btn btn-primary" onclick="initTableData();">
+						完成
+					</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal" onclick="cleanData1();">关闭
+					</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+
+	<!-- FpgaBoard -->
+	<div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModal2Label" aria-hidden="true">
+		<div class="modal-dialog mainboardindex_modal_14s">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+						&times;
+					</button>
+					<h4 class="modal-title" id="myModal2Label">
+						内部互联
+					</h4>
+				</div>
+				<div class="modal-body">
+					<!-- <div class="form-group" style="height:10%">
+					<label class="col-sm-5 control-label">交换芯片：</label>					
+				</div> -->
+					<div class="form-group">
+						<label class="col-sm-3 control-label">StartCpu：</label>
+						<div class="col-sm-9">
+							<select class="form-control" id="selectStartCpu">
+								<option>请选择StartCpu</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-3 control-label">startInf：</label>
+						<div class="col-sm-9">
+							<select class="form-control" id="selectStartInf">
+								<option>请选择startInf</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-3 control-label">EndCpu：</label>
+						<div class="col-sm-9">
+							<select class="form-control" id="selectEndCpu">
+								<option>请选择EndCpu</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-3 control-label">endInf：</label>
+						<div class="col-sm-9">
+							<select class="form-control" id="selectEndInf">
+								<option>请选择endInf</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+
+					<button type="button" class="btn btn-primary" onclick="initTableData2();">
+						完成
+					</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+					</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+
+	<script src="scripts/qunee-min.js"></script>
+	<!-- build:js libs/js.js -->
+	<script src="libs/jquery.min.js"></script>
+	<script src="libs/bootstrap/js/bootstrap.min.js"></script>
+	<script src="libs/layout.border.js"></script>
+	<script src="libs/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+	<!-- endbuild -->
+	<!-- build:js libs/graph.editor/graph.editor.js -->
+	<script src="src/common/i18n.js"></script>
+	<script src="src/common/CopyPaste.js"></script>
+	<script src="src/common/DomSupport.js"></script>
+	<script src="src/common/DragSupport.js"></script>
+	<script src="src/common/FileSupport.js"></script>
+	<script src="src/common/JSONSerializer.js"></script>
+	<script src="src/common/ExportPane.js"></script>
+	<script src="src/common/Toolbar.js"></script>
+	<script src="src/common/ToolBox.js"></script>
+	<script src="src/common/PopupMenu.js"></script>
+	<script src="src/common/PropertyPane.js"></script>
+	<script src="src/common/GridBackground.js"></script>
+	<!-- <script src="src/graph.editor.js"></script> -->
+	<script src="graph.editor/graph.editor.js"></script>
+	<!-- endbuild -->
+	<script src="scripts/graphs.js"></script>
+	<script src="scripts/board.js"></script>
+    <script src="../util/mangUtils.js"></script>
+	<script type="text/javascript">
+		//模糊查询
+		function vagueSelectInfs() {
+			$("#selectExternalInf").empty();
+			var selectHtml1 = '';
+			for (const i in allInfList) {
+				if (allInfList[i].infName.indexOf(document.getElementById('vagueSelect').value) >= 0) {
+					if (allInfList[i].ifShowInSelect == 0) {
+						var sHtml = '<option>' + allInfList[i].infName + '</option>';
+						selectHtml1 = selectHtml1 + sHtml;
+					}
+				}
+			}
+			$("#selectExternalInf").html(selectHtml1);
+		}
+		function loadcalculateBoardDatas() {
+			//显示接口
+			$("#selectExternalInf").empty();
+			var selectHtml1 = '';
+			if (allInfList.length == 0) {
+				var sHtml = '<option>接口库中无接口</option>';
+				selectHtml1 = selectHtml1 + sHtml;
+			} else {
+				for (const i in allInfList) {
+					if (allInfList[i].ifShowInSelect == 0) {
+						var sHtml = '<option>' + allInfList[i].infName + '</option>';
+						selectHtml1 = selectHtml1 + sHtml;
+					}
+				}
+			}
+			$("#selectExternalInf").html(selectHtml1);
+
+			//linktype中英文映射
+			$("#selectlinkType").empty();
+			var selectHtmlLinkType = '';
+			for (const i in calculateBoardLinkType) {
+				var sHtml = '<option value="'+ calculateBoardLinkType[i].value +'">' + calculateBoardLinkType[i].label + '</option>';
+				selectHtmlLinkType = selectHtmlLinkType + sHtml;
+			}
+			$("#selectlinkType").html(selectHtmlLinkType);
+
+			//iotype中英文映射
+			$("#selectIoType").empty();
+			var selectHtmlIoType = '';
+			for (const i in calculateBoardIoType) {
+				var sHtml = '<option value="'+ calculateBoardIoType[i].value +'">' + calculateBoardIoType[i].label + '</option>';
+				selectHtmlIoType = selectHtmlIoType + sHtml;
+			}
+			$("#selectIoType").html(selectHtmlIoType);
+		}
+
+		function loadFpgaBoardDatas() {
+
+			//显示下拉的cpu
+			$("#selectStartCpu").empty();
+			var selectStartCpuHtml = '';
+			for (var i = 0; i < dragCpuList.length; i++) {
+				var sHtml = '<option value=' + dragCpuList[i].ID + '>' + dragCpuList[i].ID + '</option>';
+				selectStartCpuHtml = selectStartCpuHtml + sHtml;
+			}
+			$("#selectStartCpu").html(selectStartCpuHtml);
+
+			$("#selectEndCpu").empty();
+			var selectEndCpuHtml = '';
+			for (var i = 0; i < dragCpuList.length; i++) {
+				var sHtml = '<option value=' + dragCpuList[i].ID + '>' + dragCpuList[i].ID + '</option>';
+				selectEndCpuHtml = selectEndCpuHtml + sHtml;
+			}
+			$("#selectEndCpu").html(selectEndCpuHtml);
+
+			//显示下拉的接口
+			// if (selectInfCount != 0) {
+			if (dragCpuList[0].infOfChipList.length != 0) {
+				$("#selectStartInf").empty();
+				var selectStartInfHtml = '';
+				for (var j = 0; j < dragCpuList[0].infOfChipList.length; j++) {
+					if (dragCpuList[0].infOfChipList[j].ioType != 0) {
+						var sHtml = '<option>' + dragCpuList[0].infOfChipList[j].ID + '</option>';
+						selectStartInfHtml = selectStartInfHtml + sHtml;
+					}
+				}
+				$("#selectStartInf").html(selectStartInfHtml);
+
+				$("#selectEndInf").empty();
+				var selectEndInfHtml = '';
+				for (var j = 0; j < dragCpuList[0].infOfChipList.length; j++) {
+					if (dragCpuList[0].infOfChipList[j].ioType != 1) {
+						var sHtml = '<option>' + dragCpuList[0].infOfChipList[j].ID + '</option>';
+						selectEndInfHtml = selectEndInfHtml + sHtml;
+					}
+				}
+				$("#selectEndInf").html(selectEndInfHtml);
+			} else {
+				$("#selectStartInf").empty();
+				var sHtml = '<option>该芯片已无可选接口</option>';
+				var selectStartInfHtml = selectStartInfHtml + sHtml;
+				$("#selectStartInf").html(selectStartInfHtml);
+
+				$("#selectEndInf").empty();
+				var sHtml = '<option>该芯片已无可选接口</option>';
+				var selectEndInfHtml = selectEndInfHtml + sHtml;
+				$("#selectEndInf").html(selectEndInfHtml);
+			}
+
+			// }
+			//console.log("dragCpuList",JSON.parse(JSON.stringify(dragCpuList)))
+		}
+
+		var ExternalInfID = 0
+		function initTableData() {
+			chipList = JSON.parse(JSON.stringify(chipList))
+			var html1 = '<tr><td>' + $('#selectExternalInf option:selected').text() + '</td><td>' + $('#selectlinkType option:selected').text() + '</td><td>' + $('#selectIoType option:selected').text() + '</td><td><button type="button" class="btn btn-default" data-toggle="modal" onclick="deletecalculateBoardLink(this);">删除</button></td></tr>';
+			$('#tbody1').append(html1);
+			$("#myModal").modal('hide');
+			linkTypeList.push(document.getElementById('selectlinkType').value)
+			ioTypeList.push(document.getElementById('selectIoType').value)
+			for (const i in allInfList) {
+				if (document.getElementById('selectExternalInf').value == allInfList[i].infName) {
+					allInfList[i].ID = ExternalInfID++
+					showExternalInf.push(allInfList[i])
+					allInfList[i].ifShowInSelect = 1
+					// removeByValue(allInfList, allInfList[i])
+				}
+			}
+			console.log("showExternalInf", showExternalInf)
+			// console.log("dragCpuList",JSON.stringify(dragCpuList))
+			var infListTemp = []
+			for (const i in showExternalInf) {
+				if (infOfExchangeCpuArr.length == 0) {
+					infOfExchangeCpuArr.push([showExternalInf[i], linkTypeList[i], ioTypeList[i]])
+				} else {
+					//查看数组中是否包含某元素
+					/* let show = infOfExchangeCpuArr.find(show => {
+						return show == showExternalInf[i]
+					});
+					console.log("show",show) */
+					//将infOfExchangeCpuArr中的每个对象中的第一个元素，也就是接口放到临时数组中，方便判断
+					for (const j in infOfExchangeCpuArr) {
+						infListTemp.push(JSON.stringify(infOfExchangeCpuArr[j][0]))
+					}
+					// console.log("infListTemp",infListTemp)
+					//判断临时数组中是否有showExternalInf的对象
+					var flag = infListTemp.includes(JSON.stringify(showExternalInf[i]))
+					// console.log("flag",flag)
+					//如果没有，则将该对象加入到infOfExchangeCpuArr
+					if (flag == false) {
+						infOfExchangeCpuArr.push([showExternalInf[i], linkTypeList[i], ioTypeList[i]])
+					}
+				}
+			}
+			//深拷贝
+			infOfExchangeCpuArr = JSON.parse(JSON.stringify(infOfExchangeCpuArr))
+			infListTemp = []
+			cleanData1()
+			//console.log("dragCpuList",dragCpuList);
+			// console.log("infOfExchangeCpuArr",infOfExchangeCpuArr)
+			// console.log("chipList", JSON.parse(JSON.stringify(chipList)))
+		}
+		function initTableData2() {
+			if (document.getElementById('selectStartInf').value == '该芯片已无可选接口' || document.getElementById('selectEndInf').value == '该芯片已无可选接口') {
+				alert("配置的内部互联中存在无效接口，请重新配置")
+				return false
+			}
+			var html2 = '<tr><td>' + $('#selectStartCpu option:selected').text() + '</td><td>' + $('#selectStartInf option:selected').text() + '</td><td>' + $('#selectEndCpu option:selected').text() + '</td><td>' + $('#selectEndInf option:selected').text() + '</td><td><button type="button" class="btn btn-default" data-toggle="modal" onclick="deleteInternalLink(this);">删除</button></td></tr>';
+			$('#tbody2').append(html2);
+			$("#myModal2").modal('hide');
+			// console.log("dragCpuList", JSON.stringify(dragCpuList))
+			for (const i in dragCpuList) {
+				if (document.getElementById('selectStartCpu').value == dragCpuList[i].ID) {
+					for (const j in dragCpuList[i].infOfChipList) {
+						if (dragCpuList[i].infOfChipList.length != 0 && dragCpuList[i].infOfChipList[j].ID == document.getElementById('selectStartInf').value) {
+							showStartCpuList.push(dragCpuList[i])
+							showStartInfList.push(dragCpuList[i].infOfChipList[j])
+							removeByValue(dragCpuList[i].infOfChipList, dragCpuList[i].infOfChipList[j]);
+							// console.log("dragCpuList[i]11", JSON.stringify(dragCpuList[i]))
+						}
+					}
+				}
+				if (document.getElementById('selectEndCpu').value == dragCpuList[i].ID) {
+					for (const j in dragCpuList[i].infOfChipList) {
+						if (dragCpuList[i].infOfChipList.length != 0 && dragCpuList[i].infOfChipList[j].ID == document.getElementById('selectEndInf').value) {
+							showEndCpuList.push(dragCpuList[i])
+							showEndInfList.push(dragCpuList[i].infOfChipList[j])
+							removeByValue(dragCpuList[i].infOfChipList, dragCpuList[i].infOfChipList[j]);
+							// console.log("dragCpuList[i]22", JSON.stringify(dragCpuList[i]))
+						}
+					}
+				}
+			}
+			dragCpuList = JSON.parse(JSON.stringify(dragCpuList))
+			//console.log("dragCpuList2", JSON.parse(JSON.stringify(dragCpuList)))
+			StartInfOfChip.length = 0
+			for (const i in dragCpuList) {
+				if (dragCpuList[i].infOfChipList.length != 0) {
+					StartInfOfChip = StartInfOfChip.concat(dragCpuList[i].infOfChipList)
+				}
+			}
+			//console.log("dragdragdrag", JSON.parse(JSON.stringify(dragCpuList)))
+			selectInfCount++
+			//console.log("StartInfOfChip2", JSON.parse(JSON.stringify(StartInfOfChip)))
+		}
+		function deletecalculateBoardLink(obj) {
+			// console.log("obj",obj.parentNode)
+			var tr = this.getRowObj(obj);
+			// console.log("tr",tr.children[0].innerText)
+			if (tr != null) {
+				tr.parentNode.removeChild(tr);
+				for (const i in showExternalInf) {
+					if (showExternalInf[i].infName == tr.children[0].innerText) {
+						removeByValue(infOfExchangeCpuArr, infOfExchangeCpuArr[i])
+						removeByValue(showExternalInf, showExternalInf[i])
+						removeByValue(linkTypeList, linkTypeList[i])
+						removeByValue(ioTypeList, ioTypeList[i])
+						for (const j in allInfList) {
+							if (allInfList[j].infName == tr.children[0].innerText) {
+								allInfList[j].ifShowInSelect = 0
+							}
+						}
+					}
+				}
+
+			} else {
+				throw new Error("the given object is not contained by the table");
+			}
+		}
+		function deleteInternalLink(obj) {
+			// console.log("obj",obj.parentNode)
+			var tr = this.getRowObj(obj);
+			// console.log("tr.children[0].innerText",tr.children[0].innerText)
+			// console.log("tr.children",tr.children)
+			// console.log("tr",tr)
+			if (tr != null) {
+				tr.parentNode.removeChild(tr);
+				for (const i in showStartInfList) {
+					if (showStartCpuList[i].ID == tr.children[0].innerText &&
+						showStartInfList[i].ID == tr.children[1].innerText &&
+						showEndCpuList[i].ID == tr.children[2].innerText &&
+						showEndInfList[i].ID == tr.children[3].innerText) {
+						for (const j in dragCpuList) {
+							if (dragCpuList[j].uniqueId == showStartCpuList[i].uniqueId) {
+								dragCpuList[j].infOfChipList.push(showStartInfList[i])
+							}
+							if (dragCpuList[j].uniqueId == showEndCpuList[i].uniqueId) {
+								dragCpuList[j].infOfChipList.push(showEndInfList[i])
+							}
+						}
+						removeByValue(showStartCpuList, showStartCpuList[i])
+						removeByValue(showStartInfList, showStartInfList[i])
+						removeByValue(showEndCpuList, showEndCpuList[i])
+						removeByValue(showEndInfList, showEndInfList[i])
+					}
+				}
+			} else {
+				throw new Error("the given object is not contained by the table");
+			}
+		}
+		function cleanData1(){
+			document.getElementById("vagueSelect").value = ''
+		}
+	</script>
+</body>
+
+</html>

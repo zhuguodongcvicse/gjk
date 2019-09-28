@@ -1,0 +1,242 @@
+<template>
+  <div class="app-container pull-auto libs_hardwarelibchip_index_14s">
+    <basic-container>
+      <avue-crud
+        ref="crud"
+        :page="page"
+        :data="tableData"
+        :table-loading="tableLoading"
+        :option="tableOption"
+        @current-change="currentChange"
+        @refresh-change="refreshChange"
+        @size-change="sizeChange"
+        @row-update="handleUpdate"
+        @row-save="handleSave"
+        @row-del="rowDel"
+      >
+        <template slot="menuLeft">
+          <!-- <el-button type="primary"  @click="showdialog">新增</el-button> -->
+          <el-button
+            type="primary"
+            @click="showdialog"
+            size="small"
+            icon="el-icon-plus"
+            v-if="permissions.libs_hardwarelibchip_add"
+          >新 增</el-button>
+          <br>
+          <br>
+        </template>
+        <template slot-scope="scope" slot="menu">
+          <el-button
+            type="primary"
+            v-if="permissions.libs_hardwarelibchip_edit"
+            size="small"
+            plain
+            @click="editChip(scope.row,scope.index)"
+          >编辑</el-button>
+          <el-button
+            type="danger"
+            v-if="permissions.libs_hardwarelibchip_del"
+            size="small"
+            plain
+            @click="handleDel(scope.row,scope.index)"
+          >删除</el-button>
+        </template>
+      </avue-crud>
+    </basic-container>
+
+    <el-dialog width="35%" :visible.sync="dialogFormVisible">
+      <el-form :model="form" label-width="120px">
+        <el-form-item label="芯片名称">
+          <el-input v-model="form.chipName"/>
+        </el-form-item>
+        <el-form-item label="内核数量">
+          <el-input v-model="form.coreNum"/>
+        </el-form-item>
+        <el-form-item label="内存大小">
+          <el-input v-model="form.memSize"/>
+        </el-form-item>
+        <el-form-item label="接收速率">
+          <el-input v-model="form.recvRate"/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="updateChip(form)">确 定</el-button>
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+      </div>
+    </el-dialog>
+    <addChip :showInf="showInf" ref="pram"></addChip>
+  </div>
+</template>
+
+<script>
+import {
+  fetchList,
+  getObj,
+  addObj,
+  putObj,
+  delObj,
+  getChipJson,
+  updateChip
+} from "@/api/libs/hardwarelibchip";
+import { tableOption } from "@/const/crud/libs/hardwarelibchip";
+import { mapGetters } from "vuex";
+import addChip from "@/views/libs/hardwarelibchip/addChip";
+export default {
+  name: "hardwarelibchip",
+  components: { addChip },
+  data() {
+    return {
+      queryData: "",
+      form: [],
+      dialogFormVisible: false,
+      showInf: {
+        //param: {},
+        dialogFormVisible: false
+      },
+      tableData: [],
+      page: {
+        total: 0, // 总页数
+        currentPage: 1, // 当前页数
+        pageSize: 20 // 每页显示多少条
+      },
+      listQuery: {
+        current: 1,
+        size: 20
+      },
+      tableLoading: false,
+      tableOption: tableOption
+    };
+  },
+  created() {
+    // location.reload()
+    this.getList();
+  },
+  mounted: function() {},
+  computed: {
+    ...mapGetters(["permissions"])
+  },
+  methods: {
+    showdialog() {
+      this.showInf.dialogFormVisible = true;
+    },
+    editChip(row, index) {
+      this.dialogFormVisible = true;
+      this.form = row;
+      // console.log(this.form)
+      /* getChipJson(row.id).then(response => {
+        this.queryData = response.data.chipData
+        console.log("this.queryData",this.queryData)
+      }) */
+    },
+    updateChip(form) {
+      // console.log("form",form)
+      this.dialogFormVisible = false;
+      this.$router.push({
+        name: "chipupdate",
+        params: form
+      });
+      this.form = {};
+    },
+    getList() {
+      this.tableLoading = true;
+      fetchList(this.listQuery).then(response => {
+        // console.log("response", response);
+        this.tableData = response.data.data.records;
+        this.page.total = response.data.data.total;
+        this.tableLoading = false;
+      });
+    },
+    currentChange(val) {
+      this.page.current = val;
+      this.listQuery.current = val;
+      this.getList();
+    },
+    sizeChange(val) {
+      this.page.size = val;
+      this.listQuery.size = val;
+      this.getList();
+    },
+    /**
+     * @title 打开新增窗口
+     * @detail 调用crud的handleadd方法即可
+     *
+     **/
+    handleAdd: function() {
+      //this.$refs.crud.rowAdd()
+      this.$router.push({ path: "/libs/hardwarelibchip/addChip" });
+    },
+    handleEdit(row, index) {
+      this.$refs.crud.rowEdit(row, index);
+    },
+    handleDel(row, index) {
+      this.$refs.crud.rowDel(row, index);
+    },
+    rowDel: function(row, index) {
+      var _this = this;
+      this.$confirm("是否确认删除ID为" + row.id + "的记录", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(function() {
+          return delObj(row.id);
+        })
+        .then(data => {
+          _this.tableData.splice(index, 1);
+          _this.$message({
+            showClose: true,
+            message: "删除成功",
+            type: "success"
+          });
+        })
+        .catch(function(err) {});
+    },
+    /**
+     * @title 数据更新
+     * @param row 为当前的数据
+     * @param index 为当前更新数据的行数
+     * @param done 为表单关闭函数
+     *
+     **/
+    handleUpdate: function(row, index, done) {
+      putObj(row).then(data => {
+        this.tableData.splice(index, 1, Object.assign({}, row));
+        this.$message({
+          showClose: true,
+          message: "修改成功",
+          type: "success"
+        });
+        done();
+      });
+    },
+    /**
+     * @title 数据添加
+     * @param row 为当前的数据
+     * @param done 为表单关闭函数
+     *
+     **/
+    handleSave: function(row, done) {
+      addObj(row).then(data => {
+        this.tableData.push(Object.assign({}, row));
+        this.$message({
+          showClose: true,
+          message: "添加成功",
+          type: "success"
+        });
+        done();
+      });
+    },
+    /**
+     * 刷新回调
+     */
+    refreshChange() {
+      this.getList();
+    }
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+</style>
+

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<node id="004124">
+    <基本属性 configureType="{'lableType':'tab'}">
+        <显示名 name="1212" configureType="{'lableType':'form','attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+        <构件编号 name="2212"  configureType="{'lableType':'form','attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+        <函数名 name="ssss"  configureType="{'lableType':'form','attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+        <函数路径 name="sssss"  configureType="{'lableType':'form','attrs':[{'actionType':'analysisHeaderFile','attrConfigType':'fileComm','attrName':'name','isShow':true}]}"/>
+        <系数文件 name="ssss"  configureType="{'lableType':'form','attrs':[{'attrConfigType':'fileComm','attrName':'name','isShow':true}]}"/>
+        <输入 configureType="{'lableType':'table'}">
+            <variable name="pfSrcData" structId="" structType="" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'showCompName','attrMapping':true,'attrConfigType':'inputComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}">
+                <变量类型 name="float*" configureType="{'attrs':[{'dataKey':'dbtab_structlibs','actionType':'xxx','attrConfigType':'selectComm','attrName':'name','isShow':true}]}"/>
+                <序号 name="0" configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name'}]}"/>
+                <长度 name="111" configureType="{'attrs':[{'actionType':'xxx','attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+                <类别 name="DATA"  structId="1561946320070365023" structType="CMP_PARA" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'assignmentType','attrMapping':true,'attrConfigType':'selectComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}"/>
+                <赋值 name="222"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+                <选择变量 name="333"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+				<参数1 name="444"  configureType="{'attrs':[{'attrKeys':'param1','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数2 name="444"  configureType="{'attrs':[{'attrKeys':'param2','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数3 name="444"  configureType="{'attrs':[{'attrKeys':'param3','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数4 name="444"  configureType="{'attrs':[{'attrKeys':'param4','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数5 name="444"  configureType="{'attrs':[{'attrKeys':'param5','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数6 name="444"  configureType="{'attrs':[{'attrKeys':'param6','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+            </variable> 
+            <variable name="pst_Para->uiNum1" structId="1565918753456955627_*" structType="FUNC2_PARA*" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'showCompName','attrMapping':true,'attrConfigType':'inputComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}">
+                <变量类型 name="float*" configureType="{'attrs':[{'dataKey':'dbtab_structlibs','actionType':'xxx','attrConfigType':'selectComm','attrName':'name','isShow':true}]}"/>
+                <序号 name="0" configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name'}]}"/>
+                <长度 name="111" configureType="{'attrs':[{'actionType':'xxx','attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+                <类别 name="DATA"  structId="1561946320070365023" structType="CMP_PARA" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'assignmentType','attrMapping':true,'attrConfigType':'selectComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}"/>
+                <赋值 name="222"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+                <选择变量 name="333"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+				<参数1 name="444"  configureType="{'attrs':[{'attrKeys':'param1','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数2 name="444"  configureType="{'attrs':[{'attrKeys':'param2','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数3 name="444"  configureType="{'attrs':[{'attrKeys':'param3','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数4 name="444"  configureType="{'attrs':[{'attrKeys':'param4','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数5 name="444"  configureType="{'attrs':[{'attrKeys':'param5','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数6 name="444"  configureType="{'attrs':[{'attrKeys':'param6','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+            </variable> 
+            <variable name="pst_Para->uiNum2" structId="1565918753456955627_*" structType="FUNC2_PARA*"  configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'showCompName','attrMapping':true,'attrConfigType':'inputComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}">
+                <变量类型 name="float*" configureType="{'attrs':[{'dataKey':'dbtab_structlibs','actionType':'xxx','attrConfigType':'selectComm','attrName':'name','isShow':true}]}"/>
+                <序号 name="0" configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name'}]}"/>
+                <长度 name="111" configureType="{'attrs':[{'actionType':'xxx','attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+                <类别 name="DATA"  structId="1561946320070365023" structType="CMP_PARA" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'assignmentType','attrMapping':true,'attrConfigType':'selectComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}"/>
+                <赋值 name="222"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+                <选择变量 name="333"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+				<参数1 name="444"  configureType="{'attrs':[{'attrKeys':'param1','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数2 name="444"  configureType="{'attrs':[{'attrKeys':'param2','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数3 name="444"  configureType="{'attrs':[{'attrKeys':'param3','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数4 name="444"  configureType="{'attrs':[{'attrKeys':'param4','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数5 name="444"  configureType="{'attrs':[{'attrKeys':'param5','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数6 name="444"  configureType="{'attrs':[{'attrKeys':'param6','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+            </variable> 
+            <variable name="pst_Para->uiNum3" structId="1565918753456955627_*" structType="FUNC2_PARA*" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'showCompName','attrMapping':true,'attrConfigType':'inputComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}">
+                <变量类型 name="float*" configureType="{'attrs':[{'dataKey':'dbtab_structlibs','actionType':'xxx','attrConfigType':'selectComm','attrName':'name','isShow':true}]}"/>
+                <序号 name="0" configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name'}]}"/>
+                <长度 name="111" configureType="{'attrs':[{'actionType':'xxx','attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+                <类别 name="DATA"  structId="1561946320070365023" structType="CMP_PARA" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'assignmentType','attrMapping':true,'attrConfigType':'selectComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}"/>
+                <赋值 name="jobtitle"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+                <选择变量 name="ujk,m"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+				<参数1 name="444"  configureType="{'attrs':[{'attrKeys':'param1','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数2 name="hb"  configureType="{'attrs':[{'attrKeys':'param2','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数3 name="sdf"  configureType="{'attrs':[{'attrKeys':'param3','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数4 name="02"  configureType="{'attrs':[{'attrKeys':'param4','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数5 name="jm"  configureType="{'attrs':[{'attrKeys':'param5','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数6 name="444"  configureType="{'attrs':[{'attrKeys':'param6','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+            </variable> 
+            <variable name="pst_Para->fNum1" structId="1565918753456955627_*" structType="FUNC2_PARA*" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'showCompName','attrMapping':true,'attrConfigType':'inputComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}">
+                <变量类型 name="float*" configureType="{'attrs':[{'dataKey':'dbtab_structlibs','actionType':'xxx','attrConfigType':'selectComm','attrName':'name','isShow':true}]}"/>
+                <序号 name="0" configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name'}]}"/>
+                <长度 name="dff" configureType="{'attrs':[{'actionType':'xxx','attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+                <类别 name="DATA"  structId="1561946320070365023" structType="CMP_PARA" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'assignmentType','attrMapping':true,'attrConfigType':'selectComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}"/>
+                <赋值 name="gfdg"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+                <选择变量 name="erf"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+				<参数1 name="errorname"  configureType="{'attrs':[{'attrKeys':'param1','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数2 name="vx"  configureType="{'attrs':[{'attrKeys':'param2','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数3 name="dsf"  configureType="{'attrs':[{'attrKeys':'param3','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数4 name="fd"  configureType="{'attrs':[{'attrKeys':'param4','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数5 name="444"  configureType="{'attrs':[{'attrKeys':'param5','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数6 name="444"  configureType="{'attrs':[{'attrKeys':'param6','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+            </variable> 
+            <variable name="pst_Para->fNum2" structId="1565918753456955627_*" structType="FUNC2_PARA*" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'showCompName','attrMapping':true,'attrConfigType':'inputComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}">
+                <变量类型 name="float*" configureType="{'attrs':[{'dataKey':'dbtab_structlibs','actionType':'xxx','attrConfigType':'selectComm','attrName':'name','isShow':true}]}"/>
+                <序号 name="0" configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name'}]}"/>
+                <长度 name="111" configureType="{'attrs':[{'actionType':'xxx','attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+                <类别 name="DATA"  structId="1561946320070365023" structType="CMP_PARA" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'assignmentType','attrMapping':true,'attrConfigType':'selectComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}"/>
+                <赋值 name="222"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+                <选择变量 name="333"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+				<参数1 name="ertyh"  configureType="{'attrs':[{'attrKeys':'param1','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数2 name="yh"  configureType="{'attrs':[{'attrKeys':'param2','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数3 name="highlights"  configureType="{'attrs':[{'attrKeys':'param3','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数4 name="gb"  configureType="{'attrs':[{'attrKeys':'param4','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数5 name="rtg"  configureType="{'attrs':[{'attrKeys':'param5','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数6 name="444"  configureType="{'attrs':[{'attrKeys':'param6','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+            </variable> 
+            <variable name="pst_Para->fNum3" structId="1565918753456955627_*" structType="FUNC2_PARA*" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'showCompName','attrMapping':true,'attrConfigType':'inputComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}">
+                <变量类型 name="float*" configureType="{'attrs':[{'dataKey':'dbtab_structlibs','actionType':'xxx','attrConfigType':'selectComm','attrName':'name','isShow':true}]}"/>
+                <序号 name="question" configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name'}]}"/>
+                <长度 name="fdf" configureType="{'attrs':[{'actionType':'xxx','attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+                <类别 name="DATA"  structId="1561946320070365023" structType="CMP_PARA" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'assignmentType','attrMapping':true,'attrConfigType':'selectComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}"/>
+                <赋值 name="222"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+                <选择变量 name="fg"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+				<参数1 name="ghj"  configureType="{'attrs':[{'attrKeys':'param1','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数2 name="7yuj"  configureType="{'attrs':[{'attrKeys':'param2','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数3 name="wesd"  configureType="{'attrs':[{'attrKeys':'param3','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数4 name="444"  configureType="{'attrs':[{'attrKeys':'param4','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数5 name="erdf"  configureType="{'attrs':[{'attrKeys':'param5','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数6 name="444"  configureType="{'attrs':[{'attrKeys':'param6','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+            </variable> 
+			<variable name="pst_Para->fNum.fp_fNum2" structId="1565918753456955627_*" structType="FUNC2_PARA*" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'showCompName','attrMapping':true,'attrConfigType':'inputComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}">
+                <变量类型 name="float*" configureType="{'attrs':[{'dataKey':'dbtab_structlibs','actionType':'xxx','attrConfigType':'selectComm','attrName':'name','isShow':true}]}"/>
+                <序号 name="0" configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name'}]}"/>
+                <长度 name="fd" configureType="{'attrs':[{'actionType':'xxx','attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+                <类别 name="DATA"  structId="1561946320070365023" structType="CMP_PARA" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'assignmentType','attrMapping':true,'attrConfigType':'selectComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}"/>
+                <赋值 name="222"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+                <选择变量 name="333"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+				<参数1 name="das"  configureType="{'attrs':[{'attrKeys':'param1','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数2 name="gfdg"  configureType="{'attrs':[{'attrKeys':'param2','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数3 name="fg"  configureType="{'attrs':[{'attrKeys':'param3','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数4 name="refclass"  configureType="{'attrs':[{'attrKeys':'param4','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数5 name="fgh"  configureType="{'attrs':[{'attrKeys':'param5','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数6 name="444"  configureType="{'attrs':[{'attrKeys':'param6','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+            </variable> 
+            <variable name="pst_Para->fNum.fp_fNum3" structId="1565918753456955627_*" structType="FUNC2_PARA*" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'showCompName','attrMapping':true,'attrConfigType':'inputComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}">
+                <变量类型 name="float*" configureType="{'attrs':[{'dataKey':'dbtab_structlibs','actionType':'xxx','attrConfigType':'selectComm','attrName':'name','isShow':true}]}"/>
+                <序号 name="0" configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name'}]}"/>
+                <长度 name="0" configureType="{'attrs':[{'actionType':'xxx','attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+                <类别 name="DATA"  structId="1561946320070365023" structType="CMP_PARA" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'assignmentType','attrMapping':true,'attrConfigType':'selectComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}"/>
+                <赋值 name=""  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+                <选择变量 name="2"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+				<参数1 name="2"  configureType="{'attrs':[{'attrKeys':'param1','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数2 name="12"  configureType="{'attrs':[{'attrKeys':'param2','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数3 name="2"  configureType="{'attrs':[{'attrKeys':'param3','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数4 name="3"  configureType="{'attrs':[{'attrKeys':'param4','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数5 name="444"  configureType="{'attrs':[{'attrKeys':'param5','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数6 name="444"  configureType="{'attrs':[{'attrKeys':'param6','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+            </variable>			
+        </输入>
+        <输出  configureType="{'lableType':'table'}">
+            <variable name="piPara1" structId="" structType="" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'showCompName','attrMapping':true,'attrConfigType':'inputComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}">
+                <变量类型 name="float*" configureType="{'attrs':[{'dataKey':'dbtab_structlibs','actionType':'xxx','attrConfigType':'selectComm','attrName':'name','isShow':true}]}"/>
+                <序号 name="0" configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name'}]}"/>
+                <长度 name="" configureType="{'attrs':[{'actionType':'xxx','attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+                <类别 name="DATA"  structId="1561946320070365023" structType="CMP_PARA" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'assignmentType','attrMapping':true,'attrConfigType':'selectComm','attrName':'name','isShow':true},{'attrName':'structId'},{'attrName':'structType'}]}"/>
+                <赋值 name="222"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+                <选择变量 name="333"  configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+				<参数1 name="444"  configureType="{'attrs':[{'attrKeys':'param1','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数2 name="444"  configureType="{'attrs':[{'attrKeys':'param2','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数3 name="444"  configureType="{'attrs':[{'attrKeys':'param3','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数4 name="444"  configureType="{'attrs':[{'attrKeys':'param4','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数5 name="444"  configureType="{'attrs':[{'attrKeys':'param5','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+				<参数6 name="444"  configureType="{'attrs':[{'attrKeys':'param6','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}"/>
+            </variable>
+        </输出>
+    </基本属性>
+    <层级属性 configureType="{'lableType':'tab'}">
+        <所属部件 name="00000" configureType="{'lableType':'tabTS','attrs':[{'actionType':'xxx','attrConfigType':'inputComm','attrName':'name','isShow':true}]}">
+            <部署配置>
+                <属性1 lableType="select" name="1" configureType="{'attrs':[{'dataKey':'comp_deploy_type','actionType':'xxx','attrConfigType':'selectComm','attrName':'name','isShow':true}]}"/>
+                <属性2 lableType="text" name="111111111" configureType="{'attrs':[{'actionType':'xxx','attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+                <属性3 lableType="text" name="2222222222" configureType="{'attrs':[{'actionType':'xxx','attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+				<所属节点 name="xxxxxx"  cmpName="xxxx" configureType="{'lableType':'colTab','attrs':[{'attrName':'name','isShow':true,'attrMapping':true,'attrKeys':'ownOnde','attrConfigType':'selectComm','dataKey':'','actionType':'xxx'},{'attrConfigType':'inputComm','attrName':'cmpName','isShow':true}]}"/>
+				<所属节点 name="xxxxxx"  cmpName="xxxx" configureType="{'lableType':'colTab','attrs':[{'attrName':'name','isShow':true,'attrMapping':true,'attrKeys':'ownOnde','attrConfigType':'selectComm','dataKey':'','actionType':'xxx'},{'attrConfigType':'inputComm','attrName':'cmpName','isShow':true}]}"/><!-- 硬件节点 -->
+            </部署配置>
+        </所属部件>
+    </层级属性>
+    <性能属性 configureType="{'lableType':'tab'}">
+        <属性1 name="T4240" configureType="{'lableType':'colTab','attrs':[{'attrConfigType':'selectComm','dataKey':'comp_xnconfig_type','attrName':'name','isShow':true}]}">
+            <属性2 name="D:/14S_GJK_GIT/gjk/gjk/upload/func1.xlsx" configureType="{'attrs':[{'attrConfigType':'fileComm','attrName':'name','isShow':true}]}"/>
+            <属性3 configureType="{'lableType':'colTab'}">
+                <proCPB coreNum="1" proRate="120"/>
+                <proCPB coreNum="2" proRate="240"/>
+                <proCPB coreNum="3" proRate="360"/>
+                <proCPB coreNum="4" proRate="480"/>
+                <proCPB coreNum="5" proRate="600"/>
+                <proCPB coreNum="6" proRate="720"/>
+            </属性3>
+        </属性1>
+		 <属性1 name="T4240" configureType="{'lableType':'colTab','attrs':[{'attrConfigType':'selectComm','dataKey':'comp_xnconfig_type','attrName':'name','isShow':true}]}">
+            <属性2 name="D:/14S_GJK_GIT/gjk/gjk/upload/func1.xlsx" configureType="{'attrs':[{'attrConfigType':'fileComm','attrName':'name','isShow':true}]}"/>
+            <属性3 configureType="{'lableType':'colTab'}">
+                <proCPB coreNum="1" proRate="120"/>
+                <proCPB coreNum="2" proRate="240"/>
+                <proCPB coreNum="3" proRate="360"/>
+                <proCPB coreNum="4" proRate="480"/>
+                <proCPB coreNum="5" proRate="600"/>
+                <proCPB coreNum="6" proRate="720"/>
+            </属性3>
+        </属性1>
+		
+    </性能属性>
+    <资源属性 configureType="{'lableType':'tab'}">
+        <属性1 name="qwe" configureType="{'lableType':'form','attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+		<属性2 name="qwe" configureType="{'lableType':'form','attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+		<属性3 name="qwe" configureType="{'lableType':'form','attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+		<属性4 name="qwe" configureType="{'lableType':'form','attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+		<属性5 name="qwe" configureType="{'lableType':'form','attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+        <属性6 name="12345"  configureType="{'lableType':'form','attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}"/>
+    </资源属性>
+</node>

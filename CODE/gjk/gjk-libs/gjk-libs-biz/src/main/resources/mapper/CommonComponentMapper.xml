@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ~ Copyright (c) 2018-2025, inforbus All rights reserved. ~ ~ Redistribution 
+	and use in source and binary forms, with or without ~ modification, are permitted 
+	provided that the following conditions are met: ~ ~ Redistributions of source 
+	code must retain the above copyright notice, ~ this list of conditions and 
+	the following disclaimer. ~ Redistributions in binary form must reproduce 
+	the above copyright ~ notice, this list of conditions and the following disclaimer 
+	in the ~ documentation and/or other materials provided with the distribution. 
+	~ Neither the name of the inforbus.com developer nor the names of its ~ contributors 
+	may be used to endorse or promote products derived from ~ this software without 
+	specific prior written permission. ~ Author: inforbus -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.inforbus.gjk.libs.mapper.CommonComponentMapper">
+
+	<resultMap id="commonComponentMap"
+		type="com.inforbus.gjk.libs.api.entity.CommonComponent">
+		<id property="id" column="id" />
+		<result property="compId" column="comp_id" />
+		<result property="compName" column="comp_name" />
+		<result property="compFuncname" column="comp_funcname" />
+		<result property="userId" column="user_id" />
+		<result property="version" column="version" />
+		<result property="compImg" column="comp_img" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="description" column="description" />
+		<result property="delFlag" column="del_flag" />
+	</resultMap>
+
+	<sql id="commonComponentSql">
+		id,
+		comp_id,
+		comp_name,
+		comp_funcname,
+		user_id,
+		version,
+		comp_img,
+		create_time,
+		update_time,
+		description,
+		del_flag
+	</sql>
+
+	<sql id="saveCommonCompSql">
+		id,
+		comp_id,
+		comp_name,
+		comp_funcname,
+		user_id,
+		version,
+		comp_img,
+		description
+	</sql>
+
+	<!--commonComponent简单分页查询 -->
+	<select id="getCommonComponentPage"
+		resultMap="commonComponentMap">
+		SELECT
+		<include refid="commonComponentSql" />
+		FROM gjk_common_component
+		<where>
+			<if
+				test="commonComponent.id != null and commonComponent.id.trim() != ''">
+				AND id = #{commonComponent.id}
+			</if>
+			<if
+				test="commonComponent.compId != null and commonComponent.compId.trim() != ''">
+				AND comp_id = #{commonComponent.compId}
+			</if>
+			<if
+				test="commonComponent.compName != null and commonComponent.compName.trim() != ''">
+				AND comp_name = #{commonComponent.compName}
+			</if>
+			<if
+				test="commonComponent.compFuncname != null and commonComponent.compFuncname.trim() != ''">
+				AND comp_funcname = #{commonComponent.compFuncname}
+			</if>
+			<if
+				test="commonComponent.userId != null and commonComponent.userId.trim() != ''">
+				AND user_id = #{commonComponent.userId}
+			</if>
+			<if
+				test="commonComponent.version != null and commonComponent.version.trim() != '' and commonComponent.version != 'max'">
+				AND version = #{commonComponent.version}
+			</if>
+			<if test="commonComponent.version == 'max'">
+				AND id in (SELECT d.id FROM (SELECT
+				comp_id,MAX(CAST(version as
+				DECIMAL)) AS maxv FROM
+				gjk_common_component
+				GROUP BY comp_id)t INNER JOIN
+				gjk_common_component d on t.comp_id= d.comp_id
+				AND t.maxv= d.version)
+			</if>
+			<if
+				test="commonComponent.compImg != null and commonComponent.compImg.trim() != ''">
+				AND comp_img = #{commonComponent.compImg}
+			</if>
+			<if
+				test="commonComponent.createTime != null and commonComponent.createTime.trim() != ''">
+				AND create_time = #{commonComponent.createTime}
+			</if>
+			<if
+				test="commonComponent.updateTime != null and commonComponent.updateTime.trim() != ''">
+				AND update_time = #{commonComponent.updateTime}
+			</if>
+			<if
+				test="commonComponent.description != null and commonComponent.description.trim() != ''">
+				AND description = #{commonComponent.description}
+			</if>
+			and del_flag = '0'
+		</where>
+	</select>
+
+	<!-- 保存公共构件 -->
+	<insert id="saveCommonComp"
+		parameterType="com.inforbus.gjk.libs.api.entity.CommonComponent">
+		INSERT INTO gjk_common_component (
+		<include refid="saveCommonCompSql" />
+		) VALUES (#{comp.id},
+		#{comp.compId},
+		#{comp.compName},
+		#{comp.compFuncname},
+		#{comp.userId},
+		#{comp.version},
+		#{comp.compImg},
+		#{comp.description})
+	</insert>
+
+	<!-- 查询构件的所有版本 -->
+	<select id="getVersionByCompId"
+		parameterType="com.inforbus.gjk.libs.api.entity.CommonComponent"
+		resultMap="commonComponentMap">
+		SELECT
+		<include refid="commonComponentSql" />
+		FROM gjk_common_component
+		<where>
+			<if test="comp.compId != null and comp.compId.trim() != ''">
+				AND comp_id=#{comp.compId}
+			</if>
+			<if test="comp.compName != null and comp.compName.trim() != ''">
+				AND comp_name=#{comp.compName}
+			</if>
+		</where>
+	</select>
+
+	<select id="getScreenComp" resultMap="commonComponentMap">
+		SELECT
+		<include refid="commonComponentSql" />
+		FROM gjk_common_component
+		<where>
+			id in(
+			SELECT comp_id
+			FROM gjk_common_component_detail
+			where libs_id in
+			<foreach collection="libsList" item="item" index="index"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+			)
+		</where>
+	</select>
+
+	<select id="queryTable" resultType="map">
+		select table_name tableName,
+		engine, table_comment tableComment, create_time createTime from
+		information_schema.tables
+		where table_schema = (select database()) and
+		table_name = #{tableName}
+	</select>
+
+	<select id="queryColumns" resultType="map">
+		select column_name
+		columnName, data_type dataType, column_comment columnComment,
+		column_key columnKey, extra from information_schema.columns
+		where
+		table_name = #{tableName} and table_schema = (select database())
+		order
+		by ordinal_position
+	</select>
+
+</mapper>

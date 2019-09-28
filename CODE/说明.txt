@@ -1,0 +1,4 @@
+1、gjk文件夹下为后台代码；
+2、gjk-ui文件夹下为前台代码；
+3、14S_GJK_GIT文件夹下为系统运行所需要的基础文件，配置路径为\CODE\gjk\gjk-common\gjk-common-core\src\main\resources\bootstrap.properties。
+4、数据库脚本路径为CODE\gjk\db文件夹下，以日期最新脚本为准，此脚本不允许擅自修改，各自改动必须以增量脚本的形式统一发送到清华那里，由清华统一整合。

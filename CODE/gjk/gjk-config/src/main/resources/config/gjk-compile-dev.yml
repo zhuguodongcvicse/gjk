@@ -1,0 +1,38 @@
+﻿security:
+  oauth2:
+    client:
+      client-id: ENC(imENTO7M8bLO38LFSIxnzw==)
+      client-secret: ENC(i3cDFhs26sa2Ucrfz2hnQw==)
+      scope: server
+
+# 数据源
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: cvicse
+    url: jdbc:mysql://127.0.0.1:3306/gjk?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+
+# 直接放行URL
+ignore:
+  urls:
+    - /actuator/**
+    - /log/**
+    - /compile/**
+    - /devenv/**
+ 
+# 路径配置
+VS2010:
+  path: C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE
+Sylixos:
+  path: D:\\software\\windriver\\windriverForMipsHR2
+Workbench:
+  path: D:\\software\\windriver\\windriverForMipsHR2
+Linux:
+  path: /gjk/project
+  ip: 192.168.234.129
+  username: root
+  password: root
+downPath:
+  path: D:\\doudou\\test

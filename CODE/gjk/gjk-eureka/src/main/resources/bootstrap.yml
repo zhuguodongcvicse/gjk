@@ -1,0 +1,35 @@
+﻿server:
+  port: 8761
+
+spring:
+  security:
+    user:
+      name: inforbus
+      password: inforbus
+  application:
+    name: gjk-eureka
+  cloud:
+    config:
+      enabled: false
+
+# docker-compose部署时候 hostname 换成pig-eureka
+# 类似的 redis 使用pig-redis ,gateway 换成 pig-gateway
+eureka:
+  instance:
+    hostname: 127.0.0.1
+    prefer-ip-address: false
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://inforbus:inforbus@${eureka.instance.hostname}:${server.port}/eureka/
+  server:
+    eviction-interval-timer-in-ms: 4000
+    enable-self-preservation: false
+    renewal-percent-threshold: 0.9
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

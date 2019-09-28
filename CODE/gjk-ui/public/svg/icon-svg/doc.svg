@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="15px" viewBox="0 0 12 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 57 (83077) - https://sketch.com -->
+    <title>doc</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="0 0.0431390977 11.9588812 0.0431390977 11.9588812 15 0 15"></polygon>
+    </defs>
+    <g id="14所-信息构建库" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="菜单栏左侧切图" transform="translate(-339.000000, -301.000000)">
+            <g id="菜单" transform="translate(286.000000, 135.000000)">
+                <g id="分组-15" transform="translate(18.000000, 108.000000)">
+                    <g id="doc" transform="translate(35.000000, 58.000000)">
+                        <g id="分组">
+                            <mask id="mask-2" fill="white">
+                                <use xlink:href="#path-1"></use>
+                            </mask>
+                            <g id="Clip-2"></g>
+                            <path d="M7.68804058,0.0431390977 L7.68804058,3.36710526 C7.68804058,3.8656015 8.02931594,4.19768797 8.54189565,4.19768797 L11.9588812,4.19768797 L11.9588812,14.1689662 C11.9588812,14.6674624 11.6170261,15 11.1045043,15 L0.853837681,15 C0.341373913,15 -1.73913043e-05,14.6674624 -1.73913043e-05,14.1689662 L-1.73913043e-05,0.874229323 C-1.73913043e-05,0.375676692 0.341373913,0.0431390977 0.853837681,0.0431390977 L7.68804058,0.0431390977 Z" id="Fill-1" fill="#548DFE" mask="url(#mask-2)"></path>
+                        </g>
+                        <polygon id="Fill-3" fill="#FFFFFF" points="5.9603706 9.16648193 4.19990228 11 3 11 3 6 4.19990228 6 4.19990228 9.25006786 5.1598024 8.25003393 5.95939343 7.41649324 7.80009772 9.25006786 7.80009772 6 9 6 9 11 7.80009772 11"></polygon>
+                        <path d="M12,4.24216023 L8.58787214,4.21294496 C7.98784771,4.21294496 7.58823863,3.81627764 7.58823863,3.33632541 L7.65980222,0 L12,4.24216023 Z" id="Fill-5" fill="#A3CDFF"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
