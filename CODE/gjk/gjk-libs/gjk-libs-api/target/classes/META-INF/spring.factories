@@ -1,3 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.inforbus.gjk.libs.api.feign.fallback.RemoteTokenServiceFallbackImpl,\
-  com.inforbus.gjk.libs.api.feign.factory.RemoteTokenServiceFallbackFactory
