@@ -99,9 +99,9 @@ function handleMessageFromParent(event) {
 			iframeData = data
 			dat = eval(JSON.stringify(iframeData.params));
 			// console.log("子接收父参数", iframeData)
-			// console.log("dat数据", dat);
+			console.log("dat数据", dat);
 			connectionData = iframeData.connectionData
-			// console.log("connection数据", connectionData)
+			console.log("connection数据", connectionData)
 			break
 		case 'getCompDtosData':
 			//接收属性栏修改后的数据
@@ -524,7 +524,7 @@ function appendDiv() {
 	var Template = "";
 	for (var i = 0; i < dat.length; i++) {
 
-		// console.log("dat[i].compImg", dat[i].compImg);
+		console.log("dat[i].compImg", dat[i].compImg);
 		var s = dat[i].compImg.substr(dat[i].compImg.indexOf("src='") + 5);
 		var img = s.substr(0, s.indexOf("' "));
 		//str += "<div class = 'btn'  data-template='tpl-menu" + i + "'><img src='"+img+"'><br/>" + dat[i].compName + "</div></br>"
@@ -1281,6 +1281,11 @@ document.onkeydown = function () {
 		event.preventDefault();
 		copyTop = copyTop + 50;
 		copyLeft = copyLeft + 50;
+		console.log(11111111111111)
+		if(copyData.length <= 0){
+			copyData = JSON.parse(sessionStorage.getItem("copyData"));
+			console.log("复制数据",copyData)
+		}
 		for (var i = 0; i < copyData.length; i++) {
 			pasteJson(copyData[i]);
 		}
@@ -1316,6 +1321,7 @@ document.onkeydown = function () {
 			copyPream.push(copyJson);
 			copyData = copyPream
 		}
+		sessionStorage.setItem("copyData", JSON.stringify(copyData));
 		var gjidAndTemid = []
 		gjidAndTemid.push({
 			gjId: "",
@@ -2031,7 +2037,8 @@ function save() {
 			sourVariableName = dat[sourceGj].outputList[sourceUuid].variableName;
 			sourLength = dat[sourceGj].outputList[sourceUuid].lengthName;
 		}
-		var sourCompName = dat[sourceGj].compName;
+		console.log("arrow数据11111111",dat[sourceGj])
+		var sourCompName = dat[sourceGj].functionName;
 		var sourcePrame = sourDataTypeName + " " + sourVariableName + "_" + sourCompName
 
 		//获取画布目标节点id
@@ -2066,7 +2073,7 @@ function save() {
 		}
 
 		//获取数据输入参数
-		var tarCompName = dat[targetGj].compName;
+		var tarCompName = dat[targetGj].functionName;
 		var targetPrame = tarDataTypeName + " " + tarVariableName + "_" + tarCompName
 
 		//拼接source与target
