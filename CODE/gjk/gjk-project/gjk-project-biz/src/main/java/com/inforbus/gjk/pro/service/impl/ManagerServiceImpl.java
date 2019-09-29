@@ -100,7 +100,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	
 	private static final String proDetailPath = JGitUtil.getLOCAL_REPO_PATH();
 	private static String serverPath = JGitUtil.getLOCAL_REPO_PATH();
-
+	private static final String flowInfPath = JGitUtil.getFlowInfPath();//获取流程内外部接口存放路径 add by hu
+	private static final String gitDetailPath = JGitUtil.getLOCAL_REPO_PATH();//gitlu路径
 	/**
 	 * @getTreeByProjectId
 	 * @Description: 获取项目树形菜单
@@ -480,11 +481,11 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 */
 	public XmlEntityMap getSysConfigXmlEntityMap(String proDetailId) {
 		ProjectFile projectFile = getProDetailById(proDetailId);
-		File file = new File(proDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml");
+		File file = new File(gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml");
 
-		if (projectFile.getFileType().equals("14")) {
-			file = new File(System.getProperty("user.dir") + "/方案展示.xml");
-		}
+//		if (projectFile.getFileType().equals("14")) {
+//			file = new File(gitDetailPath+projectFile.getFilePath()+ "方案展示.xml");
+//		}
 		//		if (projectFile.getFileType().equals("11")) {
 		//			file = new File(System.getProperty("user.dir") + "/流程实例.xml");
 		//		}
@@ -611,14 +612,15 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 */
 	@Override
 	public void simplePlan(ArrayList<String> schemeFileList, String simplePlanFile) {
-		// ExternalIOTransUtils.simplePlan(schemeFileList, simplePlanFile);
+		 ExternalIOTransUtils.simplePlan(schemeFileList, simplePlanFile);//update by zhx
 	}
 
 	/**
 	 * 根据当前软硬件映射配置的id，查找当前流程下的所有模块的文件路径
 	 * 
 	 * @param id
-	 * @return
+	 * @returnzz
+	 * 
 	 */
 	@Override
 	public List<ProjectFile> getFilePathListById(String id) {
@@ -1358,7 +1360,10 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String fileName = file.getOriginalFilename();
 		ProjectFile pro = baseMapper.getProDetailById(id);
 		String flowPath = proDetailPath + pro.getFilePath()+"工作模式\\";
-		String filePath = flowPath+"xxx.xml";
+		/************************************update by  zhx********************************************/
+		//String filePath = flowPath+"xxx.xml";
+		String filePath = proDetailPath+pro.getFilePath()+flowInfPath+File.separator+"系数文件.xml" ;
+		/*****************************************************************************************/
 		File flowFile = new File(flowPath);
 		if(!flowFile.exists()) {
 			flowFile.mkdirs();
