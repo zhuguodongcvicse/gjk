@@ -557,6 +557,8 @@
     }
 
     Q.GraphModel.prototype.parseJSON = function (json, options) {
+        // console.log("json",json)
+        // console.log("options",options)
         options = options || {};
         var datas = json.datas;
         if (!datas || !(datas.length > 0)) {
@@ -564,8 +566,10 @@
         }
         var result = [];
         var serializer = new JSONSerializer(options, json.g);
+        // console.log("serializer",serializer)
         var elementRefs = {};
         datas.forEach(function (info) {
+            // console.log("info",info)
             if (info._refId) {
                 elementRefs[info._refId] = info;
             }
