@@ -5,7 +5,7 @@
       <!-- 基本属性表单内容 -->
       <el-form
         ref="form"
-        :label-width="moduleType==='comp'? '100px' : '90px'"
+        :label-width="moduleType==='comp'? '30%' : '30%'"
         v-if="analysisConfigureType(params).lableType == 'form'"
         :key="index"
       >
@@ -40,10 +40,10 @@
           @jsplumbUidsChange="$emit('jsplumbUidsChange', $event)"
         ></params-tree>
       </el-col>
+    </template>
       <!-- 层级属性 -->
-      <el-col :span="24" :key="index" v-if="analysisConfigureType(params).lableType == 'tabTS'">
-        <el-form label-width="80px">
-          <!-- 处理第一层 -->
+    <el-form ref="form" label-width="100px" v-show="isShowCJTableData">
+      <!-- 层级属性 处理第一层-->
           <el-form-item
             v-for=" (showParam,$index) in cjBaseDataOption"
             :label="showParam.attrMappingName"
@@ -55,14 +55,12 @@
               :lableType="showParam.attrConfigType"
               :readonly="readonly"
               :disabled="disabled"
-              @onBlurNative="analysisCjUnitParam(cjBaseData)"
-              v-on:keyup.enter.native="analysisCjUnitParam(cjBaseData)"
+          @onBlurNative="analysisCjUnitParam(showParam)"
+          v-on:keyup.enter.native="analysisCjUnitParam(showParam)"
             ></form-item-type>
           </el-form-item>
           <!-- 处理部署配置下的配置 -->
           <template>
-            <!-- 处理部署配置 中的表单部分 -->
-            <span :key="index">
               <el-form-item
                 v-for=" (child,$index) in cjTableSel"
                 :label="child.attrMappingName"
@@ -78,7 +76,6 @@
                   placeholder="请选择"
                 ></form-item-type>
               </el-form-item>
-            </span>
             <!-- 处理部署配置 中的表格部分 -->
             <el-table :data="cjTableData" border stripe style="width: 100%">
               <el-table-column
@@ -104,11 +101,7 @@
               </el-table-column>
               <el-table-column fixed="right" label="操作" header-align="left" width="55">
                 <template slot-scope="{row,$index}">
-                  <el-button
-                    type="text"
-                    v-if="$index > 0"
-                    @click="delTableRow(cjTableData,$index)"
-                  >删除</el-button>
+              <el-button type="text" v-if="$index > 0" @click="delTableRow(cjTableData,$index)">删除</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -117,11 +110,7 @@
             </div>
           </template>
         </el-form>
-      </el-col>
       <!-- 性能属性 -->
-      <!-- <el-col :span="24" :key="index" v-if="analysisConfigureType(params).lableType == 'colTab'"> -->
-      <!-- </el-col> -->
-    </template>
     <el-table :data="xnTableData" border stripe style="width: 100%" v-show="isShowXnTableData">
       <!--    循环列 -->
       <template v-for="(column,index) in xnTableOption">
@@ -145,7 +134,7 @@
                   :dictKey="col.dataKey"
                   :readonly="readonly"
                   :disabled="disabled"
-                  @change="itemXnTypeChange(col,$index,index)"
+                  @change="itemXnTypeChange(deepClone(col),$index,index)"
                 ></form-item-type>
               </template>
             </template>
@@ -210,8 +199,9 @@ export default {
       xnTableOption: [], //性能表格配置
       xnTableData: [], //性能表格数据
       isShowXnTableData: false,
-      saveXnTableData: [], //性能保存数据
+      saveXnTableData: {}, //性能保存数据
       cjBaseDataOption: [],
+      isShowCJTableData: false,
       cjBaseData: {}, //层级属性的基本配置
       cjTableOption: [], //层级表格配置
       cjTableData: [], //层级表格数据
@@ -237,74 +227,97 @@ export default {
       handler: function(paramsFormXmlParams) {
         this.paramsFormXmlParams = [];
         let xnShowTable = [];
+        this.saveXnTableData = {};
+        this.cjBaseDataOption = [];
         let baseData = JSON.parse(JSON.stringify(paramsFormXmlParams));
-        baseData.forEach(params => {
+        for (let key in baseData) {
+          const params = baseData[key];
           let type = this.analysisConfigureType(params).lableType;
+          // console.log("params-form.vue预处理层级参数", params,type);
           if (type === "tabTS") {
-            // 预处理层级参数
-            this.cjBaseData = deepClone(params);
-            this.cjBaseDataOption = this.analysisAttrConfigType(
-              this.cjBaseData
+            console.log("params-form.vue中预处理层级参数", params);
+            this.isShowCJTableData = true;
+            this.$set(this.cjBaseData, key, baseData[key]); //设置基础数据
+            if (params.xmlEntityMaps) {
+              this.analysisCjTableParam(deepClone(params.xmlEntityMaps));
+            } else {
+              this.cjBaseDataOption = this.cjBaseDataOption.concat(
+                this.analysisAttrConfigType(params)
             );
-            this.analysisCjTableParam(
-              deepClone(params.xmlEntityMaps[0].xmlEntityMaps)
-            );
+            }
           } else if (type === "colTab") {
             this.isShowXnTableData = true;
+            this.saveXnTableData = deepClone(params);
             //预处理性能表格
-            this.analysisXnTableParam(params, xnShowTable);
+            this.analysisXnTableParam(deepClone(params), xnShowTable);
           } else if (type === "table") {
+          } else {
           }
-        });
-        this.xnTableData = xnShowTable;
+        }
         this.paramsFormXmlParams = baseData;
+        this.xnTableData = xnShowTable;
       }
     },
     saveXnTableData: {
       handler: function(table) {
         //将性能属性的值返回给父级页面
+        console.log(
+          "paramsFormXmlParamsparamsFormXmlParamsparamsFormXmlParams",
+          table
+        );
+        // this.$emit("change", table, this.paramType);
+      },
+      deep: true
+    },
+    cjBaseData: {
+      handler: function(table) {
+        //将性能属性的值返回给父级页面
+        console.log("cjBaseDatacjBaseData将性能属性的值返回给父级页面", table);
         this.$emit("change", table, this.paramType);
       },
       deep: true
     },
     xnTableData: {
-      handler: function(table) {
+      handler: function(xnTableData) {
         let saveXnTableData = [];
-        //循环表格处理行
-        table.forEach(tabs => {
+        xnTableData.forEach(itemTab => {
+          let tabData = deepClone(this.saveXnTableData);
+          itemTab.forEach(col => {
+            if (col.isShow) {
+              if (
+                col.attrConfigType === "fileComm" &&
+                col.actionType === "analysisAerformanceFile"
+              ) {
+                //处理属性2中的参数
+                tabData.xmlEntityMaps[0].attributeMap.name = col.lableName;
+                getPerformanceTable({ excelPath: col.lableName }).then(res => {
+                  let pars = res.data.data;
           let xmlEntityMaps = [];
-          let paramsArr = {};
-          //循环行处理单元格
-          tabs.forEach(tab => {
-            if (tab.isShow) {
-              let configureType = this.analysisConfigureType(tab);
-              //将更改后的属性值替换
-              this.attributeAssignmen(tab, configureType, tab.lableName);
-              let lableType = configureType.lableType;
-              if (lableType === "colTab") {
-                //处理属性1的数据
-                this.$set(paramsArr, "lableName", tab.attrMappingName);
-                this.$set(paramsArr, "attributeMap", tab.attributeMap);
-              } else {
-                //处理属性2的数据
+                  for (let key in pars) {
                 xmlEntityMaps.push({
-                  lableName: tab.attrMappingName,
-                  attributeMap: tab.attributeMap
+                      attributeMap: { coreNum: key, proRate: pars[key] },
+                      lableName: "proCPB"
                 });
               }
+                  this.$set(
+                    tabData.xmlEntityMaps[1],
+                    "xmlEntityMaps",
+                    xmlEntityMaps
+                  );
+                });
             } else {
-              //处理属性3的数据
-              xmlEntityMaps.push({
-                lableName: tab.attrMappingName,
-                attributeMap: tab.attributeMap,
-                xmlEntityMaps: tab.xmlEntityMaps
-              });
+                tabData.attributeMap.name = col.lableName;
+              }
             }
           });
-          this.$set(paramsArr, "xmlEntityMaps", xmlEntityMaps);
-          saveXnTableData.push(paramsArr);
+          saveXnTableData.push(tabData);
         });
-        this.saveXnTableData = saveXnTableData;
+        console.log(
+          "00000000000000000000000000000000000000000000",
+          saveXnTableData
+        );
+        //将值返回给父级组件
+        this.$emit("change", saveXnTableData, this.paramType);
       },
       deep: true
     },
@@ -312,18 +325,35 @@ export default {
     paramsFormXmlParams: {
       immediate: true,
       handler: function(paramsFormXmlParams) {
+        console.log(
+          "保存的数据。。。。。。",
+          paramsFormXmlParams,
+          this.paramType
+        );
         //将值返回给父级组件
         this.$emit("change", paramsFormXmlParams, this.paramType);
       },
       deep: true
     },
-    //处理性能参数中的表格数据
+    //处理层级参数中的表格数据
     cjTableData: {
       handler: function(paramCjTableData) {
+        let tmpCJData = deepClone(this.cjBaseData);
+        //层级属性中的所属节点
+        let saveStoreData = {}; //所属部件
+        let saveStoreTabsData = {};
+        console.log("所属部件所属部件所属部件所属部件", tmpCJData);
+        for (let key in tmpCJData) {
+          if (tmpCJData[key].lableName === "所属部件") {
+            saveStoreData = tmpCJData[key];
+          } else if (tmpCJData[key].lableName === "部署配置") {
+            saveStoreTabsData = tmpCJData[key];
+          }
+        }
+        if (saveStoreData) {
+          console.log("/层级属性中的节点是******所属部件...", saveStoreData);
         let findKey =
-          this.$route.params.processId +
-          "-" +
-          this.cjBaseData.attributeMap.name;
+            this.$route.query.processId + "-" + saveStoreData.attributeMap.name;
         let cjTableSel = [];
         if (this.cjUnitParam.hasOwnProperty(findKey)) {
           cjTableSel = this.cjUnitParam[findKey].cjTableSel;
@@ -333,53 +363,67 @@ export default {
           cjTableData: paramCjTableData
         };
         this.$store.dispatch("setAnalysisCjUnitParam", { findKey, value });
-        let baseParam = deepClone(
-          this.cjBaseData.xmlEntityMaps[0].xmlEntityMaps
-        );
+
+          console.log("saveStoreTabsData", saveStoreTabsData);
         let arrayTabData = []; //表格数据
         let arrayColData = []; //表单数据
-        let arrayTabDatax = {};
-        baseParam.forEach(base => {
+          // let arrayTabDatax = {};
+          saveStoreTabsData.xmlEntityMaps.forEach(base => {
           //判断是不是表格数据
           let analysisMapping = this.analysisConfigureType(base);
           if (analysisMapping.lableType === "colTab") {
-            arrayTabDatax = deepClone(base);
+              arrayTabData.push(deepClone(base));
           } else {
             arrayColData.push(deepClone(base));
           }
         });
-        paramCjTableData.forEach(item => {
-          arrayTabData.push(arrayTabDatax);
-        });
-        //处理保存数据
-        let tmpArrayTabData = [];
-        arrayTabData.forEach((item, index) => {
-          let attr = this.analysisConfigureType(item).attrs;
-          attr.forEach(form => {
-            //在二级数组中查找
-            let param = paramCjTableData[index].find(item => {
-              return item.attrKeys === form.attrKeys;
-            });
-            if (param !== undefined) {
-              item.attributeMap[param.attrName] = param.lableName;
+          for (let key in this.cjBaseData) {
+            if (this.cjBaseData[key].lableName === "部署配置") {
+              //将表格中的数据处理包铺村
+              let tmpCJTableData = deepClone(this.cjTableData);
+              let tabData = [];
+              for (let tmpKay in tmpCJTableData) {
+                let colData = deepClone(arrayTabData[0]);
+                for (let key in colData.attributeMap) {
+                  tmpCJTableData[tmpKay].forEach(attr => {
+                    if (key === attr.attrName) {
+                      colData.attributeMap[key] = attr.lableName;
             }
           });
-          tmpArrayTabData.push(deepClone(item));
-        });
-        this.cjBaseData.xmlEntityMaps[0].xmlEntityMaps = arrayColData.concat(
-          tmpArrayTabData
+                }
+                tabData.push(colData);
+              }
+              console.log(
+                "将部署配置中的表单arrayColData元素和表格arrayTabData元素合并",
+                arrayColData.concat(tabData)
         );
+              //将部署配置中的表单arrayColData元素和表格arrayTabData元素合并
+              this.cjBaseData[key].xmlEntityMaps = arrayColData.concat(tabData);
+            }
+          }
+          console.log("层级属性中  改变后的数据。。。。", this.cjBaseData);
+        }
       },
       deep: true
     },
-    //处理性能参数中的表单数据
+    //处理层级参数中的表单数据
     cjTableSel: {
       handler: function(paramsCjTableSel) {
+        let tmpCJData = deepClone(this.cjBaseData);
+        //层级属性中的所属节点
+        let saveStoreData = {}; //所属部件
+        let saveStoreTabsData = {};
+        for (let key in tmpCJData) {
+          if (tmpCJData[key].lableName === "所属部件") {
+            saveStoreData = tmpCJData[key];
+          } else if (tmpCJData[key].lableName === "部署配置") {
+            saveStoreTabsData = tmpCJData[key];
+          }
+        }
+        if (saveStoreData) {
         //处理表格相同
         let findKey =
-          this.$route.params.processId +
-          "-" +
-          this.cjBaseData.attributeMap.name;
+            this.$route.query.processId + "-" + saveStoreData.attributeMap.name;
         let cjTableData = [];
         if (this.cjUnitParam.hasOwnProperty(findKey)) {
           cjTableData = this.cjUnitParam[findKey].cjTableData;
@@ -389,14 +433,10 @@ export default {
           cjTableData: cjTableData
         };
         this.$store.dispatch("setAnalysisCjUnitParam", { findKey, value });
-        let baseParam = deepClone(
-          this.cjBaseData.xmlEntityMaps[0].xmlEntityMaps
-        );
-        // console.log("处理性能参数中的表单数据", this.cjUnitParam);
         let arrayTabData = []; //表格数据
         let arrayColData = []; //表单数据
         //处理保存数据
-        baseParam.forEach(base => {
+          saveStoreTabsData.xmlEntityMaps.forEach(base => {
           //判断是不是表格数据
           let analysisMapping = this.analysisConfigureType(base);
           if (analysisMapping.lableType === "colTab") {
@@ -405,33 +445,40 @@ export default {
             arrayColData.push(deepClone(base));
           }
         });
+          //给对应的表单元素中赋值
         arrayColData.forEach((tab, index) => {
           let attr = this.analysisConfigureType(tab).attrs;
           attr.forEach(form => {
             tab.attributeMap[paramsCjTableSel[index].attrName] =
               paramsCjTableSel[index].lableName;
+            });
           });
+          for (let key in this.cjBaseData) {
+            if (this.cjBaseData[key].lableName === "部署配置") {
+              //将表格中的数据处理包铺村
+              let tmpCJTableData = deepClone(this.cjTableData);
+              let tabData = [];
+              for (let tmpKay in tmpCJTableData) {
+                let colData = deepClone(arrayTabData[0]);
+                for (let key in colData.attributeMap) {
+                  tmpCJTableData[tmpKay].forEach(attr => {
+                    if (key === attr.attrName) {
+                      colData.attributeMap[key] = attr.lableName;
+                    }
         });
-        this.cjBaseData.xmlEntityMaps[0].xmlEntityMaps = arrayColData.concat(
-          arrayTabData
+                }
+                tabData.push(colData);
+              }
+              console.log(
+                "将部署配置中的表单arrayColData元素和表格arrayTabData元素合并",
+                arrayColData.concat(tabData)
         );
-      },
-      deep: true
-    },
-    //处理性能参数中的表单数据
-    cjBaseData: {
-      immediate: true,
-      handler: function(cjBaseData) {
-        let saveData = deepClone(this.paramsFormXmlParams);
-        for (let key in saveData) {
-          const param = saveData[key];
-          let type = this.analysisConfigureType(param).lableType;
-          if (type === "tabTS") {
-            saveData[key] = cjBaseData;
+              //将部署配置中的表单arrayColData元素和表格arrayTabData元素合并
+              this.cjBaseData[key].xmlEntityMaps = arrayColData.concat(tabData);
+            }
           }
+          console.log("层级属性中  改变后的数据。。。。", this.cjBaseData);
         }
-        //将值返回给父级组件
-        this.paramsFormXmlParams = saveData;
       },
       deep: true
     }
@@ -536,43 +583,7 @@ export default {
       }
     },
     //解析性能文件
-    itemXnTypeChange(col, $index, index) {
-      // console.log("999999999999999999999999999999999999999", $index, index);
-      let tabData = this.saveXnTableData[$index];
-      if (tabData) {
-        // console.log(
-        //   "tabData.xmlEntityMaps[1]00000000000000000000000000",
-        //   tabData.xmlEntityMaps[1]
-        // );
-        if (col.attrMappingName === "属性1") {
-          let configureType = this.analysisConfigureType(col);
-          this.attributeAssignmen(tabData, configureType, col.lableName);
-        } else if (col.attrMappingName === "属性2") {
-          let configureType = this.analysisConfigureType(col);
-          this.attributeAssignmen(
-            tabData.xmlEntityMaps[0],
-            configureType,
-            col.lableName
-          );
-          //处理文件内容
-          getPerformanceTable({ excelPath: col.lableName }).then(res => {
-            let pars = res.data.data;
-            let xmlEntityMaps = [];
-            for (let key in pars) {
-              xmlEntityMaps.push({
-                attributeMap: { coreNum: key, proRate: pars[key] },
-                lableName: "proCPB"
-              });
-            }
-            // console.log(
-            //   "xmlEntityMapsxmlEntityMapsxmlEntityMaps",
-            //   xmlEntityMaps
-            // );
-            this.$set(tabData.xmlEntityMaps[1], "xmlEntityMaps", xmlEntityMaps);
-          });
-        }
-      }
-    },
+    itemXnTypeChange(col, $index, index) {},
     //预处理层级参数
     analysisCjTableParam(params) {
       let tabParam = [];
@@ -585,17 +596,7 @@ export default {
         if (attrObj.lableType === "colTab") {
           for (let key1 in column) {
             if (column[key1].attrName !== "cmpName") {
-              column[key1].dataKey = [];
-              let chipsData = deepClone(this.chipsData);
-              for (let key2 in chipsData) {
-                column[key1].dataKey.push({
-                  value: String(chipsData[key2].nodeID),
-                  label:
-                    chipsData[key1].IP === undefined ? "" : chipsData[key1].IP,
-                  rightName: chipsData[key1].chipName
-                });
-              }
-              // console.log("column[key1].dataKey", column[key1].dataKey);
+              column[key1].dataKey = deepClone(this.chipsData);
             }
           }
           colParam = colParam.concat(column);
@@ -633,35 +634,41 @@ export default {
     },
     //所属部件回车
     analysisCjUnitParam(params) {
-      // console.log("this.cjUnitParam", this.cjUnitParam);
-      let key = this.$route.params.processId + "-" + params.attributeMap.name;
-      let chipsData = deepClone(this.chipsData);
-      let processDataKey = [];
-      for (let key1 in chipsData) {
-        processDataKey.push({
-          value: String(chipsData[key1].nodeID),
-          label: chipsData[key1].IP === undefined ? "" : chipsData[key1].IP,
-          rightName: chipsData[key1].chipName
-        });
-      }
+      console.log("paramsparamsparams", params);
+      if (params.attrMappingName === "所属部件") {
+        let key = this.$route.query.processId + "-" + params.attributeMap.name;
 
       if (this.cjUnitParam.hasOwnProperty(key)) {
         this.cjTableSel = this.cjUnitParam[key].cjTableSel;
-        this.cjTableData = this.cjUnitParam[key].cjTableData;
-        console.log("cjTableDatacjTableDatacjTableData",this.cjTableData)
+          let tableData = this.cjUnitParam[key].cjTableData;
+          for (let key1 in tableData) {
+            for (let key2 in tableData[key1]) {
+              if (tableData[key1][key2].attrName === "cmpName") {
+                tableData[key1][key2].lableName = params.attributeMap.name;
+                console.log("的初始值下拉框的值", tableData[key1][key2]);
       } else {
+                console.log(
+                  "设置层级属性中的所属部件中的初始值下拉框的值",
+                  tableData[key1][key2]
+                );
+                tableData[key1][key2].dataKey = deepClone(this.chipsData);
+              }
+            }
+          }
+        } else {
+          console.log("设置层级属性中的所属部件中的初始值。。。。");
         for (let key in this.cjTableSel) {
-          this.cjTableSel[key].lableName = "";
+            // this.cjTableSel[key].lableName = "";
         }
         //配置基础数据表
         this.cjTableData = [];
         let column = deepClone(this.cjTableOption);
+          console.log("设置层级属性中的所属部件中的初始值。。。。", column);
         column.forEach(col => {
-          // console.log("colcolcol", col);
           if (col.attrName === "cmpName") {
             col.lableName = params.attributeMap.name;
           } else {
-            col.dataKey = processDataKey;
+              col.dataKey = deepClone(this.chipsData);
           }
         });
         this.cjTableData.push(column);
@@ -670,6 +677,7 @@ export default {
           cjTableData: this.cjTableData
         };
         this.$store.dispatch("setAnalysisCjUnitParam", { key, value });
+        }
       }
       // console.log("cjUnitParam", this.cjUnitParam);
     },
@@ -720,7 +728,11 @@ export default {
     },
     //处理ConfigureType
     analysisConfigureType(config) {
+      if (config.attributeMap) {
       return eval("(" + config.attributeMap.configureType + ")");
+      } else {
+        return {};
+      }
     },
     //添加表格行
     addTableRow(tabData, tabOption) {
