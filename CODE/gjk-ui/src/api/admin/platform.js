@@ -52,3 +52,10 @@ export function putObj (obj) {
     data: obj
   })
 }
+export function getOwnPlatform (obj) {
+  return request({
+    url: '/admin/platform/ownPlatform',
+    method: 'post',
+    data: obj
+  })
+}

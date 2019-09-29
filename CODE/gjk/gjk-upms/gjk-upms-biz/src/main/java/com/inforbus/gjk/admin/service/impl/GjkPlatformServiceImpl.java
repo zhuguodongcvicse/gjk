@@ -638,4 +638,16 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 		}
 	}
 
+	/**
+	 * @Title: 获取所属平台
+	 * @Description: 查询所属平台用于下拉框显示
+	 * @Author xiaohe
+	 * @DateTime 2019年9月28日 下午4:33:08
+	 * @return
+	 * @see com.inforbus.gjk.admin.service.GjkPlatformService#selectOwnPlatform()
+	 */
+	@Override
+	public List<GjkPlatform> selectOwnPlatform() {
+		return baseMapper.selectList(Wrappers.<GjkPlatform>query().lambda().eq(GjkPlatform::getParentId, "-1"));
+	}
 }

@@ -7,10 +7,10 @@
   >
     <!-- :rules="rules" -->
     <el-form :model="compImg" status-icon ref="ruleForm" label-width="80px">
-      <el-form-item label="显示名称" class="icon_choose_w1_14s">
+      <el-form-item label="显示名称" class="icon_choose_w1_14s" style="margin-bottom: 5px;">
         <el-input type="text" v-model="compImg.imgShowName" :readonly="true"></el-input>
       </el-form-item>
-      <el-form-item label="边框样式">
+      <el-form-item label="边框样式" style="margin-bottom: 5px;">
         <el-select v-model="compImg.imgBorderso" class="icon_choose_w3_14s" placeholder="请选择线框">
           <el-option label="无线框" value="none"></el-option>
           <el-option label="实线框" value="solid"></el-option>
@@ -19,7 +19,7 @@
           <el-option label="双线框" value="double"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="图片高度">
+      <el-form-item label="图片高度" style="margin-bottom: 5px;">
         <el-col :span="9">
           <el-input-number
             controls-position="right"
@@ -40,7 +40,7 @@
           ></el-input-number>
         </el-col>
       </el-form-item>
-      <el-form-item label="边框线粗">
+      <el-form-item label="边框线粗" style="margin-bottom: 5px;">
         <el-col :span="9">
           <el-input-number
             controls-position="right"
@@ -62,7 +62,7 @@
           ></el-input-number>
         </el-col>
       </el-form-item>
-      <el-form-item label="边框颜色">
+      <el-form-item label="边框颜色" style="margin-bottom: 5px;">
         <el-col :span="9">
           <el-input v-model="compImg.imgBorderbl" placeholder class="icon_choose_w2_14s">
             <template slot="append">
@@ -84,7 +84,7 @@
           </el-input>
         </el-col>
       </el-form-item>
-      <el-form-item label="选择图片">
+      <el-form-item label="选择图片" style="margin-bottom: 5px;">
         <el-upload
           action="/comp/componentdetail/uploadImg"
           :show-file-list="false"

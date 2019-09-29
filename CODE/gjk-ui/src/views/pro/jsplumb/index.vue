@@ -331,7 +331,7 @@ export default {
     getCompAndDetail() {
       // 根据用户编号查询构件及文件列表
       // console.log("// 根据用户编号查询构件及文件列表");
-      getCompList(this.$route.params.proId).then(response => {
+      getCompList(this.$route.query.proId).then(response => {
         // console.log("// 根据用户编号查询构件及文件列表");
         // 所有文件DTO
         this.dtos = response.data.data.dtos;
@@ -381,7 +381,7 @@ export default {
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
       } else if (state === "loading") {
         //console.log("this.postMessageData.params", this.postMessageData.params);
-        findProJSON(this.$route.params.processId).then(res => {
+        findProJSON(this.$route.query.processId).then(res => {
           //循环流程中的构件及"arrow"
           console.log("加载后的数据", res.data.data.xmlJson.xmlEntityMaps);
           res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
@@ -398,7 +398,7 @@ export default {
           this.$refs.gjkIframe.sendMessage(this.postMessageData);
         });
       } else if (state === "exportJSON") {
-        exportFile(this.$route.params.processId);
+        exportFile(this.$route.query.processId);
       } else if (state === "fullScreen") {
         this.postMessageData.cmd = "fullScreen";
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
@@ -445,12 +445,12 @@ export default {
         spinner: "el-icon-loading",
         background: "rgba(0, 0, 0, 0.7)"
       });
-      handlerSaveSysXml(param, this.$route.params.processId).then(res => {
+      handlerSaveSysXml(param, this.$route.query.processId).then(res => {
         console.log("handlerSaveSysXml", res.data.data);
         console.log("列表", res.data);
         editProJSON(
           JSON.parse(this.saveParams.saveflowChartJson),
-          this.$route.params.processId
+          this.$route.query.processId
         ).then(res => {
           // setTimeout(() => {
           loading.close();

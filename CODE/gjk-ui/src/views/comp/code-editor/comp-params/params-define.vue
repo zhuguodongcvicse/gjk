@@ -108,14 +108,45 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    if (this.$route.params.processId) {
-      getChipsfromhardwarelibs(this.$route.params.processId).then(Response => {
+    if (this.$route.query.processId) {
+      getChipsfromhardwarelibs(this.$route.query.processId).then(Response => {
         if (Response.data.chips) {
-          this.chipsData = JSON.parse(Response.data.chips);
+          let chipsData = JSON.parse(Response.data.chips);
+          // let chipsData = deepClone(this.chipsData);
+          for (let key2 in JSON.parse(Response.data.chips)) {
+            this.chipsData.push({
+              value: String(chipsData[key2].nodeID),
+              label: chipsData[key2].IP === undefined ? "" : chipsData[key2].IP,
+              rightName: chipsData[key2].chipName
+            });
+          }
         } else {
-          this.chipsData = [];
+          // this.chipsData = [];
         }
       });
+    } else {
+      this.chipsData.push(
+        {
+          value: "1",
+          label: "测试芯片01",
+          rightName: "127.0.0.1"
+        },
+        {
+          value: "2",
+          label: "测试芯片02",
+          rightName: "127.0.0.2"
+        },
+        {
+          value: "3",
+          label: "测试芯片03",
+          rightName: "127.0.0.3"
+        },
+        {
+          value: "4",
+          label: "测试芯片04",
+          rightName: "127.0.0.4"
+        }
+      );
     }
   },
   //生命周期 - 挂载完成（可以访问DOM元素）

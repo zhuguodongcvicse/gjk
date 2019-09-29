@@ -183,6 +183,10 @@ export default {
       handler: function(treeData) {
         let saveTreeData = [];
         this.analysisByBaseXmlOptionData(deepClone(treeData), saveTreeData);
+        console.log(
+          "params-tree.vue构件赋值将保存的数据。。。。。",
+          saveTreeData
+        );
         this.tableXmlParams.xmlEntityMaps = saveTreeData;
       },
       deep: true
@@ -296,8 +300,60 @@ export default {
       this.$refs.tree.setCheckedKeys([param.id]);
       //设置右侧表单内容
       this.nodeFormParam = this.$refs.tree.getCurrentNode().nodeData;
+      this.lengthIsShow();
       //设置当前选择节点
       this.clickNodeData = this.$refs.tree.getCurrentNode();
+    },
+    lengthIsShow() {
+      let data = this.nodeFormParam;
+      // 变量类型内容
+      let bllxName;
+      data.forEach(items => {
+        items.forEach(item => {
+          // 如果是变量类型，将变量类型当前内容赋入
+          if (item.attrMappingName === this.bllxParam) {
+            bllxName = item.lableName;
+          }
+        });
+      });
+      data.forEach(items => {
+        items.forEach(item => {
+          // 如果是长度，根据变量类型内容判断是否显示
+          if (item.attrMappingName === this.lengthParam) {
+            let isx = bllxName.includes("*");
+            if (bllxName === null || bllxName === undefined) {
+              return;
+            }
+            if (item.attrMappingName === this.lengthParam) {
+              if (isx) {
+                item.isShow = true;
+              } else {
+                item.lableName = "";
+                item.isShow = false;
+              }
+            }
+          }
+          // 如果是类别，根据变量类型内容处理选择内容
+          if (item.attrMappingName === this.lbParam) {
+            let isx = bllxName.includes("*");
+            if (bllxName === null || bllxName === undefined) {
+              return;
+            }
+            item.dataKey = [];
+            if (isx) {
+              item.dataKey.push(
+                { value: "DATA", label: "DATA" },
+                { value: "STRUCTTYPE", label: "STRUCTTYPE" }
+              );
+            } else {
+              item.dataKey.push(
+                { value: "STRUCTTYPE", label: "STRUCTTYPE" },
+                { value: "IMMEDIATE", label: "IMMEDIATE" }
+              );
+            }
+          }
+        });
+      });
     },
     //过滤数据
     filterNode(value, data) {
@@ -340,15 +396,6 @@ export default {
     },
     //每个框的改变该表事件
     itemTypeChange(col, row) {
-      if (null !== row && undefined !== row) {
-        row.forEach(items => {
-          items.forEach(item => {
-            if (col.attrMappingName === this.bllxParam) {
-              this.changeCol(col, item, row);
-            }
-          });
-        });
-      }
       if (col.attrMappingName === this.bllxParam) {
         let isStruct = col.lableName.replace("*", "");
         //在不在头文件中
@@ -884,15 +931,27 @@ export default {
         let baseData = deepClone(this.baseXmlOptionData);
         let saveRow = deepClone(this.baseXmlOptionData);
         if (tree.hasOwnProperty("children") && tree.children.length > 0) {
+          console.log("params-tree.vue中， 处理有children。。。。。", tree);
           //用于处理多个层级的时候处理
           if (parentTree) {
             let separator = tree.assigParamName.includes("_*") ? "->" : ".";
             // 给结构体赋值 structId structName
             tree.assigParamName =
               parentTree.assigParamName + tree.lableName + separator;
+              console.log("测试01测试01测试01测试01",tree.assigParamName)
             tree.nodeData[0][1].lableName = parentTree.nodeData[0][1].lableName;
             tree.nodeData[0][2].lableName = parentTree.nodeData[0][2].lableName;
+          } else {
+            // let tmpName = tree.children[0].assigParamName;
+            // let saveName = "";
+            // if (tmpName.includes("->")) {
+            //   // saveName = tmpName.substr(0, tmpName.indexOf("->")).concat("->");
+            // } else {
+            //   // saveName = tmpName.substr(0, tmpName.indexOf(".")).concat(".");
+            // }
+            // tree.assigParamName = saveName;
           }
+          console.log("0000000000000000000000000000000000000000000000000",tree.assigParamName)
           //递归调用
           this.analysisByBaseXmlOptionData(tree.children, saveTreeData, tree);
         } else {
