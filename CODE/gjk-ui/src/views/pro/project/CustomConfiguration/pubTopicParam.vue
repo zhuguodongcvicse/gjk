@@ -6,12 +6,13 @@
       <el-col :span="24" class="nodeText">
         <el-form :inline="true" :model="formInline" class="demo-form-inline">
           <el-form-item label="startCmp">
-            <el-select v-model="formInline.region" placeholder="" @change="getPart">
+            <el-select v-model="formInline.region" placeholder="">
              <el-option 
                 v-for="item in part"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value"
+                @click.native="getPart"
               >
               </el-option>
             </el-select>
@@ -53,12 +54,13 @@
         </el-row>
         <el-form :label-position="'right'" label-width="120px" :model="formLabelAlign">
           <el-form-item label="funcName">
-            <el-select v-model="formLabelAlign.name" placeholder="请选择"  @change="getOutPreames">
+            <el-select v-model="formLabelAlign.name" placeholder="请选择">
               <el-option
                 v-for="item in options"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value"
+                @click.native="getOutPreames"
               >
               <span style="float: left">{{ item.label }}</span>
               <span style="float: right; color: #8492a6; font-size: 13px">{{ item.value }}</span>
@@ -91,6 +93,7 @@
 import { mapGetters } from "vuex";
 
 export default {
+  funcNameMap : new Map(),
   //import引入的组件需要注入到对象中才能使用
   components: {},
   //props用于接收父级传值
@@ -107,7 +110,7 @@ export default {
       if(this.topicKey != "" && this.cleanState != "1"){
         this.$store.dispatch('getPubMapCustomConfig', {key:"publish*"+this.topicKey,value:this.topicData})
       }
-      
+      console.log("商店中取出数据",this.pubMapCustomConfig)
       },
       deep:true
     },
@@ -121,6 +124,7 @@ export default {
         if(this.topicKey != "" && this.cleanState != "1"){
            this.$store.dispatch('getPubMapCustomConfig', {key:"publish*"+this.topicKey,value:this.topicData})
         }
+        console.log("商店中取出数据",this.pubMapCustomConfig)
       },
       deep:true
     }
@@ -129,6 +133,9 @@ export default {
     //这里存放数据
     
     return {
+      funcNameMap: new Map,
+      compId : "",
+      state:"",
       cleanState: "", //删除状态
       part:[],
       formLabelAlign: {
@@ -183,6 +190,8 @@ export default {
   //方法集合
   methods: {
      getOutPreames(){
+       this.formLabelAlign.region = ""
+       this.outPreames = []
       for(var p in this.partList){
          if(this.formInline.region == this.partList[p].partName){
             for(var i in this.partList[p].components){
@@ -202,14 +211,20 @@ export default {
     },
      getPart(){
       console.log("this.part",this.part);
+      console.log("this.options",this.options)
+      this.formLabelAlign.name = ""
+      this.options = []
        for(var p in this.partList){
          if(this.formInline.region == this.partList[p].partName){
            for(var i in this.partList[p].components){
-             console.log(this.partList[p].components[i].compId)
+             console.log("53352035",this.partList[p].components[i].functionName)
+             this.state = "1"
+             this.funcNameMap.set(this.partList[p].components[i].compId,{compName:this.partList[p].components[i].compName,funName:this.partList[p].components[i].functionName})
              this.options.push({
                label:this.partList[p].components[i].compName,
                value:this.partList[p].components[i].compId
              });
+             
            }
          }
        }
@@ -248,19 +263,25 @@ export default {
       if(topicData != undefined){
          var funcConfig =new Map(this.pubMapCustomConfig.get("publish*"+this.topicKey).funcConfig).get(this.funcConfigLabel);
         if(funcConfig == undefined){
+          this.state = "2"
+          this.compId = ""
           this.formLabelAlign.name = ""
           this.formLabelAlign.region = ""
         }else{
-          this.formLabelAlign.name = funcConfig.funcName.split("*")[1]
+          this.state = "2"
+          this.compId = funcConfig.funcName.split("*")[1]
+          this.formLabelAlign.name = funcConfig.funcName.split("*")[3]
           this.formLabelAlign.region = funcConfig.funcInterface.split("*")[1]
         }
       }
 
     },
     echo(topic,state){
+      console.log("this.pubMapCustomConfig",topic)
       this.data = [];
-      this.funcConfigLabel = topic.funcConfig[0][0]
+      console.log("父页面")
       if(topic!=undefined){
+        this.funcConfigLabel = topic.funcConfig[0][0]
         for(var i = 0;i<topic.funcConfig.length;i++){
           this.data.push({
             id:topic.funcConfig[i][0].split("*")[0],
@@ -276,11 +297,15 @@ export default {
         this.mapFuncConfig = topic
         this.clickState = state
        if(new Map(topic.funcConfig).size>0 && funcConfig!=undefined){
-          this.formLabelAlign.name = funcConfig.funcName.split("*")[1]
+          this.state = "2"
+          this.compId = funcConfig.funcName.split("*")[1]
+          this.formLabelAlign.name = funcConfig.funcName.split("*")[3]
           this.formLabelAlign.region = funcConfig.funcInterface.split("*")[1]
         }
       }else{
-          this.formInline.user = ""
+         this.state = "2"
+        this.compId = ""
+        this.formInline.user = ""
         this.formInline.region = ""
          this.formLabelAlign.name = ""
           this.formLabelAlign.region = ""
@@ -298,7 +323,29 @@ export default {
     init(){
        this.topicData.user = "startCmp*"+this.formInline.user;
        this.topicData.region = "endCmp*"+this.formInline.region;
-       this.topicData.funcConfig.set(this.funcConfigLabel,{funcName:"funcName*"+this.formLabelAlign.name,funcInterface:"funcInterface*"+this.formLabelAlign.region});
+       var strFuncName = ""
+       var strcompName = ""
+       var strcompId = ""
+       if(this.funcNameMap.size > 0 && this.state == "1"){
+         if(this.formLabelAlign.name != ""){
+           strFuncName = this.funcNameMap.get(this.formLabelAlign.name).funName
+            strcompName = this.funcNameMap.get(this.formLabelAlign.name).compName
+            strcompId = this.formLabelAlign.name
+         }
+       }else if(this.funcNameMap.size>0 && this.state == "0"){
+          strFuncName = this.funcNameMap.get(this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compId).funName
+          strcompName = this.funcNameMap.get(this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compId).compName
+          strcompId = this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compId
+       }else{
+          if(this.compId != "" && this.compId != undefined){
+           console.log("状态为2")
+           strFuncName = this.funcNameMap.get(this.compId).funName
+           strcompName = this.funcNameMap.get(this.compId).compName
+           strcompId = this.compId
+         }
+       }
+      //  var strFuncName = this.funcNameMap.get(this.formLabelAlign.name)
+       this.topicData.funcConfig.set(this.funcConfigLabel,{funcName:"funcName*"+strcompId+"*"+strFuncName+"*"+strcompName,funcInterface:"funcInterface*"+this.formLabelAlign.region});
     }
 
   },
@@ -306,6 +353,7 @@ export default {
   created() {
     // console.log("pubtopicParam",this.themeData.xmlEntityMaps)
     // console.log("topic中的数据",this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps)
+    this.$store.dispatch('cleanPubMapCustomConfig')
     for(var i = 0;i<this.themeData.xmlEntityMaps[1].xmlEntityMaps.length;i++){
       this.topicData.funcConfig.clear()
       for(var j = 0;j<this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps.length;j++){
@@ -315,7 +363,7 @@ export default {
            this.topicData.region =this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].lableName+"*"+ this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[1].attributeMap.name
         }else{
          var dataStream = {
-           funcName:this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[0].lableName+"*"+this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[0].attributeMap.name,
+           funcName:this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[0].lableName+"*"+this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[0].attributeMap.compId+"*"+this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[0].attributeMap.name+"*"+this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[0].attributeMap.compName,
            funcInterface:this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[1].lableName+"*"+this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[1].attributeMap.name,
          }; 
         //  console.log("解析xmldataStream",dataStream)
@@ -328,6 +376,9 @@ export default {
     var key = this.themeData.xmlEntityMaps[1].lableName+"*0*"+this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].lableName
     this.mapFuncConfig = this.pubMapCustomConfig.get(key)
     this.clickState = "1"
+     this.state = "0"
+    //this.funcNameMap.set(this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compId,{compName:this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compName,funName:this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.name})
+    this.funcNameMap.set(this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compId,{compName:this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compName,funName:this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.name})
     this.formInline.user = this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[0].attributeMap.name
     this.formInline.region = this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[1].attributeMap.name
     for(var a = 0;a < this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps.length-2;a++){
@@ -339,7 +390,7 @@ export default {
       );
     }
     this.funcConfigLabel = this.data[0].id+"*"+this.data[0].label
-    this.formLabelAlign.name = this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.name
+    this.formLabelAlign.name = this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compName
     this.formLabelAlign.region = this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[1].attributeMap.name 
      for(var k =0;k<this.partList.length;k++){
       this.part.push(

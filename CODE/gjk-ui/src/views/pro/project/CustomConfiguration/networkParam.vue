@@ -9,6 +9,7 @@
             :key="item.value"
             :label="item.label"
             :value="item.value"
+            @click.native="updateState"
           >
            <span style="float: left">{{ item.label }}</span>
            <span style="float: right; color: #8492a6; font-size: 13px">{{ item.value }}</span>
@@ -69,7 +70,9 @@ export default {
     return {
       //父页面funcConfig列表点击状态
       funcConfigKey:"",
-
+      funcConfigNameMap : new Map(),
+      state : "",
+      compId : "",
       labelPosition: "right",
       formLabelAlign: {
         type : "",
@@ -99,6 +102,9 @@ export default {
   },
   //方法集合
   methods: {
+    updateState(){
+      this.state = "0"
+    },
     getFuncConfigKey(funcConfigKey){
       this.funcConfigKey = funcConfigKey;
     },
@@ -110,7 +116,28 @@ export default {
     },
     init(){
       this.funcConfigData.clear()
-      this.funcConfigData.set(this.funcConfigKey.split("*")[0]+"__name",this.formLabelAlign.type);
+      var funcName = ""
+      var compName = ""
+      var compId = ""
+      if(this.funcConfigNameMap.size > 0 ){
+        if(this.state == "1"){
+          console.log("状态1")
+          funcName = this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[0].attributeMap.name
+          compName = this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[0].attributeMap.compName
+          compId = this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[0].attributeMap.compId
+        }else if(this.state =="0"){
+          console.log("状态0")
+          funcName = this.funcConfigNameMap.get(this.formLabelAlign.type).funName
+          compName = this.funcConfigNameMap.get(this.formLabelAlign.type).compName
+          compId = this.formLabelAlign.type
+        }else if(this.state =="2" && this.compId != ""){
+          console.log("状态2")
+          funcName = this.funcConfigNameMap.get(this.compId).funName
+          compName = this.funcConfigNameMap.get(this.compId).compName
+          compId = this.compId
+        }
+      }
+      this.funcConfigData.set(this.funcConfigKey.split("*")[0]+"__name",{id:compId,name:compName,funName:funcName});
       this.funcConfigData.set("ip__name",this.formLabelAlign.ip)
       this.funcConfigData.set("port__name",this.formLabelAlign.port)
       this.funcConfigData.set("protocol__name",this.formLabelAlign.protocol)
@@ -118,11 +145,16 @@ export default {
     echo(funcConfigData){
       if(funcConfigData != undefined){
         var funcConfigMap = new Map(funcConfigData);
-        this.formLabelAlign.type = funcConfigMap.get(this.funcConfigKey.split("*")[0]+"__name")
+        this.state = "2"
+        console.log("数据11111111",funcConfigMap.get(this.funcConfigKey.split("*")[0]+"__name"))
+        this.compId = funcConfigMap.get(this.funcConfigKey.split("*")[0]+"__name").id
+        this.formLabelAlign.type = funcConfigMap.get(this.funcConfigKey.split("*")[0]+"__name").name
         this.formLabelAlign.ip = funcConfigMap.get("ip__name");
         this.formLabelAlign.port = funcConfigMap.get("port__name");
         this.formLabelAlign.protocol = funcConfigMap.get("protocol__name")
       }else{
+        this.state = "2"
+        this.compId = ""
         this.formLabelAlign.type = ""
         this.formLabelAlign.ip = ""
         this.formLabelAlign.port = ""
@@ -134,11 +166,15 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-   // console.log("输出网络配置netWork_in xml数据",this.netWorkData.xmlEntityMaps[0].xmlEntityMaps);
+    this.$store.dispatch('cleanNetworkIn');
+    console.log("输出网络配置netWork_in xml数据",this.netWorkData.xmlEntityMaps[0].xmlEntityMaps);
     for(var i =0;i<this.netWorkData.xmlEntityMaps[0].xmlEntityMaps.length;i++){
-      for(var p in this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[i].attributeMap){
-        this.funcConfigData.set(this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[i].lableName+"__"+p,this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[i].attributeMap[p]);
-      }
+      // for(var p in this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[i].attributeMap){
+      //   this.funcConfigData.set(this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[i].lableName+"__"+p,this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[i].attributeMap[p]);
+      //   console.log("111111",this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[i].lableName+"__"+p)
+      //   console.log("222222",this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[i].attributeMap[p])
+      // }
+      this.funcConfigData.set(this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[i].lableName+"__name",{id:this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[i].attributeMap.compId,name:this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[i].attributeMap.compName,funName:this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[i].attributeMap.name})
       for(var j =0;j<this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps.length;j++){
         for(var s in this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].attributeMap){
           this.funcConfigData.set(this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].lableName+"__"+s,this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].attributeMap[s]);
@@ -146,7 +182,8 @@ export default {
       }
        this.$store.dispatch('getNetworkIn', {key:this.netWorkData.xmlEntityMaps[0].lableName+"*"+this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[i].lableName+"*"+i,value:this.funcConfigData})
     }
-    this.formLabelAlign.type = this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[0].attributeMap.name
+    this.state = "1"
+    this.formLabelAlign.type = this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[0].attributeMap.compName
     for(var a = 0;a<this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps.length;a++){
       if(this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[a].lableName == "ip"){
         this.formLabelAlign.ip = this.netWorkData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[a].attributeMap.name
@@ -162,6 +199,7 @@ export default {
     console.log("商店中partList",this.partList)
     for(var i = 0;i<this.partList.length;i++){
       for(var j = 0;j<this.partList[i].components.length;j++){
+        this.funcConfigNameMap.set(this.partList[i].components[j].compId,{compName:this.partList[i].components[j].compName,funName:this.partList[i].components[j].functionName})
         this.options_name.push({
           label:this.partList[i].components[j].compName,
           value:this.partList[i].components[j].compId

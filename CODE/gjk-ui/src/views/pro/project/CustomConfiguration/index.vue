@@ -28,6 +28,7 @@ import networkConfig from "./networkConfig";
 import themeConfig from "./themeConfig";
 import { mapGetters } from "vuex";
 import { createThemeXML, analysisThemeXML,createNetWorkXML } from "@/api/pro/manager";
+import {deepClone } from "@/util/util";
 export default {
   //import引入的组件需要注入到对象中才能使用
   components: {
@@ -171,7 +172,7 @@ export default {
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["subMapCustomConfig", "pubMapCustomConfig", "themeData","netWorkIn","netWorkOut"])
+    ...mapGetters(["subMapCustomConfig", "pubMapCustomConfig", "themeData","netWorkIn","netWorkOut","partList"])
   },
   //方法集合
   methods: {
@@ -186,13 +187,13 @@ export default {
       this.xml.xmlEntityMaps[1].xmlEntityMaps = [];
       console.log(
         "取出数据this.subMapCustomConfig",
-        JSON.stringify(this.subMapCustomConfig)
+        (this.subMapCustomConfig)
       );
       for (var [key, value] of this.subMapCustomConfig) {
         console.log(1111111);
         this.xml.xmlEntityMaps[0].lableName = key.split("*")[0];
         this.xmlEntityMapstopic.lableName = key.split("*")[2];
-        this.$set(this.xmlEntityMapstopic.attributeMap, "name", "kehuzijitian");
+        this.$set(this.xmlEntityMapstopic.attributeMap, "name", "");
         for (var p in value) {
           try {
             var map = new Map(value[p]);
@@ -202,11 +203,41 @@ export default {
               this.xmlEntityMapsdataStram.lableName = key.split("*")[1];
               for (var datakey in val) {
                 this.xmlEntityMaps.lableName = datakey.split("*")[0];
-                this.$set(
-                  this.xmlEntityMaps.attributeMap,
-                  "name",
-                  val[datakey].split("*")[1]
-                );
+                if(datakey.split("*")[0] == "funcName"){
+                  var uuid = val[datakey].split("*")[1]
+                  console.log("partList",this.partList)
+                  for(var pl = 0; pl < this.partList.length;pl++){
+                    for(var plcom =0; plcom<this.partList[pl].components.length;plcom++){
+                      if((val[datakey].split("*")[1]) == this.partList[pl].components[plcom].compId){
+                       // alert(11111)
+                          this.xmlEntityMaps.attributeMap = {}
+                         this.$set(
+                            this.xmlEntityMaps.attributeMap,
+                            "name",
+                            this.partList[pl].components[plcom].functionName
+                          );
+                          this.$set(
+                            this.xmlEntityMaps.attributeMap,
+                            "compId",
+                            val[datakey].split("*")[1]
+                          );
+                          this.$set(
+                            this.xmlEntityMaps.attributeMap,
+                            "compName",
+                            val[datakey].split("*")[3]
+                          );
+                      }
+                    }
+                  }
+                }else{
+                  this.xmlEntityMaps.attributeMap = {}
+                   this.$set(
+                    this.xmlEntityMaps.attributeMap,
+                    "name",
+                    val[datakey].split("*")[1]
+                  );
+                }
+               // console.log("funcName值2",val[datakey].split("*")[1])
                 this.xmlEntityMapsdataStram.xmlEntityMaps.push(
                   JSON.parse(JSON.stringify(this.xmlEntityMaps))
                 );
@@ -218,6 +249,7 @@ export default {
             }
           } catch (error) {
             this.xmlEntityMaps.lableName = p.split("*")[0];
+            console.log("startCmp的值1",value[p].split("*"))
             this.$set(
               this.xmlEntityMaps.attributeMap,
               "name",
@@ -239,7 +271,7 @@ export default {
       for (var [key, value] of this.pubMapCustomConfig) {
         this.xml.xmlEntityMaps[1].lableName = key.split("*")[0];
         this.xmlEntityMapstopic.lableName = key.split("*")[2];
-        this.$set(this.xmlEntityMapstopic.attributeMap, "name", "pub");
+        this.$set(this.xmlEntityMapstopic.attributeMap, "name", "");
         for (var p in value) {
           try {
             var map = new Map(value[p]);
@@ -251,11 +283,40 @@ export default {
               this.xmlEntityMapsdataStram.lableName = key.split("*")[1];
               for (var datakey in val) {
                 this.xmlEntityMaps.lableName = datakey.split("*")[0];
-                this.$set(
-                  this.xmlEntityMaps.attributeMap,
-                  "name",
-                  val[datakey].split("*")[1]
-                );
+                  if(datakey.split("*")[0] == "funcName"){
+                  var uuid = val[datakey].split("*")[1]
+                  console.log("023.25",val[datakey].split("*")[1])
+                  console.log("partList",this.partList)
+                  for(var pl = 0; pl < this.partList.length;pl++){
+                    for(var plcom =0; plcom<this.partList[pl].components.length;plcom++){
+                      if((val[datakey].split("*")[1]) == this.partList[pl].components[plcom].compId){
+                        this.xmlEntityMaps.attributeMap = {}
+                         this.$set(
+                            this.xmlEntityMaps.attributeMap,
+                            "name",
+                            this.partList[pl].components[plcom].functionName
+                          );
+                           this.$set(
+                            this.xmlEntityMaps.attributeMap,
+                            "compId",
+                            val[datakey].split("*")[1]
+                          );
+                          this.$set(
+                            this.xmlEntityMaps.attributeMap,
+                            "compName",
+                            val[datakey].split("*")[3]
+                          );
+                      }
+                    }
+                  }
+                }else{
+                  this.xmlEntityMaps.attributeMap = {}
+                   this.$set(
+                    this.xmlEntityMaps.attributeMap,
+                    "name",
+                    val[datakey].split("*")[1]
+                  );
+                }
                 this.xmlEntityMapsdataStram.xmlEntityMaps.push(
                   JSON.parse(JSON.stringify(this.xmlEntityMaps))
                 );
@@ -309,11 +370,22 @@ export default {
           var map = new Map(value);
            this.funcConfigEntityMaps.xmlEntityMaps = []
           for(var [k, val] of map){
+             console.log("数据比较111111",k.split("__")[0])
+             console.log("数据比较222222",key.split("*")[1])
            if(k.split("__")[0] == key.split("*")[1]){
+               this.funcConfigEntityMaps.attributeMap = {}
               this.$set(
                this.funcConfigEntityMaps.attributeMap,
-             k.split("__")[1],val);  
+             k.split("__")[1],val.funName); 
+               this.$set(
+               this.funcConfigEntityMaps.attributeMap,
+             "compName",val.name); 
+               this.$set(
+               this.funcConfigEntityMaps.attributeMap,
+             "compId",val.id); 
+             console.log("网络配置参数",val)
            }else{
+             this.entityMaps.attributeMap = {}
             this.entityMaps.lableName = k.split("__")[0]
             for(var [k1,val1] of map){
               if(k1.split("__")[0] == k.split("__")[0]){
