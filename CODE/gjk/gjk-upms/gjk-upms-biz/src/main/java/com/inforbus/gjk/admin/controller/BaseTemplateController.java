@@ -107,7 +107,7 @@ public class BaseTemplateController {
 	@PutMapping
 	@PreAuthorize("@pms.hasPermission('admin_basetemplate_edit')")
 	public R update(@RequestBody BaseTemplate baseTemplate) {
-		return new R<>(baseTemplateService.updateById(baseTemplate));
+		return new R<>(baseTemplateService.update(baseTemplate));
 	}
 
 	/**
@@ -125,7 +125,7 @@ public class BaseTemplateController {
 
 	/**
 	 * 解析xml功能
-	 * @param
+	 * @param baseTemplatePathDTO
 	 * @return R
 	 */
 	@SysLog("解析xml")
@@ -133,6 +133,7 @@ public class BaseTemplateController {
 	public R parseXml(@RequestBody BaseTemplatePathDTO baseTemplatePathDTO) {
 		return new R<>(baseTemplateService.parseXml(baseTemplatePathDTO.getPath()));
 	}
+
 	/**
 	 * 编辑基础模板的解析xml功能
 	 * 2019年9月5日 16:32:04
@@ -146,6 +147,7 @@ public class BaseTemplateController {
 	public R editParseXml(@RequestBody BaseTemplate baseTemplate) {
 		return new R<>(baseTemplateService.editParseXml(baseTemplate));
 	}
+
 	/**
 	 * 基础模板保存编辑
 	 * 2019年9月5日 16:32:20
@@ -154,6 +156,7 @@ public class BaseTemplateController {
 	 * @return R
 	 */
 	@SysLog("编辑模板")
+	@PreAuthorize("@pms.hasPermission('admin_basetemplate_edit')")
 	@PutMapping("/editBaseTemplate")
 	public R editBaseTemplate(@RequestBody BaseTemplateDTO baseTemplateDTO) {
 		return new R<>(baseTemplateService.editBaseTemplate(baseTemplateDTO));

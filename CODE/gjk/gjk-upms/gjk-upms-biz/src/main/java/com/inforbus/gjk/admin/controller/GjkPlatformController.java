@@ -116,7 +116,7 @@ public class GjkPlatformController {
 	@SysLog("新增平台库")
 	@PostMapping
 	@PreAuthorize("@pms.hasPermission('sys_platform_add')")
-	public R save(@Valid @RequestBody GjkPlatform gjkPlatform) {
+	public R save(@RequestBody GjkPlatform gjkPlatform) {
 		gjkPlatform.setPlatformId(IdGenerate.uuid());
 		return new R<>(gjkPlatformService.save(gjkPlatform));
 	}
