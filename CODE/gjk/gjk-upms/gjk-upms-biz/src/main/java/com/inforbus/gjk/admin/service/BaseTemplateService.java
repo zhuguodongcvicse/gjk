@@ -26,24 +26,53 @@ import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 /**
  * 基础模板
  *
- * @author xiaohe
+ * @author wang
  * @date 2019-07-16 08:40:33
  */
 public interface BaseTemplateService extends IService<BaseTemplate> {
 
 	/**
 	 * 基础模板简单分页查询
-	 * 
+	 *
 	 * @param baseTemplate 基础模板
 	 * @return
 	 */
 	IPage<BaseTemplate> getBaseTemplatePage(Page<BaseTemplate> page, BaseTemplate baseTemplate);
 
+	/**
+	 * 基础模板编辑功能解析xml文件
+	 * @param baseTemplate 基础模板
+	 * @return XmlEntityMap
+	 */
 	XmlEntityMap editParseXml(BaseTemplate baseTemplate);
+
+	/**
+	 * 基础模板编辑功能保存数据
+	 * @param baseTemplateDTO 基础模板
+	 * @return boolean
+	 */
 	boolean editBaseTemplate(BaseTemplateDTO baseTemplateDTO);
 
+	/**
+	 * 基础模板新增功能保存数据
+	 * 保存xml文件到指定目录下,以及在数据库添加一条数据
+	 * @param baseTemplateDTO 基础模板
+	 * @return boolean
+	 */
 	boolean saveBaseTemplate(BaseTemplateDTO baseTemplateDTO);
 
+	/**
+	 * 基础模板新增功能按指定路径读取xml文件
+	 * @param baseTemplatePath 将要读取的xml文件的路径
+	 * @return XmlEntityMap
+	 */
 	XmlEntityMap parseXml(String baseTemplatePath);
+
+	/**
+	 * 基础模板修改功能
+	 * @param baseTemplate 将要读取的xml文件的路径
+	 * @return boolean
+	 */
+	boolean update(BaseTemplate baseTemplate);
 
 }

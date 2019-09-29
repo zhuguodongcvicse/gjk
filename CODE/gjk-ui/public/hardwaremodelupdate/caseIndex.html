@@ -41,12 +41,38 @@
     <!-- endbuild -->
     <script src="scripts/graphs.js"></script>
     <script src="scripts/casemain.js"></script>
+    <script src="../util/mangUtils.js"></script>
     <script type="text/javascript">
         /* function submitSetting() {
             var aa = document.getElementsByTagName("input").value(); 
             console.log("chipValueList",chipValueList)
             console.log("aa",aa)
         } */
+        function upperCase() {
+            var x = document.getElementById("IP").childNodes.item(0).value
+            // console.log("x", x)
+            // console.log("clickchip",clickCheckedChip)
+            // document.getElementById("fname").value = x.toUpperCase()
+            for (const m in graphList.fJson) {
+                for (const k in graphList.fJson[m].datas) {
+                    if (graphList.fJson[m].datas[k].json.properties.caseName != null) {
+                        for (const i in graphList.fJson[m].datas[k].json.properties.frontBoardList) {
+                            for (const j in graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList) {
+                                //找到数组中点击的当前芯片
+                                if (graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList[j].uniqueId.indexOf(clickCheckedChip.uniqueId) != -1) {
+                                    //当前配置栏输入的IP赋给数组中芯片的属性
+                                    graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList[j].IP = clickCheckedChip.IP
+                                    //将该赋值后的芯片放到临时的芯片数组中
+                                    chipListTemp.push(graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList[j])
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            //深拷贝
+			chipListTemp = JSON.parse(JSON.stringify(chipListTemp))
+        }
         function getCaption(obj) {
             var index = obj.lastIndexOf("\+");
             obj = obj.substring(index + 1, obj.length);

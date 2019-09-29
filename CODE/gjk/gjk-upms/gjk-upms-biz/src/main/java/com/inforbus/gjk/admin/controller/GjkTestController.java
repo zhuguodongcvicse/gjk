@@ -96,7 +96,7 @@ public class GjkTestController {
 	@SysLog("新增测试库")
 	@PostMapping
 	@PreAuthorize("@pms.hasPermission('sys_test_add')")
-	public R save(@Valid @RequestBody GjkTest gjkTest) {
+	public R save(@RequestBody GjkTest gjkTest) {
 		gjkTest.setTestId(IdGenerate.uuid());
 		return new R<>(gjkTestService.save(gjkTest));
 	}

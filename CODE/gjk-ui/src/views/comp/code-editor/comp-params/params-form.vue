@@ -41,76 +41,76 @@
         ></params-tree>
       </el-col>
     </template>
-      <!-- 层级属性 -->
+    <!-- 层级属性 -->
     <el-form ref="form" label-width="100px" v-show="isShowCJTableData">
       <!-- 层级属性 处理第一层-->
-          <el-form-item
-            v-for=" (showParam,$index) in cjBaseDataOption"
-            :label="showParam.attrMappingName"
-            :key="$index"
-            style="margin-bottom: 0px;"
-          >
-            <form-item-type
-              v-model="showParam.attributeMap.name"
-              :lableType="showParam.attrConfigType"
-              :readonly="readonly"
-              :disabled="disabled"
+      <el-form-item
+        v-for=" (showParam,$index) in cjBaseDataOption"
+        :label="showParam.attrMappingName"
+        :key="$index"
+        style="margin-bottom: 0px;"
+      >
+        <form-item-type
+          v-model="showParam.attributeMap.name"
+          :lableType="showParam.attrConfigType"
+          :readonly="readonly"
+          :disabled="disabled"
           @onBlurNative="analysisCjUnitParam(showParam)"
           v-on:keyup.enter.native="analysisCjUnitParam(showParam)"
-            ></form-item-type>
-          </el-form-item>
-          <!-- 处理部署配置下的配置 -->
-          <template>
-              <el-form-item
-                v-for=" (child,$index) in cjTableSel"
-                :label="child.attrMappingName"
-                :key="$index"
-                style="margin-bottom: 0px;"
-              >
-                <form-item-type
-                  v-model="child.lableName"
-                  :lableType="child.attrConfigType"
-                  :dictKey="child.dataKey"
-                  :readonly="readonly"
-                  :disabled="disabled"
-                  placeholder="请选择"
-                ></form-item-type>
-              </el-form-item>
-            <!-- 处理部署配置 中的表格部分 -->
-            <el-table :data="cjTableData" border stripe style="width: 100%">
-              <el-table-column
-                :prop="column.attrMappingName"
-                :label="column.attrMappingName"
-                v-for="(column,index) in cjTableOption"
-                :key="index"
-              >
-                <template slot-scope="{row,$index}">
-                  <span v-for="(col,index) in row" :key="index">
-                    <template v-if="col.attrMappingName === column.attrMappingName && col.isShow">
-                      <form-item-type
-                        v-model="col.lableName"
-                        :lableType="col.attrConfigType"
-                        placeholder="请选择"
-                        :dictKey="col.dataKey"
-                        :readonly="readonly"
-                        :disabled="$index===0&&index===1"
-                      ></form-item-type>
-                    </template>
-                  </span>
+        ></form-item-type>
+      </el-form-item>
+      <!-- 处理部署配置下的配置 -->
+      <template>
+        <el-form-item
+          v-for=" (child,$index) in cjTableSel"
+          :label="child.attrMappingName"
+          :key="$index"
+          style="margin-bottom: 0px;"
+        >
+          <form-item-type
+            v-model="child.lableName"
+            :lableType="child.attrConfigType"
+            :dictKey="child.dataKey"
+            :readonly="readonly"
+            :disabled="disabled"
+            placeholder="请选择"
+          ></form-item-type>
+        </el-form-item>
+        <!-- 处理部署配置 中的表格部分 -->
+        <el-table :data="cjTableData" border stripe style="width: 100%">
+          <el-table-column
+            :prop="column.attrMappingName"
+            :label="column.attrMappingName"
+            v-for="(column,index) in cjTableOption"
+            :key="index"
+          >
+            <template slot-scope="{row,$index}">
+              <span v-for="(col,index) in row" :key="index">
+                <template v-if="col.attrMappingName === column.attrMappingName && col.isShow">
+                  <form-item-type
+                    v-model="col.lableName"
+                    :lableType="col.attrConfigType"
+                    placeholder="请选择"
+                    :dictKey="col.dataKey"
+                    :readonly="readonly"
+                    :disabled="$index===0&&index===1"
+                  ></form-item-type>
                 </template>
-              </el-table-column>
-              <el-table-column fixed="right" label="操作" header-align="left" width="55">
-                <template slot-scope="{row,$index}">
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column fixed="right" label="操作" header-align="left" width="55">
+            <template slot-scope="{row,$index}">
               <el-button type="text" v-if="$index > 0" @click="delTableRow(cjTableData,$index)">删除</el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-            <div align="center" style="height:40px;line-height:40px;padding-left:10px">
-              <el-button type="text" @click="addTableRow(cjTableData,cjTableOption)">添加</el-button>
-            </div>
-          </template>
-        </el-form>
-      <!-- 性能属性 -->
+            </template>
+          </el-table-column>
+        </el-table>
+        <div align="center" style="height:40px;line-height:40px;padding-left:10px">
+          <el-button type="text" @click="addTableRow(cjTableData,cjTableOption)">添加</el-button>
+        </div>
+      </template>
+    </el-form>
+    <!-- 性能属性 -->
     <el-table :data="xnTableData" border stripe style="width: 100%" v-show="isShowXnTableData">
       <!--    循环列 -->
       <template v-for="(column,index) in xnTableOption">
@@ -243,7 +243,7 @@ export default {
             } else {
               this.cjBaseDataOption = this.cjBaseDataOption.concat(
                 this.analysisAttrConfigType(params)
-            );
+              );
             }
           } else if (type === "colTab") {
             this.isShowXnTableData = true;
@@ -290,22 +290,25 @@ export default {
               ) {
                 //处理属性2中的参数
                 tabData.xmlEntityMaps[0].attributeMap.name = col.lableName;
-                getPerformanceTable({ excelPath: col.lableName }).then(res => {
-                  let pars = res.data.data;
-          let xmlEntityMaps = [];
-                  for (let key in pars) {
-                xmlEntityMaps.push({
-                      attributeMap: { coreNum: key, proRate: pars[key] },
-                      lableName: "proCPB"
-                });
-              }
-                  this.$set(
-                    tabData.xmlEntityMaps[1],
-                    "xmlEntityMaps",
-                    xmlEntityMaps
-                  );
-                });
-            } else {
+                let path = col.lableName;
+                if (path.includes(":")) {
+                  getPerformanceTable({ excelPath: path }).then(res => {
+                    let pars = res.data.data;
+                    let xmlEntityMaps = [];
+                    for (let key in pars) {
+                      xmlEntityMaps.push({
+                        attributeMap: { coreNum: key, proRate: pars[key] },
+                        lableName: "proCPB"
+                      });
+                    }
+                    this.$set(
+                      tabData.xmlEntityMaps[1],
+                      "xmlEntityMaps",
+                      xmlEntityMaps
+                    );
+                  });
+                }
+              } else {
                 tabData.attributeMap.name = col.lableName;
               }
             }
@@ -352,31 +355,31 @@ export default {
         }
         if (saveStoreData) {
           console.log("/层级属性中的节点是******所属部件...", saveStoreData);
-        let findKey =
+          let findKey =
             this.$route.query.processId + "-" + saveStoreData.attributeMap.name;
-        let cjTableSel = [];
-        if (this.cjUnitParam.hasOwnProperty(findKey)) {
-          cjTableSel = this.cjUnitParam[findKey].cjTableSel;
-        }
-        let value = {
-          cjTableSel: cjTableSel,
-          cjTableData: paramCjTableData
-        };
-        this.$store.dispatch("setAnalysisCjUnitParam", { findKey, value });
+          let cjTableSel = [];
+          if (this.cjUnitParam.hasOwnProperty(findKey)) {
+            cjTableSel = this.cjUnitParam[findKey].cjTableSel;
+          }
+          let value = {
+            cjTableSel: cjTableSel,
+            cjTableData: paramCjTableData
+          };
+          this.$store.dispatch("setAnalysisCjUnitParam", { findKey, value });
 
           console.log("saveStoreTabsData", saveStoreTabsData);
-        let arrayTabData = []; //表格数据
-        let arrayColData = []; //表单数据
+          let arrayTabData = []; //表格数据
+          let arrayColData = []; //表单数据
           // let arrayTabDatax = {};
           saveStoreTabsData.xmlEntityMaps.forEach(base => {
-          //判断是不是表格数据
-          let analysisMapping = this.analysisConfigureType(base);
-          if (analysisMapping.lableType === "colTab") {
+            //判断是不是表格数据
+            let analysisMapping = this.analysisConfigureType(base);
+            if (analysisMapping.lableType === "colTab") {
               arrayTabData.push(deepClone(base));
-          } else {
-            arrayColData.push(deepClone(base));
-          }
-        });
+            } else {
+              arrayColData.push(deepClone(base));
+            }
+          });
           for (let key in this.cjBaseData) {
             if (this.cjBaseData[key].lableName === "部署配置") {
               //将表格中的数据处理包铺村
@@ -388,15 +391,15 @@ export default {
                   tmpCJTableData[tmpKay].forEach(attr => {
                     if (key === attr.attrName) {
                       colData.attributeMap[key] = attr.lableName;
-            }
-          });
+                    }
+                  });
                 }
                 tabData.push(colData);
               }
               console.log(
                 "将部署配置中的表单arrayColData元素和表格arrayTabData元素合并",
                 arrayColData.concat(tabData)
-        );
+              );
               //将部署配置中的表单arrayColData元素和表格arrayTabData元素合并
               this.cjBaseData[key].xmlEntityMaps = arrayColData.concat(tabData);
             }
@@ -421,36 +424,36 @@ export default {
           }
         }
         if (saveStoreData) {
-        //处理表格相同
-        let findKey =
+          //处理表格相同
+          let findKey =
             this.$route.query.processId + "-" + saveStoreData.attributeMap.name;
-        let cjTableData = [];
-        if (this.cjUnitParam.hasOwnProperty(findKey)) {
-          cjTableData = this.cjUnitParam[findKey].cjTableData;
-        }
-        let value = {
-          cjTableSel: paramsCjTableSel,
-          cjTableData: cjTableData
-        };
-        this.$store.dispatch("setAnalysisCjUnitParam", { findKey, value });
-        let arrayTabData = []; //表格数据
-        let arrayColData = []; //表单数据
-        //处理保存数据
-          saveStoreTabsData.xmlEntityMaps.forEach(base => {
-          //判断是不是表格数据
-          let analysisMapping = this.analysisConfigureType(base);
-          if (analysisMapping.lableType === "colTab") {
-            arrayTabData.push(deepClone(base));
-          } else {
-            arrayColData.push(deepClone(base));
+          let cjTableData = [];
+          if (this.cjUnitParam.hasOwnProperty(findKey)) {
+            cjTableData = this.cjUnitParam[findKey].cjTableData;
           }
-        });
+          let value = {
+            cjTableSel: paramsCjTableSel,
+            cjTableData: cjTableData
+          };
+          this.$store.dispatch("setAnalysisCjUnitParam", { findKey, value });
+          let arrayTabData = []; //表格数据
+          let arrayColData = []; //表单数据
+          //处理保存数据
+          saveStoreTabsData.xmlEntityMaps.forEach(base => {
+            //判断是不是表格数据
+            let analysisMapping = this.analysisConfigureType(base);
+            if (analysisMapping.lableType === "colTab") {
+              arrayTabData.push(deepClone(base));
+            } else {
+              arrayColData.push(deepClone(base));
+            }
+          });
           //给对应的表单元素中赋值
-        arrayColData.forEach((tab, index) => {
-          let attr = this.analysisConfigureType(tab).attrs;
-          attr.forEach(form => {
-            tab.attributeMap[paramsCjTableSel[index].attrName] =
-              paramsCjTableSel[index].lableName;
+          arrayColData.forEach((tab, index) => {
+            let attr = this.analysisConfigureType(tab).attrs;
+            attr.forEach(form => {
+              tab.attributeMap[paramsCjTableSel[index].attrName] =
+                paramsCjTableSel[index].lableName;
             });
           });
           for (let key in this.cjBaseData) {
@@ -465,14 +468,14 @@ export default {
                     if (key === attr.attrName) {
                       colData.attributeMap[key] = attr.lableName;
                     }
-        });
+                  });
                 }
                 tabData.push(colData);
               }
               console.log(
                 "将部署配置中的表单arrayColData元素和表格arrayTabData元素合并",
                 arrayColData.concat(tabData)
-        );
+              );
               //将部署配置中的表单arrayColData元素和表格arrayTabData元素合并
               this.cjBaseData[key].xmlEntityMaps = arrayColData.concat(tabData);
             }
@@ -638,15 +641,15 @@ export default {
       if (params.attrMappingName === "所属部件") {
         let key = this.$route.query.processId + "-" + params.attributeMap.name;
 
-      if (this.cjUnitParam.hasOwnProperty(key)) {
-        this.cjTableSel = this.cjUnitParam[key].cjTableSel;
+        if (this.cjUnitParam.hasOwnProperty(key)) {
+          this.cjTableSel = this.cjUnitParam[key].cjTableSel;
           let tableData = this.cjUnitParam[key].cjTableData;
           for (let key1 in tableData) {
             for (let key2 in tableData[key1]) {
               if (tableData[key1][key2].attrName === "cmpName") {
                 tableData[key1][key2].lableName = params.attributeMap.name;
                 console.log("的初始值下拉框的值", tableData[key1][key2]);
-      } else {
+              } else {
                 console.log(
                   "设置层级属性中的所属部件中的初始值下拉框的值",
                   tableData[key1][key2]
@@ -657,26 +660,26 @@ export default {
           }
         } else {
           console.log("设置层级属性中的所属部件中的初始值。。。。");
-        for (let key in this.cjTableSel) {
+          for (let key in this.cjTableSel) {
             // this.cjTableSel[key].lableName = "";
-        }
-        //配置基础数据表
-        this.cjTableData = [];
-        let column = deepClone(this.cjTableOption);
-          console.log("设置层级属性中的所属部件中的初始值。。。。", column);
-        column.forEach(col => {
-          if (col.attrName === "cmpName") {
-            col.lableName = params.attributeMap.name;
-          } else {
-              col.dataKey = deepClone(this.chipsData);
           }
-        });
-        this.cjTableData.push(column);
-        let value = {
-          cjTableSel: this.cjTableSel,
-          cjTableData: this.cjTableData
-        };
-        this.$store.dispatch("setAnalysisCjUnitParam", { key, value });
+          //配置基础数据表
+          this.cjTableData = [];
+          let column = deepClone(this.cjTableOption);
+          console.log("设置层级属性中的所属部件中的初始值。。。。", column);
+          column.forEach(col => {
+            if (col.attrName === "cmpName") {
+              col.lableName = params.attributeMap.name;
+            } else {
+              col.dataKey = deepClone(this.chipsData);
+            }
+          });
+          this.cjTableData.push(column);
+          let value = {
+            cjTableSel: this.cjTableSel,
+            cjTableData: this.cjTableData
+          };
+          this.$store.dispatch("setAnalysisCjUnitParam", { key, value });
         }
       }
       // console.log("cjUnitParam", this.cjUnitParam);
@@ -729,7 +732,7 @@ export default {
     //处理ConfigureType
     analysisConfigureType(config) {
       if (config.attributeMap) {
-      return eval("(" + config.attributeMap.configureType + ")");
+        return eval("(" + config.attributeMap.configureType + ")");
       } else {
         return {};
       }

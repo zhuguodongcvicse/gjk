@@ -10,12 +10,7 @@
       <avue-crud :data="leftData" :option="leftOption">
         <template slot="size" slot-scope="scope">{{printSize(scope.row.size)}}</template>
         <template slot="menu" slot-scope="scope">
-          <el-button
-            size="mini"
-            type="danger"
-            plain 
-            @click="deletes(scope.row,scope.index)"
-          >移除</el-button>
+          <el-button size="mini" type="danger" plain @click="deletes(scope.row,scope.index)">移除</el-button>
         </template>
       </avue-crud>
       <!--里面一层 -->
@@ -38,14 +33,14 @@
                 <template slot-scope="scope" slot="menu">
                   <el-button
                     size="mini"
-                    type="danger" 
-                    plain 
+                    type="danger"
+                    plain
                     @click="remove(scope.row,filess.files)"
                   >移除</el-button>
                 </template>
               </avue-crud>
               <div class="control-container comp_upload_btn_14s">
-                <el-button size="small"  @click="removeAll(filess.files)">取消</el-button>
+                <el-button size="small" @click="removeAll(filess.files)">取消</el-button>
                 <el-button size="small" type="primary" @click="resumes(filess.files)">上传</el-button>
               </div>
             </template>
@@ -90,6 +85,7 @@ export default {
         delBtn: false,
         menu: true,
         border: true,
+        maxHeight: 450,
         column: [
           {
             label: "名称",
@@ -128,6 +124,7 @@ export default {
         editBtn: false,
         delBtn: false,
         // menu: false,
+        maxHeight: 450,
         border: true,
         column: [
           {
@@ -219,6 +216,7 @@ export default {
         formData.append("file", e.file);
       });
       formData.append("filesPath", JSON.stringify({ path: "gjk/upload" }));
+      console.log("每个文件的路径", formData);
       //上传文件
       uploadFilesPath(formData).then(res => {
         let maps = deepClone(res.data.data);
@@ -251,5 +249,4 @@ export default {
 </script>
 <style lang='scss' scoped>
 //@import url(); 引入公共css类
-
 </style>

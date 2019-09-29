@@ -150,6 +150,7 @@ export default {
         );
         this.formulaDialogParams.tmpLengthVal.attributeNameValue = value;
         if (this.lableType === "selectComm") {
+          this.selectOptions = [];
           //获取下拉框的值从字典获取
           if (getObjType(this.dictKey) === "string") {
             if (this.dictKey !== null && this.dictKey !== "") {
@@ -161,7 +162,6 @@ export default {
                   });
                 } else if (this.dictKey === "dbtab_platform") {
                   getOwnPlatform().then(res => {
-                    console.log("1234567890-0987654321", res.data.data);
                     res.data.data.forEach(item => {
                       this.selectOptions.push({
                         value: item.name,

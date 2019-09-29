@@ -34,7 +34,6 @@ import { menuTag } from "@/util/closeRouter";
 import {
   getXmlEntityTest,
   getNodeList,
-  getAllList,
   saveHardwarelibs,
   getHardwarelibId,
   getHardwarelibs,

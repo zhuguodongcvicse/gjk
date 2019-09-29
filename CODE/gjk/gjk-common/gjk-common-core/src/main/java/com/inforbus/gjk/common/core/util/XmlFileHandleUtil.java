@@ -450,6 +450,7 @@ public class XmlFileHandleUtil {
 			e.printStackTrace();
 			logger.info("解析Xml文件失败");
 			System.out.println("解析Xml文件失败");
+			return null;
 		}
 
 		return xmlEntityMaps.get(0);

@@ -478,7 +478,7 @@
       if (item == "集成代码生成") {
         console.log('userInfouserInfouserInfo',this.userInfo.name)
           codeGeneration(this.procedureId,this.userInfo.name).then(res => {
-        
+
         });
         const loading = this.$loading({
           lock: true,
@@ -491,6 +491,7 @@
         }, 2000);
         $(".rightmenu").hide();
       } else if (item == "修改软件框架") {
+        this.platformFlag=false
      //得到平台大类
           getPlatformList().then(Response => {
             this.platformDataList = Response.data.data

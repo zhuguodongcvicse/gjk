@@ -397,7 +397,7 @@
     <select id="getAllSoftwareListByIdIn" resultMap="softwareMap">
         SELECT *
         FROM gjk_software as gs
-        where gs.id in (${ids})
+        where gs.id in (${ids})  and del_flag!='1'
         order by gs.software_name desc,gs.version desc
     </select>
     <!--根据软件框架库ID得到平台库列表-->
