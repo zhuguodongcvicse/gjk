@@ -144,7 +144,10 @@ export default {
                 this.$store
                   .dispatch("setStruceType")
                   .then(() => {
-                    this.$router.push({ name: "测试添加" });
+                    this.$router.push({
+                      name: "测试添加",
+                      query: { type: "add" }
+                    });
                   })
                   .catch(() => {
                     this.$message({

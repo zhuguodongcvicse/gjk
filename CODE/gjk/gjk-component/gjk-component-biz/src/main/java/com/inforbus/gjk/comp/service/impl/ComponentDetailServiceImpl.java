@@ -76,6 +76,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import java.io.IOException;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 //import org.jsoup.Jsoup;
 //import org.jsoup.nodes.Document;
@@ -534,7 +535,12 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 				File uploadFile = UploadFilesUtils.createFile(gitRelativePath + File.separator + originalFilename);
 				// 将上传文件保存到路径
 				if (uploadFile.exists()) {
-					uploadFile.delete();
+					try {
+						uploadFile.delete();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 				// 上传图标文件
 				file.transferTo(uploadFile);
@@ -549,17 +555,34 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 			String imgId = elReplace(img.getImgPath(), "/comp/component/comImg/", "");
 			FileInputStream fis = componentService.getImgFile(imgId, strb);
 			originalFilename = strb.toString();
+			OutputStream os = null;
 			try {
-				File uploadFile = UploadFilesUtils.createFile(gitRelativePath + File.separator + originalFilename);
-				OutputStream os = new FileOutputStream(uploadFile);
-				int count = 0;
-				byte[] buffer = new byte[1024 * 8];
-				while ((count = fis.read(buffer)) != -1) {
-					os.write(buffer, 0, count);
-					os.flush();
+				File uploadFile = new File(
+						JGitUtil.getLOCAL_REPO_PATH() + gitRelativePath + File.separator + originalFilename);
+				if (!uploadFile.exists()) {
+					uploadFile = UploadFilesUtils.createFile(gitRelativePath + File.separator + originalFilename);
+					os = new FileOutputStream(uploadFile);
+					int count = 0;
+					byte[] buffer = new byte[1024 * 8];
+					while ((count = fis.read(buffer)) != -1) {
+						os.write(buffer, 0, count);
+						os.flush();
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
+			} finally {
+				try {
+					if (null != fis) {
+						fis.close();
+					}
+					if (null != os) {
+						os.close();
+					}
+//					httpUrl.disconnect();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		// 保存目录数据
@@ -700,63 +723,101 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	@Override
 	public String saveCompfiles(Map<String, String> maps, List<CompFilesVO> paths) {
 		// 用于保存文件夹时产生的中间文件夹的名字（保存中间文件夹不重复）
-		Map<String, String> keyMap = Maps.newHashMap();
+//		Map<String, String> keyMap = Maps.newHashMap();
 		// 存储要保存的文件明细对象
-		List<ComponentDetail> saveDetdirs = Lists.newArrayList();
+//		List<ComponentDetail> saveDetdirs = Lists.newArrayList();
 		// 文件类型
 		String strType = maps.get("fileType").toString() + "file";
 		String fileType = ("algorithmfile").equals(strType) ? "算法文件"
 				: ("testfile").equals(strType) ? "测试文件" : ("platformfile").equals(strType) ? "平台文件" : "";
-		String path = compUserFilePath + File.separator + maps.get("compName").toString() + File.separator
+		String newPath = compUserFilePath + File.separator + maps.get("compName").toString() + File.separator
 				+ maps.get("version").toString() + File.separator;
-		// 保存根目录对象
-		ComponentDetail detdirs = new ComponentDetail(IdGenerate.uuid(), maps.get("compValue").toString(), fileType,
-				strType, path, maps.get("version").toString(), maps.get("compValue").toString(),
-				maps.get("libsID").toString());
-		System.out.println(maps);
 
+		ComponentDetail detdirs = baseMapper.selectOne(Wrappers.<ComponentDetail>query().lambda()
+				.eq(ComponentDetail::getCompId, maps.get("compValue").toString())
+				.eq(ComponentDetail::getFileName, fileType));
+		List<File> files = Lists.newArrayList();
+		Boolean isUpdate = false;
+		String oldPath = "";
+		if (null == detdirs) {
+			isUpdate = false;
+			// 保存根目录对象
+			detdirs = new ComponentDetail(IdGenerate.uuid(), maps.get("compValue").toString(), fileType, strType,
+					newPath, maps.get("version").toString(), maps.get("compValue").toString(),
+					maps.get("libsID").toString());
+		} else {
+			isUpdate = true;
+			detdirs.setLibsId(maps.get("libsID").toString());
+			oldPath = detdirs.getFilePath() + detdirs.getFileName();
+			File file = new File(compDetailPath + oldPath);
+			if (!file.exists()) {
+				file.mkdirs();
+			}
+			// 得到所有文件
+			showDirectory(file, files);
+			detdirs.setFilePath(newPath);
+		}
+		String detfilesPath = newPath + fileType;
 		for (int i = 0; i < paths.size(); i++) {
+			// 这里是要保存的文件数据
 			CompFilesVO vo = JSONUtil.parseObj(paths.get(i)).toBean(CompFilesVO.class);
-			String detfilesPath = path + fileType;
-			ComponentDetail detfiles = new ComponentDetail(IdGenerate.uuid(), maps.get("compValue").toString(),
-					vo.getName(), vo.getName().substring(vo.getName().lastIndexOf(".")), detfilesPath + File.separator,
-					maps.get("version").toString(), detdirs.getId(), "");
-			saveDetdirs.add(detfiles);
-
 			// 将临时文件考到对应目录下
 			File uploadFile = new File(vo.getRelativePath());//
 			File file = null;
-			String tmpPath = compDetailPath + File.separator + detfilesPath + File.separator + vo.getName();// 要上传的文件路径
-
+			String tmpPath = "";
 			try {
-				if (StringUtils.isNotEmpty(tmpPath)) {
-					file = new File(tmpPath);
-					if (!file.getParentFile().exists()) {
-						file.getParentFile().mkdirs();
+				// 判断路径是否相等
+				if (detfilesPath.equals(oldPath)) {
+					// 如果文件不存在
+					if (!files.contains(uploadFile)) {
+						tmpPath = compDetailPath + File.separator + detfilesPath + File.separator + vo.getName();// 要上传的文件路径
+						if (StringUtils.isNotEmpty(tmpPath)) {
+							file = new File(tmpPath);
+							if (!file.getParentFile().exists()) {
+								file.getParentFile().mkdirs();
+							}
+							file.createNewFile();
+						}
+						FileUtil.copyFilesFromDir(uploadFile, file, true);
+						// 上传文件到 GIT
+						JGitUtil.commitAndPush(file.getPath(), "上传构件xml文件");
 					}
-					file.createNewFile();
+				} else {
+					String path = uploadFile.getPath();
+					if (StringUtils.isNotEmpty(oldPath) && path.indexOf(oldPath) != -1) {
+						tmpPath = path.replace("\\", "/").replaceAll(oldPath.replace("\\", "/"),
+								detfilesPath.replace("\\", "/"));
+					} else {
+						tmpPath = compDetailPath + File.separator + detfilesPath + File.separator + vo.getName();// 要上传的文件路径
+					}
+					// 删除以前的文件及文件夹
+					if (isUpdate) {
+						UploadFilesUtils.delFolder(compDetailPath + File.separator + oldPath);
+					}
+					if (StringUtils.isNotEmpty(tmpPath)) {
+						file = new File(tmpPath);
+						if (!file.getParentFile().exists()) {
+							file.getParentFile().mkdirs();
+						}
+						file.createNewFile();
+					}
+					FileUtil.copyFilesFromDir(uploadFile, file, true);
+					// 上传文件到 GIT
+					JGitUtil.commitAndPush(file.getPath(), "上传构件xml文件");
 				}
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			FileUtil.copyFilesFromDir(uploadFile, file, true);
-//			 上传文件到 GIT
-			JGitUtil.commitAndPush(file.getPath(), "上传构件xml文件");
-//			baseMapper.saveCompDetail(detfiles);
-		}
-		String retPath = "";
-		// 判断是否有子元素
-		if (saveDetdirs.size() != 0) {
-			// 保存根目录对象
-			saveDetdirs.add(detdirs);
-			retPath = detdirs.getFilePath() + detdirs.getFileName();
-		}
-		// 循环保存所有对象
-		for (ComponentDetail compDet : saveDetdirs) {
 
 		}
-		baseMapper.saveCompDetail(detdirs);
-		return retPath;
+		if (isUpdate) {
+			baseMapper.updateById(detdirs);
+		} else {
+			baseMapper.saveCompDetail(detdirs);
+		}
+
+		return detdirs.getFilePath() + detdirs.getFileName();
 
 	}
 
@@ -829,6 +890,17 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 //		String str = "<div style='text-align:center;height:80px;width:110px;border:1px solid #000;border-radius:5px;background-color: null;display: block;'><img  src='data:image/png;base64ZPjf//3/AZMfZZynZiCHAAAAAElFTkSuQmCC' style='vertical-align: middle;width: 150px; height:75px;border-radius:5px;'><i style='display: inline-block;height: 100%;vertical-align: middle;'></i><div class='desc' id='\" + i + \"'>fdg</div></div>";
 //		String regex = "'data:image/(.*?)'";
 //		System.out.println(elReplace(str, regex, "'00'"));
+	}
+
+	public static void showDirectory(File file, List<File> paths) {
+		File[] files = file.listFiles();
+		for (File f : files) {
+			if (f.isDirectory()) {
+				showDirectory(f, paths);
+			} else {
+				paths.add(f);
+			}
+		}
 	}
 
 	public static void base64ToFile(String destPath, String base64, String fileName) {

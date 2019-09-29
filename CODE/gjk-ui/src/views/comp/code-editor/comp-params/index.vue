@@ -9,8 +9,9 @@
           icon="el-icon-edit"
           @click.native="clickHandleSaveComp"
         >
-          <span v-if="this.$route.query.compId == undefined">保存</span>
-          <span v-else>修改</span>
+          <span v-if="this.$route.query.type === 'add'">添加</span>
+          <span v-else-if="this.$route.query.type ==='edit'">修改</span>
+          <span v-else-if="this.$route.query.type ==='copy'">添加</span>
         </el-button>
       </el-col>
       <el-col :span="4">
@@ -111,6 +112,9 @@ export default {
     saveDBXmlMaps: {
       handler: function(saveXmlMaps) {
         let tmpComponent = deepClone(this.component);
+        if (this.$route.query.type === "copy") {
+          tmpComponent.id = "";
+        }
         tmpComponent.applyState = "0";
         tmpComponent.applyDesc = "未申请入库";
         tmpComponent.userId = this.userInfo.userId;
@@ -174,23 +178,20 @@ export default {
                   item.attributeMap.name = res.data.data;
                 }
               });
-              // console.log(
-              //   "000000000000000000000000000000",
-              //   this.headerFile.structParams
-              // );
-              saveStructMap(this.headerFile.structParams).then(() => {
-                this.$store.dispatch("clearParseHeaderObj");
-              });
+              if (this.headerFile.structParams) {
+                saveStructMap(this.headerFile.structParams).then(() => {
+                  this.$store.dispatch("clearParseHeaderObj");
+                });
+              }
               handleSaveCompMap(saveComp, "Component", comp.id).then(res => {
                 this.$route.query.compId = comp.id;
                 this.reload();
+                loading.close();
               });
             });
           });
         });
       });
-
-      loading.close();
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）

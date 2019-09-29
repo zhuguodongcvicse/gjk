@@ -121,10 +121,10 @@ export const encryption = (params) => {
       var encrypted = CryptoJS.AES.encrypt(
         data,
         key, {
-          iv: iv,
-          mode: CryptoJS.mode.CBC,
-          padding: CryptoJS.pad.ZeroPadding
-        })
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.ZeroPadding
+      })
       result[ele] = encrypted.toString()
     })
   }
@@ -312,18 +312,78 @@ export const getPrintSize = (size) => {
     return parseFloat(size / 1024).toFixed(2) + "GB";
   }
 }
-
+/**
+ * 判断是不是基本类型和指针
+ */
+export const getStrType = (str) => {
+  let isPoint = str.includes("*")
+  let type = str.replace("*", "")
+  let isType = false
+  switch (type) {
+    //整形
+    case "short":
+      isType = true
+      break;
+    case "int":
+      isType = true
+      break;
+    //浮点形
+    case "long":
+      isType = true
+      break;
+    case "long long":
+      isType = true
+      break;
+    case "unsigned short":
+      isType = true
+      break;
+    case "unsigned int":
+      isType = true
+      break;
+    case "unsigned long":
+      isType = true
+      break;
+    case "unsigned long long":
+      isType = true
+      break;
+    case "char":
+      isType = true
+      break;
+    case "unsigned char":
+      isType = true
+      break;
+    case "signed char":
+      isType = true
+      break;
+    case "bool":
+      isType = true
+      break;
+    case "double":
+      isType = true
+      break;
+    case "float":
+      isType = true
+      break;
+    case "long double":
+      isType = true
+      break;
+    case "string":
+      isType = true
+      break;
+  }
+  return { isType, isPoint }
+}
 export const parseStrToObj = (str) => {//替换字符串中的'为" 再转换为对象
-  var reg = new RegExp("'","g");
-  str = str.replace(reg,"\"");
+  var reg = new RegExp("'", "g");
+  str = str.replace(reg, "\"");
   return JSON.parse(str);
 }
 
 export const parseObjToStr = (obj) => {//转换对象为json串,替换字符串中的"为' 再转换为字符串
- var jsonStr = JSON.stringify(obj);
- var reg = new RegExp("\"","g");
- var str = jsonStr.replace(reg,"'");
- return str;
+  var jsonStr = JSON.stringify(obj);
+  var reg = new RegExp("\"", "g");
+  var str = jsonStr.replace(reg, "'");
+  return str;
 }
 
 /**

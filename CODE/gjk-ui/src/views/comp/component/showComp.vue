@@ -3,7 +3,9 @@
     <split-pane v-model="offset" @on-moving="handleMoving" min="150px">
       <div slot="left" class="comp_component_showcomp_tree_14s">
         <el-tree
+          style="height:100%;overflow-y: auto;"
           ref="tree"
+          accordion
           :data="treeData"
           :default-expand-all="true"
           :highlight-current="true"
@@ -14,14 +16,14 @@
       <div slot="right" class="comp_component_showcomp_main_14s">
         <template>
           <!-- <el-scrollbar class="h100_14s"> -->
-            <keep-alive>
-              <transition>
-                <router-view v-if="$route.meta.keepAlive"></router-view>
-              </transition>
-            </keep-alive>
+          <keep-alive>
             <transition>
-              <router-view v-if="!$route.meta.keepAlive"></router-view>
+              <router-view v-if="$route.meta.keepAlive"></router-view>
             </transition>
+          </keep-alive>
+          <transition>
+            <router-view v-if="!$route.meta.keepAlive"></router-view>
+          </transition>
           <!-- </el-scrollbar> -->
         </template>
       </div>
@@ -75,7 +77,6 @@ export default {
       this.currNode = data;
       let parentType = data.parentType;
       if (data.children.length === 0) {
-        console.log("00000000000000000000000", data);
         this.$router.push({
           path: "/comp/showComp/codeEditor",
           query: {

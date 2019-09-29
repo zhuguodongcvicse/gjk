@@ -315,10 +315,6 @@ export default {
           });
           saveXnTableData.push(tabData);
         });
-        console.log(
-          "00000000000000000000000000000000000000000000",
-          saveXnTableData
-        );
         //将值返回给父级组件
         this.$emit("change", saveXnTableData, this.paramType);
       },
@@ -640,7 +636,6 @@ export default {
       console.log("paramsparamsparams", params);
       if (params.attrMappingName === "所属部件") {
         let key = this.$route.query.processId + "-" + params.attributeMap.name;
-
         if (this.cjUnitParam.hasOwnProperty(key)) {
           this.cjTableSel = this.cjUnitParam[key].cjTableSel;
           let tableData = this.cjUnitParam[key].cjTableData;
@@ -658,6 +653,7 @@ export default {
               }
             }
           }
+          this.cjTableData = tableData;
         } else {
           console.log("设置层级属性中的所属部件中的初始值。。。。");
           for (let key in this.cjTableSel) {

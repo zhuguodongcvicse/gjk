@@ -320,9 +320,17 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			component.setVersion(version);
 			// 修改主表信息
 			baseMapper.editComp(component);
-			// 删除不包含图片的信息
-			compDetailMapper.delete(Wrappers.<ComponentDetail>query().lambda()
-					.eq(ComponentDetail::getCompId, component.getId()).notLike(ComponentDetail::getFileType, "img%"));
+
+//			// 查询出 所有构件中不包含图片的文件信息信息
+//			List<ComponentDetail> lists = compDetailMapper.selectList(Wrappers.<ComponentDetail>query().lambda()
+//					.eq(ComponentDetail::getCompId, component.getId()).notLike(ComponentDetail::getFileType, "img%"));
+//			for (ComponentDetail comdet : lists) {
+//				// 删除文件
+//				this.delAllFile(compDetailPath + comdet.getFilePath() + comdet.getFileName());
+//			}
+//			//删除数据库记录
+//			compDetailMapper.delete(Wrappers.<ComponentDetail>query().lambda()
+//					.eq(ComponentDetail::getCompId, component.getId()).notLike(ComponentDetail::getFileType, "img%"));
 		} else {
 			List<String> versionList = getVersionByCompId(component);
 			component.setId(IdGenerate.uuid());
