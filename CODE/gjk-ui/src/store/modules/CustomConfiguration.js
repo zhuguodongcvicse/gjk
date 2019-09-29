@@ -18,7 +18,18 @@ const CustomConfiguration = {
           return new Promise(resolve =>{
             var key = subTopic.key;
             var value = subTopic.value
+            //alert(111111111)
+            console.log("商店中的数据key",key)
             commit("SET_SubMapCustomConfig",{key,value})
+            resolve()
+          })
+        },
+        //清除subScribe数据
+        cleanSubMapCustomConfig({
+          commit
+        }){
+          return new Promise(resolve =>{
+            commit("CLEAN_SubMapCustomConfig")
             resolve()
           })
         },
@@ -51,6 +62,15 @@ const CustomConfiguration = {
             var key = pubTopic.key;
             var value = pubTopic.value
             commit("SET_PubMapCustomConfig",{key,value})
+            resolve()
+          })
+        },
+         //清除pubScribe数据
+         cleanPubMapCustomConfig({
+          commit
+        }){
+          return new Promise(resolve =>{
+            commit("CLEAN_PubMapCustomConfig")
             resolve()
           })
         },
@@ -93,6 +113,15 @@ const CustomConfiguration = {
             resolve()
           })
         },
+        //清除netWorkIn数据
+        cleanNetworkIn({
+          commit
+        }){
+          return new Promise(resolve =>{
+            commit('CLEAN_NetWorkIn')
+            resolve()
+          })
+        },
         //删除netWorkIn数据
         delNetworkIn({
           commit
@@ -108,6 +137,15 @@ const CustomConfiguration = {
         },params) {
           return new Promise((resolve,reject) =>{
             commit('SET_NetWorkOut',params)
+            resolve()
+          })
+        },
+        //清空netWorkOut数据
+        cleanNetworkOut({
+          commit
+        }){
+          return new Promise(resolve =>{
+            commit('CLEAN_NetWorkOut')
             resolve()
           })
         },
@@ -131,12 +169,28 @@ const CustomConfiguration = {
             type:"session"
           })
         },
+        CLEAN_SubMapCustomConfig:(state) =>{
+          state.subMapCustomConfig.clear()
+          setStore({
+            name:'subMapCustomConfig',
+            content:state.subMapCustomConfig,
+            type:"session"
+          })
+        },
         SET_PubMapCustomConfig: (state, {key,value}) => {
           state.pubMapCustomConfig.set(key, JSON.parse(JSON.stringify(value)));
           //console.log("商店PUB", JSON.stringify(state.pubMapCustomConfig));
           setStore({
             name: 'pubMapCustomConfig',
             content: state.pubMapCustomConfig,
+            type:"session"
+          })
+        },
+        CLEAN_PubMapCustomConfig:(state) =>{
+          state.pubMapCustomConfig.clear()
+          setStore({
+            name:'pubMapCustomConfig',
+            content:state.pubMapCustomConfig,
             type:"session"
           })
         },
@@ -163,6 +217,22 @@ const CustomConfiguration = {
             name : 'netWorkIn',
             content : state.netWorkIn,
             type : "session"
+          })
+        },
+        CLEAN_NetWorkIn:(state) =>{
+          state.netWorkIn.clear()
+          setStore({
+            name:'netWorkIn',
+            content:state.netWorkIn,
+            type:"session"
+          })
+        },
+        CLEAN_NetWorkOut:(state) =>{
+          state.netWorkOut.clear()
+          setStore({
+            name:'netWorkOut',
+            content:state.netWorkOut,
+            type:"session"
           })
         },
         SET_NetWorkOut :(state,{key,value}) =>{
