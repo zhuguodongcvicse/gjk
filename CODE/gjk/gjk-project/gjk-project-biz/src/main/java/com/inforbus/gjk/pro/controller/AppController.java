@@ -17,6 +17,7 @@
 package com.inforbus.gjk.pro.controller;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
@@ -29,6 +30,7 @@ import com.inforbus.gjk.pro.api.entity.App;
 import com.inforbus.gjk.pro.api.entity.Project;
 import com.inforbus.gjk.pro.api.entity.ProjectFile;
 import com.inforbus.gjk.pro.service.AppService;
+import com.inforbus.gjk.pro.service.impl.ManagerServiceImpl;
 
 import ch.qos.logback.core.util.FileUtil;
 import cn.hutool.core.io.IORuntimeException;
@@ -41,11 +43,14 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +59,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.tools.ant.taskdefs.Zip;
 import org.apache.tools.ant.types.FileSet;
+import org.ho.yaml.Yaml;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -514,6 +520,43 @@ public class AppController {
 			}
 		}
 
+	}
+	
+	/**
+	 * 根据流程Id查询是否生成app组件工程
+	 * 
+	 * @return
+	 */
+	@PutMapping(value = "/getAppByProcessId")
+	public R getAppByProcessId(@RequestBody Map<String, String> map) {
+		String procedureId =map.get("procedureId");
+		String fileName =map.get("fileName");
+		//根据流程Id查询
+		App app = appService.getAppByProcessId(procedureId);
+		//解析json 获取对应文件夹所在平台
+		JSONObject json = JSONObject.parseObject(app.getPartnamePlatform());
+		// 获取当前类的路径
+		String filePath = ManagerServiceImpl.class.getResource("").getPath();
+		try {
+			// 中文乱码问题
+			filePath = URLDecoder.decode(filePath, "utf-8");
+		} catch (UnsupportedEncodingException e1) {
+			e1.printStackTrace();
+		}
+		// 找到bootstrap.properties的地址
+		filePath = filePath.substring(0, filePath.indexOf("target/classes/") + "target/classes/".length())
+				+ "platformType.yml";
+		File dumpFile = new File(filePath);
+
+		Map father;
+		String makefileType = "";
+		try {
+			father = Yaml.loadType(dumpFile, HashMap.class);
+			makefileType = father.get(json.get(fileName)).toString();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return new R<>(makefileType);
 	}
 
 }

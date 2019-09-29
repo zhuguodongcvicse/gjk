@@ -201,3 +201,14 @@ export function handleDown(oriFilePathMap) {
     }, 0)
   })
 }
+
+//根据流程Id查询是否生成app组件工程
+export function getAppByProcessId (obj) {
+  return request({
+    url: '/pro/app/getAppByProcessId',
+    method: 'put',
+    data: obj
+  })
+}
+
+

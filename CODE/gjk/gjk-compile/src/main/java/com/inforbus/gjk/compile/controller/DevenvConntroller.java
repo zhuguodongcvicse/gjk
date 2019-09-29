@@ -25,8 +25,8 @@ public class DevenvConntroller {
 	public R Command(@RequestBody Map<String, String> map) {
 		String path =map.get("path");
 		String fileName =map.get("fileName");
-		
-		String str = devenvService.Command(path,fileName);
+		String platformType = map.get("platformType");
+		String str = devenvService.Command(path,fileName,platformType);
 		//推送消息到rabbitmq中
 		//this.rabbitmqTemplate.convertAndSend("gjkmq" , "test===@@@==="+str);
 		//System.out.println(str);

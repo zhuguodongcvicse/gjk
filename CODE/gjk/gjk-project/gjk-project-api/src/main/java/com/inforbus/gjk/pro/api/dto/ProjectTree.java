@@ -23,6 +23,7 @@ public class ProjectTree extends TreeNode {
 	private String bspId;
 	private String fileName;
 	private String filePath;
+	private String processId;
 	private String icon;
 
 	public ProjectTree() {
@@ -54,6 +55,7 @@ public class ProjectTree extends TreeNode {
 		} else {
 			this.label = vo.getFileName();
 		}
+		this.processId = vo.getProcedureId();
 		this.softwareId = vo.getSoftwareId();
 		this.bspId = vo.getBspId();
 		this.fileName = vo.getFileName();

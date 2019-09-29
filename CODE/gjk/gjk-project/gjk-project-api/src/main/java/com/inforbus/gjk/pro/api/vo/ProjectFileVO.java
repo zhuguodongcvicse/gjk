@@ -36,6 +36,10 @@ public class ProjectFileVO extends Model<ProjectFileVO> {
 	 */
 	private String parentId;
 	/**
+	 * 流程ID
+	 */
+	private String procedureId;
+	/**
 	 * 软件框架ID
 	 */
 	private String softwareId;
@@ -71,7 +75,7 @@ public class ProjectFileVO extends Model<ProjectFileVO> {
 	}
 
 	public ProjectFileVO(String fileId, String fileName, String showName, String fileType, String filePath,
-			String parentId) {
+			String parentId, String procedureId) {
 		super();
 		this.fileId = fileId;
 		this.fileName = fileName;
@@ -79,6 +83,7 @@ public class ProjectFileVO extends Model<ProjectFileVO> {
 		this.fileType = fileType;
 		this.filePath = filePath;
 		this.parentId = parentId;
+		this.procedureId = procedureId;
 	}
 
 	public ProjectFileVO(ProjectFile file) {
