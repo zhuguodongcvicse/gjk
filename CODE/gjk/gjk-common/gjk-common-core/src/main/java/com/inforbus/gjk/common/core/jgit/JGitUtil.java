@@ -48,15 +48,17 @@ public class JGitUtil {
 	@Getter
 	private static String GIT_PASSWORD;
 	@Getter
-	private static String generateCodeResult;	
+	private static String generateCodeResult;
 	@Getter
 	private static String softToHardResult;
 	@Getter
 	private static String flowInfPath;
-	
+
 	private static String INIT_LOCAL_CODE_DIR;
 	private static String LOCAL_CODE_CT_SQL_DIR;
 	private static String BRANCH_NAME;
+	@Getter
+	private static String INTEGER_CODE_FILE_NAME;
 	final static Logger log = LoggerFactory.getLogger(JGitUtil.class);
 
 	static {
@@ -84,6 +86,7 @@ public class JGitUtil {
 			generateCodeResult = father.get("gjk.pro.process.generateCodeResult").toString();
 			softToHardResult = father.get("gjk.pro.process.softToHardResult").toString();
 			flowInfPath = father.get("gjk.pro.process.flowInfPath").toString();
+			INTEGER_CODE_FILE_NAME = father.get("integer.code.file.name").toString();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

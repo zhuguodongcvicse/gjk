@@ -14,6 +14,8 @@ import com.google.common.collect.Maps;
 
 import com.inforbus.gjk.common.core.appinter.appInterface;
 import com.inforbus.gjk.common.core.util.vo.*;
+
+import appProCreate.cmpProCreate;
 import appcontrol.AppControl;
 import customtoconfig.TopicConfig;
 import headerfile.HeadFile;
@@ -120,12 +122,13 @@ public class ExternalIOTransUtils {
 
 	/**
 	 * 注册
+	 * 
 	 * @param cmpNameToHwType APP组件工程生成，<组件名称，对应平台大类属性>
-	 * @param appID APP对应的流程ID
-	 * @param appName  APP名称
-	 * @param packinfoPath  客户自存自取路径
-	 * @param cmpResFilePath 客户自存自取路径
-	 * @param appProPath APP工程文件夹路径
+	 * @param appID           APP对应的流程ID
+	 * @param appName         APP名称
+	 * @param packinfoPath    客户自存自取路径
+	 * @param cmpResFilePath  客户自存自取路径
+	 * @param appProPath      APP工程文件夹路径
 	 * @return
 	 */
 	public static boolean appInstall(Map<String, String> cmpNameToHwType, int appID, String appName,
@@ -135,28 +138,30 @@ public class ExternalIOTransUtils {
 	}
 
 	/**
-	 * 加载、更新加载 
-	 * @param cmpNameToHwType APP组件工程生成，<组件名称，对应平台大类属性>
-	 * @param appID APP对应的流程ID
-	 * @param appName APP名称
-	 * @param existDeployConfig  APP组件工程配置
-	 * @param sysconfigPath 系统配置模块XML路径
-	 * @param appProPath  APP工程文件夹路径
-	 * @return 
+	 * 加载、更新加载
+	 * 
+	 * @param cmpNameToHwType   APP组件工程生成，<组件名称，对应平台大类属性>
+	 * @param appID             APP对应的流程ID
+	 * @param appName           APP名称
+	 * @param existDeployConfig APP组件工程配置
+	 * @param sysconfigPath     系统配置模块XML路径
+	 * @param appProPath        APP工程文件夹路径
+	 * @return
 	 */
-	 
-	public static boolean appLoad(Map<String, String> cmpNameToHwType, int appID, String appName, boolean existDeployConfig,
-			String sysconfigPath, String appProPath) {
+
+	public static boolean appLoad(Map<String, String> cmpNameToHwType, int appID, String appName,
+			boolean existDeployConfig, String sysconfigPath, String appProPath) {
 		AppControl appControl = new AppControl();
 		return appControl.appLoad(cmpNameToHwType, appID, appName, existDeployConfig, sysconfigPath, appProPath);
-		
+
 	}
-	
+
 	/**
 	 * 卸载
+	 * 
 	 * @param cmpNameToHwType APP组件工程生成，<组件名称，对应平台大类属性>
-	 * @param appID APP对应的流程ID
-	 * @param appName APP名称
+	 * @param appID           APP对应的流程ID
+	 * @param appName         APP名称
 	 * @return
 	 */
 	public static boolean appUnload(Map<String, String> cmpNameToHwType, int appID, String appName) {
@@ -166,9 +171,10 @@ public class ExternalIOTransUtils {
 
 	/**
 	 * 启动
+	 * 
 	 * @param cmpNameToHwType APP组件工程生成，<组件名称，对应平台大类属性>
-	 * @param appID APP对应的流程ID
-	 * @param appName APP名称
+	 * @param appID           APP对应的流程ID
+	 * @param appName         APP名称
 	 * @return
 	 */
 	public static boolean appRestart(Map<String, String> cmpNameToHwType, int appID, String appName) {
@@ -178,9 +184,10 @@ public class ExternalIOTransUtils {
 
 	/**
 	 * 停止
+	 * 
 	 * @param cmpNameToHwType APP组件工程生成，<组件名称，对应平台大类属性>
-	 * @param appID APP对应的流程ID
-	 * @param appName APP名称
+	 * @param appID           APP对应的流程ID
+	 * @param appName         APP名称
 	 * @return
 	 */
 	public static boolean appStop(Map<String, String> cmpNameToHwType, int appID, String appName) {
@@ -190,9 +197,10 @@ public class ExternalIOTransUtils {
 
 	/**
 	 * 暂停
+	 * 
 	 * @param cmpNameToHwType APP组件工程生成，<组件名称，对应平台大类属性>
-	 * @param appID APP对应的流程ID
-	 * @param appName APP名称
+	 * @param appID           APP对应的流程ID
+	 * @param appName         APP名称
 	 * @return
 	 */
 	public static boolean appPause(Map<String, String> cmpNameToHwType, int appID, String appName) {
@@ -204,9 +212,9 @@ public class ExternalIOTransUtils {
 	 * 注销
 	 * 
 	 * @param cmpNameToHwType APP组件工程生成，<组件名称，对应平台大类属性>
-	 * @param appID APP对应的流程ID
-	 * @param appName APP名称
-	 * @param packinfoPath 客户自存自取路径
+	 * @param appID           APP对应的流程ID
+	 * @param appName         APP名称
+	 * @param packinfoPath    客户自存自取路径
 	 * @return
 	 */
 	public static boolean appUnInstall(Map<String, String> cmpNameToHwType, int appID, String appName,
@@ -231,25 +239,31 @@ public class ExternalIOTransUtils {
 //	}
 	/**
 	 * 导出
-	 * @param appId APP对应的流程ID
-	 * @param taskInfoPath Git临时路径，之后下载到前台
-	 * @param appPath APP工程文件夹路径
-	 * @param sysconfigPath  系统配置模块XML路径
-	 * @param packinfoPath 客户自存自取路径
+	 * 
+	 * @param appId                 APP对应的流程ID
+	 * @param taskInfoPath          Git临时路径，之后下载到前台
+	 * @param appPath               APP工程文件夹路径
+	 * @param sysconfigPath         系统配置模块XML路径
+	 * @param packinfoPath          客户自存自取路径
 	 * @param cmpDeployPlanFilePath 客户自存自取路径
 	 */
 	public static void appTaskExport(int appId, String taskInfoPath, String appPath, String sysconfigPath,
 			String packinfoPath, String cmpDeployPlanFilePath) {
 		appInterface.appTaskExport(appId, taskInfoPath, appPath, sysconfigPath, packinfoPath, cmpDeployPlanFilePath);
 	}
+
 	/**
 	 * 解析系统参数波形
 	 */
-	public static void parseSystemPara(String flowName,String str, String xmlPath) {
+	public static void parseSystemPara(String flowName, String str, String xmlPath) {
 		try {
 			SystemPara.parseSystempPara(flowName, str, xmlPath);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static void modifySpbInclude(List<String> compFuncNameList, String cmpAppFilePath) throws IOException {
+		cmpProCreate.modifySpbInclude(compFuncNameList, cmpAppFilePath);
 	}
 }
