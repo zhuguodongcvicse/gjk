@@ -68,7 +68,7 @@ public class ProcedureXmlAnalysis {
 
 		XmlEntityMap xmlEntityMap = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);
 
-		if (xmlEntityMap.getXmlEntityMaps() == null) {
+		if (xmlEntityMap == null) {
 			return;
 		}
 		for (XmlEntityMap entityMap : xmlEntityMap.getXmlEntityMaps()) {
@@ -271,7 +271,7 @@ public class ProcedureXmlAnalysis {
 	 * 递归获取所属节点标签的属性值
 	 * 
 	 * @param xmlEntityMap
-	 * @param lableName
+	 * @param //lableName
 	 * @return
 	 */
 	private void getHardwarePartMapList(List<HardwarePart> hardwarePartMapList, XmlEntityMap xmlEntityMap) {
