@@ -245,8 +245,21 @@ export default {
     },
     create() {
       if (this.form.testId == undefined) {
-        alert("请先选择一个节点！！！");
-        this.reload();
+        if (this.treeData.length == 0) {
+          Vue.set(this.form, "parentId", "-1");
+          addObj(this.form).then(() => {
+            this.getList();
+            this.$notify({
+              title: "成功",
+              message: "创建成功",
+              type: "success",
+              duration: 2000
+            });
+          });
+        } else {
+          alert("请先选择一个节点！！！");
+          this.reload();
+        }
       } else {
         Vue.set(this.form, "parentId", this.currentId);
         addObj(this.form).then(() => {
