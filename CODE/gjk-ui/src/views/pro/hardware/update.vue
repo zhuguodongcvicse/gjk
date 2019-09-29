@@ -35,12 +35,15 @@ import { menuTag } from "@/util/closeRouter";
 import {
   getXmlEntityTest,
   getNodeList,
-  getAllList,
   saveHardwarelibs,
   getHardwarelibs,
   updateHardwarelib
 } from "@/api/pro/project";
-import { createHardwarelibXML } from "@/api/pro/manager";
+import {
+  createHardwarelibXML,
+  saveChipsFromHardwarelibs,
+  getChipsfromhardwarelibs
+} from "@/api/pro/manager";
 import {
   traverseFrontHardwarelib,
   traverseBackHardwarelib,
@@ -122,8 +125,8 @@ export default {
       getCaseData().then(res => {
         //console.log("res.data",res.data);
         var caseDate = res.data;
-        this.params.frontJson = JSON.parse(this.params.frontJson)
-        this.params.backJson = JSON.parse(this.params.backJson)
+        this.params.frontJson = JSON.parse(this.params.frontJson);
+        this.params.backJson = JSON.parse(this.params.backJson);
         this.postMessageData.cmd = "getHardwarelibs";
         this.postMessageData.params = [this.params, caseDate];
         console.log("this.params", this.params);
@@ -133,19 +136,27 @@ export default {
     },
     // 接受子页面发来的信息
     handleMessage(event) {
-      // console.log("接收子页面数据:****", event.data)
-      this.params.frontJson = event.data.params[0].fJson[0];
-      this.params.backJson = event.data.params[0].bJson[0];
+      console.log("event.data", event.data);
+      if (event.data.params == null) {
+        return;
+      }
+      this.params.frontJson = JSON.stringify(event.data.params[0].fJson);
+      this.params.backJson = JSON.stringify(event.data.params[0].bJson);
+      this.params.link = event.data.params[0].link;
       this.params.linkRelation = event.data.params[1];
-      localStorage.setItem(
-        "chipsOfHardwarelibs",
-        JSON.stringify(event.data.params[2])
-      );
+      this.params.frontCaseForDeployment = event.data.params[3];
+      var chipsfromhardwarelibs = {
+        id: this.params.id,
+        chips: JSON.stringify(event.data.params[2]),
+        projectId: "",
+        flowId: "",
+        modelId: ""
+      };
       // console.log("this.params",this.params)
       switch (event.data.cmd) {
         case "submitCaseJSON":
           // 处理业务逻辑
-          // this.createXml();
+          this.createXml();
           this.ifSave = 0;
           updateHardwarelib(this.params).then(response => {
             this.$message({
@@ -153,6 +164,9 @@ export default {
               message: "修改成功",
               type: "success"
             });
+          });
+          saveChipsFromHardwarelibs(chipsfromhardwarelibs).then(res => {
+            console.log("res", res);
           });
           var tag1 = this.tag;
           menuTag(this.$route.path, "remove", this.tagList, tag1);
