@@ -59,6 +59,19 @@
         <el-form-item label="接收速率">
           <el-input v-model="form.recvRate"/>
         </el-form-item>
+        
+        <el-form-item label="平台大类" :label-width="formLabelWidth" prop="hrTypeName">
+        <el-select v-model="form.hrTypeName" placeholder="请选择平台">
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
+      </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="updateChip(form)">确 定</el-button>
@@ -80,6 +93,7 @@ import {
   updateChip
 } from "@/api/libs/hardwarelibchip";
 import { tableOption } from "@/const/crud/libs/hardwarelibchip";
+import { fetchPlatformTree } from "@/api/admin/platform";
 import { mapGetters } from "vuex";
 import addChip from "@/views/libs/hardwarelibchip/addChip";
 export default {
@@ -87,6 +101,10 @@ export default {
   components: { addChip },
   data() {
     return {
+      formLabelWidth: "120px",
+      options: [],
+      pTreeData: [],
+      treeData: [],
       queryData: "",
       form: [],
       dialogFormVisible: false,
@@ -111,6 +129,7 @@ export default {
   created() {
     // location.reload()
     this.getList();
+    this.getPlatformSelectTree();
   },
   mounted: function() {},
   computed: {
@@ -123,6 +142,7 @@ export default {
     editChip(row, index) {
       this.dialogFormVisible = true;
       this.form = row;
+      // console.log("row",row)
       // console.log(this.form)
       /* getChipJson(row.id).then(response => {
         this.queryData = response.data.chipData
@@ -137,6 +157,21 @@ export default {
         params: form
       });
       this.form = {};
+    },
+    getPlatformSelectTree() {
+      fetchPlatformTree().then(response => {
+        //平台库树结构只展示根节点数据
+        for (let item of response.data.data) {
+          let index = response.data.data.indexOf(item);
+          let plaTreeData = {};
+          plaTreeData.value = item.name;
+          plaTreeData.label = item.label;
+          plaTreeData.id = item.id;
+          plaTreeData.parentId = item.parentId;
+          this.pTreeData.push(plaTreeData);
+        }
+        this.options = this.pTreeData;
+      });
     },
     getList() {
       this.tableLoading = true;

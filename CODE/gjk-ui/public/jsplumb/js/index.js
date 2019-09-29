@@ -99,9 +99,9 @@ function handleMessageFromParent(event) {
 			iframeData = data
 			dat = eval(JSON.stringify(iframeData.params));
 			// console.log("子接收父参数", iframeData)
-			console.log("dat数据", dat);
+			// console.log("dat数据", dat);
 			connectionData = iframeData.connectionData
-			console.log("connection数据", connectionData)
+			// console.log("connection数据", connectionData)
 			break
 		case 'getCompDtosData':
 			//接收属性栏修改后的数据
@@ -524,7 +524,7 @@ function appendDiv() {
 	var Template = "";
 	for (var i = 0; i < dat.length; i++) {
 
-		console.log("dat[i].compImg", dat[i].compImg);
+		// console.log("dat[i].compImg", dat[i].compImg);
 		var s = dat[i].compImg.substr(dat[i].compImg.indexOf("src='") + 5);
 		var img = s.substr(0, s.indexOf("' "));
 		//str += "<div class = 'btn'  data-template='tpl-menu" + i + "'><img src='"+img+"'><br/>" + dat[i].compName + "</div></br>"

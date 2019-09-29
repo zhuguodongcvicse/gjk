@@ -60,7 +60,6 @@ export default {
       options: [],
       pTreeData: [],
       treeData: [],
-      values: [],
       formLabelWidth: "120px",
       form: {
         id: "",

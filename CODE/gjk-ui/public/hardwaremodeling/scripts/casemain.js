@@ -30,7 +30,7 @@ Q.registerImage('ePort', 'images/网口.svg');
 // 子接收父参数
 function handleMessageFromParent(event) {
 
-	console.log("event.data.params", event.data.params)
+	// console.log("event.data.params", event.data.params)
 	switch (event.data.cmd) {
 		case 'getCase':
 			caseArr = event.data.params;
@@ -1295,15 +1295,32 @@ function initEditor(editor) {
 				} */
 			}
 			if (data.properties.chipName != null) {
-				data.set('chipname', data._mn3.chipName);
-				data.set('corenum', data._mn3.coreNum);
-				data.set('memsize', data._mn3.memSize);
-				data.set('boardname', data._mn3.boardName);
+				data.set('chipName', data._mn3.chipName);
+				data.set('coreNum', data._mn3.coreNum);
+				data.set('memSize', data._mn3.memSize);
+				data.set('hrTypeName', data._mn3.hrTypeName);
+				data.set('recvRate', data._mn3.recvRate);
+			}
+			if (data.properties.infName != null) {
 				data.set('infName', data._mn3.infName);
 				data.set('infRate', data._mn3.infRate);
 				data.set('opticalNum', data._mn3.opticalNum);
 			}
-
+			if (data.properties.boardType != null) {
+				if (data._mn3.boardType == 0) {
+					data.set('showBoardType', 'calculateBoard');
+				}
+				if (data._mn3.boardType == 1) {
+					data.set('showBoardType', 'FpgaBoard');
+				}
+				if (data._mn3.boardType == 2) {
+					data.set('showBoardType', 'exchangeBoard');
+				}
+				if (data._mn3.boardType == 3) {
+					data.set('showBoardType', 'interfaceBoard');
+				}
+				data.set('boardName', data._mn3.boardName);
+			}
 			// data.set('rackname', data._mn3.caseName);
 			// data.set('boardnum', data._mn3.bdnum);
 		}
@@ -1311,16 +1328,24 @@ function initEditor(editor) {
 			return {
 				group: '芯片属性',
 				properties: [{
-					client: 'chipname',
+					client: 'chipName',
 					displayName: '芯片名称'
 				},
 				{
-					client: 'corenum',
+					client: 'coreNum',
 					displayName: '内核数量'
 				},
 				{
-					client: 'memsize',
+					client: 'memSize',
 					displayName: '内存大小'
+				},
+				{
+					client: 'recvRate',
+					displayName: '接收速率'
+				},
+				{
+					client: 'hrTypeName',
+					displayName: '平台大类'
 				},
 				{
 					client: 'IP',
@@ -1352,8 +1377,12 @@ function initEditor(editor) {
 			return {
 				group: '主板属性',
 				properties: [{
-					client: 'boardname',
+					client: 'boardName',
 					displayName: '主板名称'
+				},
+				{
+					client: 'showBoardType',
+					displayName: '主板类型'
 				}
 				]
 			}

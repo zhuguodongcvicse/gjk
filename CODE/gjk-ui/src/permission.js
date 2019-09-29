@@ -16,6 +16,11 @@ const lockPage = store.getters.website.lockPage // 锁屏页
  * https://router.vuejs.org/zh/guide/advanced/navigation-guards.html
  */
 router.beforeEach((to, from, next) => {
+  if (to.name == "process") {
+    to.query.src = ''
+  }
+  // console.log("to",to)
+  // console.log("from",from)
   // 缓冲设置
   if (to.meta.keepAlive === true && store.state.tags.tagList.some(ele => {
     return ele.value === to.fullPath
@@ -44,6 +49,7 @@ router.beforeEach((to, from, next) => {
         })
       } else {
         const value = to.query.src || to.fullPath
+        // console.log("value---",value)
         const label = to.query.name || to.meta.title || to.name
         // console.log("label",label)
         if (meta.isTab !== false && !validatenull(value) && !validatenull(label)) {
