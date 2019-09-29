@@ -80,7 +80,7 @@ public class GjkPlatformController {
 	public R getTrees() {
 		return new R<>(TreeUtilPl.buildTrees(gjkPlatformService.list(Wrappers.emptyWrapper()), "-1"));
 	}
-	
+
 	/**
 	 * 返回角色的平台库集合
 	 *
@@ -90,10 +90,8 @@ public class GjkPlatformController {
 	@GetMapping("/tree/{roleId}")
 //	public List getRoleTree(@PathVariable Integer roleId) {
 	public List getRoleTree() {
-		return gjkPlatformService.getPlatformByRoleId()
-			.stream()
-			.map(PlatformVO::getPlatformId)
-			.collect(Collectors.toList());
+		return gjkPlatformService.getPlatformByRoleId().stream().map(PlatformVO::getPlatformId)
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -116,7 +114,7 @@ public class GjkPlatformController {
 	@SysLog("新增平台库")
 	@PostMapping
 	@PreAuthorize("@pms.hasPermission('sys_platform_add')")
-	public R save(@Valid @RequestBody GjkPlatform gjkPlatform) {
+	public R save(@RequestBody GjkPlatform gjkPlatform) {
 		gjkPlatform.setPlatformId(IdGenerate.uuid());
 		return new R<>(gjkPlatformService.save(gjkPlatform));
 	}
@@ -147,4 +145,15 @@ public class GjkPlatformController {
 		return new R<>(gjkPlatformService.updatePlatformById(gjkPlatform));
 	}
 
+	/**
+	 * @Title: ownPlatform
+	 * @Description: 
+	 * @Author xiaohe
+	 * @DateTime 2019年9月29日 上午11:19:42
+	 * @return 
+	 */
+	@PostMapping("ownPlatform")
+	public R ownPlatform() {
+		return new R<>(gjkPlatformService.selectOwnPlatform());
+	}
 }

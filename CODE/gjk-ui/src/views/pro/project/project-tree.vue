@@ -186,6 +186,7 @@
   import { fetchTestTree } from "@/api/admin/test";
   import { getUserhasApplyAuto } from "@/api/admin/user";
   import { saveProProcess, saveProCompList } from "@/api/pro/project";
+  
   import {
     fetchProList,
     fetchProTree,
@@ -198,7 +199,7 @@
     showPartSoftwareAndPlatform,
     getPlatformList
   } from "@/api/pro/manager";
-  import { addObj as saveApp } from "@/api/pro/app";
+  import { addObj as saveApp, getAppByProcessId } from "@/api/pro/app";
   import { getSoftwareTree } from "@/api/libs/software";
   import { getAllComp, screenCompByLibs } from "@/api/libs/commoncomponent";
   import { getBSPTree } from "@/api/libs/bsp";
@@ -478,7 +479,7 @@
       if (item == "集成代码生成") {
         console.log('userInfouserInfouserInfo',this.userInfo.name)
           codeGeneration(this.procedureId,this.userInfo.name).then(res => {
-        
+
         });
         const loading = this.$loading({
           lock: true,
@@ -491,6 +492,7 @@
         }, 2000);
         $(".rightmenu").hide();
       } else if (item == "修改软件框架") {
+        this.platformFlag=false
      //得到平台大类
           getPlatformList().then(Response => {
             this.platformDataList = Response.data.data
@@ -531,16 +533,27 @@
         // filePath.filePath = this.fileData.filePath
         //getPath({path:"D:\\\CCode\\\ConsoleApplication1\\\ConsoleApplication1.sln"});
         //将 文件夹名称 和 数据 一起返回给textEdits.vue
-        getPath({
-          path: filePath.filePath,
-          fileName: this.fileData.fileName
+
+        //获取平台类型
+        getAppByProcessId({
+          fileName: this.fileData.fileName,
+          procedureId: this.procedureId
         }).then(val => {
-          // this.$store.dispatch(
-          //   "saveConsoleLog",
-          //   this.fileData.fileName + "===@@@===" + val.data.data
-          // );
-          //this.$store.dispatch("saveTextLog",val.data.data)
+          getPath({
+          path: filePath.filePath,
+          fileName: this.fileData.fileName,
+          platformType: val.data.data
+          }).then(val => {
+            // this.$store.dispatch(
+            //   "saveConsoleLog",
+            //   this.fileData.fileName + "===@@@===" + val.data.data
+            // );
+            //this.$store.dispatch("saveTextLog",val.data.data)
+          });
         });
+
+
+        
         $(".rightmenu").hide();
       } else if (item == "添加流程") {
         this.addProcedureDialogVisible = true;
@@ -723,6 +736,7 @@
           }
         }
       } else if (data.type == "app") {
+        this.procedureId = data.processId;
         this.menus = ["编译"];
         this.fileData = data;
       } else if (data.parentId == "-1") {

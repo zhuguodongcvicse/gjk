@@ -2,6 +2,12 @@
 	var createElement = function(options) {
 		options = options || {};
 		var element = document.createElement(options.tagName || 'div');
+		if (options.parent.innerText == 'IP') {
+			element.setAttribute("id","IP")
+			// console.log("element.childNodes777",element.childNodes[0])
+			// console.log("options",options)
+			// console.log("options.parent",options.parent)
+		}
 		if(options.class) {
 			$(element).addClass(options.class);
 		}
@@ -53,7 +59,7 @@
 				parent: parent
 			});
 			this.input = input;
-
+			// console.log("input",input.parentNode)
 			if(property.readonly) {
 				input.setAttribute('readonly', 'readonly');
 			}
@@ -624,8 +630,8 @@
 				parent: formItem,
 				class: "input-group input-group-sm col-sm-7"
 			});
-			// console.log("inputDIV",inputDIV)
-			var aa = $("#form-control")
+			
+			// var aa = $("#form-control")
             // console.log("aa",aa.document)
 			var cellEditor = createCellEditor(property, inputDIV, function() {
 				// console.log("this.getValue(property)",this.getValue(property))
@@ -719,7 +725,7 @@
 				// console.log("properties",name,properties)
 				this.createItem(group, properties[name]);
 			}
-			// var html1='<button type="button" class="btn btn-default" style="float:right;margin-top:8px" onclick="submitSetting();">保存</button>';
+			// var html1='<button type="button" class="btn btn-default propertypane_tablebtn_14s"  onclick="submitSetting();">保存</button>';
 			/* Q.createElement({
 				tagName: 'button1',
 				parent: group,

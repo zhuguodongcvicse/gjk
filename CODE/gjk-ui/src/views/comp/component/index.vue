@@ -255,7 +255,7 @@ export default {
     },
     //选中数据
     selectionChange(list) {
-      this.$message.success("选中的数据" + JSON.stringify(list));
+      // this.$message.success("选中的数据" + JSON.stringify(list));
     },
     getStructTrees() {
       let struct = {};

@@ -54,7 +54,7 @@ public class TreeUtilAl {
 			}
 
 			for (T it : treeNodes) {
-				if (it.getParentId().equals(treeNode.getId()) ) {
+				if (treeNode.getId().equals(it.getParentId()) ) {
 					if (treeNode.getChildren() == null) {
 						treeNode.setChildren(new ArrayList<>());
 					}

@@ -91,7 +91,7 @@ public class GjkAlgorithmController {
 	@SysLog("新增算法库")
 	@PostMapping
 	@PreAuthorize("@pms.hasPermission('sys_algorithm_add')")
-	public R save(@Valid @RequestBody GjkAlgorithm gjkAlgorithm) {
+	public R save(@RequestBody GjkAlgorithm gjkAlgorithm) {
 		gjkAlgorithm.setAlgorithmId(IdGenerate.uuid());
 		return new R<>(gjkAlgorithmService.save(gjkAlgorithm));
 	}

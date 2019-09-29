@@ -58,6 +58,16 @@ public class XmlEntity {
 	 * 属性name的value
 	 */
 	private String attributeNameValue;
+	
+	/**
+	 * 属性compId
+	 */
+	private String attributeCompId;
+	
+	/**
+	 * 属性compId的value
+	 */
+	private String attributeCompIdValue;
 
 	
 	/**

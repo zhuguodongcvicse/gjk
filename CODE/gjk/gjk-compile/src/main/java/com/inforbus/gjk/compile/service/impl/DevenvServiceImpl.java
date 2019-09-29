@@ -70,52 +70,44 @@ public class DevenvServiceImpl implements DevenvService{
 	private AmqpTemplate rabbitmqTemplate;
 	
 	@Override
-	public String Command(String path1,String fileName) {
+	public String Command(String path1,String fileName,String platformType) {
 		Set<String> filePathList = new TreeSet<String>();
 		//VS编译
 		String fileEndName = ".sln";
 
-		//Workbench编译
-		String fileEndNameW = ".wrmakefile";
-
-		//Sylixos编译
-		String makeFile = "Makefile";
-
-		//Linux编译
-		String subdir = "subdir.mk";
 		File file = new File(path1);
 		String str = "";
 		//判断是否存在sln文件
 		boolean isFile = false;
 		if(file.exists()) {
 			File[] childFiles = file.listFiles();
-			for (File childFile : childFiles) {
-				//判断是否是VS平台
-				if (childFile.getName().endsWith(fileEndName)) {
-					//filePathList.add(file.getAbsolutePath());
-					isFile = true;
-					str = devenv(childFile.getAbsolutePath(),fileName);
-
-					//判断是否是Sylixos平台
-				}else if(childFile.getName().equals(makeFile)){
-					str = sylixos(file.getAbsolutePath(),fileName);
-					//判断是否是Workbench平台
-				}else if(childFile.getName().endsWith(fileEndNameW)) {
-					//查询workbench中的makefile
-					Set<String> set = new HashSet<String>();
-					List<String> list = new ArrayList<String>();
-					FileUtil.getSelectStrFilePathList(set,file.getAbsolutePath(),"Makefile");
-					list.addAll(set);
-					str = workbench(list.get(0),fileName);
+			if(platformType.equals("VS2010")) {
+				//判断是否是VS2010
+				for (File childFile : childFiles) {
+					//判断是否是VS平台
+					if (childFile.getName().endsWith(fileEndName)) {
+						//filePathList.add(file.getAbsolutePath());
+						isFile = true;
+						str = devenv(childFile.getAbsolutePath(),fileName);
+					} 
 				}
-			}
-
-			//判断是否是 Linux平台 根据文件名判断是否是 linux平台
-			String subdirPath = FileUtil.getSelectStrFilePath(file.getAbsolutePath(), subdir);
-			if(subdirPath != null) {
+			}else if(platformType.equals("Sylixos")){
+				//判断是否是Sylixos平台
+				isFile = true;
+				str = sylixos(file.getAbsolutePath(),fileName);
+			}else if(platformType.equals("Workbench")) {
+				//判断是否是Workbench平台
+				isFile = true;
+				Set<String> set = new HashSet<String>();
+				List<String> list = new ArrayList<String>();
+				FileUtil.getSelectStrFilePathList(set,file.getAbsolutePath(),"Makefile");
+				list.addAll(set);
+				str = workbench(list.get(0),fileName);
+			}else if(platformType.equals("Linux")) {
+				//判断是否是 Linux平台
+				isFile = true;
 				linux(file.getAbsolutePath(),fileName);
 			}
-
 		}else {
 			System.out.println("传入路径错误，请联系管理员。");
 		}

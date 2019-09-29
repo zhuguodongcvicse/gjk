@@ -194,13 +194,11 @@ export default {
           // console.log("paramFile.filevo.compImg", paramFile.filevo[0].compImg);
           this.compImg = paramFile.filevo[0].compImg;
         } else {
-          console.log("..............................paramFile.filePath",paramFile);
           if (null !== paramFile && null !== paramFile.filePath) {
             this.algorithm = paramFile.filePath.name;
             this.compValueType.libsID = paramFile.filePath.id;
           }
-         
-          this.filesPath = paramFile.filevo;
+          this.compValueType.paths = this.filesPath = paramFile.filevo;
         }
       }
     },
@@ -304,6 +302,7 @@ export default {
         fileType: this.fileType,
         paths: this.compValueType.paths
       };
+      console.log("savefilessavefilessavefiles", savefiles);
       return Promise.resolve(fetchSavefiles(savefiles));
     },
     imgRetStrFunction(retStr) {

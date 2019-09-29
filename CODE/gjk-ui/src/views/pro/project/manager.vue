@@ -19,7 +19,7 @@
         alt="收缩"
         @click="imgToClick"
         v-bind:style="{cursor:'pointer','vertical-align':'middle','position': 'absolute','top': '50%','left': '50%','transform': 'translate(-50%, -50%)'}"
-      >
+      />
     </div>
     <!--右边主体-->
     <div class="mb_main" v-bind:style="rightClass">
@@ -206,8 +206,8 @@ export default {
         // this.hardwarelibIfExist();
       });
       deleteChipsFromHardwarelibs(this.hardwarelibs.id).then(res => {
-        console.log("res",res)
-      })
+        console.log("res", res);
+      });
       // this.closeRouterTag()
     },
     //获取鼠标坐标
@@ -295,9 +295,13 @@ export default {
           let process = res.data.data;
           if (node.type == "11") {
             this.$router.push({
-              // path: "/comp/manager/process",
-              name: "process",
-              params: { proId: process.parentId, processId: node.id, modelId: node.parentId }
+              path: "/comp/manager/process",
+              // name: "process",
+              query: {
+                proId: process.parentId,
+                processId: node.id,
+                modelId: node.parentId
+              }
             });
           }
         });

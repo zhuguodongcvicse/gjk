@@ -101,6 +101,7 @@ import { remote } from "@/api/admin/dict";
 import { getObjType, deepClone, randomLenNum } from "@/util/util";
 import { mapGetters } from "vuex";
 import { fetchStrInPointer } from "@/api/libs/structlibs";
+import { getOwnPlatform } from "@/api/admin/platform";
 import formulaEditing from "../formula-editing";
 export default {
   //import引入的组件需要注入到对象中才能使用
@@ -149,6 +150,7 @@ export default {
         );
         this.formulaDialogParams.tmpLengthVal.attributeNameValue = value;
         if (this.lableType === "selectComm") {
+          this.selectOptions = [];
           //获取下拉框的值从字典获取
           if (getObjType(this.dictKey) === "string") {
             if (this.dictKey !== null && this.dictKey !== "") {
@@ -157,6 +159,15 @@ export default {
                   //从商店中获取对应表的数据
                   fetchStrInPointer().then(res => {
                     this.selectOptions = res.data.data;
+                  });
+                } else if (this.dictKey === "dbtab_platform") {
+                  getOwnPlatform().then(res => {
+                    res.data.data.forEach(item => {
+                      this.selectOptions.push({
+                        value: item.name,
+                        label: item.name
+                      });
+                    });
                   });
                 }
               } else {

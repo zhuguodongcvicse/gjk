@@ -111,6 +111,11 @@ public class XmlFileHandleUtil {
 
 			xmlNode.setAttribute(xmlEntity.getAttributeName(), xmlEntity.getAttributeNameValue());
 		}
+		//新增加的为了区分构建函数名
+		if (xmlEntity.getAttributeCompId() != null) {
+
+			xmlNode.setAttribute(xmlEntity.getAttributeCompId(), xmlEntity.getAttributeCompIdValue());
+		}
 
 		if (xmlEntity.getAttributeStructTypeName() != null) {
 			xmlNode.setAttribute(xmlEntity.getAttributeStructTypeName(), xmlEntity.getAttributeStructTypeValue());
@@ -374,6 +379,11 @@ public class XmlFileHandleUtil {
 							entity.setAttributeName("name");
 							entity.setAttributeNameValue(value);
 						}
+						
+						if (name.equals("compId")) {
+							entity.setAttributeCompId("compId");
+							entity.setAttributeCompIdValue(value);
+						}
 
 						if (name.equals("structType")) {
 							entity.setAttributeStructTypeName("structType");
@@ -450,6 +460,7 @@ public class XmlFileHandleUtil {
 			e.printStackTrace();
 			logger.info("解析Xml文件失败");
 			System.out.println("解析Xml文件失败");
+			return null;
 		}
 
 		return xmlEntityMaps.get(0);

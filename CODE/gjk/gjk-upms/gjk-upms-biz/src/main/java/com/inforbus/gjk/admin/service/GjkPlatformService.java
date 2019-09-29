@@ -1,7 +1,6 @@
 
 package com.inforbus.gjk.admin.service;
 
-
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -53,68 +52,85 @@ public interface GjkPlatformService extends IService<GjkPlatform> {
 	 * @return 成功、失败
 	 */
 	Boolean updatePlatformById(GjkPlatform gjkPlatform);
-	
+
 	/**
 	 * 组装平台树，包括软件框架库
+	 * 
 	 * @return
 	 */
 	public List<GjkPlatform> getPlatformTree();
-	
+
 	/**
 	 * 获取软件框架库的主表信息
+	 * 
 	 * @return
 	 */
 	List<Software> getSoftware();
-	
+
 	/**
 	 * 获取软件框架库平台id的副表信息
+	 * 
 	 * @return
 	 */
 	List<SoftwareDetail> getSoftwarePlatform();
-	
+
 	/**
 	 * 获取软件框架库文件夹的副表信息
 	 */
 	List<SoftwareFile> getSoftwareFile();
-	
+
 	/**
 	 * 获取BSP的主表信息
+	 * 
 	 * @return
 	 */
 	List<BSP> getBSP();
-	
+
 	/**
 	 * 获取BSP平台id的副表信息
+	 * 
 	 * @return
 	 */
 	List<BSPDetail> getBSPPlatform();
-	
+
 	/**
 	 * 获取BSP文件夹的副表信息
 	 */
 	List<BSPFile> getBSPFile();
-	
-	
+
 	/**
 	 * 获取构件建模模块的信息
+	 * 
 	 * @return
 	 */
 //	List<ComponentDetail> getLibsInfo();
-	
+
 	/**
 	 * 获取构件建模模块选择的文件夹的信息
+	 * 
 	 * @return
 	 */
 //	List<ComponentDetail> getLibsFile(String libsId);
 	/**
 	 * 组装平台树，包括软件框架库
+	 * 
 	 * @return
 	 */
 	public List<GjkAlgorithm> getAlgorithmTree();
+
 	/**
 	 * 组装平台树，包括软件框架库
+	 * 
 	 * @return
 	 */
 	public List<GjkTest> getTestTree();
-	
+
+	/**
+	 * @Title 获取所属平台
+	 * @Description 查询所属平台用于下拉框显示
+	 * @Author xiaohe
+	 * @DateTime 2019年9月28日 下午4:33:08
+	 * @return
+	 */
+	List<GjkPlatform> selectOwnPlatform();
 }

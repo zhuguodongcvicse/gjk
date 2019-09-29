@@ -742,7 +742,7 @@ export default {
               } else if (attrs[i].dataKey == "dbtab_structlibs") {
               } else if (attrs[i].dataKey == "[]") {
                 this.selectDatas = [];
-              } else {
+              } else {//其他配置方式获取字典表数据
                 getDictValue(attrs[i].dataKey).then(res => {
                   this.selectDatas = res.data.data;
                 });
@@ -781,7 +781,7 @@ export default {
         this.lableName = "";
         this.lableMappingName = "";
         this.configureType = {
-          //每个标签上都拥有的配置信息对象
+          //创建配置信息对象
           lableType: "false",
           lableName: "",
           lableMapping: false,
@@ -794,7 +794,7 @@ export default {
     addAttribute() {
       //添加标签属性
       if (this.configureType.attrs == undefined) this.configureType.attrs = [];
-      this.configureType.attrs.push({
+      this.configureType.attrs.push({//创建并添加属性的对象
         attrName: "",
         attrMapping: false,
         attrMappingName: "",
@@ -837,7 +837,7 @@ export default {
 
         if (this.configureType.mappingKeys == undefined) {
           //如果字典中没有此映射数据,先把数据存入字典表,再请求到此id,存入mappingKeys上
-          var description = "";
+          var description = "";//为字典表中description字段创建数据
           if (this.template == "comp_param_type") {
             description = "构件建模";
           } else if (this.template == "hardware_param_type") {
@@ -853,7 +853,7 @@ export default {
           } else if (this.template == "other_param_type") {
             description = "其他模型";
           }
-          var SysDict = {
+          var SysDict = {//字典表对象
             value: this.configureType.lableName,
             type: this.template,
             label: lableMappingName,
@@ -863,30 +863,30 @@ export default {
           await addDict(SysDict); //发送同步请求,存数据到字典表中
           await getDictValue(this.template).then(response => {
             //发送同步请求,查询字典表数据
-            this.dictValues = response.data.data;
+            this.dictValues = response.data.data;//刷新页面字典表数据
           });
-          if (lableMapping) {
+          if (lableMapping) {//判断标签名是否映射
             var dictValues = this.dictValues;
             for (let j of dictValues) {
               if (
                 this.configureType.lableName == j.value &&
                 lableMappingName == j.label
               ) {
-                Vue.set(this.configureType, "mappingKeys", j.id);
+                Vue.set(this.configureType, "mappingKeys", j.id);//存储映射数据(字典表)的id
                 break;
               }
             }
           }
         }
-        this.addLableUtil(lableMappingName); //提出出的公共部分方法
+        this.addLableUtil(lableMappingName); //公共方法
       } else {
         lableMappingName = this.configureType.lableName;
-        this.addLableUtil(lableMappingName);
+        this.addLableUtil(lableMappingName);//公共方法
       }
     },
 
     async addLableUtil(lableMappingName) {
-      var currentXmlMap = {
+      var currentXmlMap = {//创建标签对象
         lableName: this.configureType.lableName, //root标签
         lableMappingName: lableMappingName,
         textContent: "",
@@ -912,7 +912,7 @@ export default {
 
             if (i.attrKeys == undefined) {
               //字典表中没有映射数据,就先添加至字典表中
-              var description = "";
+              var description = "";//为字典表中description字段创建数据
               if (this.template == "comp_param_type") {
                 description = "构件建模";
               } else if (this.template == "hardware_param_type") {
@@ -928,7 +928,7 @@ export default {
               } else if (this.template == "other_param_type") {
                 description = "其他模型";
               }
-              var SysDict = {
+              var SysDict = {//字典表对象
                 value: i.attrName,
                 type: this.template,
                 label: i.attrMappingName,
@@ -942,15 +942,15 @@ export default {
               });
             }
           } else {
-            Vue.set(i, "attrKeys", undefined);
-            Vue.set(i, "attrMappingName", i.attrName);
+            Vue.set(i, "attrKeys", undefined);//属性不映射attrKeys为undefined
+            Vue.set(i, "attrMappingName", i.attrName);//属性不映射,属性名不做处理
           }
           Vue.set(currentXmlMap.attributeMap, i.attrName, ""); //遍历添加属性
         }
         if (attrs.length > 0) {
           await getDictValue(this.template).then(response => {
-            this.dictValues = response.data.data;
-            for (var i = 0; i < attrs.length; i++) {
+            this.dictValues = response.data.data;//刷新页面上字典表数据
+            for (var i = 0; i < attrs.length; i++) {//对映射的属性名,字典表中又没有对应映射数据的数据,存入attrKeys字段上
               if (attrs[i].attrMapping) {
                 var dictValues = this.dictValues;
                 for (let j of dictValues) {
@@ -984,7 +984,7 @@ export default {
         }
       }
 
-      var str = parseObjToStr(this.configureType);
+      var str = parseObjToStr(this.configureType);//把configureType对象转化为字符串
 
       Vue.set(currentXmlMap.attributeMap, "configureType", str); //获取新增的属性
       if (this.lablePosition == "in") {
