@@ -412,6 +412,23 @@ export default {
           console.log("连线关系数据", this.postMessageData);
           this.$refs.gjkIframe.sendMessage(this.postMessageData);
         });
+        console.log("this.$route.params.processId",this.$route.params.processId)
+        findProJSON(this.$route.query.processId).then(res => {
+          //循环流程中的构件及"arrow"
+          console.log("加载后的数据", res.data.data.xmlJson.xmlEntityMaps);
+          res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
+            if (tmp.lableName !== "arrow") {
+              /* 将查询的东西插入到临时 */
+              // this.tempParam.push(tmp);
+              // 使用map将 数据对应上
+              this.tmpMaps.set(tmp.attributeMap.id, tmp);
+            }
+          });
+          console.log("map数据", this.tmpMaps);
+          this.postMessageData.cmd = "clickCompLoading";
+          this.postMessageData.params = res.data.data.json;
+          this.$refs.gjkIframe.sendMessage(this.postMessageData);
+        });
       }
       //调用Iframe组件中的发送方法
       //this.$refs.gjkIframe.sendMessage(this.postMessageData);
