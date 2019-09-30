@@ -44,8 +44,9 @@ function handleMessageFromParent(event) {
 			}
 			if (linkTemp.length != 0) {
 				graphList.link = linkTemp
-				linkGraphList.datas = linkTemp
+				linkGraphList = linkTemp
 			}
+			console.log("linkGraphList",linkGraphList)
 			for (const n in graphList.fJson) {
 				for (const i in graphList.fJson[n].datas) {
 					if (graphList.fJson[n].datas[i].json.properties != null && graphList.fJson[n].datas[i].json.properties.caseName != null) {
@@ -1068,6 +1069,7 @@ function initEditor(editor) {
 						},
 					}
 				}
+				console.log("linkGraphList",linkGraphList)
 				//赋值连线的refid，将连线和两个重新画出的接口放到数组
 				for (const i in linkList) {
 					linkList[i][0]._refId = '1' + parseInt(1500 * Math.random())
