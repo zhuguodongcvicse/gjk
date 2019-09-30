@@ -152,7 +152,6 @@ function ondropLoadJSON(evt, graph, center, options) {
 		}
 	}
 	var json = JSON.stringify(frontjson)
-	console.log('json**************',json)
 	//校验后机箱上的图元不许移动
 	for (index in bJsonObj.datas) {
 		var image = bJsonObj.datas[index].json.image;

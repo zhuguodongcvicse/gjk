@@ -356,6 +356,7 @@
 		`front_json` = #{frontJson},
 		`back_json` = #{backJson},
 		`link` = #{link},
+		`frontCaseForDeployment` = #{frontCaseForDeployment},
 		`link_relation` = #{linkRelation}
 		WHERE `id` = #{id}
 	</update>
