@@ -377,7 +377,7 @@ export default {
     for(var i = 0;i<this.themeData.xmlEntityMaps[0].xmlEntityMaps.length;i++){
       this.topicData.dataStream.clear()
       for(var j = 0;j<this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps.length;j++){
-        if(this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[j].lableName == "startCmp"){
+        if(this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].lableName == "startCmp"){
            //this.topicData.startCmp =this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].lableName+"*"+ this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[0].attributeMap.name
            for(var p in this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[0].attributeMap){
               if(p == "name"){
@@ -386,7 +386,7 @@ export default {
               }
               
            }
-        }else if(this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[j].lableName == "endCmp"){
+        }else if(this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].lableName == "endCmp"){
            this.topicData.endCmp =this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].lableName+"*"+ this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[1].attributeMap.name
         }else{
          var dataStream = {

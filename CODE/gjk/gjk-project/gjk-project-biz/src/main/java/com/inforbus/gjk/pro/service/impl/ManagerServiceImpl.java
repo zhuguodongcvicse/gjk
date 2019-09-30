@@ -1002,8 +1002,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (!newFile.exists()) {
 			newFile.mkdirs();
 		}
-		// ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName,
-		// newFilePath + "xxx.xml");
+		 ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName,
+		 newFilePath + "xxx.xml");
 		baseMapper.saveNewFilePath(newFilePath + "xxx.xml", proDetailId);
 
 		JGitUtil.commitAndPush(filePath + fileName, "上传构件相关文件");

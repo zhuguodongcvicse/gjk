@@ -351,15 +351,16 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    // console.log("pubtopicParam",this.themeData.xmlEntityMaps)
-    // console.log("topic中的数据",this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps)
+    console.log("pubtopicParam",this.themeData.xmlEntityMaps[1].xmlEntityMaps)
+    // console.log("pubtopic中的数据",this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps)
+     console.log("1111111111111",this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps)
     this.$store.dispatch('cleanPubMapCustomConfig')
     for(var i = 0;i<this.themeData.xmlEntityMaps[1].xmlEntityMaps.length;i++){
       this.topicData.funcConfig.clear()
       for(var j = 0;j<this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps.length;j++){
-        if(this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[j].lableName == "startCmp"){
+        if(this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].lableName == "startCmp"){
            this.topicData.user =this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].lableName+"*"+ this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[0].attributeMap.name
-        }else if(this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[j].lableName == "endCmp"){
+        }else if(this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].lableName == "endCmp"){
            this.topicData.region =this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].lableName+"*"+ this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[1].attributeMap.name
         }else{
          var dataStream = {

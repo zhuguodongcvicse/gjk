@@ -1102,7 +1102,7 @@ jsPlumb.bind("click", function (conn, originalEvent) {
 	connectionObjClick = {};
 	console.log(connectionObjClick)
 	//conn.getPaintStyle().stroke = "red"
-	conn.getPaintStyle().strokeStyle = "red"
+	//conn.getPaintStyle().strokeStyle = "red"
 	connectionObjClick.removeConnection = conn
 	//console.log(conn)
 	connectionObjClick.connSourceUUid = conn.endpoints[0].getUuid();
