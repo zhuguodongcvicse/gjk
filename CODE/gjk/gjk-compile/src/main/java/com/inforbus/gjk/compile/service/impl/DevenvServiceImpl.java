@@ -238,6 +238,10 @@ public class DevenvServiceImpl implements DevenvService{
 			//再创建工程文件夹
 			session = connection.openSession();
 			session.execCommand("mkdir "+lPath+"/"+ProcessName+"/"+fileName);
+			if(session != null) {
+				session.close();
+			}
+			session.close();
 		}catch(Exception e) {	
 			e.getStackTrace();
 		}
