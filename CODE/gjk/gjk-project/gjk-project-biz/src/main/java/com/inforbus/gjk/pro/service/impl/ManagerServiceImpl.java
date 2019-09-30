@@ -102,6 +102,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	private static String serverPath = JGitUtil.getLOCAL_REPO_PATH();
 	private static final String flowInfPath = JGitUtil.getFlowInfPath();//获取流程内外部接口存放路径 add by hu
 	private static final String gitDetailPath = JGitUtil.getLOCAL_REPO_PATH();//gitlu路径
+	private static final String generateCodeResult = JGitUtil.getGenerateCodeResult();//集成代码生成结果存放路径
+	
 	/**
 	 * @getTreeByProjectId
 	 * @Description: 获取项目树形菜单
@@ -333,27 +335,33 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		ProjectFile file = getProDetailById(proDetailId);
 		String modelId = file.getParentId();
 		List<ProjectFile> files = getProFileListByModelId(modelId);
+		String flowPath = null;
 		String customizeFileName = null;
 		String processFileName = null;
+		String packinfoFileName = null; 
+		
 		Boolean bool = isXmlFileExist(proDetailId);
 		for (ProjectFile projectFile : files) {
-			if (projectFile.getFileType().equals("16")) {
-				// customizeFileName =
-				// proDetailPath + projectFile.getFilePath() + projectFile.getFileName() +
-				// ".xml";
-				customizeFileName = System.getProperty("user.dir") + "/自定义配置.xml";
-			}
+			
 			if (projectFile.getFileType().equals("11")) {
-				// processFileName = proDetailPath + projectFile.getFilePath() +
-				// projectFile.getFileName() + ".xml";
-				processFileName = System.getProperty("user.dir") + "/流程模型.xml";
+				System.out.print(proDetailPath+ projectFile.getFilePath());
+				 processFileName = proDetailPath + projectFile.getFilePath() +
+				 projectFile.getFileName() + ".xml";
+			}
+			if (projectFile.getFileType().equals("16")) {
+				customizeFileName = proDetailPath + projectFile.getFilePath() +
+				 "新xml文件/xxx.xml";  //获取处理后的主题配置文件
 			}
 
 		}
-
+		
+		
+		//需要添加判断genarateCode路径或packinfo文件是否存在，判断自定义主题配置文件是否生成
+		ProjectFile processFile= getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, this.getById(proDetailId).getParentId()));
+		packinfoFileName=gitDetailPath+processFile.getFilePath()+generateCodeResult + "/packinfo.xml";
 		// 获取客户api的返回值
 		Map<String, List<String>> apiReturnStringList = ExternalIOTransUtils.getCmpSysConfig(customizeFileName,
-				System.getProperty("user.dir") + "/cmpPackInfoWorkMode1.xml", processFileName);
+				packinfoFileName, processFileName);
 
 		// 解析返回值
 		Map<String, List<Object>> map = new HashMap<>();
