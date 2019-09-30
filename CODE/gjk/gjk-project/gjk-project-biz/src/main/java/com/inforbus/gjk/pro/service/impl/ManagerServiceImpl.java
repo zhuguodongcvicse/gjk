@@ -16,6 +16,7 @@ import java.io.Writer;
 import java.net.URLDecoder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -97,13 +98,15 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	protected ProjectMapper projectMapper;
 	@Autowired
 	protected PartPlatformSoftwareMapper partPlatformSoftwareMapper;
-	
+
 	private static final String proDetailPath = JGitUtil.getLOCAL_REPO_PATH();
+	private static final String integerCodeFileName = JGitUtil.getINTEGER_CODE_FILE_NAME();
 	private static String serverPath = JGitUtil.getLOCAL_REPO_PATH();
-	private static final String flowInfPath = JGitUtil.getFlowInfPath();//获取流程内外部接口存放路径 add by hu
-	private static final String gitDetailPath = JGitUtil.getLOCAL_REPO_PATH();//gitlu路径
-	private static final String generateCodeResult = JGitUtil.getGenerateCodeResult();//集成代码生成结果存放路径
-	
+
+	private static final String flowInfPath = JGitUtil.getFlowInfPath();// 获取流程内外部接口存放路径 add by hu
+	private static final String gitDetailPath = JGitUtil.getLOCAL_REPO_PATH();// gitlu路径
+	private static final String generateCodeResult = JGitUtil.getGenerateCodeResult();// 集成代码生成结果存放路径
+
 	/**
 	 * @getTreeByProjectId
 	 * @Description: 获取项目树形菜单
@@ -163,7 +166,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String defaultSoftwareId = project.getDefaultSoftwareId();
 		String defaultBspId = project.getDefaultBspId();
 		String filePath = "gjk" + File.separator + "project" + File.separator + project.getProjectName()
-		+ File.separator;
+				+ File.separator;
 
 		ProjectFile processFile = new ProjectFile(IdGenerate.uuid(), projectId, processName + "流程", "9", filePath,
 				projectId, defaultSoftwareId, defaultBspId);
@@ -338,27 +341,25 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String flowPath = null;
 		String customizeFileName = null;
 		String processFileName = null;
-		String packinfoFileName = null; 
-		
+		String packinfoFileName = null;
+
 		Boolean bool = isXmlFileExist(proDetailId);
 		for (ProjectFile projectFile : files) {
-			
+
 			if (projectFile.getFileType().equals("11")) {
-				System.out.print(proDetailPath+ projectFile.getFilePath());
-				 processFileName = proDetailPath + projectFile.getFilePath() +
-				 projectFile.getFileName() + ".xml";
+				System.out.print(proDetailPath + projectFile.getFilePath());
+				processFileName = proDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml";
 			}
 			if (projectFile.getFileType().equals("16")) {
-				customizeFileName = proDetailPath + projectFile.getFilePath() +
-				 "新xml文件/xxx.xml";  //获取处理后的主题配置文件
+				customizeFileName = proDetailPath + projectFile.getFilePath() + "新xml文件/xxx.xml"; // 获取处理后的主题配置文件
 			}
 
 		}
-		
-		
-		//需要添加判断genarateCode路径或packinfo文件是否存在，判断自定义主题配置文件是否生成
-		ProjectFile processFile= getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, this.getById(proDetailId).getParentId()));
-		packinfoFileName=gitDetailPath+processFile.getFilePath()+generateCodeResult + "/packinfo.xml";
+
+		// 需要添加判断genarateCode路径或packinfo文件是否存在，判断自定义主题配置文件是否生成
+		ProjectFile processFile = getOne(
+				Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, this.getById(proDetailId).getParentId()));
+		packinfoFileName = gitDetailPath + processFile.getFilePath() + generateCodeResult + "/packinfo.xml";
 		// 获取客户api的返回值
 		Map<String, List<String>> apiReturnStringList = ExternalIOTransUtils.getCmpSysConfig(customizeFileName,
 				packinfoFileName, processFileName);
@@ -494,9 +495,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 //		if (projectFile.getFileType().equals("14")) {
 //			file = new File(gitDetailPath+projectFile.getFilePath()+ "方案展示.xml");
 //		}
-		//		if (projectFile.getFileType().equals("11")) {
-		//			file = new File(System.getProperty("user.dir") + "/流程实例.xml");
-		//		}
+		// if (projectFile.getFileType().equals("11")) {
+		// file = new File(System.getProperty("user.dir") + "/流程实例.xml");
+		// }
 
 		XmlEntityMap xmlEntityMap = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);
 		return xmlEntityMap;
@@ -620,7 +621,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 */
 	@Override
 	public void simplePlan(ArrayList<String> schemeFileList, String simplePlanFile) {
-		 ExternalIOTransUtils.simplePlan(schemeFileList, simplePlanFile);//update by zhx
+		ExternalIOTransUtils.simplePlan(schemeFileList, simplePlanFile);// update by zhx
 	}
 
 	/**
@@ -628,7 +629,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * 
 	 * @param id
 	 * @returnzz
-	 * 
 	 */
 	@Override
 	public List<ProjectFile> getFilePathListById(String id) {
@@ -681,7 +681,12 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		ProjectFile sysConfigXmlFile = getProFileByModelIdAndProFileType(projectFile.getParentId(), "17");
 		String sysConfigFilePath = sysConfigXmlFile.getFilePath() + sysConfigXmlFile.getFileName() + ".xml";
 
-		String proceId = this.getById(this.getById(procedureId).getParentId()).getParentId();
+		String modelId = projectFile.getParentId();
+		String proceId = this.getById(modelId).getParentId();
+
+		String integerCodeFilePath = proDetailPath + this.getById(modelId).getFilePath() + File.separator
+				+ integerCodeFileName;
+
 		List<PartPlatformSoftware> partPlatformSoftwares = partPlatformSoftwareMapper.getByProcedureId(proceId);
 
 		String appFilePath = null;
@@ -721,11 +726,11 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			// 遍历所有根组件，创建根组件文件夹
 			for (HardwareNode hardwareNode : hardwareNodes) {
 				for (Map<String, Object> map : maps) {
-					if (hardwareNode.getNodeName().equals(map.get("ID").toString())) {
+					if (map.containsKey("IP") && hardwareNode.getNodeName().equals(map.get("IP").toString())) {
 						for (Part part : hardwareNode.getRootPart()) {
 							partnamePlatformMap.put(part.getPartName(), map.get("hrTypeName").toString());
 							createAssemblyDir(appFilePath, part, map.get("hrTypeName").toString(),
-									partPlatformSoftwares);
+									partPlatformSoftwares, integerCodeFilePath);
 						}
 					}
 				}
@@ -766,13 +771,13 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @param part             组件
 	 */
 	private void createAssemblyDir(String appFilePath, Part part, String libsType,
-			List<PartPlatformSoftware> partPlatformSoftwares) {
+			List<PartPlatformSoftware> partPlatformSoftwares, String integerCodeFilePath) {
 		// 创建根组件文件夹的名称及文件路径
 		String assemblyName = appFilePath + part.getPartName();
 
+		String platformName = libsType;
 		String softwareFilePath = "";
 		String softwareName = "";
-		String platformName = libsType;
 		for (PartPlatformSoftware software : partPlatformSoftwares) {
 			if (software.getPlatformName().contains(";")) {
 				String[] platforms = software.getPlatformName().split(";");
@@ -794,34 +799,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			logger.error("复制软件框架文件夹错误，请联系系统管理员");
 		}
 
-		String makefileType = null;
-
-		// 获取当前类的路径
-		String filePath = ManagerServiceImpl.class.getResource("").getPath();
-		try {
-			// 中文乱码问题
-			filePath = URLDecoder.decode(filePath, "utf-8");
-		} catch (UnsupportedEncodingException e1) {
-			e1.printStackTrace();
-			logger.error("中文路径转义失败。");
-		}
-		// 找到bootstrap.properties的地址
-		filePath = filePath.substring(0, filePath.indexOf("target/classes/") + "target/classes/".length())
-				+ "platformType.yml";
-		File dumpFile = new File(filePath);
-
-		Map father;
-		try {
-			father = Yaml.loadType(dumpFile, HashMap.class);
-			makefileType = father.get(platformName).toString();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			logger.error("读取配置文件失败，请检查配置文件中配置是否正确");
-		}
-
-		if (makefileType == null) {
-			makefileType = "VS2010";
-		}
+		String makefileType = getMakefileTypeByProperties(platformName);
 
 		// 查找组件文件夹下文件夹名为App的文件夹路径
 		String appFilePathName = FileUtil.getSelectStrFilePath(assemblyName, "App");
@@ -829,39 +807,94 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			// 如果未找到App文件夹路径，在组件文件夹下创建App文件夹
 			appFilePathName = assemblyName + File.separator + "App";
 		}
+		// 获取集成代码文件夹 文件夹路径规则:../App/Src/
+		String partIntegerCodeFilePath = appFilePathName + File.separator + "Src" + File.separator;
 		// 获取include文件夹 文件夹路径规则:../App/Include/Spb/
 		String includeFilePath = appFilePathName + File.separator + "Include" + File.separator + "Spb" + File.separator;
 		// 获取src文件夹 文件夹路径规则:../App/Src/Spb/
 		String srcFilePath = appFilePathName + File.separator + "Src" + File.separator + "Spb" + File.separator;
 
+		// 复制集成代码
+		Set<String> integerCodeSet = new HashSet<String>();
+		FileUtil.getSelectStrFilePathList(integerCodeSet, integerCodeFilePath, "Cmp" + part.getPartName(), ".c");
+		try {
+			for (String filepath : integerCodeSet) {
+				FileUtil.copyFile(filepath, partIntegerCodeFilePath);
+			}
+		} catch (IOException e) {
+			logger.error("复制集成代码失败，请联系管理员。");
+			e.printStackTrace();
+		}
+
 		// 创建空集合，存储所有.h文件路径
 		Set<String> hFilePathSet = new HashSet<String>();
 		// 创建空集合，存储所有.h文件的makeFile路径
 		Set<String> hMakeFilePathSet = new HashSet<String>();
-
 		// 创建空集合，存储所有.c和.cpp文件路径
 		Set<String> cFilePathSet = new HashSet<String>();
+		// 创建空集合，存储所有.c和.cpp文件的makeFile路径
+		Set<String> cMakeFilePathSet = new HashSet<String>();
+		// 调接口时使用,储存调用客户接口所需要的数据
+		Set<String> apiNeedStringSet = new HashSet<>();
+		// 调接口时使用,存构件的函数名
+		List<String> compFuncNameList = new ArrayList<String>();
 		// 存储需要查找的文件的后缀集合
 		List<String> selectFileExtensionList = new ArrayList<String>();
 		selectFileExtensionList.add(".c");
 		selectFileExtensionList.add(".cpp");
-		// 创建空集合，存储所有.c和.cpp文件的makeFile路径
-		Set<String> cMakeFilePathSet = new HashSet<String>();
 
-		// TODO
-		Set<String> apiNeedStringSet = new HashSet<>();
+		getCompCHFileAndSave(part, assemblyName, includeFilePath, srcFilePath, hFilePathSet, hMakeFilePathSet,
+				cFilePathSet, cMakeFilePathSet, apiNeedStringSet, compFuncNameList, selectFileExtensionList);
 
+		try {
+			// 原始需求调用客户接口,apiFileList中存添加的.c .cpp .h文件不带后缀的文件名
+			List<String> apiFileList = new ArrayList<String>();
+			apiFileList.addAll(apiNeedStringSet);
+			ExternalIOTransUtils.modifySpbInclude(apiFileList, appFilePathName);
+		} catch (IOException e) {
+			logger.error("调用客户接口失败，请联系管理员。");
+			e.printStackTrace();
+		}
+
+//		try {
+//			// 调用客户接口,list中存添加的构件的函数名
+//			ExternalIOTransUtils.modifySpbInclude(compFuncNameList, appFilePathName);
+//		} catch (IOException e) {
+//			logger.error("调用客户接口失败，请联系管理员。");
+//			e.printStackTrace();
+//		}
+
+		// 将set集合转成List集合
+		List<String> hMakeFilePathList = (List<String>) getListBySet(hMakeFilePathSet);
+		List<String> cMakeFilePathList = (List<String>) getListBySet(cMakeFilePathSet);
+		List<String> cFilePathList = (List<String>) getListBySet(cFilePathSet);
+
+		if (makefileType.trim().toLowerCase().equals("VS2010".toLowerCase())) {
+			modifyVs2010MakeFile(assemblyName, hMakeFilePathList, cMakeFilePathList);
+		} else if (makefileType.trim().toLowerCase().equals("Workbench".toLowerCase())) {
+			WorkbenchUtil.updateWorkbench(assemblyName);
+		} else if (makefileType.trim().toLowerCase().equals("Sylixos".toLowerCase())) {
+			SylixosUtil.updateSylixos(assemblyName, softwareName);
+		} else if (makefileType.trim().toLowerCase().startsWith("Linux".toLowerCase())) {
+			LinuxUtil.updateLinux(cFilePathList, assemblyName, ".c");
+		}
+	}
+
+	private void getCompCHFileAndSave(Part part, String assemblyName, String includeFilePath, String srcFilePath,
+			Set<String> hFilePathSet, Set<String> hMakeFilePathSet, Set<String> cFilePathSet,
+			Set<String> cMakeFilePathSet, Set<String> apiNeedStringSet, List<String> compFuncNameList,
+			List<String> selectFileExtensionList) {
 		// 遍历组件中所有构件，在构件文件夹中获取所有.h .c .cpp文件路径集合
 		List<Component> compList = part.getComponents();
 		for (Component comp : compList) {
-			FileUtil.getSelectStrFilePathList(hFilePathSet, proDetailPath + comp.getFunctionPath(), ".h");
+			compFuncNameList.add(comp.getFunctionName());
 
+			// 查找构件文件夹中所有的.h文件
+			FileUtil.getSelectStrFilePathList(hFilePathSet, proDetailPath + comp.getFunctionPath(), ".h");
+			// 查找构件文件夹中所有的.c和.cpp文件
 			FileUtil.getSelectStrFilePathList(cFilePathSet, proDetailPath + comp.getFunctionPath(),
 					selectFileExtensionList);
 		}
-
-		List<String> cFilePathList = new ArrayList<String>();
-		cFilePathList.addAll(cFilePathSet);
 
 		// 将.h文件拷贝到指定路径下，并将拷贝后的文件路径按照makeFile文件路径切割并存入集合
 		for (String hFilePath : hFilePathSet) {
@@ -886,60 +919,79 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 						.getAbsolutePath().substring(assemblyName.length() + 1);
 				cMakeFilePathSet.add(cMakeFilePath);
 
+				// 调客户Api需要的不带后缀的文件名
 				String cFileName = new File(cFilePath).getName();
 				apiNeedStringSet.add(cFileName.substring(0, cFileName.lastIndexOf(".")));
 			} catch (IOException e) {
 				logger.error("拷贝c文件错误，请联系管理员。");
 			}
 		}
+	}
 
-		// 将set集合转成List集合
-		List<String> hMakeFilePathList = new ArrayList<>();
-		hMakeFilePathList.addAll(hMakeFilePathSet);
-		List<String> cMakeFilePathList = new ArrayList<>();
-		cMakeFilePathList.addAll(cMakeFilePathSet);
+	private String getMakefileTypeByProperties(String platformName) {
+		String makefileType = null;
+		// 获取当前类的路径
+		String filePath = ManagerServiceImpl.class.getResource("").getPath();
+		try {
+			// 中文乱码问题
+			filePath = URLDecoder.decode(filePath, "utf-8");
+		} catch (UnsupportedEncodingException e1) {
+			e1.printStackTrace();
+			logger.error("中文路径转义失败。");
+		}
+		// 找到bootstrap.properties的地址
+		filePath = filePath.substring(0, filePath.indexOf("target/classes/") + "target/classes/".length())
+				+ "platformType.yml";
+		File dumpFile = new File(filePath);
 
-		if (makefileType.trim().toLowerCase().equals("VS2010".toLowerCase())) {
-			// 获取makeFile文件,vs2010中的.filters文件
-			Set<String> makeFileList = new HashSet<String>();
-			String filtersFileName = null;
-			FileUtil.getSelectStrFilePathList(makeFileList, assemblyName, ".filters");
-			if (makeFileList.size() > 0) {
-				List<String> list = new ArrayList<>();
-				list.addAll(makeFileList);
-				filtersFileName = list.get(0);
-			}
-			// 获取makeFile文件,vs2010中的. vcxproj文件
-			String vcxprojFileName = null;
-			makeFileList = new HashSet<String>();
-			FileUtil.getSelectStrFilePathList(makeFileList, assemblyName, ".vcxproj");
-			if (makeFileList.size() > 0) {
-				List<String> list = new ArrayList<>();
-				list.addAll(makeFileList);
-				vcxprojFileName = list.get(0);
-			}
-
-			// 调用makeFile工具类，传入参数makeFile文件路径、需要修改的文件路径集合、文件类型
-			if (filtersFileName != null) {
-				MakeFileUtil.updateVcxprojFiltersFile(filtersFileName, hMakeFilePathList, MakeFileUtil.hFile);
-				MakeFileUtil.updateVcxprojFiltersFile(filtersFileName, cMakeFilePathList, MakeFileUtil.cFile);
-			}
-			if (vcxprojFileName != null) {
-				MakeFileUtil.updateVcxprojFiltersFile(vcxprojFileName, hMakeFilePathList, MakeFileUtil.hFile);
-				MakeFileUtil.updateVcxprojFiltersFile(vcxprojFileName, cMakeFilePathList, MakeFileUtil.cFile);
-			}
-		} else if (makefileType.trim().toLowerCase().equals("Workbench".toLowerCase())) {
-			WorkbenchUtil.updateWorkbench(assemblyName);
-		} else if (makefileType.trim().toLowerCase().equals("Sylixos".toLowerCase())) {
-			SylixosUtil.updateSylixos(assemblyName, softwareName);
-		} else if (makefileType.trim().toLowerCase().equals("Linux".toLowerCase())) {
-			LinuxUtil.updateLinux(cFilePathList, assemblyName, ".c");
+		Map father;
+		try {
+			father = Yaml.loadType(dumpFile, HashMap.class);
+			makefileType = father.get(platformName).toString();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			logger.error("读取配置文件失败，请检查配置文件中配置是否正确");
 		}
 
-		// TODO:调客户接口,参数：apiNeedStringSet转list,apiFilePath
-		List<String> apiFileList = new ArrayList<String>();
-		apiFileList.addAll(apiNeedStringSet);
-		String apiFilePath = new File(appFilePathName).getParentFile().getAbsolutePath();
+		return makefileType;
+	}
+
+	private void modifyVs2010MakeFile(String assemblyName, List<String> hMakeFilePathList,
+			List<String> cMakeFilePathList) {
+		// 获取makeFile文件,vs2010中的.filters文件
+		Set<String> makeFileList = new HashSet<String>();
+		String filtersFileName = null;
+		FileUtil.getSelectStrFilePathList(makeFileList, assemblyName, ".filters");
+		if (makeFileList.size() > 0) {
+			List<String> list = new ArrayList<>();
+			list.addAll(makeFileList);
+			filtersFileName = list.get(0);
+		}
+		// 获取makeFile文件,vs2010中的. vcxproj文件
+		String vcxprojFileName = null;
+		makeFileList = new HashSet<String>();
+		FileUtil.getSelectStrFilePathList(makeFileList, assemblyName, ".vcxproj");
+		if (makeFileList.size() > 0) {
+			List<String> list = new ArrayList<>();
+			list.addAll(makeFileList);
+			vcxprojFileName = list.get(0);
+		}
+
+		// 调用makeFile工具类，传入参数makeFile文件路径、需要修改的文件路径集合、文件类型
+		if (filtersFileName != null) {
+			MakeFileUtil.updateVcxprojFiltersFile(filtersFileName, hMakeFilePathList, MakeFileUtil.hFile);
+			MakeFileUtil.updateVcxprojFiltersFile(filtersFileName, cMakeFilePathList, MakeFileUtil.cFile);
+		}
+		if (vcxprojFileName != null) {
+			MakeFileUtil.updateVcxprojFiltersFile(vcxprojFileName, hMakeFilePathList, MakeFileUtil.hFile);
+			MakeFileUtil.updateVcxprojFiltersFile(vcxprojFileName, cMakeFilePathList, MakeFileUtil.cFile);
+		}
+	}
+
+	private List<?> getListBySet(Collection c) {
+		List<?> list = new ArrayList<>();
+		list.addAll(c);
+		return list;
 	}
 
 	public App saveAppImage(MultipartFile file, App app) {
@@ -1010,8 +1062,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (!newFile.exists()) {
 			newFile.mkdirs();
 		}
-		 ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName,
-		 newFilePath + "xxx.xml");
+		ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName, newFilePath + "xxx.xml");
 		baseMapper.saveNewFilePath(newFilePath + "xxx.xml", proDetailId);
 
 		JGitUtil.commitAndPush(filePath + fileName, "上传构件相关文件");
@@ -1069,13 +1120,13 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String modelId = (String) allIdByHardwarelibId.get("modelId");
 		String flowId = (String) allIdByHardwarelibId.get("flowId");
 		String projectId = (String) allIdByHardwarelibId.get("projectId");
-		//		String projectFile = (String) allIdByHardwarelibId.get("projectFile");
+		// String projectFile = (String) allIdByHardwarelibId.get("projectFile");
 		/*
 		 * ProjectFile projectFile = this.getById(hardwarelibs.getId()); String modelId
 		 * = projectFile.getParentId(); ProjectFile modelFile = this.getById(modelId);
 		 * String flowId = modelFile.getParentId();
 		 */
-		//		hardwarelibs.setId(projectFile.getId());
+		// hardwarelibs.setId(projectFile.getId());
 		hardwarelibs.setFlowId(flowId);
 		hardwarelibs.setProjectId(projectId);
 		hardwarelibs.setModelId(modelId);
@@ -1254,7 +1305,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	public void deleteHardwarelibById(String id) {
 		baseMapper.deleteHardwarelibById(id);
 	}
-	public byte[] exportFile(String id,StringRef sr) {
+
+	public byte[] exportFile(String id, StringRef sr) {
 		Map<String, String> map = baseMapper.findProJSON(id);
 		String xmlFilepath = proDetailPath + map.get("filePath") + map.get("fileName") + ".xml";
 		String jsonFilepath = proDetailPath + map.get("filePath") + map.get("jsonPath");
@@ -1264,9 +1316,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		ZipOutputStream zip = new ZipOutputStream(outputStream);
 		ZipEntry zipEntry = null;
-		if(xmlFile.exists() && jsonFile.exists()) {
-			File[] files = {xmlFile,jsonFile};
-			for(int i = 0;i<files.length;i++) {
+		if (xmlFile.exists() && jsonFile.exists()) {
+			File[] files = { xmlFile, jsonFile };
+			for (int i = 0; i < files.length; i++) {
 				try {
 					BufferedInputStream bis = new BufferedInputStream(new FileInputStream(files[i]));
 					zipEntry = new ZipEntry(files[i].getName());
@@ -1289,7 +1341,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		ProjectFile projectFile = this.getById(chipsfromhardwarelibs.getId());
 		String modelId = projectFile.getParentId();
 		Chipsfromhardwarelibs chips = baseMapper.getChipsById(modelId);
-		if (chips != null){
+		if (chips != null) {
 			baseMapper.updateChipsfromhardwarelibs(chipsfromhardwarelibs);
 		} else {
 			ProjectFile modelFile = this.getById((modelId));
@@ -1306,16 +1358,14 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		ProjectFile projectFile = this.getById(id);
 		String modelId = projectFile.getParentId();
 		Chipsfromhardwarelibs chips = baseMapper.getChipsById(modelId);
-		/*List<ChildrenNodes> childrenNodes = baseMapper.getAllChildrenNodes(modelId);
-		Chipsfromhardwarelibs chips = null;
-		for (ChildrenNodes childrenNode : childrenNodes) {
-			if ("硬件建模".equals(childrenNode.getFileName())){
-				chips =  baseMapper.getChipsById(childrenNode.getId());
-				break;
-			}
-		}*/
+		/*
+		 * List<ChildrenNodes> childrenNodes = baseMapper.getAllChildrenNodes(modelId);
+		 * Chipsfromhardwarelibs chips = null; for (ChildrenNodes childrenNode :
+		 * childrenNodes) { if ("硬件建模".equals(childrenNode.getFileName())){ chips =
+		 * baseMapper.getChipsById(childrenNode.getId()); break; } }
+		 */
 		return chips;
-	}	
+	}
 
 	/**
 	 * 获取流程建模xml文件地址
@@ -1325,7 +1375,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// TODO Auto-generated method stub
 		String Path = null;
 		String local_REPO_PATH = null;
-		ProjectFile model=	baseMapper.selectOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getParentId, projectId));
+		ProjectFile model = baseMapper
+				.selectOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getParentId, projectId));
 		for (ProjectFile projectFile : getProFileListByModelId(model.getId())) {
 			if ("11".equals(projectFile.getFileType())) {
 				Path = projectFile.getFilePath();
@@ -1347,7 +1398,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// TODO Auto-generated method stub
 		String Path = null;
 		String local_REPO_PATH = null;
-		ProjectFile model=	baseMapper.selectOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getParentId, projectId));
+		ProjectFile model = baseMapper
+				.selectOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getParentId, projectId));
 		for (ProjectFile projectFile : getProFileListByModelId(model.getId())) {
 			if ("11".equals(projectFile.getFileType())) {
 				Path = projectFile.getFilePath();
@@ -1359,28 +1411,32 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		return userDefineTopicFilePath;
 	}
+
 	@Override
 	public void deleteChipsFromHardwarelibs(String id) {
 		baseMapper.deleteChipsFromHardwarelibs(id);
 	}
+
 	@Override
 	public void getWorking(MultipartFile file, String flowName, String id) {
 		String fileName = file.getOriginalFilename();
 		ProjectFile pro = baseMapper.getProDetailById(id);
-		String flowPath = proDetailPath + pro.getFilePath()+"工作模式\\";
-		/************************************update by  zhx********************************************/
-		//String filePath = flowPath+"xxx.xml";
-		String filePath = proDetailPath+pro.getFilePath()+flowInfPath+File.separator+"系数文件.xml" ;
+		String flowPath = proDetailPath + pro.getFilePath() + "工作模式\\";
+		/************************************
+		 * update by zhx
+		 ********************************************/
+		// String filePath = flowPath+"xxx.xml";
+		String filePath = proDetailPath + pro.getFilePath() + flowInfPath + File.separator + "系数文件.xml";
 		/*****************************************************************************************/
 		File flowFile = new File(flowPath);
-		if(!flowFile.exists()) {
+		if (!flowFile.exists()) {
 			flowFile.mkdirs();
 		}
 		String tmpPath = new String();
-		tmpPath = new String(serverPath+"/gjk/upload/" + fileName).replace("\\", "/");
-		
+		tmpPath = new String(serverPath + "/gjk/upload/" + fileName).replace("\\", "/");
+
 		File newFile = null;
-		if (StringUtils.isNotEmpty(tmpPath)) {	
+		if (StringUtils.isNotEmpty(tmpPath)) {
 			try {
 				newFile = new File(tmpPath);
 				if (!newFile.getParentFile().exists()) {
@@ -1392,12 +1448,13 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				e.printStackTrace();
 			}
 		}
-		
-		ExternalIOTransUtils.parseSystemPara(flowName, tmpPath,filePath);
+
+		ExternalIOTransUtils.parseSystemPara(flowName, tmpPath, filePath);
 		System.out.println(file);
-		
+
 	}
-		@Override
+
+	@Override
 	public R getSoftWareListAndPlatformName() {
 		List<Software> softwareList = baseMapper.getAllSoftwareList();
 		for (Software software : softwareList) {
@@ -1443,13 +1500,14 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		}
 		return new R<>(true);
 	}
-    @Override
-    public R showPartSoftwareAndPlatform(String id) {
-        return new R<>(partPlatformSoftwareMapper.getAllPartPlatformSoftwareByProcedureId(id));
-    }
 
-    @Override
-    public R getPlatformList() {
-        return new R<>(baseMapper.getPlatformList());
-    }
+	@Override
+	public R showPartSoftwareAndPlatform(String id) {
+		return new R<>(partPlatformSoftwareMapper.getAllPartPlatformSoftwareByProcedureId(id));
+	}
+
+	@Override
+	public R getPlatformList() {
+		return new R<>(baseMapper.getPlatformList());
+	}
 }
