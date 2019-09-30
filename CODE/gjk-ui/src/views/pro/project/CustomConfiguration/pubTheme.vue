@@ -83,6 +83,7 @@ export default {
       this.topicId  = node.id;
       this.$refs.topicParam.getTopicKey(node.id+"*"+node.label);
       var topicData = this.pubMapCustomConfig.get("publish*"+node.id+"*"+node.label);
+      console.log("topicData","publish*"+node.id+"*"+node.label)
       this.$refs.topicParam.echo(topicData,"1");
     },
     addNode(){
