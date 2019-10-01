@@ -244,16 +244,12 @@ export default {
           for (let keys in newb) {
             let strArr = new String(keys).split("-");
             if (this.fileType === strArr[0]) {
-              this.filesPath.push(newb[keys]);
+              if (JSON.stringify(newb[keys]) !== "{}") {
+                this.filesPath.push(newb[keys]);
+              }
             }
           }
         });
-        // for(let key in this.filePath){
-        //   if(JSON.stringify(this.filePath[key])==="{}"){
-        //      this.filesPath.splice(key, 1);
-        //   }
-        // }
-        //console.log("filesPathfilesPathfilesPathfilesPathfilesPathfilesPath",this.filesPath)
         this.saveLeftData(this.filesPath);
       },
       deep: true
@@ -288,9 +284,13 @@ export default {
     saveCompImg(param) {
       let imgretStr = deepClone(this.imgValue.saveCompImgStr);
       imgretStr.compParam.comp = param;
+      let imgHtml = deepClone(this.compImg.imgHtml);
+      //设置构件图标中的版本
+      this.compImg.imgHtml = imgHtml.replace(
+        this.compImg.imgShowName,
+        this.compImg.imgShowName + "-V" + param.version
+      );
       imgretStr.compParam.compImg = this.compImg;
-
-      // console.log("this.imgretStr", param,imgretStr);
       saveCompImg(imgretStr);
     },
     //保存对应文件
@@ -319,7 +319,6 @@ export default {
     },
     imgContextmenu() {
       this.imgValue.dialogVisible = true;
-      // this.compImg.imgShowName = this.comp.compName;
     },
     nodeContextmenu(event, data) {},
     getList() {

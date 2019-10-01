@@ -7,7 +7,10 @@
           ref="tree"
           accordion
           :data="treeData"
-          :default-expand-all="true"
+          node-key="id"
+          :default-expand-all="false"
+          :auto-expand-parent="true"
+          :default-expanded-keys="defaultExpandIds"
           :highlight-current="true"
           @node-click="handleNodeClick"
           @node-contextmenu="nodeContextmenu"
@@ -37,6 +40,7 @@ import { fetchCompLists } from "@/api/comp/component";
 import { userInfo } from "os";
 import { getFilePathById } from "@/api/comp/componentdetail";
 import SplitPane from "@/page/components/split-pane";
+import { getTreeDefaultExpandIds } from "@/util/util";
 export default {
   name: "split_pane_page",
   components: {
@@ -46,7 +50,8 @@ export default {
     return {
       offset: "250px",
       offsetVertical: "250px",
-      treeData: []
+      treeData: [],
+      defaultExpandIds: []
     };
   },
   //监听属性 类似于data概念
@@ -69,10 +74,15 @@ export default {
       //判断是新增构件还是编辑构件
       if (this.$route.query.compId != undefined) {
         fetchCompLists(this.$route.query.compId, false).then(response => {
+          let defaultExpandIds = [];
+          getTreeDefaultExpandIds(response.data.data, defaultExpandIds, 0, 2);
+          this.defaultExpandIds = defaultExpandIds;
           this.treeData = response.data.data;
+          console.log("1234567890-=-098723456789098", defaultExpandIds);
         });
       }
     },
+
     handleNodeClick(data) {
       this.currNode = data;
       let parentType = data.parentType;

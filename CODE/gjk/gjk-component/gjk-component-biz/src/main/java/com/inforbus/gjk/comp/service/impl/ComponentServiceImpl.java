@@ -314,23 +314,12 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	@Override
 	public Component saveComp(Component component) {
 		component.setDelFlag("0");
-		if (component.getId() != null) {
+		if (StringUtils.isNotEmpty(component.getId())) {
 			String version = ("0").equals(component.getApplyState()) ? component.getVersion()
 					: Double.toString(Double.parseDouble(component.getVersion()) + 1);
 			component.setVersion(version);
 			// 修改主表信息
 			baseMapper.editComp(component);
-
-//			// 查询出 所有构件中不包含图片的文件信息信息
-//			List<ComponentDetail> lists = compDetailMapper.selectList(Wrappers.<ComponentDetail>query().lambda()
-//					.eq(ComponentDetail::getCompId, component.getId()).notLike(ComponentDetail::getFileType, "img%"));
-//			for (ComponentDetail comdet : lists) {
-//				// 删除文件
-//				this.delAllFile(compDetailPath + comdet.getFilePath() + comdet.getFileName());
-//			}
-//			//删除数据库记录
-//			compDetailMapper.delete(Wrappers.<ComponentDetail>query().lambda()
-//					.eq(ComponentDetail::getCompId, component.getId()).notLike(ComponentDetail::getFileType, "img%"));
 		} else {
 			List<String> versionList = getVersionByCompId(component);
 			component.setId(IdGenerate.uuid());

@@ -121,7 +121,7 @@ function handleMessageFromParent(event) {
 			break
 		case 'clickCompLoading':
 			//loadingState = false;
-			console.log("数据", JSON.stringify(data.params));
+			// console.log("数据", JSON.stringify(data.params));
 			loadState = true;
 			loadJson(data.params);
 			loadAddPointParam = data.params.addPointParam
@@ -2330,8 +2330,8 @@ function loadJson(loadJson) {
 		var addPoinrIndex = 0;
 		var midpoints = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
 		$.each(endpoints, function (index, endpoint) {
-			console.log("idsss", endpoint.id);
-			console.log("elem.blockId", elem.blockId)
+			// console.log("idsss", endpoint.id);
+			// console.log("elem.blockId", elem.blockId)
 			if (endpoint.id == elem.blockId) {
 				var config = JSON.parse(JSON.stringify(getBaseNodeConfig()))
 				if (endpoint.anchorX == 0) {

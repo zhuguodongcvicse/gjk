@@ -78,9 +78,8 @@
 	</select>
 
 	<select id="getDictTypes" resultType="com.inforbus.gjk.admin.api.entity.SysDict">
-		SELECT DISTINCT
-		*
-		FROM sys_dict
-		where del_flag = '0' GROUP BY type
+	SELECT DISTINCT * FROM sys_dict a
+	where a.del_flag = '0' AND a.remarks ='selectType' AND a.type
+	!="comp_selectbin_type" GROUP BY type
 	</select>
 </mapper>

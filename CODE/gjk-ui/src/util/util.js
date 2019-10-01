@@ -434,5 +434,20 @@ export const off = (function () {
     }
   }
 })()
+export const getTreeDefaultExpandIds = (tree, treeIds, cLen, index) => {//替换字符串中的'为" 再转换为对象
+  cLen++;
+  tree.forEach(t => {
+    if (cLen === index) {
+      treeIds.push(t.id);
+    } else {
+      getTreeDefaultExpandIds(
+        t.children,
+        treeIds,
+        cLen,
+        index
+      );
+    }
+  });
+}
 
 

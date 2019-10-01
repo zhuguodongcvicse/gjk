@@ -24,7 +24,7 @@
       <br />
       <span>申请日期：{{applyTime}}</span>
     </el-card>
-    <el-card shadow="always">
+    <el-card shadow="always" style="height:100%;overflow-y: auto;">
       <div slot="header">
         <span>{{libsNameValue}}申请详细信息</span>
       </div>

@@ -63,51 +63,52 @@
     </basic-container>
 
     <el-dialog title="新增模板" :visible.sync="isAddTemplate" width="40%" v-if="isAddTemplate">
-      <div slot="footer" class="dialog-footer">
-        <div></div>
-        <el-form label-width="80px" :model="BaseTemplate" :rules="rules" ref="BaseTemplate">
-          <el-form-item label="模板名称" prop="tempName">
-            <el-input v-model="BaseTemplate.tempName" placeholder="请输入模板名称"></el-input>
-          </el-form-item>
-          <el-form-item label="模板类型">
-            <el-select v-model="BaseTemplate.tempType" filterable allow-create placeholder="请选择或输入模板类型">
-              <el-option
-                v-for="item in templateTpyes"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="选择模板" prop="tempType">
-            <el-input placeholder="请选择模板" v-model="BaseTemplate.fileName" :readonly="true">
-              <span slot="append" size="mini">
-                <el-upload
-                  action="/comp/componentdetail/uploadUrl"
-                  size="mini"
-                  :show-file-list="false"
-                  :http-request="UploadImage"
-                >
-                  <el-button :style="{padding:'7px 30px'}" type="primary">
-                    <i class="el-icon-folder"></i>
-                  </el-button>
-                </el-upload>
-              </span>
-            </el-input>
-          </el-form-item>
-          <el-form-item label="备注">
-            <el-input v-model="BaseTemplate.remarks" placeholder="备注"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button @click="isAddTemplate = false">取 消</el-button>
-            <el-button type="primary" @click="handleAdd(BaseTemplate.tempType)">确 定</el-button>
-          </el-form-item>
-        </el-form>
-      </div>
+      <el-form label-width="80px" :model="BaseTemplate" :rules="rules" ref="BaseTemplate">
+        <el-form-item label="模板名称" prop="tempName">
+          <el-input v-model="BaseTemplate.tempName" placeholder="请输入模板名称"></el-input>
+        </el-form-item>
+        <el-form-item label="模板类型">
+          <el-select
+            v-model="BaseTemplate.tempType"
+            filterable
+            allow-create
+            placeholder="请选择或输入模板类型"
+          >
+            <el-option
+              v-for="item in templateTpyes"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="选择模板" prop="tempType">
+          <el-input placeholder="请选择模板" v-model="BaseTemplate.fileName" :readonly="true">
+            <span slot="append" size="mini">
+              <el-upload
+                action="/comp/componentdetail/uploadUrl"
+                size="mini"
+                :show-file-list="false"
+                :http-request="UploadImage"
+              >
+                <el-button :style="{padding:'7px 30px'}" type="primary">
+                  <i class="el-icon-folder"></i>
+                </el-button>
+              </el-upload>
+            </span>
+          </el-input>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input v-model="BaseTemplate.remarks" placeholder="备注"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isAddTemplate = false">取 消</el-button>
+        <el-button type="primary" @click="handleAdd(BaseTemplate.tempType)">确 定</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
-
 <script>
 import {
   fetchList,

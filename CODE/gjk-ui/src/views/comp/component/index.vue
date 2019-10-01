@@ -18,38 +18,16 @@
       >
         <template slot="menuLeft">
           <el-button
-            type="primary"
-            icon="el-icon-edit"
-            @click="handleAdd"
-            size="small"
-            v-if="permissions.comp_component_add"
-          >新 增</el-button>
-          <el-button size="small">
-            <i class="el-icon-download el-icon--left"></i>导出
-          </el-button>
-          <el-button size="small" @click="importComp">
-            <i class="el-icon-upload el-icon--left"></i>导入
-          </el-button>
-          <el-button
             icon="el-icon-edit el-icon--left"
             size="small"
             @click="templateData.templateVisible = true"
-          >选择模板新增</el-button>
-          <!-- <el-button
-              type="primary"
-              icon="el-icon-share"
-              @click="outerVisible = true"
-              size="small"
-              v-if="permissions.comp_component_add"
-          >导 入</el-button>-->
-          <!-- <el-button
-              type="primary"
-              icon="el-icon-share"
-              @click="getStructTrees"
-              size="small"
-              v-if="permissions.comp_component_add"
-          >测 试</el-button>-->
-          <!-- </el-button-group> -->
+          >新增</el-button>
+          <!-- <el-button size="small">
+            <i class="el-icon-download el-icon--left"></i>导出
+          </el-button> -->
+          <el-button size="small" @click="importComp">
+            <i class="el-icon-upload el-icon--left"></i>导入
+          </el-button>
         </template>
         <template slot="tip">
           <el-button type="text" size="small">导出</el-button>
@@ -57,7 +35,7 @@
         </template>
         <template slot-scope="scope" slot="menu">
           <el-button-group>
-            <!-- <el-tooltip class="item" effect="dark" content="复制" placement="top">
+            <el-tooltip class="item" effect="dark" content="复制" placement="top">
               <el-button
                 type="primary"
                 v-if="permissions.comp_component_edit"
@@ -65,7 +43,7 @@
                 plain
                 @click="handleCopy(scope.row,scope.index)"
               >复制</el-button>
-            </el-tooltip> -->
+            </el-tooltip>
             <el-tooltip class="item" effect="dark" content="编辑" placement="top">
               <el-button
                 type="primary"

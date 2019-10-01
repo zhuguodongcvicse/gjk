@@ -16,16 +16,18 @@
 
 package com.inforbus.gjk.admin.controller;
 
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.inforbus.gjk.admin.api.dto.RoleDTO;
 import com.inforbus.gjk.admin.api.entity.SysDict;
 import com.inforbus.gjk.admin.api.vo.DictVO;
 import com.inforbus.gjk.admin.service.SysDictService;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.log.annotation.SysLog;
+
 import lombok.AllArgsConstructor;
 
 import lombok.Getter;
@@ -36,6 +38,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -96,9 +99,7 @@ public class DictController {
 	@GetMapping("/type/{type}")
 	@Cacheable(value = "dict_details", key = "#type")
 	public R getDictByType(@PathVariable String type) {
-		return new R<>(sysDictService.list(Wrappers
-			.<SysDict>query().lambda()
-			.eq(SysDict::getType, type)));
+		return new R<>(sysDictService.list(Wrappers.<SysDict>query().lambda().eq(SysDict::getType, type)));
 	}
 
 	/**
@@ -158,9 +159,9 @@ public class DictController {
 	 * @return
 	 */
 	@GetMapping("/types/{type}")
-	//@Cacheable(value = "dict_details", key = "#type")
+	// @Cacheable(value = "dict_details", key = "#type")
 	public R getDictValue(@PathVariable String type) {
-		return  new R<>(sysDictService.getDictValue(type));
+		return new R<>(sysDictService.getDictValue(type));
 	}
 
 	/**
@@ -176,8 +177,8 @@ public class DictController {
 	public R getLableValue(@PathVariable String type) {
 		return new R<>(sysDictService.getOne(Wrappers.<SysDict>query().lambda().eq(SysDict::getLabel, type)));
 
-
 	}
+
 	/**
 	 * 通过字典value与字典类型查找字典
 	 *
@@ -194,7 +195,7 @@ public class DictController {
 	@PutMapping("/getDicts")
 	@SysLog("获取字典中的全部模板类型及其对应的值")
 	public R getDicts(@RequestBody SysDict sysDict) {
-		return  new R<>(sysDictService.getDicts(sysDict));
+		return new R<>(sysDictService.getDicts(sysDict));
 	}
 
 	/**
@@ -213,7 +214,12 @@ public class DictController {
 	@GetMapping("/getDictTypes")
 	@SysLog("获取字典中的全部模板类型及其对应的值")
 	public R getDictTypes() {
-		return  new R<>(sysDictService.getDictTypes());
+		Map<String, Object> maps = Maps.newHashMap();
+		// 查询出从字典表中的获取的下拉框数据（不包含从库中查询）
+		maps.put("dictSel", sysDictService.getDictTypes());
+		// 查询出从字典表中的获取的下拉框数据（不包含从库中查询）
+		maps.put("dictDb", sysDictService.getBaseMapper()
+				.selectList((Wrappers.<SysDict>query().lambda().eq(SysDict::getType, "comp_selectbin_type"))));
+		return new R<>(maps);
 	}
-
 }

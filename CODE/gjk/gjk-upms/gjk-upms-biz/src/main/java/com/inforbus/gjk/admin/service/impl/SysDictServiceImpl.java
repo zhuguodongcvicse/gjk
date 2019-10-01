@@ -47,6 +47,7 @@ import org.springframework.stereotype.Service;
 public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> implements SysDictService {
 	@Autowired
 	private SysDictMapper sysDictMapper;
+
 	/**
 	 * 分页查询字典信息
 	 *
@@ -56,10 +57,11 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 	 */
 	@Override
 	public IPage getDictPage(Page page, SysDict sysDict) {
-		
+
 		IPage IPage = baseMapper.getDictVosPage(page, sysDict);
 		return IPage;
 	}
+
 	/**
 	 * 查询标志字典
 	 */
@@ -69,21 +71,19 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 		return sysDictMapper.getDictValue(type);
 	}
 
-    @Override
-    public List<DictVO> getDicts(SysDict sysDict) {
-        return sysDictMapper.getDictsByNameAndType(sysDict);
-    }
+	@Override
+	public List<DictVO> getDicts(SysDict sysDict) {
+		return sysDictMapper.getDictsByNameAndType(sysDict);
+	}
 
 	@Override
 	public List<DictType> getDictTypes() {
 		List<SysDict> types = sysDictMapper.getDictTypes();
 		List<DictType> dictTypes = new ArrayList<>();
-		if (types.size()>0 && types!=null){
+		if (types.size() > 0 && types != null) {
 			for (SysDict dict : types) {
-				dictTypes.add(new DictType(dict.getType(),dict.getDescription()));
+				dictTypes.add(new DictType(dict.getType(), dict.getDescription()));
 			}
-
-
 		}
 		return dictTypes;
 	}

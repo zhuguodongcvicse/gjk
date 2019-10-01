@@ -143,7 +143,7 @@
       </template>
       <el-table-column fixed="right" label="操作" header-align="left" width="55">
         <template slot-scope="{row,$index}">
-          <el-button type="text" @click="delTableRow(xnTableData,$index)">删除</el-button>
+          <el-button style="padding:0" type="text" @click="delTableRow(xnTableData,$index)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -285,7 +285,7 @@ export default {
           itemTab.forEach(col => {
             if (col.isShow) {
               if (
-                col.attrConfigType === "fileComm" &&
+                col.attrConfigType === "uploadComm" &&
                 col.actionType === "analysisAerformanceFile"
               ) {
                 //处理属性2中的参数
@@ -488,7 +488,7 @@ export default {
     itemTypeChange(baseData, params) {
       let config = this.analysisConfigureType(baseData);
       config.attrs.forEach(attr => {
-        if (attr.attrConfigType === "fileComm") {
+        if (attr.attrConfigType === "uploadComm") {
           let analysisBaseFile = this.analysisBaseFile;
           let str = "";
           //平台
@@ -528,9 +528,10 @@ export default {
           }
           let obj = {};
           obj[str] = this.files;
-          // console.log("analysisBaseFile", obj);
-          analysisBaseFile.push(obj);
-          this.$store.dispatch("setAnalysisBaseFile", analysisBaseFile);
+          if (JSON.stringify(obj) !== "{}") {
+            analysisBaseFile.push(obj);
+            this.$store.dispatch("setAnalysisBaseFile", analysisBaseFile);
+          }
         }
       });
     },
@@ -633,7 +634,6 @@ export default {
     },
     //所属部件回车
     analysisCjUnitParam(params) {
-      console.log("paramsparamsparams", params);
       if (params.attrMappingName === "所属部件") {
         let key = this.$route.query.processId + "-" + params.attributeMap.name;
         if (this.cjUnitParam.hasOwnProperty(key)) {
@@ -642,27 +642,20 @@ export default {
           for (let key1 in tableData) {
             for (let key2 in tableData[key1]) {
               if (tableData[key1][key2].attrName === "cmpName") {
-                tableData[key1][key2].lableName = params.attributeMap.name;
-                console.log("的初始值下拉框的值", tableData[key1][key2]);
+                // tableData[key1][key2].lableName = params.attributeMap.name;
               } else {
-                console.log(
-                  "设置层级属性中的所属部件中的初始值下拉框的值",
-                  tableData[key1][key2]
-                );
                 tableData[key1][key2].dataKey = deepClone(this.chipsData);
               }
             }
           }
           this.cjTableData = tableData;
         } else {
-          console.log("设置层级属性中的所属部件中的初始值。。。。");
           for (let key in this.cjTableSel) {
             // this.cjTableSel[key].lableName = "";
           }
           //配置基础数据表
           this.cjTableData = [];
           let column = deepClone(this.cjTableOption);
-          console.log("设置层级属性中的所属部件中的初始值。。。。", column);
           column.forEach(col => {
             if (col.attrName === "cmpName") {
               col.lableName = params.attributeMap.name;

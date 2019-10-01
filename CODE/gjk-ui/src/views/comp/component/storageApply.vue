@@ -1,5 +1,11 @@
 <template>
-  <el-dialog class="comp_component_storageApply_14s" title="构件入库" :visible.sync="dialog" width="50%" :before-close="handleClose">
+  <el-dialog
+    class="comp_component_storageApply_14s"
+    title="构件入库"
+    :visible.sync="dialog"
+    width="50%"
+    :before-close="handleClose"
+  >
     <el-container>
       <el-header class="storageapply_header_14s">
         <span>是否将以下构件及相关文件提交入库？</span>
@@ -17,10 +23,10 @@
             </el-select>
           </el-form-item>
           <el-form-item label="显示名">
-            <el-input v-model="compName" disabled/>
+            <el-input v-model="compName" disabled />
           </el-form-item>
           <el-form-item label="构件编号">
-            <el-input v-model="compId" disabled/>
+            <el-input v-model="compId" disabled />
           </el-form-item>
         </el-form>
         <!-- 如果需要选择文件进行提交，树加上 show-checkbox 属性，
@@ -28,8 +34,12 @@
         <el-tree
           ref="tree"
           :data="compTreeData"
-          :default-expand-all="true"
+          node-key="id"
+          accordion
+          :auto-expand-parent="true"
+          :default-expand-all="false"
           :check-on-click-node="true"
+          :default-expanded-keys="defaultExpandIds"
           @check-change="handleCheckChange"
         ></el-tree>
       </el-main>
@@ -49,6 +59,7 @@ import { fetchCompLists, putObj } from "@/api/comp/component";
 import { putObj as approvalPutObj } from "@/api/libs/approval";
 import { getUserhasApplyAuto } from "@/api/admin/user";
 import { saveApproval, getIdByApplyId } from "@/api/libs/approval";
+import { getTreeDefaultExpandIds } from "@/util/util";
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
 export default {
@@ -67,6 +78,7 @@ export default {
       compName: "",
       compId: "",
       compTreeData: [],
+      defaultExpandIds: [],
       selectNodeArray: [],
 
       //具有审批权限的用户，用于选择审批人
@@ -82,6 +94,9 @@ export default {
       this.compName = this.compItemMsg.compName;
       this.compId = this.compItemMsg.compId;
       fetchCompLists(this.compItemMsg.id, true).then(Response => {
+        let defaultExpandIds = [];
+        getTreeDefaultExpandIds(Response.data.data, defaultExpandIds, 0, 2);
+        this.defaultExpandIds = defaultExpandIds;
         this.compTreeData = Response.data.data;
 
         getUserhasApplyAuto().then(Response => {

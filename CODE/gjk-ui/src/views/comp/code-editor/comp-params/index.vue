@@ -9,9 +9,9 @@
           icon="el-icon-edit"
           @click.native="clickHandleSaveComp"
         >
-          <span v-if="this.$route.query.type === 'add'">添加</span>
+          <span v-if="this.$route.query.type === 'add'">保存</span>
           <span v-else-if="this.$route.query.type ==='edit'">修改</span>
-          <span v-else-if="this.$route.query.type ==='copy'">添加</span>
+          <span v-else-if="this.$route.query.type ==='copy'">另存为</span>
         </el-button>
       </el-col>
       <el-col :span="4">

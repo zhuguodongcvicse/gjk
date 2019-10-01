@@ -302,7 +302,15 @@
             </el-table-column>
             <el-table-column label="动作">
               <template slot-scope="scope">
-                <el-input v-model="scope.row.actionType"></el-input>
+                <!-- <el-input v-model="scope.row.actionType"></el-input> -->
+                <el-select size="medium" clearable  v-model="scope.row.actionType">
+                  <el-option
+                    v-for="item in actionOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
               </template>
             </el-table-column>
             <el-table-column label="操作" fixed="right">
@@ -483,7 +491,15 @@
             </el-table-column>
             <el-table-column label="动作">
               <template slot-scope="scope">
-                <el-input v-model="scope.row.actionType"></el-input>
+                <!-- <el-input v-model="scope.row.actionType"></el-input> -->
+                <el-select size="medium" clearable v-model="scope.row.actionType">
+                  <el-option
+                    v-for="item in actionOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
               </template>
             </el-table-column>
             <el-table-column label="操作" fixed="right">
@@ -543,7 +559,7 @@ import { parseObjToStr } from "@/util/util";
 import { parseXml } from "@/api/admin/basetemplate"; //解析xml
 import { addObj } from "@/api/admin/basetemplate"; //保存
 import { getDictValue } from "@/api/admin/dict"; //获取字典数据
-import { getDicts, getDictTypes } from "@/api/admin/dict"; //获取字典数据
+import { getDicts, getDictTypes, remote } from "@/api/admin/dict"; //获取字典数据
 import { addObj as addDict } from "@/api/admin/dict"; //添加数据到字典中
 import { type } from "os";
 import { getUploadFilesUrl } from "@/api/comp/componentdetail"; //文件上传接口
@@ -581,6 +597,7 @@ export default {
     //这里存放数据
 
     return {
+      actionOptions: [], //动作下拉框值的
       BaseTemplateBTO: {}, //保存模板使用对象
       BaseTemplate: {}, //模板对象
       labelPosition: "left", //form表单效果变量
@@ -588,24 +605,24 @@ export default {
       lablePosition: "in", //添加标签的位置
       node: undefined,
       dataKeys: [
-        {
-          label: "其他",
-          options: [
-            {
-              value: "[]",
-              label: "无"
-            },
-            {
-              value: "dbtab_structlibs",
-              label: "结构体列表"
-            }
-          ]
-        },
-        //下拉框中数据来源集合
-        {
-          label: "字典表",
-          options: []
-        }
+        //   {
+        //     label: "其他",
+        //     options: [
+        //       {
+        //         value: "[]",
+        //         label: "无"
+        //       },
+        //       {
+        //         value: "dbtab_structlibs",
+        //         label: "结构体列表"
+        //       }
+        //     ]
+        //   },
+        //   //下拉框中数据来源集合
+        //   {
+        //     label: "字典表",
+        //     options: []
+        //   }
       ],
       checkBox: ["选项1", "选项2", "选项3", "选项4"], //复选框
       selectDatas: [], //下拉列表中的数据
@@ -1410,7 +1427,21 @@ export default {
   created() {
     this.$store.dispatch("setStruceType"); //在vuex中存入结构体相关数据,供公式编辑器使用
     getDictTypes().then(res => {
-      this.dataKeys[1].options = res.data.data;
+      this.dataKeys = [];
+      let other = [
+        {
+          value: "[]",
+          label: "无"
+        }
+      ];
+      other = other.concat(res.data.data.dictDb);
+
+      this.dataKeys.push({ label: "其他", options: other });
+      this.dataKeys.push({ label: "字典表", options: res.data.data.dictSel });
+    });
+    //查询动作调用的方法
+    remote("comp_action_type").then(res => {
+      this.actionOptions = res.data.data;
     });
   },
   //生命周期 - 挂载完成（可以访问DOM元素）

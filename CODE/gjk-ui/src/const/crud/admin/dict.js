@@ -10,7 +10,7 @@ export const tableOption = {
   searchSize: 'mini',
   editBtn: false,
   delBtn: false,
-  dialogWidth:'50%',
+  dialogWidth: '50%',
   column: [{
     width: 150,
     label: '数据值',
@@ -55,7 +55,27 @@ export const tableOption = {
       trigger: 'blur'
     }]
   }, {
-    label: '备注信息',
-    prop: 'remarks'
+    label: '配置类型',
+    prop: 'remarks',
+    search: true,
+    type: 'select',
+    rules: [{
+      required: true,
+      message: '请选择配置类型',
+      trigger: 'blur'
+    }],
+    dicData: [{
+      label: '下拉框值配置',
+      value: 'selectType'
+    }, {
+      label: '中英文映射配置',
+      value: 'mapperType'
+    }, {
+      label: '方法配置',
+      value: 'actionType'
+    }, {
+      label: '其他配置',
+      value: 'otherType'
+    }]
   }]
 }

@@ -4,7 +4,7 @@
     <!-- 当前项目 -->
     <div class="project_tree_14s">
       <img
-        src="https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100"
+        src="/img/theme/night/logo/proImg.png"
         ondragstart="return false;"
       />
       <!-- 项目切换 -->
@@ -21,7 +21,6 @@
       </el-dropdown>
     </div>
     <!-- 树 -->
-
     <div class="tree-container">
       <el-tree
         ref="tree"

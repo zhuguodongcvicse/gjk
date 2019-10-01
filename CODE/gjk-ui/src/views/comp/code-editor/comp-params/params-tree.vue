@@ -189,12 +189,6 @@ export default {
       handler: function(treeData) {
         let saveTreeData = [];
         this.analysisByBaseXmlOptionData(deepClone(treeData), saveTreeData);
-        saveTreeData.forEach(item => {
-          console.log(
-            "params-tree.vue构件赋值将保存的数据。。。。。",
-            item.attributeMap.name
-          );
-        });
         this.tableXmlParams.xmlEntityMaps = saveTreeData;
       },
       deep: true
@@ -894,7 +888,6 @@ export default {
         });
         let child = deepClone(params);
         child.assigParamName = parentKey === "" ? params.lableName : parentKey;
-        console.log("endKey*************************************endKey",endKey,key)
         child.lableName = endKey;
         //处理树上所带参数
         child.nodeData.forEach(nodes => {
@@ -991,11 +984,6 @@ export default {
           //用于处理多个层级的时候处理
           if (parentTree) {
             let strType = getStrType(parentTree.assigStructType);
-            console.log(
-              "用于处理多个层级的时候处理用于处理多个层级的时候处理",
-              parentTree,
-              tree
-            );
             if (!strType.isType) {
               //是指针
               if (strType.isPoint) {
@@ -1028,11 +1016,6 @@ export default {
               }
             }
           }
-          console.log(
-            "1234=-tmpNametmpNametmpNametmpNametmpNametmpNametmpName",
-            tree,
-            tree.lableName
-          );
           //递归调用
           this.analysisByBaseXmlOptionData(tree.children, saveTreeData, tree);
         } else {
