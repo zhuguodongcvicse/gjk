@@ -726,7 +726,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			// 遍历所有根组件，创建根组件文件夹
 			for (HardwareNode hardwareNode : hardwareNodes) {
 				for (Map<String, Object> map : maps) {
-					if (map.containsKey("IP") && hardwareNode.getNodeName().equals(map.get("IP").toString())) {
+					if (map.containsKey("nodeID") && hardwareNode.getNodeName().equals(map.get("nodeID").toString())) {
 						for (Part part : hardwareNode.getRootPart()) {
 							partnamePlatformMap.put(part.getPartName(), map.get("hrTypeName").toString());
 							createAssemblyDir(appFilePath, part, map.get("hrTypeName").toString(),
@@ -850,11 +850,21 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			// 原始需求调用客户接口,apiFileList中存添加的.c .cpp .h文件不带后缀的文件名
 			List<String> apiFileList = new ArrayList<String>();
 			apiFileList.addAll(apiNeedStringSet);
-			ExternalIOTransUtils.modifySpbInclude(apiFileList, appFilePathName);
+			ExternalIOTransUtils.modifySpbInclude(apiFileList,
+					new File(appFilePathName).getParentFile().getAbsolutePath());
 		} catch (IOException e) {
 			logger.error("调用客户接口失败，请联系管理员。");
 			e.printStackTrace();
 		}
+//		try {
+//			// 原始需求调用客户接口,apiFileList中存添加的.c .cpp .h文件不带后缀的文件名
+//			List<String> apiFileList = new ArrayList<String>();
+//			apiFileList.addAll(apiNeedStringSet);
+//			ExternalIOTransUtils.modifySpbInclude(apiFileList, appFilePathName);
+//		} catch (IOException e) {
+//			logger.error("调用客户接口失败，请联系管理员。");
+//			e.printStackTrace();
+//		}
 
 //		try {
 //			// 调用客户接口,list中存添加的构件的函数名
