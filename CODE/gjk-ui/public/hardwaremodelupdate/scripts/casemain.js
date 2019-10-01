@@ -22,6 +22,7 @@ var backAllCaseJsonTemp
 var linkList = []
 var linkGraphList = { datas: [] }
 var clickCheckedChip
+var frontCaseForDeployment
 Q.registerImage('rack', 'images/机箱.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
 Q.registerImage('card', 'images/前板卡.svg');
 Q.registerImage('cell', 'images/芯片.svg');
@@ -38,14 +39,16 @@ function handleMessageFromParent(event) {
 			caseArr = event.data.params[1];
 			hardwareArr = event.data.params[0];
 			var linkTemp = JSON.parse(hardwareArr.link)
+			// console.log("linkTemp",linkTemp)
 			for (const i in hardwareArr.frontJson) {
 				graphList.fJson.push(hardwareArr.frontJson[i])
 				graphList.bJson.push(hardwareArr.backJson[i])
 			}
 			if (linkTemp.length != 0) {
 				graphList.link = linkTemp
-				linkGraphList.datas = linkTemp
+				linkGraphList = linkTemp
 			}
+			// console.log("linkGraphList",linkGraphList)
 			for (const n in graphList.fJson) {
 				for (const i in graphList.fJson[n].datas) {
 					if (graphList.fJson[n].datas[i].json.properties != null && graphList.fJson[n].datas[i].json.properties.caseName != null) {
@@ -56,7 +59,7 @@ function handleMessageFromParent(event) {
 									for (const m in graphList.fJson[n].datas) {
 										if (graphList.fJson[n].datas[m].json.properties != null && graphList.fJson[n].datas[m].json.properties.chipName != null
 											&& graphList.fJson[n].datas[m].json.properties.uniqueId == graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].uniqueId) {
-												graphList.fJson[n].datas[m].json.properties.IP = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].IP
+											graphList.fJson[n].datas[m].json.properties.IP = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].IP
 										}
 									}
 								}
@@ -65,8 +68,8 @@ function handleMessageFromParent(event) {
 					}
 				}
 			}
-			console.log("graphList",graphList)
-			console.log("linkGraphList",linkGraphList)
+			console.log("graphList", graphList)
+			console.log("linkGraphList", linkGraphList)
 			graphList.fJson = JSON.parse(JSON.stringify(graphList.fJson))
 			graphList.bJson = JSON.parse(JSON.stringify(graphList.bJson))
 			for (const i in caseArr) {
@@ -515,7 +518,6 @@ function initEditor(editor) {
 	var toolbarDiv = editor.toolbar;
 	var button = document.createElement('button');
 	var cpuNodeID = 0
-	var frontCaseForDeployment
 	button.textContent = '机箱保存';
 	button.className = 'boarddesign_board_14s';
 	toolbarDiv.appendChild(button)
@@ -916,8 +918,9 @@ function initEditor(editor) {
 			//进入正面
 			if (graph.name == '背部视图') {
 				graph.name = '正面视图';
-				console.log("linkGraphListfffffffffffff",linkGraphList)
+				console.log("linkGraphListfffffffffffff", linkGraphList)
 				backAllCaseJsonTemp = graph.toJSON()
+				console.log("frontCaseForDeployment", frontCaseForDeployment)
 				console.log("backAllCaseJsonTemp", backAllCaseJsonTemp)
 				//找到连线的两个接口放到数组
 				for (const i in backAllCaseJsonTemp.datas) {
@@ -959,11 +962,14 @@ function initEditor(editor) {
 				frontCaseForDeployment = graph.toJSON()
 				graph.clear();
 				graph.name = '背部视图'
-				
+
 				for (const i in graphList.bJson) {
 					graph.parseJSON(graphList.bJson[i], { transform: false });
 				}
-				graph.parseJSON(graphList.link)
+				if (typeof graphList.link != 'undefined') {
+					graph.parseJSON(graphList.link)
+				}
+
 				setEditable(false);
 			}
 			//进入背面
@@ -1068,6 +1074,7 @@ function initEditor(editor) {
 						},
 					}
 				}
+				console.log("linkGraphList", linkGraphList)
 				//赋值连线的refid，将连线和两个重新画出的接口放到数组
 				for (const i in linkList) {
 					linkList[i][0]._refId = '1' + parseInt(1500 * Math.random())
@@ -1246,7 +1253,7 @@ function initEditor(editor) {
 				}
 			});
 			//第一次切换回正面
-			if (backAllCaseJsonTemp.datas.length != 0) {
+			if (typeof backAllCaseJsonTemp != 'undefined' && backAllCaseJsonTemp.datas.length != 0) {
 				for (let i = 0; i < backAllCaseJsonTemp.datas.length; i++) {
 					if (backAllCaseJsonTemp.datas[i].json.properties == null || backAllCaseJsonTemp.datas[i]._className == "Q.Edge") {
 						removeByValue(backAllCaseJsonTemp.datas, backAllCaseJsonTemp.datas[i])
@@ -1254,7 +1261,7 @@ function initEditor(editor) {
 					}
 				}
 			}
-			if (backAllCaseJsonTemp.datas.length != 0) {
+			if (typeof backAllCaseJsonTemp != 'undefined' && backAllCaseJsonTemp.datas.length != 0) {
 				for (let i = 0; i < backAllCaseJsonTemp.datas.length; i++) {
 					if (backAllCaseJsonTemp.datas[i].json.properties != null && backAllCaseJsonTemp.datas[i].json.properties.infName != null
 						&& backAllCaseJsonTemp.datas[i].json.properties.uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
@@ -1263,6 +1270,21 @@ function initEditor(editor) {
 					}
 				}
 			}
+			/* for (let i = 0; i < frontCaseForDeployment.datas.length;) {
+				if (frontCaseForDeployment.datas[i].json.properties.caseName != null && frontCaseForDeployment.datas[i].json.properties.uniqueId == selection[0].properties.uniqueId) {
+					while (frontCaseForDeployment.datas[i + 1].json.properties.caseName == null) {
+						removeByValue(frontCaseForDeployment.datas, frontCaseForDeployment.datas[i])
+						i++
+						if (i == frontCaseForDeployment.datas.length) {
+							removeByValue(frontCaseForDeployment.datas, frontCaseForDeployment.datas[i])
+							break
+						}
+					}
+					break
+				} else {
+					i++
+				}
+			} */
 			console.log("backAllCaseJsonTemp", backAllCaseJsonTemp)
 			console.log("caseList", caseList)
 			console.log("graphList", graphList)
@@ -1270,6 +1292,10 @@ function initEditor(editor) {
 			console.log("linkGraphList", linkGraphList)
 			console.log("linkMap", linkMap)
 		}, this);
+	}
+	function removeJsonDatas(n) {
+		removeByValue(frontCaseForDeployment.datas, frontCaseForDeployment.datas[n])
+		return ++n
 	}
 	//右侧属性面板
 	var propertySheet = editor.propertyPane;
@@ -1336,15 +1362,32 @@ function initEditor(editor) {
 				} */
 			}
 			if (data.properties.chipName != null) {
-				data.set('chipname', data._mn3.chipName);
-				data.set('corenum', data._mn3.coreNum);
-				data.set('memsize', data._mn3.memSize);
-				data.set('boardname', data._mn3.boardName);
+				data.set('chipName', data._mn3.chipName);
+				data.set('coreNum', data._mn3.coreNum);
+				data.set('memSize', data._mn3.memSize);
+				data.set('hrTypeName', data._mn3.hrTypeName);
+				data.set('recvRate', data._mn3.recvRate);
+			}
+			if (data.properties.infName != null) {
 				data.set('infName', data._mn3.infName);
 				data.set('infRate', data._mn3.infRate);
 				data.set('opticalNum', data._mn3.opticalNum);
 			}
-
+			if (data.properties.boardType != null) {
+				if (data._mn3.boardType == 0) {
+					data.set('showBoardType', 'calculateBoard');
+				}
+				if (data._mn3.boardType == 1) {
+					data.set('showBoardType', 'FpgaBoard');
+				}
+				if (data._mn3.boardType == 2) {
+					data.set('showBoardType', 'exchangeBoard');
+				}
+				if (data._mn3.boardType == 3) {
+					data.set('showBoardType', 'interfaceBoard');
+				}
+				data.set('boardName', data._mn3.boardName);
+			}
 			// data.set('rackname', data._mn3.caseName);
 			// data.set('boardnum', data._mn3.bdnum);
 		}
@@ -1352,16 +1395,24 @@ function initEditor(editor) {
 			return {
 				group: '芯片属性',
 				properties: [{
-					client: 'chipname',
+					client: 'chipName',
 					displayName: '芯片名称'
 				},
 				{
-					client: 'corenum',
+					client: 'coreNum',
 					displayName: '内核数量'
 				},
 				{
-					client: 'memsize',
+					client: 'memSize',
 					displayName: '内存大小'
+				},
+				{
+					client: 'recvRate',
+					displayName: '接收速率'
+				},
+				{
+					client: 'hrTypeName',
+					displayName: '平台大类'
 				},
 				{
 					client: 'IP',
@@ -1393,8 +1444,12 @@ function initEditor(editor) {
 			return {
 				group: '主板属性',
 				properties: [{
-					client: 'boardname',
+					client: 'boardName',
 					displayName: '主板名称'
+				},
+				{
+					client: 'showBoardType',
+					displayName: '主板类型'
 				}
 				]
 			}

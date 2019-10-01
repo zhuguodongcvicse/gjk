@@ -83,6 +83,7 @@ export default {
       this.topicId  = node.id;
       this.$refs.topicParam.getTopicKey(node.id+"*"+node.label);
       var topicData = this.pubMapCustomConfig.get("publish*"+node.id+"*"+node.label);
+      console.log("topicData","publish*"+node.id+"*"+node.label)
       this.$refs.topicParam.echo(topicData,"1");
     },
     addNode(){
@@ -98,7 +99,9 @@ export default {
         if(this.data[i].id == this.topicId){
            this.$store.dispatch('delPubTopicData',"publish*"+this.data[i].id+"*"+this.data[i].label)
           this.data.splice(i,1);
+          this.$refs.topicParam.getTopicKey("");
           this.$refs.topicParam.clean();
+
         }
       }
     }

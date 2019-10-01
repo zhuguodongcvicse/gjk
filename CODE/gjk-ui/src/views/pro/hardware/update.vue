@@ -69,7 +69,7 @@ export default {
       next();
     } else {
       this.params = "";
-      alert("已离开当前页面,数据清除");
+      // alert("已离开当前页面,数据清除");
       next();
     }
   },

@@ -93,6 +93,7 @@ export default {
            console.log(this.data[i]);
           this.$store.dispatch('delSubTopicData',"subscribe*"+this.data[i].id+"*"+this.data[i].label)
           this.data.splice(i,1);
+          this.$refs.topicParam.getTopicKey("");
           this.$refs.topicParam.clean();
         }
       }

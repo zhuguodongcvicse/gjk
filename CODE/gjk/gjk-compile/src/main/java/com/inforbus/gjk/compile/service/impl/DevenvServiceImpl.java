@@ -70,52 +70,44 @@ public class DevenvServiceImpl implements DevenvService{
 	private AmqpTemplate rabbitmqTemplate;
 	
 	@Override
-	public String Command(String path1,String fileName) {
+	public String Command(String path1,String fileName,String platformType) {
 		Set<String> filePathList = new TreeSet<String>();
 		//VS编译
 		String fileEndName = ".sln";
 
-		//Workbench编译
-		String fileEndNameW = ".wrmakefile";
-
-		//Sylixos编译
-		String makeFile = "Makefile";
-
-		//Linux编译
-		String subdir = "subdir.mk";
 		File file = new File(path1);
 		String str = "";
 		//判断是否存在sln文件
 		boolean isFile = false;
 		if(file.exists()) {
 			File[] childFiles = file.listFiles();
-			for (File childFile : childFiles) {
-				//判断是否是VS平台
-				if (childFile.getName().endsWith(fileEndName)) {
-					//filePathList.add(file.getAbsolutePath());
-					isFile = true;
-					str = devenv(childFile.getAbsolutePath(),fileName);
-
-					//判断是否是Sylixos平台
-				}else if(childFile.getName().equals(makeFile)){
-					str = sylixos(file.getAbsolutePath(),fileName);
-					//判断是否是Workbench平台
-				}else if(childFile.getName().endsWith(fileEndNameW)) {
-					//查询workbench中的makefile
-					Set<String> set = new HashSet<String>();
-					List<String> list = new ArrayList<String>();
-					FileUtil.getSelectStrFilePathList(set,file.getAbsolutePath(),"Makefile");
-					list.addAll(set);
-					str = workbench(list.get(0),fileName);
+			if(platformType.equals("VS2010")) {
+				//判断是否是VS2010
+				for (File childFile : childFiles) {
+					//判断是否是VS平台
+					if (childFile.getName().endsWith(fileEndName)) {
+						//filePathList.add(file.getAbsolutePath());
+						isFile = true;
+						str = devenv(childFile.getAbsolutePath(),fileName);
+					} 
 				}
-			}
-
-			//判断是否是 Linux平台 根据文件名判断是否是 linux平台
-			String subdirPath = FileUtil.getSelectStrFilePath(file.getAbsolutePath(), subdir);
-			if(subdirPath != null) {
+			}else if(platformType.equals("Sylixos")){
+				//判断是否是Sylixos平台
+				isFile = true;
+				str = sylixos(file.getAbsolutePath(),fileName);
+			}else if(platformType.equals("Workbench")) {
+				//判断是否是Workbench平台
+				isFile = true;
+				Set<String> set = new HashSet<String>();
+				List<String> list = new ArrayList<String>();
+				FileUtil.getSelectStrFilePathList(set,file.getAbsolutePath(),"Makefile");
+				list.addAll(set);
+				str = workbench(list.get(0),fileName);
+			}else if(platformType.equals("Linux")) {
+				//判断是否是 Linux平台
+				isFile = true;
 				linux(file.getAbsolutePath(),fileName);
 			}
-
 		}else {
 			System.out.println("传入路径错误，请联系管理员。");
 		}
@@ -228,7 +220,10 @@ public class DevenvServiceImpl implements DevenvService{
 
 	//编译 linux 
 	private String linux(String filePath,String fileName) {
-
+		//通过filePath 截取流程名称 用来创建父级目录
+		String ProcessName = filePath.substring(0,filePath.indexOf("流程APP"));
+		ProcessName = ProcessName.substring(ProcessName.lastIndexOf("_")+1,ProcessName.length());
+		System.out.println("流程名称===="+ProcessName);
 		//手动创建目录
 		//执行linux命令编译 项目
 		try {
@@ -237,17 +232,16 @@ public class DevenvServiceImpl implements DevenvService{
 			connection.authenticateWithPassword(username, password);
 			Session session = connection.openSession();
 			
-			//先执行查找makefile命令
-			session.execCommand("mkdir "+lPath+"/"+fileName);
-			String makeFilePath = "";
+			//先创建流程文件夹
+			session.execCommand("mkdir "+lPath+"/"+ProcessName);
 			
-			//获取输出结果 为 makefile 的绝对路径
-			InputStream is = new StreamGobbler(session.getStdout());
-			BufferedReader brs = new BufferedReader(new InputStreamReader(is,Charset.forName("UTF-8")));
-			String temp = "";
-			while ((temp = brs.readLine()) != null) {
-				makeFilePath = temp.substring(0,temp.lastIndexOf("/"));
+			//再创建工程文件夹
+			session = connection.openSession();
+			session.execCommand("mkdir "+lPath+"/"+ProcessName+"/"+fileName);
+			if(session != null) {
+				session.close();
 			}
+			session.close();
 		}catch(Exception e) {	
 			e.getStackTrace();
 		}
@@ -256,7 +250,7 @@ public class DevenvServiceImpl implements DevenvService{
 
 		//将Windows 项目文件上传到linux服务器中
 		try {
-			SftpUtil.uploadFilesToServer(filePath, lPath+"/"+fileName,ip,username,password, new SftpProgressMonitor() {
+			SftpUtil.uploadFilesToServer(filePath, lPath+"/"+ProcessName+"/"+fileName,ip,username,password, new SftpProgressMonitor() {
 
 				@Override
 				public void init(int op, String src, String dest, long max) {
@@ -282,6 +276,8 @@ public class DevenvServiceImpl implements DevenvService{
 
 
 		//执行linux命令编译 项目
+		//makefile文件夹路径
+		String makeFilePath = "";
 		try {
 			Connection connection = new Connection(ip);
 			connection.connect();
@@ -289,8 +285,7 @@ public class DevenvServiceImpl implements DevenvService{
 			Session session = connection.openSession();
 			
 			//先执行查找makefile命令
-			session.execCommand("find "+lPath+"/"+fileName+" -name makefile");
-			String makeFilePath = "";
+			session.execCommand("find "+lPath+"/"+ProcessName+"/"+fileName+" -name makefile");
 			
 			//获取输出结果 为 makefile 的绝对路径
 			InputStream is = new StreamGobbler(session.getStdout());
@@ -324,9 +319,9 @@ public class DevenvServiceImpl implements DevenvService{
 				this.rabbitmqTemplate.convertAndSend("gjkmq" , fileName+"===@@@===\n"+temp);
 			}
 
-			//找到路径后  执行make命令
+			//执行打包命令
 			session = connection.openSession();
-			session.execCommand("cd "+lPath+" ; zip -r "+fileName+".zip "+fileName);
+			session.execCommand("cd "+makeFilePath+" ; zip -r "+fileName+".zip "+"*");
 			
 			//成功返回
 			is = new StreamGobbler(session.getStdout());
@@ -358,14 +353,14 @@ public class DevenvServiceImpl implements DevenvService{
 			e.printStackTrace();
 		}
 		try {
-			SftpUtil.download(lPath+"/"+fileName+".zip",lPath+"/"+fileName+".zip",dPath,chSftp);
+			SftpUtil.download(makeFilePath+"/"+fileName+".zip",makeFilePath+"/"+fileName+".zip",dPath,chSftp);
 			
 			//推送消息到rabbitmq中
 			this.rabbitmqTemplate.convertAndSend("gjkmq" , fileName+"===@@@===\n下载完毕");
 			
-			//解压缩
+			//解压到工程Debug目录下
 			try {
-				unZipFiles(dPath+"\\"+fileName+".zip",dPath);
+				unZipFiles(dPath+"\\"+fileName+".zip",filePath+"\\Debug");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -388,15 +383,14 @@ public class DevenvServiceImpl implements DevenvService{
 		ChannelSftpSingleton.channelSftpNull();
 		
 		//执行完毕 删除 linux数据
-		//执行linux命令编译 项目
     	try {
 	    	Connection connection = new Connection(ip);
 			connection.connect();
 			connection.authenticateWithPassword(username, password);
 			Session session = connection.openSession();
 			
-			//先执行查找makefile命令
-			session.execCommand("rm -rf "+lPath+"/*");
+			//执行删除文件夹命令
+			session.execCommand("rm -rf "+lPath+"/"+ProcessName);
 			if(session != null) {
 				session.close();
 			}

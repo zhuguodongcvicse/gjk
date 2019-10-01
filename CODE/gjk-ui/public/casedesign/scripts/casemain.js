@@ -1141,6 +1141,7 @@ function initEditor(editor) {
 					data.set('showBoardType', 'FpgaBoard');
 				}
 				if (data._mn3.boardType == 2) {
+					console.log("data*****",data)
 					data.set('showBoardType', 'exchangeBoard');
 				}
 				if (data._mn3.boardType == 3) {

@@ -65,7 +65,7 @@ export default {
       next();
     } else {
       this.params = "";
-      alert("已离开当前页面,数据清除");
+      // alert("已离开当前页面,数据清除");
       next();
     }
   },
@@ -85,7 +85,7 @@ export default {
     NProgress.configure({ showSpinner: false });
     var hardwareObj = this.$route.params;
     this.params = hardwareObj;
-    console.log("this.params", this.params);
+    // console.log("this.params", this.params);
     //this.sendMessage()
   },
   async mounted() {

@@ -36,22 +36,26 @@ const navs = {
   actions: {},
   mutations: {
     ADD_TAG: (state, action) => {
+      // console.log("state***",state)
+      // console.log("action***",action)
       state.tag = action
       setStore({ name: 'tag', content: state.tag, type: 'session' })
+
       if (state.tagList.some(ele => diff(ele, action))) return
+      for (const i in state.tagList) {
+        if (state.tagList[i].label == action.label) {
+          // console.log("***")
+          return
+        }
+      }
       state.tagList.push(action)
       setFistTag(state.tagList)
       setStore({ name: 'tagList', content: state.tagList, type: 'session' })
     },
     DEL_TAG: (state, action) => {
-      console.log("state",state)
-      console.log("action",action)
       state.tagList = state.tagList.filter(item => {
-        console.log("item",item)
-        console.log("!diff(item, action)",!diff(item, action))
         return !diff(item, action)
       })
-      console.log("state.tagList",state.tagList)
       setFistTag(state.tagList)
       setStore({ name: 'tagList', content: state.tagList, type: 'session' })
     },

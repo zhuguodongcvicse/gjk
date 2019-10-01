@@ -168,7 +168,7 @@ export default [{
             import( /* webpackChunkName: "page" */ '@/views/libs/hardwarelibchip/chipdesign'),
             meta: {
                 // $keepAlive: true,
-                title: '芯片设计'
+                title: '芯片新增'
             }
     },{
         path: 'chipupdate',
@@ -197,7 +197,7 @@ export default [{
             import( /* webpackChunkName: "page" */ '@/views/libs/hardwarelibboard/boarddesign'),
             meta: {
                 // $keepAlive: true,
-                title: '板卡设计'
+                title: '板卡新增'
             }
     },{
         path: 'boardupdate',
@@ -220,7 +220,7 @@ export default [{
             import( /* webpackChunkName: "page" */ '@/views/libs/hardwarelibcase/casedesign'),
             meta: {
                 // $keepAlive: true,
-                title: '机箱设计'
+                title: '机箱新增'
             }
     },{
         path: 'caseupdate',

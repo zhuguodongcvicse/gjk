@@ -26,10 +26,7 @@
         ></el-tab-pane>
       </el-tabs>
       <div class="avue-tags__menu el-dropdown" style="right:70px;">
-        <el-button class="btn_more_14" type="primary"
-                   size="mini" @click="open_console">
-          控制台
-        </el-button>
+        <el-button class="btn_more_14" type="primary" size="mini" @click="open_console">控制台</el-button>
       </div>
       <el-dropdown class="avue-tags__menu">
         <el-button class="btn_more_14" type="primary" size="mini">
@@ -79,13 +76,12 @@ export default {
   },
   methods: {
     watchContextmenu() {
-      console.log("*********")
+      // console.log("*********");
       if (!this.$el.contains(event.target) || event.button !== 0) {
         this.contextmenuFlag = false;
       }
 
       window.removeEventListener("mousedown", this.watchContextmenu);
-      
     },
     handleContextmenu(event) {
       let target = event.target;
@@ -111,10 +107,10 @@ export default {
     },
     menuTag(value, action) {
       // var closeRouter =  this.$store.state.closeRouter
-      console.log("value",value)
+      // console.log("value", value);
       if (action === "remove") {
         let { tag, key } = this.findTag(value);
-        console.log("tag+++", tag, key);
+        // console.log("tag+++", tag, key);
         this.$store.commit("DEL_TAG", tag);
         if (tag.value === this.tag.value) {
           tag = this.tagList[key === 0 ? key : key - 1]; //如果关闭本标签让前推一个
@@ -123,7 +119,7 @@ export default {
       }
     },
     openTag(item) {
-      console.log("item",item)
+      // console.log("item", item);
       //直接点击标签跳到路由则关闭以下路由标签
       /* if (item.$parent != null) {
         var closeLastTag = item.$parent.$children;
@@ -155,6 +151,7 @@ export default {
       this.$store.commit("DEL_TAG_OTHER");
     },
     findTag(value) {
+      // console.log("this.tagList",this.tagList)
       let tag, key;
       this.tagList.map((item, index) => {
         if (item.value === value) {
@@ -162,6 +159,7 @@ export default {
           key = index;
         }
       });
+      // console.log("{ tag: tag, key: key }", { tag: tag, key: key });
       return { tag: tag, key: key };
     },
     closeAllTags() {
@@ -175,8 +173,8 @@ export default {
       });
     },
     //激活控制台
-    open_console(){
-      this.$emit("ecrollbarparent","70%");
+    open_console() {
+      this.$emit("ecrollbarparent", "70%");
     }
   }
 };

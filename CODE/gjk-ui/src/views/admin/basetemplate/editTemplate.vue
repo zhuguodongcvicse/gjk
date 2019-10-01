@@ -209,97 +209,111 @@
         <el-row>
           <el-button type="primary" plain @click="addAttribute">添加属性</el-button>
         </el-row>
-        <el-table :data="configureType.attrs" class="w100_14s" border>
-          <el-table-column label="属性名">
-            <template slot-scope="scope">
-              <!-- <el-input v-model="scope.row.attrName" placeholder="请输入属性名"></el-input> -->
-              <el-select v-model="scope.row.attrName" filterable allow-create placeholder="请选择映射名">
-                <el-option
-                  v-for="item in dictValues"
-                  :key="item.value"
-                  :label="item.value"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="是否映射">
-            <template slot-scope="scope">
-              <!-- <el-radio v-model="scope.row.attrMapping" label="true">Y</el-radio>
-              <el-radio v-model="scope.row.attrMapping" label="false">N</el-radio>-->
-              <el-switch
-                v-model="scope.row.attrMapping"
-                active-color="#13ce66"
-                inactive-color="#ff4949"
-              ></el-switch>
-            </template>
-          </el-table-column>
-          <el-table-column label="映射名">
-            <template slot-scope="scope">
-              <!-- <el-input v-if="scope.row.attrMapping" v-model="scope.row.attrMappingName"></el-input> -->
-              <el-select
-                v-if="scope.row.attrMapping"
-                v-model="scope.row.attrMappingName"
-                filterable
-                allow-create
-                placeholder="映射名"
-              >
-                <el-option
-                  v-for="item in dictValues"
-                  :key="item.label"
-                  :label="item.label"
-                  :value="item.label"
-                ></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="配置方式">
-            <template slot-scope="scope">
-              <el-select v-model="scope.row.attrConfigType" placeholder="请选择">
-                <el-option
-                  v-for="item in getMethods"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="数据源">
-            <template slot-scope="scope">
-              <el-select
-                size="medium"
-                v-model="scope.row.dataKey"
-                v-if="scope.row.attrConfigType=='selectComm'"
-              >
-                <el-option-group v-for="group in dataKeys" :key="group.label" :label="group.label">
+        <div class="libs_structlibs_configstruct_14s_25s_table">
+          <el-table :data="configureType.attrs" class="w100_14s" border>
+            <el-table-column label="属性名">
+              <template slot-scope="scope">
+                <!-- <el-input v-model="scope.row.attrName" placeholder="请输入属性名"></el-input> -->
+                <el-select
+                  v-model="scope.row.attrName"
+                  filterable
+                  allow-create
+                  placeholder="请选择映射名"
+                >
                   <el-option
-                    v-for="item in group.options"
+                    v-for="item in dictValues"
+                    :key="item.value"
+                    :label="item.value"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="是否映射">
+              <template slot-scope="scope">
+                <!-- <el-radio v-model="scope.row.attrMapping" label="true">Y</el-radio>
+                <el-radio v-model="scope.row.attrMapping" label="false">N</el-radio>-->
+                <el-switch
+                  v-model="scope.row.attrMapping"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                ></el-switch>
+              </template>
+            </el-table-column>
+            <el-table-column label="映射名">
+              <template slot-scope="scope">
+                <!-- <el-input v-if="scope.row.attrMapping" v-model="scope.row.attrMappingName"></el-input> -->
+                <el-select
+                  v-if="scope.row.attrMapping"
+                  v-model="scope.row.attrMappingName"
+                  filterable
+                  allow-create
+                  placeholder="映射名"
+                >
+                  <el-option
+                    v-for="item in dictValues"
+                    :key="item.label"
+                    :label="item.label"
+                    :value="item.label"
+                  ></el-option>
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="配置方式">
+              <template slot-scope="scope">
+                <el-select v-model="scope.row.attrConfigType" placeholder="请选择">
+                  <el-option
+                    v-for="item in getMethods"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value"
                   ></el-option>
-                </el-option-group>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="是否显示">
-            <template slot-scope="scope">
-              <el-switch v-model="scope.row.isShow" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
-            </template>
-          </el-table-column>
-          <el-table-column label="动作">
-            <template slot-scope="scope">
-              <el-input v-model="scope.row.actionType"></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" fixed="right">
-            <template slot-scope="scope">
-              <el-button type="danger" plain @click.prevent="removeAttribute(scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="数据源">
+              <template slot-scope="scope">
+                <el-select
+                  size="medium"
+                  v-model="scope.row.dataKey"
+                  v-if="scope.row.attrConfigType=='selectComm'"
+                >
+                  <el-option-group
+                    v-for="group in dataKeys"
+                    :key="group.label"
+                    :label="group.label"
+                  >
+                    <el-option
+                      v-for="item in group.options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-option-group>
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="是否显示">
+              <template slot-scope="scope">
+                <el-switch
+                  v-model="scope.row.isShow"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                ></el-switch>
+              </template>
+            </el-table-column>
+            <el-table-column label="动作">
+              <template slot-scope="scope">
+                <el-input v-model="scope.row.actionType"></el-input>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" fixed="right">
+              <template slot-scope="scope">
+                <el-button type="danger" plain @click.prevent="removeAttribute(scope.row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
         <el-row class="addtemplate_dialogbtn_14s text_align_right_14s">
           <el-button @click="isAddLable = false">取 消</el-button>
           <el-button type="primary" @click="AddLable()">确 定</el-button>
@@ -376,97 +390,111 @@
         <el-row>
           <el-button type="primary" plain @click="addAttribute">添加属性</el-button>
         </el-row>
-        <el-table :data="configureType.attrs" class="w100_14s" border>
-          <el-table-column label="属性名">
-            <template slot-scope="scope">
-              <!-- <el-input v-model="scope.row.attrName" placeholder="请输入属性名"></el-input> -->
-              <el-select v-model="scope.row.attrName" filterable allow-create placeholder="请选择映射名">
-                <el-option
-                  v-for="item in dictValues"
-                  :key="item.value"
-                  :label="item.value"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="是否映射">
-            <template slot-scope="scope">
-              <!-- <el-radio v-model="scope.row.attrMapping" label="true">Y</el-radio>
-              <el-radio v-model="scope.row.attrMapping" label="false">N</el-radio>-->
-              <el-switch
-                v-model="scope.row.attrMapping"
-                active-color="#13ce66"
-                inactive-color="#ff4949"
-              ></el-switch>
-            </template>
-          </el-table-column>
-          <el-table-column label="映射名">
-            <template slot-scope="scope">
-              <!-- <el-input v-if="scope.row.attrMapping" v-model="scope.row.attrMappingName"></el-input> -->
-              <el-select
-                v-if="scope.row.attrMapping"
-                v-model="scope.row.attrMappingName"
-                filterable
-                allow-create
-                placeholder="映射名"
-              >
-                <el-option
-                  v-for="item in dictValues"
-                  :key="item.label"
-                  :label="item.label"
-                  :value="item.label"
-                ></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="配置方式">
-            <template slot-scope="scope">
-              <el-select v-model="scope.row.attrConfigType" placeholder="请选择">
-                <el-option
-                  v-for="item in getMethods"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="数据源">
-            <template slot-scope="scope">
-              <el-select
-                size="medium"
-                v-model="scope.row.dataKey"
-                v-if="scope.row.attrConfigType=='selectComm'"
-              >
-                <el-option-group v-for="group in dataKeys" :key="group.label" :label="group.label">
+        <div class="libs_structlibs_configstruct_14s_25s_table">
+          <el-table :data="configureType.attrs" class="w100_14s" border>
+            <el-table-column label="属性名">
+              <template slot-scope="scope">
+                <!-- <el-input v-model="scope.row.attrName" placeholder="请输入属性名"></el-input> -->
+                <el-select
+                  v-model="scope.row.attrName"
+                  filterable
+                  allow-create
+                  placeholder="请选择映射名"
+                >
                   <el-option
-                    v-for="item in group.options"
+                    v-for="item in dictValues"
+                    :key="item.value"
+                    :label="item.value"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="是否映射">
+              <template slot-scope="scope">
+                <!-- <el-radio v-model="scope.row.attrMapping" label="true">Y</el-radio>
+                <el-radio v-model="scope.row.attrMapping" label="false">N</el-radio>-->
+                <el-switch
+                  v-model="scope.row.attrMapping"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                ></el-switch>
+              </template>
+            </el-table-column>
+            <el-table-column label="映射名">
+              <template slot-scope="scope">
+                <!-- <el-input v-if="scope.row.attrMapping" v-model="scope.row.attrMappingName"></el-input> -->
+                <el-select
+                  v-if="scope.row.attrMapping"
+                  v-model="scope.row.attrMappingName"
+                  filterable
+                  allow-create
+                  placeholder="映射名"
+                >
+                  <el-option
+                    v-for="item in dictValues"
+                    :key="item.label"
+                    :label="item.label"
+                    :value="item.label"
+                  ></el-option>
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="配置方式">
+              <template slot-scope="scope">
+                <el-select v-model="scope.row.attrConfigType" placeholder="请选择">
+                  <el-option
+                    v-for="item in getMethods"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value"
                   ></el-option>
-                </el-option-group>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="是否显示">
-            <template slot-scope="scope">
-              <el-switch v-model="scope.row.isShow" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
-            </template>
-          </el-table-column>
-          <el-table-column label="动作">
-            <template slot-scope="scope">
-              <el-input v-model="scope.row.actionType"></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" fixed="right">
-            <template slot-scope="scope">
-              <el-button type="danger" plain @click.prevent="removeAttribute(scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="数据源">
+              <template slot-scope="scope">
+                <el-select
+                  size="medium"
+                  v-model="scope.row.dataKey"
+                  v-if="scope.row.attrConfigType=='selectComm'"
+                >
+                  <el-option-group
+                    v-for="group in dataKeys"
+                    :key="group.label"
+                    :label="group.label"
+                  >
+                    <el-option
+                      v-for="item in group.options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-option-group>
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="是否显示">
+              <template slot-scope="scope">
+                <el-switch
+                  v-model="scope.row.isShow"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                ></el-switch>
+              </template>
+            </el-table-column>
+            <el-table-column label="动作">
+              <template slot-scope="scope">
+                <el-input v-model="scope.row.actionType"></el-input>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" fixed="right">
+              <template slot-scope="scope">
+                <el-button type="danger" plain @click.prevent="removeAttribute(scope.row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
         <el-row class="addtemplate_dialogbtn_14s text_align_right_14s">
           <el-button @click="isEidtLable = false">取 消</el-button>
           <el-button type="primary" @click="eidtLable()">确 定</el-button>
@@ -482,18 +510,20 @@
             <span>粘贴至</span>
           </el-col>
           <el-col :span="14">
-            <el-tree
-              class="filter-tree"
-              node-key="id"
-              highlight-current
-              :data="xmlEntityMaps"
-              :expand-on-click-node="false"
-              @node-click="getNodeData2"
-            >
-              <span class="custom-tree-node" slot-scope="{ node }">
-                <span>{{ node.data.lableMappingName }}</span>
-              </span>
-            </el-tree>
+            <div class="libs_structlibs_configstruct_14s_25s_table">
+              <el-tree
+                class="filter-tree"
+                node-key="id"
+                highlight-current
+                :data="xmlEntityMaps"
+                :expand-on-click-node="false"
+                @node-click="getNodeData2"
+              >
+                <span class="custom-tree-node" slot-scope="{ node }">
+                  <span>{{ node.data.lableMappingName }}</span>
+                </span>
+              </el-tree>
+            </div>
           </el-col>
           <el-col :span="3">
             <el-radio v-model="lablePosition" label="up">上</el-radio>

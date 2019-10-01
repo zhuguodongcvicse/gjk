@@ -126,6 +126,32 @@ public class FileUtil {
 	 * 
 	 * @param returnFilePathList
 	 * @param filePath
+	 * @param selectFileName
+	 */
+	public void getSelectStrFilePathList(Set<String> returnFilePathList, String filePath, String startWith,
+			String endWith) {
+		File file = new File(filePath);
+		if (file.exists()) {
+			if (file.isFile()) {
+				if (file.getName().startsWith(startWith) && file.getName().endsWith(endWith)) {
+					returnFilePathList.add(file.getAbsolutePath());
+				}
+			} else if (file.isDirectory()) {
+				File[] childFiles = file.listFiles();
+				for (File childFile : childFiles) {
+					getSelectStrFilePathList(returnFilePathList, childFile.getAbsolutePath(), startWith, endWith);
+				}
+			}
+		} else {
+			System.out.println("传入路径错误，请联系管理员。");
+		}
+	}
+
+	/**
+	 * 获取在指定文件路径下所有符合条件的文件的绝对路径的集合
+	 * 
+	 * @param returnFilePathList
+	 * @param filePath
 	 * @param selectFileNameList
 	 */
 	public void getSelectStrFilePathList(Set<String> returnFilePathList, String filePath,
