@@ -1245,21 +1245,20 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 								for (XmlEntityMap entityMap2 : entityMap1.getXmlEntityMaps()) {
 									if (entityMap2.getLableName().equals("层级属性")) {
 										for (XmlEntityMap entityMap3 : entityMap2.getXmlEntityMaps()) {
-											if (entityMap3.getLableName().equals("所属部件")) {
-												for (XmlEntityMap entityMap4 : entityMap3.getXmlEntityMaps()) {
-													if (entityMap4.getLableName().equals("部署配置")) {
-														for (XmlEntityMap entityMap5 : entityMap4.getXmlEntityMaps()) {
+											//if (entityMap3.getLableName().equals("所属部件")) {
+												//for (XmlEntityMap entityMap4 : entityMap3.getXmlEntityMaps()) {
+													if (entityMap3.getLableName().equals("部署配置")) {
+														for (XmlEntityMap entityMap5 : entityMap3.getXmlEntityMaps()) {
 															if (entityMap5.getLableName().equals("所属节点")) {
-																String cmpname = entityMap5.getAttributeMap()
-																		.get("cmpName");
+																String cmpname = entityMap5.getAttributeMap().get("cmpName");
 																if (cmpname.equals(bakpartName)) {
 																	entityMap5.getAttributeMap().put("name", bakcpuid);
 																}
 															}
 														}
 													}
-												}
-											}
+												//}
+											//}
 										}
 									}
 								}
@@ -1288,19 +1287,18 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 								for (XmlEntityMap entityMap2 : entityMap1.getXmlEntityMaps()) {
 									if (entityMap2.getLableName().equals("层级属性")) {
 										for (XmlEntityMap entityMap3 : entityMap2.getXmlEntityMaps()) {
-											if (entityMap3.getLableName().equals("所属部件")) {
-												for (XmlEntityMap entityMap4 : entityMap3.getXmlEntityMaps()) {
-													if (entityMap4.getLableName().equals("部署配置")) {
-														for (XmlEntityMap entityMap5 : entityMap4.getXmlEntityMaps()) {
+										//	if (entityMap3.getLableName().equals("所属部件")) {
+											//	for (XmlEntityMap entityMap4 : entityMap3.getXmlEntityMaps()) {
+													if (entityMap3.getLableName().equals("部署配置")) {
+														for (XmlEntityMap entityMap5 : entityMap3.getXmlEntityMaps()) {
 															if (entityMap5.getLableName().equals("所属节点")) {
-																String cmpname = entityMap5.getAttributeMap()
-																		.get("cmpName");
+																String cmpname = entityMap5.getAttributeMap().get("cmpName");
 																if (cmpname.equals(partName)) {
 																	entityMap5.getAttributeMap().put("name", cpuid);
 																}
 															}
-														}
-													}
+												//		}
+												//	}
 												}
 											}
 										}
