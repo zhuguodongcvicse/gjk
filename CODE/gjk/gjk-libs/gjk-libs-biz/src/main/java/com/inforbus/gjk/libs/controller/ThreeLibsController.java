@@ -275,7 +275,7 @@ public class ThreeLibsController {
 				}
 			}
 			System.out.println("**************************code::::"+code);
-			dto.setTextContext(prefix + "======" + str + "======" +  code);
+			dto.setTextContext(prefix + "@%#@*+-+@" + str + "@%#@*+-+@" +  code);
 		} else {
 			System.out.println("找不到指定的文件");
 		}
