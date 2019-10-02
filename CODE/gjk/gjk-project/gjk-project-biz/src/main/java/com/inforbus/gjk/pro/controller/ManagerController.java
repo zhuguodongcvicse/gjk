@@ -645,6 +645,7 @@ public class ManagerController {
 	 */
 	@PostMapping("saveHardwarelibs")
 	public void saveHarewarelibs(@RequestBody Hardwarelibs hardwarelibs) {
+		System.out.println("hardwarelibs"+hardwarelibs);
 		managerService.saveHardwarelibs(hardwarelibs);
 	}
 	/**

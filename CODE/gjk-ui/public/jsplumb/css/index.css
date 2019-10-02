@@ -185,7 +185,7 @@ div.desc {
 
 
 .public_jsplumb_index_14s{}
-.public_jsplumb_left_14s{text-align: center;height: calc(100% - 16px) ; overflow-y:auto;overflow-x: hidden;}
+.public_jsplumb_left_14s{text-align: center;height: calc(100% - 80px) ; overflow-y:auto;overflow-x: hidden;}
 .public_jsplumb_left_14s select{border:1px solid #ddd;padding:3px 5px;margin-bottom:5px;margin-left:10px;}
 
 .public_jsplumb_right2_14s{position: absolute;background-color: rgba(137,189,189,0.5);border:1px solid rgb(137,189,189);}
@@ -243,4 +243,12 @@ div.desc {
 }
 .nodeStyle{
   z-index: 2;
+}
+.point {
+  width: 150px;
+  height: 80px;
+  word-wrap: break-word;
+  word-break: break-all;
+  overflow-y:auto;
+  
 }

@@ -109,8 +109,8 @@ export default {
       this.$refs[formName].validate(valid => {});
       this.showInf.dialogFormVisible = false;
       this.$router.push({
-        name: "chipdesign",
-        params: this.form
+        path: "/libs/hardwarelibchip/chipdesign",
+        query: this.form
       });
       this.form = {};
     },

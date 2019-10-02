@@ -43,7 +43,7 @@ import { menuTag } from "@/util/closeRouter";
 
 export default {
   name: "AvueIframe",
-  beforeRouteLeave(to, from, next) {
+  /* beforeRouteLeave(to, from, next) {
     if (this.ifSave == 0) {
       this.params = "";
       next();
@@ -52,7 +52,7 @@ export default {
       alert("已离开当前页面,数据清除");
       next();
     }
-  },
+  }, */
   inject: ["reload"],
   data() {
     return {
@@ -68,7 +68,7 @@ export default {
   },
   created() {
     NProgress.configure({ showSpinner: false });
-    var formObj = this.$route.params;
+    var formObj = this.$route.query;
     this.params = formObj;
     // console.log("this.params",this.params)
   },

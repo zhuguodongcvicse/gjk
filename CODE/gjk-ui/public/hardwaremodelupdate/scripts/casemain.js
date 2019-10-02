@@ -862,6 +862,7 @@ function initEditor(editor) {
 				}
 			} */
 			//配置的ip nodeID
+			var maxNodeId
 			for (const n in graphList.fJson) {
 				for (const i in graphList.fJson[n].datas) {
 					if (graphList.fJson[n].datas[i].json.properties != null && graphList.fJson[n].datas[i].json.properties.caseName != null) {
@@ -873,7 +874,17 @@ function initEditor(editor) {
 											graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k] = chipListTemp[m]
 										}
 									}
-									graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].nodeID = cpuNodeID++
+									if (graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].nodeID != null) {
+										if (typeof maxNodeId != 'undefined') {
+											if (maxNodeId < graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].nodeID) {
+												maxNodeId = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].nodeID
+											}
+										} else {
+											maxNodeId = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].nodeID
+										}
+									} else {
+										graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].nodeID = cpuNodeID++
+									}
 									//给部署图所需数据赋nodeid
 									for (const p in frontCaseForDeployment.datas) {
 										if (frontCaseForDeployment.datas[p].json.properties.chipName != null

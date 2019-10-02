@@ -35,7 +35,7 @@ export default {
         this.threeLibsFilePathDTO.filePathName = this.$route.query.compFilePath;
         console.log(" this.threeLibsFilePathDTO::::", this.threeLibsFilePathDTO);
         readAlgorithmfile(this.threeLibsFilePathDTO).then(response => {
-          this.textContext = response.data.data.textContext.split("======")[1];
+          this.textContext = response.data.data.textContext.split("@%#@*+-+@")[1];
         });
       },
       deep: true
@@ -45,7 +45,7 @@ export default {
     //     console.log("显示数据", val.data.data);
     //     this.threeLibsFilePathDTO.filePathName = val.data.data;
     //     readAlgorithmfile(this.threeLibsFilePathDTO).then(response => {
-    //       this.textContext = response.data.data.textContext.split("======")[1];
+    //       this.textContext = response.data.data.textContext.split("@%#@*+-+@")[1];
     //     });
     //   });
     // }
