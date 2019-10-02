@@ -285,9 +285,9 @@ export default {
         this.threeLibsFilePathDTO.filePathName = data.filePath;
         readAlgorithmfile(this.threeLibsFilePathDTO).then(response => {
           //文件内容
-          this.textContext = response.data.data.textContext.split("======")[1];
+          this.textContext = response.data.data.textContext.split("@%#@*+-+@")[1];
           //文件后缀名，用于判断区分文件后缀名，使用文本编辑器还是什么
-          this.fileSuffix = response.data.data.textContext.split("======")[0];
+          this.fileSuffix = response.data.data.textContext.split("@%#@*+-+@")[0];
           // if (
           //   this.fileSuffix === "c" ||
           //   this.fileSuffix === "h" ||

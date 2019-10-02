@@ -72,7 +72,7 @@ export default {
         this.fileName = this.$route.query.appFileName;
         this.threeLibsFilePathDTO.filePathName = this.$route.query.filePath;
         readAlgorithmfile(this.threeLibsFilePathDTO).then(response => {
-          this.textContext = response.data.data.textContext.split("======")[1];
+          this.textContext = response.data.data.textContext.split("@%#@*+-+@")[1];
         });
       },
       deep: true
@@ -80,13 +80,13 @@ export default {
     //  textLog :{
     //    handler:function(newValue, oldValue){
     //      //创建新的label
-    //      $("#textedits_lable").append("<button type='button' class='el-button el-button--primary el-button--mini' onclick='project(this)'><i class='el-icon-thirdproject'></i><span>"+this.textLog.split("======")[0]+"</span></button>");
+    //      $("#textedits_lable").append("<button type='button' class='el-button el-button--primary el-button--mini' onclick='project(this)'><i class='el-icon-thirdproject'></i><span>"+this.textLog.split("@%#@*+-+@")[0]+"</span></button>");
     //      //隐藏所有日志div
     //      $("#textedits_log").find("div").each(function(){
     //        $(this).hide();
     //      });
     //      //创建新的日志div并展示
-    //      $("#textedits_log").append("<div pid='"+this.textLog.split("======")[0]+"' class='el-textarea'><textarea autocomplete='off' rows='10' class='el-textarea__inner' style='min-height: 35px;'>"+this.textLog.split("======")[1]+"</textarea></div>");
+    //      $("#textedits_log").append("<div pid='"+this.textLog.split("@%#@*+-+@")[0]+"' class='el-textarea'><textarea autocomplete='off' rows='10' class='el-textarea__inner' style='min-height: 35px;'>"+this.textLog.split("@%#@*+-+@")[1]+"</textarea></div>");
     //      //以前的代码
     //      //this.inputText = this.textLog;
     //    }
