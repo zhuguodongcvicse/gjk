@@ -161,15 +161,23 @@ public class ThreeLibsController {
 	 * @throws Exception
 	 */
 
-	@RequestMapping("/readAlgorithmfile")
-	public R fileRead(ThreeLibsFilePathDTO threeLibsFilePathDTO) throws Exception {
+	@PostMapping("/readAlgorithmfile")
+	public R fileRead(@RequestBody ThreeLibsFilePathDTO threeLibsFilePathDTO) throws Exception {
 		String fileName = threeLibsFilePathDTO.getFilePathName();
+		//获取文件编码格式
+		String code = "";
 		if(StringUtils.isEmpty(fileName)) {
 			return new R<>();
 		}
 		File isFile = new File(fileName);
 		//获取文件编码格式
-		String code = this.codeString(fileName);
+		//获得文件编码  
+//		String fileEncode=EncodingDetect.getJavaEncode(filePath);  
+//		if(threeLibsFilePathDTO.getEditorCode()!=null) {
+//			code = threeLibsFilePathDTO.getEditorCode();
+//		}else {
+			code = this.codeString(fileName);
+//		}
 		String prefix = fileName.substring(fileName.lastIndexOf(".") + 1);
 
 		String str = "";
@@ -240,7 +248,7 @@ public class ThreeLibsController {
 //			
 //		}
 			// 读取//.h .m .c .o 文件
-			else if ("h".equals(prefix) || "c".equals(prefix) || "cpp".equals(prefix)) {
+			else {
 				// 获得文件编码
 //				String fileEncode=EncodingDetect.getJavaEncode(fileName);   
 				//String encoding = "utf-8";
@@ -251,7 +259,7 @@ public class ThreeLibsController {
 
 					// 之前的老方法
 					// 考虑到编码格式
-//					InputStreamReader read = new InputStreamReader(new FileInputStream(fileName), encoding);
+//					InputStreamReader read = new InputStreamReader(new FileInputStream(fileName), code);
 //					BufferedReader bufferedReader = new BufferedReader(read);
 //					// 定义一个字符串缓存，将字符串存放缓存中
 //					StringBuilder sb = new StringBuilder();
@@ -266,8 +274,8 @@ public class ThreeLibsController {
 					e.printStackTrace();
 				}
 			}
-
-			dto.setTextContext(prefix + "======" + str);
+			System.out.println("**************************code::::"+code);
+			dto.setTextContext(prefix + "======" + str + "======" +  code);
 		} else {
 			System.out.println("找不到指定的文件");
 		}
@@ -282,13 +290,13 @@ public class ThreeLibsController {
         String code = null;
  
         switch (p) {
-        case 0xefbb:
+        case 298127:
             code = "UTF-8";
             break;
-        case 0xfffe:
+        case 65534:
             code = "Unicode";
             break;
-        case 0xfeff:
+        case 65279:
             code = "UTF-16BE";
             break;
         default:
