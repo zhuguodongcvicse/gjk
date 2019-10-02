@@ -89,6 +89,7 @@ export default {
   data() {
     //这里存放数据
     return {
+      hardwarelibNode: '',
       existHardwarelib: "",
       dialogVisible: false,
       dialogVisible2: false,
@@ -164,33 +165,44 @@ export default {
   //方法集合
   methods: {
     //查找是否添加了硬件建模
-    hardwarelibIfExist(nodeId) {
-      this.hardwarelibs.id = nodeId;
-      getHardwarelibs(nodeId).then(response => {
+    hardwarelibIfExist(node) {
+      this.hardwarelibNode = node
+      this.hardwarelibs.id = node.id;
+      getHardwarelibs(node.id).then(response => {
         // console.log("response.data", response.data);
         this.existHardwarelib = response.data;
         if (response.data.frontJson == null) {
           // this.dialogVisible = true;
-          this.confirmAddHardwarelibs();
+          this.confirmAddHardwarelibs(node);
         } else {
           this.dialogVisible2 = true;
           // this.confirmUpdateHardwarelibs();
         }
       });
     },
-    confirmAddHardwarelibs() {
+    confirmAddHardwarelibs(node) {
       // console.log("this.hardwarelibs",this.hardwarelibs)
+      let hardwarelibs = this.hardwarelibs
+      let hardwarelibModelId = node.parentId
       this.$router.replace({
-        name: "hardwareAdd",
-        params: this.hardwarelibs
+        path: "/comp/manager/hardwareAdd",
+        query: {
+          hardwarelibs,
+          hardwarelibModelId
+        }
       });
       // this.dialogVisible = false;
       // this.closeRouterTag()
     },
     confirmUpdateHardwarelibs() {
+      let existHardwarelib = this.existHardwarelib
+      let hardwarelibModelId = this.hardwarelibNode.parentId
       this.$router.push({
-        name: "hardwareUpdate",
-        params: this.existHardwarelib
+        path: "/comp/manager/hardwareUpdate",
+        query: {
+          existHardwarelib,
+          hardwarelibModelId
+        }
       });
       this.dialogVisible2 = false;
       // this.closeRouterTag()
@@ -341,7 +353,7 @@ export default {
       if (node.parentType == "12") {
         if (node.type == "12") {
           // console.log("node",node)
-          this.hardwarelibIfExist(node.id);
+          this.hardwarelibIfExist(node);
           /* this.$router.replace({
             name: "hardware",
             params: { sysId: node.id }

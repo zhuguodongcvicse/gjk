@@ -83,9 +83,9 @@ export default {
   },
   created() {
     NProgress.configure({ showSpinner: false });
-    var hardwareObj = this.$route.params;
+    var hardwareObj = this.$route.query.hardwarelibs;
     this.params = hardwareObj;
-    // console.log("this.params", this.params);
+    console.log("this.params", this.params);
     //this.sendMessage()
   },
   async mounted() {
@@ -146,6 +146,7 @@ export default {
         JSON.stringify(event.data.params[2])
       ); */
       // console.log("接收子页面数据:****", event.data);
+      // console.log("this.params",this.params)
       switch (event.data.cmd) {
         case "submitCaseJSON":
           // 处理业务逻辑
@@ -161,7 +162,7 @@ export default {
             });
           });
           saveChipsFromHardwarelibs(chipsfromhardwarelibs).then(res => {
-            console.log("res", res);
+            // console.log("res", res);
           });
           var tag1 = this.tag;
           menuTag(this.$route.path, "remove", this.tagList, tag1);

@@ -87,9 +87,9 @@ export default {
   },
   created() {
     NProgress.configure({ showSpinner: false });
-    var hardwareObj = this.$route.params;
+    var hardwareObj = this.$route.query.existHardwarelib;
     this.params = hardwareObj;
-    // console.log("this.params",this.params)
+    console.log("this.params",this.params)
     //this.sendMessage()
   },
   async mounted() {
@@ -121,15 +121,18 @@ export default {
       });
     },
     sendMessage() {
-      let iframeWin = this.$refs.iframe.contentWindow;
       getCaseData().then(res => {
         //console.log("res.data",res.data);
         var caseDate = res.data;
-        this.params.frontJson = JSON.parse(this.params.frontJson);
-        this.params.backJson = JSON.parse(this.params.backJson);
+        let iframeWin = this.$refs.iframe.contentWindow;
+        // console.log("typeof this.params.frontJson",typeof this.params.frontJson)
+        if (typeof this.params.frontJson == 'string') {
+          this.params.frontJson = JSON.parse(this.params.frontJson);
+          this.params.backJson = JSON.parse(this.params.backJson);
+        }
         this.postMessageData.cmd = "getHardwarelibs";
         this.postMessageData.params = [this.params, caseDate];
-        console.log("this.params", this.params);
+        // console.log("this.params", this.params);
         iframeWin.postMessage(this.postMessageData, "*");
         //console.log("postMessageData",this.postMessageData.params)
       });
@@ -152,7 +155,6 @@ export default {
         flowId: "",
         modelId: ""
       };
-      // console.log("this.params",this.params)
       switch (event.data.cmd) {
         case "submitCaseJSON":
           // 处理业务逻辑
@@ -166,7 +168,7 @@ export default {
             });
           });
           saveChipsFromHardwarelibs(chipsfromhardwarelibs).then(res => {
-            console.log("res", res);
+            // console.log("res", res);
           });
           var tag1 = this.tag;
           menuTag(this.$route.path, "remove", this.tagList, tag1);
