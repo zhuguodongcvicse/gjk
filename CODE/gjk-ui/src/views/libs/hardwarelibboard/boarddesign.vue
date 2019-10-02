@@ -52,7 +52,7 @@ import { saveProcessModel } from "@/api/pro/project";
 
 export default {
   name: "AvueIframe",
-  beforeRouteLeave(to, from, next) {
+  /* beforeRouteLeave(to, from, next) {
     if (this.ifSave == 0) {
       this.params = "";
       next();
@@ -61,7 +61,7 @@ export default {
       alert("已离开当前页面,数据清除")
       next();
     }
-  },
+  }, */
   data() {
     return {
       ifSave: 1,
@@ -80,7 +80,7 @@ export default {
   },
   created() {
     NProgress.configure({ showSpinner: false });
-    var formObj = this.$route.params;
+    var formObj = this.$route.query;
     this.params = formObj
   },
   async mounted() {

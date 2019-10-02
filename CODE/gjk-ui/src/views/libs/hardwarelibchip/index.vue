@@ -153,8 +153,8 @@ export default {
       // console.log("form",form)
       this.dialogFormVisible = false;
       this.$router.push({
-        name: "chipupdate",
-        params: form
+        path: "/libs/hardwarelibchip/chipupdate",
+        query: form
       });
       this.form = {};
     },

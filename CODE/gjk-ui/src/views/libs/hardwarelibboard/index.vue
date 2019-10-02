@@ -161,19 +161,17 @@ export default {
       var calculateBoardIoType;
       remote("hardware_calculateBoard_inf_linkType").then(res1 => {
         calculateBoardLinkType = res1.data.data;
-        console.log("calculateBoardLinkType",calculateBoardLinkType)
         remote("hardware_inf_io_type").then(res2 => {
           calculateBoardIoType = res2.data.data;
           this.$router.push({
-            name: "boardupdate",
-            params: [
+            path: "/libs/hardwarelibboard/boardupdate",
+            query: [
               this.queryData,
               form,
               calculateBoardLinkType,
               calculateBoardIoType
             ]
           });
-          console.log("calculateBoardIoType",calculateBoardIoType)
         });
       });
 

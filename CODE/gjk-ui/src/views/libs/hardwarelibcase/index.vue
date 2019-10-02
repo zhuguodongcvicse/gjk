@@ -126,9 +126,8 @@ import { remote } from "@/api/admin/dict";
       var fpgaBoardLinkType
       remote('hardware_FpgaBoard_inf_linkType').then(res1 => {
         fpgaBoardLinkType = res1.data.data
-        console.log("fpgaBoardLinkType",fpgaBoardLinkType)
       })
-      this.$router.push({name:"caseupdate",params:[this.queryData, this.form, fpgaBoardLinkType] });
+      this.$router.push({path:"/libs/hardwarelibcase/caseupdate",query:[this.queryData, this.form, fpgaBoardLinkType] });
       this.form = {}
     },
     currentChange(val) {
