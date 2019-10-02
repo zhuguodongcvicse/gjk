@@ -39,8 +39,8 @@ export function getAlgorithmFilePath (id) {
 export function readAlgorithmfile (query) {
   return request({
     url: '/libs/threelibs/readAlgorithmfile' ,
-    method: 'put',
-    params: query
+    method: 'post',
+    data: query
   })
 }
 

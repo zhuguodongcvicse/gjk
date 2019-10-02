@@ -35,11 +35,11 @@
                     </el-form-item>
                     <el-form-item>
                       <!-- <show-child :filePath="filePath" :textContext="textContext"></show-child> -->
-                      <show-child
+                      <!-- <show-child
                         v-if="isShowChild === true"
                         :filePath="filePath"
                         :textContext="textContext"
-                      ></show-child>
+                      ></show-child> -->
                       <monaco-editor
                         v-if="isShowEditor === true"
                         :textContext="textContext"
@@ -90,7 +90,7 @@ export default {
       offset: "250px",
       threeLibsFilePathDTO: {},
       isShowChild: false,
-      isShowEditor: false,
+      isShowEditor: true,
       context: "",
       fileContext: "",
       filePath: "",
@@ -289,17 +289,17 @@ export default {
             console.log("ggggfg:::", this.textContext);
             //文件后缀名，用于判断区分文件后缀名，使用文本编辑器还是什么
             this.fileSuffix = response.data.data.textContext.split("======")[0];
-            if (
-              this.fileSuffix === "c" ||
-              this.fileSuffix === "h" ||
-              this.fileSuffix === "cpp"
-            ) {
-              this.isShowEditor = true;
-              this.isShowChild = false;
-            } else {
-              this.isShowChild = true;
-              this.isShowEditor = false;
-            }
+            // if (
+            //   this.fileSuffix === "c" ||
+            //   this.fileSuffix === "h" ||
+            //   this.fileSuffix === "cpp"
+            // ) {
+            //   this.isShowEditor = true;
+            //   this.isShowChild = false;
+            // } else {
+            //   this.isShowChild = true;
+            //   this.isShowEditor = false;
+            // }
           }
         });
       }
