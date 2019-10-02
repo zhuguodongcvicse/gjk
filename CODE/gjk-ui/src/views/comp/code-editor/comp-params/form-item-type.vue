@@ -144,10 +144,10 @@ export default {
         if (null === value && undefined === value) {
           return;
         }
-        console.log(
-          "监控data中的数据变化****************************监控data中的数据变化",
-          value
-        );
+        // console.log(
+        //   "监控data中的数据变化****************************监控data中的数据变化",
+        //   value
+        // );
         this.formulaDialogParams.tmpLengthVal.attributeNameValue = value;
         if (this.lableType === "selectComm") {
           this.selectOptions = [];

@@ -215,7 +215,7 @@ export default {
         if (index !== -1) {
           this.filesPath.splice(index, 1);
         }
-        this.saveLeftData(this.filesPath);
+        // this.saveLeftData(this.filesPath);
         // console.log("index", index, this.filesPath, oldFile);
       }
     },
@@ -248,6 +248,12 @@ export default {
             }
           }
         });
+        // for(let key in this.filePath){
+        //   if(JSON.stringify(this.filePath[key])==="{}"){
+        //      this.filesPath.splice(key, 1);
+        //   }
+        // }
+        //console.log("filesPathfilesPathfilesPathfilesPathfilesPathfilesPath",this.filesPath)
         this.saveLeftData(this.filesPath);
       },
       deep: true
@@ -302,7 +308,6 @@ export default {
         fileType: this.fileType,
         paths: this.compValueType.paths
       };
-      console.log("savefilessavefilessavefiles", savefiles);
       return Promise.resolve(fetchSavefiles(savefiles));
     },
     imgRetStrFunction(retStr) {

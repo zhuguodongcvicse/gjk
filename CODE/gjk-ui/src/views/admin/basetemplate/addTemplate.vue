@@ -207,97 +207,111 @@
         <el-row>
           <el-button type="primary" plain @click="addAttribute">添加属性</el-button>
         </el-row>
-        <el-table :data="configureType.attrs" class="w100_14s" border>
-          <el-table-column label="属性名">
-            <template slot-scope="scope">
-              <!-- <el-input v-model="scope.row.attrName" placeholder="请输入属性名"></el-input> -->
-              <el-select v-model="scope.row.attrName" filterable allow-create placeholder="请选择映射名">
-                <el-option
-                  v-for="item in dictValues"
-                  :key="item.value"
-                  :label="item.value"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="是否映射">
-            <template slot-scope="scope">
-              <!-- <el-radio v-model="scope.row.attrMapping" label="true">Y</el-radio>
-              <el-radio v-model="scope.row.attrMapping" label="false">N</el-radio>-->
-              <el-switch
-                v-model="scope.row.attrMapping"
-                active-color="#13ce66"
-                inactive-color="#ff4949"
-              ></el-switch>
-            </template>
-          </el-table-column>
-          <el-table-column label="映射名">
-            <template slot-scope="scope">
-              <!-- <el-input v-if="scope.row.attrMapping" v-model="scope.row.attrMappingName"></el-input> -->
-              <el-select
-                v-if="scope.row.attrMapping"
-                v-model="scope.row.attrMappingName"
-                filterable
-                allow-create
-                placeholder="映射名"
-              >
-                <el-option
-                  v-for="item in dictValues"
-                  :key="item.label"
-                  :label="item.label"
-                  :value="item.label"
-                ></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="配置方式">
-            <template slot-scope="scope">
-              <el-select v-model="scope.row.attrConfigType" placeholder="请选择">
-                <el-option
-                  v-for="item in getMethods"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="数据源">
-            <template slot-scope="scope">
-              <el-select
-                size="medium"
-                v-model="scope.row.dataKey"
-                v-if="scope.row.attrConfigType=='selectComm'"
-              >
-                <el-option-group v-for="group in dataKeys" :key="group.label" :label="group.label">
+        <div class="libs_structlibs_configstruct_14s_25s_table">
+          <el-table :data="configureType.attrs" class="w100_14s" border>
+            <el-table-column label="属性名">
+              <template slot-scope="scope">
+                <!-- <el-input v-model="scope.row.attrName" placeholder="请输入属性名"></el-input> -->
+                <el-select
+                  v-model="scope.row.attrName"
+                  filterable
+                  allow-create
+                  placeholder="请选择映射名"
+                >
                   <el-option
-                    v-for="item in group.options"
+                    v-for="item in dictValues"
+                    :key="item.value"
+                    :label="item.value"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="是否映射">
+              <template slot-scope="scope">
+                <!-- <el-radio v-model="scope.row.attrMapping" label="true">Y</el-radio>
+                <el-radio v-model="scope.row.attrMapping" label="false">N</el-radio>-->
+                <el-switch
+                  v-model="scope.row.attrMapping"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                ></el-switch>
+              </template>
+            </el-table-column>
+            <el-table-column label="映射名">
+              <template slot-scope="scope">
+                <!-- <el-input v-if="scope.row.attrMapping" v-model="scope.row.attrMappingName"></el-input> -->
+                <el-select
+                  v-if="scope.row.attrMapping"
+                  v-model="scope.row.attrMappingName"
+                  filterable
+                  allow-create
+                  placeholder="映射名"
+                >
+                  <el-option
+                    v-for="item in dictValues"
+                    :key="item.label"
+                    :label="item.label"
+                    :value="item.label"
+                  ></el-option>
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="配置方式">
+              <template slot-scope="scope">
+                <el-select v-model="scope.row.attrConfigType" placeholder="请选择">
+                  <el-option
+                    v-for="item in getMethods"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value"
                   ></el-option>
-                </el-option-group>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="是否显示">
-            <template slot-scope="scope">
-              <el-switch v-model="scope.row.isShow" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
-            </template>
-          </el-table-column>
-          <el-table-column label="动作">
-            <template slot-scope="scope">
-              <el-input v-model="scope.row.actionType"></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" fixed="right">
-            <template slot-scope="scope">
-              <el-button type="danger" plain @click.prevent="removeAttribute(scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="数据源">
+              <template slot-scope="scope">
+                <el-select
+                  size="medium"
+                  v-model="scope.row.dataKey"
+                  v-if="scope.row.attrConfigType=='selectComm'"
+                >
+                  <el-option-group
+                    v-for="group in dataKeys"
+                    :key="group.label"
+                    :label="group.label"
+                  >
+                    <el-option
+                      v-for="item in group.options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-option-group>
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="是否显示">
+              <template slot-scope="scope">
+                <el-switch
+                  v-model="scope.row.isShow"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                ></el-switch>
+              </template>
+            </el-table-column>
+            <el-table-column label="动作">
+              <template slot-scope="scope">
+                <el-input v-model="scope.row.actionType"></el-input>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" fixed="right">
+              <template slot-scope="scope">
+                <el-button type="danger" plain @click.prevent="removeAttribute(scope.row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
         <el-row class="addtemplate_dialogbtn_14s text_align_right_14s">
           <el-button @click="isAddLable = false">取 消</el-button>
           <el-button type="primary" @click="AddLable()">确 定</el-button>
@@ -374,97 +388,111 @@
         <el-row>
           <el-button type="primary" plain @click="addAttribute">添加属性</el-button>
         </el-row>
-        <el-table :data="configureType.attrs" class="w100_14s" border>
-          <el-table-column label="属性名">
-            <template slot-scope="scope">
-              <!-- <el-input v-model="scope.row.attrName" placeholder="请输入属性名"></el-input> -->
-              <el-select v-model="scope.row.attrName" filterable allow-create placeholder="请选择映射名">
-                <el-option
-                  v-for="item in dictValues"
-                  :key="item.value"
-                  :label="item.value"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="是否映射">
-            <template slot-scope="scope">
-              <!-- <el-radio v-model="scope.row.attrMapping" label="true">Y</el-radio>
-              <el-radio v-model="scope.row.attrMapping" label="false">N</el-radio>-->
-              <el-switch
-                v-model="scope.row.attrMapping"
-                active-color="#13ce66"
-                inactive-color="#ff4949"
-              ></el-switch>
-            </template>
-          </el-table-column>
-          <el-table-column label="映射名">
-            <template slot-scope="scope">
-              <!-- <el-input v-if="scope.row.attrMapping" v-model="scope.row.attrMappingName"></el-input> -->
-              <el-select
-                v-if="scope.row.attrMapping"
-                v-model="scope.row.attrMappingName"
-                filterable
-                allow-create
-                placeholder="映射名"
-              >
-                <el-option
-                  v-for="item in dictValues"
-                  :key="item.label"
-                  :label="item.label"
-                  :value="item.label"
-                ></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="配置方式">
-            <template slot-scope="scope">
-              <el-select v-model="scope.row.attrConfigType" placeholder="请选择">
-                <el-option
-                  v-for="item in getMethods"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="数据源">
-            <template slot-scope="scope">
-              <el-select
-                size="medium"
-                v-model="scope.row.dataKey"
-                v-if="scope.row.attrConfigType=='selectComm'"
-              >
-                <el-option-group v-for="group in dataKeys" :key="group.label" :label="group.label">
+        <div class="libs_structlibs_configstruct_14s_25s_table">
+          <el-table :data="configureType.attrs" class="w100_14s" border>
+            <el-table-column label="属性名">
+              <template slot-scope="scope">
+                <!-- <el-input v-model="scope.row.attrName" placeholder="请输入属性名"></el-input> -->
+                <el-select
+                  v-model="scope.row.attrName"
+                  filterable
+                  allow-create
+                  placeholder="请选择映射名"
+                >
                   <el-option
-                    v-for="item in group.options"
+                    v-for="item in dictValues"
+                    :key="item.value"
+                    :label="item.value"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="是否映射">
+              <template slot-scope="scope">
+                <!-- <el-radio v-model="scope.row.attrMapping" label="true">Y</el-radio>
+                <el-radio v-model="scope.row.attrMapping" label="false">N</el-radio>-->
+                <el-switch
+                  v-model="scope.row.attrMapping"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                ></el-switch>
+              </template>
+            </el-table-column>
+            <el-table-column label="映射名">
+              <template slot-scope="scope">
+                <!-- <el-input v-if="scope.row.attrMapping" v-model="scope.row.attrMappingName"></el-input> -->
+                <el-select
+                  v-if="scope.row.attrMapping"
+                  v-model="scope.row.attrMappingName"
+                  filterable
+                  allow-create
+                  placeholder="映射名"
+                >
+                  <el-option
+                    v-for="item in dictValues"
+                    :key="item.label"
+                    :label="item.label"
+                    :value="item.label"
+                  ></el-option>
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="配置方式">
+              <template slot-scope="scope">
+                <el-select v-model="scope.row.attrConfigType" placeholder="请选择">
+                  <el-option
+                    v-for="item in getMethods"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value"
                   ></el-option>
-                </el-option-group>
-              </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column label="是否显示">
-            <template slot-scope="scope">
-              <el-switch v-model="scope.row.isShow" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
-            </template>
-          </el-table-column>
-          <el-table-column label="动作">
-            <template slot-scope="scope">
-              <el-input v-model="scope.row.actionType"></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" fixed="right">
-            <template slot-scope="scope">
-              <el-button type="danger" plain @click.prevent="removeAttribute(scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="数据源">
+              <template slot-scope="scope">
+                <el-select
+                  size="medium"
+                  v-model="scope.row.dataKey"
+                  v-if="scope.row.attrConfigType=='selectComm'"
+                >
+                  <el-option-group
+                    v-for="group in dataKeys"
+                    :key="group.label"
+                    :label="group.label"
+                  >
+                    <el-option
+                      v-for="item in group.options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-option-group>
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="是否显示">
+              <template slot-scope="scope">
+                <el-switch
+                  v-model="scope.row.isShow"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                ></el-switch>
+              </template>
+            </el-table-column>
+            <el-table-column label="动作">
+              <template slot-scope="scope">
+                <el-input v-model="scope.row.actionType"></el-input>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" fixed="right">
+              <template slot-scope="scope">
+                <el-button type="danger" plain @click.prevent="removeAttribute(scope.row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
         <el-row class="addtemplate_dialogbtn_14s text_align_right_14s">
           <el-button @click="isEidtLable = false">取 消</el-button>
           <el-button type="primary" @click="eidtLable()">确 定</el-button>
@@ -480,18 +508,20 @@
             <span>粘贴至</span>
           </el-col>
           <el-col :span="14">
-            <el-tree
-              class="filter-tree"
-              node-key="id"
-              highlight-current
-              :data="xmlEntityMaps"
-              :expand-on-click-node="false"
-              @node-click="getNodeData2"
-            >
-              <span class="custom-tree-node" slot-scope="{ node }">
-                <span>{{ node.data.lableMappingName }}</span>
-              </span>
-            </el-tree>
+            <div class="libs_structlibs_configstruct_14s_25s_table">
+              <el-tree
+                class="filter-tree"
+                node-key="id"
+                highlight-current
+                :data="xmlEntityMaps"
+                :expand-on-click-node="false"
+                @node-click="getNodeData2"
+              >
+                <span class="custom-tree-node" slot-scope="{ node }">
+                  <span>{{ node.data.lableMappingName }}</span>
+                </span>
+              </el-tree>
+            </div>
           </el-col>
           <el-col :span="3">
             <el-radio v-model="lablePosition" label="up">上</el-radio>
@@ -742,7 +772,8 @@ export default {
               } else if (attrs[i].dataKey == "dbtab_structlibs") {
               } else if (attrs[i].dataKey == "[]") {
                 this.selectDatas = [];
-              } else {//其他配置方式获取字典表数据
+              } else {
+                //其他配置方式获取字典表数据
                 getDictValue(attrs[i].dataKey).then(res => {
                   this.selectDatas = res.data.data;
                 });
@@ -794,7 +825,8 @@ export default {
     addAttribute() {
       //添加标签属性
       if (this.configureType.attrs == undefined) this.configureType.attrs = [];
-      this.configureType.attrs.push({//创建并添加属性的对象
+      this.configureType.attrs.push({
+        //创建并添加属性的对象
         attrName: "",
         attrMapping: false,
         attrMappingName: "",
@@ -837,7 +869,7 @@ export default {
 
         if (this.configureType.mappingKeys == undefined) {
           //如果字典中没有此映射数据,先把数据存入字典表,再请求到此id,存入mappingKeys上
-          var description = "";//为字典表中description字段创建数据
+          var description = ""; //为字典表中description字段创建数据
           if (this.template == "comp_param_type") {
             description = "构件建模";
           } else if (this.template == "hardware_param_type") {
@@ -853,7 +885,8 @@ export default {
           } else if (this.template == "other_param_type") {
             description = "其他模型";
           }
-          var SysDict = {//字典表对象
+          var SysDict = {
+            //字典表对象
             value: this.configureType.lableName,
             type: this.template,
             label: lableMappingName,
@@ -863,16 +896,17 @@ export default {
           await addDict(SysDict); //发送同步请求,存数据到字典表中
           await getDictValue(this.template).then(response => {
             //发送同步请求,查询字典表数据
-            this.dictValues = response.data.data;//刷新页面字典表数据
+            this.dictValues = response.data.data; //刷新页面字典表数据
           });
-          if (lableMapping) {//判断标签名是否映射
+          if (lableMapping) {
+            //判断标签名是否映射
             var dictValues = this.dictValues;
             for (let j of dictValues) {
               if (
                 this.configureType.lableName == j.value &&
                 lableMappingName == j.label
               ) {
-                Vue.set(this.configureType, "mappingKeys", j.id);//存储映射数据(字典表)的id
+                Vue.set(this.configureType, "mappingKeys", j.id); //存储映射数据(字典表)的id
                 break;
               }
             }
@@ -881,12 +915,13 @@ export default {
         this.addLableUtil(lableMappingName); //公共方法
       } else {
         lableMappingName = this.configureType.lableName;
-        this.addLableUtil(lableMappingName);//公共方法
+        this.addLableUtil(lableMappingName); //公共方法
       }
     },
 
     async addLableUtil(lableMappingName) {
-      var currentXmlMap = {//创建标签对象
+      var currentXmlMap = {
+        //创建标签对象
         lableName: this.configureType.lableName, //root标签
         lableMappingName: lableMappingName,
         textContent: "",
@@ -912,7 +947,7 @@ export default {
 
             if (i.attrKeys == undefined) {
               //字典表中没有映射数据,就先添加至字典表中
-              var description = "";//为字典表中description字段创建数据
+              var description = ""; //为字典表中description字段创建数据
               if (this.template == "comp_param_type") {
                 description = "构件建模";
               } else if (this.template == "hardware_param_type") {
@@ -928,7 +963,8 @@ export default {
               } else if (this.template == "other_param_type") {
                 description = "其他模型";
               }
-              var SysDict = {//字典表对象
+              var SysDict = {
+                //字典表对象
                 value: i.attrName,
                 type: this.template,
                 label: i.attrMappingName,
@@ -942,15 +978,16 @@ export default {
               });
             }
           } else {
-            Vue.set(i, "attrKeys", undefined);//属性不映射attrKeys为undefined
-            Vue.set(i, "attrMappingName", i.attrName);//属性不映射,属性名不做处理
+            Vue.set(i, "attrKeys", undefined); //属性不映射attrKeys为undefined
+            Vue.set(i, "attrMappingName", i.attrName); //属性不映射,属性名不做处理
           }
           Vue.set(currentXmlMap.attributeMap, i.attrName, ""); //遍历添加属性
         }
         if (attrs.length > 0) {
           await getDictValue(this.template).then(response => {
-            this.dictValues = response.data.data;//刷新页面上字典表数据
-            for (var i = 0; i < attrs.length; i++) {//对映射的属性名,字典表中又没有对应映射数据的数据,存入attrKeys字段上
+            this.dictValues = response.data.data; //刷新页面上字典表数据
+            for (var i = 0; i < attrs.length; i++) {
+              //对映射的属性名,字典表中又没有对应映射数据的数据,存入attrKeys字段上
               if (attrs[i].attrMapping) {
                 var dictValues = this.dictValues;
                 for (let j of dictValues) {
@@ -984,7 +1021,7 @@ export default {
         }
       }
 
-      var str = parseObjToStr(this.configureType);//把configureType对象转化为字符串
+      var str = parseObjToStr(this.configureType); //把configureType对象转化为字符串
 
       Vue.set(currentXmlMap.attributeMap, "configureType", str); //获取新增的属性
       if (this.lablePosition == "in") {

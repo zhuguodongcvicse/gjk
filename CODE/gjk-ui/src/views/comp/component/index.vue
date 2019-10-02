@@ -17,7 +17,6 @@
         @row-del="rowDel"
       >
         <template slot="menuLeft">
-          
           <el-button
             type="primary"
             icon="el-icon-edit"
@@ -36,20 +35,20 @@
             size="small"
             @click="templateData.templateVisible = true"
           >选择模板新增</el-button>
-            <!-- <el-button
+          <!-- <el-button
               type="primary"
               icon="el-icon-share"
               @click="outerVisible = true"
               size="small"
               v-if="permissions.comp_component_add"
-            >导 入</el-button>-->
-            <!-- <el-button
+          >导 入</el-button>-->
+          <!-- <el-button
               type="primary"
               icon="el-icon-share"
               @click="getStructTrees"
               size="small"
               v-if="permissions.comp_component_add"
-            >测 试</el-button>-->
+          >测 试</el-button>-->
           <!-- </el-button-group> -->
         </template>
         <template slot="tip">
@@ -58,6 +57,15 @@
         </template>
         <template slot-scope="scope" slot="menu">
           <el-button-group>
+            <!-- <el-tooltip class="item" effect="dark" content="复制" placement="top">
+              <el-button
+                type="primary"
+                v-if="permissions.comp_component_edit"
+                size="mini"
+                plain
+                @click="handleCopy(scope.row,scope.index)"
+              >复制</el-button>
+            </el-tooltip> -->
             <el-tooltip class="item" effect="dark" content="编辑" placement="top">
               <el-button
                 type="primary"
@@ -300,24 +308,28 @@ export default {
      *
      **/
     handleAdd: function() {
-      //this.$refs.crud.rowAdd();
-      // this.$router.push({ name: "测试文件" });
-      //  this.$router.push({path:'xxx',params:{aa:xx, bb: xx}});
       //加载结构体
       this.$store.dispatch("setStruceType").then(() => {
         this.$router.push({ path: "/comp/showComp/addComp" });
       });
     },
     handleEdit(row, index) {
-      //this.$router.push({path:'/comp/showComp/addComp',query:{compId:row.compId}});
-      //前台之间相互传值  将compId传到showComp.vue中   name为router  index.js中的name
-      //this.$router.push({ name: "构件建模文件", params: { compId: row.compId } });
-      console.log("row", row);
-      this.$router.push({
-        path: "/comp/showComp/addComp1",
-        query: { compId: row.id }
+      //加载中英文映射
+      this.$store.dispatch("setChineseMapping", "comp_param_type").then(() => {
+        this.$router.push({
+          path: "/comp/showComp/addComp1",
+          query: { compId: row.id, type: "edit" }
+        });
       });
-      // this.$refs.crud.rowEdit(row, index);
+    },
+    handleCopy(row, index) {
+      //加载中英文映射
+      this.$store.dispatch("setChineseMapping", "comp_param_type").then(() => {
+        this.$router.push({
+          path: "/comp/showComp/addComp1",
+          query: { compId: row.id, type: "copy" }
+        });
+      });
     },
     handleDel(row, index) {
       this.$refs.crud.rowDel(row, index);

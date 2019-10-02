@@ -76,7 +76,13 @@ import { mapGetters } from "vuex";
 import formItemType from "./form-item-type";
 import paramsTreeNode from "./params-tree-node";
 import showDialogParams from "./show-dialog-params";
-import { randomLenNum, randomUuid, deepClone, getObjType } from "@/util/util";
+import {
+  randomLenNum,
+  randomUuid,
+  deepClone,
+  getObjType,
+  getStrType
+} from "@/util/util";
 import { getStructTree, saveStructMap } from "@/api/libs/structlibs";
 import { Decipher } from "crypto";
 export default {
@@ -183,10 +189,12 @@ export default {
       handler: function(treeData) {
         let saveTreeData = [];
         this.analysisByBaseXmlOptionData(deepClone(treeData), saveTreeData);
-        console.log(
-          "params-tree.vue构件赋值将保存的数据。。。。。",
-          saveTreeData
-        );
+        saveTreeData.forEach(item => {
+          console.log(
+            "params-tree.vue构件赋值将保存的数据。。。。。",
+            item.attributeMap.name
+          );
+        });
         this.tableXmlParams.xmlEntityMaps = saveTreeData;
       },
       deep: true
@@ -255,7 +263,12 @@ export default {
       //给树赋值显示值
       node["id"] = randomUuid(); //new Number(randomLenNum(5, false));
       node["lableName"] = base.attributeMap.name;
-      node["assigParamName"] = base.attributeMap.name;
+      console.log(
+        "base.attributeMap.namebase.attributeMap.name",
+        base.attributeMap
+      );
+      node["assigParamName"] = "";
+      node["assigStructType"] = "";
       let xmlChild = base.xmlEntityMaps;
       xmlChild.forEach(child => {
         //处理合并子数据清空子数据
@@ -426,18 +439,21 @@ export default {
           );
           this.$set(struct, "structType", col.lableName);
           let separator = col.lableName.includes("*") ? "->" : ".";
+          // 设置树上的assigStructType assigParamName;
           if (this.$refs.tree !== undefined) {
-            this.$refs.tree.getCheckedNodes()[0].assigParamName =
-              this.$refs.tree.getCheckedNodes()[0].lableName + separator;
+            this.$refs.tree.getCurrentNode().assigStructType =
+              struct.structType;
+            this.$refs.tree.getCurrentNode().assigParamName = this.$refs.tree.getCurrentNode().lableName;
           }
         } else if (isokStrDb) {
           //设置structId  structType
           this.$set(struct, "structId", isokStrDb.value);
           this.$set(struct, "structType", isokStrDb.label);
-          let separator = col.lableName.includes("_*") ? "->" : ".";
+          // 设置树上的assigStructType assigParamName;
           if (this.$refs.tree !== undefined) {
-            this.$refs.tree.getCheckedNodes()[0].assigParamName =
-              this.$refs.tree.getCheckedNodes()[0].lableName + separator;
+            this.$refs.tree.getCurrentNode().assigStructType =
+              struct.structType;
+            this.$refs.tree.getCurrentNode().assigParamName = this.$refs.tree.getCurrentNode().lableName;
           }
         }
         for (let key in row) {
@@ -591,7 +607,8 @@ export default {
       treeData.push(this.analysisMapping(attr));
       node["id"] = randomUuid(); //new Number(randomLenNum(5, false));
       node["lableName"] = attr.attributeMap.name;
-      node["assigParamName"] = attr.attributeMap.structType;
+      node["assigParamName"] = "";
+      node["assigStructType"] = attr.attributeMap.structType;
       attr.xmlEntityMaps.forEach(xml => {
         if (xml.lableName === this.bllxParam) {
           xml.attributeMap.name = nodeData.fparamType;
@@ -628,9 +645,15 @@ export default {
       isok = "shStruct";
       //去头文件中找结构体
       if (isok === "shStruct") {
-        struct = this.headerFile.structParams[id.replace("*", "")];
-        if (!struct) {
-          isok = "dbStruct";
+        let tmpStruct = this.headerFile.structParams[
+          deepClone(id).replace("*", "")
+        ];
+        struct = deepClone(tmpStruct);
+        if (tmpStruct) {
+          if (id.includes("*")) {
+            struct.dbId = tmpStruct.dbId + "_*";
+            struct.fparamType = tmpStruct.fparamType + "*";
+          }
           //s设置回显结构体
           let isokStrD = this.strInPointer.find(item => {
             return item.label === id;
@@ -639,6 +662,8 @@ export default {
           if (isokStrD) {
             id = isokStrD.value;
           }
+        } else {
+          isok = "dbStruct";
         }
       }
       if (isok === "dbStruct") {
@@ -672,6 +697,9 @@ export default {
           typeParam.numIndex
         );
         // //设置当前选中节点的子节点
+        this.$refs.tree.getCurrentNode().assigParamName = this.$refs.tree.getCurrentNode().lableName;
+        this.$refs.tree.getCurrentNode().assigStructType =
+          typeParam.struct.fparamType;
         if (!this.$refs.tree.getCurrentNode().children) {
           this.$set(this.$refs.tree.getCurrentNode(), "children", []);
         }
@@ -689,6 +717,10 @@ export default {
             nodes.children,
             typeParam.numIndex
           );
+          this.$refs.tree.getCurrentNode().assigParamName = this.$refs.tree.getCurrentNode().lableName;
+          this.$refs.tree.getCurrentNode().assigStructType =
+            typeParam.struct.fparamType;
+
           //设置当前选中节点的子节点
           if (!this.$refs.tree.getCurrentNode().children) {
             this.$set(this.$refs.tree.getCurrentNode(), "children", []);
@@ -753,7 +785,8 @@ export default {
           //给树赋值显示值
           node["id"] = randomUuid(); //new Number(randomLenNum(5, false));
           node["lableName"] = xml.attributeMap.name;
-          node["assigParamName"] = xml.attributeMap.name;
+          node["assigParamName"] = "";
+          node["assigStructType"] = xml.attributeMap.structType;
           let xmlChild = xml.xmlEntityMaps;
           tmpTabOptionData = xml; //添加基础配置
 
@@ -803,6 +836,7 @@ export default {
         let dataTree = [];
         //处理返回树形结构,此处没有问题
         this.convertXmlToRootXml(treeDataAll, dataTree);
+        console.log("1234567890-0987654321", dataTree);
         this.treeData = dataTree;
         if (this.treeData !== undefined && this.treeData.length > 0) {
           // 当前表单
@@ -851,7 +885,6 @@ export default {
     //递归返回树形数据
     handleDialogParam(params, retArray, parentKey) {
       ///预处理部分参数
-      // this.analysisXmlDataParam(params);
       let varName = new String(params.lableName).replace(/\-\>/gi, ".");
       let key = varName.substring(0, varName.indexOf("."));
       let endKey = varName.substring(varName.indexOf(".") + 1);
@@ -861,6 +894,7 @@ export default {
         });
         let child = deepClone(params);
         child.assigParamName = parentKey === "" ? params.lableName : parentKey;
+        console.log("endKey*************************************endKey",endKey,key)
         child.lableName = endKey;
         //处理树上所带参数
         child.nodeData.forEach(nodes => {
@@ -873,17 +907,40 @@ export default {
         if (arr === undefined) {
           let parent = deepClone(params);
           //确保树上显示的和框中显示的一致
-          parent.lableName = parent.nodeData[0][0].lableName = key;
-          parent.assigParamName = parentKey;
-          // parent.nodeData[0][1].lableName = ;
-          // parent.nodeData[0][2].lableName = ;
-          this.$set(parent, "children", [child]);
+          parent.id = randomUuid();
+          parent.assigParamName = key;
+          let parentArr = parent.nodeData;
+          for (let key1 in parentArr) {
+            for (let key2 in parentArr[key1]) {
+              //设置名字"名称"
+              if (parentArr[key1][key2].attrMappingName === this.nameParam) {
+                console.log("parent.lableName = parentArr[key1][key2].lableName",parent.lableName , parentArr[key1][key2].lableName)
+                parent.lableName = parentArr[key1][key2].lableName = key;
+              } else if (
+                parentArr[key1][key2].attrMappingName === this.bllxParam
+              ) {
+                parentArr[key1][key2].lableName = parent.assigStructType;
+              } else if (
+                parentArr[key1][key2].attrMappingName === this.bllxParam
+              ) {
+                parentArr[key1][key2].lableName = parent.assigStructType;
+              } else if (parentArr[key1][key2].attrMappingName === "序号") {
+              } else if (
+                parentArr[key1][key2].attrMappingName === this.lbParam
+              ) {
+                parentArr[key1][key2].lableName = "STRUCTTYPE";
+              } else {
+                parentArr[key1][key2].lableName = "";
+              }
+            }
+          }
+          this.$set(parent, "children", [deepClone(child)]);
           retArray.push(parent);
         } else {
           if (endKey.includes(".")) {
-            this.handleDialogParam(child, arr.children, params.lableName);
+            this.handleDialogParam(deepClone(child), arr.children, key);
           } else {
-            arr.children.push(child);
+            arr.children.push(deepClone(child));
           }
         }
       } else {
@@ -931,27 +988,51 @@ export default {
         let baseData = deepClone(this.baseXmlOptionData);
         let saveRow = deepClone(this.baseXmlOptionData);
         if (tree.hasOwnProperty("children") && tree.children.length > 0) {
-          console.log("params-tree.vue中， 处理有children。。。。。", tree);
           //用于处理多个层级的时候处理
           if (parentTree) {
-            let separator = tree.assigParamName.includes("_*") ? "->" : ".";
+            let strType = getStrType(parentTree.assigStructType);
+            console.log(
+              "用于处理多个层级的时候处理用于处理多个层级的时候处理",
+              parentTree,
+              tree
+            );
+            if (!strType.isType) {
+              //是指针
+              if (strType.isPoint) {
+                tree.assigParamName =
+                  parentTree.assigParamName + tree.assigParamName + "->";
+              } else {
+                tree.assigParamName =
+                  parentTree.assigParamName + tree.assigParamName + ".";
+              }
+            }
             // 给结构体赋值 structId structName
-            tree.assigParamName =
-              parentTree.assigParamName + tree.lableName + separator;
-              console.log("测试01测试01测试01测试01",tree.assigParamName)
+            // tree.assigParamName =
+            //   parentTree.assigParamName + tree.assigParamName;
             tree.nodeData[0][1].lableName = parentTree.nodeData[0][1].lableName;
             tree.nodeData[0][2].lableName = parentTree.nodeData[0][2].lableName;
           } else {
-            // let tmpName = tree.children[0].assigParamName;
-            // let saveName = "";
-            // if (tmpName.includes("->")) {
-            //   // saveName = tmpName.substr(0, tmpName.indexOf("->")).concat("->");
-            // } else {
-            //   // saveName = tmpName.substr(0, tmpName.indexOf(".")).concat(".");
-            // }
-            // tree.assigParamName = saveName;
+            //处理第一层有children的赋值类型
+            let tmpName = String(tree.children[0].assigParamName)
+              .replace("->", ".")
+              .split(".")[0];
+            let assigStructType = getStrType(tree.assigStructType);
+            if (!assigStructType.isType) {
+              //是指针
+              if (assigStructType.isPoint) {
+                tree.assigParamName =
+                  tmpName === "" ? tree.lableName + "->" : tmpName + "->";
+              } else {
+                tree.assigParamName =
+                  tmpName === "" ? tree.lableName + "." : tmpName + ".";
+              }
+            }
           }
-          console.log("0000000000000000000000000000000000000000000000000",tree.assigParamName)
+          console.log(
+            "1234=-tmpNametmpNametmpNametmpNametmpNametmpNametmpName",
+            tree,
+            tree.lableName
+          );
           //递归调用
           this.analysisByBaseXmlOptionData(tree.children, saveTreeData, tree);
         } else {
@@ -960,8 +1041,8 @@ export default {
             // 给结构体赋值 structId structName
             tree.nodeData[0][0].lableName =
               parentTree.assigParamName + tree.lableName;
-            tree.nodeData[0][1].lableName = parentTree.nodeData[0][1].lableName;
-            tree.nodeData[0][2].lableName = parentTree.nodeData[0][2].lableName;
+            tree.nodeData[0][1].lableName = parentTree.assigParamName;
+            tree.nodeData[0][2].lableName = parentTree.assigStructType;
           } else {
             tree.nodeData[0][0].lableName = tree.lableName;
           }

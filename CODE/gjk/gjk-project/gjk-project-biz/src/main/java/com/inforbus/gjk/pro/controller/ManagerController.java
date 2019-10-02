@@ -137,6 +137,15 @@ public class ManagerController {
 	@PutMapping
 	@RequestMapping("/createXmlFile/{proDetailId}")
 	public R createXmlFile(@RequestBody XmlEntity entity, @PathVariable("proDetailId") String proDetailId) {
+		ProjectFile processFile=	managerService.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, proDetailId));
+		ProjectFile modelFile= managerService.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, processFile.getParentId()));
+		ProjectFile flowFile= managerService.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, modelFile.getParentId()));
+
+		String filePath = gitDetailPath + flowFile.getFilePath()+flowFile.getFileName()+"/softToHardResult";
+		File file = new File(filePath);
+		if (!file.exists()) {
+			file.mkdirs();
+		}
 		return new R<>(managerService.createXmlFile(entity, proDetailId));
 	}
 
@@ -813,7 +822,6 @@ public class ManagerController {
 		//		processFile.getFilePath()
 		String tmpGenerateCodeResult=gitDetailPath+processFile.getFilePath()+processFile.getFileName()+File.separator+generateCodeResult;
 		//		String tmpSoftToHardResult=gitDetailPath+processFile.getFilePath()+softToHardResult;
-
 		String generatecode = JGitUtil.getGeneratecode();//"D:\\14S_GJK_GIT\\gjk\\gjk\\generateCodeExe\\generatecode.exe";
 		String userName = 	username;
 		String workModeId = projectId;
@@ -822,6 +830,12 @@ public class ManagerController {
 		String userDefineTopicFilePath = managerService.getUserDefineTopicFilePath(projectId);
 		String cmpIntgCodeFilePath = tmpGenerateCodeResult;
 
+		String filePath = gitDetailPath + processFile.getFilePath()+processFile.getFileName()+"/generateCodeResult";
+				File file = new File(filePath);
+				if (!file.exists()) {
+					file.mkdirs();
+				}
+		
 		String[] strArray = new String[] {
 				generatecode,
 				userName,
