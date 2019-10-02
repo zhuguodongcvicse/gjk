@@ -34,6 +34,7 @@ const getters = {
   netWorkData : state => state.CustomConfiguration.netWorkData,
   netWorkOut : state => state.CustomConfiguration.netWorkOut,
   partList : state => state.CustomConfiguration.partList,
+  xmlDataMap : state => state.CustomConfiguration.xmlDataMap,
   tmpStructLength: state => state.struct.tmpStructLength,
   textLog : state => state.textEdits.textLog,
   consoleLog : state => state.gjkConsole.consoleLog,  

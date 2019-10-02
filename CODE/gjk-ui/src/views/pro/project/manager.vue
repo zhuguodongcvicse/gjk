@@ -360,8 +360,9 @@ export default {
         if (node.type == "16") {
           analysisThemeXML(node.id).then(val => {
             console.log("解析XML数据", val.data.data);
+            var xmlData = {params:val.data.data,id:node.id}
             this.$store
-              .dispatch("AnalysisXML", val.data.data)
+              .dispatch("AnalysisXML", xmlData)
               .then(() => {
                 this.$router.push({
                   path: "/comp/manager/customConfiguration",

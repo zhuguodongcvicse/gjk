@@ -256,21 +256,21 @@ function setEnterPoint(id, gj) {
 			var x = $("#" + endpointId).offset().left;
 			// var mouse = mousePosition();
 			$('.point').css("position", "absolute");
-			$('.point').css("left", x - 300);
+			$('.point').css("left", x - 310);
 			$('.point').css("top", y);
 		});
-		inPoint.bind('mouseout', function (endpoint, originalEvent) {
-			$('.point').remove();
-		});
+		// inPoint.bind('mouseout', function (endpoint, originalEvent) {
+		// 	$('.point').remove();
+		// });
 		differenceValue += anchorNumber;
 	}
 }
 //鼠标悬浮锚点显示div
 function addDiv(endpoint) {
-	console.log("端点信息", endpoint)
+	//console.log("端点信息", endpoint)
 	var templateid = endpoint.elementId;
 	var templateUuid = endpoint.getUuid();
-	console.log(templateUuid);
+	//console.log(templateUuid);
 	//console.log(templateUuid);
 	var str = templateUuid.split('*');
 	var tempUuid = str[0];
@@ -279,7 +279,7 @@ function addDiv(endpoint) {
 	// console.log(tempUuid);
 	// console.log(temp);
 	var b = $('#' + templateid + '-heading')[0].dataset.id;
-	console.log("下标", b)
+	//console.log("下标", b)
 	var str = '';
 	if (temp != 'input') {
 		str = hoverDiv(dat[b].outputList[tempUuid]);
@@ -290,7 +290,7 @@ function addDiv(endpoint) {
 		// 	"<p>结构体：" + dat[b].outputList[tempUuid].variableStructType + "</p>" +
 		// 	"</div>";
 	} else {
-		console.log("端点显示数据", dat[b].inputList);
+		//console.log("端点显示数据", dat[b].inputList);
 		str = hoverDiv(dat[b].inputList[tempUuid])
 		// str += "<div class = 'point'>" +
 		// 	"<h6>参数名称：" + dat[b].inputList[tempUuid].variableName + "</h6>" +
@@ -300,19 +300,40 @@ function addDiv(endpoint) {
 		// 	"</div>";
 	}
 	$('#drop-bg').append(str);
+	$(".point").bind('click',function(event){
+	//	console.log("+++++++++++++++",event)
+		event.stopPropagation();
+		$('.point').remove();
+	})
+	$(".point").bind('mousedown', function (event) {
+		mousedownState = 1;
+		return false
+	})
+
 }
+// function out(e){
+// 	console.log("+++++++++++",event)
+// 	//event.stopPropagation();
+// 	//alert(111)
+// 	e.remove();
+// }
+function come(event){
+	event.stopPropagation();
+	alert(222)
+}
+
 function hoverDiv(inPointData) {
-	console.log("端点数据", inPointData)
+	//console.log("端点数据", inPointData)
 	var str = '';
 	if (inPointData.variableStructType != '') {
-		str += "<div class = 'point' style='background:#F0E6BD'>" +
+		str += "<div class = 'point'  οnmοuseοver='come()' style='background:#F0E6BD'>" +
 			"<p>参数名称：" + inPointData.variableName + "</p>" +
 			"<p>参数类型：" + inPointData.dataTypeName + "</p>" +
 			"<p>参数长度：" + inPointData.lengthName + "</p>" +
 			"<p>结构体：" + inPointData.variableStructType + "</p>" +
 			"</div>";
 	} else {
-		str += "<div class = 'point' style='background:#F0E6BD	'>" +
+		str += "<div class = 'point'  οnmοuseοver='come()' style='background:#F0E6BD'>" +
 			"<p>参数名称：" + inPointData.variableName + "</p>" +
 			"<p>参数类型：" + inPointData.dataTypeName + "</p>" +
 			"<p>参数长度：" + inPointData.lengthName + "</p>" +
@@ -346,13 +367,13 @@ function setExitPoint(id, gj) {
 			var y = $("#" + endpointId).offset().top;
 			var x = $("#" + endpointId).offset().left;
 			$('.point').css("position", "absolute");
-			$('.point').css("left", x);
+			$('.point').css("left", x-15);
 			$('.point').css("top", y);
 		});
 		//端点绑定鼠标移出事件
-		outPoint.bind('mouseout', function (endpoint, originalEvent) {
-			$('.point').remove();
-		});
+		// outPoint.bind('mouseout', function (endpoint, originalEvent) {
+		// 	$('.point').remove();
+		// });
 		outPoint.bind('mousedown', function (endpoint, originalEvent) {
 			mousedownState = 1;
 		});
@@ -361,6 +382,8 @@ function setExitPoint(id, gj) {
 	}
 
 }
+
+
 
 // 渲染html
 function renderHtml(type, position) {
@@ -505,11 +528,21 @@ function checkDat() {
 	$('.row').mousemove(function (e) {
 		if (flag) {
 			let f = $(".div_left").width();
-			$(".border").css("left", e.clientX - iX + "px")
-			$(".div_left").css("right", dw - (e.clientX - BR) + "px")
-			//根据鼠标事件相对位置计算出div的position
-			$(".div_right").css("left", (e.clientX - BR) + "px")
+			console.log("1111",e.clientX - iX)
+			console.log("222",dw - (e.clientX - BR))
+			console.log("3333",(e.clientX - BR))
+			if(e.clientX - iX > 130){
+				$(".border").css("left", e.clientX - iX + "px")
+				$(".div_left").css("right", dw - (e.clientX - BR) + "px")
+				$(".div_right").css("left", (e.clientX - BR) + "px")	
+			}else{
+				$(".border").css("left", 11 + "%")
+				$(".div_left").css("right", 88 +"%")
+				$(".div_right").css("left", 12 + "%")
+			}
 			$(".div_right").css("width", ($(".div_right").width()+(e.clientX - BR))-60 + "px")
+			//根据鼠标事件相对位置计算出div的position
+			
 			return false;
 		}
 	})
@@ -887,6 +920,15 @@ function addPointDiv(proPream) {
 			"</div>";
 	}
 	$('#drop-bg').append(str);
+	$(".point").bind('click',function(event){
+		//	console.log("+++++++++++++++",event)
+			event.stopPropagation();
+			$('.point').remove();
+	})
+	$(".point").bind('mousedown', function (event) {
+		mousedownState = 1;
+		return false
+	})
 }
 
 
@@ -942,7 +984,7 @@ function updatePoint(proPream) {
 				var y = $("#" + endpointId).offset().top;
 				var x = $("#" + endpointId).offset().left;
 				$('.point').css("position", "absolute");
-				$('.point').css("left", x - 380);
+				$('.point').css("left", x - 310);
 				$('.point').css("top", y);
 				//$('.point').css("border", "1px solid red");
 			});
@@ -976,7 +1018,7 @@ function updatePoint(proPream) {
 				var y = $("#" + endpointId).offset().top;
 				var x = $("#" + endpointId).offset().left;
 				$('.point').css("position", "absolute");
-				$('.point').css("left", x - 80);
+				$('.point').css("left", x - 15);
 				$('.point').css("top", y);
 			});
 			addOutPoint.bind('mouseout', function () {
@@ -1921,7 +1963,7 @@ function pasteJson(pasteDataJson) {
 					var y = $("#" + endpointId).offset().top;
 					var x = $("#" + endpointId).offset().left;
 					$('.point').css("position", "absolute");
-					$('.point').css("left", x - 380);
+					$('.point').css("left", x - 310);
 					$('.point').css("top", y);
 				});
 				inPoint.bind('mouseout', function (endpoint, originalEvent) {
@@ -1941,7 +1983,7 @@ function pasteJson(pasteDataJson) {
 					var y = $("#" + endpointId).offset().top;
 					var x = $("#" + endpointId).offset().left;
 					$('.point').css("position", "absolute");
-					$('.point').css("left", x - 80);
+					$('.point').css("left", x - 15);
 					$('.point').css("top", y);
 				});
 				outPoint.bind('mouseout', function (endpoint, originalEvent) {
@@ -2212,6 +2254,15 @@ function addTemDiv(endpoint, PointsData) {
 			"</div>";
 	}
 	$('#drop-bg').append(str);
+	$(".point").bind('click',function(event){
+	//	console.log("+++++++++++++++",event)
+		event.stopPropagation();
+		$('.point').remove();
+	})
+	$(".point").bind('mousedown', function (event) {
+		mousedownState = 1;
+		return false
+	})
 }
 // function addTemplate(){
 
@@ -2369,7 +2420,7 @@ function loadJson(loadJson) {
 						var y = $("#" + endpointId).offset().top;
 						var x = $("#" + endpointId).offset().left;
 						$('.point').css("position", "absolute");
-						$('.point').css("left", x - 380);
+						$('.point').css("left", x - 310);
 						$('.point').css("top", y);
 					});
 					inPoint.bind('mouseout', function (endpoint, originalEvent) {
@@ -2405,7 +2456,7 @@ function loadJson(loadJson) {
 						var y = $("#" + endpointId).offset().top;
 						var x = $("#" + endpointId).offset().left;
 						$('.point').css("position", "absolute");
-						$('.point').css("left", x - 80);
+						$('.point').css("left", x - 15);
 						$('.point').css("top", y);
 					});
 					outPoint.bind('mouseout', function (endpoint, originalEvent) {
@@ -2601,52 +2652,52 @@ $('.div_right').bind({
 });
 
 //画布初始比例
-var scale = 1
-$(".div_right").bind('mousewheel DOMMouseScroll', function (event) { //on也可以 bind监听
-	var wheel = event.originalEvent.wheelDelta;
-	var detal = event.originalEvent.detail;
-	if (event.originalEvent.wheelDelta && event.ctrlKey == true) { //判断浏览器IE,谷歌滚轮事件        
-		//禁止页面触发比例缩放
-		event.preventDefault()
-		if (wheel > 0) { //当滑轮向上滚动时 
-			if (scale < 1.6) {
-				scale = scale + 0.2
-				$(".div_right").css({
-					"-webkit-transform": `scale(${scale})`,
-					"-moz-transform": `scale(${scale})`,
-					"-ms-transform": `scale(${scale})`,
-					"-o-transform": `scale(${scale})`,
-					"transform": `scale(${scale})`
-				})
-				jsPlumb.setSuspendDrawing(false, true)
-			}
+// var scale = 1
+// $(".div_right").bind('mousewheel DOMMouseScroll', function (event) { //on也可以 bind监听
+// 	var wheel = event.originalEvent.wheelDelta;
+// 	var detal = event.originalEvent.detail;
+// 	if (event.originalEvent.wheelDelta && event.ctrlKey == true) { //判断浏览器IE,谷歌滚轮事件        
+// 		//禁止页面触发比例缩放
+// 		event.preventDefault()
+// 		if (wheel > 0) { //当滑轮向上滚动时 
+// 			if (scale < 1.6) {
+// 				scale = scale + 0.2
+// 				$(".div_right").css({
+// 					"-webkit-transform": `scale(${scale})`,
+// 					"-moz-transform": `scale(${scale})`,
+// 					"-ms-transform": `scale(${scale})`,
+// 					"-o-transform": `scale(${scale})`,
+// 					"transform": `scale(${scale})`
+// 				})
+// 				jsPlumb.setSuspendDrawing(false, true)
+// 			}
 
-		}
-		if (wheel < 0) { //当滑轮向下滚动时  
-			console.log(wheel)
-			if(scale>0.6){
-				scale = scale - 0.2
-				$(".div_right").css({
-					"-webkit-transform": `scale(${scale})`,
-					"-moz-transform": `scale(${scale})`,
-					"-ms-transform": `scale(${scale})`,
-					"-o-transform": `scale(${scale})`,
-					"transform": `scale(${scale})`
-				})
-				jsPlumb.setSuspendDrawing(false, true)
-			}	
-		}
-	} else if (event.originalEvent.detail) {  //Firefox滚轮事件  
-		if (detal > 0) { //当滑轮向下滚动时  
+// 		}
+// 		if (wheel < 0) { //当滑轮向下滚动时  
+// 			console.log(wheel)
+// 			if(scale>0.6){
+// 				scale = scale - 0.2
+// 				$(".div_right").css({
+// 					"-webkit-transform": `scale(${scale})`,
+// 					"-moz-transform": `scale(${scale})`,
+// 					"-ms-transform": `scale(${scale})`,
+// 					"-o-transform": `scale(${scale})`,
+// 					"transform": `scale(${scale})`
+// 				})
+// 				jsPlumb.setSuspendDrawing(false, true)
+// 			}	
+// 		}
+// 	} else if (event.originalEvent.detail) {  //Firefox滚轮事件  
+// 		if (detal > 0) { //当滑轮向下滚动时  
 
-		}
-		if (detal < 0) { //当滑轮向上滚动时  
+// 		}
+// 		if (detal < 0) { //当滑轮向上滚动时  
 
-		}
+// 		}
 
-	}
+// 	}
 
-});
+// });
 
 // $("#mySelect").bind("change",function(){
 // 	var id = ""

@@ -43,8 +43,7 @@ const navs = {
 
       if (state.tagList.some(ele => diff(ele, action))) return
       for (const i in state.tagList) {
-        if (state.tagList[i].label == action.label) {
-          // console.log("***")
+        if (state.tagList[i].query.modelId != null && state.tagList[i].query.modelId == action.query.modelId) {
           return
         }
       }
