@@ -111,6 +111,7 @@ export default {
       if (action === "remove") {
         let { tag, key } = this.findTag(value);
         // console.log("tag+++", tag, key);
+        console.log("tag", tag);
         this.$store.commit("DEL_TAG", tag);
         if (tag.value === this.tag.value) {
           tag = this.tagList[key === 0 ? key : key - 1]; //如果关闭本标签让前推一个
