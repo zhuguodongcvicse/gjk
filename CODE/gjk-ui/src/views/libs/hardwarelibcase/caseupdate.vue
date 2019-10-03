@@ -38,7 +38,7 @@ import { saveProcessModel } from "@/api/pro/project";
 
 export default {
   name: "AvueIframe",
-  /* beforeRouteLeave(to, from, next) {
+  beforeRouteLeave(to, from, next) {
     // console.log("to", to);
     // console.log("from", from);
     // console.log("next", next);
@@ -47,10 +47,10 @@ export default {
       next();
     } else {
       this.params = "";
-      alert("已离开当前页面,数据清除")
+      // alert("已离开当前页面,数据清除")
       next();
     }
-  }, */
+  },
   data() {
     return {
       formObj: '',

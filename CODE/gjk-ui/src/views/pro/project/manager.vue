@@ -19,7 +19,7 @@
         alt="收缩"
         @click="imgToClick"
         v-bind:style="{cursor:'pointer','vertical-align':'middle','position': 'absolute','top': '50%','left': '50%','transform': 'translate(-50%, -50%)'}"
-      />
+      >
     </div>
     <!--右边主体-->
     <div class="mb_main" v-bind:style="rightClass">
@@ -79,6 +79,7 @@ import { mapGetters, mapState } from "vuex";
 import projectTree from "./project-tree";
 import iframes from "@/components/iframe";
 import { analysisThemeXML, fetchTwoNode } from "@/api/pro/manager";
+
 import { getPath } from "@/api/compile/devenv";
 export default {
   //import引入的组件需要注入到对象中才能使用
@@ -89,7 +90,7 @@ export default {
   data() {
     //这里存放数据
     return {
-      hardwarelibNode: '',
+      hardwarelibNode: "",
       existHardwarelib: "",
       dialogVisible: false,
       dialogVisible2: false,
@@ -166,7 +167,7 @@ export default {
   methods: {
     //查找是否添加了硬件建模
     hardwarelibIfExist(node) {
-      this.hardwarelibNode = node
+      this.hardwarelibNode = node;
       this.hardwarelibs.id = node.id;
       getHardwarelibs(node.id).then(response => {
         // console.log("response.data", response.data);
@@ -182,8 +183,8 @@ export default {
     },
     confirmAddHardwarelibs(node) {
       // console.log("this.hardwarelibs",this.hardwarelibs)
-      let hardwarelibs = this.hardwarelibs
-      let hardwarelibModelId = node.parentId
+      let hardwarelibs = this.hardwarelibs;
+      let hardwarelibModelId = node.parentId;
       this.$router.replace({
         path: "/comp/manager/hardwareAdd",
         query: {
@@ -195,8 +196,8 @@ export default {
       // this.closeRouterTag()
     },
     confirmUpdateHardwarelibs() {
-      let existHardwarelib = this.existHardwarelib
-      let hardwarelibModelId = this.hardwarelibNode.parentId
+      let existHardwarelib = this.existHardwarelib;
+      let hardwarelibModelId = this.hardwarelibNode.parentId;
       this.$router.push({
         path: "/comp/manager/hardwareUpdate",
         query: {
@@ -298,21 +299,22 @@ export default {
     handleChangeProject(project) {
       this.loadProject(project.id);
     },
-    handleNodeClick(node) {
-      // console.log("shshshshsh", node);
+    handleNodeClick(node, nodeRoot) {
+      // console.log("node", node);
       let id = node.id;
       if (node.parentType == "11") {
         fetchTwoNode(node, 2).then(res => {
           //流程节点
           let process = res.data.data;
+          // console.log("node", node, nodeRoot);
           if (node.type == "11") {
             this.$router.push({
               path: "/comp/manager/process",
-              // name: "process",
               query: {
                 proId: process.parentId,
                 processId: node.id,
-                modelId: node.parentId
+                modelId: node.parentId,
+                proFloName: nodeRoot.fileName + '_' + res.data.data.fileName + '_' + node.label
               }
             });
           }

@@ -52,16 +52,16 @@ import { saveProcessModel } from "@/api/pro/project";
 
 export default {
   name: "AvueIframe",
-  /* beforeRouteLeave(to, from, next) {
+  beforeRouteLeave(to, from, next) {
     if (this.ifSave == 0) {
       this.params = "";
       next();
     } else {
       this.params = "";
-      alert("已离开当前页面,数据清除")
+      // alert("已离开当前页面,数据清除")
       next();
     }
-  }, */
+  },
   data() {
     return {
       ifSave: 1,

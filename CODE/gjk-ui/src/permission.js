@@ -43,8 +43,9 @@ router.beforeEach((to, from, next) => {
           })
         })
       } else {
+        // console.log("to",to)
         const value = to.query.src || to.fullPath
-        const label = to.query.name || to.meta.title || to.name
+        const label = to.query.proFloName || to.query.name || to.meta.title || to.name
         if (meta.isTab !== false && !validatenull(value) && !validatenull(label)) {
           store.commit('ADD_TAG', {
             label: label,

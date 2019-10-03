@@ -2,6 +2,7 @@
 import Layout from '@/page/index/'
 import projectMain from '@/views/pro/project/manager'
 import compMain from '@/views/comp/component/showComp'
+let meta = { auth: true }
 export default [{
     path: '/wel',
     component: Layout,
@@ -51,7 +52,7 @@ export default [{
             name: '测试添加',
             component: () => import('@/views/comp/code-editor/comp-params'),
             meta: {
-                keepAlive: true ,// 需要被缓存src\views\comp\code-editor\comp-params
+                keepAlive: true,// 需要被缓存src\views\comp\code-editor\comp-params
             }
         }]
     },
@@ -59,7 +60,8 @@ export default [{
         path: '/comp/manager',
         component: projectMain,
         redirect: '/comp/manager',
-        children: [{
+        meta,
+        children: (pro => [{
             path: 'showproject',
             name: '项目信息',
             component: () => import('@/views/pro/project/showproject')
@@ -68,7 +70,7 @@ export default [{
             name: 'process',
             component: () => import('@/views/pro/jsplumb/index'),
             meta: {
-                // $keepAlive: true,
+                // title1: `${pro}`,
                 title: '流程模型'
             }
         }, {
@@ -104,28 +106,28 @@ export default [{
             name: 'hardware',
             component: () =>
                 import('@/views/pro/hardware/index'),
-                meta: {
-                    // $keepAlive: true,
-                    title: '硬件建模'
-                }
+            meta: {
+                // $keepAlive: true,
+                title: '硬件建模'
+            }
         }, {
             path: 'hardwareUpdate',
             name: 'hardwareUpdate',
             component: () =>
                 import('@/views/pro/hardware/update'),
-                meta: {
-                    // $keepAlive: true,
-                    title: '硬件模型编辑'
-                }
+            meta: {
+                // $keepAlive: true,
+                title: '硬件模型编辑'
+            }
         }, {
             path: 'hardwareAdd',
             name: 'hardwareAdd',
             component: () =>
                 import('@/views/pro/hardware/add'),
-                meta: {
-                    // $keepAlive: true,
-                    title: '硬件模型新增'
-                }
+            meta: {
+                // $keepAlive: true,
+                title: '硬件模型新增'
+            }
         }, {
             path: 'customConfiguration',
             name: '自定义配置',
@@ -136,15 +138,12 @@ export default [{
             name: 'deployment',
             component: () =>
                 import('@/views/pro/deployment/index'),
-                meta: {
-                    // $keepAlive: true,
-                    title: '部署图'
-                }
+            meta: {
+                // $keepAlive: true,
+                title: '部署图'
+            }
         },
-
-       
-        
-    ]
+        ])('00000')
     }]
 
 }, {
@@ -166,21 +165,21 @@ export default [{
         name: 'chipdesign',
         component: () =>
             import( /* webpackChunkName: "page" */ '@/views/libs/hardwarelibchip/chipdesign'),
-            meta: {
-                // $keepAlive: true,
-                title: '芯片新增'
-            }
-    },{
+        meta: {
+            // $keepAlive: true,
+            title: '芯片新增'
+        }
+    }, {
         path: 'chipupdate',
         name: 'chipupdate',
         component: () =>
             import( /* webpackChunkName: "page" */ '@/views/libs/hardwarelibchip/chipupdate'),
-            meta: {
-                // $keepAlive: true,
-                title: '芯片编辑',
-                chipDataTemp: ''
-            },
-    },{
+        meta: {
+            // $keepAlive: true,
+            title: '芯片编辑',
+            chipDataTemp: ''
+        },
+    }, {
         path: 'chipList',
         name: '芯片列表',
         component: () =>
@@ -195,19 +194,19 @@ export default [{
         name: 'boarddesign',
         component: () =>
             import( /* webpackChunkName: "page" */ '@/views/libs/hardwarelibboard/boarddesign'),
-            meta: {
-                // $keepAlive: true,
-                title: '板卡新增'
-            }
-    },{
+        meta: {
+            // $keepAlive: true,
+            title: '板卡新增'
+        }
+    }, {
         path: 'boardupdate',
         name: 'boardupdate',
         component: () =>
             import( /* webpackChunkName: "page" */ '@/views/libs/hardwarelibboard/boardupdate'),
-            meta: {
-                // $keepAlive: true,
-                title: '板卡编辑'
-            }
+        meta: {
+            // $keepAlive: true,
+            title: '板卡编辑'
+        }
     }]
 }, {
     path: '/libs/hardwarelibcase',
@@ -218,45 +217,45 @@ export default [{
         name: 'casedesign',
         component: () =>
             import( /* webpackChunkName: "page" */ '@/views/libs/hardwarelibcase/casedesign'),
-            meta: {
-                // $keepAlive: true,
-                title: '机箱新增'
-            }
-    },{
+        meta: {
+            // $keepAlive: true,
+            title: '机箱新增'
+        }
+    }, {
         path: 'caseupdate',
         name: 'caseupdate',
         component: () =>
             import( /* webpackChunkName: "page" */ '@/views/libs/hardwarelibcase/caseupdate'),
-            meta: {
-                // $keepAlive: true,
-                title: '机箱编辑'
-            }
+        meta: {
+            // $keepAlive: true,
+            title: '机箱编辑'
+        }
     }]
 },
 
 {
     path: '/admin/basetemplate12',
-    name:"基础模板管理",
+    name: "基础模板管理",
     component: Layout,
     //component: basetemplate,
     //redirect: '/wel/index',
-    children: [   
+    children: [
         {
             path: '/basetemplate/addTemplate',
-            name:'基础模板新增功能', 
+            name: '基础模板新增功能',
             component: () =>
-                import( '@/views/admin/basetemplate/addTemplate'),
-        
+                import('@/views/admin/basetemplate/addTemplate'),
+
         },
         {
             path: '/basetemplate/editTemplate',
-            name:'基础模板编辑模板', 
+            name: '基础模板编辑模板',
             component: () =>
-                import( '@/views/admin/basetemplate/editTemplate'),
-        
+                import('@/views/admin/basetemplate/editTemplate'),
+
         },
     ]
-    
+
 },
 
 ]
