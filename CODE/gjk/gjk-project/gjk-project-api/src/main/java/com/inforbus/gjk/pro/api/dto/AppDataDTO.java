@@ -12,10 +12,11 @@ public class AppDataDTO {
 	 */
 //	private Map<String,String> cmpNameToHwType;
 	private String cmpNameToHwType;
+	
 	/**
-	 * 流程ID
+	 *工作模式标识id
 	 */
-	private int appID;
+	private int flowId;
 	/**
 	 * APP名
 	 */

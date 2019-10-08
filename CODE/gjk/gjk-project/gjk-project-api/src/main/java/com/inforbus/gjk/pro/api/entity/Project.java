@@ -46,6 +46,10 @@ public class Project extends Model<Project> {
 	 */
 	private String projectName;
 	/**
+	 * 工作模式ID
+	 */
+	private String flowId;
+	/**
 	 * 用户ID
 	 */
 	private String userId;

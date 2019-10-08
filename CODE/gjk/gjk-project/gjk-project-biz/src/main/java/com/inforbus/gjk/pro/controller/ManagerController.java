@@ -293,6 +293,37 @@ public class ManagerController {
 			}
 		}
 	}
+	
+	/**
+	 * 根据当前软硬件映射配置的id，查找当前流程下的所有模块的文件路径，从而截取想要的路径
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@GetMapping("/getSoftProcessFilePath/{id}")
+	public R getSoftProcessFilePath(@PathVariable("id") String id) {
+		List<ProjectFile> lists = managerService.getFilePathListById(id);
+		//流程建模路径（赋给软硬件映射配置xml的流程文件标签）
+		String workModeFilePath = "";
+		//客户自存自取的文件路径，赋给软硬件映射配置ml的方案路径
+		String planFilePath = "";
+		String str = "";
+		for (ProjectFile ls : lists) {
+			if (ls.getFileType().equals("11")) {
+				String bb = ls.getFilePath().replaceAll("\\\\", "/");
+				String www = gitDetailPath + ls.getFilePath() + ls.getFileName() + ".xml";
+				String aa = bb.substring(0, bb.lastIndexOf("/"));
+				aa = aa.substring(0,aa.lastIndexOf("/"));
+				String ppp = gitDetailPath + aa + File.separator +  softToHardResult;
+				workModeFilePath = www.replaceAll("\\\\", "/");
+				planFilePath = ppp.replaceAll("\\\\", "/");
+				str = workModeFilePath + "@###@###@@" + planFilePath;
+			}
+			
+		}
+		return new R<>(str);
+		
+	}
 
 	/**
 	 * 根据当前软硬件映射配置的id，查找当前流程下的所有模块的文件路径
@@ -340,6 +371,9 @@ public class ManagerController {
 			if (ls.getFileType().equals("13")) {
 				mapConfigPath = ls.getFilePath() + ls.getFileName() + ".xml";
 			}
+			if (ls.getFileType().equals("17")) {
+				sysParamFilePath = ls.getFilePath() + ls.getFileName() + ".xml";
+			}
 			// 方案展示的路径
 			if (ls.getFileType().equals("14")) {
 				simplePlanFile = gitDetailPath +ls.getFilePath() + ls.getFileName() + ".xml";
@@ -358,10 +392,10 @@ public class ManagerController {
 		//getFile(filepath, planId);
 		/**************************************update by  zhx*********************************************/
 		hardWareFilePath = local_REPO_PATH + hardWareFilePath;
-		mapConfigPath = local_REPO_PATH + mapConfigPath;	
+		mapConfigPath = local_REPO_PATH + mapConfigPath; 
+		//sysParamFilePath = "D:\\14S_GJK_GIT\\gjk\\gjk\\project\\24141\\12312312流程\\模型\\系数配置.xml";			sysParamFilePath = gitDetailPath + flowFile.getFilePath()+flowInfPath+File.separator+"系数文件.xml" ;
 		workSpacePath = gitDetailPath + flowFile.getFilePath()+softToHardResult ;
-		sysParamFilePath = workSpacePath+File.separator+"系数文件.xml" ;
-				
+        sysParamFilePath = workSpacePath+File.separator+"系数文件.xml" ;				
 		//客户exe文件全路径
 		String exe = JGitUtil.getSoftToHard();//"D:\\14S_GJK_GIT\\gjk\\gjk\\exe\\exe.exe";
 		//调用客户接口执行exe

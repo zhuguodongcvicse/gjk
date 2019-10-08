@@ -103,6 +103,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	private static final String integerCodeFileName = JGitUtil.getINTEGER_CODE_FILE_NAME();
 	private static String serverPath = JGitUtil.getLOCAL_REPO_PATH();
 
+	private static final String flowInfPath = JGitUtil.getFlowInfPath();// 获取流程内外部接口存放路径 add by hu
 	private static final String gitDetailPath = JGitUtil.getLOCAL_REPO_PATH();// gitlu路径
 	private static final String generateCodeResult = JGitUtil.getGenerateCodeResult();// 集成代码生成结果存放路径
 	private static final String softToHardResult = JGitUtil.getSoftToHardResult();//软硬件映射结果文件存放路径
@@ -167,7 +168,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String filePath = "gjk" + File.separator + "project" + File.separator + project.getProjectName()
 				+ File.separator;
 
-		ProjectFile processFile = new ProjectFile(IdGenerate.uuid(), projectId, processName + "流程", "9", filePath,
+		ProjectFile processFile = new ProjectFile(IdGenerate.uuid(), projectId, processName + "", "9", filePath,
 				projectId, defaultSoftwareId, defaultBspId);
 		files.add(processFile);
 
@@ -1434,12 +1435,12 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	public void getWorking(MultipartFile file, String flowName, String id) {
 		String fileName = file.getOriginalFilename();
 		ProjectFile pro = baseMapper.getProDetailById(id);
-		System.out.println("softToHardResult"+softToHardResult);
 		String flowPath =  proDetailPath + pro.getFilePath() + softToHardResult + File.separator;
 		/************************************
 		 * update by zhx
 		 ********************************************/
 		String filePath = flowPath + "系数文件.xml";
+		
 		/*****************************************************************************************/
 		File flowFile = new File(flowPath);
 		if (!flowFile.exists()) {
@@ -1456,6 +1457,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 					newFile.getParentFile().mkdirs();
 				}
 				newFile.createNewFile();
+
 				ExternalIOTransUtils.parseSystemPara(flowName, tmpPath, filePath);
 			} catch (Exception e) {
 				e.printStackTrace();

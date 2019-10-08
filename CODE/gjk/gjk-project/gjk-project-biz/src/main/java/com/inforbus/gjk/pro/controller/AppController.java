@@ -78,7 +78,10 @@ public class AppController {
 	private final AppService appService;
 //	private static String filePath = AppController.class.getResource("/").getPath().split("WEB-INF")[0] + "upload/";
 	private static final String gitFilePath = JGitUtil.getLOCAL_REPO_PATH();
-
+	//packinfo文件路径(客户自存自取)
+	private static final String softToHardResult = JGitUtil.getSoftToHardResult();
+	//组件划分方案路径(客户自存自取)
+	private static final String generateCodeResult = JGitUtil.getGenerateCodeResult();
 	/**
 	 * 简单分页查询
 	 * 
@@ -207,12 +210,20 @@ public class AppController {
 	public R appInstall(@RequestBody AppDataDTO appDataDTO) {
 		// 前台以json串的形式传到后台，后台解析成map
 		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
+		String bb = appDataDTO.getSysconfigPath().replaceAll("\\\\", "/");
+		//String aa = bb.substring(0,bb.lastIndexOf("/",bb.indexOf("/")+1));
+		String aa = bb.substring(0,bb.lastIndexOf("/"));
+		aa = aa.substring(0,aa.lastIndexOf("/"));
+		//packinfo文件路径（客户自存自取的路径）
+		String selfSoftToHardResult = gitFilePath + aa + File.separator +  softToHardResult + File.separator + "packinfo.xml";
+		//组件划分方案路径（自存自取）
+		String selfGenerateCodeResult = gitFilePath + aa + File.separator +  generateCodeResult + File.separator + "组件划分方案.xml";
 		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
-		boolean returnVal = true;
+		boolean returnVal ;
 		try {
 			// 调用注册接口
-			returnVal = ExternalIOTransUtils.appInstall(cmpNameToHwType, appDataDTO.getAppID(), appDataDTO.getAppName(),
-					appDataDTO.getPackinfoPath(), appDataDTO.getCmpDeployPlanFilePath(), gitFilePath + appDataDTO.getAppProPath());
+			returnVal = ExternalIOTransUtils.appInstall(cmpNameToHwType, appDataDTO.getFlowId(), appDataDTO.getAppName(),
+					selfSoftToHardResult, selfGenerateCodeResult, gitFilePath + appDataDTO.getAppProPath());
 		} catch (Exception e) {
 			returnVal = false;
 			e.printStackTrace();
@@ -238,7 +249,7 @@ public class AppController {
 		// 是否带部署方案(数据库存的字符串0、1，后台需要转换一下)
 		boolean existDeployConfig;
 		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
-		boolean returnVal = true;
+		boolean returnVal ;
 		if (appDataDTO.getExistDeployConfig().equals("1")) {
 			existDeployConfig = false;
 		} else {
@@ -246,7 +257,7 @@ public class AppController {
 		}
 		try {
 			// 调用加载、更新加载接口
-			returnVal = ExternalIOTransUtils.appLoad(cmpNameToHwType, appDataDTO.getAppID(), appDataDTO.getAppName(),
+			returnVal = ExternalIOTransUtils.appLoad(cmpNameToHwType, appDataDTO.getFlowId(), appDataDTO.getAppName(),
 					existDeployConfig, appDataDTO.getSysconfigPath(), gitFilePath + appDataDTO.getAppProPath());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -268,10 +279,10 @@ public class AppController {
 		// 前台以json串的形式传到后台，后台解析成map
 		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
 		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
-		boolean returnVal = true;
+		boolean returnVal;
 		try {
 			// 调用卸载接口
-			returnVal = ExternalIOTransUtils.appUnload(cmpNameToHwType, appDataDTO.getAppID(), appDataDTO.getAppName());
+			returnVal = ExternalIOTransUtils.appUnload(cmpNameToHwType, appDataDTO.getFlowId(), appDataDTO.getAppName());
 		} catch (Exception e) {
 			e.printStackTrace();
 			returnVal = false;
@@ -292,10 +303,10 @@ public class AppController {
 		// 前台以json串的形式传到后台，后台解析成map
 		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
 		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
-		boolean returnVal = true;
+		boolean returnVal;
 		try {
 			// 调用启动接口
-			returnVal = ExternalIOTransUtils.appRestart(cmpNameToHwType, appDataDTO.getAppID(),
+			returnVal = ExternalIOTransUtils.appRestart(cmpNameToHwType, appDataDTO.getFlowId(),
 					appDataDTO.getAppName());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -317,10 +328,10 @@ public class AppController {
 		// 前台以json串的形式传到后台，后台解析成map
 		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
 		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
-		boolean returnVal = true;
+		boolean returnVal;
 		try {
 			// 调用停止接口
-			returnVal = ExternalIOTransUtils.appStop(cmpNameToHwType, appDataDTO.getAppID(), appDataDTO.getAppName());
+			returnVal = ExternalIOTransUtils.appStop(cmpNameToHwType, appDataDTO.getFlowId(), appDataDTO.getAppName());
 		} catch (Exception e) {
 			e.printStackTrace();
 			returnVal = false;
@@ -341,10 +352,10 @@ public class AppController {
 		// 前台以json串的形式传到后台，后台解析成map
 		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
 		// 返回值
-		boolean returnVal = true;
+		boolean returnVal;
 		try {
 			// 调用暂停接口
-			returnVal = ExternalIOTransUtils.appPause(cmpNameToHwType, appDataDTO.getAppID(), appDataDTO.getAppName());
+			returnVal = ExternalIOTransUtils.appPause(cmpNameToHwType, appDataDTO.getFlowId(), appDataDTO.getAppName());
 		} catch (Exception e) {
 			e.printStackTrace();
 			returnVal = false;
@@ -365,12 +376,18 @@ public class AppController {
 	public R appDelete(@RequestBody AppDataDTO appDataDTO) {
 		// 前台以json串的形式传到后台，后台解析成map
 		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
+		String bb = appDataDTO.getSysconfigPath().replaceAll("\\\\", "/");
+		//String aa = bb.substring(0,bb.lastIndexOf("/",bb.indexOf("/")+1));
+		String aa = bb.substring(0,bb.lastIndexOf("/"));
+		aa = aa.substring(0,aa.lastIndexOf("/"));
+		//packinfo文件路径（客户自存自取的路径）
+		String selfSoftToHardResult = gitFilePath + aa + File.separator +  softToHardResult + File.separator + "packinfo.xml";
 		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
-		boolean returnVal = true;
+		boolean returnVal ;
 		try {
 			// 调用注销接口
-			returnVal = ExternalIOTransUtils.appUnInstall(cmpNameToHwType, appDataDTO.getAppID(),
-					appDataDTO.getAppName(), appDataDTO.getPackinfoPath());
+			returnVal = ExternalIOTransUtils.appUnInstall(cmpNameToHwType, appDataDTO.getFlowId(),
+					appDataDTO.getAppName(), selfSoftToHardResult);
 		} catch (Exception e) {
 			e.printStackTrace();
 			returnVal = false;
@@ -391,10 +408,17 @@ public class AppController {
 
 	@PostMapping(value = "/appTaskExport")
 	public void appTaskExport(@RequestBody AppDataDTO appDataDTO) {
+		String bb = appDataDTO.getSysconfigPath().replaceAll("\\\\", "/");
+		//String aa = bb.substring(0,bb.lastIndexOf("/",bb.indexOf("/")+1));
+		String aa = bb.substring(0,bb.lastIndexOf("/"));
+		aa = aa.substring(0,aa.lastIndexOf("/"));
+		//packinfo文件路径（客户自存自取的路径）
+		String selfSoftToHardResult = gitFilePath + aa + File.separator +  softToHardResult + File.separator + "packinfo.xml";
+		//组件划分方案路径（自存自取）
+		String selfGenerateCodeResult = gitFilePath + aa + File.separator +  generateCodeResult + File.separator + "组件划分方案.xml";
 		// 还未给接口，自己模拟的接口  + File.separator +
-		ExternalIOTransUtils.appTaskExport(appDataDTO.getAppID(), gitFilePath + File.separator + "gjk/APPDownload/" + File.separator + appDataDTO.getTaskInfoPath(),
-				gitFilePath + appDataDTO.getAppProPath(), appDataDTO.getSysconfigPath(), appDataDTO.getPackinfoPath(),
-				appDataDTO.getCmpDeployPlanFilePath());
+		ExternalIOTransUtils.appTaskExport(appDataDTO.getFlowId(), gitFilePath + File.separator + "gjk/APPDownload/" + File.separator + appDataDTO.getTaskInfoPath(),
+				gitFilePath + appDataDTO.getAppProPath(), appDataDTO.getSysconfigPath(), selfSoftToHardResult, selfGenerateCodeResult);
 	}
 
 	/**
