@@ -5,9 +5,10 @@
       v-if="contextmenuFlag"
       class="avue-tags__contentmenu"
       :style="{left:contentmenuX+'px',top:contentmenuY+'px'}"
+      @mouseleave="changeCount()"
     >
-      <div class="item" @click="closeOthersTags">关闭其他</div>
-      <div class="item" @click="closeAllTags">关闭全部</div>
+      <div class="item" @click="closeOthersTags" >关闭其他</div>
+      <div class="item" @click="closeAllTags" >关闭全部</div>
     </div>
     <div class="avue-tags__box" :class="{'avue-tags__box--close':!website.isFirstPage}">
       <el-tabs
@@ -75,6 +76,12 @@ export default {
     }
   },
   methods: {
+        changeCount(){
+       setTimeout(() => {
+             this.contextmenuFlag=false
+                }, 500)
+    
+      },
     watchContextmenu() {
       if (!this.$el.contains(event.target) || event.button !== 0) {
         this.contextmenuFlag = false;
