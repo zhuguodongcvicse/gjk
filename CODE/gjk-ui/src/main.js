@@ -63,10 +63,10 @@ Object.keys(filters).forEach(key => {
 })
 
 // 动态加载阿里云字体库
-iconfontVersion.forEach(ele => {
-  console.log("-----------------------------------------ele", ele);
-  loadStyle(iconfontUrl.replace('$key', ele))
-})
+// iconfontVersion.forEach(ele => {
+//   console.log("-----------------------------------------ele", ele);
+//   loadStyle(iconfontUrl.replace('$key', ele))
+// })
 
 Vue.config.productionTip = false
 
