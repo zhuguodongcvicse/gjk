@@ -24,7 +24,7 @@ var components;
 function handleMessageFromParent(event) {
 	console.log("event.data", event.data)
 	deployment = event.data.params[0].frontCaseForDeployment;
-	console.log('deployment',deployment);
+//	console.log('deployment',deployment);
 	json = JSON.parse(deployment);
 	console.log('json', json)
 	linkArray = event.data.params[1][0];
@@ -352,7 +352,7 @@ function createdge(startId, endId) {
 		"json": {
 			"zIndex": 200,
 			"styles": {
-				"edge.color": "#03ff84",
+				"edge.color": "#5bf000",
 				//"arrow.to": true,
 				"arrow.to.size": 1.8,
 			},
@@ -427,7 +427,7 @@ function creatbakgj(compName, cpux, cpuy, refid, compid, parttype, components) {
 				"_ref": refid
 			},
 			"styles": {
-				"label.background.color": "#0391ff",
+				"label.background.color": "#000080",
 				"label.font.size": 1,
 				"label.padding": 0.3,
 				"label.radius": 0.3,
@@ -502,7 +502,7 @@ function creatgj(compName, cpux, cpuy, refid, compid, parttype, components) {
 				"_ref": refid
 			},
 			"styles": {
-				"label.background.color": "#4dff03",
+				"label.background.color": "#71e61c",
 				"label.font.size": 1,
 				"label.padding": 0.3,
 				"label.radius": 0.3,
@@ -553,7 +553,7 @@ function initEditor(editor) {
 	//遍历构件数据
 	for (var i in linkArray) {
 		for (var l in json.datas) {
-			console.log('json.datas[l].json.properties.nodeID',json.datas[l].json.properties.nodeID);
+	//		console.log('json.datas[l].json.properties.nodeID',json.datas[l].json.properties.nodeID);
 			//真数据放开 并nodeID替换成nodeID
 			if(json.datas[l].json.image == 'images/芯片.svg'){
 				if (linkArray[i].nodeName == json.datas[l].json.properties.nodeID) {
@@ -584,6 +584,8 @@ function initEditor(editor) {
 				}
 			}
 		}
+			//变量恢复初始值
+			rootnum = 0.5;
 		//遍历备份构件
 		for (var n in linkArray[i].backupParts) {
 			baknum++;
@@ -599,7 +601,7 @@ function initEditor(editor) {
 			}
 		}
 		//变量恢复初始值
-		rootnum = -0.5;
+		
 		baknum = -0.5;
 	}
 	//遍历arrow绘画连线
@@ -913,6 +915,8 @@ console.log('dataJsondataJsondataJsondataJson',dataJson)
 					data.set('compname', data.name);
 					data.set('rackname', data._mn3.caseName);
 					data.set('bdNum', data._mn3.bdNum);
+					data.set('IP', data._mn3.IP);
+					data.set('hrTypeName', data._mn3.hrTypeName);
 				} else {
 					data.set('startcomp', data.from.name);
 					data.set('endcomp', data.to.name);
@@ -933,6 +937,14 @@ console.log('dataJsondataJsondataJsondataJson',dataJson)
 				{
 					client: 'memsize',
 					displayName: '内存大小'
+				},
+				{
+					client: 'hrTypeName',
+					displayName: '平台大类'
+				},
+					{
+					client: 'IP',
+					displayName: 'IP'
 				}
 				]
 			}
@@ -1146,7 +1158,7 @@ console.log('dataJsondataJsondataJsondataJson',dataJson)
 			}
 			if (evt.kind == Q.InteractionEvent.ELEMENT_MOVE_START) {
 				var type = data.get('type');
-				if (type && (type == 'card' || type == 'port')) {
+				if (type && (type == 'card' || type == 'port' || type =='item')) {
 					dragInfo = {
 						data: data,
 						x: data.x,
@@ -1172,15 +1184,67 @@ console.log('dataJsondataJsondataJsondataJson',dataJson)
 			}
 			if (evt.kind == Q.InteractionEvent.ELEMENT_MOVE_END) {
 				unhighlight();
-				var data = dragInfo.data;
-				var oldSlot = data.parent;
-				var slot = findSlot(data, evt);
-				if (!slot || slot == oldSlot) {
-					graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-				} else {
-					adaptBounds(data, slot);
-				}
-				dragInfo = null;
+				var host = findCellHost(evt, data);
+				//console.log('hostELEMENT_MOVE_START',host);
+				//所点击当前构件的所属部件
+				var partname = data._mn3.partname;
+			//	console.log("data",data.id);
+			//	console.log('partname',partname);
+			/* 	for (const i in host.children.datas) {
+					if(host.children.datas[i].id != data.id ){
+						if(host.children.datas[i]._mn3.partname == data._mn3.partname ){ 
+
+							var data = dragInfo.data;
+							var oldSlot = data.parent;
+							console.log("datadddddddt",data);
+							console.log("oldSlot",oldSlot);
+							var slot = findSlot(data, evt);
+							console.log("slot",slot);
+							/* if (!slot) {
+								graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+							}  *//* else {
+								adaptBounds(data, slot);
+							} *
+
+
+							var host = findCellHost(evt, data);
+							console.log('hostELEMENT_MOVE_START',host);
+							//所点击当前构件的所属部件
+							var partname = data._mn3.partname;
+						//	console.log("data",data.id);
+						//	console.log('partname',partname);
+							for (const i in host.children.datas) {
+								if(host.children.datas[i].id != data.id ){
+									if(host.children.datas[i]._mn3.partname == data._mn3.partname ){ 
+										var newsoltparent = data.parent;
+										if(newsoltparent == oldSlot){
+											alert(6666)
+										//	graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+										}
+
+
+										console.log("newdataparent",newsoltparent);
+									
+									//	console.log('	variable =============',	variable = false);
+									//	if(variable != true){	
+										//	showMessage('该芯片上还有其他同部件构件请一起移动','success',2000);
+											//variable == false;
+								//		}
+										//	graph.selemctionModel.clear();
+								
+									
+								}
+						}
+				
+					}
+							dragInfo = null;
+							
+						}}} */
+
+
+			
+
+
 			}
 		})
 	}
