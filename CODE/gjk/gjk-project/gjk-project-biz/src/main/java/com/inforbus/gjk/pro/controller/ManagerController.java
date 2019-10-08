@@ -340,9 +340,6 @@ public class ManagerController {
 			if (ls.getFileType().equals("13")) {
 				mapConfigPath = ls.getFilePath() + ls.getFileName() + ".xml";
 			}
-			if (ls.getFileType().equals("17")) {
-				sysParamFilePath = ls.getFilePath() + ls.getFileName() + ".xml";
-			}
 			// 方案展示的路径
 			if (ls.getFileType().equals("14")) {
 				simplePlanFile = gitDetailPath +ls.getFilePath() + ls.getFileName() + ".xml";
@@ -361,10 +358,9 @@ public class ManagerController {
 		//getFile(filepath, planId);
 		/**************************************update by  zhx*********************************************/
 		hardWareFilePath = local_REPO_PATH + hardWareFilePath;
-		mapConfigPath = local_REPO_PATH + mapConfigPath;
-		//update by huqinghua
-		//sysParamFilePath = "D:\\14S_GJK_GIT\\gjk\\gjk\\project\\24141\\12312312流程\\模型\\系数配置.xml";			sysParamFilePath = gitDetailPath + flowFile.getFilePath()+flowInfPath+File.separator+"系数文件.xml" ;
+		mapConfigPath = local_REPO_PATH + mapConfigPath;	
 		workSpacePath = gitDetailPath + flowFile.getFilePath()+softToHardResult ;
+		sysParamFilePath = workSpacePath+File.separator+"系数文件.xml" ;
 				
 		//客户exe文件全路径
 		String exe = JGitUtil.getSoftToHard();//"D:\\14S_GJK_GIT\\gjk\\gjk\\exe\\exe.exe";
