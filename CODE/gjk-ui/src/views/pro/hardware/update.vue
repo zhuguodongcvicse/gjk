@@ -139,9 +139,12 @@ export default {
     },
     // 接受子页面发来的信息
     handleMessage(event) {
-      console.log("event.data", event.data);
+      // console.log("event.data", event.data);
       if (event.data.params == null) {
         return;
+      }
+      if (this.params == null || this.params == '') {
+        return
       }
       this.params.frontJson = JSON.stringify(event.data.params[0].fJson);
       this.params.backJson = JSON.stringify(event.data.params[0].bJson);
