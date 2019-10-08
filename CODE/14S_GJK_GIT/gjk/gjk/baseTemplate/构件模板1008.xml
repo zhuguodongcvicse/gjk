@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<node id="004124">
+    <基本属性 configureType="{'lableType':'tab'}">
+        <显示名 name="" configureType="{'lableType':'form','attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}" />
+        <构件编号 name="" configureType="{'lableType':'form','attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}" />
+        <函数名 name="" configureType="{'lableType':'form','attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}" />
+        <函数路径 name="" configureType="{'lableType':'form','attrs':[{'actionType':'analysisPlatformFile','attrConfigType':'uploadComm','attrName':'name','isShow':true}]}" />
+        <系数文件 name="" configureType="{'lableType':'form','attrs':[{'actionType':'analysisAlgorithmFile','attrConfigType':'uploadComm','attrName':'name','isShow':true}]}" />
+        <系数文件1 name="" configureType="{'lableType':'form','attrs':[{'attrConfigType':'radioComm','attrName':'name','isShow':true}]}" />
+        <数据积累类型 name="" configureType="{'lableType':'form','attrs':[{'dataKey':'comp_accumulation_type','attrConfigType':'selectComm','attrName':'name','isShow':true}]}" />
+        <输入 configureType="{'lableType':'table'}">
+            <variable name="structname" structId="" structType="" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'showCompName','attrMapping':true,'attrConfigType':'inputComm','attrName':'name','isShow':true},{'attrName':'structId','isShow':false},{'attrName':'structType','isShow':false}]}">
+                <变量类型 name="" configureType="{'attrs':[{'dataKey':'dbtab_structlibs','actionType':'xxx','attrConfigType':'selectComm','attrName':'name','isShow':true}]}" />
+                <序号 name="" configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}" />
+                <长度 name="" configureType="{'attrs':[{'actionType':'xxx','attrConfigType':'formulaComm','attrName':'name','isShow':true}]}" />
+                <类别 name="" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'assignmentType','attrMapping':false,'attrConfigType':'selectComm','attrName':'name','isShow':true}]}" />
+                <赋值 name="" configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':false}]}" />
+                <选择变量 name="" structId="" structType="" configureType="{'attrs':[{'attrMappingName':'','attrKeys':'assignmentType','attrMapping':true,'attrConfigType':'assignmenComm','attrName':'name','isShow':true},{'attrName':'structId','isShow':false},{'attrName':'structType','isShow':false}]}" />
+                <参数1 name="" configureType="{'attrs':[{'attrKeys':'param1','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}" />
+                <参数2 name="" configureType="{'attrs':[{'attrKeys':'param2','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}" />
+                <参数3 name="" configureType="{'attrs':[{'attrKeys':'param3','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}" />
+                <参数4 name="" configureType="{'attrs':[{'attrKeys':'param4','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}" />
+                <参数5 name="" configureType="{'attrs':[{'attrKeys':'param5','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}" />
+                <参数6 name="" configureType="{'attrs':[{'attrKeys':'param6','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}" />
+            </variable>
+        </输入>
+        <输出 configureType="{'lableType':'table'}">
+            <variable name="structname" structId="" structType="" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'showCompName','attrMapping':true,'attrConfigType':'inputComm','attrName':'name','isShow':true},{'attrName':'structId','isShow':false},{'attrName':'structType','isShow':false}]}">
+                <变量类型 name="" configureType="{'attrs':[{'dataKey':'dbtab_structlibs','actionType':'xxx','attrConfigType':'selectComm','attrName':'name','isShow':true}]}" />
+                <序号 name="" configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}" />
+                <长度 name="" configureType="{'attrs':[{'actionType':'xxx','attrConfigType':'formulaComm','attrName':'name','isShow':true}]}" />
+                <类别 name="" configureType="{'lableType':'table','attrs':[{'attrMappingName':'','attrKeys':'assignmentType','attrMapping':false,'attrConfigType':'selectComm','attrName':'name','isShow':true}]}" />
+                <赋值 name="" configureType="{'attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':false}]}" />
+                <选择变量 name="" structId="" structType="" configureType="{'attrs':[{'attrMappingName':'','attrKeys':'assignmentType','attrMapping':true,'attrConfigType':'assignmenComm','attrName':'name','isShow':true},{'attrName':'structId','isShow':false},{'attrName':'structType','isShow':false}]}" />
+                <参数1 name="" configureType="{'attrs':[{'attrKeys':'param1','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}" />
+                <参数2 name="" configureType="{'attrs':[{'attrKeys':'param2','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}" />
+                <参数3 name="" configureType="{'attrs':[{'attrKeys':'param3','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}" />
+                <参数4 name="" configureType="{'attrs':[{'attrKeys':'param4','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}" />
+                <参数5 name="" configureType="{'attrs':[{'attrKeys':'param5','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}" />
+                <参数6 name="" configureType="{'attrs':[{'attrKeys':'param6','attrMapping':true,'attrConfigType':'formulaComm','attrName':'name','isShow':true}]}" />
+            </variable>
+        </输出>
+    </基本属性>
+    <层级属性 configureType="{'lableType':'tab'}">
+        <所属部件 name="" configureType="{'lableType':'tabTS','attrs':[{'actionType':'xxx','attrConfigType':'inputComm','attrName':'name','isShow':true}]}" />
+        <部署配置 configureType="{'lableType':'tabTS'}">
+            <属性1 name="" configureType="{'attrs':[{'dataKey':'comp_deploy_type','actionType':'xxx','attrConfigType':'selectComm','attrName':'name','isShow':true}]}" />
+            <属性2 name="" configureType="{'attrs':[{'dataKey':'comp_deploy_type','actionType':'xxx','attrConfigType':'selectComm','attrName':'name','isShow':true}]}" />
+            <所属节点 name="" cmpName="" configureType="{'lableType':'colTab','attrs':[{'attrName':'name','isShow':true,'attrMapping':true,'attrKeys':'ownOnde','attrConfigType':'selectComm','dataKey':[],'actionType':'xxx'},{'attrConfigType':'inputComm','attrName':'cmpName','isShow':true}]}" />
+        </部署配置>
+    </层级属性>
+    <性能属性 configureType="{'lableType':'tab'}">
+        <平台类型 name="" configureType="{'lableType':'colTab','attrs':[{'attrConfigType':'selectComm','dataKey':'dbtab_platform','attrName':'name','isShow':true}]}">
+            <测试结果路径 name="" configureType="{'attrs':[{'actionType':'analysisAerformanceFile','attrConfigType':'uploadComm','attrName':'name','isShow':true}]}" />
+            <通过率 configureType="{'lableType':'colTab'}"></通过率>
+        </平台类型>
+    </性能属性>
+    <资源属性 configureType="{'lableType':'tab'}">
+        <属性1 name="" configureType="{'lableType':'form','attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}" />
+        <属性2 name="" configureType="{'lableType':'form','attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}" />
+        <属性3 name="" configureType="{'lableType':'form','attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}" />
+        <属性4 name="" configureType="{'lableType':'form','attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}" />
+        <属性5 name="" configureType="{'lableType':'form','attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}" />
+        <属性6 name="" configureType="{'lableType':'form','attrs':[{'attrConfigType':'inputComm','attrName':'name','isShow':true}]}" />
+    </资源属性>
+</node>
