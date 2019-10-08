@@ -34,17 +34,18 @@
         @node-expand="handleNodeExpand"
         @node-collapse="handleNodeCollapse"
       ></el-tree>
-    </div>
-    <!-- 右键菜单 -->
-    <div class="rightmenu">
-      <div class="menu">
-        <a v-for="item in menus" :key="item" @click="nodeContextmenuClick(item)">
-          <div class="command">
-            <span>{{item}}</span>
-          </div>
-        </a>
+      <!-- 右键菜单 -->
+      <div class="rightmenu">
+        <div class="menu">
+          <a v-for="item in menus" :key="item" @click="nodeContextmenuClick(item)">
+            <div class="command">
+              <span>{{item}}</span>
+            </div>
+          </a>
+        </div>
       </div>
     </div>
+    
     <el-dialog
       title="添加流程"
       :visible.sync="addProcedureDialogVisible"
@@ -758,7 +759,7 @@ export default {
       }
       $(".rightmenu")
         .css({
-          top: event.y - 110
+          top: event.y - 230
         })
         .show();
       // }

@@ -2,7 +2,7 @@
 <template>
   <div class="avue-layout" ref="contail">
     <!--左边导航-->
-    <div class="nt_main" v-bind:style="leftClass" v-show="leftShow">
+    <div class="nt_main nt_main_14s_1008" v-bind:style="leftClass" v-show="leftShow">
       <!-- 左侧导航栏 -->
       <project-tree
         ref="tree"
@@ -106,7 +106,7 @@ export default {
         position: "absolute",
         left: 0,
         top: 0,
-        width: "230px",
+        width: "261px",
         height: "99%"
       },
       imgClass: {
@@ -125,10 +125,10 @@ export default {
       rightClass: {
         position: "absolute",
         top: 0,
-        left: "275px",
+        left: "266px",
         padding: 0,
         "padding-bottom": "0px",
-        width: "calc(100% - 285px)",
+        width: "calc(100% - 277px)",
         height: "calc(97%)",
         "box-sizing": "border-box",
         background: "#ffffff",

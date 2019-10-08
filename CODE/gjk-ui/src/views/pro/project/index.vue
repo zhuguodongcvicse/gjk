@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container pro_project_index_14s pro_project_height_14s pull-auto h100_14s">
+  <div class="app-container pro_project_index_14s pro_project_height_14s pull-auto h100_14s table_cursor_14s_1008">
     <basic-container>
       <avue-crud
         ref="crud"
