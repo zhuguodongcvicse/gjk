@@ -24,15 +24,15 @@ ignore:
  
 # 路径配置
 VS2010:
-  path: C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE
+  path: G:\tools\visual studio\IDE
 Sylixos:
   path: D:\\software\\windriver\\windriverForMipsHR2
 Workbench:
   path: D:\\software\\windriver\\windriverForMipsHR2
 Linux:
   path: /gjk/project
-  ip: 192.168.77.30
-  username: root
+  ip: 192.168.230.131
+  username: root1
   password: root
 downPath:
   path: D:\\doudou\\test

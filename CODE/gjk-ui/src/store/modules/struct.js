@@ -122,14 +122,19 @@ const struct = {
       // }
     },
     SET_TMPSTRUCTLENGTH: (state, params) => {
-      console.log(state.tmpStructLength, "state.tmpStructLength")
+      // 清空已有的值
+      for (let index in state.tmpStructLength) {
+        if (state.tmpStructLength[index].label === params.label) {
+          state.tmpStructLength.splice(index, 1)
+        }
+      }
       if (state.tmpStructLength.length >= 10) {
+        //删除大于10的值
         state.tmpStructLength.splice(0, 1)
         state.tmpStructLength.push(params)
       } else {
         state.tmpStructLength.push(params)
       }
-      // state.cjAttribute[key] = value
       setStore({
         name: 'tmpStructLength',
         content: state.tmpStructLength,

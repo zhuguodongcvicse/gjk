@@ -91,8 +91,8 @@ public class JGitUtil {
 			softToHardResult = father.get("gjk.pro.process.softToHardResult").toString();
 			flowInfPath = father.get("gjk.pro.process.flowInfPath").toString();
 			INTEGER_CODE_FILE_NAME = father.get("integer.code.file.name").toString();
-			softToHard = father.get("git.local.generateCodePath").toString();
-			generatecode = father.get("git.local.mapSoftToHardPath").toString();
+			generatecode = father.get("git.local.generateCodePath").toString();
+			softToHard = father.get("git.local.mapSoftToHardPath").toString();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

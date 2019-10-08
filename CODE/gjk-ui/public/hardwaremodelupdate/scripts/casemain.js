@@ -569,6 +569,7 @@ function initEditor(editor) {
 										if (frontCaseForDeployment.datas[p].json.properties.chipName != null
 											&& frontCaseForDeployment.datas[p].json.properties.uniqueId == graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].uniqueId) {
 											frontCaseForDeployment.datas[p].json.properties.nodeID = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].nodeID
+											frontCaseForDeployment.datas[p].json.properties.IP = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].IP
 										}
 									}
 									allChipToFlow.push(graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k])
@@ -705,6 +706,7 @@ function initEditor(editor) {
 										if (frontCaseForDeployment.datas[p].json.properties.chipName != null
 											&& frontCaseForDeployment.datas[p].json.properties.uniqueId == graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].uniqueId) {
 											frontCaseForDeployment.datas[p].json.properties.nodeID = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].nodeID
+											frontCaseForDeployment.datas[p].json.properties.IP = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].IP
 										}
 									}
 									allChipToFlow.push(graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k])
@@ -890,6 +892,7 @@ function initEditor(editor) {
 										if (frontCaseForDeployment.datas[p].json.properties.chipName != null
 											&& frontCaseForDeployment.datas[p].json.properties.uniqueId == graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].uniqueId) {
 											frontCaseForDeployment.datas[p].json.properties.nodeID = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].nodeID
+											frontCaseForDeployment.datas[p].json.properties.IP = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].IP
 										}
 									}
 									allChipToFlow.push(graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k])
@@ -1335,9 +1338,19 @@ function initEditor(editor) {
 				parent[0].removeChild(child[0]);
 			} */
 
+			if (typeof data == 'undefined') {
+				return
+			}
 			if (data.properties.chipName != null) {
+				var chipPropertyList = document.getElementsByClassName('form-control')
+				chipPropertyList.item(0).setAttribute("readonly","readonly")
+				chipPropertyList.item(1).setAttribute("readonly","readonly")
+				chipPropertyList.item(2).setAttribute("readonly","readonly")
+				chipPropertyList.item(3).setAttribute("readonly","readonly")
+				chipPropertyList.item(4).setAttribute("readonly","readonly")
 				//给ip输入框添加失去聚焦属性
 				document.getElementById('IP').childNodes.item(0).setAttribute("onblur", "upperCase()")
+				// console.log("chipPropertyList",chipPropertyList)
 				clickCheckedChip = data.properties
 				//将板卡对应卡槽的slotnum赋给fSlotNum
 				// console.log("propertySheet",propertySheet)
@@ -1380,11 +1393,20 @@ function initEditor(editor) {
 				data.set('recvRate', data._mn3.recvRate);
 			}
 			if (data.properties.infName != null) {
+				var infPropertyList = document.getElementsByClassName('form-control')
+				infPropertyList.item(0).setAttribute("readonly","readonly")
+				infPropertyList.item(1).setAttribute("readonly","readonly")
+				infPropertyList.item(2).setAttribute("readonly","readonly")
+				// console.log("infPropertyList",infPropertyList)
 				data.set('infName', data._mn3.infName);
 				data.set('infRate', data._mn3.infRate);
 				data.set('opticalNum', data._mn3.opticalNum);
 			}
 			if (data.properties.boardType != null) {
+				var boardPropertyList = document.getElementsByClassName('form-control')
+				boardPropertyList.item(0).setAttribute("readonly","readonly")
+				boardPropertyList.item(1).setAttribute("readonly","readonly")
+				// console.log("boardPropertyList",boardPropertyList)
 				if (data._mn3.boardType == 0) {
 					data.set('showBoardType', 'calculateBoard');
 				}
@@ -1398,6 +1420,12 @@ function initEditor(editor) {
 					data.set('showBoardType', 'interfaceBoard');
 				}
 				data.set('boardName', data._mn3.boardName);
+			}
+			if (data.properties.caseName != null) {
+				var casePropertyList = document.getElementsByClassName('form-control')
+				casePropertyList.item(0).setAttribute("readonly","readonly")
+				casePropertyList.item(1).setAttribute("readonly","readonly")
+				// console.log("casePropertyList",casePropertyList)
 			}
 			// data.set('rackname', data._mn3.caseName);
 			// data.set('boardnum', data._mn3.bdnum);

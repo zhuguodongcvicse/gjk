@@ -59,11 +59,9 @@ export default {
       this.showInf.dialogFormVisible = false;
     },
     submit(formName) {
-      console.log("formName",formName)
-      console.log("this.form",this.form)
       this.$refs[formName].validate(valid => {});
       this.showInf.dialogFormVisible = false;
-      this.$router.push({name:"casedesign",params:this.form});
+      this.$router.push({path:"/libs/hardwarelibcase/casedesign",query:this.form});
       this.form = {}
       // window.opener = null;
       // window.open("about:blank", "_top").close()

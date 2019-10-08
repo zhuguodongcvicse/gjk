@@ -4,9 +4,9 @@
     <!-- 当前项目 -->
     <div class="project_tree_14s">
       <img
-        src="https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100"
+        src="/img/theme/night/logo/proImg.png"
         ondragstart="return false;"
-      />
+      >
       <!-- 项目切换 -->
       <el-dropdown class="project_tree_dropdown" @command="changeProjectCommand">
         <span class="el-dropdown-link">
@@ -21,7 +21,6 @@
       </el-dropdown>
     </div>
     <!-- 树 -->
-
     <div class="tree-container">
       <el-tree
         ref="tree"
@@ -34,17 +33,18 @@
         @node-expand="handleNodeExpand"
         @node-collapse="handleNodeCollapse"
       ></el-tree>
-    </div>
-    <!-- 右键菜单 -->
-    <div class="rightmenu">
-      <div class="menu">
-        <a v-for="item in menus" :key="item" @click="nodeContextmenuClick(item)">
-          <div class="command">
-            <span>{{item}}</span>
-          </div>
-        </a>
+      <!-- 右键菜单 -->
+      <div class="rightmenu"  @mouseleave="changeCount()" style="width: 130px">
+        <div class="menu">
+          <a v-for="item in menus" :key="item" @click="nodeContextmenuClick(item)">
+            <div class="command">
+              <span>{{item}}</span>
+            </div>
+          </a>
+        </div>
       </div>
     </div>
+    
     <el-dialog
       title="添加流程"
       :visible.sync="addProcedureDialogVisible"
@@ -75,7 +75,7 @@
     >
       <el-form ref="form" label-width="80px">
         <el-form-item label="构件筛选">
-          <select-tree :treeData="screenLibsTree" multiple :id.sync="screenLibsIdArray" />
+          <select-tree :treeData="screenLibsTree" multiple :id.sync="screenLibsIdArray"/>
         </el-form-item>
         <el-form-item label="构件选择">
           <select-tree
@@ -110,8 +110,12 @@
       :modal-append-to-body="false"
     >
       <span style="color: red;" v-show="platformFlag">{{platformNameTs}}未选择</span>
-      <el-select class="text_align_center_14s" v-model="softwareSelectString" multiple placeholder="请选择"
-                 @change="selectSoftwareClk"
+      <el-select
+        class="text_align_center_14s"
+        v-model="softwareSelectString"
+        multiple
+        placeholder="请选择"
+        @change="selectSoftwareClk"
       >
         <el-option
           v-for="item in softwareTreeData"
@@ -120,7 +124,9 @@
           :value="item.id"
         >
           <span style="float: left">{{ item.softwareName }}(v{{item.version}}.0)</span>
-          <span style="float: right; color: #8492a6; font-size: 13px;margin-right: 30px;">{{ item.description }}</span>
+          <span
+            style="float: right; color: #8492a6; font-size: 13px;margin-right: 30px;"
+          >{{ item.description }}</span>
         </el-option>
       </el-select>
       <!--<el-select class="text_align_center_14s" v-model="softwareSelectString" placeholder="请选择">-->
@@ -133,7 +139,7 @@
       <!--</el-select>-->
       <div slot="footer">
         <el-button @click="closeSoftwareDialog">取 消</el-button>
-        <el-button type="primary"  :disabled="platformFlag" @click="changeProcedureSoftwareId">确 定</el-button>
+        <el-button type="primary" :disabled="platformFlag" @click="changeProcedureSoftwareId">确 定</el-button>
       </div>
     </el-dialog>
     <el-dialog
@@ -169,7 +175,7 @@
         :http-request="appImageUploadFunc"
         :on-change="onchange"
       >
-        <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+        <img v-if="imageUrl" :src="imageUrl" class="avatar">
         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
       </el-upload>
       <el-checkbox v-model="localDeploymentPlan">本地部署方案</el-checkbox>
@@ -181,66 +187,66 @@
   </div>
 </template>
 <script>
-  import $ from "jquery";
-  import { fetchAlgorithmTree } from "@/api/admin/algorithm";
-  import { fetchTestTree } from "@/api/admin/test";
-  import { getUserhasApplyAuto } from "@/api/admin/user";
-  import { saveProProcess, saveProCompList } from "@/api/pro/project";
-  
-  import {
-    fetchProList,
-    fetchProTree,
-    getProcedureNameListByProId,
-    updateProcedureDetail,
-    appAssemblyProjectCreate,
-    appImageUpload,
-    getSoftwareSelect,
-    updatePartSoftwareAndPlatform,
-    showPartSoftwareAndPlatform,
-    getPlatformList
-  } from "@/api/pro/manager";
-  import { addObj as saveApp, getAppByProcessId } from "@/api/pro/app";
-  import { getSoftwareTree } from "@/api/libs/software";
-  import { getAllComp, screenCompByLibs } from "@/api/libs/commoncomponent";
-  import { getBSPTree } from "@/api/libs/bsp";
-  import { readAlgorithmfile } from "@/api/libs/threelibs";
-  import {
-    getPassCompByProId,
-    saveApproval,
-    saveApprovalApply
-  } from "@/api/libs/approval";
-  import { getUploadFilesUrl } from "@/api/comp/componentdetail";
-  import { getPath } from "@/api/compile/devenv";
-  import { mapGetters } from "vuex";
-  import selectTree from "./selectTree";
-  import {codeGeneration} from "@/api/pro/project";
-  export default {
-    // components: { ComponentSave },
-    components: {
-      "select-tree": selectTree
-    },
-    //注入依赖，调用this.reload();用于刷新页面
-    inject: ["reload"],
-    data() {
-      var proNameSameNameCheck = (rule, value, callback) => {
-        for (let item of this.procedureNameList) {
-          if (value === item) {
-            callback(new Error("流程名已存在，请重新输入。"));
-          }
+import $ from "jquery";
+import { fetchAlgorithmTree } from "@/api/admin/algorithm";
+import { fetchTestTree } from "@/api/admin/test";
+import { getUserhasApplyAuto } from "@/api/admin/user";
+import { saveProProcess, saveProCompList } from "@/api/pro/project";
+
+import {
+  fetchProList,
+  fetchProTree,
+  getProcedureNameListByProId,
+  updateProcedureDetail,
+  appAssemblyProjectCreate,
+  appImageUpload,
+  getSoftwareSelect,
+  updatePartSoftwareAndPlatform,
+  showPartSoftwareAndPlatform,
+  getPlatformList
+} from "@/api/pro/manager";
+import { addObj as saveApp, getAppByProcessId } from "@/api/pro/app";
+import { getSoftwareTree } from "@/api/libs/software";
+import { getAllComp, screenCompByLibs } from "@/api/libs/commoncomponent";
+import { getBSPTree } from "@/api/libs/bsp";
+import { readAlgorithmfile } from "@/api/libs/threelibs";
+import {
+  getPassCompByProId,
+  saveApproval,
+  saveApprovalApply
+} from "@/api/libs/approval";
+import { getUploadFilesUrl } from "@/api/comp/componentdetail";
+import { getPath } from "@/api/compile/devenv";
+import { mapGetters } from "vuex";
+import selectTree from "./selectTree";
+import { codeGeneration } from "@/api/pro/project";
+export default {
+  // components: { ComponentSave },
+  components: {
+    "select-tree": selectTree
+  },
+  //注入依赖，调用this.reload();用于刷新页面
+  inject: ["reload"],
+  data() {
+    var proNameSameNameCheck = (rule, value, callback) => {
+      for (let item of this.procedureNameList) {
+        if (value === item) {
+          callback(new Error("流程名已存在，请重新输入。"));
         }
-      };
-      return {
-        filePathName: "",
-        platformDataList: [],
-        platformNameTs:"",
-        platformFlag:false,
-        loading: false,
-        temp_currProject: {},
-        menus: [],
-        currNode: {},
-        showProjects: false,
-        projects: [],
-        treeData: [],
+      }
+    };
+    return {
+      filePathName: "",
+      platformDataList: [],
+      platformNameTs: "",
+      platformFlag: false,
+      loading: false,
+      temp_currProject: {},
+      menus: [],
+      currNode: {},
+      showProjects: false,
+      projects: [],
+      treeData: [],
 
       addProcedureDialogVisible: false,
       procedureNameList: [],
@@ -342,6 +348,13 @@
   },
   beforeDestroy: function() {},
   methods: {
+    changeCount(){
+       setTimeout(() => {
+                       $(".rightmenu").hide();
+                }, 500)
+    
+      },
+
     /* 查询所有项目   */
     getProjects() {
       // console.log("permissions", this.permissions);
@@ -478,10 +491,8 @@
     nodeContextmenuClick(item) {
       // this.loading=true;
       if (item == "集成代码生成") {
-        console.log('userInfouserInfouserInfo',this.userInfo.name)
-          codeGeneration(this.procedureId,this.userInfo.name).then(res => {
-
-        });
+        console.log("userInfouserInfouserInfo", this.userInfo.name);
+        codeGeneration(this.procedureId, this.userInfo.name).then(res => {});
         const loading = this.$loading({
           lock: true,
           text: "集成代码生成中。。。",
@@ -493,32 +504,34 @@
         }, 2000);
         $(".rightmenu").hide();
       } else if (item == "修改软件框架") {
-        this.platformFlag=false
-     //得到平台大类
-          getPlatformList().then(Response => {
-            this.platformDataList = Response.data.data
-            console.log("平台大类：", this.platformDataList)
-          })
+        this.platformFlag = false;
+        //得到平台大类
+        getPlatformList().then(Response => {
+          this.platformDataList = Response.data.data;
+          console.log("平台大类：", this.platformDataList);
+        });
         getSoftwareSelect().then(Response => {
-          console.log("软件框架库下拉列表：", Response.data.data)
+          console.log("软件框架库下拉列表：", Response.data.data);
           let datas = Response.data.data;
           let softwareTreeDataList = [];
           for (var i = 0; i < datas.length; i++) {
             if (datas[i].description != "") {
-              softwareTreeDataList.push(datas[i])
+              softwareTreeDataList.push(datas[i]);
             }
           }
           this.softwareTreeData = softwareTreeDataList;
-      console.log("this.procedureId" + this.procedureId)
-            this.softwareSelectString = []
-            showPartSoftwareAndPlatform(this.procedureId).then(Response => {
-              for (var k = 0; k < Response.data.data.length; k++) {
-                this.softwareSelectString.push(Response.data.data[k].softwareId)
-                this.softwareSelectNameString.push(Response.data.data[k].platformName)
-              }
-              //校验是否选中所有平台大类
-              this.checkoutPlatform();
-            })
+          console.log("this.procedureId" + this.procedureId);
+          this.softwareSelectString = [];
+          showPartSoftwareAndPlatform(this.procedureId).then(Response => {
+            for (var k = 0; k < Response.data.data.length; k++) {
+              this.softwareSelectString.push(Response.data.data[k].softwareId);
+              this.softwareSelectNameString.push(
+                Response.data.data[k].platformName
+              );
+            }
+            //校验是否选中所有平台大类
+            this.checkoutPlatform();
+          });
           // this.softwareSelectString.push(this.softwareTreeData[0].id)
         });
         this.softwareDialogVisible = true;
@@ -541,9 +554,9 @@
           procedureId: this.procedureId
         }).then(val => {
           getPath({
-          path: filePath.filePath,
-          fileName: this.fileData.fileName,
-          platformType: val.data.data
+            path: filePath.filePath,
+            fileName: this.fileData.fileName,
+            platformType: val.data.data
           }).then(val => {
             // this.$store.dispatch(
             //   "saveConsoleLog",
@@ -553,72 +566,77 @@
           });
         });
 
-
-        
         $(".rightmenu").hide();
       } else if (item == "添加流程") {
         this.addProcedureDialogVisible = true;
       } else if (item == "申请构件") {
         this.addProCompDialogVisible = true;
-       }
-      },
-      //修改软件框架值改变
-      selectSoftwareClk(val) {
-        var valNameArr = [];
-        for (var j = 0; j < val.length; j++) {
-          for (var i = 0; i < this.softwareTreeData.length; i++) {
-            if (this.softwareTreeData[i].id == val[j]) {
-              valNameArr.push(this.softwareTreeData[i].description);
+      }
+    },
+    //修改软件框架值改变
+    selectSoftwareClk(val) {
+      var valNameArr = [];
+      for (var j = 0; j < val.length; j++) {
+        for (var i = 0; i < this.softwareTreeData.length; i++) {
+          if (this.softwareTreeData[i].id == val[j]) {
+            valNameArr.push(this.softwareTreeData[i].description);
+          }
+        }
+      }
+      //至少选中一个
+      if (val.length > 1) {
+        console.log("当前选中的值", val);
+        //遍历下拉框得到平台名称
+        var lastPlatformName = "";
+        for (var i = 0; i < this.softwareTreeData.length; i++) {
+          if (this.softwareTreeData[i].id == val[val.length - 1]) {
+            lastPlatformName = this.softwareTreeData[i].description;
+          }
+        }
+        console.log("最后选中的平台大类：", lastPlatformName);
+        console.log("选中的平台大类名称：", valNameArr);
+        //根据分号拆分平台类
+        lastPlatformName = lastPlatformName.substring(
+          0,
+          lastPlatformName.length - 1
+        );
+        var platformNameArr = lastPlatformName.split(";");
+        console.log("拆分后的平台类名：", platformNameArr);
+        for (var k = 0; k < platformNameArr.length; k++) {
+          for (var m = 0; m < val.length - 1; m++) {
+            if (valNameArr[m].indexOf(platformNameArr[k]) != -1) {
+              console.log("进入删除数组元素：" + m);
+              val.splice(m, 1);
+              valNameArr.splice(m, 1);
             }
           }
         }
-        //至少选中一个
-        if (val.length > 1) {
-          console.log("当前选中的值", val)
-          //遍历下拉框得到平台名称
-          var lastPlatformName = "";
-          for (var i = 0; i < this.softwareTreeData.length; i++) {
-            if (this.softwareTreeData[i].id == val[val.length - 1]) {
-              lastPlatformName = this.softwareTreeData[i].description;
-            }
-          }
-          console.log("最后选中的平台大类：", lastPlatformName)
-          console.log("选中的平台大类名称：", valNameArr)
-          //根据分号拆分平台类
-          lastPlatformName = lastPlatformName.substring(0, lastPlatformName.length - 1)
-          var platformNameArr = lastPlatformName.split(";");
-          console.log("拆分后的平台类名：", platformNameArr)
-          for (var k = 0; k < platformNameArr.length; k++) {
-            for (var m = 0; m < val.length - 1; m++) {
-              if (valNameArr[m].indexOf(platformNameArr[k]) != -1) {
-                console.log("进入删除数组元素：" + m)
-                val.splice(m, 1);
-                valNameArr.splice(m,1)
-              }
-            }
+      }
+      this.softwareSelectNameString = valNameArr;
+      this.checkoutPlatform();
+    },
+    checkoutPlatform() {
+      var disabledPlatformName = "";
+      for (var i = 0; i < this.platformDataList.length; i++) {
+        //是否选中标志
+        let vFlag = true;
+        for (var j = 0; j < this.softwareSelectString.length; j++) {
+          if (
+            this.softwareSelectNameString[j].indexOf(
+              this.platformDataList[i].name
+            ) != -1
+          ) {
+            vFlag = false;
           }
         }
-        this.softwareSelectNameString=valNameArr
-        this.checkoutPlatform();
-      },
-      checkoutPlatform(){
-        var disabledPlatformName = "";
-        for (var i = 0; i < this.platformDataList.length; i++) {
-          //是否选中标志
-          let vFlag = true
-          for (var j = 0; j < this.softwareSelectString.length; j++) {
-            if ((this.softwareSelectNameString[j]).indexOf(this.platformDataList[i].name)!=-1) {
-              vFlag = false
-            }
-          }
-          if (vFlag) {
-            disabledPlatformName += this.platformDataList[i].name+",";
-          }
+        if (vFlag) {
+          disabledPlatformName += this.platformDataList[i].name + ",";
         }
-        this.platformFlag=false;
-        if (disabledPlatformName != "") {
-          this.platformFlag=true;
-          this.platformNameTs=disabledPlatformName;
+      }
+      this.platformFlag = false;
+      if (disabledPlatformName != "") {
+        this.platformFlag = true;
+        this.platformNameTs = disabledPlatformName;
       }
     },
     dialogBeforeClose(done) {
@@ -747,7 +765,7 @@
       }
       $(".rightmenu")
         .css({
-          top: event.y - 110
+          top: event.y - 248
         })
         .show();
       // }
@@ -763,14 +781,27 @@
         ) {
           this.$router.push({
             path: "/comp/manager/textEditors",
-            query: { filePath: this.filePathName, appFileName: data.fileName }
+            query: {
+              filePath: this.filePathName,
+              appFileName: data.fileName,
+              proFloName:
+                this.treeData[0].fileName +
+                "_" +
+                this.treeData[0].children[0].fileName +
+                "_" +
+                data.label
+            }
           });
         }
 
         $(".rightmenu").hide();
         // this.showProjects = false
       }
-      this.$emit("node-click", data);
+      this.$emit(
+        "node-click",
+        data,
+        JSON.parse(JSON.stringify(this.treeData[0]))
+      );
     },
     handleAvatarSuccess(res, file) {
       this.imageUrl = URL.createObjectURL(file.raw);

@@ -36,8 +36,6 @@ const navs = {
   actions: {},
   mutations: {
     ADD_TAG: (state, action) => {
-      // console.log("state***",state)
-      // console.log("action***",action)
       state.tag = action
       setStore({ name: 'tag', content: state.tag, type: 'session' })
 

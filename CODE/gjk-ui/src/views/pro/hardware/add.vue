@@ -83,9 +83,9 @@ export default {
   },
   created() {
     NProgress.configure({ showSpinner: false });
-    var hardwareObj = this.$route.params;
+    var hardwareObj = this.$route.query.hardwarelibs;
     this.params = hardwareObj;
-    // console.log("this.params", this.params);
+    console.log("this.params", this.params);
     //this.sendMessage()
   },
   async mounted() {
@@ -124,13 +124,17 @@ export default {
     },
     // 接受子页面发来的信息
     handleMessage(event) {
+      // console.log("this.params", this.params);
       console.log("event.data", event.data);
       if (event.data.params == null) {
         return;
       }
+      if (this.params == null || this.params == "") {
+        return;
+      }
       this.params.frontJson = JSON.stringify(event.data.params[0].fJson);
       this.params.backJson = JSON.stringify(event.data.params[0].bJson);
-      this.params.link = event.data.params[0].link
+      this.params.link = event.data.params[0].link;
       this.params.linkRelation = event.data.params[1];
       this.params.frontCaseForDeployment = event.data.params[3];
       var chipsfromhardwarelibs = {
@@ -146,6 +150,7 @@ export default {
         JSON.stringify(event.data.params[2])
       ); */
       // console.log("接收子页面数据:****", event.data);
+      // console.log("this.params",this.params)
       switch (event.data.cmd) {
         case "submitCaseJSON":
           // 处理业务逻辑
@@ -161,7 +166,7 @@ export default {
             });
           });
           saveChipsFromHardwarelibs(chipsfromhardwarelibs).then(res => {
-            console.log("res", res);
+            // console.log("res", res);
           });
           var tag1 = this.tag;
           menuTag(this.$route.path, "remove", this.tagList, tag1);
@@ -226,6 +231,9 @@ export default {
         };
       }
     }
+  },
+  destroyed() {
+    console.log("destroyed");
   }
 };
 </script>

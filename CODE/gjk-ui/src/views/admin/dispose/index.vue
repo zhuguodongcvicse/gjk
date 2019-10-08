@@ -3,7 +3,7 @@
     <div class="dispose_btn">
       <el-button type="primary" plain size="mini" @click.native="handleSavePro">保存</el-button>
       <!-- <el-button type="primary" icon="el-icon-share">静态检查</el-button> -->
-      <el-button type="primary" plain size="mini" :disabled="isAble" @click="softwareClick">软硬件配置</el-button>
+      <el-button type="primary" plain size="mini" :disabled="isAble" @click="softwareClick">软硬件映射</el-button>
     </div>
     <el-row class="admin_dispose_row">
       <el-col :span="10" class="admin_dispose_left">
@@ -104,9 +104,15 @@
             <el-form :model="form" label-width="82px" :inline="false">
               <el-form-item label="参数路径：">
                 <el-input v-model="actions" size="mini" :disabled="true"></el-input>
-                <el-upload action="xx" :on-change="testOnChange">
-                  <el-button size="mini" plain type="primary" icon="el-icon-search"></el-button>
-                </el-upload>
+               
+				<el-upload action="/pro/manager/getWorking" 
+                  :on-change="testOnChange" 
+                  class="upload-demo inline-block"
+                  multiple
+                  :show-file-list="false"
+                  :http-request="customFileUpload">
+                      <el-button size="mini" plain type="primary" icon="el-icon-search"></el-button>
+                  </el-upload>
               </el-form-item>
             </el-form>
 
@@ -263,10 +269,11 @@ import {
   handleSavePro,
   rollbackDispose,
   getProcessName,
+  getSoftProcessFilePath,
   getFilePathListById,
   getSysConfigXmlEntityMap,
-  getProcessFilePathById
-} from "@/api/pro/manager";
+  getProcessFilePathById,
+  getWorking} from "@/api/pro/manager";
 import { getDictValue, remote } from "@/api/admin/dict";
 
 export default {
@@ -446,7 +453,7 @@ export default {
               {
                 lableName: "流程文件",
                 attributeName: "name",
-                attributeNameValue: "文件名"
+                attributeNameValue: ""
               },
               {
                 lableName: "内存空间",
@@ -475,6 +482,10 @@ export default {
           }
         ]
       },
+      //流程文件
+      workModeFilePath: "",
+      //方案路径
+      planFilePath: "",
       processName: "",
       actions: "",
       handle1: "handle1",
@@ -491,6 +502,12 @@ export default {
     };
   },
   created() {
+    getSoftProcessFilePath(this.$route.query.proId)
+      .then(val => {
+        console.log("BBBBBB:",val);
+        this.workModeFilePath = val.data.data.split("@###@###@@")[0];
+        this.planFilePath = val.data.data.split("@###@###@@")[1];
+      }),
     //获取构件名
     getProcessFilePathById(this.$route.query.proId)
       .then(val => {
@@ -640,6 +657,12 @@ export default {
   watch: {},
   //方法集合
   methods: {
+	customFileUpload(event){
+      var formData = new FormData();
+      formData.append("file", event.file);
+      getWorking(formData,this.processName,this.$route.query.pareId)
+      console.log("111111",this.$route.query)
+    },
     //软硬件配置
     softwareClick() {
       //调用接口
@@ -701,7 +724,7 @@ export default {
       });
       console.log("cdcdcdcdc:::", this.entity);
       //给方案路径赋值
-      this.entity.xmlEntitys[0].attributeNameValue = this.inputPath;
+      this.entity.xmlEntitys[0].attributeNameValue = this.planFilePath;
       //给起始构件赋值(存到xml中的是构件函数名)
       this.entity.xmlEntitys[4].xmlEntitys[4].attributeNameValue = this.selectBeginFunctionName;
       this.entity.xmlEntitys[4].xmlEntitys[4].attributeCompIdValue = this.selectBeginCompId;
@@ -723,6 +746,8 @@ export default {
       this.entity.xmlEntitys[4].xmlEntitys[0].attributeNameValue = this.actions;
       //给流程名赋值
       this.entity.xmlEntitys[4].xmlEntitys[1].attributeNameValue = this.processName;
+      //给流程文件赋值
+      this.entity.xmlEntitys[4].xmlEntitys[2].attributeNameValue = this.workModeFilePath;
       //给内存空间赋值
       this.entity.xmlEntitys[4].xmlEntitys[3].xmlEntitys = this.spaceForm.domains;
       //给标志赋值

@@ -59,7 +59,7 @@
         <el-form-item label="接收速率">
           <el-input v-model="form.recvRate"/>
         </el-form-item>
-        
+
         <el-form-item label="平台大类" :label-width="formLabelWidth" prop="hrTypeName">
         <el-select v-model="form.hrTypeName" placeholder="请选择平台">
           <el-option
@@ -153,8 +153,8 @@ export default {
       // console.log("form",form)
       this.dialogFormVisible = false;
       this.$router.push({
-        name: "chipupdate",
-        params: form
+        path: "/libs/hardwarelibchip/chipupdate",
+        query: form
       });
       this.form = {};
     },

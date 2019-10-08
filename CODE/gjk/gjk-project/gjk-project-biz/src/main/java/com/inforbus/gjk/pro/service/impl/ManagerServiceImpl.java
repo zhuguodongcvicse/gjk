@@ -106,7 +106,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	private static final String flowInfPath = JGitUtil.getFlowInfPath();// 获取流程内外部接口存放路径 add by hu
 	private static final String gitDetailPath = JGitUtil.getLOCAL_REPO_PATH();// gitlu路径
 	private static final String generateCodeResult = JGitUtil.getGenerateCodeResult();// 集成代码生成结果存放路径
-
+	private static final String softToHardResult = JGitUtil.getSoftToHardResult();//软硬件映射结果文件存放路径
 	/**
 	 * @getTreeByProjectId
 	 * @Description: 获取项目树形菜单
@@ -168,7 +168,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String filePath = "gjk" + File.separator + "project" + File.separator + project.getProjectName()
 				+ File.separator;
 
-		ProjectFile processFile = new ProjectFile(IdGenerate.uuid(), projectId, processName + "流程", "9", filePath,
+		ProjectFile processFile = new ProjectFile(IdGenerate.uuid(), projectId, processName + "", "9", filePath,
 				projectId, defaultSoftwareId, defaultBspId);
 		files.add(processFile);
 
@@ -1245,21 +1245,20 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 								for (XmlEntityMap entityMap2 : entityMap1.getXmlEntityMaps()) {
 									if (entityMap2.getLableName().equals("层级属性")) {
 										for (XmlEntityMap entityMap3 : entityMap2.getXmlEntityMaps()) {
-											if (entityMap3.getLableName().equals("所属部件")) {
-												for (XmlEntityMap entityMap4 : entityMap3.getXmlEntityMaps()) {
-													if (entityMap4.getLableName().equals("部署配置")) {
-														for (XmlEntityMap entityMap5 : entityMap4.getXmlEntityMaps()) {
+											//if (entityMap3.getLableName().equals("所属部件")) {
+												//for (XmlEntityMap entityMap4 : entityMap3.getXmlEntityMaps()) {
+													if (entityMap3.getLableName().equals("部署配置")) {
+														for (XmlEntityMap entityMap5 : entityMap3.getXmlEntityMaps()) {
 															if (entityMap5.getLableName().equals("所属节点")) {
-																String cmpname = entityMap5.getAttributeMap()
-																		.get("cmpName");
+																String cmpname = entityMap5.getAttributeMap().get("cmpName");
 																if (cmpname.equals(bakpartName)) {
 																	entityMap5.getAttributeMap().put("name", bakcpuid);
 																}
 															}
 														}
 													}
-												}
-											}
+												//}
+											//}
 										}
 									}
 								}
@@ -1288,19 +1287,18 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 								for (XmlEntityMap entityMap2 : entityMap1.getXmlEntityMaps()) {
 									if (entityMap2.getLableName().equals("层级属性")) {
 										for (XmlEntityMap entityMap3 : entityMap2.getXmlEntityMaps()) {
-											if (entityMap3.getLableName().equals("所属部件")) {
-												for (XmlEntityMap entityMap4 : entityMap3.getXmlEntityMaps()) {
-													if (entityMap4.getLableName().equals("部署配置")) {
-														for (XmlEntityMap entityMap5 : entityMap4.getXmlEntityMaps()) {
+										//	if (entityMap3.getLableName().equals("所属部件")) {
+											//	for (XmlEntityMap entityMap4 : entityMap3.getXmlEntityMaps()) {
+													if (entityMap3.getLableName().equals("部署配置")) {
+														for (XmlEntityMap entityMap5 : entityMap3.getXmlEntityMaps()) {
 															if (entityMap5.getLableName().equals("所属节点")) {
-																String cmpname = entityMap5.getAttributeMap()
-																		.get("cmpName");
+																String cmpname = entityMap5.getAttributeMap().get("cmpName");
 																if (cmpname.equals(partName)) {
 																	entityMap5.getAttributeMap().put("name", cpuid);
 																}
 															}
-														}
-													}
+												//		}
+												//	}
 												}
 											}
 										}
@@ -1437,12 +1435,12 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	public void getWorking(MultipartFile file, String flowName, String id) {
 		String fileName = file.getOriginalFilename();
 		ProjectFile pro = baseMapper.getProDetailById(id);
-		String flowPath = proDetailPath + pro.getFilePath() + "工作模式\\";
+		String flowPath =  proDetailPath + pro.getFilePath() + softToHardResult + File.separator;
 		/************************************
 		 * update by zhx
 		 ********************************************/
-		// String filePath = flowPath+"xxx.xml";
-		String filePath = proDetailPath + pro.getFilePath() + flowInfPath + File.separator + "系数文件.xml";
+		String filePath = flowPath + "系数文件.xml";
+		
 		/*****************************************************************************************/
 		File flowFile = new File(flowPath);
 		if (!flowFile.exists()) {
@@ -1459,14 +1457,12 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 					newFile.getParentFile().mkdirs();
 				}
 				newFile.createNewFile();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
+
+				ExternalIOTransUtils.parseSystemPara(flowName, tmpPath, filePath);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-
-		ExternalIOTransUtils.parseSystemPara(flowName, tmpPath, filePath);
-		System.out.println(file);
 
 	}
 

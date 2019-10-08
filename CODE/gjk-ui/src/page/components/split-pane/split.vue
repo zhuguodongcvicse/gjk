@@ -123,6 +123,12 @@ export default {
       let outerWidth = this.$refs.outerWrapper[this.offsetSize]
       let value = this.valueIsPx ? `${parseFloat(this.oldOffset) + offset}px` : (this.px2percent(outerWidth * this.oldOffset + offset, outerWidth))
       let anotherValue = this.getAnotherOffset(value)
+      console.log("handleMove**********************************handleMove",e)
+      console.log("pageOffset**********************************pageOffset",pageOffset)
+      console.log("offset**************************************offset",offset)
+      console.log("outerWidth**********************************outerWidth",outerWidth)
+      console.log("value***************************************value",value)
+      console.log("anotherValue********************************anotherValue",anotherValue)
       if (parseFloat(value) <= parseFloat(this.computedMin)) value = this.getMax(value, this.computedMin)
       if (parseFloat(anotherValue) <= parseFloat(this.computedMax)) value = this.getAnotherOffset(this.getMax(anotherValue, this.computedMax))
       e.atMin = this.value === this.computedMin
@@ -144,9 +150,9 @@ export default {
       on(document, 'mouseup', this.handleUp)
       this.$emit('on-move-start')
     },
-    handleDblclick(){
+    handleDblclick(e){
       if (this.location==="left") {
-        
+        console.log("handleDblclick***********************88handleDblclick",e)
       }
     }
   },

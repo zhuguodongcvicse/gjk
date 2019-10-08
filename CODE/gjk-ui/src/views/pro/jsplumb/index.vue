@@ -147,7 +147,7 @@ export default {
       connectionData: [], //保存连线关系
       tmpDataParam: {},
       isFullscreen: false, //是否全屏
-      index : 0
+      index: 0
     };
   },
   //监听属性 类似于data概念
@@ -226,8 +226,8 @@ export default {
           ); //将uu 添加到表格
           this.tmpMaps.set(newParam.newTmpId, ctrlParam); //将查询的东西插入到临时
           this.saveXmlMaps = this.tmpMaps.get(newParam.newTmpId); //tmpMaps使用map将 数据对应上
-        } else if(newParam.state === 5){
-          this.saveXmlMaps.xmlEntityMaps=[]
+        } else if (newParam.state === 5) {
+          this.saveXmlMaps.xmlEntityMaps = [];
         }
       },
       deep: true //对象内部的属性监听，也叫深度监听
@@ -320,6 +320,10 @@ export default {
       for (let key in dBXmlMaps.xmlEntityMaps) {
         const item = dBXmlMaps.xmlEntityMaps[key];
         if (item.lableName === nameType) {
+          if (item.lableName === "层级属性") {
+            console.log("234567890-09876543", saveComp);
+            this.refreshCjParamAll(deepClone(saveComp));
+          }
           dBXmlMaps.xmlEntityMaps[key].xmlEntityMaps = saveComp;
         }
       }
@@ -329,6 +333,33 @@ export default {
       this.isShow_14s === true
         ? (this.isShow_14s = false)
         : (this.isShow_14s = true);
+    },
+    //用于给相同组件
+    refreshCjParamAll(cjParam) {
+      let index = 0;
+      //循环临时画布上的数据
+      this.tmpMaps.forEach(function(value, mapKey, toMaps) {
+        let mapParam = deepClone(toMaps.get(mapKey));
+        for (let key1 in mapParam.xmlEntityMaps) {
+          //查找出层级属性
+          if (mapParam.xmlEntityMaps[key1].lableName === "层级属性") {
+            for (let key2 in mapParam.xmlEntityMaps[key1].xmlEntityMaps) {
+              let param = mapParam.xmlEntityMaps[key1].xmlEntityMaps;
+              if (param[key2].lableName === "所属部件") {
+                if (undefined !== cjParam[key2]) {
+                  let cjName = cjParam[key2].attributeMap.name;
+                  let toName = param[key2].attributeMap.name;
+                  //查找出所属部件一样的节点
+                  if (toName === cjName) {
+                    mapParam.xmlEntityMaps[key1].xmlEntityMaps = cjParam;
+                    toMaps.set(mapKey, mapParam);
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
     },
     //获取构件列表
     getCompAndDetail() {
@@ -415,27 +446,29 @@ export default {
           console.log("连线关系数据", this.postMessageData);
           this.$refs.gjkIframe.sendMessage(this.postMessageData);
         });
-        this.index++
-        if(this.index == 1){
-
-           findProJSON(this.$route.query.processId).then(res => {
-          //循环流程中的构件及"arrow"
-          console.log("加载后的数据", res.data.data.xmlJson.xmlEntityMaps);
-          res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
-            if (tmp.lableName !== "arrow") {
-              /* 将查询的东西插入到临时 */
-              // this.tempParam.push(tmp);
-              // 使用map将 数据对应上
-              this.tmpMaps.set(tmp.attributeMap.id, tmp);
-            }
+        console.log(
+          "this.$route.params.processId",
+          this.$route.params.processId
+        );
+        this.index++;
+        if (this.index == 1) {
+          findProJSON(this.$route.query.processId).then(res => {
+            //循环流程中的构件及"arrow"
+            console.log("加载后的数据", res.data.data.xmlJson.xmlEntityMaps);
+            res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
+              if (tmp.lableName !== "arrow") {
+                /* 将查询的东西插入到临时 */
+                // this.tempParam.push(tmp);
+                // 使用map将 数据对应上
+                this.tmpMaps.set(tmp.attributeMap.id, tmp);
+              }
+            });
+            console.log("map数据", this.tmpMaps);
+            this.postMessageData.cmd = "clickCompLoading";
+            this.postMessageData.params = res.data.data.json;
+            this.$refs.gjkIframe.sendMessage(this.postMessageData);
           });
-          console.log("map数据", this.tmpMaps);
-          this.postMessageData.cmd = "clickCompLoading";
-          this.postMessageData.params = res.data.data.json;
-          this.$refs.gjkIframe.sendMessage(this.postMessageData);
-        });
         }
-       
       }
       //调用Iframe组件中的发送方法
       //this.$refs.gjkIframe.sendMessage(this.postMessageData);

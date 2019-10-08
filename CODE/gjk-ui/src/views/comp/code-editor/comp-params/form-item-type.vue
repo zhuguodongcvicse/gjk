@@ -2,6 +2,15 @@
 <template>
   <!-- 文本框 -->
   <span>
+    <el-switch
+      v-model="itemParam"
+      v-if="lableType ==='switchComm'"
+      :readonly="readonly"
+      :disabled="disabled"
+      v-on:blur="onBlurNative"
+      active-color="#13ce66"
+      inactive-color="#ff4949"
+    ></el-switch>
     <!-- 单选 -->
     <el-radio-group
       v-model="itemParam"
@@ -55,7 +64,7 @@
 
     <!-- 文件选择 -->
     <el-input
-      v-if="lableType ==='fileComm'"
+      v-if="lableType ==='uploadComm'"
       v-model="itemParam"
       :placeholder="placeholder"
       :readonly="true"
@@ -183,6 +192,9 @@ export default {
               this.selectOptions = this.dictKey;
             }
           }
+        }
+        if (this.lableType === "switchComm") {
+          value = Boolean(value);
         }
         this.itemParam = value;
       }

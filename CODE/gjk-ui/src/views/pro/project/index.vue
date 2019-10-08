@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container pro_project_index_14s pro_project_height_14s pull-auto h100_14s">
+  <div class="app-container pro_project_index_14s pro_project_height_14s pull-auto h100_14s table_cursor_14s_1008">
     <basic-container>
       <avue-crud
         ref="crud"
@@ -95,6 +95,9 @@
                 <el-form-item label="流程名称">
                   <el-input v-model="formLabelAlign.processName"></el-input>
                 </el-form-item>
+                <el-form-item label="工作模式标识">
+                  <el-input v-model="formLabelAlign.flowId"></el-input>
+                </el-form-item>
               </div>
 
               <div class="control-container bsp_footer_btn_14s text_align_right_14s">
@@ -189,7 +192,8 @@ export default {
         projectName: "",
         number: "",
         hardware: "",
-        processName: ""
+        processName: "",
+        flowId: ""
       },
       labelPosition: "right",
       dialogTableVisible: false,
@@ -353,6 +357,8 @@ export default {
       // this.project.defaultSoftwareId = this.softwareSelectString;
       this.project.defaultBspId = this.bspSelectString;
       this.project.userId = this.userInfo.userId;
+      //给工作模式ID赋值
+      this.project.flowId = this.formLabelAlign.flowId;
       saveProject(this.project).then(Response => {
         // console.log("11111111111111111111111111111",Response.data.data);
         this.project.id = Response.data.data.id;

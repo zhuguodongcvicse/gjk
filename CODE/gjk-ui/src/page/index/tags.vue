@@ -5,9 +5,10 @@
       v-if="contextmenuFlag"
       class="avue-tags__contentmenu"
       :style="{left:contentmenuX+'px',top:contentmenuY+'px'}"
+      @mouseleave="changeCount()"
     >
-      <div class="item" @click="closeOthersTags">关闭其他</div>
-      <div class="item" @click="closeAllTags">关闭全部</div>
+      <div class="item" @click="closeOthersTags" >关闭其他</div>
+      <div class="item" @click="closeAllTags" >关闭全部</div>
     </div>
     <div class="avue-tags__box" :class="{'avue-tags__box--close':!website.isFirstPage}">
       <el-tabs
@@ -75,8 +76,13 @@ export default {
     }
   },
   methods: {
+        changeCount(){
+       setTimeout(() => {
+             this.contextmenuFlag=false
+                }, 500)
+    
+      },
     watchContextmenu() {
-      // console.log("*********");
       if (!this.$el.contains(event.target) || event.button !== 0) {
         this.contextmenuFlag = false;
       }
@@ -106,12 +112,8 @@ export default {
       this.active = this.tag.value;
     },
     menuTag(value, action) {
-      // var closeRouter =  this.$store.state.closeRouter
-      // console.log("value", value);
       if (action === "remove") {
         let { tag, key } = this.findTag(value);
-        // console.log("tag+++", tag, key);
-        console.log("tag", tag);
         this.$store.commit("DEL_TAG", tag);
         if (tag.value === this.tag.value) {
           tag = this.tagList[key === 0 ? key : key - 1]; //如果关闭本标签让前推一个

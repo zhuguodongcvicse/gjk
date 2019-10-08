@@ -11,16 +11,25 @@
     >
       <el-row :gutter="20">
         <el-col :span="10">
-          <el-form ref="form" label-position="top" label-width="80px">
+          <el-form ref="form" label-width="80px">
             <el-form-item
               :label="fileParamType==='formulaComm'?'计算结果':fileParamType==='assignmenComm'?'赋值':''"
             >
-              <el-input type="textarea" v-model="tmpLengthVal" rows="5"></el-input>
+              <el-button type="primary" @click="tmpLengthVal=''">清空</el-button>
             </el-form-item>
           </el-form>
-          <div class="divborder" v-show="fileParamType==='formulaComm'">
-            <el-tree empty-text :data="storeLengthVal" @node-click="handleNodeClick"></el-tree>
-          </div>
+          <el-input type="textarea" v-model="tmpLengthVal" rows="5"></el-input>
+          <el-table
+            :data="storeLengthVal"
+            v-show="fileParamType==='formulaComm'"
+            border
+            style="width: 100%"
+            :show-header="false"
+            stripe
+            @cell-click="handleNodeClick"
+          >
+            <el-table-column prop="label" style="text-align:right;" align="right"></el-table-column>
+          </el-table>
         </el-col>
         <el-col :span="14">
           <el-form ref="Fform" :model="structform" label-width="80px" size="mini">
@@ -158,8 +167,9 @@ export default {
     tmpStructLength: {
       immediate: true,
       handler: function(params) {
-        let tmpArray = params;
-        this.storeLengthVal = tmpArray;
+        //排序
+        let tmpArray = JSON.parse(JSON.stringify(params));
+        this.storeLengthVal = tmpArray.sort(this.compare("time"));
       },
       deep: true
     },
@@ -234,6 +244,14 @@ export default {
   },
   //方法集合
   methods: {
+    //按照属性排序
+    compare(property) {
+      return function(a, b) {
+        var value1 = a[property];
+        var value2 = b[property];
+        return value2 - value1;
+      };
+    },
     handleNodeClick(node) {
       this.tmpLengthVal += node.label;
     },
@@ -340,5 +358,8 @@ export default {
 };
 </script>
 <style lang='scss' scoped>
+.el-table .cell {
+  text-align: left!important;
+}
 //@import url(); 引入公共css类
 </style>
