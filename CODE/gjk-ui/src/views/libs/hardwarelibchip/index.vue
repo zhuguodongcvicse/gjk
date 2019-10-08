@@ -59,7 +59,7 @@
         <el-form-item label="接收速率">
           <el-input v-model="form.recvRate"/>
         </el-form-item>
-        
+
         <el-form-item label="平台大类" :label-width="formLabelWidth" prop="hrTypeName">
         <el-select v-model="form.hrTypeName" placeholder="请选择平台">
           <el-option
@@ -128,7 +128,6 @@ export default {
   },
   created() {
     // location.reload()
-    console.log("+++++++++++")
     this.getList();
     this.getPlatformSelectTree();
   },

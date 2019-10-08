@@ -60,7 +60,6 @@ export default {
     property
   },
   beforeRouteLeave(to, from, next) {
-    console.log("**********************")
     if (this.ifSave == 0) {
       this.params = "";
       next();
@@ -126,7 +125,7 @@ export default {
     // 接受子页面发来的信息
     handleMessage(event) {
       // console.log("this.params", this.params);
-      // console.log("event.data", event.data);
+      console.log("event.data", event.data);
       if (event.data.params == null) {
         return;
       }
