@@ -35,7 +35,7 @@
         @node-collapse="handleNodeCollapse"
       ></el-tree>
       <!-- 右键菜单 -->
-      <div class="rightmenu">
+      <div class="rightmenu"  @mouseleave="changeCount()" style="width: 130px">
         <div class="menu">
           <a v-for="item in menus" :key="item" @click="nodeContextmenuClick(item)">
             <div class="command">
@@ -349,6 +349,13 @@ export default {
   },
   beforeDestroy: function() {},
   methods: {
+    changeCount(){
+       setTimeout(() => {
+                       $(".rightmenu").hide();
+                }, 500)
+    
+      },
+
     /* 查询所有项目   */
     getProjects() {
       // console.log("permissions", this.permissions);
@@ -759,7 +766,7 @@ export default {
       }
       $(".rightmenu")
         .css({
-          top: event.y - 230
+          top: event.y - 248
         })
         .show();
       // }
