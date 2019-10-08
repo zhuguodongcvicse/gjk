@@ -128,7 +128,7 @@ export default {
   },
   created() {
     // location.reload()
-    console.log("++++++++++")
+    console.log("+++++++++++")
     this.getList();
     this.getPlatformSelectTree();
   },
