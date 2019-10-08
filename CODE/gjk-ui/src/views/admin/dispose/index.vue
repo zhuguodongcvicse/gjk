@@ -104,9 +104,14 @@
             <el-form :model="form" label-width="82px" :inline="false">
               <el-form-item label="参数路径：">
                 <el-input v-model="actions" size="mini" :disabled="true"></el-input>
-                <el-upload action="xx" :on-change="testOnChange">
-                  <el-button size="mini" plain type="primary" icon="el-icon-search"></el-button>
-                </el-upload>
+               <el-upload action="/pro/manager/getWorking" 
+                  :on-change="testOnChange" 
+                  class="upload-demo inline-block"
+                  multiple
+                  :show-file-list="false"
+                  :http-request="customFileUpload">
+                      <el-button size="mini" plain type="primary" icon="el-icon-search"></el-button>
+                  </el-upload>
               </el-form-item>
             </el-form>
 
@@ -265,7 +270,8 @@ import {
   getProcessName,
   getFilePathListById,
   getSysConfigXmlEntityMap,
-  getProcessFilePathById
+  getProcessFilePathById,
+  getWorking
 } from "@/api/pro/manager";
 import { getDictValue, remote } from "@/api/admin/dict";
 
@@ -640,6 +646,12 @@ export default {
   watch: {},
   //方法集合
   methods: {
+    customFileUpload(event){
+      var formData = new FormData();
+      formData.append("file", event.file);
+      getWorking(formData,this.processName,this.$route.query.pareId)
+      console.log("111111",this.$route.query)
+    },
     //软硬件配置
     softwareClick() {
       //调用接口
