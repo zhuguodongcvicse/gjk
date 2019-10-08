@@ -36,15 +36,12 @@ const navs = {
   actions: {},
   mutations: {
     ADD_TAG: (state, action) => {
-      // console.log("state***",state)
-      // console.log("action***",action)
       state.tag = action
       setStore({ name: 'tag', content: state.tag, type: 'session' })
 
       if (state.tagList.some(ele => diff(ele, action))) return
       for (const i in state.tagList) {
-        if (state.tagList[i].label == action.label) {
-          // console.log("***")
+        if (state.tagList[i].query.modelId != null && state.tagList[i].query.modelId == action.query.modelId) {
           return
         }
       }

@@ -105,6 +105,12 @@ export function getProcessName(id) {
 //     method: 'post'
 //   })
 // }
+export function getSoftProcessFilePath(id) {
+  return request({
+    url: '/pro/manager/getSoftProcessFilePath/' + id,
+    method: 'get'
+  })
+}
 
 export function getFilePathListById(id) {
   return request({

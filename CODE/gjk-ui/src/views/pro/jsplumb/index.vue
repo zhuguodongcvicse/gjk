@@ -8,7 +8,7 @@
         </el-input>
         <el-button-group>
           <el-button type="primary" plain size="small" @click="sendMessage('save')">保存</el-button>
-          <el-button type="primary" plain size="small" @click="sendMessage('loading')">加载</el-button>
+          <!-- <el-button type="primary" plain size="small" @click="sendMessage('loading')">加载</el-button> -->
           <el-button type="primary" plain size="small" @click="sendMessage('simulation')">仿真</el-button>
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('fullScreen')">全屏</el-button> -->
           <el-button type="primary" plain size="small" @click="sendMessage('exportJSON')">导出</el-button>
@@ -146,7 +146,8 @@ export default {
       saveParams: {}, //保存的参数
       connectionData: [], //保存连线关系
       tmpDataParam: {},
-      isFullscreen: false //是否全屏
+      isFullscreen: false, //是否全屏
+      index: 0
     };
   },
   //监听属性 类似于data概念
@@ -225,6 +226,8 @@ export default {
           ); //将uu 添加到表格
           this.tmpMaps.set(newParam.newTmpId, ctrlParam); //将查询的东西插入到临时
           this.saveXmlMaps = this.tmpMaps.get(newParam.newTmpId); //tmpMaps使用map将 数据对应上
+        } else if (newParam.state === 5) {
+          this.saveXmlMaps.xmlEntityMaps = [];
         }
       },
       deep: true //对象内部的属性监听，也叫深度监听
@@ -447,22 +450,25 @@ export default {
           "this.$route.params.processId",
           this.$route.params.processId
         );
-        findProJSON(this.$route.query.processId).then(res => {
-          //循环流程中的构件及"arrow"
-          console.log("加载后的数据", res.data.data.xmlJson.xmlEntityMaps);
-          res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
-            if (tmp.lableName !== "arrow") {
-              /* 将查询的东西插入到临时 */
-              // this.tempParam.push(tmp);
-              // 使用map将 数据对应上
-              this.tmpMaps.set(tmp.attributeMap.id, tmp);
-            }
+        this.index++;
+        if (this.index == 1) {
+          findProJSON(this.$route.query.processId).then(res => {
+            //循环流程中的构件及"arrow"
+            console.log("加载后的数据", res.data.data.xmlJson.xmlEntityMaps);
+            res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
+              if (tmp.lableName !== "arrow") {
+                /* 将查询的东西插入到临时 */
+                // this.tempParam.push(tmp);
+                // 使用map将 数据对应上
+                this.tmpMaps.set(tmp.attributeMap.id, tmp);
+              }
+            });
+            console.log("map数据", this.tmpMaps);
+            this.postMessageData.cmd = "clickCompLoading";
+            this.postMessageData.params = res.data.data.json;
+            this.$refs.gjkIframe.sendMessage(this.postMessageData);
           });
-          console.log("map数据", this.tmpMaps);
-          this.postMessageData.cmd = "clickCompLoading";
-          this.postMessageData.params = res.data.data.json;
-          this.$refs.gjkIframe.sendMessage(this.postMessageData);
-        });
+        }
       }
       //调用Iframe组件中的发送方法
       //this.$refs.gjkIframe.sendMessage(this.postMessageData);

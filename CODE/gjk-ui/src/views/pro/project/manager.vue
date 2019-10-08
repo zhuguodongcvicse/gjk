@@ -2,7 +2,7 @@
 <template>
   <div class="avue-layout" ref="contail">
     <!--左边导航-->
-    <div class="nt_main" v-bind:style="leftClass" v-show="leftShow">
+    <div class="nt_main nt_main_14s_1008" v-bind:style="leftClass" v-show="leftShow">
       <!-- 左侧导航栏 -->
       <project-tree
         ref="tree"
@@ -19,7 +19,7 @@
         alt="收缩"
         @click="imgToClick"
         v-bind:style="{cursor:'pointer','vertical-align':'middle','position': 'absolute','top': '50%','left': '50%','transform': 'translate(-50%, -50%)'}"
-      />
+      >
     </div>
     <!--右边主体-->
     <div class="mb_main" v-bind:style="rightClass">
@@ -79,6 +79,7 @@ import { mapGetters, mapState } from "vuex";
 import projectTree from "./project-tree";
 import iframes from "@/components/iframe";
 import { analysisThemeXML, fetchTwoNode } from "@/api/pro/manager";
+
 import { getPath } from "@/api/compile/devenv";
 export default {
   //import引入的组件需要注入到对象中才能使用
@@ -89,6 +90,7 @@ export default {
   data() {
     //这里存放数据
     return {
+      hardwarelibNode: "",
       existHardwarelib: "",
       dialogVisible: false,
       dialogVisible2: false,
@@ -104,7 +106,7 @@ export default {
         position: "absolute",
         left: 0,
         top: 0,
-        width: "230px",
+        width: "261px",
         height: "99%"
       },
       imgClass: {
@@ -123,10 +125,10 @@ export default {
       rightClass: {
         position: "absolute",
         top: 0,
-        left: "275px",
+        left: "266px",
         padding: 0,
         "padding-bottom": "0px",
-        width: "calc(100% - 285px)",
+        width: "calc(100% - 277px)",
         height: "calc(97%)",
         "box-sizing": "border-box",
         background: "#ffffff",
@@ -164,33 +166,44 @@ export default {
   //方法集合
   methods: {
     //查找是否添加了硬件建模
-    hardwarelibIfExist(nodeId) {
-      this.hardwarelibs.id = nodeId;
-      getHardwarelibs(nodeId).then(response => {
+    hardwarelibIfExist(node) {
+      this.hardwarelibNode = node;
+      this.hardwarelibs.id = node.id;
+      getHardwarelibs(node.id).then(response => {
         // console.log("response.data", response.data);
         this.existHardwarelib = response.data;
         if (response.data.frontJson == null) {
           // this.dialogVisible = true;
-          this.confirmAddHardwarelibs();
+          this.confirmAddHardwarelibs(node);
         } else {
           this.dialogVisible2 = true;
           // this.confirmUpdateHardwarelibs();
         }
       });
     },
-    confirmAddHardwarelibs() {
+    confirmAddHardwarelibs(node) {
       // console.log("this.hardwarelibs",this.hardwarelibs)
+      let hardwarelibs = this.hardwarelibs;
+      let hardwarelibModelId = node.parentId;
       this.$router.replace({
-        name: "hardwareAdd",
-        params: this.hardwarelibs
+        path: "/comp/manager/hardwareAdd",
+        query: {
+          hardwarelibs,
+          hardwarelibModelId
+        }
       });
       // this.dialogVisible = false;
       // this.closeRouterTag()
     },
     confirmUpdateHardwarelibs() {
+      let existHardwarelib = this.existHardwarelib;
+      let hardwarelibModelId = this.hardwarelibNode.parentId;
       this.$router.push({
-        name: "hardwareUpdate",
-        params: this.existHardwarelib
+        path: "/comp/manager/hardwareUpdate",
+        query: {
+          existHardwarelib,
+          hardwarelibModelId
+        }
       });
       this.dialogVisible2 = false;
       // this.closeRouterTag()
@@ -286,21 +299,22 @@ export default {
     handleChangeProject(project) {
       this.loadProject(project.id);
     },
-    handleNodeClick(node) {
-      // console.log("shshshshsh", node);
+    handleNodeClick(node, nodeRoot) {
+      // console.log("node", node);
       let id = node.id;
       if (node.parentType == "11") {
         fetchTwoNode(node, 2).then(res => {
           //流程节点
           let process = res.data.data;
+          // console.log("node", node, nodeRoot);
           if (node.type == "11") {
             this.$router.push({
               path: "/comp/manager/process",
-              // name: "process",
               query: {
                 proId: process.parentId,
                 processId: node.id,
-                modelId: node.parentId
+                modelId: node.parentId,
+                proFloName: nodeRoot.fileName + '_' + res.data.data.fileName + '_' + node.label
               }
             });
           }
@@ -341,7 +355,7 @@ export default {
       if (node.parentType == "12") {
         if (node.type == "12") {
           // console.log("node",node)
-          this.hardwarelibIfExist(node.id);
+          this.hardwarelibIfExist(node);
           /* this.$router.replace({
             name: "hardware",
             params: { sysId: node.id }

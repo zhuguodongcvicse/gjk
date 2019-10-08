@@ -42,14 +42,12 @@ export default {
   name: "AvueIframe",
   beforeRouteLeave(to, from, next) {
     // console.log("to", to);
-    // console.log("from", from);
-    // console.log("next", next);
     if (this.ifSave == 0) {
       this.params = "";
       next();
     } else {
       this.params = "";
-      alert("已离开当前页面,数据清除");
+      // alert("已离开当前页面,数据清除");
       next();
     }
   },
@@ -71,7 +69,7 @@ export default {
   created() {
     console.log("created");
     NProgress.configure({ showSpinner: false });
-    var formObj = this.$route.params;
+    var formObj = this.$route.query;
     // this.$route.chipDataTemp = this.$route.params
     // this.$set(this.$route,"chipDataTemp", this.$route.params)
     this.params = formObj;

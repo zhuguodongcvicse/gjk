@@ -2,8 +2,14 @@
 	var createElement = function(options) {
 		options = options || {};
 		var element = document.createElement(options.tagName || 'div');
+		// console.log("element",element)
+		// console.log("options",options)
+		/* if (options.class == 'input-group input-group-sm col-sm-7') {
+			element.setAttribute("readonly","readonly")
+		} */
 		if (options.parent.innerText == 'IP') {
 			element.setAttribute("id","IP")
+			element.removeAttribute("readonly")
 			// console.log("element.childNodes777",element.childNodes[0])
 			// console.log("options",options)
 			// console.log("options.parent",options.parent)

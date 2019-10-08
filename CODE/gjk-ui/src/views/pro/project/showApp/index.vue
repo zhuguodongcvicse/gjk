@@ -520,7 +520,7 @@ export default {
       //无用
       // this.appFile = "D:/14S_GJK_GIT/gjk/gjk/APPDownload/" + domain.fileName;
       //当前app对应的流程id(数据库存的字符串，客戶方的是int，先在前台转成了int，后期根据需求改动)
-      this.appDataDTO.appID = parseInt(domain.processId);
+      this.appDataDTO.flowId = domain.flowId;
       //导出路径（如：D:/14S_GJK_GIT/gjk/gjk/APPDownload/admin_123_111流程APP）
       this.appDataDTO.taskInfoPath = domain.fileName;
       //app工程文件夹路径（如：D:/14S_GJK_GIT/gjk/gjk/APP/admin_123_111流程APP）
@@ -528,9 +528,9 @@ export default {
       //系统配置模块xml路径
       this.appDataDTO.sysconfigPath = domain.sysconfigFilePath;
       //packinfo文件路径（客户自存自取的路径）
-      this.appDataDTO.packinfoPath = "";
+      // this.appDataDTO.packinfoPath = "";
       //组件划分方案路径（自存自取）
-      this.appDataDTO.cmpDeployPlanFilePath = "";
+      // this.appDataDTO.cmpDeployPlanFilePath = "";
 
       //导出接口
       appTaskExport(this.appDataDTO).then(res => {});
@@ -552,7 +552,7 @@ export default {
       //APP组件工程生成，<组件名称，对应平台大类属性>
       this.appDataDTO.cmpNameToHwType = domain.partnamePlatform;
       //当前app对应的流程id(数据库存的字符串，客戶方的是int，先在前台转成了int，后期根据需求改动)
-      this.appDataDTO.appID = parseInt(domain.processId);
+      this.appDataDTO.flowId = domain.flowId;
       //APP名称
       this.appDataDTO.appName = domain.fileName;
       // APP组件工程配置
@@ -591,7 +591,7 @@ export default {
       //APP组件工程生成，<组件名称，对应平台大类属性>
       this.appDataDTO.cmpNameToHwType = domain.partnamePlatform;
       //当前app对应的流程id(数据库存的字符串，客戶方的是int，先在前台转成了int，后期根据需求改动)
-      this.appDataDTO.appID = parseInt(domain.processId);
+      this.appDataDTO.flowId = domain.flowId;
       //APP名称
       this.appDataDTO.appName = domain.fileName;
       // APP组件工程配置
@@ -630,7 +630,7 @@ export default {
       //APP组件工程生成，<组件名称，对应平台大类属性>
       this.appDataDTO.cmpNameToHwType = domain.partnamePlatform;
       //当前app对应的流程id(数据库存的字符串，客戶方的是int，先在前台转成了int，后期根据需求改动)
-      this.appDataDTO.appID = parseInt(domain.processId);
+      this.appDataDTO.flowId = domain.flowId;
       //APP名称
       this.appDataDTO.appName = domain.fileName;
       appTaskRestart(this.appDataDTO).then(res => {
@@ -664,7 +664,7 @@ export default {
       //APP组件工程生成，<组件名称，对应平台大类属性>
       this.appDataDTO.cmpNameToHwType = domain.partnamePlatform;
       //当前app对应的流程id(数据库存的字符串，客戶方的是int，先在前台转成了int，后期根据需求改动)
-      this.appDataDTO.appID = parseInt(domain.processId);
+      this.appDataDTO.flowId = domain.flowId;
       //APP名称
       this.appDataDTO.appName = domain.fileName;
       appPause(this.appDataDTO).then(res => {
@@ -697,7 +697,7 @@ export default {
       //APP组件工程生成，<组件名称，对应平台大类属性>
       this.appDataDTO.cmpNameToHwType = domain.partnamePlatform;
       //当前app对应的流程id(数据库存的字符串，客戶方的是int，先在前台转成了int，后期根据需求改动)
-      this.appDataDTO.appID = parseInt(domain.processId);
+      this.appDataDTO.flowId = domain.flowId;
       //APP名称
       this.appDataDTO.appName = domain.fileName;
       appStop(this.appDataDTO).then(res => {
@@ -730,7 +730,7 @@ export default {
       //APP组件工程生成，<组件名称，对应平台大类属性>
       this.appDataDTO.cmpNameToHwType = domain.partnamePlatform;
       //当前app对应的流程id(数据库存的字符串，客戶方的是int，先在前台转成了int，后期根据需求改动)
-      this.appDataDTO.appID = parseInt(domain.processId);
+      this.appDataDTO.flowId = domain.flowId;
       //APP名称
       this.appDataDTO.appName = domain.fileName;
 
@@ -765,15 +765,18 @@ export default {
       //调接口传的参数
       this.appDataDTO.cmpNameToHwType = domain.partnamePlatform;
       //当前app对应的流程id(数据库存的字符串，客戶方的是int，先在前台转成了int，后期根据需求改动)
-      this.appDataDTO.appID = parseInt(domain.processId);
+      this.appDataDTO.flowId = parseInt("33333");
       //APP名称
       this.appDataDTO.appName = domain.fileName;
+      //系统配置模块xml路径
+      this.appDataDTO.sysconfigPath = domain.sysconfigFilePath;
       //客户自存自取路径
-      this.appDataDTO.packinfoPath = "";
+      // this.appDataDTO.packinfoPath = "";
       //客户自存自取路径
-      this.appDataDTO.cmpDeployPlanFilePath = "";
+      // this.appDataDTO.cmpDeployPlanFilePath = "";
       //app工程文件夹路径
       this.appDataDTO.appProPath = domain.filePath + "/" + domain.fileName;
+      console.log(this.appDataDTO);
       appInstall(this.appDataDTO).then(res => {
         if (res.data.data === true) {
           domain.appState = "Installed";
@@ -804,11 +807,13 @@ export default {
       //调接口传的参数
       this.appDataDTO.cmpNameToHwType = domain.partnamePlatform;
       //当前app对应的流程id(数据库存的字符串，客戶方的是int，先在前台转成了int，后期根据需求改动)
-      this.appDataDTO.appID = parseInt(domain.processId);
+      this.appDataDTO.flowId = domain.flowId;
       //APP名称
       this.appDataDTO.appName = domain.fileName;
+      //系统配置模块xml路径
+      this.appDataDTO.sysconfigPath = domain.sysconfigFilePath;
       //客户自存自取路径
-      this.appDataDTO.packinfoPath = "";
+      // this.appDataDTO.packinfoPath = "";
       appDelete(this.appDataDTO).then(res => {
         if (res.data.data === true) {
           domain.appState = "Uninstalled";

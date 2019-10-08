@@ -509,6 +509,7 @@ function checkDat() {
 			$(".div_left").css("right", dw - (e.clientX - BR) + "px")
 			//根据鼠标事件相对位置计算出div的position
 			$(".div_right").css("left", (e.clientX - BR) + "px")
+			$(".div_right").css("width", ($(".div_right").width()+(e.clientX - BR))-60 + "px")
 			return false;
 		}
 	})
@@ -528,7 +529,7 @@ function appendDiv() {
 		var s = dat[i].compImg.substr(dat[i].compImg.indexOf("src='") + 5);
 		var img = s.substr(0, s.indexOf("' "));
 		//str += "<div class = 'btn'  data-template='tpl-menu" + i + "'><img src='"+img+"'><br/>" + dat[i].compName + "</div></br>"
-		str += "<div class = 'btn'  data-template='tpl-menu" + i + "'>" + dat[i].compImg + "</div></br>"
+		str += "<div class = 'btn' style = 'margin:5px' data-template='tpl-menu" + i + "'>" + dat[i].compImg + "</div></br>"
 		//str += "<a class='btn btn-success btn-controler'  data-template='tpl-menu" + i + "' role='button'>" + dat[i].compName + "</a></br><br>";
 		Template += "<script id='tpl-menu" + i + "' type='text/html'>" +
 			"<div class='pa' id='{{id}}' style='top:{{top}}px;left:{{left}}px'>" +
@@ -2533,6 +2534,17 @@ var firstTime = 0;
 var lastTime = 0;
 $('.div_right').bind({
 	click: function () {
+		var removeTemp = [];
+			removeTemp.push({
+				//构件ID
+				gjId:"",
+				//构件模板ID
+				tmpId: "",
+				//状态
+				state: 5
+			});
+			//console.log(removeTemp);
+			handleMessageToParent("returnFormJson", removeTemp);
 		if (key) {
 			//alert(idList.length)
 			key = false;
@@ -2570,6 +2582,12 @@ $('.div_right').bind({
 			for (var i = 0; i < idList.length; i++) {
 				//$("#"+idList[i]+"-heading").css({"box-shadow":"none"})
 				$(".pa").removeClass("ui-selected")
+			}
+			if(lastTimeId != ""){
+				$('#' + lastTimeId).removeClass("nodeStyle")
+				$.each(jsPlumb.getEndpoints(lastTimeId), function (n,v) {
+					v.removeClass("nodeStyle")
+				});
 			}
 			idList = []
 			startX = e.pageX;

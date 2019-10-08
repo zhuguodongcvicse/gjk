@@ -25,7 +25,7 @@ export const tableOption = {
   editBtn: false,
   delBtn: false,
   addBtn: false,
-  labelWidth:120,
+  labelWidth: 120,
   column: [
     {
       label: '项目标识',
@@ -35,6 +35,10 @@ export const tableOption = {
     {
       label: '项目名称',
       prop: 'projectName'
+    },
+    {
+      label: '工作模式标识',
+      prop: 'flowId'
     },
     {
       label: '用户ID',

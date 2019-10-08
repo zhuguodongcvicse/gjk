@@ -1,3 +1,6 @@
+/**
+ * 屎山，很多能复用的方法没提，冗余for循环，等等，维护的大哥祝你好运
+ */
 var caseArr;
 var board_json = [];
 var frontCaseJSON;
@@ -157,7 +160,7 @@ function ondropLoadJSON(evt, graph, center, options) {
 		var image = bJsonObj.datas[index].json.image;
 		if (image == 'images/芯片.svg' || image == 'images/光纤口.svg' || image == 'images/网口.svg'
 			|| image == 'images/圆口.svg' || image == 'images/串口.svg' || image == 'images/前板卡.svg'
-			|| image == 'images/后板卡.svg' ||image == 'rack' ) {
+			|| image == 'images/后板卡.svg' || image == 'rack') {
 			bJsonObj.datas[index].json.movable = false;
 		}
 	}
@@ -429,15 +432,15 @@ function initEditor(editor) {
 		'selection.type': Q.Consts.SELECTION_TYPE_BORDER_RECT
 	}
 
-		//全屏按钮
-		var toolbarDiv = editor.toolbar;
-		var button = document.createElement('button');
-		button.textContent = '全屏';
-		button.className = 'boarddesign_board_14s';
-		toolbarDiv.appendChild(button)
-		button.onclick = function () {
-			toggleFullScreen()
-		}
+	//全屏按钮
+	var toolbarDiv = editor.toolbar;
+	var button = document.createElement('button');
+	button.textContent = '全屏';
+	button.className = 'boarddesign_board_14s';
+	toolbarDiv.appendChild(button)
+	button.onclick = function () {
+		toggleFullScreen()
+	}
 	initToolbar();
 
 	//以下为切换编辑模式
@@ -514,6 +517,7 @@ function initEditor(editor) {
 				}
 			}
 			//配置的ip nodeID 
+			console.log("chipListTemp",chipListTemp)
 			for (const n in graphList.fJson) {
 				for (const i in graphList.fJson[n].datas) {
 					if (graphList.fJson[n].datas[i].json.properties != null && graphList.fJson[n].datas[i].json.properties.caseName != null) {
@@ -531,6 +535,7 @@ function initEditor(editor) {
 										if (frontCaseForDeployment.datas[p].json.properties.chipName != null
 											&& frontCaseForDeployment.datas[p].json.properties.uniqueId == graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].uniqueId) {
 											frontCaseForDeployment.datas[p].json.properties.nodeID = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].nodeID
+											frontCaseForDeployment.datas[p].json.properties.IP = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].IP
 										}
 									}
 									allChipToFlow.push(graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k])
@@ -667,6 +672,7 @@ function initEditor(editor) {
 										if (frontCaseForDeployment.datas[p].json.properties.chipName != null
 											&& frontCaseForDeployment.datas[p].json.properties.uniqueId == graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].uniqueId) {
 											frontCaseForDeployment.datas[p].json.properties.nodeID = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].nodeID
+											frontCaseForDeployment.datas[p].json.properties.IP = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].IP
 										}
 									}
 									allChipToFlow.push(graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k])
@@ -841,6 +847,7 @@ function initEditor(editor) {
 										if (frontCaseForDeployment.datas[p].json.properties.chipName != null
 											&& frontCaseForDeployment.datas[p].json.properties.uniqueId == graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].uniqueId) {
 											frontCaseForDeployment.datas[p].json.properties.nodeID = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].nodeID
+											frontCaseForDeployment.datas[p].json.properties.IP = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].IP
 										}
 									}
 									allChipToFlow.push(graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k])
@@ -1068,46 +1075,41 @@ function initEditor(editor) {
 
 		toolbar.appendChild(button)
 		//网状画布 
-	//	var graph = editor.graph;
+		//	var graph = editor.graph;
 		//不可改变形状大小
 		graph.editable = false;
 
-	//	var defaultStyles = graph.styles = {};
-	//	defaultStyles[Q.Styles.ARROW_TO] = false;
+		//	var defaultStyles = graph.styles = {};
+		//	defaultStyles[Q.Styles.ARROW_TO] = false;
 
 		var background = new GridBackground(graph);
 
 		var currentCell = 10;
 
-	 	function snapToGrid(x, y) {
+		function snapToGrid(x, y) {
 			var gap = currentCell;
 			x = Math.round(x / gap) * gap;
 			y = Math.round(y / gap) * gap;
 			return [x, y];
-		} 
+		}
 
 	}
 
 	graph.popupmenu.getMenuItems = function (graph, data, evt) {
 		if (data) {
-			console.log("2626",data.from)
-			if(data.from != null){
+			console.log("2626", data.from)
+			if (data.from != null) {
 				return [
 					{
 						text: '删除连线', action: function () {
 							var data = graph.getElement(evt);
 							graph.removeSelectionByInteraction(data);
 						}
-	
 					},
-	
 				];
 			}
-		
-
 		}
 	}
-
 
 	//删除
 	graph.removeSelectionByInteraction = false;
@@ -1255,10 +1257,19 @@ function initEditor(editor) {
 			if (child.length != 0) {
 				parent[0].removeChild(child[0]);
 			} */
-
+			if (typeof data == 'undefined') {
+				return
+			}
 			if (data.properties.chipName != null) {
+				var chipPropertyList = document.getElementsByClassName('form-control')
+				chipPropertyList.item(0).setAttribute("readonly","readonly")
+				chipPropertyList.item(1).setAttribute("readonly","readonly")
+				chipPropertyList.item(2).setAttribute("readonly","readonly")
+				chipPropertyList.item(3).setAttribute("readonly","readonly")
+				chipPropertyList.item(4).setAttribute("readonly","readonly")
 				//给ip输入框添加失去聚焦属性
 				document.getElementById('IP').childNodes.item(0).setAttribute("onblur", "upperCase()")
+				// console.log("chipPropertyList",chipPropertyList)
 				clickCheckedChip = data.properties
 				//将板卡对应卡槽的slotnum赋给fSlotNum
 				// console.log("propertySheet",propertySheet)
@@ -1301,11 +1312,20 @@ function initEditor(editor) {
 				data.set('recvRate', data._mn3.recvRate);
 			}
 			if (data.properties.infName != null) {
+				var infPropertyList = document.getElementsByClassName('form-control')
+				infPropertyList.item(0).setAttribute("readonly","readonly")
+				infPropertyList.item(1).setAttribute("readonly","readonly")
+				infPropertyList.item(2).setAttribute("readonly","readonly")
+				// console.log("infPropertyList",infPropertyList)
 				data.set('infName', data._mn3.infName);
 				data.set('infRate', data._mn3.infRate);
 				data.set('opticalNum', data._mn3.opticalNum);
 			}
 			if (data.properties.boardType != null) {
+				var boardPropertyList = document.getElementsByClassName('form-control')
+				boardPropertyList.item(0).setAttribute("readonly","readonly")
+				boardPropertyList.item(1).setAttribute("readonly","readonly")
+				// console.log("boardPropertyList",boardPropertyList)
 				if (data._mn3.boardType == 0) {
 					data.set('showBoardType', 'calculateBoard');
 				}
@@ -1319,6 +1339,12 @@ function initEditor(editor) {
 					data.set('showBoardType', 'interfaceBoard');
 				}
 				data.set('boardName', data._mn3.boardName);
+			}
+			if (data.properties.caseName != null) {
+				var casePropertyList = document.getElementsByClassName('form-control')
+				casePropertyList.item(0).setAttribute("readonly","readonly")
+				casePropertyList.item(1).setAttribute("readonly","readonly")
+				// console.log("casePropertyList",casePropertyList)
 			}
 			// data.set('rackname', data._mn3.caseName);
 			// data.set('boardnum', data._mn3.bdnum);
@@ -1502,20 +1528,20 @@ function initEditor(editor) {
 			if (evt.kind == Q.InteractionEvent.ELEMENT_CREATED && evt.data instanceof Q.Edge) {
 				var edge = evt.data;
 				//校验只能接口连线
-				 	  if(evt.data.from.image != 'images/光纤口.svg' && evt.data.from.image != 'images/圆口.svg' && 
-				  evt.data.from.image !='images/网口.svg' &&   evt.data.from.image != 'images/串口.svg' 
-				  ){
+				if (evt.data.from.image != 'images/光纤口.svg' && evt.data.from.image != 'images/圆口.svg' &&
+					evt.data.from.image != 'images/网口.svg' && evt.data.from.image != 'images/串口.svg'
+				) {
 					graph.removeElement(edge);
-				 } 
-				 if(evt.data.to.image != 'images/光纤口.svg' && evt.data.to.image != 'images/圆口.svg' && 
-				 evt.data.to.image !='images/网口.svg' &&   evt.data.to.image != 'images/串口.svg' 
-				 ){
-				   graph.removeElement(edge);
-				} 
+				}
+				if (evt.data.to.image != 'images/光纤口.svg' && evt.data.to.image != 'images/圆口.svg' &&
+					evt.data.to.image != 'images/网口.svg' && evt.data.to.image != 'images/串口.svg'
+				) {
+					graph.removeElement(edge);
+				}
 
 
 				//连线条件限制
-			
+
 				var edgeBundle = edge.getEdgeBundle();
 				edge.setStyle(Q.Styles.EDGE_COLOR, '#2D97F9');
 				edge.name = ' ';

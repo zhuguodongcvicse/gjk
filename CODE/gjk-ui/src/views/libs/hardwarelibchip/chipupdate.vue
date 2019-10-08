@@ -60,7 +60,7 @@ export default {
       next();
     } else {
       this.params = "";
-      alert("已离开当前页面,数据清除");
+      // alert("已离开当前页面,数据清除");
       next();
     }
   },
@@ -78,7 +78,7 @@ export default {
   },
   created() {
     NProgress.configure({ showSpinner: false });
-    var formObj = this.$route.params;
+    var formObj = this.$route.query;
     this.params = formObj;
     // console.log("this.params",this.params)
   },

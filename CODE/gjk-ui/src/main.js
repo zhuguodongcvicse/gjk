@@ -12,6 +12,8 @@ import { loadStyle } from './util/util'
 import * as urls from '@/config/env'
 //引入图标
 import './assets/icon/iconfont.css'
+import './assets/icon/font/font_567566_qo5lxgtishg.css'
+import './assets/icon/font/font_667895_vf6hgm08ubf.css'
 import './util/dd.js'
 
 
@@ -61,9 +63,10 @@ Object.keys(filters).forEach(key => {
 })
 
 // 动态加载阿里云字体库
-iconfontVersion.forEach(ele => {
-  loadStyle(iconfontUrl.replace('$key', ele))
-})
+// iconfontVersion.forEach(ele => {
+//   console.log("-----------------------------------------ele", ele);
+//   loadStyle(iconfontUrl.replace('$key', ele))
+// })
 
 Vue.config.productionTip = false
 
