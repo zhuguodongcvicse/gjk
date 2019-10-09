@@ -106,7 +106,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	private static final String flowInfPath = JGitUtil.getFlowInfPath();// 获取流程内外部接口存放路径 add by hu
 	private static final String gitDetailPath = JGitUtil.getLOCAL_REPO_PATH();// gitlu路径
 	private static final String generateCodeResult = JGitUtil.getGenerateCodeResult();// 集成代码生成结果存放路径
-	private static final String softToHardResult = JGitUtil.getSoftToHardResult();//软硬件映射结果文件存放路径
+	private static final String softToHardResult = JGitUtil.getSoftToHardResult();// 软硬件映射结果文件存放路径
+
 	/**
 	 * @getTreeByProjectId
 	 * @Description: 获取项目树形菜单
@@ -360,20 +361,20 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		ProjectFile processFile = getOne(
 				Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, this.getById(proDetailId).getParentId()));
 		packinfoFileName = gitDetailPath + processFile.getFilePath() + generateCodeResult + "/packinfo.xml";
-		
+
 		File customizefile = new File(customizeFileName);
 		File packinfofile = new File(packinfoFileName);
 		File processfile = new File(processFileName);
-		
+
 		// 解析返回值
 		Map<String, List<Object>> map = new HashMap<>();
-		if(customizefile.exists() && packinfofile.exists() && processfile.exists())  {
+		if (customizefile.exists() && packinfofile.exists() && processfile.exists()) {
 			// 获取客户api的返回值
 			Map<String, List<String>> apiReturnStringList = ExternalIOTransUtils.getCmpSysConfig(customizeFileName,
 					packinfoFileName, processFileName);
 			analysisApiReturnStringList(apiReturnStringList, map);
 		}
-		
+
 		return map;
 	}
 
@@ -842,6 +843,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		Set<String> cMakeFilePathSet = new HashSet<String>();
 		// 调接口时使用,储存调用客户接口所需要的数据
 		Set<String> apiNeedStringSet = new HashSet<>();
+		// 获取Linux编译需要的所有APP/src文件路径下的所有.c文件
+		Set<String> linuxCFilePathSet = new HashSet<>();
 		// 调接口时使用,存构件的函数名
 		List<String> compFuncNameList = new ArrayList<String>();
 		// 存储需要查找的文件的后缀集合
@@ -851,6 +854,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		getCompCHFileAndSave(part, assemblyName, includeFilePath, srcFilePath, hFilePathSet, hMakeFilePathSet,
 				cFilePathSet, cMakeFilePathSet, apiNeedStringSet, compFuncNameList, selectFileExtensionList);
+
+		FileUtil.getSelectStrFilePathList(linuxCFilePathSet, partIntegerCodeFilePath, selectFileExtensionList);
 
 		try {
 			// 原始需求调用客户接口,apiFileList中存添加的.c .cpp .h文件不带后缀的文件名
@@ -884,6 +889,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		List<String> hMakeFilePathList = (List<String>) getListBySet(hMakeFilePathSet);
 		List<String> cMakeFilePathList = (List<String>) getListBySet(cMakeFilePathSet);
 		List<String> cFilePathList = (List<String>) getListBySet(cFilePathSet);
+		List<String> linuxCFilePath = (List<String>) getListBySet(linuxCFilePathSet);
 
 		if (makefileType.trim().toLowerCase().equals("VS2010".toLowerCase())) {
 			modifyVs2010MakeFile(assemblyName, hMakeFilePathList, cMakeFilePathList);
@@ -892,7 +898,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		} else if (makefileType.trim().toLowerCase().equals("Sylixos".toLowerCase())) {
 			SylixosUtil.updateSylixos(assemblyName, softwareName);
 		} else if (makefileType.trim().toLowerCase().startsWith("Linux".toLowerCase())) {
-			LinuxUtil.updateLinux(cFilePathList, assemblyName, ".c");
+			LinuxUtil.updateLinux(linuxCFilePath, assemblyName, ".c");
 		}
 	}
 
@@ -1245,20 +1251,20 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 								for (XmlEntityMap entityMap2 : entityMap1.getXmlEntityMaps()) {
 									if (entityMap2.getLableName().equals("层级属性")) {
 										for (XmlEntityMap entityMap3 : entityMap2.getXmlEntityMaps()) {
-											//if (entityMap3.getLableName().equals("所属部件")) {
-												//for (XmlEntityMap entityMap4 : entityMap3.getXmlEntityMaps()) {
-													if (entityMap3.getLableName().equals("部署配置")) {
-														for (XmlEntityMap entityMap5 : entityMap3.getXmlEntityMaps()) {
-															if (entityMap5.getLableName().equals("所属节点")) {
-																String cmpname = entityMap5.getAttributeMap().get("cmpName");
-																if (cmpname.equals(bakpartName)) {
-																	entityMap5.getAttributeMap().put("name", bakcpuid);
-																}
-															}
+											// if (entityMap3.getLableName().equals("所属部件")) {
+											// for (XmlEntityMap entityMap4 : entityMap3.getXmlEntityMaps()) {
+											if (entityMap3.getLableName().equals("部署配置")) {
+												for (XmlEntityMap entityMap5 : entityMap3.getXmlEntityMaps()) {
+													if (entityMap5.getLableName().equals("所属节点")) {
+														String cmpname = entityMap5.getAttributeMap().get("cmpName");
+														if (cmpname.equals(bakpartName)) {
+															entityMap5.getAttributeMap().put("name", bakcpuid);
 														}
 													}
-												//}
-											//}
+												}
+											}
+											// }
+											// }
 										}
 									}
 								}
@@ -1287,18 +1293,18 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 								for (XmlEntityMap entityMap2 : entityMap1.getXmlEntityMaps()) {
 									if (entityMap2.getLableName().equals("层级属性")) {
 										for (XmlEntityMap entityMap3 : entityMap2.getXmlEntityMaps()) {
-										//	if (entityMap3.getLableName().equals("所属部件")) {
-											//	for (XmlEntityMap entityMap4 : entityMap3.getXmlEntityMaps()) {
-													if (entityMap3.getLableName().equals("部署配置")) {
-														for (XmlEntityMap entityMap5 : entityMap3.getXmlEntityMaps()) {
-															if (entityMap5.getLableName().equals("所属节点")) {
-																String cmpname = entityMap5.getAttributeMap().get("cmpName");
-																if (cmpname.equals(partName)) {
-																	entityMap5.getAttributeMap().put("name", cpuid);
-																}
-															}
-												//		}
-												//	}
+											// if (entityMap3.getLableName().equals("所属部件")) {
+											// for (XmlEntityMap entityMap4 : entityMap3.getXmlEntityMaps()) {
+											if (entityMap3.getLableName().equals("部署配置")) {
+												for (XmlEntityMap entityMap5 : entityMap3.getXmlEntityMaps()) {
+													if (entityMap5.getLableName().equals("所属节点")) {
+														String cmpname = entityMap5.getAttributeMap().get("cmpName");
+														if (cmpname.equals(partName)) {
+															entityMap5.getAttributeMap().put("name", cpuid);
+														}
+													}
+													// }
+													// }
 												}
 											}
 										}
@@ -1435,12 +1441,12 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	public void getWorking(MultipartFile file, String flowName, String id) {
 		String fileName = file.getOriginalFilename();
 		ProjectFile pro = baseMapper.getProDetailById(id);
-		String flowPath =  proDetailPath + pro.getFilePath() + softToHardResult + File.separator;
+		String flowPath = proDetailPath + pro.getFilePath() + softToHardResult + File.separator;
 		/************************************
 		 * update by zhx
 		 ********************************************/
 		String filePath = flowPath + "系数文件.xml";
-		
+
 		/*****************************************************************************************/
 		File flowFile = new File(flowPath);
 		if (!flowFile.exists()) {
