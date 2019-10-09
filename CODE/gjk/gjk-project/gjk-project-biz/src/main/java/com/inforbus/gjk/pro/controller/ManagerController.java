@@ -849,32 +849,32 @@ public class ManagerController {
 	 */
 	@PutMapping("/codeGeneration/{projectId}/{username}")
 	public void codeGeneration(@PathVariable("projectId") String projectId,@PathVariable("username") String username) {
-		ProjectFile processFile=	managerService.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, projectId));
-		//		processFile.getFilePath()
-		String tmpGenerateCodeResult=gitDetailPath+processFile.getFilePath()+processFile.getFileName()+File.separator+generateCodeResult;
-		//		String tmpSoftToHardResult=gitDetailPath+processFile.getFilePath()+softToHardResult;
-		String generatecode = JGitUtil.getGeneratecode();//"D:\\14S_GJK_GIT\\gjk\\gjk\\generateCodeExe\\generatecode.exe";
-		String userName = 	username;
-		String workModeId = projectId;
+		ProjectFile processFile = managerService
+				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, projectId));
+		// processFile.getFilePath()
+		String tmpGenerateCodeResult = gitDetailPath + processFile.getFilePath() + processFile.getFileName()
+				+ File.separator + generateCodeResult;
+		// String
+		// tmpSoftToHardResult=gitDetailPath+processFile.getFilePath()+softToHardResult;
+		String generatecode = JGitUtil.getGeneratecode();// "D:\\14S_GJK_GIT\\gjk\\gjk\\generateCodeExe\\generatecode.exe";
+		String userName = username;
+		
+		ProjectFile projectFile = managerService.getBaseMapper().selectById(projectId);
+		String workModeId = projectFile.getFlowId();
+		
 		String workModeFilePath = managerService.getWorkModeFilePath(projectId);
-		String packinfoPath = tmpGenerateCodeResult+File.separator+"packinfo.xml";
+		String packinfoPath = tmpGenerateCodeResult + File.separator + "packinfo.xml";
 		String userDefineTopicFilePath = managerService.getUserDefineTopicFilePath(projectId);
 		String cmpIntgCodeFilePath = tmpGenerateCodeResult;
 
-		String filePath = gitDetailPath + processFile.getFilePath()+processFile.getFileName()+"/generateCodeResult";
-				File file = new File(filePath);
-				if (!file.exists()) {
-					file.mkdirs();
-				}
-		
-		String[] strArray = new String[] {
-				generatecode,
-				userName,
-				projectId,
-				workModeFilePath,
-				packinfoPath,
-				userDefineTopicFilePath,
-				cmpIntgCodeFilePath };
+		String filePath = gitDetailPath + processFile.getFilePath() + processFile.getFileName() + "/generateCodeResult";
+		File file = new File(filePath);
+		if (!file.exists()) {
+			file.mkdirs();
+		}
+
+		String[] strArray = new String[] { generatecode, userName, workModeId, workModeFilePath, packinfoPath,
+				userDefineTopicFilePath, cmpIntgCodeFilePath };
 		try {
 			Process process = Runtime.getRuntime().exec(strArray);
 			InputStreamReader reader = new InputStreamReader(process.getInputStream());
