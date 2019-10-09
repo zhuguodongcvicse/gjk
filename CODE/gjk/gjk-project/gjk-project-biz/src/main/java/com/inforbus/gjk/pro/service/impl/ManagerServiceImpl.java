@@ -375,10 +375,10 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// 解析返回值
 		Map<String, List<Object>> map = new HashMap<>();
 		//if (customizefile.exists() && packinfofile.exists() && processfile.exists()) {
-			// 获取客户api的返回值
-			Map<String, List<String>> apiReturnStringList = ExternalIOTransUtils.getCmpSysConfig(customizeFileName,
+		// 获取客户api的返回值
+		Map<String, List<String>> apiReturnStringList = ExternalIOTransUtils.getCmpSysConfig(customizeFileName,
 					packinfoFileName, processFileName);
-			analysisApiReturnStringList(apiReturnStringList, map);
+		analysisApiReturnStringList(apiReturnStringList, map);
 		//}
 
 		return map;
