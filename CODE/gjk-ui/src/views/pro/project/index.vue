@@ -358,11 +358,11 @@ export default {
       this.project.defaultBspId = this.bspSelectString;
       this.project.userId = this.userInfo.userId;
       //给工作模式ID赋值
-      this.project.flowId = this.formLabelAlign.flowId;
+      
       saveProject(this.project).then(Response => {
         // console.log("11111111111111111111111111111",Response.data.data);
         this.project.id = Response.data.data.id;
-        saveProProcess(this.project.id, this.project.processName).then(
+        saveProProcess(this.project.id, this.project.processName, this.formLabelAlign.flowId).then(
           Response => {
             console.log("得到saveProProcess的返回结果：",Response)
             for(var i=0;i<Response.data.data.length;i++){

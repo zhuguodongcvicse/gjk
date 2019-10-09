@@ -86,9 +86,9 @@ export function saveProject(obj) {
   })
 }
 
-export function saveProProcess(projectId, processName) {
+export function saveProProcess(projectId, processName, flowId) {
   return request({
-    url: '/pro/manager/saveProProcess/' + projectId + "/" + processName,
+    url: '/pro/manager/saveProProcess/' + projectId + "/" + processName + "/" + flowId,
     method: 'put'
   })
 }
