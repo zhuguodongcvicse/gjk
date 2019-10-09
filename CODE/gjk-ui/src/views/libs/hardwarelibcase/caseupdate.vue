@@ -102,6 +102,7 @@ export default {
     handleMessage(event) {
       this.params[1].frontCase = event.data.params[0]
       this.params[1].backCase = event.data.params[1]
+      this.params[1].bdNum = event.data.params[3];
       switch (event.data.cmd) {
         case "submitCaseJSON":
           // 处理业务逻辑

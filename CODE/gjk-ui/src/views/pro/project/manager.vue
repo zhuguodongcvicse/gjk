@@ -365,8 +365,8 @@ export default {
       if (node.parentType == "15") {
         if (node.type == "15") {
           this.$router.push({
-            name: "deployment",
-            params: { sysId: node.id }
+            path: "/comp/manager/deployment",
+            query: { sysId: node.id }
           });
         }
       }

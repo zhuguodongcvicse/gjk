@@ -1,5 +1,11 @@
 <template>
-  <el-dialog width="30%" class="libs_hardwarelibinf_addinf_14s" title="接口设计" :visible.sync="showInf.dialogFormVisible" :close-on-click-modal="false">
+  <el-dialog
+    width="30%"
+    class="libs_hardwarelibinf_addinf_14s"
+    title="接口设计"
+    :visible.sync="showInf.dialogFormVisible"
+    :close-on-click-modal="false"
+  >
     <el-form :model="form" label-width="90px" :rules="rules" ref="form">
       <el-form-item label="接口名称" :label-width="formLabelWidth" prop="infName">
         <el-input v-model="form.infName" autocomplete="off"></el-input>
@@ -19,10 +25,14 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="光纤数量" :label-width="formLabelWidth" prop="opticalNum" v-if="form.infType == 2">
+      <el-form-item
+        label="光纤数量"
+        :label-width="formLabelWidth"
+        prop="opticalNum"
+        v-if="form.infType == 2"
+      >
         <el-input v-model="form.opticalNum" autocomplete="off"></el-input>
       </el-form-item>
-
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click="close('form')">取 消</el-button>
@@ -54,14 +64,27 @@ export default {
       },
       rules: {
         infName: [
-          { required: true, message: "不能为空", trigger: "blur" }
+          { required: true, message: "接口名不能为空", trigger: "blur" }
         ],
-        infRate: [{ required: true, message: "不能为空", trigger: "blur" }],
+        infRate: [
+          { required: true, message: "接口速率不能为空", trigger: "blur" },
+          {
+            pattern: /^[0-9]*[1-9][0-9]*$/,
+            message: "请输入整数",
+            trigger: "blur"
+          }
+        ],
         infType: [
-          { required: true, message: "请选择活动区域", trigger: "change" }
+          { required: true, message: "请选择接口类型", trigger: "change" }
         ],
-        opticalNum: [{ required: true, message: "不能为空", trigger: "blur" }],
-        chipInf: [{ required: true, message: "不能为空", trigger: "blur" }]
+        opticalNum: [
+          { required: true, message: "不能为空", trigger: "blur" },
+          {
+            pattern: /^[0-9]*[1-9][0-9]*$/,
+            message: "请输入整数",
+            trigger: "blur"
+          }
+        ]
       }
     };
   },
@@ -77,41 +100,34 @@ export default {
       this.showInf.dialogFormVisible = false;
     },
     submit(formName) {
-      // console.log("this.allInfList",this.allInfList)
-      for (const i in this.allInfList.infList) {
-        if (this.form.infName == this.allInfList.infList[i].infName) {
-          alert("接口名称不能重复,您可以取名为“XXX.1,XXX.2”,或者换一个名字")
-          return
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          // console.log("this.allInfList",this.allInfList)
+          for (const i in this.allInfList.infList) {
+            if (this.form.infName == this.allInfList.infList[i].infName) {
+              alert(
+                "接口名称不能重复,您可以取名为“XXX.1,XXX.2”,或者换一个名字"
+              );
+              return;
+            }
+          }
+          // console.log("this.$store.state.infList",this.$store.state.infList)
+          this.showInf.dialogFormVisible = false;
+          // console.log("this.form",this.form)
+          saveInf(this.form).then(request => {
+            this.$message({
+              showClose: true,
+              message: "添加成功",
+              type: "success"
+            });
+            this.$parent.getList();
+            this.$refs[formName].resetFields();
+          });
+        } else {
+          // console.log("error submit!!");
+          return false;
         }
-      }
-      // console.log("this.$store.state.infList",this.$store.state.infList)
-      this.$refs[formName].validate(valid => {});
-      this.showInf.dialogFormVisible = false;
-      // console.log("this.form",this.form)
-      saveInf(this.form).then(request => {
-        this.$message({
-          showClose: true,
-          message: "添加成功",
-          type: "success"
-        });
-        this.$parent.getList();
-        this.$refs[formName].resetFields();
       });
-      this.form = {
-        id: "",
-        infName: "",
-        infRate: "",
-        infType: "",
-        opticalNum: "",
-        ioType: "2"
-      }
-    },
-    getPram(pram) {
-      //console.log("传递的参数", pram);
-      this.form.id = pram.id;
-      this.form.infName = pram.infName;
-      this.form.infRate = pram.infRate;
-      this.form.infType = pram.infType;
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
