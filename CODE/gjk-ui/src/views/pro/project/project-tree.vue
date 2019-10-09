@@ -58,9 +58,6 @@
             </template>
           </el-input>
         </el-form-item>
-        <el-form-item label="工作模式标识">
-          <el-input v-model="form.flowId" placeholder="工作模式标识" />
-        </el-form-item>
       </el-form>
       <div slot="footer">
         <el-button @click="closeAddProcedureDialog">取 消</el-button>
@@ -267,7 +264,6 @@ export default {
       procedureNameList: [],
       form: {
         procedureName: "",
-        flowId: ""
       },
 
       deleteProcedureDialogVisible: false,
@@ -681,8 +677,7 @@ export default {
     addProcedure() {
       saveProProcess(
         this.temp_currProject.id,
-        this.form.procedureName,
-        this.form.flowId
+        this.form.procedureName
       ).then(response => {
         this.closeAddProcedureDialog();
         this.reload();
