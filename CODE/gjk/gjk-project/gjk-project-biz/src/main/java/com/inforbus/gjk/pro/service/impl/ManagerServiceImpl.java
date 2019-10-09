@@ -1461,19 +1461,22 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (!flowFile.exists()) {
 			flowFile.mkdirs();
 		}
-		String tmpPath = new String();
-		tmpPath = new String(serverPath + "/gjk/upload/" + fileName).replace("\\", "/");
-
+		String upLoadFile = flowPath + fileName;
+//		String tmpPath = new String();
+//		tmpPath = new String(serverPath + "/gjk/upload/" + fileName).replace("\\", "/");
 		File newFile = null;
-		if (StringUtils.isNotEmpty(tmpPath)) {
+		if (StringUtils.isNotEmpty(upLoadFile)) {
 			try {
-				newFile = new File(tmpPath);
-				if (!newFile.getParentFile().exists()) {
-					newFile.getParentFile().mkdirs();
+				newFile = new File(upLoadFile);
+//				if (!newFile.getParentFile().exists()) {
+//					newFile.getParentFile().mkdirs();
+//				}
+				if(newFile.exists()) {
+					newFile.delete();
 				}
-				newFile.createNewFile();
-
-				ExternalIOTransUtils.parseSystemPara(flowName, tmpPath, filePath);
+				//newFile.createNewFile();
+				file.transferTo(newFile);
+				ExternalIOTransUtils.parseSystemPara(flowName, upLoadFile, filePath);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

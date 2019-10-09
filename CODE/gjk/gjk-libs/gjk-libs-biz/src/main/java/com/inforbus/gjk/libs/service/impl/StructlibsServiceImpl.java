@@ -300,7 +300,7 @@ public class StructlibsServiceImpl extends ServiceImpl<StructlibsMapper, Structl
             // 根据结构体主键查询数据
             List<Structlibs> lists = baseMapper.selectList(
                     Wrappers.<Structlibs>query().lambda().eq(Structlibs::getParentId, struct.getChildrenIds())
-                            .like(Structlibs::getName, param).orderByAsc(Structlibs::getSort));
+                            .like(Structlibs::getName, param[0]).orderByAsc(Structlibs::getSort));
             // 将ChildrenIds处理，用于重新赋值关系 ①
             struct.setChildrenIds(IdGenerate.uuid());
             for (Structlibs strs : lists) {

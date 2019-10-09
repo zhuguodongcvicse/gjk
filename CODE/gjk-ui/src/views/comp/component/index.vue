@@ -18,20 +18,20 @@
       >
         <template slot="menuLeft">
           <el-button
+            type="primary"
             icon="el-icon-edit el-icon--left"
             size="small"
             @click="templateData.templateVisible = true"
           >新增</el-button>
           <!-- <el-button size="small">
             <i class="el-icon-download el-icon--left"></i>导出
-          </el-button> -->
-          <el-button size="small" @click="importComp">
+          </el-button>-->
+          <el-button size="small" @click="importComp" type="primary">
             <i class="el-icon-upload el-icon--left"></i>导入
           </el-button>
         </template>
-        <template slot="tip">
-          <el-button type="text" size="small">导出</el-button>
-          <el-button type="text" size="small">导入</el-button>
+        <template slot="version" slot-scope="scope">
+          <el-tag>V{{parseFloat(scope.row.version).toFixed(1)}}</el-tag>
         </template>
         <template slot-scope="scope" slot="menu">
           <el-button-group>
@@ -292,20 +292,28 @@ export default {
       });
     },
     handleEdit(row, index) {
+      this.$store.dispatch("setFetchStrInPointer");
       //加载中英文映射
       this.$store.dispatch("setChineseMapping", "comp_param_type").then(() => {
-        this.$router.push({
-          path: "/comp/showComp/addComp1",
-          query: { compId: row.id, type: "edit" }
+        //加载结构体
+        this.$store.dispatch("setStruceType").then(() => {
+          this.$router.push({
+            path: "/comp/showComp/addComp1",
+            query: { compId: row.id, type: "edit" }
+          });
         });
       });
     },
     handleCopy(row, index) {
+      this.$store.dispatch("setFetchStrInPointer");
       //加载中英文映射
       this.$store.dispatch("setChineseMapping", "comp_param_type").then(() => {
-        this.$router.push({
-          path: "/comp/showComp/addComp1",
-          query: { compId: row.id, type: "copy" }
+        //加载结构体
+        this.$store.dispatch("setStruceType").then(() => {
+          this.$router.push({
+            path: "/comp/showComp/addComp1",
+            query: { compId: row.id, type: "copy" }
+          });
         });
       });
     },
