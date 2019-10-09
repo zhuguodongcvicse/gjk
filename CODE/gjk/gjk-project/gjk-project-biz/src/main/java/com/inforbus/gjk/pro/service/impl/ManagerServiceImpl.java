@@ -828,7 +828,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		FileUtil.getSelectStrFilePathList(integerCodeSet, integerCodeFilePath, "Cmp" + part.getPartName(), ".c");
 		try {
 			for (String filepath : integerCodeSet) {
-				FileUtil.copyFile(filepath, partIntegerCodeFilePath);
+				FileUtil.copyFile(filepath, partIntegerCodeFilePath, "CmpSpbIntg.c");
 			}
 		} catch (IOException e) {
 			logger.error("复制集成代码失败，请联系管理员。");
