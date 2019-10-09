@@ -860,7 +860,7 @@ public class ManagerController {
 		String userName = username;
 		
 		ProjectFile projectFile = managerService.getBaseMapper().selectById(projectId);
-		String workModeId = projectFile.getFlowId();
+		String workModeId = String.valueOf(projectFile.getFlowId());
 		
 		String workModeFilePath = managerService.getWorkModeFilePath(projectId);
 		String packinfoPath = tmpGenerateCodeResult + File.separator + "packinfo.xml";
