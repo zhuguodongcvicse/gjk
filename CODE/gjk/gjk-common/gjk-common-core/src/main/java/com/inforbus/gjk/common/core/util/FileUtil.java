@@ -97,6 +97,56 @@ public class FileUtil {
 	}
 
 	/**
+	 * 将文件拷贝到指定的文件夹下指定的文件
+	 * 
+	 * @param filePath       需要拷贝的文件
+	 * @param targetFilePath 指定的文件夹
+	 * @return
+	 * @throws IOException
+	 */
+	public String copyFile(String filePath, String targetFilePath, String fileName) throws IOException {
+		FileInputStream inputStream = null;
+		FileOutputStream outputStream = null;
+		try {
+			File file = new File(filePath);
+			File targetFile = new File(targetFilePath);
+			if (!targetFile.exists()) {
+				targetFile.mkdirs();
+			}
+			targetFilePath += File.separator + fileName;
+			targetFile = new File(targetFilePath);
+
+			if (targetFile.exists()) {
+				targetFile.delete();
+			}
+
+			inputStream = new FileInputStream(file);
+			outputStream = new FileOutputStream(targetFile);
+
+			if (file.exists()) {
+				byte[] buffer = new byte[2048];
+				while (true) {
+					int len = inputStream.read(buffer);
+
+					if (len == -1) {
+						break;
+					} else {
+						outputStream.write(buffer, 0, len);
+					}
+				}
+			}
+		} finally {
+			if (inputStream != null) {
+				inputStream.close();
+			}
+			if (outputStream != null) {
+				outputStream.close();
+			}
+		}
+		return targetFilePath;
+	}
+
+	/**
 	 * 获取在指定文件路径下所有符合条件的文件的绝对路径的集合
 	 * 
 	 * @param returnFilePathList

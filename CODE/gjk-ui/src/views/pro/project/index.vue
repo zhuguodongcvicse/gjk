@@ -95,9 +95,6 @@
                 <el-form-item label="流程名称">
                   <el-input v-model="formLabelAlign.processName"></el-input>
                 </el-form-item>
-                <el-form-item label="工作模式标识">
-                  <el-input v-model="formLabelAlign.flowId"></el-input>
-                </el-form-item>
               </div>
 
               <div class="control-container bsp_footer_btn_14s text_align_right_14s">
@@ -193,7 +190,6 @@ export default {
         number: "",
         hardware: "",
         processName: "",
-        flowId: ""
       },
       labelPosition: "right",
       dialogTableVisible: false,
@@ -362,7 +358,7 @@ export default {
       saveProject(this.project).then(Response => {
         // console.log("11111111111111111111111111111",Response.data.data);
         this.project.id = Response.data.data.id;
-        saveProProcess(this.project.id, this.project.processName, this.formLabelAlign.flowId).then(
+        saveProProcess(this.project.id, this.project.processName).then(
           Response => {
             console.log("得到saveProProcess的返回结果：",Response)
             for(var i=0;i<Response.data.data.length;i++){

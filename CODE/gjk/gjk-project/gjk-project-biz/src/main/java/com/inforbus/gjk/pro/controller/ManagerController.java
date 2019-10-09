@@ -128,10 +128,10 @@ public class ManagerController {
 		return new R<>(managerService.getProcedureNameListByProjectId(projectId));
 	}
 
-	@RequestMapping(value = "/saveProProcess/{projectId}/{processName}/{flowId}")
+	@RequestMapping(value = "/saveProProcess/{projectId}/{processName}")
 	public R saveProProcess(@PathVariable("projectId") String projectId,
-			@PathVariable("processName") String processName, @PathVariable("flowId") String flowId) {
-		return new R<>(managerService.saveProProcess(projectId, processName, Integer.parseInt(flowId)));
+			@PathVariable("processName") String processName) {
+		return new R<>(managerService.saveProProcess(projectId, processName));
 	}
 
 	@PutMapping
@@ -926,4 +926,8 @@ public class ManagerController {
     public R getPlatformList() {
         return managerService.getPlatformList();
     }
+	@GetMapping("/deleteProcedureById/{procedureId}")
+	public R deleteProcedureById(@PathVariable("procedureId") String procedureId) {
+		return new R<>(managerService.deleteProcedureById(procedureId));
+	}
 }

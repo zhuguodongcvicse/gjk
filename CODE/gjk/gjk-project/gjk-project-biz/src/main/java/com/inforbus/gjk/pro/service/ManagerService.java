@@ -46,7 +46,7 @@ public interface ManagerService extends IService<ProjectFile> {
 	 * @param processName
 	 * @return
 	 */
-	List<ProjectFile> saveProProcess(String projectId, String processName, int flowId);
+	List<ProjectFile> saveProProcess(String projectId, String processName);
 
 	/**
 	 * @Title: createXmlFile
@@ -278,4 +278,6 @@ public interface ManagerService extends IService<ProjectFile> {
 	 * @return
 	 */
 	R getPlatformList();
+	
+	public boolean deleteProcedureById(String procedureId);
 }

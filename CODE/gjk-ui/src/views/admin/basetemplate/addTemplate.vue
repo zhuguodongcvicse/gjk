@@ -769,18 +769,23 @@ export default {
       this.currentXmlMap = data;
       var attributeMap = data.attributeMap;
       var configureType = {};
-      if (attributeMap != null || attributeMap != undefined) {
+      if (attributeMap != null) {
         //获取标签上属性的配置方式
 
         var str = attributeMap["configureType"];
         configureType = parseStrToObj(str);
-
         this.configureType = configureType;
-
-        this.lableMappingName = this.currentXmlMap.lableMappingName; //获取标签上映射名
-
-        var attrs = this.configureType.attrs;
-        if (attrs.length > 0) {
+        if(this.currentXmlMap.lableMappingName != undefined){
+          this.lableMappingName = this.currentXmlMap.lableMappingName; //获取标签上映射名
+        }
+        
+        if(this.configureType.attrs != undefined){
+          var attrs = this.configureType.attrs;
+        }else{
+          var attrs = [];
+        }
+        
+        if (attrs != undefined && attrs.length > 0) {
           for (var i = 0; i < attrs.length; i++) {
             if (attrs[i].attrConfigType == "selectComm") {
               //匹配下拉框中的数据来源
@@ -1339,7 +1344,7 @@ export default {
         if (configureType != undefined) {
           //判断configureType对象是否存在
           var dictValues = this.dictValues;
-          if (configureType.lableMapping) {
+          if (configureType.lableMapping != undefined && configureType.lableMapping) {
             //判断标签名是否映射
             for (let i of dictValues) {
               if (configureType.mappingKeys == i.id) {
@@ -1349,10 +1354,10 @@ export default {
             }
           } else {
             //不映射的话页面显示原始标签名
-            Vue.set(XmlEntityMap, "lableMappingName", configureType.lableName);
+            Vue.set(XmlEntityMap, "lableMappingName", XmlEntityMap.lableName);
           }
           var attrs = configureType.attrs;
-          if (attrs.length > 0 && attrs != undefined) {
+          if (attrs != undefined && attrs.length > 0 ) {
             //判断标签上是否拥有属性
             for (let i of attrs) {
               //遍历属性
