@@ -900,7 +900,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		} else if (makefileType.trim().toLowerCase().equals("Sylixos".toLowerCase())) {
 			SylixosUtil.updateSylixos(assemblyName, softwareName);
 		} else if (makefileType.trim().toLowerCase().startsWith("Linux".toLowerCase())) {
-			LinuxUtil.updateLinux(linuxCFilePath, assemblyName, ".c");
+			LinuxUtil.updateLinux(cFilePathList, assemblyName, ".c");
+//			LinuxUtil.updateLinux(linuxCFilePath, assemblyName, ".c");
 		}
 	}
 
