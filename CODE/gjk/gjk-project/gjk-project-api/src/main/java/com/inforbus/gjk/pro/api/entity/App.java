@@ -79,7 +79,7 @@ public class App extends Model<App> {
 	/**
 	 * 工作模式标志
 	 */
-	private String flowId;
+	private int flowId;
 	/**
 	 * 本地部署方案Boolean值
 	 */

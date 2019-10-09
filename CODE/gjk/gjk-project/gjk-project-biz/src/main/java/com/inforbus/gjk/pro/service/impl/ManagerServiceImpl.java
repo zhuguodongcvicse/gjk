@@ -160,7 +160,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @see com.inforbus.gjk.pro.service.ManagerService#saveProProcess(java.lang.String,
 	 *      java.lang.String)
 	 */
-	public List<ProjectFile> saveProProcess(String projectId, String processName, String flowId) {
+	public List<ProjectFile> saveProProcess(String projectId, String processName, int flowId) {
 		List<ProjectFile> files = new ArrayList<ProjectFile>();
 
 		Project project = projectMapper.getProById(projectId);
@@ -174,36 +174,36 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		files.add(processFile);
 
 		filePath += processFile.getFileName() + File.separator;
-		ProjectFile modelFile = new ProjectFile(IdGenerate.uuid(), projectId, null, "模型", "10", filePath,
+		ProjectFile modelFile = new ProjectFile(IdGenerate.uuid(), projectId, "模型", "10", filePath,
 				processFile.getId(), null, null);
 		files.add(modelFile);
 
 		filePath += modelFile.getFileName() + File.separator;
-		ProjectFile file = new ProjectFile(IdGenerate.uuid(), projectId, null, "流程建模", "11", filePath,
+		ProjectFile file = new ProjectFile(IdGenerate.uuid(), projectId,  "流程建模", "11", filePath,
 				modelFile.getId(), null, null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, null, "硬件建模", "12", filePath, modelFile.getId(), null,
+		file = new ProjectFile(IdGenerate.uuid(), projectId, "硬件建模", "12", filePath, modelFile.getId(), null,
 				null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, null, "软硬件映射配置", "13", filePath, modelFile.getId(), null,
+		file = new ProjectFile(IdGenerate.uuid(), projectId, "软硬件映射配置", "13", filePath, modelFile.getId(), null,
 				null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, null, "方案展示", "14", filePath, modelFile.getId(), null,
+		file = new ProjectFile(IdGenerate.uuid(), projectId, "方案展示", "14", filePath, modelFile.getId(), null,
 				null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, null, "部署图", "15", filePath, modelFile.getId(), null,
+		file = new ProjectFile(IdGenerate.uuid(), projectId, "部署图", "15", filePath, modelFile.getId(), null,
 				null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, null, "自定义配置", "16", filePath, modelFile.getId(), null,
+		file = new ProjectFile(IdGenerate.uuid(), projectId, "自定义配置", "16", filePath, modelFile.getId(), null,
 				null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, null, "系统配置", "17", filePath, modelFile.getId(), null,
+		file = new ProjectFile(IdGenerate.uuid(), projectId, "系统配置", "17", filePath, modelFile.getId(), null,
 				null);
 		files.add(file);
 
@@ -697,7 +697,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String modelId = projectFile.getParentId();
 		String proceId = this.getById(modelId).getParentId();
 
-		String flowId = this.getById(proceId).getFlowId();
+		int flowId = this.getById(proceId).getFlowId();
 		String integerCodeFilePath = proDetailPath + this.getById(modelId).getFilePath() + File.separator
 				+ integerCodeFileName;
 

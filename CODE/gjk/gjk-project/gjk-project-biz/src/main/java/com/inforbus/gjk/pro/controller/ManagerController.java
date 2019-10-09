@@ -131,7 +131,7 @@ public class ManagerController {
 	@RequestMapping(value = "/saveProProcess/{projectId}/{processName}/{flowId}")
 	public R saveProProcess(@PathVariable("projectId") String projectId,
 			@PathVariable("processName") String processName, @PathVariable("flowId") String flowId) {
-		return new R<>(managerService.saveProProcess(projectId, processName, flowId));
+		return new R<>(managerService.saveProProcess(projectId, processName, Integer.parseInt(flowId)));
 	}
 
 	@PutMapping

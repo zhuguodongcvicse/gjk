@@ -20,11 +20,23 @@ public class ProjectFile extends Model<Project> {
 
 	private static final long serialVersionUID = 1L;
 
-	public ProjectFile(String id, String projectId, String flowId, String fileName, String fileType, String filePath, String parentId,
+	public ProjectFile(String id, String projectId, int flowId, String fileName, String fileType, String filePath, String parentId,
 			String softwareId, String bspId) {
 		this.id = id;
 		this.projectId = projectId;
 		this.flowId = flowId;
+		this.fileName = fileName;
+		this.fileType = fileType;
+		this.filePath = filePath;
+		this.parentId = parentId;
+		this.softwareId = softwareId;
+		this.bspId = bspId;
+	}
+	
+	public ProjectFile(String id, String projectId, String fileName, String fileType, String filePath, String parentId,
+			String softwareId, String bspId) {
+		this.id = id;
+		this.projectId = projectId;
 		this.fileName = fileName;
 		this.fileType = fileType;
 		this.filePath = filePath;
@@ -49,7 +61,7 @@ public class ProjectFile extends Model<Project> {
 	/**
 	 * 工作模式ID
 	 */
-	private String flowId;
+	private int flowId;
 	/**
 	 * 文件名
 	 */

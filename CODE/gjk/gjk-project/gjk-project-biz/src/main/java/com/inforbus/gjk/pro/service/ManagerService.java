@@ -46,7 +46,7 @@ public interface ManagerService extends IService<ProjectFile> {
 	 * @param processName
 	 * @return
 	 */
-	List<ProjectFile> saveProProcess(String projectId, String processName, String flowId);
+	List<ProjectFile> saveProProcess(String projectId, String processName, int flowId);
 
 	/**
 	 * @Title: createXmlFile
