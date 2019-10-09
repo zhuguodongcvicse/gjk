@@ -25,6 +25,8 @@ import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
  */
 public interface ManagerService extends IService<ProjectFile> {
 
+
+
 	/**
 	 * @Title: getTreeByProjectId
 	 * @Description: 根据项目编号查询项目树
@@ -44,7 +46,7 @@ public interface ManagerService extends IService<ProjectFile> {
 	 * @param processName
 	 * @return
 	 */
-	List<ProjectFile> saveProProcess(String projectId, String processName, int flowId);
+	List<ProjectFile> saveProProcess(String projectId, String processName);
 
 	/**
 	 * @Title: createXmlFile
@@ -219,6 +221,7 @@ public interface ManagerService extends IService<ProjectFile> {
 	 */
 	List<String> getProcedureNameListByProjectId(String projectId);
 
+
 	Hardwarelibs getHardwarelibs(String id);
 
 	void saveHardwarelibs(Hardwarelibs hardwarelibs);
@@ -232,25 +235,23 @@ public interface ManagerService extends IService<ProjectFile> {
 	void updataDeploymentXml(DeploymentXMLMap deploymentXMLMap);
 
 	void deleteHardwarelibById(String id);
-
 	/**
-	 * 导出流程建模文件
+	 *导出流程建模文件 
 	 */
-	byte[] exportFile(String id, StringRef sr);
+	byte[] exportFile(String id,StringRef sr);
 
-	void saveChipsfromhardwarelibs(Chipsfromhardwarelibs chipsfromhardwarelibs);
+    void saveChipsfromhardwarelibs(Chipsfromhardwarelibs chipsfromhardwarelibs);
 
-	Chipsfromhardwarelibs getChipsfromhardwarelibs(String id);
-
+    Chipsfromhardwarelibs getChipsfromhardwarelibs(String id);
+    
 	String getWorkModeFilePath(String projectId);
-
+	
 	String getUserDefineTopicFilePath(String projectId);
-
 	void deleteChipsFromHardwarelibs(String id);
 
 	void getWorking(MultipartFile file, String flowName, String id);
-
-	/**
+	
+		/**
 	 * 修改软件框架下拉列表内容
 	 * 
 	 * @return
@@ -267,7 +268,6 @@ public interface ManagerService extends IService<ProjectFile> {
 
 	/**
 	 * 回显软件框架
-	 * 
 	 * @param id
 	 * @return
 	 */
@@ -275,16 +275,7 @@ public interface ManagerService extends IService<ProjectFile> {
 
 	/**
 	 * 得到平台大类
-	 * 
 	 * @return
 	 */
 	R getPlatformList();
-
-	/**
-	 * 根据流程Id删除流程及流程下的模型及各类配置节点
-	 * 
-	 * @param procedureId
-	 * @return
-	 */
-	boolean deleteProcedureById(String procedureId);
 }

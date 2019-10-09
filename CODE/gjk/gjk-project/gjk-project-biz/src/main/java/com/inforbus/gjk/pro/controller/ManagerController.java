@@ -81,11 +81,11 @@ import mapping.BackNodeInfoForSpb;
 public class ManagerController {
 
 	private static final Logger logger = LoggerFactory.getLogger(ManagerController.class);
-	private static final String gitDetailPath = JGitUtil.getLOCAL_REPO_PATH();// gitlu路径
-	private static final String generateCodeResult = JGitUtil.getGenerateCodeResult();// 集成代码生成结果存放路径
-	private static final String softToHardResult = JGitUtil.getSoftToHardResult();// 软硬件映射结果文件存放路径
-	private static final String flowInfPath = JGitUtil.getFlowInfPath();// 获取流程内外部接口存放路径 add by hu
-
+	private static final String gitDetailPath = JGitUtil.getLOCAL_REPO_PATH();//gitlu路径
+	private static final String generateCodeResult = JGitUtil.getGenerateCodeResult();//集成代码生成结果存放路径
+	private static final String softToHardResult = JGitUtil.getSoftToHardResult();//软硬件映射结果文件存放路径
+	private static final String flowInfPath = JGitUtil.getFlowInfPath();//获取流程内外部接口存放路径 add by hu
+	
 	/**
 	 * @Fields managerService : 项目管理
 	 */
@@ -100,9 +100,8 @@ public class ManagerController {
 			retFile = managerService.getById(retFile.getParentId());
 		}
 		return new R<>(retFile);
-
+		
 	}
-
 	/**
 	 * @Title: 获取树形菜单集合
 	 * @Description:
@@ -129,23 +128,20 @@ public class ManagerController {
 		return new R<>(managerService.getProcedureNameListByProjectId(projectId));
 	}
 
-	@RequestMapping(value = "/saveProProcess/{projectId}/{processName}/{flowId}")
+	@RequestMapping(value = "/saveProProcess/{projectId}/{processName}")
 	public R saveProProcess(@PathVariable("projectId") String projectId,
-			@PathVariable("processName") String processName, @PathVariable("flowId") String flowId) {
-		return new R<>(managerService.saveProProcess(projectId, processName, Integer.parseInt(flowId)));
+			@PathVariable("processName") String processName) {
+		return new R<>(managerService.saveProProcess(projectId, processName));
 	}
 
 	@PutMapping
 	@RequestMapping("/createXmlFile/{proDetailId}")
 	public R createXmlFile(@RequestBody XmlEntity entity, @PathVariable("proDetailId") String proDetailId) {
-		ProjectFile processFile = managerService
-				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, proDetailId));
-		ProjectFile modelFile = managerService
-				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, processFile.getParentId()));
-		ProjectFile flowFile = managerService
-				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, modelFile.getParentId()));
+		ProjectFile processFile=	managerService.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, proDetailId));
+		ProjectFile modelFile= managerService.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, processFile.getParentId()));
+		ProjectFile flowFile= managerService.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, modelFile.getParentId()));
 
-		String filePath = gitDetailPath + flowFile.getFilePath() + flowFile.getFileName() + "/softToHardResult";
+		String filePath = gitDetailPath + flowFile.getFilePath()+flowFile.getFileName()+"/softToHardResult";
 		File file = new File(filePath);
 		if (!file.exists()) {
 			file.mkdirs();
@@ -254,17 +250,17 @@ public class ManagerController {
 	/**
 	 * 软硬件映射调接口缩略方案
 	 */
-	// @PostMapping("/simplePlan")
-	// public void simplePlan(String id) {
-	// //File file = new File(filePaths);
-	// //getFile(filePaths);
-	// //查找路径下的所有文件
-	//
-	//
-	// //managerService.simplePlan(schemeFileList, simplePlanFile);
-	// System.out.println("lllllllll");
-	// }
-	//
+	//	@PostMapping("/simplePlan")
+	//	public void simplePlan(String id) {
+	//		//File file = new File(filePaths);
+	//		//getFile(filePaths);
+	//		//查找路径下的所有文件
+	//        
+	//		
+	//		//managerService.simplePlan(schemeFileList, simplePlanFile);
+	//		System.out.println("lllllllll");
+	//	}
+	//	
 	private void getFile(String path, String id) {
 		ProjectPlan projectPlan = new ProjectPlan();
 
@@ -283,21 +279,21 @@ public class ManagerController {
 				projectPlan.setParentId(id);
 
 				// only take file name
-				// System.out.println("^^^^^" + array[i].getName());
+				//                System.out.println("^^^^^" + array[i].getName());
 				projectPlan.setFileName(array[i].getName().substring(0, (array[i].getName().length() - 4)));
 				System.out.println("fileName:" + projectPlan.getFileName());
 				// take file path and name
-				// System.out.println("#####" + array[i]);
+				//                System.out.println("#####" + array[i]);
 				projectPlan.setFilePath(array[i].getPath());
 				// take file path and name
-				// System.out.println("*****" + array[i].getPath());
+				//                System.out.println("*****" + array[i].getPath());
 				managerService.saveProjectPlan(projectPlan);
 			} else if (array[i].isDirectory()) {
 				getFile(array[i].getPath(), id);
 			}
 		}
 	}
-
+	
 	/**
 	 * 根据当前软硬件映射配置的id，查找当前流程下的所有模块的文件路径，从而截取想要的路径
 	 * 
@@ -307,9 +303,9 @@ public class ManagerController {
 	@GetMapping("/getSoftProcessFilePath/{id}")
 	public R getSoftProcessFilePath(@PathVariable("id") String id) {
 		List<ProjectFile> lists = managerService.getFilePathListById(id);
-		// 流程建模路径（赋给软硬件映射配置xml的流程文件标签）
+		//流程建模路径（赋给软硬件映射配置xml的流程文件标签）
 		String workModeFilePath = "";
-		// 客户自存自取的文件路径，赋给软硬件映射配置ml的方案路径
+		//客户自存自取的文件路径，赋给软硬件映射配置ml的方案路径
 		String planFilePath = "";
 		String str = "";
 		for (ProjectFile ls : lists) {
@@ -317,16 +313,16 @@ public class ManagerController {
 				String bb = ls.getFilePath().replaceAll("\\\\", "/");
 				String www = gitDetailPath + ls.getFilePath() + ls.getFileName() + ".xml";
 				String aa = bb.substring(0, bb.lastIndexOf("/"));
-				aa = aa.substring(0, aa.lastIndexOf("/"));
-				String ppp = gitDetailPath + aa + File.separator + softToHardResult;
+				aa = aa.substring(0,aa.lastIndexOf("/"));
+				String ppp = gitDetailPath + aa + File.separator +  softToHardResult;
 				workModeFilePath = www.replaceAll("\\\\", "/");
 				planFilePath = ppp.replaceAll("\\\\", "/");
 				str = workModeFilePath + "@###@###@@" + planFilePath;
 			}
-
+			
 		}
 		return new R<>(str);
-
+		
 	}
 
 	/**
@@ -341,11 +337,9 @@ public class ManagerController {
 		// id：软硬件映射配置的主键id
 		List<ProjectFile> lists = managerService.getFilePathListById(id);
 		// 当前项目id
-		String projectId = lists.size() > 0 ? lists.get(0).getProjectId() : "0";
-		ProjectFile processFile = managerService
-				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, id));
-		ProjectFile flowFile = managerService
-				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, processFile.getParentId()));
+		String projectId = lists.size()>0?lists.get(0).getProjectId():"0";
+		ProjectFile processFile= managerService.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, id));
+		ProjectFile flowFile= managerService.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, processFile.getParentId()));
 		// 流程模型文件
 		String workModeFilePath = "";
 		// cpu模型文件
@@ -363,7 +357,7 @@ public class ManagerController {
 		// 方案展示的文件路径
 		String simplePlanFile = "";
 		String flowpath = "";
-		String flowName = "";
+		String flowName ="";
 		for (ProjectFile ls : lists) {
 			if (ls.getFileType().equals("11")) {
 				workModeFilePath = ls.getFilePath() + ls.getFileName() + ".xml";
@@ -382,7 +376,7 @@ public class ManagerController {
 			}
 			// 方案展示的路径
 			if (ls.getFileType().equals("14")) {
-				simplePlanFile = gitDetailPath + ls.getFilePath() + ls.getFileName() + ".xml";
+				simplePlanFile = gitDetailPath +ls.getFilePath() + ls.getFileName() + ".xml";
 			}
 			// 详细方案的路径
 			if (ls.getFileType().equals("18")) {
@@ -391,27 +385,27 @@ public class ManagerController {
 			}
 		}
 		// 调用软硬件映射接口
-		// String workSpacePaths = softwareInterface.softInter(workModeFilePath,
-		// cpuModelFilePath, hardWareFilePath,
-		// mapConfigPath, sysParamFilePath, workSpacePath);
+		//String workSpacePaths = softwareInterface.softInter(workModeFilePath, cpuModelFilePath, hardWareFilePath,
+			//	mapConfigPath, sysParamFilePath, workSpacePath);
 		local_REPO_PATH = JGitUtil.getLOCAL_REPO_PATH();
 		// 后期把filepath替换成数据库中的workSpacePaths
-		// getFile(filepath, planId);
-		/**************************************
-		 * update by zhx
-		 *********************************************/
+		//getFile(filepath, planId);
+		/**************************************update by  zhx*********************************************/
 		hardWareFilePath = local_REPO_PATH + hardWareFilePath;
-		mapConfigPath = local_REPO_PATH + mapConfigPath;
-		// sysParamFilePath =
-		// "D:\\14S_GJK_GIT\\gjk\\gjk\\project\\24141\\12312312流程\\模型\\系数配置.xml";
-		// sysParamFilePath = gitDetailPath +
-		// flowFile.getFilePath()+flowInfPath+File.separator+"系数文件.xml" ;
-		workSpacePath = gitDetailPath + flowFile.getFilePath() + softToHardResult;
-		sysParamFilePath = workSpacePath + File.separator + "系数文件.xml";
-		// 客户exe文件全路径
-		String exe = JGitUtil.getSoftToHard();// "D:\\14S_GJK_GIT\\gjk\\gjk\\exe\\exe.exe";
-		// 调用客户接口执行exe
-		String[] strArray = new String[] { exe, hardWareFilePath, mapConfigPath, sysParamFilePath, workSpacePath };
+		mapConfigPath = local_REPO_PATH + mapConfigPath; 
+		//sysParamFilePath = "D:\\14S_GJK_GIT\\gjk\\gjk\\project\\24141\\12312312流程\\模型\\系数配置.xml";			sysParamFilePath = gitDetailPath + flowFile.getFilePath()+flowInfPath+File.separator+"系数文件.xml" ;
+		workSpacePath = gitDetailPath + flowFile.getFilePath()+softToHardResult ;
+        sysParamFilePath = workSpacePath+File.separator+"系数文件.xml" ;				
+		//客户exe文件全路径
+		String exe = JGitUtil.getSoftToHard();//"D:\\14S_GJK_GIT\\gjk\\gjk\\exe\\exe.exe";
+		//调用客户接口执行exe
+		String[] strArray = new String[] {
+				exe,
+				hardWareFilePath,
+				mapConfigPath,
+				sysParamFilePath,
+				workSpacePath
+		};
 		try {
 			Process process = Runtime.getRuntime().exec(strArray);
 			InputStreamReader reader = new InputStreamReader(process.getInputStream());
@@ -430,73 +424,76 @@ public class ManagerController {
 			e.printStackTrace();
 		}
 
-		/****************************************
-		 * end
-		 ********************************************/
+
+		/****************************************end********************************************/
+
 
 		// 获取方案文件路径列表；调用接口
-		// List<ProjectPlan> planFileLists =
-		// managerService.getPlanFilePathListByParentId(planId);//需要修改,zhx
+		//List<ProjectPlan> planFileLists = managerService.getPlanFilePathListByParentId(planId);//需要修改,zhx
 		ArrayList<String> schemeFileList = new ArrayList<>();
-
-		List<String> fileName = getFile(workSpacePath, 0);
-
+		
+		List<String> fileName = getFile(workSpacePath,0);   
+		
 		for (String filename : fileName) {
-			String schemeFile = workSpacePath + "/" + filename;
-			schemeFileList.add(schemeFile);
+		String	schemeFile = workSpacePath +"/" +filename;
+		schemeFileList.add(schemeFile);
 		}
 		System.out.println("schemeFileList::" + schemeFileList);
 		// 调用生成缩略方案的接口
-		try {
-			managerService.simplePlan(schemeFileList, simplePlanFile);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+				try {
+					managerService.simplePlan(schemeFileList, simplePlanFile);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 		return new R<>(simplePlanFile);
 
 	}
 
 	/*
-	 * 函数名：getFile 作用：使用递归，输出指定文件夹内的所有文件 参数：path：文件夹路径 deep：表示文件的层次深度，控制前置空格的个数
+	 * 函数名：getFile
+	 * 作用：使用递归，输出指定文件夹内的所有文件
+	 * 参数：path：文件夹路径   deep：表示文件的层次深度，控制前置空格的个数
 	 * 前置空格缩进，显示文件层次结构
 	 */
-	private static List<String> getFile(String path, int deep) {
-		List<String> fileNamelist = new ArrayList<String>();
-		// 获得指定文件对象
-		File file = new File(path);
-		// 获得该文件夹内的所有文件
-		File[] array = file.listFiles();
+	private static List<String> getFile(String path,int deep){   
+		List<String> fileNamelist=new ArrayList<String>();
+		// 获得指定文件对象  
+		File file = new File(path);   
+		// 获得该文件夹内的所有文件   
+		File[] array = file.listFiles();   
 
-		for (int i = 0; i < array.length; i++) {
-			if (array[i].isFile())// 如果是文件
-			{
-				for (int j = 0; j < deep; j++)// 输出前置空格
+		for(int i=0;i<array.length;i++)
+		{   
+			if(array[i].isFile())//如果是文件
+			{   
+				for (int j = 0; j < deep; j++)//输出前置空格
 					System.out.print(" ");
-				// 只输出文件名字
-				// System.out.println( array[i].getName());
-				if (array[i].getName().startsWith("软硬件映射") && array[i].getName().endsWith(".xml")) {
+				// 只输出文件名字  
+				//                System.out.println( array[i].getName());  
+				if(array[i].getName().startsWith("软硬件映射") && array[i].getName().endsWith(".xml")) {
 
 					fileNamelist.add(array[i].getName());
 				}
-				System.out.println("fileNamelist" + fileNamelist);
+				System.out.println("fileNamelist"+fileNamelist);
 
-				// 输出当前文件的完整路径
-				// System.out.println("#####" + array[i]);
-				// 同样输出当前文件的完整路径 大家可以去掉注释 测试一下
-				// System.out.println(array[i].getPath());
-			} else if (array[i].isDirectory())// 如果是文件夹
-			{
-				for (int j = 0; j < deep; j++)// 输出前置空格
+				// 输出当前文件的完整路径   
+				// System.out.println("#####" + array[i]);   
+				// 同样输出当前文件的完整路径   大家可以去掉注释 测试一下   
+				// System.out.println(array[i].getPath());   
+			}
+			else if(array[i].isDirectory())//如果是文件夹
+			{  
+				for (int j = 0; j < deep; j++)//输出前置空格
 					System.out.print(" ");
 
-				System.out.println(array[i].getName());
-				// System.out.println(array[i].getPath());
-				// 文件夹需要调用递归 ，深度+1
-				getFile(array[i].getPath(), deep + 1);
-			}
+				System.out.println( array[i].getName());
+				//System.out.println(array[i].getPath());
+				//文件夹需要调用递归 ，深度+1
+				getFile(array[i].getPath(),deep+1);  
+			}   
 		}
-		return fileNamelist;
-	}
+		return fileNamelist;   
+	}   
 
 	// 调回写部署方案接口
 	@PostMapping("/writeBackDeployScheme")
@@ -513,23 +510,20 @@ public class ManagerController {
 				workModeFilePath = ls.getFilePath() + ls.getFileName() + ".xml";
 			}
 			// 方案展示的路径
-			// if (ls.getFileType().equals("14")) {
-			// simplePlanFiles = ls.getFilePath() + ls.getFileName() + ".xml";
-			// }
+			//			if (ls.getFileType().equals("14")) {
+			//				simplePlanFiles = ls.getFilePath() + ls.getFileName() + ".xml";
+			//			}
 		}
 		// 调用回写部署方案接口
-		// String path =
-		// "D:\\14S_GJK_GIT\\gjk\\gjk\\project\\gengTest\\geng流程\\模型\\方案展示.xml";
-		// String simplePlanFiles =
-		// gitDetailPath+processFile.getFilePath()+processFile.getFileName()+"\\模型\\方案展示.xml"
-		// ;
+		//	String path = "D:\\14S_GJK_GIT\\gjk\\gjk\\project\\gengTest\\geng流程\\模型\\方案展示.xml";
+		//String simplePlanFiles = gitDetailPath+processFile.getFilePath()+processFile.getFileName()+"\\模型\\方案展示.xml" ;
 
 		try {
 			// 后期换成(String)map.get("path")
-			schemeFile = (String) map.get("path");
+			schemeFile = (String)map.get("path");
 			// 报错
 			// 输入：流程模型文件、部署方案文件（选择的方案路径）
-			BackNodeInfoForSpb.writeBackDeployScheme(workModeFilePath, schemeFile);
+			BackNodeInfoForSpb.writeBackDeployScheme(workModeFilePath,schemeFile );
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
@@ -681,10 +675,9 @@ public class ManagerController {
 	 */
 	@PostMapping("saveHardwarelibs")
 	public void saveHarewarelibs(@RequestBody Hardwarelibs hardwarelibs) {
-		System.out.println("hardwarelibs" + hardwarelibs);
+		System.out.println("hardwarelibs"+hardwarelibs);
 		managerService.saveHardwarelibs(hardwarelibs);
 	}
-
 	/**
 	 * 保存硬件建模
 	 *
@@ -694,20 +687,18 @@ public class ManagerController {
 	public void saveChipsFromHardwarelibs(@RequestBody Chipsfromhardwarelibs chipsfromhardwarelibs) {
 		managerService.saveChipsfromhardwarelibs(chipsfromhardwarelibs);
 	}
-
 	@GetMapping("getChipsfromhardwarelibs/{id}")
 	public Chipsfromhardwarelibs getChipsfromhardwarelibs(@PathVariable("id") String id) {
-		long startTime = System.currentTimeMillis(); // 获取开始时间
+		long startTime = System.currentTimeMillis(); //获取开始时间
 
 		Chipsfromhardwarelibs chipsfromhardwarelibs = managerService.getChipsfromhardwarelibs(id);
 
-		long endTime = System.currentTimeMillis(); // 获取结束时间
+		long endTime = System.currentTimeMillis(); //获取结束时间
 
-		System.out.println("程序运行时间：" + (endTime - startTime) + "ms"); // 输出程序运行时间
+		System.out.println("程序运行时间：" + (endTime - startTime) + "ms"); //输出程序运行时间
 
 		return chipsfromhardwarelibs;
 	}
-
 	/**
 	 * xml文件解析
 	 * 
@@ -762,31 +753,29 @@ public class ManagerController {
 
 	/**
 	 * 删除硬件建模芯片
-	 * 
 	 * @param id
 	 */
 	@DeleteMapping("deleteChipsFromHardwarelibs/{id}")
 	public void deleteChipsFromHardwarelibs(@PathVariable String id) {
 		managerService.deleteChipsFromHardwarelibs(id);
 	}
-
 	/**
-	 * 流程建模导出
+	 *流程建模导出 
 	 */
 	@PutMapping
 	@RequestMapping("/exportFile/{id}")
-	public void exportFile(HttpServletRequest request, HttpServletResponse response, @PathVariable("id") String id) {
+	public void exportFile(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable("id") String id) {
 		try {
 			StringRef sr = new StringRef();
-			byte[] data = managerService.exportFile(id, sr);
+			byte[] data = managerService.exportFile(id,sr);
 			ProjectFile retFile = managerService.getById(id);
 			for (int i = 0; i < 2; i++) {
 				retFile = managerService.getById(retFile.getParentId());
 			}
 			String zipFileName = retFile.getFileName() + ".zip";
 			response.reset();
-			response.setHeader("Content-Disposition", String.format("attachment; filename=%s.zip",
-					new String(zipFileName.getBytes("UTF-8"), "ISO-8859-1")));
+			response.setHeader("Content-Disposition", String.format("attachment; filename=%s.zip", new String(zipFileName.getBytes("UTF-8"), "ISO-8859-1")));
 			response.setHeader("FileName", new String(zipFileName.getBytes("utf-8"), "ISO-8859-1"));
 			response.setHeader("Content-Length", "" + data.length);
 			response.setContentType("application/octet-stream; charset=utf-8");
@@ -794,7 +783,7 @@ public class ManagerController {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} 
 
 	}
 
@@ -805,7 +794,7 @@ public class ManagerController {
 	@ResponseBody
 	@PostMapping(path = "/importFile", consumes = { "multipart/mixed", "multipart/form-data" })
 	public R importFile(@RequestParam(value = "file", required = false) MultipartFile file) {
-		if (Objects.isNull(file) || file.isEmpty()) {
+		if(Objects.isNull(file) || file.isEmpty()) {
 			logger.error("请选中文件导入");
 		}
 		String filename = file.getOriginalFilename();
@@ -821,29 +810,29 @@ public class ManagerController {
 			ZipEntry zipEntry;
 			String json = "";
 			String xmlData = "";
-			while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+			while((zipEntry = zipInputStream.getNextEntry()) != null) {
 				zipFileName = zipEntry.getName();
-				if (zipFileName.split("\\.")[1].equals("json")) {
-					bos = new ByteArrayOutputStream();
-					int index = 0;
+				if(zipFileName.split("\\.")[1].equals("json")) {
+					bos =  new ByteArrayOutputStream();
+					int index  = 0;
 					byte[] jsonBytes = new byte[1024];
-					while ((index = bs.read(jsonBytes)) != -1) {
-						bos.write(jsonBytes, 0, index);
+					while((index = bs.read(jsonBytes)) != -1) {
+						bos.write(jsonBytes,0,index);
 					}
 					byte[] strBytes = bos.toByteArray();
-					json = new String(strBytes, 0, strBytes.length, "utf-8");
+					json = new String(strBytes,0,strBytes.length ,"utf-8" );
 					System.out.println(json);
 					Object jsonStr = JSON.toJavaObject(JSONObject.parseObject(json), Object.class);
 					retMap.put("json", jsonStr);
-				} else {
-					bos = new ByteArrayOutputStream();
-					int bytesRead = 0;
+				}else {
+					bos =  new ByteArrayOutputStream();
+					int bytesRead  = 0;
 					byte[] bytes = new byte[1024];
-					while ((bytesRead = bs.read(bytes)) != -1) {
-						bos.write(bytes, 0, bytesRead);
+					while((bytesRead = bs.read(bytes)) != -1) {
+						bos.write(bytes,0,bytesRead);
 					}
 					byte[] strByte = bos.toByteArray();
-					// xmlData = new String(strByte,0,strByte .length ,"utf-8" );
+					//xmlData = new String(strByte,0,strByte .length ,"utf-8" );
 					XmlEntityMap xmlJson = XmlFileHandleUtil.analysisXmlStr(strByte);
 					retMap.put("xmlJson", xmlJson);
 				}
@@ -859,30 +848,33 @@ public class ManagerController {
 	 * 集成代码生成
 	 */
 	@PutMapping("/codeGeneration/{projectId}/{username}")
-	public void codeGeneration(@PathVariable("projectId") String projectId, @PathVariable("username") String username) {
-		ProjectFile processFile = managerService
-				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, projectId));
-		// processFile.getFilePath()
-		String tmpGenerateCodeResult = gitDetailPath + processFile.getFilePath() + processFile.getFileName()
-				+ File.separator + generateCodeResult;
-		// String
-		// tmpSoftToHardResult=gitDetailPath+processFile.getFilePath()+softToHardResult;
-		String generatecode = JGitUtil.getGeneratecode();// "D:\\14S_GJK_GIT\\gjk\\gjk\\generateCodeExe\\generatecode.exe";
-		String userName = username;
+	public void codeGeneration(@PathVariable("projectId") String projectId,@PathVariable("username") String username) {
+		ProjectFile processFile=	managerService.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, projectId));
+		//		processFile.getFilePath()
+		String tmpGenerateCodeResult=gitDetailPath+processFile.getFilePath()+processFile.getFileName()+File.separator+generateCodeResult;
+		//		String tmpSoftToHardResult=gitDetailPath+processFile.getFilePath()+softToHardResult;
+		String generatecode = JGitUtil.getGeneratecode();//"D:\\14S_GJK_GIT\\gjk\\gjk\\generateCodeExe\\generatecode.exe";
+		String userName = 	username;
 		String workModeId = projectId;
 		String workModeFilePath = managerService.getWorkModeFilePath(projectId);
-		String packinfoPath = tmpGenerateCodeResult + File.separator + "packinfo.xml";
+		String packinfoPath = tmpGenerateCodeResult+File.separator+"packinfo.xml";
 		String userDefineTopicFilePath = managerService.getUserDefineTopicFilePath(projectId);
 		String cmpIntgCodeFilePath = tmpGenerateCodeResult;
 
-		String filePath = gitDetailPath + processFile.getFilePath() + processFile.getFileName() + "/generateCodeResult";
-		File file = new File(filePath);
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-
-		String[] strArray = new String[] { generatecode, userName, projectId, workModeFilePath, packinfoPath,
-				userDefineTopicFilePath, cmpIntgCodeFilePath };
+		String filePath = gitDetailPath + processFile.getFilePath()+processFile.getFileName()+"/generateCodeResult";
+				File file = new File(filePath);
+				if (!file.exists()) {
+					file.mkdirs();
+				}
+		
+		String[] strArray = new String[] {
+				generatecode,
+				userName,
+				projectId,
+				workModeFilePath,
+				packinfoPath,
+				userDefineTopicFilePath,
+				cmpIntgCodeFilePath };
 		try {
 			Process process = Runtime.getRuntime().exec(strArray);
 			InputStreamReader reader = new InputStreamReader(process.getInputStream());
@@ -902,42 +894,38 @@ public class ManagerController {
 		}
 
 	}
-
+	
 	@ResponseBody
 	@PostMapping(path = "/getWorking/{flowName}/{id}", consumes = { "multipart/mixed", "multipart/form-data" })
-	public void getWorking(@RequestParam(value = "file", required = false) MultipartFile file,
-			@PathVariable("flowName") String flowName, @PathVariable("id") String id) {
+	public void getWorking(@RequestParam(value = "file", required = false) MultipartFile file, @PathVariable("flowName") String flowName,@PathVariable("id") String id) {
 		managerService.getWorking(file, flowName, id);
 	}
-
-	@ResponseBody
+	
+		@ResponseBody
 	@PostMapping(path = "/getSoftWareListAndPlatformName")
 	public R getSoftWareListAndPlatformName() {
 		return managerService.getSoftWareListAndPlatformName();
-	}
+}
 
 	@PutMapping("/updatePartSoftwareAndPlatform")
 	public R updatePartSoftwareAndPlatform(@RequestBody Software software) {
 		return new R<>(managerService.updatePartSoftwareAndPlatform(software));
 	}
+    @ResponseBody
+    @GetMapping("/showPartSoftwareAndPlatform/{id}")
+    public R showPartSoftwareAndPlatform(@PathVariable("id") String id) {
+        return managerService.showPartSoftwareAndPlatform(id);
+    }
 
-	@ResponseBody
-	@GetMapping("/showPartSoftwareAndPlatform/{id}")
-	public R showPartSoftwareAndPlatform(@PathVariable("id") String id) {
-		return managerService.showPartSoftwareAndPlatform(id);
-	}
-
-	/**
-	 * 得到平台大类
-	 * 
-	 * @return
-	 */
-	@ResponseBody
-	@PostMapping(path = "/getPlatformList")
-	public R getPlatformList() {
-		return managerService.getPlatformList();
-	}
-
+    /**
+     * 得到平台大类
+     * @return
+     */
+    @ResponseBody
+    @PostMapping(path = "/getPlatformList")
+    public R getPlatformList() {
+        return managerService.getPlatformList();
+    }
 	@GetMapping("/deleteProcedureById/{procedureId}")
 	public R deleteProcedureById(@PathVariable("procedureId") String procedureId) {
 		return new R<>(managerService.deleteProcedureById(procedureId));
