@@ -501,13 +501,16 @@ export default {
             if (path.includes(":")) {
               this.$store.dispatch("GetParseHeaderObj", path).then(() => {
                 let base = deepClone(this.paramsFormXmlParams);
+                this.paramsFormXmlParams=[]
                 let input = this.headerFile.inputXmlMapParams;
                 let output = this.headerFile.outputXmlMapParams;
                 let paramsFormXml = [];
                 params.forEach(param => {
                   let fromParam = deepClone(param);
                   if (param.lableName === "输入") {
+                   console.log("计算前********************",deepClone(input), fromParam)
                     this.itemTypeChangeAssignmenDataParam(input, fromParam);
+                   console.log("计算后********************",deepClone(fromParam), fromParam)
                     param = input;
                   }
                   if (param.lableName === "输出") {
