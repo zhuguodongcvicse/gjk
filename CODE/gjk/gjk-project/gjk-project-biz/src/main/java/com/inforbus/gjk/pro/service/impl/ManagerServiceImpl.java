@@ -174,37 +174,31 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		files.add(processFile);
 
 		filePath += processFile.getFileName() + File.separator;
-		ProjectFile modelFile = new ProjectFile(IdGenerate.uuid(), projectId, "模型", "10", filePath,
-				processFile.getId(), null, null);
+		ProjectFile modelFile = new ProjectFile(IdGenerate.uuid(), projectId, "模型", "10", filePath, processFile.getId(),
+				null, null);
 		files.add(modelFile);
 
 		filePath += modelFile.getFileName() + File.separator;
-		ProjectFile file = new ProjectFile(IdGenerate.uuid(), projectId,  "流程建模", "11", filePath,
-				modelFile.getId(), null, null);
+		ProjectFile file = new ProjectFile(IdGenerate.uuid(), projectId, "流程建模", "11", filePath, modelFile.getId(),
+				null, null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, "硬件建模", "12", filePath, modelFile.getId(), null,
-				null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, "硬件建模", "12", filePath, modelFile.getId(), null, null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, "软硬件映射配置", "13", filePath, modelFile.getId(), null,
-				null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, "软硬件映射配置", "13", filePath, modelFile.getId(), null, null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, "方案展示", "14", filePath, modelFile.getId(), null,
-				null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, "方案展示", "14", filePath, modelFile.getId(), null, null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, "部署图", "15", filePath, modelFile.getId(), null,
-				null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, "部署图", "15", filePath, modelFile.getId(), null, null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, "自定义配置", "16", filePath, modelFile.getId(), null,
-				null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, "自定义配置", "16", filePath, modelFile.getId(), null, null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, "系统配置", "17", filePath, modelFile.getId(), null,
-				null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, "系统配置", "17", filePath, modelFile.getId(), null, null);
 		files.add(file);
 
 		for (ProjectFile projectFile : files) {
@@ -1535,5 +1529,28 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	@Override
 	public R getPlatformList() {
 		return new R<>(baseMapper.getPlatformList());
+	}
+
+	@Override
+	public boolean deleteProcedureById(String procedureId) {
+		try {
+			List<ProjectFile> projectFiles = new ArrayList<>();
+			projectFiles.add(this.getById(procedureId));
+			List<ProjectFile> modelFile = getProFileListByModelId(procedureId);
+			if (modelFile != null && modelFile.size() > 0) {
+				projectFiles.addAll(modelFile);
+				for (ProjectFile projectFile : modelFile) {
+					List<ProjectFile> list = getProFileListByModelId(projectFile.getId());
+					projectFiles.addAll(list);
+				}
+			}
+			for (ProjectFile projectFile : projectFiles) {
+				this.removeById(projectFile.getId());
+			}
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 }
