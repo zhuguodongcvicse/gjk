@@ -427,7 +427,7 @@ function creatbakgj(compName, cpux, cpuy, refid, compid, parttype, components) {
 				"_ref": refid
 			},
 			"styles": {
-				"label.background.color": "#000080",
+				"label.background.color": "#03b6ff",
 				"label.font.size": 1,
 				"label.padding": 0.3,
 				"label.radius": 0.3,
@@ -584,8 +584,7 @@ function initEditor(editor) {
 				}
 			}
 		}
-			//变量恢复初始值
-			rootnum = 0.5;
+		
 		//遍历备份构件
 		for (var n in linkArray[i].backupParts) {
 			baknum++;
@@ -601,7 +600,7 @@ function initEditor(editor) {
 			}
 		}
 		//变量恢复初始值
-		
+		rootnum = -0.5;
 		baknum = -0.5;
 	}
 	//遍历arrow绘画连线
@@ -1190,7 +1189,7 @@ console.log('dataJsondataJsondataJsondataJson',dataJson)
 				var partname = data._mn3.partname;
 			//	console.log("data",data.id);
 			//	console.log('partname',partname);
-			/* 	for (const i in host.children.datas) {
+		/* 		for (const i in host.children.datas) {
 					if(host.children.datas[i].id != data.id ){
 						if(host.children.datas[i]._mn3.partname == data._mn3.partname ){ 
 
@@ -1239,13 +1238,13 @@ console.log('dataJsondataJsondataJsondataJson',dataJson)
 					}
 							dragInfo = null;
 							
-						}}} */
+						}}}
 
 
-			
+			*/
 
 
-			}
+			} 
 		})
 	}
 	function findCellHost(evt, element) {
