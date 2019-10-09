@@ -6,6 +6,7 @@
 		id="projectFileMap">
 		<id property="id" column="id" />
 		<result property="projectId" column="project_id" />
+		<result property="flowId" column="flow_id" />
 		<result property="fileName" column="file_name" />
 		<result property="fileType" column="file_type" />
 		<result property="filePath" column="file_path" />
@@ -107,6 +108,7 @@
 	<sql id="projectFileSql">
 		id,
 		project_id,
+		flow_id,
 		file_name,
 		file_type,
 		file_path,
@@ -204,6 +206,7 @@
 		<include refid="projectFileSql" />
 		) VALUES (#{proDetail.id},
 		#{proDetail.projectId},
+		#{proDetail.flowId},
 		#{proDetail.fileName},
 		#{proDetail.fileType},
 		#{proDetail.filePath},

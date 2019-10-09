@@ -20,10 +20,11 @@ public class ProjectFile extends Model<Project> {
 
 	private static final long serialVersionUID = 1L;
 
-	public ProjectFile(String id, String projectId, String fileName, String fileType, String filePath, String parentId,
+	public ProjectFile(String id, String projectId, String flowId, String fileName, String fileType, String filePath, String parentId,
 			String softwareId, String bspId) {
 		this.id = id;
 		this.projectId = projectId;
+		this.flowId = flowId;
 		this.fileName = fileName;
 		this.fileType = fileType;
 		this.filePath = filePath;
@@ -45,6 +46,10 @@ public class ProjectFile extends Model<Project> {
 	 * 项目ID
 	 */
 	private String projectId;
+	/**
+	 * 工作模式ID
+	 */
+	private String flowId;
 	/**
 	 * 文件名
 	 */

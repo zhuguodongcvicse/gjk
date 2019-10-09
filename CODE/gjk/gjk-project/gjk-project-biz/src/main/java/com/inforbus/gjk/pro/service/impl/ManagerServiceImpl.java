@@ -160,7 +160,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @see com.inforbus.gjk.pro.service.ManagerService#saveProProcess(java.lang.String,
 	 *      java.lang.String)
 	 */
-	public List<ProjectFile> saveProProcess(String projectId, String processName) {
+	public List<ProjectFile> saveProProcess(String projectId, String processName, String flowId) {
 		List<ProjectFile> files = new ArrayList<ProjectFile>();
 
 		Project project = projectMapper.getProById(projectId);
@@ -169,36 +169,42 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String filePath = "gjk" + File.separator + "project" + File.separator + project.getProjectName()
 				+ File.separator;
 
-		ProjectFile processFile = new ProjectFile(IdGenerate.uuid(), projectId, processName + "", "9", filePath,
+		ProjectFile processFile = new ProjectFile(IdGenerate.uuid(), projectId, flowId, processName + "", "9", filePath,
 				projectId, defaultSoftwareId, defaultBspId);
 		files.add(processFile);
 
 		filePath += processFile.getFileName() + File.separator;
-		ProjectFile modelFile = new ProjectFile(IdGenerate.uuid(), projectId, "模型", "10", filePath, processFile.getId(),
-				null, null);
+		ProjectFile modelFile = new ProjectFile(IdGenerate.uuid(), projectId, null, "模型", "10", filePath,
+				processFile.getId(), null, null);
 		files.add(modelFile);
 
 		filePath += modelFile.getFileName() + File.separator;
-		ProjectFile file = new ProjectFile(IdGenerate.uuid(), projectId, "流程建模", "11", filePath, modelFile.getId(),
-				null, null);
+		ProjectFile file = new ProjectFile(IdGenerate.uuid(), projectId, null, "流程建模", "11", filePath,
+				modelFile.getId(), null, null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, "硬件建模", "12", filePath, modelFile.getId(), null, null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, null, "硬件建模", "12", filePath, modelFile.getId(), null,
+				null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, "软硬件映射配置", "13", filePath, modelFile.getId(), null, null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, null, "软硬件映射配置", "13", filePath, modelFile.getId(), null,
+				null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, "方案展示", "14", filePath, modelFile.getId(), null, null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, null, "方案展示", "14", filePath, modelFile.getId(), null,
+				null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, "部署图", "15", filePath, modelFile.getId(), null, null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, null, "部署图", "15", filePath, modelFile.getId(), null,
+				null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, "自定义配置", "16", filePath, modelFile.getId(), null, null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, null, "自定义配置", "16", filePath, modelFile.getId(), null,
+				null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, "系统配置", "17", filePath, modelFile.getId(), null, null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, null, "系统配置", "17", filePath, modelFile.getId(), null,
+				null);
 		files.add(file);
 
 		for (ProjectFile projectFile : files) {
@@ -691,6 +697,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String modelId = projectFile.getParentId();
 		String proceId = this.getById(modelId).getParentId();
 
+		String flowId = this.getById(proceId).getFlowId();
 		String integerCodeFilePath = proDetailPath + this.getById(modelId).getFilePath() + File.separator
 				+ integerCodeFileName;
 
@@ -747,6 +754,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			app.setFilePath(new File(appFilePath).getParent().substring(proDetailPath.length()));
 			app.setSysconfigFilePath(sysConfigFilePath);
 			app.setProcessId(proceId);
+			app.setFlowId(flowId);
 
 			// 拷贝bsp对应的文件夹到app组件工程目录下
 			createBspDir(bspDirPath, appFilePath);

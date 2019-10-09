@@ -77,6 +77,10 @@ public class App extends Model<App> {
 	 */
 	private String appState;
 	/**
+	 * 工作模式标志
+	 */
+	private String flowId;
+	/**
 	 * 本地部署方案Boolean值
 	 */
 	private String localDeploymentPlan;

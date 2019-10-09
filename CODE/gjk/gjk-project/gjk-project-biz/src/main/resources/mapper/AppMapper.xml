@@ -27,6 +27,7 @@
 		<result property="createTime" column="create_time" />
 		<result property="updateTime" column="update_time" />
 		<result property="appState" column="app_state" />
+		<result property="flowId" column="flow_id" />
 		<result property="localDeploymentPlan"
 			column="local_deployment_plan" />
 		<result property="description" column="description" />
@@ -71,6 +72,7 @@
 		create_time,
 		update_time,
 		app_state,
+		flow_id,
 		local_deployment_plan,
 		description,
 		del_flag
@@ -84,6 +86,7 @@
 		back_path,
 		partname_platform,
 		sysconfig_file_path,
+		flow_id,
 		local_deployment_plan
 	</sql>
 
@@ -140,9 +143,10 @@
 		#{app.backPath},
 		#{app.partnamePlatform},
 		#{app.sysconfigFilePath},
+		#{app.flowId},
 		#{app.localDeploymentPlan})
 	</insert>
-	
+
 	<!-- 获取所有app组件 -->
 	<select id="getAllApp" resultMap="appMap">
 		SELECT * FROM gjk_app
@@ -178,14 +182,14 @@
 			process_id = #{processId}
 		</where>
 	</select>
-	
+
 	<!-- 根据appid修改app的运行状态 -->
 	<update id="editAppState">
 		UPDATE `gjk_app` SET `app_state` =
 		#{appState} WHERE
 		`id` = #{id}
 	</update>
-	
+
 	<!-- 通过项目id拿到流程 -->
 	<select id="getProcessByProjectId" resultMap="projectFileMap">
 		SELECT p.* FROM
@@ -193,11 +197,11 @@
 		(SELECT pd.project_id FROM gjk_project_detail pd WHERE
 		pd.id=#{id})
 	</select>
-	
+
 	<!-- 通过项目id拿到当前项目信息 -->
 	<select id="getprojectByProjectId" resultMap="projectMap">
 		SELECT pd.* FROM
 		gjk_project pd WHERE pd.id=#{id}
 	</select>
-	
+
 </mapper>

@@ -18,7 +18,6 @@
 		type="com.inforbus.gjk.pro.api.entity.Project">
 		<id property="id" column="id" />
 		<result property="projectName" column="project_name" />
-		<result property="flowId" column="flow_id" />
 		<result property="userId" column="user_id" />
 		<result property="projectImg" column="project_img" />
 		<result property="createTime" column="create_time" />
@@ -55,7 +54,6 @@
 		id,
 		project_name,
 		user_id,
-		flow_id,
 		project_img,
 		create_time,
 		update_time,
@@ -68,7 +66,6 @@
 	<sql id="saveProSql">
 		id,
 		project_name,
-		flow_id,
 		user_id,
 		project_img,
 		default_software_id,
@@ -117,10 +114,6 @@
 				test="project.projectName != null and project.projectName.trim() != ''">
 				AND project_name = #{project.projectName}
 			</if>
-			<if
-				test="project.flowId != null and project.flowId.trim() != ''">
-				AND flow_id = #{project.flowId}
-			</if>
 			<if test="project.userId != null and project.userId.trim() != ''">
 				AND user_id = #{project.userId}
 			</if>
@@ -167,7 +160,6 @@
 		<include refid="saveProSql" />
 		) VALUES (#{pro.id},
 		#{pro.projectName},
-		#{pro.flowId},
 		#{pro.userId},
 		#{pro.projectImg},
 		#{pro.defaultSoftwareId},
