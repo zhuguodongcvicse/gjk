@@ -6,6 +6,7 @@
         <button type="button" style="float:right;" @click="textedits_window" class="el-button el-button--primary el-button--mini"><i class="el-icon-thirdclose"></i></button>
         <button type="button" id="consoleUp" style="float:right;margin-right:5px;" @click="fullScreenUp" class="el-button el-button--primary el-button--mini"><i class="el-icon-thirdup"></i></button>
         <button type="button" id="consoleDown" style="float:right;margin-right:5px;display:none;" @click="fullScreenDown" class="el-button el-button--primary el-button--mini"><i class="el-icon-thirddown"></i></button>
+        <button type="button" id="cleanUp" style="float:right;padding:8px 17px 7px 17px;" @click="cleanUpConsole" class="el-button el-button--primary el-button--mini"><i class="el-icon-delete-solid" ></i></button>
       </div>
       <!-- 控制台内容div -->
       <div id="textedits_log">
@@ -155,6 +156,10 @@ export default {
         // additional header
       }
       this.client.connect(headers, this.onConnected, this.onFailed)
+    },
+    cleanUpConsole(){
+      console.log("dasasd")
+      $(".el-textarea__inner").html("");
     }
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
