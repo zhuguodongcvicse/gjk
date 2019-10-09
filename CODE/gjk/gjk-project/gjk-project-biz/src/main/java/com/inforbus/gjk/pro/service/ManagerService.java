@@ -278,4 +278,6 @@ public interface ManagerService extends IService<ProjectFile> {
 	 * @return
 	 */
 	R getPlatformList();
+	
+	public boolean deleteProcedureById(String procedureId);
 }
