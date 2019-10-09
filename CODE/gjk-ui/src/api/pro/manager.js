@@ -232,13 +232,13 @@ export function getCoeffNodeTree(proDetailId) {
     url: "/pro/manager/getCoeffNodeTree/" + proDetailId,
   })
 }
- export function getWorking(obj,flowName,id){
+export function getWorking(obj, flowName, id) {
   return request({
-    url: "/pro/manager/getWorking/"+flowName+"/"+id,
+    url: "/pro/manager/getWorking/" + flowName + "/" + id,
     method: 'post',
     data: obj
   })
- }
+}
 
 export function getSoftwareSelect() {
   return request({
@@ -266,5 +266,12 @@ export function getPlatformList() {
   return request({
     method: "post",
     url: "/pro/manager/getPlatformList"
+  })
+}
+
+export function deleteProcedureById(procedureId) {
+  return request({
+    method: "get",
+    url: "/pro/manager/deleteProcedureById/" + procedureId
   })
 }

@@ -3,10 +3,7 @@
     <!-- <component-save ref="dialog" @save="saveComponent"></component-save> -->
     <!-- 当前项目 -->
     <div class="project_tree_14s">
-      <img
-        src="/img/theme/night/logo/proImg.png"
-        ondragstart="return false;"
-      >
+      <img src="/img/theme/night/logo/proImg.png" ondragstart="return false;" />
       <!-- 项目切换 -->
       <el-dropdown class="project_tree_dropdown" @command="changeProjectCommand">
         <span class="el-dropdown-link">
@@ -34,7 +31,7 @@
         @node-collapse="handleNodeCollapse"
       ></el-tree>
       <!-- 右键菜单 -->
-      <div class="rightmenu"  @mouseleave="changeCount()" style="width: 130px">
+      <div class="rightmenu" @mouseleave="changeCount()" style="width: 130px">
         <div class="menu">
           <a v-for="item in menus" :key="item" @click="nodeContextmenuClick(item)">
             <div class="command">
@@ -44,7 +41,7 @@
         </div>
       </div>
     </div>
-    
+
     <el-dialog
       title="添加流程"
       :visible.sync="addProcedureDialogVisible"
@@ -62,12 +59,26 @@
           </el-input>
         </el-form-item>
         <el-form-item label="工作模式标识">
-          <el-input v-model="form.flowId" placeholder="工作模式标识"/>
+          <el-input v-model="form.flowId" placeholder="工作模式标识" />
         </el-form-item>
       </el-form>
       <div slot="footer">
         <el-button @click="closeAddProcedureDialog">取 消</el-button>
         <el-button type="primary" @click="addProcedure">确 定</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog
+      title="删除流程"
+      :visible.sync="deleteProcedureDialogVisible"
+      width="35%"
+      :before-close="dialogBeforeClose"
+      :modal-append-to-body="false"
+      :close-on-click-modal="false"
+    >
+      <el-alert title="您确定要删除此流程并删除相应的配置吗？" type="warning" show-icon :closable="false"></el-alert>
+      <div slot="footer">
+        <el-button @click="deleteProcedureDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="deleteProcedure">确 定</el-button>
       </div>
     </el-dialog>
     <el-dialog
@@ -78,7 +89,7 @@
     >
       <el-form ref="form" label-width="80px">
         <el-form-item label="构件筛选">
-          <select-tree :treeData="screenLibsTree" multiple :id.sync="screenLibsIdArray"/>
+          <select-tree :treeData="screenLibsTree" multiple :id.sync="screenLibsIdArray" />
         </el-form-item>
         <el-form-item label="构件选择">
           <select-tree
@@ -178,7 +189,7 @@
         :http-request="appImageUploadFunc"
         :on-change="onchange"
       >
-        <img v-if="imageUrl" :src="imageUrl" class="avatar">
+        <img v-if="imageUrl" :src="imageUrl" class="avatar" />
         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
       </el-upload>
       <el-checkbox v-model="localDeploymentPlan">本地部署方案</el-checkbox>
@@ -206,7 +217,8 @@ import {
   getSoftwareSelect,
   updatePartSoftwareAndPlatform,
   showPartSoftwareAndPlatform,
-  getPlatformList
+  getPlatformList,
+  deleteProcedureById
 } from "@/api/pro/manager";
 import { addObj as saveApp, getAppByProcessId } from "@/api/pro/app";
 import { getSoftwareTree } from "@/api/libs/software";
@@ -257,6 +269,8 @@ export default {
         procedureName: "",
         flowId: ""
       },
+
+      deleteProcedureDialogVisible: false,
 
       addProCompDialogVisible: false,
       screenLibsTree: [],
@@ -352,12 +366,11 @@ export default {
   },
   beforeDestroy: function() {},
   methods: {
-    changeCount(){
-       setTimeout(() => {
-                       $(".rightmenu").hide();
-                }, 500)
-    
-      },
+    changeCount() {
+      setTimeout(() => {
+        $(".rightmenu").hide();
+      }, 500);
+    },
 
     /* 查询所有项目   */
     getProjects() {
@@ -575,6 +588,8 @@ export default {
         this.addProcedureDialogVisible = true;
       } else if (item == "申请构件") {
         this.addProCompDialogVisible = true;
+      } else if (item == "删除流程") {
+        this.deleteProcedureDialogVisible = true;
       }
     },
     //修改软件框架值改变
@@ -664,12 +679,28 @@ export default {
       this.bspDialogVisible = false;
     },
     addProcedure() {
-      saveProProcess(this.temp_currProject.id, this.form.procedureName, this.form.flowId).then(
-        response => {
-          this.closeAddProcedureDialog();
-          this.reload();
+      saveProProcess(
+        this.temp_currProject.id,
+        this.form.procedureName,
+        this.form.flowId
+      ).then(response => {
+        this.closeAddProcedureDialog();
+        this.reload();
+      });
+    },
+    deleteProcedure() {
+      deleteProcedureById(this.procedureId).then(Response => {
+        this.deleteProcedureDialogVisible = false;
+        if (Response.data.data) {
+          this.$message({
+            message: "此流程删除成功",
+            type: "success"
+          });
+        } else {
+          this.$message.error("此流程删除失败。");
         }
-      );
+        this.reload();
+      });
     },
     addProComp() {
       saveProCompList(this.temp_currProject.id, this.compSelectArray).then(
@@ -746,7 +777,8 @@ export default {
           "集成代码生成",
           "修改软件框架",
           "修改BSP",
-          "APP组件工程生成"
+          "APP组件工程生成",
+          "删除流程"
         ];
         this.procedureId = data.id;
         this.softwareSelectString = data.softwareId;

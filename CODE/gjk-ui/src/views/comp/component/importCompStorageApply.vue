@@ -33,7 +33,7 @@
     </avue-crud>
 
     <span slot="footer" class="dialog-footer">
-      <el-button @click="dialogStateShow(false)">取 消</el-button>
+      <el-button @click="dialogBeforeClose">取 消</el-button>
       <el-button type="primary" @click="storageApplyComp">入库</el-button>
     </span>
 
@@ -113,7 +113,15 @@ export default {
   //监控data中的数据变化
   watch: {
     compList: function() {
-      this.tableData = this.compList;
+      if (this.compList.length == 0) {
+        this.dialog = false;
+        this.$message({
+          message: "导入的构件已存在，请勿重复导入。",
+          type: "warning"
+        });
+      } else {
+        this.tableData = this.compList;
+      }
     }
   },
   //方法集合
@@ -130,9 +138,6 @@ export default {
     dialogBeforeClose(done) {
       done();
     },
-    dialogStateShow(state) {
-      this.$emit("storageApplyDialogState", state);
-    },
     handleCheckChange() {
       let res = this.$refs.tree.getCheckedNodes();
       this.selectNodeArray = [];
@@ -144,72 +149,72 @@ export default {
     },
     //提交入库的方法
     storageApplyComp() {
-      let approval = {};
-      approval.userId = this.userInfo.userId;
-      approval.applyId = this.compMessage.id;
-      approval.applyType = "1";
-      approval.libraryType = "1";
-      approval.approvalState = "0";
-      if (this.applyUser != "") {
-        approval.applyUserId = this.applyUser;
-      }
-      //如果审批状态是未提交或为空，提交审批记录
-      if (
-        this.compMessage.applyState == "0" ||
-        this.compMessage.applyState == null
-      ) {
-        //提交记录到审批管理库
-        saveApproval(approval).then(Response => {
-          let comp = {};
-          comp.id = this.compMessage.id;
-          comp.applyState = "1";
-          comp.applyDesc = "已提交申请，请等待库管理员审批";
-          //修改构件审批状态成已提交申请
-          putObj(comp).then(Response => {
-            this.$message({
-              message: "已提交申请，请等待库管理员审批",
-              type: "success"
-            });
-          });
-        });
-        //如果申请状态为被驳回，可以再次提交审批
-      } else if (this.compMessage.applyState == "3") {
-        let comp = {};
-        comp.id = this.compMessage.id;
-        comp.applyState = "4";
-        comp.applyDesc = "已提交申请，请等待库管理员审批";
-        //修改状态成被驳回后提交申请
-        putObj(comp).then(Response => {
-          getIdByApplyId(this.compMessage.id).then(Response => {
-            let modifyApply = {};
-            modifyApply.id = Response.data.data.id;
-            modifyApply.approvalState = "4";
-            modifyApply.description =
-              "前次申请被驳回理由：" + this.compMessage.applyDesc;
-            //将前次被驳回理由当做审批备注，修改审批记录
-            approvalPutObj(modifyApply).then(Response => {
-              this.$message({
-                message: "已提交申请，请等待库管理员审批",
-                type: "success"
-              });
-            });
-          });
-        });
-        //如果申请状态为已提交，不可以提交审批
-      } else if (this.compMessage.applyState == "1") {
-        this.$message({
-          message: "该构件已提交审批，请勿重复提交！",
-          type: "warning"
-        });
-        //如果申请状态为审批已通过，不可以提交审批
-      } else if (this.compMessage.applyState == "2") {
-        this.$message({
-          message: "该构件已通过审批！",
-          type: "warning"
-        });
-      }
-      this.reload();
-      this.dialogStateShow(false);
+    //   let approval = {};
+    //   approval.userId = this.userInfo.userId;
+    //   approval.applyId = this.compMessage.id;
+    //   approval.applyType = "1";
+    //   approval.libraryType = "1";
+    //   approval.approvalState = "0";
+    //   if (this.applyUser != "") {
+    //     approval.applyUserId = this.applyUser;
+    //   }
+    //   //如果审批状态是未提交或为空，提交审批记录
+    //   if (
+    //     this.compMessage.applyState == "0" ||
+    //     this.compMessage.applyState == null
+    //   ) {
+    //     //提交记录到审批管理库
+    //     saveApproval(approval).then(Response => {
+    //       let comp = {};
+    //       comp.id = this.compMessage.id;
+    //       comp.applyState = "1";
+    //       comp.applyDesc = "已提交申请，请等待库管理员审批";
+    //       //修改构件审批状态成已提交申请
+    //       putObj(comp).then(Response => {
+    //         this.$message({
+    //           message: "已提交申请，请等待库管理员审批",
+    //           type: "success"
+    //         });
+    //       });
+    //     });
+    //     //如果申请状态为被驳回，可以再次提交审批
+    //   } else if (this.compMessage.applyState == "3") {
+    //     let comp = {};
+    //     comp.id = this.compMessage.id;
+    //     comp.applyState = "4";
+    //     comp.applyDesc = "已提交申请，请等待库管理员审批";
+    //     //修改状态成被驳回后提交申请
+    //     putObj(comp).then(Response => {
+    //       getIdByApplyId(this.compMessage.id).then(Response => {
+    //         let modifyApply = {};
+    //         modifyApply.id = Response.data.data.id;
+    //         modifyApply.approvalState = "4";
+    //         modifyApply.description =
+    //           "前次申请被驳回理由：" + this.compMessage.applyDesc;
+    //         //将前次被驳回理由当做审批备注，修改审批记录
+    //         approvalPutObj(modifyApply).then(Response => {
+    //           this.$message({
+    //             message: "已提交申请，请等待库管理员审批",
+    //             type: "success"
+    //           });
+    //         });
+    //       });
+    //     });
+    //     //如果申请状态为已提交，不可以提交审批
+    //   } else if (this.compMessage.applyState == "1") {
+    //     this.$message({
+    //       message: "该构件已提交审批，请勿重复提交！",
+    //       type: "warning"
+    //     });
+    //     //如果申请状态为审批已通过，不可以提交审批
+    //   } else if (this.compMessage.applyState == "2") {
+    //     this.$message({
+    //       message: "该构件已通过审批！",
+    //       type: "warning"
+    //     });
+    //   }
+    //   this.reload();
+    //   this.dialogStateShow(false);
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
