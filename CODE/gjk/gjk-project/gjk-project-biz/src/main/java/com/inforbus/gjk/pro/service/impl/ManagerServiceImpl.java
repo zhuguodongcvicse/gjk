@@ -1436,7 +1436,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				break;
 			}
 		}
-		String userDefineTopicFilePath = local_REPO_PATH + Path + "/新xml文件/xxx.xml";
+		String userDefineTopicFilePath = local_REPO_PATH + Path + "新xml文件/xxx.xml";
 
 		return userDefineTopicFilePath;
 	}
