@@ -1,17 +1,20 @@
 <template>
-  <el-dialog width="35%" class="libs_hardwarelibcase_addcase_14s" title="板子设计" :visible.sync="showInf.dialogFormVisible" :close-on-click-modal="false">
-
+  <el-dialog
+    width="35%"
+    class="libs_hardwarelibcase_addcase_14s"
+    title="板子设计"
+    :visible.sync="showInf.dialogFormVisible"
+    :close-on-click-modal="false"
+  >
     <el-form :model="form" label-width="120px" :rules="rules" ref="form">
-
       <el-form-item label="机箱名称" :label-width="formLabelWidth" prop="caseName">
         <el-input v-model="form.caseName" autocomplete="off"></el-input>
       </el-form-item>
       <!-- <el-form-item label="板卡数量" :label-width="formLabelWidth" prop="bdNum">
         <el-input v-model="form.bdNum" autocomplete="off"></el-input>
-      </el-form-item> -->
+      </el-form-item>-->
     </el-form>
     <div slot="footer" class="dialog-footer">
-      
       <el-button type="primary" @click="submit('form')">确 定</el-button>
       <el-button @click="close('form')">取 消</el-button>
     </div>
@@ -39,17 +42,12 @@ export default {
         backCase: ""
       },
       rules: {
-        caseName: [
-          { required: true, message: "不能为空", trigger: "blur" }
-        ],
-        bdNum: [
-          { required: true, message: "不能为空", trigger: "blur" }
-        ]
+        caseName: [{ required: true, message: "机箱名称不能为空", trigger: "blur" }]
       }
     };
   },
   //监听属性 类似于data概念
-  computed: {}, 
+  computed: {},
   //监控data中的数据变化
   watch: {},
   //方法集合
@@ -59,19 +57,19 @@ export default {
       this.showInf.dialogFormVisible = false;
     },
     submit(formName) {
-      this.$refs[formName].validate(valid => {});
-      this.showInf.dialogFormVisible = false;
-      this.$router.push({path:"/libs/hardwarelibcase/casedesign",query:this.form});
-      this.form = {}
-      // window.opener = null;
-      // window.open("about:blank", "_top").close()
-    },
-    getPram(pram) {
-      // console.log("传递的参数", pram);
-      this.form.id = pram.id;
-      this.form.infName = pram.infName;
-      this.form.infRate = pram.infRate;
-      this.form.infType = pram.infType;
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.showInf.dialogFormVisible = false;
+          this.$router.push({
+            path: "/libs/hardwarelibcase/casedesign",
+            query: this.form
+          });
+          this.$refs[formName].resetFields();
+        } else {
+          // console.log("error submit!!");
+          return false;
+        }
+      });
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）

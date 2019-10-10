@@ -1,6 +1,6 @@
 <template>
   <div class="split-pane-page-wrapper comp_component_showcomp_14s">
-    <split-pane v-model="offset" @on-moving="handleMoving" min="150px">
+    <split-pane v-model="offset" @on-moving="handleMoving" min="0" max="1150px">
       <div slot="left" class="comp_component_showcomp_tree_14s">
         <el-tree
           style="height:100%;overflow-y: auto;"

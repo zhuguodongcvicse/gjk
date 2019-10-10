@@ -42,10 +42,10 @@ export const tableOption = {
       label: '顺序号',
       prop: 'infId'
     }, */
-	  /* {
+	  {
       label: '接口速率',
       prop: 'infRate'
-    }, */
+    },
 	  {
       label: '接口类型',
       prop: 'infType'

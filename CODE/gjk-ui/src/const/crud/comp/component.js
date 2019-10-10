@@ -16,14 +16,13 @@
  */
 
 export const tableOption = {
-  selection: true,
-  selectionWidth:"35",
-  // excelBtn:true,
-  tip:false,
   border: true,
+  index: true,
+  indexWidth:"55",
   indexLabel: '序号',
   stripe: true,
   menuAlign: 'center',
+  stripe: true,
   align: 'center',
   editBtn: false,
   delBtn: false,
@@ -53,6 +52,7 @@ export const tableOption = {
     },
     {
       label: '版本',
+      slot: true,
       prop: 'version'
     },
     {

@@ -33,7 +33,7 @@ var outLineMap = new Map()
 var outLineArr
 var clickBoardList = []
 var oppositeBoard
-var boardNum = 0
+var boardNum
 var fSlotNum
 var bSlotNum
 var fpgaBoardLinkType
@@ -56,6 +56,7 @@ function handleMessageFromParent(event) {
 	// console.log("caseData.backCase", JSON.parse(caseData.backCase))
 	switch (event.data.cmd) {
 		case 'updateCase':
+		boardNum = caseData.bdNum
 			var existFrontBoards = JSON.parse(caseData.frontCase).datas[0].json.properties.frontBoardList
 			var existBackBoards = JSON.parse(caseData.backCase).datas[0].json.properties.backBoardList
 			//配置界面弹窗的接口显示，去重

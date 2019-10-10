@@ -744,7 +744,8 @@ export default {
         if (isx) {
           item.dataKey.push(
             { value: "DATA", label: "DATA" },
-            { value: "STRUCTTYPE", label: "STRUCTTYPE" }
+            { value: "STRUCTTYPE", label: "STRUCTTYPE" },
+            { value: "IMMEDIATE", label: "IMMEDIATE" }
           );
         } else {
           item.dataKey.push(

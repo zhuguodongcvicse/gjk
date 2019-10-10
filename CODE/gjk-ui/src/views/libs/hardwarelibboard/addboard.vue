@@ -11,18 +11,6 @@
         <el-input v-model="form.boardName" autocomplete="off"></el-input>
       </el-form-item>
 
-      <!-- <el-form-item label="CPU数量" :label-width="formLabelWidth" prop="cpuNum">
-        <el-input v-model="form.cpuNum" autocomplete="off"></el-input>
-      </el-form-item>-->
-
-      <!--    <el-form-item label="类型名称" :label-width="formLabelWidth" prop="hrTypeName">
-        <el-input v-model="form.hrTypeName" autocomplete="off"></el-input>
-      </el-form-item>
-      -->
-      <!--       <el-form-item label="说明" :label-width="formLabelWidth" prop="description">
-        <el-input v-model="form.description" autocomplete="off"></el-input>
-      </el-form-item>-->
-
       <el-form-item label="板子类型" :label-width="formLabelWidth" prop="boardType">
         <el-select v-model="form.boardType" placeholder="请选择板子类型">
           <el-option label="calculateBoard" value="0"></el-option>
@@ -32,9 +20,6 @@
         </el-select>
       </el-form-item>
 
-      <!-- <el-form-item label="CPU数量" :label-width="formLabelWidth" prop="cpuNum" v-if="form.boardType == 0">
-        <el-input v-model="form.cpuNum" autocomplete="off"></el-input>
-      </el-form-item>-->
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button type="primary" @click="submit('form')">确 定</el-button>
@@ -58,20 +43,14 @@ export default {
       form: {
         id: "",
         boardName: "",
-        cpuNum: "",
-        hrTypeName: "",
-        description: "",
-        boardType: "请选择"
+        boardType: ""
       },
       rules: {
         boardName: [
-          { required: true, message: "标签名称不能为空", trigger: "blur" }
+          { required: true, message: "板卡名称不能为空", trigger: "blur" }
         ],
         boardType: [
-          { required: true, message: "请选择活动区域", trigger: "change" }
-        ],
-        cpuNum: [
-          { required: true, message: "标签名称不能为空", trigger: "blur" }
+          { required: true, message: "请选择板卡类型", trigger: "change" }
         ]
       }
     };
@@ -87,17 +66,19 @@ export default {
       this.showInf.dialogFormVisible = false;
     },
     submit(formName) {
-      this.$refs[formName].validate(valid => {});
-      this.showInf.dialogFormVisible = false;
-      this.$router.push({ path: "/libs/hardwarelibboard/boarddesign", query: this.form });
-      this.form = {};
-    },
-    getPram(pram) {
-      console.log("传递的参数", pram);
-      this.form.id = pram.id;
-      this.form.infName = pram.infName;
-      this.form.infRate = pram.infRate;
-      this.form.infType = pram.infType;
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.showInf.dialogFormVisible = false;
+          this.$router.push({
+            path: "/libs/hardwarelibboard/boarddesign",
+            query: this.form
+          });
+          this.$refs[formName].resetFields();
+        } else {
+          // console.log("error submit!!");
+          return false;
+        }
+      });
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）

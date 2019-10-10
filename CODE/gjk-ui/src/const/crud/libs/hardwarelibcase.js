@@ -66,9 +66,9 @@ export const tableOption = {
       label: '板子数量',
       prop: 'bdNum'
     },
-	  /* {
-      label: '机箱json',
-      prop: 'caseData'
-    }, */
+	  {
+      label: '版本',
+      prop: 'version'
+    }
   ]
 }

@@ -358,7 +358,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				processFileName = proDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml";
 			}
 			if (projectFile.getFileType().equals("16")) {
-				customizeFileName = proDetailPath + projectFile.getFilePath() + "新xml文件/xxx.xml"; // 获取处理后的主题配置文件
+				customizeFileName = proDetailPath + projectFile.getFilePath() + "自定义配置__网络配置.xml"; 
 			}
 
 		}
@@ -374,12 +374,12 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		// 解析返回值
 		Map<String, List<Object>> map = new HashMap<>();
-		if (customizefile.exists() && packinfofile.exists() && processfile.exists()) {
-			// 获取客户api的返回值
-			Map<String, List<String>> apiReturnStringList = ExternalIOTransUtils.getCmpSysConfig(customizeFileName,
+		//if (customizefile.exists() && packinfofile.exists() && processfile.exists()) {
+		// 获取客户api的返回值
+		Map<String, List<String>> apiReturnStringList = ExternalIOTransUtils.getCmpSysConfig(customizeFileName,
 					packinfoFileName, processFileName);
-			analysisApiReturnStringList(apiReturnStringList, map);
-		}
+		analysisApiReturnStringList(apiReturnStringList, map);
+		//}
 
 		return map;
 	}
@@ -1436,7 +1436,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				break;
 			}
 		}
-		String userDefineTopicFilePath = local_REPO_PATH + Path + "/新xml文件/xxx.xml";
+		String userDefineTopicFilePath = local_REPO_PATH + Path + "新xml文件/xxx.xml";
 
 		return userDefineTopicFilePath;
 	}
@@ -1461,19 +1461,22 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (!flowFile.exists()) {
 			flowFile.mkdirs();
 		}
-		String tmpPath = new String();
-		tmpPath = new String(serverPath + "/gjk/upload/" + fileName).replace("\\", "/");
-
+		String upLoadFile = flowPath + fileName;
+//		String tmpPath = new String();
+//		tmpPath = new String(serverPath + "/gjk/upload/" + fileName).replace("\\", "/");
 		File newFile = null;
-		if (StringUtils.isNotEmpty(tmpPath)) {
+		if (StringUtils.isNotEmpty(upLoadFile)) {
 			try {
-				newFile = new File(tmpPath);
-				if (!newFile.getParentFile().exists()) {
-					newFile.getParentFile().mkdirs();
+				newFile = new File(upLoadFile);
+//				if (!newFile.getParentFile().exists()) {
+//					newFile.getParentFile().mkdirs();
+//				}
+				if(newFile.exists()) {
+					newFile.delete();
 				}
-				newFile.createNewFile();
-
-				ExternalIOTransUtils.parseSystemPara(flowName, tmpPath, filePath);
+				//newFile.createNewFile();
+				file.transferTo(newFile);
+				ExternalIOTransUtils.parseSystemPara(flowName, upLoadFile, filePath);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

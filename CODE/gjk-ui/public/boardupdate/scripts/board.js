@@ -34,7 +34,7 @@ var linkTypeList = []
 var chipList = []
 var alreadyExistExchangeLink = []
 var alreadyExistInternalLink = []
-var chipIDNum = 0
+var chipIDNum
 var infIDNum = 0
 var ifDeleteFlag = 0
 var allInfList = []
@@ -187,13 +187,24 @@ function handleMessageFromParent(event) {
 				let alreadyExistCpuList = deepClone(JSON.parse(boardArr.boardJson).datas[0].json.properties.chipList)
 				// console.log("alreadyExistCpuList",JSON.stringify(alreadyExistCpuList))
 				chipList = deepClone(chipList.concat(alreadyExistCpuList))
-				var j
+				if (chipList.length != 0) {
+					chipIDNum = chipList[0].ID + 1
+				} else {
+					chipIDNum = 0
+				}
+				
+				for (let i = 0; i < chipList.length; i++) {
+					if (i < chipList.length - 1 && chipList[i].ID < chipList[i + 1].ID) {
+						chipIDNum = chipList[j].ID + 1
+					}
+				}
+				/* var j
 				for (const i in chipList) {
 					j = parseInt(i) + 1
 					if (j < chipList.length && chipList[i].ID < chipList[j].ID) {
 						chipIDNum = chipList[j].ID + 1
 					}
-				}
+				} */
 				// console.log("chipList",JSON.stringify(chipList))
 				//板卡上的CPU合并到dragCpuList
 				dragCpuList = deepClone(dragCpuList.concat(alreadyExistCpuList))
@@ -737,7 +748,7 @@ function initEditor(editor) {
 		var json = JSON.stringify(data);
 		postMessageParentData.cmd = "submitJSON";
 		postMessageParentData.params = json;
-		console.log("data", data);
+		// console.log("data", data);
 		//closePane()
 		window.parent.postMessage(postMessageParentData, "*")
 	}

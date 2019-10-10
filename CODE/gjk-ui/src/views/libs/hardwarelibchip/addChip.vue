@@ -1,5 +1,11 @@
 <template>
-  <el-dialog class="libs_hardwarelibchip_addchip_14s" width="35%" title="芯片设计" :visible.sync="showInf.dialogFormVisible" :close-on-click-modal="false">
+  <el-dialog
+    class="libs_hardwarelibchip_addchip_14s"
+    width="35%"
+    title="芯片设计"
+    :visible.sync="showInf.dialogFormVisible"
+    :close-on-click-modal="false"
+  >
     <el-form :model="form" label-width="120px" :rules="rules" ref="form">
       <el-form-item label="芯片名称" :label-width="formLabelWidth" prop="chipName">
         <el-input v-model="form.chipName" autocomplete="off"></el-input>
@@ -24,8 +30,7 @@
             :key="item.value"
             :label="item.label"
             :value="item.value"
-          >
-          </el-option>
+          ></el-option>
         </el-select>
       </el-form-item>
 
@@ -38,7 +43,6 @@
       </el-form-item>-->
     </el-form>
     <div slot="footer" class="dialog-footer">
-      
       <el-button type="primary" @click="submit('form')">确 定</el-button>
       <el-button @click="close('form')">取 消</el-button>
     </div>
@@ -73,22 +77,34 @@ export default {
       },
       rules: {
         chipName: [
-          { required: true, message: "标签名称不能为空", trigger: "blur" }
+          { required: true, message: "芯片名称不能为空", trigger: "blur" }
         ],
-        /* hrTypeName: [
-          { required: true, message: "标签名称不能为空", trigger: "blur" }
-        ], */
-        /* ipConfige: [
-          { required: true, message: "标签名称不能为空", trigger: "blur" }
-        ], */
         coreNum: [
-          { required: true, message: "标签名称不能为空", trigger: "blur" }
+          { required: true, message: "内核数量不能为空", trigger: "blur" },
+          {
+            pattern: /^[0-9]*[1-9][0-9]*$/,
+            message: "请输入整数",
+            trigger: "blur"
+          }
         ],
         memSize: [
-          { required: true, message: "标签名称不能为空", trigger: "blur" }
+          { required: true, message: "内存大小不能为空", trigger: "blur" },
+          {
+            pattern: /^[0-9]*[1-9][0-9]*$/,
+            message: "请输入整数",
+            trigger: "blur"
+          }
         ],
         recvRate: [
-          { required: true, message: "标签名称不能为空", trigger: "blur" }
+          { required: true, message: "接收速率不能为空", trigger: "blur" },
+          {
+            pattern: /^[0-9]*[1-9][0-9]*$/,
+            message: "请输入整数",
+            trigger: "blur"
+          }
+        ],
+        hrTypeName: [
+          { required: true, message: "请选择平台大类", trigger: "change" }
         ]
       }
     };
@@ -96,8 +112,7 @@ export default {
   //监听属性 类似于data概念
   computed: {},
   //监控data中的数据变化
-  watch: {
-  },
+  watch: {},
   //方法集合
   methods: {
     close(formName) {
@@ -106,13 +121,19 @@ export default {
       this.showInf.dialogFormVisible = false;
     },
     submit(formName) {
-      this.$refs[formName].validate(valid => {});
-      this.showInf.dialogFormVisible = false;
-      this.$router.push({
-        path: "/libs/hardwarelibchip/chipdesign",
-        query: this.form
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.showInf.dialogFormVisible = false;
+          this.$router.push({
+            path: "/libs/hardwarelibchip/chipdesign",
+            query: this.form
+          });
+          this.$refs[formName].resetFields();
+        } else {
+          // console.log("error submit!!");
+          return false;
+        }
       });
-      this.form = {};
     },
     getPlatformSelectTree() {
       fetchPlatformTree().then(response => {
