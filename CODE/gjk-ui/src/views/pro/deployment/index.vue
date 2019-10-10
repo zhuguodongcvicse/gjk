@@ -94,7 +94,7 @@ export default {
     //this.sendMessage()
   },
   async mounted() {
-    this.xmlMap.id = this.$route.params.sysId;
+    this.xmlMap.id = this.$route.query.sysId;
     // 构件map信息
     getAllList(this.xmlMap.id).then(res => {
       if (res.data == "") {
@@ -152,7 +152,7 @@ export default {
         case "submitJSON":
           // 处理业务逻辑
           // console.log("++", event.data);
-          this.xmlMap.id = this.$route.params.sysId;
+          this.xmlMap.id = this.$route.query.sysId;
           this.xmlMap.compAllArray = event.data.params[1];
           this.xmlMap.bakcompAllArray = event.data.params[2];
           submitXmlEntity(this.xmlMap).then(response => {

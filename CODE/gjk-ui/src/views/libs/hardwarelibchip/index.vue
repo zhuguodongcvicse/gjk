@@ -46,35 +46,33 @@
     </basic-container>
 
     <el-dialog width="35%" :visible.sync="dialogFormVisible">
-      <el-form :model="form" label-width="120px">
-        <el-form-item label="芯片名称">
+      <el-form :model="form" label-width="120px" :rules="rules" ref="form">
+        <el-form-item label="芯片名称" prop="chipName">
           <el-input v-model="form.chipName"/>
         </el-form-item>
-        <el-form-item label="内核数量">
+        <el-form-item label="内核数量" prop="coreNum">
           <el-input v-model="form.coreNum"/>
         </el-form-item>
-        <el-form-item label="内存大小">
+        <el-form-item label="内存大小" prop="memSize">
           <el-input v-model="form.memSize"/>
         </el-form-item>
-        <el-form-item label="接收速率">
+        <el-form-item label="接收速率" prop="recvRate">
           <el-input v-model="form.recvRate"/>
         </el-form-item>
 
         <el-form-item label="平台大类" :label-width="formLabelWidth" prop="hrTypeName">
-        <el-select v-model="form.hrTypeName" placeholder="请选择平台">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          >
-          </el-option>
-        </el-select>
-      </el-form-item>
-
+          <el-select v-model="form.hrTypeName" placeholder="请选择平台">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="updateChip(form)">确 定</el-button>
+        <el-button type="primary" @click="updateChip('form', form)">确 定</el-button>
         <el-button @click="dialogFormVisible = false">取 消</el-button>
       </div>
     </el-dialog>
@@ -123,7 +121,39 @@ export default {
         size: 20
       },
       tableLoading: false,
-      tableOption: tableOption
+      tableOption: tableOption,
+      rules: {
+        chipName: [
+          { required: true, message: "芯片名称不能为空", trigger: "blur" }
+        ],
+        coreNum: [
+          { required: true, message: "内核数量不能为空", trigger: "blur" },
+          {
+            pattern: /^[0-9]*[1-9][0-9]*$/,
+            message: "请输入整数",
+            trigger: "blur"
+          }
+        ],
+        memSize: [
+          { required: true, message: "内存大小不能为空", trigger: "blur" },
+          {
+            pattern: /^[0-9]*[1-9][0-9]*$/,
+            message: "请输入整数",
+            trigger: "blur"
+          }
+        ],
+        recvRate: [
+          { required: true, message: "接收速率不能为空", trigger: "blur" },
+          {
+            pattern: /^[0-9]*[1-9][0-9]*$/,
+            message: "请输入整数",
+            trigger: "blur"
+          }
+        ],
+        hrTypeName: [
+          { required: true, message: "请选择平台大类", trigger: "change" }
+        ]
+      }
     };
   },
   created() {
@@ -149,14 +179,21 @@ export default {
         console.log("this.queryData",this.queryData)
       }) */
     },
-    updateChip(form) {
+    updateChip(formName, form) {
       // console.log("form",form)
-      this.dialogFormVisible = false;
-      this.$router.push({
-        path: "/libs/hardwarelibchip/chipupdate",
-        query: form
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.dialogFormVisible = false;
+          this.$router.push({
+            path: "/libs/hardwarelibchip/chipupdate",
+            query: form
+          });
+          // this.$refs[formName].resetFields();
+        } else {
+          // console.log("error submit!!");
+          return false;
+        }
       });
-      this.form = {};
     },
     getPlatformSelectTree() {
       fetchPlatformTree().then(response => {

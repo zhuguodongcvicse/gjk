@@ -1,6 +1,6 @@
 <template>
   <div class="split-pane-page-wrapper comp_component_showcomp_14s">
-    <split-pane v-model="offset" @on-moving="handleMoving" min="150px">
+    <split-pane v-model="offset" @on-moving="handleMoving" min="0" max="1150px">
       <div slot="left" class="comp_component_showcomp_tree_14s">
         <el-tree
           style="height:100%;overflow-y: auto;"
@@ -40,7 +40,7 @@ import { fetchCompLists } from "@/api/comp/component";
 import { userInfo } from "os";
 import { getFilePathById } from "@/api/comp/componentdetail";
 import SplitPane from "@/page/components/split-pane";
-import { getTreeDefaultExpandIds } from "@/util/util";
+import { getTreeDefaultExpandIds ,findParent} from "@/util/util";
 export default {
   name: "split_pane_page",
   components: {
@@ -84,6 +84,12 @@ export default {
     },
 
     handleNodeClick(data) {
+      console.log("PPPPPPP:",data);
+      var reg = new RegExp("\\\\", "g");
+
+      var a = data.filePath.replace(reg,"#$#");
+      var b = a.split("#$#");
+      console.log("aaaaaq:",b[5] + "_" + b[7] + "_" + b[8] + "_" + data.label);
       this.currNode = data;
       let parentType = data.parentType;
       if (data.children.length === 0) {
@@ -93,7 +99,8 @@ export default {
             compId: this.$route.query.compId,
             fileType: "comp",
             compFilePath: data.filePath + "\\" + data.label,
-            compFileName: data.label
+            compFileName: data.label,
+            proFloName: b[5] + "_" + b[7] + "_"  + data.label
           }
         });
       }

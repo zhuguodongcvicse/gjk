@@ -27,18 +27,6 @@ export const tableOption = {
   delBtn: false,
   addBtn: false,
   column: [
-    // {
-    //   label: 'ID',
-    //   prop: 'id'
-    // },
-    // {
-    //   label: '父ID',
-    //   prop: 'parentId'
-    // },
-    // {
-    //   label: '结构体类型根节点id',
-    //   prop: 'rootId'
-    // },
     {
       label: '名称',
       'search': true,
@@ -46,28 +34,26 @@ export const tableOption = {
     },
     {
       label: '版本',
-      // 'search': true,
+      slot: true,
       prop: 'version'
-    },
-    {
-      label: '类别',
-      prop: 'type'
     },
     {
       label: '数据类型',
       prop: 'dataType'
     },
-    // {
-    //   label: '结构体类型',
-    //   prop: 'structType'
-    // },
-    // {
-    //   label: '数据长度',
-    //   prop: 'dataLength'
-    // },
-    // {
-    //   label: '权限标识',
-    //   prop: 'permission'
-    // },
+    {
+      label: '结构体类型',
+      prop: 'structType',
+      dicData: [{
+        label: '公共结构体',
+        value: '0'
+      }, {
+        label: '组件参数结构体',
+        value: '1'
+      }, {
+        label: '其他结构体',
+        value: '2'
+      }]
+    },
   ]
 }

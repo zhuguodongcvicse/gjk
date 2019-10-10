@@ -52,15 +52,28 @@
             }"
                 >
                   <el-select v-model="domain.attributeNameValue" placeholder="请选择">
-                    <el-option
-                      v-for="item in message"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                    >
-                      <span class="fl_14s">{{ item.label }}</span>
-                      <span class="fr_14s fontsize1">{{ item.value }}</span>
-                    </el-option>
+                    <template v-if="domain.lableName==='优化目标'">
+                      <el-option
+                        v-for="item in messageTarget"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                      >
+                        <span class="fl_14s">{{ item.label }}</span>
+                        <span class="fr_14s fontsize1">{{ item.value }}</span>
+                      </el-option>
+                    </template>
+                    <template v-if="domain.lableName==='映射功能'">
+                      <el-option
+                        v-for="item in messageResult"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                      >
+                        <span class="fl_14s">{{ item.label }}</span>
+                        <span class="fr_14s fontsize1">{{ item.value }}</span>
+                      </el-option>
+                    </template>
                   </el-select>
                 </el-form-item>
               </el-form>
@@ -104,15 +117,17 @@
             <el-form :model="form" label-width="82px" :inline="false">
               <el-form-item label="参数路径：">
                 <el-input v-model="actions" size="mini" :disabled="true"></el-input>
-               
-				<el-upload action="/pro/manager/getWorking" 
-                  :on-change="testOnChange" 
+
+                <el-upload
+                  action="/pro/manager/getWorking"
+                  :on-change="testOnChange"
                   class="upload-demo inline-block"
                   multiple
                   :show-file-list="false"
-                  :http-request="customFileUpload">
-                      <el-button size="mini" plain type="primary" icon="el-icon-search"></el-button>
-                  </el-upload>
+                  :http-request="customFileUpload"
+                >
+                  <el-button size="mini" plain type="primary" icon="el-icon-search"></el-button>
+                </el-upload>
               </el-form-item>
             </el-form>
 
@@ -273,7 +288,8 @@ import {
   getFilePathListById,
   getSysConfigXmlEntityMap,
   getProcessFilePathById,
-  getWorking} from "@/api/pro/manager";
+  getWorking
+} from "@/api/pro/manager";
 import { getDictValue, remote } from "@/api/admin/dict";
 
 export default {
@@ -315,7 +331,8 @@ export default {
       handlerForm: {
         domains: []
       },
-      messages: [],
+      messageResult: [],
+      messageTarget: [],
       length: "",
       arrays: [],
       xml: {
@@ -502,153 +519,161 @@ export default {
     };
   },
   created() {
-    getSoftProcessFilePath(this.$route.query.proId)
-      .then(val => {
-        console.log("BBBBBB:",val);
-        this.workModeFilePath = val.data.data.split("@###@###@@")[0];
-        this.planFilePath = val.data.data.split("@###@###@@")[1];
-      }),
-    //获取构件名
-    getProcessFilePathById(this.$route.query.proId)
-      .then(val => {
-        console.log("aaaa::::===", val);
-        this.selectComponent = [];
-        if (val.data.data != null) {
-          for (let item of val.data.data) {
-            let selectComp = {};
-            selectComp.label = item.compName;
-            selectComp.value = item.compId;
-            selectComp.functionName = item.functionName;
-            selectComp.compId = item.compId;
-            this.selectComponent.push(selectComp);
-          }
-        } else {
-          this.$message.error("缺少流程配置文件，请先配置流程。");
-        }
-      })
-      .then(val => {
-        getProcessName(this.$route.query.pareId).then(val => {
-          this.processName = val.data.data.fileName;
-        });
-        rollbackDispose(this.$route.query.proId).then(val => {
-          console.log("77777", val.data.data);
-          //方案路径的回显
-          // this.inputPath=val.data.data.xmlEntitys[0].attributeNameValue;
-          //参数路径的回显
-          this.actions =
-            val.data.data.xmlEntitys[4].xmlEntitys[0].attributeNameValue;
-          //流程名的回显
-          // this.processName = this.$route.query.processName;
-          //起始构件的回显
-          console.log("function:::", this.selectComponent);
-          for (let item of this.selectComponent) {
-            if (
-              val.data.data.xmlEntitys[4].xmlEntitys[4].attributeCompIdValue ===
-              item.compId
-            ) {
-              this.selectBegin = item.label + "," + item.value;
-              this.selectBeginFunctionName = item.functionName;
-              this.selectBeginCompId = item.compId;
+    //获取下拉列表的值
+    remote("softToHardConfig_result").then(res => {
+      this.messageResult = res.data.data;
+    });
+    remote("softToHardConfig_target").then(res => {
+      this.messageTarget = res.data.data;
+    });
+    getSoftProcessFilePath(this.$route.query.proId).then(val => {
+      console.log("BBBBBB:", val);
+      this.workModeFilePath = val.data.data.split("@###@###@@")[0];
+      this.planFilePath = val.data.data.split("@###@###@@")[1];
+    }),
+      //获取构件名
+      getProcessFilePathById(this.$route.query.proId)
+        .then(val => {
+          console.log("aaaa::::===", val);
+          this.selectComponent = [];
+          if (val.data.data != null) {
+            for (let item of val.data.data) {
+              let selectComp = {};
+              selectComp.label = item.compName;
+              selectComp.value = item.compId;
+              selectComp.functionName = item.functionName;
+              selectComp.compId = item.compId;
+              this.selectComponent.push(selectComp);
             }
+          } else {
+            this.$message.error("缺少流程配置文件，请先配置流程。");
           }
-          // this.selectBegin =
-          //   val.data.data.xmlEntitys[4].xmlEntitys[4].attributeNameValue;
-          //结束构件的回显
-          for (let item of this.selectComponent) {
-            console.log(
-              item,
-              val.data.data.xmlEntitys[4].xmlEntitys[5].attributeCompIdValue
-            );
-            if (
-              val.data.data.xmlEntitys[4].xmlEntitys[5].attributeCompIdValue ===
-              item.compId
-            ) {
-              this.selectEnd = item.label + "," + item.value;
-              this.selectEndFunctionName = item.functionName;
-              this.selectEndCompId = item.compId;
+        })
+        .then(val => {
+          getProcessName(this.$route.query.pareId).then(val => {
+            this.processName = val.data.data.fileName;
+          });
+          rollbackDispose(this.$route.query.proId).then(val => {
+            console.log("77777", val.data.data);
+            //方案路径的回显
+            // this.inputPath=val.data.data.xmlEntitys[0].attributeNameValue;
+            //参数路径的回显
+            this.actions =
+              val.data.data.xmlEntitys[4].xmlEntitys[0].attributeNameValue;
+            //流程名的回显
+            // this.processName = this.$route.query.processName;
+            //起始构件的回显
+            console.log("function:::", this.selectComponent);
+            for (let item of this.selectComponent) {
+              if (
+                val.data.data.xmlEntitys[4].xmlEntitys[4]
+                  .attributeCompIdValue === item.compId
+              ) {
+                this.selectBegin = item.label + "," + item.value;
+                this.selectBeginFunctionName = item.functionName;
+                this.selectBeginCompId = item.compId;
+              }
             }
-          }
+            // this.selectBegin =
+            //   val.data.data.xmlEntitys[4].xmlEntitys[4].attributeNameValue;
+            //结束构件的回显
+            for (let item of this.selectComponent) {
+              console.log(
+                item,
+                val.data.data.xmlEntitys[4].xmlEntitys[5].attributeCompIdValue
+              );
+              if (
+                val.data.data.xmlEntitys[4].xmlEntitys[5]
+                  .attributeCompIdValue === item.compId
+              ) {
+                this.selectEnd = item.label + "," + item.value;
+                this.selectEndFunctionName = item.functionName;
+                this.selectEndCompId = item.compId;
+              }
+            }
 
-          // this.selectEnd =
-          //   val.data.data.xmlEntitys[4].xmlEntitys[5].attributeNameValue;
-          //是否进行软硬件映射的回显
-          this.whether =
-            val.data.data.xmlEntitys[4].xmlEntitys[6].attributeNameValue;
-          //裕量的回显
-          val.data.data.xmlEntitys[2].xmlEntitys.forEach(element => {
-            this.dynamicValidateForm.domains.push({
-              lableName: element.lableName,
-              attributeName: "name",
-              attributeNameValue: element.attributeNameValue
-            });
-          });
-          //系统验证参数的回显
-          val.data.data.xmlEntitys[3].xmlEntitys.forEach(element => {
-            this.parameterForm.domains.push({
-              lableName: element.lableName,
-              attributeName: "name",
-              attributeNameValue: element.attributeNameValue
-            });
-          });
-          //内存空间的回显
-          val.data.data.xmlEntitys[4].xmlEntitys[3].xmlEntitys.forEach(
-            element => {
-              this.spaceForm.domains.push({
+            // this.selectEnd =
+            //   val.data.data.xmlEntitys[4].xmlEntitys[5].attributeNameValue;
+            //是否进行软硬件映射的回显
+            this.whether =
+              val.data.data.xmlEntitys[4].xmlEntitys[6].attributeNameValue;
+            //裕量的回显
+            val.data.data.xmlEntitys[2].xmlEntitys.forEach(element => {
+              this.dynamicValidateForm.domains.push({
                 lableName: element.lableName,
                 attributeName: "name",
                 attributeNameValue: element.attributeNameValue
               });
-            }
-          );
-          //标识的回显
-          val.data.data.xmlEntitys[1].xmlEntitys.forEach(element => {
-            //从字典里获取标识的值
-            getDictValue("signals").then(response => {
-              //给标识赋值
-              this.message = response.data.data;
             });
-            this.identificationForm.domains.push({
-              lableName: element.lableName,
-              attributeName: "name",
-              attributeNameValue: element.attributeNameValue
+            //系统验证参数的回显
+            val.data.data.xmlEntitys[3].xmlEntitys.forEach(element => {
+              this.parameterForm.domains.push({
+                lableName: element.lableName,
+                attributeName: "name",
+                attributeNameValue: element.attributeNameValue
+              });
             });
-          });
-          //特殊处理的回显
-          this.indexs = "";
-          //var index;
-          for (let item of val.data.data.xmlEntitys[4].xmlEntitys) {
-            this.indexs = val.data.data.xmlEntitys[4].xmlEntitys.indexOf(item);
-            if (this.indexs > 6) {
-              length = this.indexs - 6;
-              this.arrays = val.data.data.xmlEntitys[4].xmlEntitys.slice(
-                -length
+            //内存空间的回显
+            val.data.data.xmlEntitys[4].xmlEntitys[3].xmlEntitys.forEach(
+              element => {
+                this.spaceForm.domains.push({
+                  lableName: element.lableName,
+                  attributeName: "name",
+                  attributeNameValue: element.attributeNameValue
+                });
+              }
+            );
+            //标识的回显
+            val.data.data.xmlEntitys[1].xmlEntitys.forEach(element => {
+              //从字典里获取标识的值
+              getDictValue("signals").then(response => {
+                //给标识赋值
+                this.message = response.data.data;
+              });
+              this.identificationForm.domains.push({
+                lableName: element.lableName,
+                attributeName: "name",
+                attributeNameValue: element.attributeNameValue
+              });
+            });
+            //特殊处理的回显
+            this.indexs = "";
+            //var index;
+            for (let item of val.data.data.xmlEntitys[4].xmlEntitys) {
+              this.indexs = val.data.data.xmlEntitys[4].xmlEntitys.indexOf(
+                item
               );
+              if (this.indexs > 6) {
+                length = this.indexs - 6;
+                this.arrays = val.data.data.xmlEntitys[4].xmlEntitys.slice(
+                  -length
+                );
+              }
             }
-          }
-          // 对取到的特殊处理数组分析
-          for (var i = 0; i < length; i++) {
-            // 下拉列表值组装
-            var arr = [];
-            this.arrays[i].xmlEntitys.forEach(element => {
-              //console.log("element",element);
-              arr.push(element.attributeNameValue);
-            });
-            this.res[0].lableName = this.arrays[i].lableName;
-            this.res[0].xmlEntitys[0].lableName = this.arrays[i].lableName;
-            this.res[0].xmlEntitys[0].attributeName = this.arrays[
-              i
-            ].attributeName;
-            this.res[0].xmlEntitys[0].attributeNameValue = JSON.parse(
-              JSON.stringify(arr)
-            );
-            this.handlerForm.domains.push(
-              JSON.parse(JSON.stringify(this.res[0]))
-            );
+            // 对取到的特殊处理数组分析
+            for (var i = 0; i < length; i++) {
+              // 下拉列表值组装
+              var arr = [];
+              this.arrays[i].xmlEntitys.forEach(element => {
+                //console.log("element",element);
+                arr.push(element.attributeNameValue);
+              });
+              this.res[0].lableName = this.arrays[i].lableName;
+              this.res[0].xmlEntitys[0].lableName = this.arrays[i].lableName;
+              this.res[0].xmlEntitys[0].attributeName = this.arrays[
+                i
+              ].attributeName;
+              this.res[0].xmlEntitys[0].attributeNameValue = JSON.parse(
+                JSON.stringify(arr)
+              );
+              this.handlerForm.domains.push(
+                JSON.parse(JSON.stringify(this.res[0]))
+              );
 
-            this.specialHandle();
-          }
+              this.specialHandle();
+            }
+          });
         });
-      });
   },
 
   //监听属性 类似于data概念
@@ -657,11 +682,11 @@ export default {
   watch: {},
   //方法集合
   methods: {
-	customFileUpload(event){
+    customFileUpload(event) {
       var formData = new FormData();
       formData.append("file", event.file);
-      getWorking(formData,this.processName,this.$route.query.pareId)
-      console.log("111111",this.$route.query)
+      getWorking(formData, this.processName, this.$route.query.pareId);
+      console.log("111111", this.$route.query);
     },
     //软硬件配置
     softwareClick() {

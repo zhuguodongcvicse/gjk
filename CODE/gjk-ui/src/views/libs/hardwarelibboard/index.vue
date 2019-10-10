@@ -50,19 +50,13 @@
     </basic-container>
 
     <el-dialog width="35%" :visible.sync="dialogFormVisible">
-      <el-form :model="form" label-width="90px">
-        <el-form-item label="板卡名称">
+      <el-form :model="form" label-width="90px" :rules="rules" ref="form">
+        <el-form-item label="板卡名称" prop="boardName">
           <el-input v-model="form.boardName"/>
         </el-form-item>
-        <!-- <el-form-item label="CPU数量" v-if="form.boardType == 0">
-            <el-input v-model="form.cpuNum"/>
-        </el-form-item>-->
-        <!-- <el-form-item label="板卡类型">
-            <el-input v-model="form.boardType"/>
-        </el-form-item>-->
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="updateBoard(form)">确 定</el-button>
+        <el-button type="primary" @click="updateBoard('form', form)">确 定</el-button>
         <el-button @click="dialogFormVisible = false">取 消</el-button>
       </div>
     </el-dialog>
@@ -115,7 +109,12 @@ export default {
         size: 20
       },
       tableLoading: false,
-      tableOption: tableOption
+      tableOption: tableOption,
+      rules: {
+        boardName: [
+          { required: true, message: "板卡名称不能为空", trigger: "blur" }
+        ]
+      }
     };
   },
   created() {
@@ -155,27 +154,33 @@ export default {
         });
       });
     },
-    updateBoard(form) {
-      this.dialogFormVisible = false;
-      var calculateBoardLinkType;
-      var calculateBoardIoType;
-      remote("hardware_calculateBoard_inf_linkType").then(res1 => {
-        calculateBoardLinkType = res1.data.data;
-        remote("hardware_inf_io_type").then(res2 => {
-          calculateBoardIoType = res2.data.data;
-          this.$router.push({
-            path: "/libs/hardwarelibboard/boardupdate",
-            query: [
-              this.queryData,
-              form,
-              calculateBoardLinkType,
-              calculateBoardIoType
-            ]
+    updateBoard(formName, form) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.dialogFormVisible = false;
+          var calculateBoardLinkType;
+          var calculateBoardIoType;
+          remote("hardware_calculateBoard_inf_linkType").then(res1 => {
+            calculateBoardLinkType = res1.data.data;
+            remote("hardware_inf_io_type").then(res2 => {
+              calculateBoardIoType = res2.data.data;
+              this.$router.push({
+                path: "/libs/hardwarelibboard/boardupdate",
+                query: [
+                  this.queryData,
+                  form,
+                  calculateBoardLinkType,
+                  calculateBoardIoType
+                ]
+              });
+            });
           });
-        });
+          // this.$refs[formName].resetFields();
+        } else {
+          // console.log("error submit!!");
+          return false;
+        }
       });
-
-      this.form = {};
     },
 
     currentChange(val) {

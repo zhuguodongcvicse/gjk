@@ -28,7 +28,7 @@
           >编辑</el-button>
           <el-button
             type="danger"
-            v-if="permissions.libs_hardwarelibinf_del" 
+            v-if="permissions.libs_hardwarelibinf_del"
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
@@ -38,14 +38,16 @@
     </basic-container>
 
     <el-dialog width="30%" :visible.sync="dialogFormVisible">
-      <el-form :model="form" label-width="90px">
-        <el-form-item label="接口名称">
+      <el-form :model="form" label-width="90px" :rules="rules" ref="form">
+        <el-form-item label="接口名称" prop="infName">
           <el-input v-model="form.infName"/>
         </el-form-item>
-        <el-form-item label="接口速率">
+
+        <el-form-item label="接口速率" prop="infRate">
           <el-input v-model="form.infRate"/>
         </el-form-item>
-        <el-form-item label="内存大小">
+
+        <el-form-item label="接口类型" prop="infType">
           <el-select v-model="form.infType" placeholder="请选择接口类型">
             <el-option label="芯片接口" value="3"></el-option>
             <el-option label="网口" value="0"></el-option>
@@ -54,14 +56,19 @@
             <el-option label="圆口" value="4"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="光纤数量" :label-width="formLabelWidth" prop="opticalNum" v-if="form.infType == 2">
+
+        <el-form-item
+          label="光纤数量"
+          :label-width="formLabelWidth"
+          prop="opticalNum"
+          v-if="form.infType == 2"
+        >
           <el-input v-model="form.opticalNum" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-       
-        <el-button type="primary" @click="updateInf(form)">确 定</el-button>
-         <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="updateInf('form', form)">确 定</el-button>
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
       </div>
     </el-dialog>
 
@@ -89,13 +96,20 @@ export default {
   watch: {},
   data() {
     return {
-      infTemp: '',
+      infTemp: "",
       dialogFormVisible: false,
       showInf: {
         //param: {},
         dialogFormVisible: false
       },
-      form: {},
+      form: {
+        id: "",
+        infName: "",
+        infRate: "",
+        infType: "",
+        opticalNum: "",
+        ioType: "2"
+      },
       showEdit: false,
       editId: null,
       tableData: [],
@@ -109,7 +123,31 @@ export default {
         size: 20
       },
       tableLoading: false,
-      tableOption: tableOption
+      tableOption: tableOption,
+      rules: {
+        infName: [
+          { required: true, message: "接口名不能为空", trigger: "blur" }
+        ],
+        infRate: [
+          { required: true, message: "接口速率不能为空", trigger: "blur" },
+          {
+            pattern: /^[0-9]*[1-9][0-9]*$/,
+            message: "请输入整数",
+            trigger: "blur"
+          }
+        ],
+        infType: [
+          { required: true, message: "请选择接口类型", trigger: "change" }
+        ],
+        opticalNum: [
+          { required: true, message: "不能为空", trigger: "blur" },
+          {
+            pattern: /^[0-9]*[1-9][0-9]*$/,
+            message: "请输入整数",
+            trigger: "blur"
+          }
+        ]
+      }
     };
   },
   created() {
@@ -144,38 +182,43 @@ export default {
     getList() {
       this.tableLoading = true;
       fetchList(this.listQuery).then(response => {
-        this.$store.dispatch('allInfList', response.data.data.records)
+        this.$store.dispatch("allInfList", response.data.data.records);
         // console.log("response.data.data.records",response.data.data.records)
         this.tableData = response.data.data.records;
         this.page.total = response.data.data.total;
         this.tableLoading = false;
       });
     },
-    editInf(row){
-      this.dialogFormVisible = true
-      this.form = row
-      this.infTemp = row.infName
+    editInf(row) {
+      this.dialogFormVisible = true;
+      this.form = row;
+      this.infTemp = row.infName;
       // console.log("this.form",this.form)
     },
-    updateInf(form){
-      // console.log("form",form.infName)
-      // console.log("this.infTemp",this.infTemp)
-      if (form.infName == this.infTemp) {
-        alert("接口名称不能重复,您可以取名为“XXX.1,XXX.2”,或者换一个名字")
-        return
-      }
-      this.dialogFormVisible = false
-      saveInf(form).then(response => {
-        this.$message({
-          showClose: true,
-          message: "修改成功",
-          type: "success"
-        });
-        this.getList();
-        // console.log("this",this)
-      })
-      this.form = {}
-      this.infTemp = ''
+    updateInf(formName, form) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          if (form.infName == this.infTemp) {
+            alert("接口名称不能重复,您可以取名为“XXX.1,XXX.2”,或者换一个名字");
+            return;
+          }
+          this.dialogFormVisible = false;
+          saveInf(form).then(response => {
+            this.$message({
+              showClose: true,
+              message: "修改成功",
+              type: "success"
+            });
+            this.getList();
+            // console.log("this",this)
+          });
+          this.infTemp = "";
+          this.$refs[formName].resetFields();
+        } else {
+          // console.log("error submit!!");
+          return false;
+        }
+      });
     },
     currentChange(val) {
       this.page.current = val;
