@@ -58,6 +58,7 @@ public class ThreeLibsController {
 
 	private final ThreeLibsService threeLibsService;
 	private static final String softwarePath = JGitUtil.getLOCAL_REPO_PATH();
+	private static final String defaultEncoding = JGitUtil.getDefaultEncoding();
 
 	/**
 	 * 
@@ -166,6 +167,11 @@ public class ThreeLibsController {
 		String fileName = threeLibsFilePathDTO.getFilePathName();
 		//获取文件编码格式
 		String code = "";
+		if(StringUtils.isEmpty(threeLibsFilePathDTO.getCode())) {
+			code = defaultEncoding;
+		}else {
+			code = threeLibsFilePathDTO.getCode();
+		}
 		if(StringUtils.isEmpty(fileName)) {
 			return new R<>();
 		}
@@ -176,7 +182,7 @@ public class ThreeLibsController {
 //		if(threeLibsFilePathDTO.getEditorCode()!=null) {
 //			code = threeLibsFilePathDTO.getEditorCode();
 //		}else {
-			code = this.codeString(fileName);
+//			code = this.codeString(fileName);
 //		}
 		String prefix = fileName.substring(fileName.lastIndexOf(".") + 1);
 
@@ -231,44 +237,15 @@ public class ThreeLibsController {
 					System.out.println("读取文件内容出错");
 					e.printStackTrace();
 				}
-
 			}
-//		else if ("doc".equals(prefix) ) {
-//			WordExtractor wordExtractor;
-//			try {
-//				FileInputStream file = new FileInputStream(fileName);
-//				wordExtractor = new WordExtractor(file);
-//				String[] paragraph = wordExtractor.getParagraphText();
-//				for(int j=0; j < paragraph.length; j++) {
-//					str = str + paragraph[j].toString();
-//				}
-//			}catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//			
-//		}
-			// 读取//.h .m .c .o 文件
+			// 读取//.h .m .c .o等客户 文件
 			else {
 				// 获得文件编码
 //				String fileEncode=EncodingDetect.getJavaEncode(fileName);   
 				//String encoding = "utf-8";
-				
 				try {
 					str = FileUtils.readFileToString(new File(fileName), code);
 					System.out.println("sss:::" + str);
-
-					// 之前的老方法
-					// 考虑到编码格式
-//					InputStreamReader read = new InputStreamReader(new FileInputStream(fileName), code);
-//					BufferedReader bufferedReader = new BufferedReader(read);
-//					// 定义一个字符串缓存，将字符串存放缓存中
-//					StringBuilder sb = new StringBuilder();
-//					String lineTxt = null;
-//					while ((lineTxt = bufferedReader.readLine()) != null) {
-//						sb.append(lineTxt + "\n");
-//					}
-//					read.close();
-//					str = sb.toString();
 				} catch (Exception e) {
 					System.out.println("读取文件内容出错");
 					e.printStackTrace();
