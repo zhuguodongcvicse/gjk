@@ -51,16 +51,17 @@ public class LinuxUtil {
 			}
 			fis.close();// 关闭输入流
 			// 从构建器中生成字符串，并替换搜索文本
-			
-			
 			//截取C_SRCS 
 			String subStr = sb.toString().substring(sb.indexOf("C_SRCS += \\"),sb.length());
-			subStr = subStr.substring(0,subStr.indexOf("OBJS += \\"));
-			subStr = subStr.substring(0,subStr.lastIndexOf(".c")+2);
+			String replaceSubStr = subStr.substring(0,subStr.indexOf("OBJS += \\"));
+			//subStr = subStr.substring(0,subStr.lastIndexOf(".c")+2);
+			if(replaceSubStr.contains("\n")){
+				subStr = replaceSubStr.substring(0,replaceSubStr.indexOf("\n"));
+			}
 			System.out.println(subStr);
 			//加工后续
 			String subStr1 = subStr;
-			subStr1 += " \\ \r";
+			subStr1 += "\r";
 			for(int i=0;i<listPath.size();i++) {
 				if(i==listPath.size()-1) {
 					//截取获取文件名称
@@ -74,12 +75,15 @@ public class LinuxUtil {
 			
 			//截取OBJS 
 			String subOBJS = sb.toString().substring(sb.indexOf("OBJS += \\"),sb.length());
-			subOBJS = subOBJS.substring(0,subOBJS.indexOf("C_DEPS += \\"));
-			subOBJS = subOBJS.substring(0,subOBJS.lastIndexOf(".o")+2);
+			String  replaceSubOBJS = subOBJS.substring(0,subOBJS.indexOf("C_DEPS += \\"));
+			//subOBJS = subOBJS.substring(0,subOBJS.lastIndexOf(".o")+2);
+			if(replaceSubOBJS.contains("\n")){
+				subOBJS = replaceSubOBJS.substring(0,replaceSubOBJS.indexOf("\n"));
+			}
 			System.out.println(subOBJS);
 			//加工后续
 			String subOBJS1 = subOBJS;
-			subOBJS1 += " \\ \r";
+			subOBJS1 += "\r";
 			for(int i=0;i<listPath.size();i++) {
 				if(i==listPath.size()-1) {
 					//截取获取文件名称
@@ -93,12 +97,15 @@ public class LinuxUtil {
 			
 			//截取C_DEPS 
 			String subC_DEPS = sb.toString().substring(sb.indexOf("C_DEPS += \\"),sb.length());
-			subC_DEPS = subC_DEPS.substring(0,subC_DEPS.indexOf("# Each subdirectory"));
-			subC_DEPS = subC_DEPS.substring(0,subC_DEPS.lastIndexOf(".d")+2);
+			String replaceSubC_DEPS = subC_DEPS.substring(0,subC_DEPS.indexOf("# Each subdirectory"));
+			//subC_DEPS = subC_DEPS.substring(0,subC_DEPS.lastIndexOf(".d")+2);
+			if(replaceSubC_DEPS.contains("\n")){
+				subC_DEPS = replaceSubC_DEPS.substring(0,replaceSubC_DEPS.indexOf("\n"));
+			}
 			System.out.println(subC_DEPS);
 			//加工后续
 			String subC_DEPS1 = subC_DEPS;
-			subC_DEPS1 += " \\ \r";
+			subC_DEPS1 += "\r";
 			for(int i=0;i<listPath.size();i++) {
 				if(i==listPath.size()-1) {
 					//截取获取文件名称
@@ -109,9 +116,9 @@ public class LinuxUtil {
 				}
 			}
 			
-			String str = sb.toString().replace(subStr,subStr1+"\r");
-			str = str.replace(subOBJS,subOBJS1+"\r");
-			str = str.replace(subC_DEPS,subC_DEPS1+"\r");
+			String str = sb.toString().replace(replaceSubStr,subStr1+"\r");
+			str = str.replace(replaceSubOBJS,subOBJS1+"\r");
+			str = str.replace(replaceSubC_DEPS,subC_DEPS1+"\r");
 			
 			OutputStreamWriter fout = new OutputStreamWriter(new FileOutputStream(path),"GBK");
 			fout.write(str.toCharArray());// 把替换完成的字符串写入文件内

@@ -1,6 +1,7 @@
 <template>
   <div class="app-container pull-auto admin_basetemplate_index_14s">
     <basic-container>
+      <!--表格,页面表格-->
       <avue-crud
         ref="crud"
         :page="page"
@@ -14,6 +15,7 @@
         @row-update="handleUpdate"
       >
         <!-- @row-save="rowAdd"-->
+        <!--新增基础模板按钮-->
         <template slot="menuLeft">
           <el-button
             type="primary"
@@ -61,12 +63,14 @@
       </avue-crud>
       <!-- <add-comm :rowParam="rowParam"></add-comm> -->
     </basic-container>
-
+    <!--新增基础模板的弹窗-->
     <el-dialog title="新增模板" :visible.sync="isAddTemplate" width="40%" v-if="isAddTemplate">
       <el-form label-width="80px" :model="BaseTemplate" :rules="rules" ref="BaseTemplate">
+        <!--新增模板的名称,不可重复-->
         <el-form-item label="模板名称" prop="tempName">
           <el-input v-model="BaseTemplate.tempName" placeholder="请输入模板名称"></el-input>
         </el-form-item>
+        <!--模板的类型-->
         <el-form-item label="模板类型">
           <el-select
             v-model="BaseTemplate.tempType"
@@ -82,7 +86,8 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="选择模板" prop="tempType">
+        <!--选择模板文件,上传完成后页面显示模板文件名称后才能进行新增-->
+        <el-form-item label="选择模板" prop="fileName">
           <el-input placeholder="请选择模板" v-model="BaseTemplate.fileName" :readonly="true">
             <span slot="append" size="mini">
               <el-upload
@@ -98,6 +103,7 @@
             </span>
           </el-input>
         </el-form-item>
+        <!--备注-->
         <el-form-item label="备注">
           <el-input v-model="BaseTemplate.remarks" placeholder="备注"></el-input>
         </el-form-item>
@@ -126,6 +132,7 @@ export default {
   name: "basetemplate",
   components: {},
   data() {
+    //验证模板名称是否重复
     var validateTempName = (rule, value, callback) => {
       checkTempName(value).then(response => {
         if (window.boxType === "edit") callback();
@@ -168,12 +175,14 @@ export default {
       ],
       templateTpye: "", //模板类型
       BaseTemplate: {
+        //模板对象
         tempName: "",
         tempType: "",
         remarks: "",
         fileName: "",
         baseTemplatePath: ""
       },
+      //新增表单验证规则
       rules: {
         tempName: [
           { required: true, message: "请输入模板名称", trigger: "blur" },
@@ -181,6 +190,9 @@ export default {
         ],
         tempType: [
           { required: true, message: "请选择或输入模板类型", trigger: "blur" }
+        ],
+        fileName: [
+          { required: true, message: "请选择模板文件", trigger: "blur" }
         ]
       },
       rowParam: {
@@ -209,6 +221,7 @@ export default {
   },
   methods: {
     getList() {
+      //页面初始获取表格数据
       this.tableLoading = true;
       fetchList(this.listQuery).then(response => {
         this.tableData = response.data.data.records;
@@ -233,6 +246,7 @@ export default {
      **/
 
     handleAdd(value) {
+      //新增模板时,根据不同的模板类型给予不同的template的值
       this.$refs.BaseTemplate.validate(valid => {
         if (valid) {
           if (value == "构件模型") {
@@ -295,22 +309,25 @@ export default {
         }
       });
     },
-
+    //上传模板文件方法
     UploadImage(param) {
-      //选择模板文件
-      this.BaseTemplate.fileName = param.file.name;
+      //发送请求至后台接口上传文件
       getUploadFilesUrl(param).then(res => {
         /* 给文本框赋值 */
         var filePath = res.data.data;
-        this.BaseTemplate.baseTemplatePath = filePath;
+        this.BaseTemplate.baseTemplatePath = filePath; //获取上传后的文件的路径
+        this.BaseTemplate.fileName = param.file.name; //获取被上传文件的文件名称
       });
     },
+    //编辑功能
     handleEdit(row, index) {
       this.$refs.crud.rowEdit(row, index);
     },
+    //删除功能
     handleDel(row, index) {
       this.$refs.crud.rowDel(row, index);
     },
+    //删除方法
     rowDel: function(row, index) {
       var _this = this;
       this.$confirm("是否确认删除" + row.tempName + "的记录", "提示", {
@@ -319,7 +336,7 @@ export default {
         type: "warning"
       })
         .then(function() {
-          return delObj(row.tempId);
+          return delObj(row.tempId); //根据id删除
         })
         .then(data => {
           _this.tableData.splice(index, 1);
@@ -340,7 +357,7 @@ export default {
      **/
     handleUpdate: function(row, index, done) {
       putObj(row).then(data => {
-        this.tableData.splice(index, 1, Object.assign({}, row));
+        this.tableData.splice(index, 1, Object.assign({}, row)); //删除数组中指定索引的数据
         this.$message({
           showClose: true,
           message: "修改成功",
@@ -367,7 +384,7 @@ export default {
         done();
       });
     },
-
+    //编辑模板文件功能
     editTemplate(row, index) {
       this.$confirm("是否确认编辑" + row.tempName + "模板", "提示", {
         confirmButtonText: "确定",
@@ -375,6 +392,7 @@ export default {
         type: "warning"
       }).then(() => {
         this.$router.push({
+          //路由跳转至编辑模板文件页面
           path: "/basetemplate/editTemplate",
           query: {
             BaseTemplate: row

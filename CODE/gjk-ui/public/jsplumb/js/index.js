@@ -99,9 +99,9 @@ function handleMessageFromParent(event) {
 			iframeData = data
 			dat = eval(JSON.stringify(iframeData.params));
 			// console.log("子接收父参数", iframeData)
-			console.log("dat数据", dat);
+			//console.log("dat数据", dat);
 			connectionData = iframeData.connectionData
-			console.log("connection数据", connectionData)
+			//console.log("connection数据", connectionData)
 			break
 		case 'getCompDtosData':
 			//接收属性栏修改后的数据
@@ -116,12 +116,12 @@ function handleMessageFromParent(event) {
 				"saveArrow": saveArrow,
 				"saveflowChartJson": saveflowChartJson
 			};
-			console.log("保存后数据", saveData);
+			//console.log("保存后数据", saveData);
 			handleMessage(saveData, 'returnSave');
 			break
 		case 'clickCompLoading':
 			//loadingState = false;
-			// console.log("数据", JSON.stringify(data.params));
+			//console.log("数据", JSON.stringify(data.params));
 			loadState = true;
 			loadJson(data.params);
 			loadAddPointParam = data.params.addPointParam
@@ -163,8 +163,8 @@ function handleMessageFromParent(event) {
 					break;
 			}
 			break;
-			case 'fullScreen':
-				toggleFullScreen();
+			case 'cleanCanvas':
+				cleanCanvas();
 				break;
 	}
 };
@@ -249,7 +249,7 @@ function setEnterPoint(id, gj) {
 			uuid: i + '*input*' + id,
 			deleteEndpointsOnEmpty: true
 		}, config);
-		inPoint.bind('mouseover', function (endpoint, originalEvent) {
+		inPoint.bind('dblclick', function (endpoint, originalEvent) {
 			addDiv(endpoint);
 			var endpointId = endpoint.getUuid().split("*")[2]
 			var y = $("#" + endpointId).offset().top;
@@ -262,6 +262,9 @@ function setEnterPoint(id, gj) {
 		// inPoint.bind('mouseout', function (endpoint, originalEvent) {
 		// 	$('.point').remove();
 		// });
+		inPoint.bind('mousedown', function (endpoint, originalEvent) {
+			mousedownState = 1;
+		});
 		differenceValue += anchorNumber;
 	}
 }
@@ -361,7 +364,7 @@ function setExitPoint(id, gj) {
 			deleteEndpointsOnEmpty: true
 		}, config);
 		//端点绑定鼠标移入事件
-		outPoint.bind('mouseover', function (endpoint, originalEvent) {
+		outPoint.bind('dblclick', function (endpoint, originalEvent) {
 			addDiv(endpoint);
 			var endpointId = endpoint.getUuid().split("*")[2]
 			var y = $("#" + endpointId).offset().top;
@@ -452,7 +455,7 @@ function addDraggable(id) {
 			//alert("开始移动")
 			dragNode = {}
 			oldPosition = []
-			console.log("拖动时的idList数组", idList)
+			//console.log("拖动时的idList数组", idList)
 			if (isNode(id)) {
 				for (var a = 0; a < idList.length; a++) {
 					oldPosition.push(saveNodePosition(idList[a]))
@@ -528,17 +531,17 @@ function checkDat() {
 	$('.row').mousemove(function (e) {
 		if (flag) {
 			let f = $(".div_left").width();
-			console.log("1111",e.clientX - iX)
-			console.log("222",dw - (e.clientX - BR))
-			console.log("3333",(e.clientX - BR))
+			// console.log("1111",e.clientX - iX)
+			// console.log("222",dw - (e.clientX - BR))
+			// console.log("3333",(e.clientX - BR))
 			if(e.clientX - iX > 130){
 				$(".border").css("left", e.clientX - iX + "px")
 				$(".div_left").css("right", dw - (e.clientX - BR) + "px")
 				$(".div_right").css("left", (e.clientX - BR) + "px")	
 			}else{
-				$(".border").css("left", 11 + "%")
-				$(".div_left").css("right", 88 +"%")
-				$(".div_right").css("left", 12 + "%")
+				$(".border").css("left", 12 + "%")
+				$(".div_left").css("right", 87 +"%")
+				$(".div_right").css("left", 13 + "%")
 			}
 			$(".div_right").css("width", ($(".div_right").width()+(e.clientX - BR))-60 + "px")
 			//根据鼠标事件相对位置计算出div的position
@@ -558,7 +561,7 @@ function appendDiv() {
 	var Template = "";
 	for (var i = 0; i < dat.length; i++) {
 
-		console.log("dat[i].compImg", dat[i].compImg);
+		//console.log("dat[i].compImg", dat[i].compImg);
 		var s = dat[i].compImg.substr(dat[i].compImg.indexOf("src='") + 5);
 		var img = s.substr(0, s.indexOf("' "));
 		//str += "<div class = 'btn'  data-template='tpl-menu" + i + "'><img src='"+img+"'><br/>" + dat[i].compName + "</div></br>"
@@ -614,7 +617,7 @@ function main() {
 			limitZ()
 			//清空ctrlY时的数据
 			//clean();
-			console.log("用户所做操作", chartRareOperationStack)
+			//console.log("用户所做操作", chartRareOperationStack)
 			//console.log("ui数据", $('#' + a + '-heading')[0].dataset.id)
 			var endpoints = jsPlumb.getEndpoints(gjTemplateId);
 			var uuidList = new Array();
@@ -633,7 +636,7 @@ function main() {
 				//节点所有锚点uuid
 				uuidList: uuidList
 			});
-			console.log("参数：",JSON.stringify(gjidAndTemid));
+			//console.log("参数：",JSON.stringify(gjidAndTemid));
 			//gjIdAndTemId = gjidAndTemid;
 			handleMessageToParent("returnFormJson", gjidAndTemid);
 			//添加画布构件点击事件
@@ -857,7 +860,7 @@ function saveNodeJson(nodeId) {
 	copyDataJson.nodes = nodes;
 	copyDataJson.connections = connections;
 	copyDataJson.jsonendpoints = jsonendpoints;
-	console.log(copyDataJson);
+	//console.log(copyDataJson);
 	return copyDataJson;
 }
 
@@ -934,7 +937,7 @@ function addPointDiv(proPream) {
 
 //动态增加删除锚点
 function updatePoint(proPream) {
-	console.log("进入增加删除锚点", proPream);
+	//console.log("进入增加删除锚点", proPream);
 	var endpoints = jsPlumb.getEndpoints(proPream.compId);
 	//console.log(endpoints.length);
 	var inputUuidList = new Array();
@@ -954,7 +957,7 @@ function updatePoint(proPream) {
 		if (proPream.inOrOut == 'input') {
 			//修改画布数据
 			canvasData.get(proPream.compId).inputList.push(proPream.data)
-			console.log("修改数据", canvasData)
+			//console.log("修改数据", canvasData)
 			var len = inputUuidList.length + 1;
 			var anchorNumber = 1 / len;
 			var differenceValue = anchorNumber / 2;
@@ -977,7 +980,7 @@ function updatePoint(proPream) {
 				uuid: proPream.uid,
 				deleteEndpointsOnEmpty: true
 			}, config);
-			addInPoint.bind('mouseover', function (endpoint, originalEvent) {
+			addInPoint.bind('dblclick', function (endpoint, originalEvent) {
 				addPointDiv(proPream);
 				//var mouse = mousePosition();
 				var endpointId = endpoint.getUuid().split("*")[2]
@@ -988,10 +991,12 @@ function updatePoint(proPream) {
 				$('.point').css("top", y);
 				//$('.point').css("border", "1px solid red");
 			});
-
-			addInPoint.bind('mouseout', function () {
-				$('.point').remove();
+			addInPoint.bind('mousedown', function (endpoint, originalEvent) {
+				mousedownState = 1;
 			});
+			// addInPoint.bind('mouseout', function () {
+			// 	$('.point').remove();
+			// });
 		} else {
 			canvasData.get(proPream.compId).outputList.push(proPream.data)
 			console.log("画布数据", canvasData);
@@ -1011,7 +1016,7 @@ function updatePoint(proPream) {
 				uuid: proPream.uid,
 				deleteEndpointsOnEmpty: true
 			}, config);
-			addOutPoint.bind('mouseover', function (endpoint, originalEvent) {
+			addOutPoint.bind('dblclick', function (endpoint, originalEvent) {
 				addPointDiv(proPream);
 				//var mouse = mousePosition();
 				var endpointId = endpoint.getUuid().split("*")[2]
@@ -1021,8 +1026,11 @@ function updatePoint(proPream) {
 				$('.point').css("left", x - 15);
 				$('.point').css("top", y);
 			});
-			addOutPoint.bind('mouseout', function () {
-				$('.point').remove();
+			// addOutPoint.bind('mouseout', function () {
+			// 	$('.point').remove();
+			// });
+			addOutPoint.bind('mousedown', function (endpoint, originalEvent) {
+				mousedownState = 1;
 			});
 		}
 		// jsPlumb.connect({ uuids: [endpoints[0].getUuid(), endpoints[0].getUuid()] })
@@ -1125,7 +1133,7 @@ var connInfoObj = {}
 jsPlumb.bind("connection", function (connInfo, originalEvent) {
 	if (isConnection) {
 		connInfoObj = {}
-		console.log(connInfo)
+		//console.log(connInfo)
 		connInfoObj.conn = connInfo;
 		connInfoObj.connSourceUUid = connInfo.sourceEndpoint.getUuid();
 		connInfoObj.connTargetUUid = connInfo.targetEndpoint.getUuid()
@@ -1143,14 +1151,14 @@ var connectionObjClick = {}
 //删除连线
 jsPlumb.bind("click", function (conn, originalEvent) {
 	connectionObjClick = {};
-	console.log(connectionObjClick)
+	//console.log(connectionObjClick)
 	//conn.getPaintStyle().stroke = "red"
 	//conn.getPaintStyle().strokeStyle = "red"
 	connectionObjClick.removeConnection = conn
 	//console.log(conn)
 	connectionObjClick.connSourceUUid = conn.endpoints[0].getUuid();
 	connectionObjClick.connTargetUUid = conn.endpoints[1].getUuid()
-	console.log(connectionObjClick)
+	//console.log(connectionObjClick)
 	//console.log(conn)
 	// document.onkeydown=function(event){
 	// 	//var e = event || window.event || arguments.callee.caller.arguments[0];
@@ -1252,7 +1260,7 @@ jsPlumb.bind("connectionDragStop", function (info) {
 		var targetIndex = 0;
 		if (addPointParam.length > 0) {
 			$.each(addPointParam, function (index2, addPoinr) {
-				console.log("进入目标节点循环");
+				//console.log("进入目标节点循环");
 				if (targetUid == addPoinr.uid) {
 					targetPointState = true;
 					targetIndex = index2;
@@ -1324,7 +1332,7 @@ document.onkeydown = function () {
 		event.preventDefault();
 		copyTop = copyTop + 50;
 		copyLeft = copyLeft + 50;
-		console.log(11111111111111)
+		//console.log(11111111111111)
 		if(copyData.length <= 0){
 			copyData = JSON.parse(sessionStorage.getItem("copyData"));
 			console.log("复制数据",copyData)
@@ -1955,7 +1963,8 @@ function pasteJson(pasteDataJson) {
 					anchors: [0, endpoint.anchorY, 0, 0],
 					uuid: endpoint.uuid.split("*")[0] + "*" + endpoint.uuid.split("*")[1] + "*" + newId,
 				}, config)
-				inPoint.bind('mouseover', function (endpoint, originalEvent) {
+				inPoint.bind('dblclick', function (endpoint, originalEvent) {
+					console.log("222222222222222",canvasData.get(newId))
 					console.log("进入", canvasData.get(newId).inputList[0].variableName)
 					addTemDiv(endpoint, canvasData.get(newId).inputList);
 					//var mouse = mousePosition();
@@ -1966,8 +1975,11 @@ function pasteJson(pasteDataJson) {
 					$('.point').css("left", x - 310);
 					$('.point').css("top", y);
 				});
-				inPoint.bind('mouseout', function (endpoint, originalEvent) {
-					$('.point').remove();
+				// inPoint.bind('mouseout', function (endpoint, originalEvent) {
+				// 	$('.point').remove();
+				// });
+				inPoint.bind('mousedown', function (endpoint, originalEvent) {
+					mousedownState = 1;
 				});
 			} else {
 				config.isTarget = true
@@ -1977,7 +1989,7 @@ function pasteJson(pasteDataJson) {
 					anchors: [1, endpoint.anchorY, 0, 0],
 					uuid: endpoint.uuid.split("*")[0] + "*" + endpoint.uuid.split("*")[1] + "*" + newId,
 				}, config)
-				outPoint.bind('mouseover', function (endpoint, originalEvent) {
+				outPoint.bind('dblclick', function (endpoint, originalEvent) {
 					addTemDiv(endpoint, canvasData.get(newId).outputList);
 					var endpointId = endpoint.getUuid().split("*")[2]
 					var y = $("#" + endpointId).offset().top;
@@ -1986,8 +1998,11 @@ function pasteJson(pasteDataJson) {
 					$('.point').css("left", x - 15);
 					$('.point').css("top", y);
 				});
-				outPoint.bind('mouseout', function (endpoint, originalEvent) {
-					$('.point').remove();
+				// outPoint.bind('mouseout', function (endpoint, originalEvent) {
+				// 	$('.point').remove();
+				// });
+				outPoint.bind('mousedown', function (endpoint, originalEvent) {
+					mousedownState = 1;
 				});
 			}
 		});
@@ -2159,7 +2174,13 @@ function save() {
 	console.log("arrow串", JSON.stringify(connects));
 	return JSON.stringify(connects);
 }
-
+//清空当前画布构件
+function cleanCanvas(){
+	$(".pa").each(function(index,elem){
+		var $elem = $(elem)
+		jsPlumb.remove($elem.attr('id'))
+	})
+}
 function saveFlowchart() {
 	//画布节点信息
 	var nodes = [];
@@ -2382,8 +2403,8 @@ function loadJson(loadJson) {
 		var addPoinrIndex = 0;
 		var midpoints = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
 		$.each(endpoints, function (index, endpoint) {
-			// console.log("idsss", endpoint.id);
-			// console.log("elem.blockId", elem.blockId)
+			console.log("idsss", endpoint.id);
+			console.log("elem.blockId", elem.blockId)
 			if (endpoint.id == elem.blockId) {
 				var config = JSON.parse(JSON.stringify(getBaseNodeConfig()))
 				if (endpoint.anchorX == 0) {
@@ -2400,7 +2421,7 @@ function loadJson(loadJson) {
 						anchors: [0, endpoint.anchorY, 0, 0],
 						uuid: endpoint.uuid,
 					}, config)
-					inPoint.bind('mouseover', function (endpoint, originalEvent) {
+					inPoint.bind('dblclick', function (endpoint, originalEvent) {
 						$.each(addPoinrData, function (index1, addPoinr) {
 							if (endpoint.getUuid() == addPoinr.uid) {
 								addinPointState = true;
@@ -2423,9 +2444,9 @@ function loadJson(loadJson) {
 						$('.point').css("left", x - 310);
 						$('.point').css("top", y);
 					});
-					inPoint.bind('mouseout', function (endpoint, originalEvent) {
-						$('.point').remove();
-					});
+					// inPoint.bind('mouseout', function (endpoint, originalEvent) {
+					// 	$('.point').remove();
+					// });
 					inPoint.bind('mousedown', function (endpoint, originalEvent) {
 						mousedownState = 1;
 					});
@@ -2437,7 +2458,7 @@ function loadJson(loadJson) {
 						anchors: [1, endpoint.anchorY, 0, 0],
 						uuid: endpoint.uuid,
 					}, config)
-					outPoint.bind('mouseover', function (endpoint, originalEvent) {
+					outPoint.bind('dblclick', function (endpoint, originalEvent) {
 						$.each(addPoinrData, function (index1, addPoinr) {
 							if (endpoint.getUuid() == addPoinr.uid) {
 								addoutPointState = true;
@@ -2459,9 +2480,9 @@ function loadJson(loadJson) {
 						$('.point').css("left", x - 15);
 						$('.point').css("top", y);
 					});
-					outPoint.bind('mouseout', function (endpoint, originalEvent) {
-						$('.point').remove();
-					});
+					// outPoint.bind('mouseout', function (endpoint, originalEvent) {
+					// 	$('.point').remove();
+					// });
 					outPoint.bind('mousedown', function (endpoint, originalEvent) {
 						mousedownState = 1;
 					});

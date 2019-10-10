@@ -4,6 +4,7 @@
     :style="{width: '100%', height: '100%' ,overflow:'auto'}"
   >
     <basic-container>
+      <!--操作按钮-->
       <div class="filter-container">
         <el-button-group>
           <el-button type="primary" icon="plus" @click="addSonLable">添加</el-button>
@@ -13,7 +14,7 @@
           <el-button type="primary" @click="save">保存</el-button>
         </el-button-group>
       </div>
-
+      <!--标签树-->
       <el-row class="admin_menu_index_main_14s">
         <el-col :span="6" class="menu_main_left_14s">
           <el-tree
@@ -27,28 +28,27 @@
           >
             <span class="custom-tree-node" slot-scope="{ node }">
               <span>{{ node.data.lableMappingName }}</span>
-
-              <!-- <span v-if=" isMapping(node.data)==false  ">{{ node.data.lableName }}</span> -->
             </span>
           </el-tree>
         </el-col>
-
+        <!--屏幕右侧属性展示区-->
         <el-col :span="18" class="menu_main_right_14s">
           <el-row v-for="(attribute,index) in configureType.attrs" :key="index">
             <el-col :span="5">{{attribute.attrMappingName}}</el-col>
-
+            <!--不同的配置方式-->
             <el-col :span="6">
+              <!--input输入框配置方式-->
               <el-input
                 v-model="currentXmlMap.attributeMap[attribute.attrName]"
                 placeholder="请输入值"
                 v-if="attribute.attrConfigType=='inputComm'"
               ></el-input>
-
+              <!--单选框配置方式-->
               <el-row v-if="attribute.attrConfigType=='radioComm'">
                 <el-radio v-model="currentXmlMap.attributeMap[attribute.attrName]" label="Y">是</el-radio>
                 <el-radio v-model="currentXmlMap.attributeMap[attribute.attrName]" label="N">否</el-radio>
               </el-row>
-
+              <!--select下拉框配置方式-->
               <el-select
                 v-model="currentXmlMap.attributeMap[attribute.attrName]"
                 placeholder="请选择"
@@ -61,7 +61,7 @@
                   :value="item.value"
                 ></el-option>
               </el-select>
-
+              <!--多选框配置方式-->
               <el-row v-if="attribute.attrConfigType=='checkBoxComm' ">
                 <el-checkbox
                   v-model="currentXmlMap.attributeMap[attribute.attrName]"
@@ -71,13 +71,13 @@
                 >{{check}}</el-checkbox>
                 <!-- <el-checkbox v-model="currentXmlMap.attributeMap[attribute.attrName]" label="备选项1">备选项1</el-checkbox> -->
               </el-row>
-
+              <!--选择文件夹配置方式-->
               <files-upload
                 ref="saveFiles"
                 v-if="attribute.attrConfigType=='uploadBtnComm'"
                 @save-leftData="saveLeftData"
               ></files-upload>
-
+              <!--选择文件配置方式-->
               <el-input
                 placeholder="选择文件"
                 :id="'filename'+index"
@@ -100,7 +100,7 @@
                   </el-upload>
                 </span>
               </el-input>
-
+              <!--结构体赋值配置方式-->
               <el-row v-if="attribute.attrConfigType=='assignmenComm'">
                 <el-input
                   v-model="currentXmlMap.attributeMap[attribute.attrName]"
@@ -110,9 +110,8 @@
                   @dblclick.native="handleLength(attribute)"
                 ></el-input>
                 <formula-editing :fatherModel="formulaDialogParams"></formula-editing>
-                <!-- <span>公式编辑器</span> -->
               </el-row>
-
+              <!--公式编辑器配置方式-->
               <el-row v-if="attribute.attrConfigType=='formulaComm'">
                 <el-input
                   v-model="currentXmlMap.attributeMap[attribute.attrName]"
@@ -122,7 +121,6 @@
                   @dblclick.native="handleLength(attribute)"
                 ></el-input>
                 <formula-editing :fatherModel="formulaDialogParams"></formula-editing>
-                <!-- <span>公式编辑器</span> -->
               </el-row>
             </el-col>
           </el-row>
@@ -138,6 +136,7 @@
         :style="{overflow:'auto'}"
       >
         <el-row class="addtemplate_dialog_row_14s">
+          <!--标签增加的位置选择-->
           <el-row>
             <el-col :span="4">增加的位置</el-col>
             <el-col :span="20">
@@ -146,6 +145,7 @@
               <el-radio v-model="lablePosition" label="down">下</el-radio>
             </el-col>
           </el-row>
+          <!--标签名-->
           <el-row>
             <el-col :span="4">标签名</el-col>
             <el-col :span="5">
@@ -164,7 +164,7 @@
                 ></el-option>
               </el-select>
             </el-col>
-
+            <!--标签名是否映射选择-->
             <el-col :span="3">是否映射</el-col>
             <el-col :span="3">
               <!-- <el-radio v-model="configureType.lableMapping" label="true">Y</el-radio>
@@ -175,6 +175,7 @@
                 inactive-color="#ff4949"
               ></el-switch>
             </el-col>
+            <!--标签名映射的话映射名是什么-->
             <div v-if="configureType.lableMapping">
               <el-col :span="4">映射名</el-col>
               <el-col :span="5">
@@ -190,6 +191,7 @@
               </el-col>
             </div>
           </el-row>
+          <!--选择此标签的配置方式-->
           <el-row>
             <el-col :span="4">此标签的配置方式</el-col>
             <el-col :span="20">
@@ -209,6 +211,7 @@
         </el-row>
         <div class="libs_structlibs_configstruct_14s_25s_table">
           <el-table :data="configureType.attrs" class="w100_14s" border>
+            <!--属性名添加-->
             <el-table-column label="属性名">
               <template slot-scope="scope">
                 <!-- <el-input v-model="scope.row.attrName" placeholder="请输入属性名"></el-input> -->
@@ -227,6 +230,7 @@
                 </el-select>
               </template>
             </el-table-column>
+            <!--选择属性名是否映射-->
             <el-table-column label="是否映射">
               <template slot-scope="scope">
                 <!-- <el-radio v-model="scope.row.attrMapping" label="true">Y</el-radio>
@@ -238,6 +242,7 @@
                 ></el-switch>
               </template>
             </el-table-column>
+            <!--属性映射的话,映射名是什么-->
             <el-table-column label="映射名">
               <template slot-scope="scope">
                 <!-- <el-input v-if="scope.row.attrMapping" v-model="scope.row.attrMappingName"></el-input> -->
@@ -257,6 +262,7 @@
                 </el-select>
               </template>
             </el-table-column>
+            <!--属性的配置方式-->
             <el-table-column label="配置方式">
               <template slot-scope="scope">
                 <el-select v-model="scope.row.attrConfigType" placeholder="请选择">
@@ -269,6 +275,7 @@
                 </el-select>
               </template>
             </el-table-column>
+            <!--当属性使用下拉框时,选择下拉框中的数据源-->
             <el-table-column label="数据源">
               <template slot-scope="scope">
                 <el-select
@@ -291,6 +298,7 @@
                 </el-select>
               </template>
             </el-table-column>
+            <!--此属性名在页面上是否显示-->
             <el-table-column label="是否显示">
               <template slot-scope="scope">
                 <el-switch
@@ -300,10 +308,11 @@
                 ></el-switch>
               </template>
             </el-table-column>
+            <!--属性的动作-->
             <el-table-column label="动作">
               <template slot-scope="scope">
                 <!-- <el-input v-model="scope.row.actionType"></el-input> -->
-                <el-select size="medium" clearable  v-model="scope.row.actionType">
+                <el-select size="medium" clearable v-model="scope.row.actionType">
                   <el-option
                     v-for="item in actionOptions"
                     :key="item.value"
@@ -313,6 +322,7 @@
                 </el-select>
               </template>
             </el-table-column>
+            <!--删除属性的按钮-->
             <el-table-column label="操作" fixed="right">
               <template slot-scope="scope">
                 <el-button type="danger" plain @click.prevent="removeAttribute(scope.row)">删除</el-button>
@@ -335,6 +345,7 @@
         :style="{overflow:'auto'}"
       >
         <el-row class="addtemplate_dialog_row_14s">
+          <!--标签名称-->
           <el-row>
             <el-col :span="4">标签名</el-col>
             <el-col :span="4">
@@ -353,7 +364,7 @@
                 ></el-option>
               </el-select>
             </el-col>
-
+            <!--标签名是否映射-->
             <el-col :span="3">是否映射</el-col>
             <el-col :span="4">
               <!-- <el-radio v-model="configureType.lableMapping" label="true">Y</el-radio>
@@ -364,6 +375,7 @@
                 inactive-color="#ff4949"
               ></el-switch>
             </el-col>
+            <!--标签进行映射后,映射名是什么-->
             <div v-if="configureType.lableMapping">
               <el-col :span="4">映射名</el-col>
               <el-col :span="5">
@@ -379,6 +391,7 @@
               </el-col>
             </div>
           </el-row>
+          <!--此标签的配置方式-->
           <el-row>
             <el-col :span="4">此标签的配置方式</el-col>
             <el-col :span="20">
@@ -398,6 +411,7 @@
         </el-row>
         <div class="libs_structlibs_configstruct_14s_25s_table">
           <el-table :data="configureType.attrs" class="w100_14s" border>
+            <!--属性名-->
             <el-table-column label="属性名">
               <template slot-scope="scope">
                 <!-- <el-input v-model="scope.row.attrName" placeholder="请输入属性名"></el-input> -->
@@ -405,7 +419,7 @@
                   v-model="scope.row.attrName"
                   filterable
                   allow-create
-                  placeholder="请选择映射名"
+                  placeholder="请选择属性名"
                 >
                   <el-option
                     v-for="item in dictValues"
@@ -416,6 +430,7 @@
                 </el-select>
               </template>
             </el-table-column>
+            <!--属性名是否映射-->
             <el-table-column label="是否映射">
               <template slot-scope="scope">
                 <!-- <el-radio v-model="scope.row.attrMapping" label="true">Y</el-radio>
@@ -427,6 +442,7 @@
                 ></el-switch>
               </template>
             </el-table-column>
+            <!--属性名映射的话,映射名-->
             <el-table-column label="映射名">
               <template slot-scope="scope">
                 <!-- <el-input v-if="scope.row.attrMapping" v-model="scope.row.attrMappingName"></el-input> -->
@@ -446,6 +462,7 @@
                 </el-select>
               </template>
             </el-table-column>
+            <!--属性的配置方式-->
             <el-table-column label="配置方式">
               <template slot-scope="scope">
                 <el-select v-model="scope.row.attrConfigType" placeholder="请选择">
@@ -458,6 +475,7 @@
                 </el-select>
               </template>
             </el-table-column>
+            <!--如果使用下拉框的话,下拉框中的数据从哪里来-->
             <el-table-column label="数据源">
               <template slot-scope="scope">
                 <el-select
@@ -480,6 +498,7 @@
                 </el-select>
               </template>
             </el-table-column>
+            <!--该属性在页面上是否显示-->
             <el-table-column label="是否显示">
               <template slot-scope="scope">
                 <el-switch
@@ -489,6 +508,7 @@
                 ></el-switch>
               </template>
             </el-table-column>
+            <!--属性的动作-->
             <el-table-column label="动作">
               <template slot-scope="scope">
                 <!-- <el-input v-model="scope.row.actionType"></el-input> -->
@@ -503,6 +523,7 @@
               </template>
             </el-table-column>
             <el-table-column label="操作" fixed="right">
+              <!--删除属性的按钮-->
               <template slot-scope="scope">
                 <el-button type="danger" plain @click.prevent="removeAttribute(scope.row)">删除</el-button>
               </template>
@@ -514,15 +535,17 @@
           <el-button type="primary" @click="eidtLable()">确 定</el-button>
         </el-row>
       </el-dialog>
-      <!------------------------------复制节点------------------------------------------------------------------------------------>
+      <!------------------------------复制节点对话框------------------------------------------------------------------------------------>
 
       <el-dialog class="addtemplate_dialog_14s" title="复制节点" :visible.sync="isCopyNode">
         <el-row class="admin_menu_index_main_14s">
           <el-col :span="7">
             <span>复制</span>
+            <!--被复制的标签名-->
             <font color="red">{{currentXmlMap.lableMappingName}}</font>
             <span>粘贴至</span>
           </el-col>
+          <!--选择粘贴到的位置的标签树-->
           <el-col :span="14">
             <div class="libs_structlibs_configstruct_14s_25s_table">
               <el-tree
@@ -539,6 +562,7 @@
               </el-tree>
             </div>
           </el-col>
+          <!--标签粘贴的位置-->
           <el-col :span="3">
             <el-radio v-model="lablePosition" label="up">上</el-radio>
             <el-radio v-model="lablePosition" label="in">中</el-radio>
@@ -576,6 +600,7 @@ export default {
   props: [],
   //监控data中的数据变化
   watch: {
+    //监控标签名的变化,发送请求至后台,更新前台dicts的数据
     "configureType.lableName"(val) {
       var SysDict = {
         value: this.configureType.lableName,
@@ -775,16 +800,16 @@ export default {
         var str = attributeMap["configureType"];
         configureType = parseStrToObj(str);
         this.configureType = configureType;
-        if(this.currentXmlMap.lableMappingName != undefined){
+        if (this.currentXmlMap.lableMappingName != undefined) {
           this.lableMappingName = this.currentXmlMap.lableMappingName; //获取标签上映射名
         }
-        
-        if(this.configureType.attrs != undefined){
+
+        if (this.configureType.attrs != undefined) {
           var attrs = this.configureType.attrs;
-        }else{
+        } else {
           var attrs = [];
         }
-        
+
         if (attrs != undefined && attrs.length > 0) {
           for (var i = 0; i < attrs.length; i++) {
             if (attrs[i].attrConfigType == "selectComm") {
@@ -1257,7 +1282,7 @@ export default {
       //复制节点(标签)
       let copyXmlMaps = JSON.parse(JSON.stringify(this.currentXmlMap));
       if (this.lablePosition == "in") {
-        //选择粘贴的位置
+        //选择粘贴的位置,添加为子标签
         if (
           this.currentPasteXmlMap.children == null ||
           this.currentPasteXmlMap.children == undefined
@@ -1267,6 +1292,7 @@ export default {
         }
         this.currentPasteXmlMap.xmlEntityMaps.push(copyXmlMaps);
       } else if (this.lablePosition == "up") {
+        //添加到标签上面
         var index = this.parentPasteXmlMap.xmlEntityMaps.indexOf(
           this.currentPasteXmlMap
         );
@@ -1274,6 +1300,7 @@ export default {
         this.parentPasteXmlMap.xmlEntityMaps.splice(index, 0, copyXmlMaps);
         //this.parentXmlMap.children.splice(index, 0, currentXmlMap);
       } else if (this.lablePosition == "down") {
+        //添加到标签下面
         var index = this.parentPasteXmlMap.xmlEntityMaps.indexOf(
           this.currentPasteXmlMap
         );
@@ -1293,7 +1320,7 @@ export default {
       addObj(this.BaseTemplateBTO).then(repsonse => {
         if (repsonse.data.code == 0) {
           console.log("保存成功");
-          this.$router.replace("/admin/basetemplate");
+          this.$router.replace("/admin/basetemplate"); //保存成功后.跳转到首页
         } else {
           console.log("保存失败");
         }
@@ -1344,7 +1371,10 @@ export default {
         if (configureType != undefined) {
           //判断configureType对象是否存在
           var dictValues = this.dictValues;
-          if (configureType.lableMapping != undefined && configureType.lableMapping) {
+          if (
+            configureType.lableMapping != undefined &&
+            configureType.lableMapping
+          ) {
             //判断标签名是否映射
             for (let i of dictValues) {
               if (configureType.mappingKeys == i.id) {
@@ -1357,7 +1387,7 @@ export default {
             Vue.set(XmlEntityMap, "lableMappingName", XmlEntityMap.lableName);
           }
           var attrs = configureType.attrs;
-          if (attrs != undefined && attrs.length > 0 ) {
+          if (attrs != undefined && attrs.length > 0) {
             //判断标签上是否拥有属性
             for (let i of attrs) {
               //遍历属性

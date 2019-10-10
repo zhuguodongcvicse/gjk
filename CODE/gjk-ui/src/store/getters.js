@@ -46,5 +46,6 @@ const getters = {
   strInPointer : state => state.comp.strInPointer,
   chipsOfHardwarelibs : state => state.chipsOfHardwarelibs.chipsOfHardwarelibs,
   closeRouter : state => state.closeRouter,
+  projectTreeShow : state => state.projectTreeShow.projectTreeShow,
 }
 export default getters
