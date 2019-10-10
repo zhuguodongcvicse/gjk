@@ -185,12 +185,16 @@ export default {
       //父组件点击后的数据
       mapFuncConfig : new Map(),
       //父组件点击后的状态
-      clickState:""
+      clickState:"",
+      //xml数据
+      themeData:{},
+      //解析流程建模数据
+      partList:{}
     };
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["subMapCustomConfig","themeData","partList"])
+    ...mapGetters(["subMapCustomConfig","xmlDataMap"])
   },
   //方法集合
   methods: {
@@ -265,6 +269,7 @@ export default {
     },
 
     handleNodeClick(e) {
+       this.cleanState = "0"
       this.funcConfigLabel = e.id+"*"+e.label;
       console.log(this.funcConfigLabel)
       console.log("商店中取出数据",this.subMapCustomConfig)
@@ -291,6 +296,7 @@ export default {
 
     },
     echo(topic,state){
+      this.cleanState = "0"
       this.data = []
       if(topic!=undefined){
         console.log("获取数据",topic);
@@ -372,9 +378,13 @@ export default {
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
     this.$store.dispatch("cleanSubMapCustomConfig")
-   console.log("topicParam",this.themeData.xmlEntityMaps[0].xmlEntityMaps)
+    this.themeData = this.xmlDataMap[this.$route.query.sysId].themeData
+    console.log("解析xml所得数据+++++++++",this.themeData)
+    this.partList = this.xmlDataMap[this.$route.query.sysId].partList
+   //console.log("topicParam",this.themeData.xmlEntityMaps[0].xmlEntityMaps)
     // console.log("topic中的数据",this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps)
-    for(var i = 0;i<this.themeData.xmlEntityMaps[0].xmlEntityMaps.length;i++){
+    if(this.themeData.xmlEntityMaps != null){
+      for(var i = 0;i<this.themeData.xmlEntityMaps[0].xmlEntityMaps.length;i++){
       this.topicData.dataStream.clear()
       for(var j = 0;j<this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps.length;j++){
         if(this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].lableName == "startCmp"){
@@ -398,30 +408,33 @@ export default {
         }
       }
      
-      this.$store.dispatch('getSubMapCustomConfig', {key:this.themeData.xmlEntityMaps[0].lableName+"*"+i+"*"+this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].lableName,value:this.topicData})
-     console.log("走了几次",this.subMapCustomConfig)
+        this.$store.dispatch('getSubMapCustomConfig', {key:this.themeData.xmlEntityMaps[0].lableName+"*"+i+"*"+this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].lableName,value:this.topicData})
+        console.log("走了几次",this.subMapCustomConfig)
+      }
+        var key = this.themeData.xmlEntityMaps[0].lableName+"*0*"+this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].lableName
+        this.mapFuncConfig = this.subMapCustomConfig.get(key)
+        this.clickState = "1"
+        this.state = "0"
+        this.funcNameMap.set(this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compId,{compName:this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compName,funName:this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.name})
+        console.log("this.funcNameMap11111111",this.funcNameMap)
+        this.formInline.user = this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[0].attributeMap.name
+        this.formInline.region = this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[1].attributeMap.name
+        for(var a = 0;a < this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps.length-2;a++){
+          this.data.push(
+            {
+              id:a+2,
+              label: this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[a+2].lableName
+            }
+          );
+        }
+        this.funcConfigLabel = this.data[0].id+"*"+this.data[0].label
+        this.formLabelAlign.name = this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compName
+        
+        this.formLabelAlign.region = this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[1].attributeMap.name 
+
     }
    
-    var key = this.themeData.xmlEntityMaps[0].lableName+"*0*"+this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].lableName
-    this.mapFuncConfig = this.subMapCustomConfig.get(key)
-    this.clickState = "1"
-    this.state = "0"
-    this.funcNameMap.set(this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compId,{compName:this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compName,funName:this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.name})
-    console.log("this.funcNameMap11111111",this.funcNameMap)
-    this.formInline.user = this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[0].attributeMap.name
-    this.formInline.region = this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[1].attributeMap.name
-    for(var a = 0;a < this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps.length-2;a++){
-      this.data.push(
-        {
-           id:a+2,
-           label: this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[a+2].lableName
-        }
-      );
-    }
-    this.funcConfigLabel = this.data[0].id+"*"+this.data[0].label
-    this.formLabelAlign.name = this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compName
     
-    this.formLabelAlign.region = this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[1].attributeMap.name 
     console.log("所有的部件",this.partList)
     for(var k =0;k<this.partList.length;k++){
       this.part.push(
@@ -436,9 +449,11 @@ export default {
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
-     this.$nextTick(function(){
+    if(this.data.length>0){
+      this.$nextTick(function(){
         this.$refs.tree.setCurrentKey(this.data[0].id);
       })
+    }
   },
   beforeCreate() {}, //生命周期 - 创建之前
   beforeMount() {}, //生命周期 - 挂载之前

@@ -11,6 +11,7 @@ import gjkConsole from './modules/gjkConsole'
 import comp from './modules/comp'
 import infList from './modules/infList'
 import chipsOfHardwarelibs from './modules/chipsOfHardwarelibs'
+import projectTreeShow from './modules/projectTreeShow'
 import closeRouter from './modules/closeRouter'
 
 Vue.use(Vuex)
@@ -25,7 +26,8 @@ const store = new Vuex.Store({
     infList,
     chipsOfHardwarelibs,
     comp,
-    gjkConsole  
+    gjkConsole,
+    projectTreeShow
   },
   getters
 })

@@ -3,7 +3,7 @@
     <!-- <component-save ref="dialog" @save="saveComponent"></component-save> -->
     <!-- 当前项目 -->
     <div class="project_tree_14s">
-      <img src="/img/theme/night/logo/proImg.png" ondragstart="return false;" />
+      <img src="/img/theme/night/logo/proImg.png" ondragstart="return false;">
       <!-- 项目切换 -->
       <el-dropdown class="project_tree_dropdown" @command="changeProjectCommand">
         <span class="el-dropdown-link">
@@ -86,7 +86,7 @@
     >
       <el-form ref="form" label-width="80px">
         <el-form-item label="构件筛选">
-          <select-tree :treeData="screenLibsTree" multiple :id.sync="screenLibsIdArray" />
+          <select-tree :treeData="screenLibsTree" multiple :id.sync="screenLibsIdArray"/>
         </el-form-item>
         <el-form-item label="构件选择">
           <select-tree
@@ -186,7 +186,7 @@
         :http-request="appImageUploadFunc"
         :on-change="onchange"
       >
-        <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+        <img v-if="imageUrl" :src="imageUrl" class="avatar">
         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
       </el-upload>
       <el-checkbox v-model="localDeploymentPlan">本地部署方案</el-checkbox>
@@ -263,7 +263,7 @@ export default {
       addProcedureDialogVisible: false,
       procedureNameList: [],
       form: {
-        procedureName: "",
+        procedureName: ""
       },
 
       deleteProcedureDialogVisible: false,
@@ -325,7 +325,7 @@ export default {
           this.$delete(this.compSelectArray, index);
         }
       }
-      console.log("compSelectArray:", this.compSelectArray);
+      // console.log("compSelectArray:", this.compSelectArray);
     }
   },
   computed: {
@@ -373,19 +373,32 @@ export default {
       // console.log("permissions", this.permissions);
       fetchProList(this.userInfo.userId)
         .then(response => {
-          this.projects = response.data.data;
-          this.temp_currProject = response.data.data[0];
+          // console.log("response.data.data ", response.data.data);
+          if (this.$store.state.projectTreeShow.projectTreeShow.length != 0) {
+            this.projects = this.$store.state.projectTreeShow.projectTreeShow;
+            // console.log("this.projects",this.projects)
+            for (const i in this.projects) {
+              if (this.projects[i].showFlag == 0) {
+                this.temp_currProject = this.projects[i];
+               }
+            }
+          } else {
+            this.projects = response.data.data;
+            this.temp_currProject = response.data.data[0];
+          }
+          this.getTreeData(this.temp_currProject.id);
+          // console.log("this.temp_currProject",this.temp_currProject)
           /* 查询项目树 */
-          if (JSON.stringify(this.tmpProject) !== "{}") {
+          /* if (JSON.stringify(this.tmpProject) !== "{}") {
             this.getTreeData(this.tmpProject.id);
             this.temp_currProject = this.tmpProject;
           } else {
             this.getTreeData(this.temp_currProject.id);
             this.temp_currProject = response.data.data[0];
-          }
+          } */
         })
         .catch(err => {
-          console.log("err: ", err);
+          // console.log("err: ", err);
         });
     },
     changeHeight() {
@@ -483,6 +496,7 @@ export default {
     },
     //查询树
     getTreeData(proId) {
+      // console.log("proId",proId)
       fetchProTree(proId).then(async response => {
         this.treeData = response.data.data;
         // this.$router.push({ path: "/comp/manager/dispose",query:{processName: this.treeData[0].children[0].name} });
@@ -491,7 +505,18 @@ export default {
       });
     },
     changeProjectCommand(project) {
-      // console.log(project);
+      // console.log("project", project);
+      // console.log("this.projects", this.projects);
+      if (project && project.id) {
+        for (const i in this.projects) {
+          this.projects[i].showFlag = 1;
+          if (this.projects[i].id == project.id) {
+            this.projects[i].showFlag = 0;
+          }
+        }
+      }
+      this.$store.dispatch("setProjectTreeShow", this.projects);
+      // console.log("this.projects", this.projects);
       // this.showProjects = false
       this.temp_currProject = project;
       this.$store.dispatch("setTmpProject", project);
@@ -504,7 +529,7 @@ export default {
     nodeContextmenuClick(item) {
       // this.loading=true;
       if (item == "集成代码生成") {
-        console.log("userInfouserInfouserInfo", this.userInfo.name);
+        // console.log("userInfouserInfouserInfo", this.userInfo.name);
         codeGeneration(this.procedureId, this.userInfo.name).then(res => {});
         const loading = this.$loading({
           lock: true,
@@ -521,10 +546,10 @@ export default {
         //得到平台大类
         getPlatformList().then(Response => {
           this.platformDataList = Response.data.data;
-          console.log("平台大类：", this.platformDataList);
+          // console.log("平台大类：", this.platformDataList);
         });
         getSoftwareSelect().then(Response => {
-          console.log("软件框架库下拉列表：", Response.data.data);
+          // console.log("软件框架库下拉列表：", Response.data.data);
           let datas = Response.data.data;
           let softwareTreeDataList = [];
           for (var i = 0; i < datas.length; i++) {
@@ -533,7 +558,7 @@ export default {
             }
           }
           this.softwareTreeData = softwareTreeDataList;
-          console.log("this.procedureId" + this.procedureId);
+          // console.log("this.procedureId" + this.procedureId);
           this.softwareSelectString = [];
           showPartSoftwareAndPlatform(this.procedureId).then(Response => {
             for (var k = 0; k < Response.data.data.length; k++) {
@@ -600,7 +625,7 @@ export default {
       }
       //至少选中一个
       if (val.length > 1) {
-        console.log("当前选中的值", val);
+        // console.log("当前选中的值", val);
         //遍历下拉框得到平台名称
         var lastPlatformName = "";
         for (var i = 0; i < this.softwareTreeData.length; i++) {
@@ -608,19 +633,19 @@ export default {
             lastPlatformName = this.softwareTreeData[i].description;
           }
         }
-        console.log("最后选中的平台大类：", lastPlatformName);
-        console.log("选中的平台大类名称：", valNameArr);
+        // console.log("最后选中的平台大类：", lastPlatformName);
+        // console.log("选中的平台大类名称：", valNameArr);
         //根据分号拆分平台类
         lastPlatformName = lastPlatformName.substring(
           0,
           lastPlatformName.length - 1
         );
         var platformNameArr = lastPlatformName.split(";");
-        console.log("拆分后的平台类名：", platformNameArr);
+        // console.log("拆分后的平台类名：", platformNameArr);
         for (var k = 0; k < platformNameArr.length; k++) {
           for (var m = 0; m < val.length - 1; m++) {
             if (valNameArr[m].indexOf(platformNameArr[k]) != -1) {
-              console.log("进入删除数组元素：" + m);
+              // console.log("进入删除数组元素：" + m);
               val.splice(m, 1);
               valNameArr.splice(m, 1);
             }
@@ -675,13 +700,12 @@ export default {
       this.bspDialogVisible = false;
     },
     addProcedure() {
-      saveProProcess(
-        this.temp_currProject.id,
-        this.form.procedureName
-      ).then(response => {
-        this.closeAddProcedureDialog();
-        this.reload();
-      });
+      saveProProcess(this.temp_currProject.id, this.form.procedureName).then(
+        response => {
+          this.closeAddProcedureDialog();
+          this.reload();
+        }
+      );
     },
     deleteProcedure() {
       deleteProcedureById(this.procedureId).then(Response => {
@@ -729,7 +753,7 @@ export default {
         });
         return;
       }
-      console.log("修改软件构件库保存：", this.softwareSelectString);
+      // console.log("修改软件构件库保存：", this.softwareSelectString);
       let prodetail = {};
       prodetail.id = this.procedureId;
       prodetail.description = this.softwareSelectString.join(";");
@@ -765,7 +789,7 @@ export default {
     },
     nodeContextmenu(event, data) {
       // this.handleNodeClick(data)
-      console.log("ddddddddd", data);
+      // console.log("ddddddddd", data);
       // if (data.parentType == "9") {
       if (data.type == "9") {
         this.menus = [

@@ -4,6 +4,7 @@
     :style="{width: '100%', height: '100%' ,overflow:'auto'}"
   >
     <basic-container>
+      <!--操作按钮-->
       <div class="filter-container">
         <el-button-group>
           <el-button type="primary" icon="plus" @click="addSonLable">添加</el-button>
@@ -13,7 +14,7 @@
           <el-button type="primary" @click="save">保存</el-button>
         </el-button-group>
       </div>
-
+      <!--标签树-->
       <el-row class="admin_menu_index_main_14s">
         <el-col :span="6" class="menu_main_left_14s">
           <el-tree
@@ -27,28 +28,27 @@
           >
             <span class="custom-tree-node" slot-scope="{ node }">
               <span>{{ node.data.lableMappingName }}</span>
-
-              <!-- <span v-if=" isMapping(node.data)==false  ">{{ node.data.lableName }}</span> -->
             </span>
           </el-tree>
         </el-col>
-
+        <!--屏幕右侧属性展示区-->
         <el-col :span="18" class="menu_main_right_14s">
           <el-row v-for="(attribute,index) in configureType.attrs" :key="index">
             <el-col :span="5">{{attribute.attrMappingName}}</el-col>
-
+            <!--不同的配置方式-->
             <el-col :span="6">
+              <!--input输入框配置方式-->
               <el-input
                 v-model="currentXmlMap.attributeMap[attribute.attrName]"
                 placeholder="请输入值"
                 v-if="attribute.attrConfigType=='inputComm'"
               ></el-input>
-
+              <!--单选框配置方式-->
               <el-row v-if="attribute.attrConfigType=='radioComm'">
-                <el-radio v-model="currentXmlMap.attributeMap[attribute.attrName]" label="Y">Y</el-radio>
-                <el-radio v-model="currentXmlMap.attributeMap[attribute.attrName]" label="N">N</el-radio>
+                <el-radio v-model="currentXmlMap.attributeMap[attribute.attrName]" label="Y">是</el-radio>
+                <el-radio v-model="currentXmlMap.attributeMap[attribute.attrName]" label="N">否</el-radio>
               </el-row>
-
+              <!--select下拉框配置方式-->
               <el-select
                 v-model="currentXmlMap.attributeMap[attribute.attrName]"
                 placeholder="请选择"
@@ -61,11 +61,8 @@
                   :value="item.value"
                 ></el-option>
               </el-select>
-
-              <!-- <el-checkbox v-model="currentXmlMap.attributeMap[attribute.attrName]" label="备选项1">备选项1</el-checkbox>
-                <el-checkbox v-model="currentXmlMap.attributeMap[attribute.attrName]" label="备选项2">备选项2</el-checkbox>
-              <el-checkbox v-model="currentXmlMap.attributeMap[attribute.attrName]" label="备选项3">备选项3</el-checkbox>-->
-              <el-row v-if="attribute.attrConfigType=='checkBoxComm'">
+              <!--多选框配置方式-->
+              <el-row v-if="attribute.attrConfigType=='checkBoxComm' ">
                 <el-checkbox
                   v-model="currentXmlMap.attributeMap[attribute.attrName]"
                   v-for="check in checkBox"
@@ -74,13 +71,13 @@
                 >{{check}}</el-checkbox>
                 <!-- <el-checkbox v-model="currentXmlMap.attributeMap[attribute.attrName]" label="备选项1">备选项1</el-checkbox> -->
               </el-row>
-
+              <!--选择文件夹配置方式-->
               <files-upload
                 ref="saveFiles"
                 v-if="attribute.attrConfigType=='uploadBtnComm'"
                 @save-leftData="saveLeftData"
               ></files-upload>
-
+              <!--选择文件配置方式-->
               <el-input
                 placeholder="选择文件"
                 :id="'filename'+index"
@@ -103,7 +100,7 @@
                   </el-upload>
                 </span>
               </el-input>
-
+              <!--结构体赋值配置方式-->
               <el-row v-if="attribute.attrConfigType=='assignmenComm'">
                 <el-input
                   v-model="currentXmlMap.attributeMap[attribute.attrName]"
@@ -113,8 +110,8 @@
                   @dblclick.native="handleLength(attribute)"
                 ></el-input>
                 <formula-editing :fatherModel="formulaDialogParams"></formula-editing>
-                <!-- <span>公式编辑器</span> -->
               </el-row>
+              <!--公式编辑器配置方式-->
               <el-row v-if="attribute.attrConfigType=='formulaComm'">
                 <el-input
                   v-model="currentXmlMap.attributeMap[attribute.attrName]"
@@ -124,7 +121,6 @@
                   @dblclick.native="handleLength(attribute)"
                 ></el-input>
                 <formula-editing :fatherModel="formulaDialogParams"></formula-editing>
-                <!-- <span>公式编辑器</span> -->
               </el-row>
             </el-col>
           </el-row>
@@ -140,6 +136,7 @@
         :style="{overflow:'auto'}"
       >
         <el-row class="addtemplate_dialog_row_14s">
+          <!--标签增加的位置选择-->
           <el-row>
             <el-col :span="4">增加的位置</el-col>
             <el-col :span="20">
@@ -148,6 +145,7 @@
               <el-radio v-model="lablePosition" label="down">下</el-radio>
             </el-col>
           </el-row>
+          <!--标签名-->
           <el-row>
             <el-col :span="4">标签名</el-col>
             <el-col :span="5">
@@ -166,7 +164,7 @@
                 ></el-option>
               </el-select>
             </el-col>
-
+            <!--标签名是否映射选择-->
             <el-col :span="3">是否映射</el-col>
             <el-col :span="3">
               <!-- <el-radio v-model="configureType.lableMapping" label="true">Y</el-radio>
@@ -177,6 +175,7 @@
                 inactive-color="#ff4949"
               ></el-switch>
             </el-col>
+            <!--标签名映射的话映射名是什么-->
             <div v-if="configureType.lableMapping">
               <el-col :span="4">映射名</el-col>
               <el-col :span="5">
@@ -192,6 +191,7 @@
               </el-col>
             </div>
           </el-row>
+          <!--选择此标签的配置方式-->
           <el-row>
             <el-col :span="4">此标签的配置方式</el-col>
             <el-col :span="20">
@@ -211,6 +211,7 @@
         </el-row>
         <div class="libs_structlibs_configstruct_14s_25s_table">
           <el-table :data="configureType.attrs" class="w100_14s" border>
+            <!--属性名添加-->
             <el-table-column label="属性名">
               <template slot-scope="scope">
                 <!-- <el-input v-model="scope.row.attrName" placeholder="请输入属性名"></el-input> -->
@@ -229,6 +230,7 @@
                 </el-select>
               </template>
             </el-table-column>
+            <!--选择属性名是否映射-->
             <el-table-column label="是否映射">
               <template slot-scope="scope">
                 <!-- <el-radio v-model="scope.row.attrMapping" label="true">Y</el-radio>
@@ -240,6 +242,7 @@
                 ></el-switch>
               </template>
             </el-table-column>
+            <!--属性映射的话,映射名是什么-->
             <el-table-column label="映射名">
               <template slot-scope="scope">
                 <!-- <el-input v-if="scope.row.attrMapping" v-model="scope.row.attrMappingName"></el-input> -->
@@ -259,6 +262,7 @@
                 </el-select>
               </template>
             </el-table-column>
+            <!--属性的配置方式-->
             <el-table-column label="配置方式">
               <template slot-scope="scope">
                 <el-select v-model="scope.row.attrConfigType" placeholder="请选择">
@@ -271,6 +275,7 @@
                 </el-select>
               </template>
             </el-table-column>
+            <!--当属性使用下拉框时,选择下拉框中的数据源-->
             <el-table-column label="数据源">
               <template slot-scope="scope">
                 <el-select
@@ -293,6 +298,7 @@
                 </el-select>
               </template>
             </el-table-column>
+            <!--此属性名在页面上是否显示-->
             <el-table-column label="是否显示">
               <template slot-scope="scope">
                 <el-switch
@@ -302,6 +308,7 @@
                 ></el-switch>
               </template>
             </el-table-column>
+            <!--属性的动作-->
             <el-table-column label="动作">
               <template slot-scope="scope">
                 <!-- <el-input v-model="scope.row.actionType"></el-input> -->
@@ -315,6 +322,7 @@
                 </el-select>
               </template>
             </el-table-column>
+            <!--删除属性的按钮-->
             <el-table-column label="操作" fixed="right">
               <template slot-scope="scope">
                 <el-button type="danger" plain @click.prevent="removeAttribute(scope.row)">删除</el-button>
@@ -337,6 +345,7 @@
         :style="{overflow:'auto'}"
       >
         <el-row class="addtemplate_dialog_row_14s">
+          <!--标签名称-->
           <el-row>
             <el-col :span="4">标签名</el-col>
             <el-col :span="4">
@@ -355,7 +364,7 @@
                 ></el-option>
               </el-select>
             </el-col>
-
+            <!--标签名是否映射-->
             <el-col :span="3">是否映射</el-col>
             <el-col :span="4">
               <!-- <el-radio v-model="configureType.lableMapping" label="true">Y</el-radio>
@@ -366,6 +375,7 @@
                 inactive-color="#ff4949"
               ></el-switch>
             </el-col>
+            <!--标签进行映射后,映射名是什么-->
             <div v-if="configureType.lableMapping">
               <el-col :span="4">映射名</el-col>
               <el-col :span="5">
@@ -381,6 +391,7 @@
               </el-col>
             </div>
           </el-row>
+          <!--此标签的配置方式-->
           <el-row>
             <el-col :span="4">此标签的配置方式</el-col>
             <el-col :span="20">
@@ -400,6 +411,7 @@
         </el-row>
         <div class="libs_structlibs_configstruct_14s_25s_table">
           <el-table :data="configureType.attrs" class="w100_14s" border>
+            <!--属性名-->
             <el-table-column label="属性名">
               <template slot-scope="scope">
                 <!-- <el-input v-model="scope.row.attrName" placeholder="请输入属性名"></el-input> -->
@@ -407,7 +419,7 @@
                   v-model="scope.row.attrName"
                   filterable
                   allow-create
-                  placeholder="请选择映射名"
+                  placeholder="请选择属性名"
                 >
                   <el-option
                     v-for="item in dictValues"
@@ -418,6 +430,7 @@
                 </el-select>
               </template>
             </el-table-column>
+            <!--属性名是否映射-->
             <el-table-column label="是否映射">
               <template slot-scope="scope">
                 <!-- <el-radio v-model="scope.row.attrMapping" label="true">Y</el-radio>
@@ -429,6 +442,7 @@
                 ></el-switch>
               </template>
             </el-table-column>
+            <!--属性名映射的话,映射名-->
             <el-table-column label="映射名">
               <template slot-scope="scope">
                 <!-- <el-input v-if="scope.row.attrMapping" v-model="scope.row.attrMappingName"></el-input> -->
@@ -448,6 +462,7 @@
                 </el-select>
               </template>
             </el-table-column>
+            <!--属性的配置方式-->
             <el-table-column label="配置方式">
               <template slot-scope="scope">
                 <el-select v-model="scope.row.attrConfigType" placeholder="请选择">
@@ -460,6 +475,7 @@
                 </el-select>
               </template>
             </el-table-column>
+            <!--如果使用下拉框的话,下拉框中的数据从哪里来-->
             <el-table-column label="数据源">
               <template slot-scope="scope">
                 <el-select
@@ -482,6 +498,7 @@
                 </el-select>
               </template>
             </el-table-column>
+            <!--该属性在页面上是否显示-->
             <el-table-column label="是否显示">
               <template slot-scope="scope">
                 <el-switch
@@ -491,6 +508,7 @@
                 ></el-switch>
               </template>
             </el-table-column>
+            <!--属性的动作-->
             <el-table-column label="动作">
               <template slot-scope="scope">
                 <!-- <el-input v-model="scope.row.actionType"></el-input> -->
@@ -505,6 +523,7 @@
               </template>
             </el-table-column>
             <el-table-column label="操作" fixed="right">
+              <!--删除属性的按钮-->
               <template slot-scope="scope">
                 <el-button type="danger" plain @click.prevent="removeAttribute(scope.row)">删除</el-button>
               </template>
@@ -516,15 +535,17 @@
           <el-button type="primary" @click="eidtLable()">确 定</el-button>
         </el-row>
       </el-dialog>
-      <!------------------------------复制节点------------------------------------------------------------------------------------>
+      <!------------------------------复制节点对话框------------------------------------------------------------------------------------>
 
       <el-dialog class="addtemplate_dialog_14s" title="复制节点" :visible.sync="isCopyNode">
         <el-row class="admin_menu_index_main_14s">
           <el-col :span="7">
             <span>复制</span>
+            <!--被复制的标签名-->
             <font color="red">{{currentXmlMap.lableMappingName}}</font>
             <span>粘贴至</span>
           </el-col>
+          <!--选择粘贴到的位置的标签树-->
           <el-col :span="14">
             <div class="libs_structlibs_configstruct_14s_25s_table">
               <el-tree
@@ -541,6 +562,7 @@
               </el-tree>
             </div>
           </el-col>
+          <!--标签粘贴的位置-->
           <el-col :span="3">
             <el-radio v-model="lablePosition" label="up">上</el-radio>
             <el-radio v-model="lablePosition" label="in">中</el-radio>
@@ -556,29 +578,31 @@
   </div>
 </template>
 <script>
-import { parseStrToObj } from "@/util/util";
-import { parseObjToStr } from "@/util/util";
-import { parseXml } from "@/api/admin/basetemplate";
-import { editParseXml } from "@/api/admin/basetemplate";
-import { editBaseTemplate } from "@/api/admin/basetemplate";
-import { getDictValue, getDictTypes, remote } from "@/api/admin/dict";
-import { getDicts } from "@/api/admin/dict";
-import { addObj as addDict } from "@/api/admin/dict";
-import formula from "@/views/comp/code-editor/formula-editing"; //公式编辑器组件
+import { parseStrToObj, parseObjToStr } from "@/util/util";
+import {
+  editParseXml,
+  editBaseTemplate,
+  addObj
+} from "@/api/admin/basetemplate";
+import { getDictValue } from "@/api/admin/dict"; //获取字典数据
+import { getDicts, getDictTypes, remote } from "@/api/admin/dict"; //获取字典数据
+import { addObj as addDict } from "@/api/admin/dict"; //添加数据到字典中
+import { type } from "os";
 import { getUploadFilesUrl } from "@/api/comp/componentdetail"; //文件上传接口
 import filesUpload from "@/views/comp/code-editor/files-upload"; //文件夹上传组件
-import { type } from "os";
+import formula from "@/views/comp/code-editor/formula-editing"; //公式编辑器组件
 import { mapGetters } from "vuex";
 export default {
   //import引入的组件需要注入到对象中才能使用
   components: {
-    "files-upload": filesUpload,
-    "formula-editing": formula
+    "files-upload": filesUpload, //上传文件夹
+    "formula-editing": formula //公式编辑器
   },
   //props用于接收父级传值
   props: [],
   //监控data中的数据变化
   watch: {
+    //监控标签名的变化,发送请求至后台,更新前台dicts的数据
     "configureType.lableName"(val) {
       var SysDict = {
         value: this.configureType.lableName,
@@ -589,6 +613,7 @@ export default {
       });
     },
     tmpStructLength() {
+      //公式编辑器计算后返回的值
       var attributeMap = this.currentXmlMap.attributeMap;
       var index = this.tmpStructLength.length - 1;
       var value = this.tmpStructLength[index];
@@ -600,68 +625,53 @@ export default {
 
     return {
       actionOptions: [], //动作下拉框值的
-      BaseTemplateBTO: {},
-      BaseTemplate: {},
+      BaseTemplateBTO: {}, //保存模板使用对象
+      BaseTemplate: {}, //模板对象
       labelPosition: "left", //form表单效果变量
-      attribute: undefined, //公式编辑器使用
-      lablePosition: "in",
+      attribute: undefined, //使用公式编辑器时对应的属性
+      lablePosition: "in", //添加标签的位置
       node: undefined,
-      //types: [], //映射来源集合
-      // SysDict: {
-      //   //查询字典使用
-      //   value: String,
-      //   type: this.template
-      // },
-      checkBox: ["选项1", "选项2", "选项3", "选项4"],
       dataKeys: [
-        // {
-        //   label: "其他",
-        //   options: [
-        //     {
-        //       value: "[]",
-        //       label: "无"
-        //     },
-        //     {
-        //       value: "dbtab_structlibs",
-        //       label: "结构体列表"
-        //     }
-        //   ]
-        // },
-        // //下拉框中数据来源集合
-        // {
-        //   label: "字典表",
-        //   options: []
-        // }
+        //   {
+        //     label: "其他",
+        //     options: [
+        //       {
+        //         value: "[]",
+        //         label: "无"
+        //       },
+        //       {
+        //         value: "dbtab_structlibs",
+        //         label: "结构体列表"
+        //       }
+        //     ]
+        //   },
+        //   //下拉框中数据来源集合
+        //   {
+        //     label: "字典表",
+        //     options: []
+        //   }
       ],
-      formulaDialogParams: {
-        //公式编辑器使用
-        tmpLengthVal: { attributeNameValue: Number },
-        dialogFormVisible: false
-      },
+      checkBox: ["选项1", "选项2", "选项3", "选项4"], //复选框
       selectDatas: [], //下拉列表中的数据
       dicts: [], //标签名映射使用
-      //attrDicts: [], //属性名映射使用
-      //queryDicts: [],
       dictValues: [], //映射的标签名集合
-      //allType: {}, //中文映射集合
-      //oneType: [], //英文映射集合
       configureType: {
         //每个标签上都拥有的配置信息对象
         lableType: String,
         lableName: String,
         lableMapping: Boolean,
-        mappingKeys: "",
+        mappingKeys: Number,
         actionType: String,
         attrs: []
       },
       getMethods: [
         {
-          value: "inputComm",
-          label: "输入框"
-        },
-        {
           value: "selectComm",
           label: "下拉框"
+        },
+        {
+          value: "inputComm",
+          label: "输入框"
         },
         {
           value: "uploadComm",
@@ -689,6 +699,7 @@ export default {
         }
       ],
       sonLableConfigTypes: [
+        //标签配置方式
         {
           label: "无",
           value: "false"
@@ -716,13 +727,17 @@ export default {
       ],
       isEidtLable: false, //编辑标签
       isAddLable: false, //添加子标签
-      template: "",
+      template: "", //模板
       lableName: "",
       lableMappingName: "",
       isCopyNode: false, //复制节点弹窗标志
 
+      formulaDialogParams: {
+        //公式编辑器使用
+        tmpLengthVal: { attributeNameValue: 1 },
+        dialogFormVisible: false
+      },
       xmlEntityMaps: [],
-
       XmlEntityMap: {
         lableName: undefined,
         lableMappingName: undefined,
@@ -781,30 +796,42 @@ export default {
       this.currentXmlMap = data;
       var attributeMap = data.attributeMap;
       var configureType = {};
-      if (attributeMap != null || attributeMap != undefined) {
+      if (attributeMap != null) {
         //获取标签上属性的配置方式
 
         var str = attributeMap["configureType"];
         configureType = parseStrToObj(str);
-
         this.configureType = configureType;
+        if (this.currentXmlMap.lableMappingName != undefined) {
+          this.lableMappingName = this.currentXmlMap.lableMappingName; //获取标签上映射名
+        }
 
-        this.lableMappingName = this.currentXmlMap.lableMappingName;
+        if (this.configureType.attrs != undefined) {
+          var attrs = this.configureType.attrs;
+        } else {
+          var attrs = [];
+        }
 
-        var attrs = this.configureType.attrs;
-        if (attrs.length > 0) {
-          for (let i of attrs) {
-            if (i.attrConfigType == "selectComm") {
-              if (i.dataKey == "dict") {
+        if (attrs != undefined && attrs.length > 0) {
+          for (var i = 0; i < attrs.length; i++) {
+            if (attrs[i].attrConfigType == "selectComm") {
+              //匹配下拉框中的数据来源
+              if (attrs[i].dataKey == "dict") {
                 this.selectDatas = this.dictValues;
-              } else if (i.dataKey == "dbtab_structlibs") {
-              } else if (i.dataKey == "[]") {
+              } else if (attrs[i].dataKey == "dbtab_structlibs") {
+              } else if (attrs[i].dataKey == "[]") {
                 this.selectDatas = [];
               } else {
-                getDictValue(i.dataKey).then(res => {
+                //其他配置方式获取字典表数据
+                getDictValue(attrs[i].dataKey).then(res => {
                   this.selectDatas = res.data.data;
                 });
               }
+            }
+            if (attrs[i].attrConfigType == "checkBoxComm") {
+              //待定
+
+              this.currentXmlMap.attributeMap[attrs[i].attrName];
             }
           }
         }
@@ -813,7 +840,7 @@ export default {
     },
 
     getNodeData2(data, node) {
-      //点击获取节点
+      //复制节点使用
       console.log("当前粘贴的节点", data);
       this.currentPasteXmlMap = data;
       this.parentPasteXmlMap = node.parent.data;
@@ -834,7 +861,7 @@ export default {
         this.lableName = "";
         this.lableMappingName = "";
         this.configureType = {
-          //每个标签上都拥有的配置信息对象
+          //创建配置信息对象
           lableType: "false",
           lableName: "",
           lableMapping: false,
@@ -848,6 +875,7 @@ export default {
       //添加标签属性
       if (this.configureType.attrs == undefined) this.configureType.attrs = [];
       this.configureType.attrs.push({
+        //创建并添加属性的对象
         attrName: "",
         attrMapping: false,
         attrMappingName: "",
@@ -875,25 +903,22 @@ export default {
       var lableMapping = this.configureType.lableMapping;
       var lableMappingName = "";
       if (lableMapping) {
+        //判断标签名是否映射
         lableMappingName = this.lableMappingName;
-        var lableId = undefined;
         var dictValues = this.dictValues;
         for (let j of dictValues) {
           if (
             this.configureType.lableName == j.value &&
             lableMappingName == j.label
           ) {
-            lableId = j.id;
-            Vue.set(this.configureType, "mappingKeys", j.id);
+            Vue.set(this.configureType, "mappingKeys", j.id); //如果字典中有此映射数据,把id存入到mappingKeys上
             break;
           }
         }
 
-        if (
-          this.configureType.mappingKeys == undefined ||
-          lableId == undefined
-        ) {
-          var description = "";
+        if (this.configureType.mappingKeys == undefined) {
+          //如果字典中没有此映射数据,先把数据存入字典表,再请求到此id,存入mappingKeys上
+          var description = ""; //为字典表中description字段创建数据
           if (this.template == "comp_param_type") {
             description = "构件建模";
           } else if (this.template == "hardware_param_type") {
@@ -910,38 +935,42 @@ export default {
             description = "其他模型";
           }
           var SysDict = {
+            //字典表对象
             value: this.configureType.lableName,
             type: this.template,
             label: lableMappingName,
             description: description,
             sort: 0
           };
-          await addDict(SysDict);
+          await addDict(SysDict); //发送同步请求,存数据到字典表中
           await getDictValue(this.template).then(response => {
-            this.dictValues = response.data.data;
+            //发送同步请求,查询字典表数据
+            this.dictValues = response.data.data; //刷新页面字典表数据
           });
           if (lableMapping) {
+            //判断标签名是否映射
             var dictValues = this.dictValues;
             for (let j of dictValues) {
               if (
                 this.configureType.lableName == j.value &&
                 lableMappingName == j.label
               ) {
-                Vue.set(this.configureType, "mappingKeys", j.id);
+                Vue.set(this.configureType, "mappingKeys", j.id); //存储映射数据(字典表)的id
                 break;
               }
             }
           }
         }
-        this.addLableUtil(lableMappingName);
+        this.addLableUtil(lableMappingName); //公共方法
       } else {
         lableMappingName = this.configureType.lableName;
-        this.addLableUtil(lableMappingName);
+        this.addLableUtil(lableMappingName); //公共方法
       }
     },
 
     async addLableUtil(lableMappingName) {
       var currentXmlMap = {
+        //创建标签对象
         lableName: this.configureType.lableName, //root标签
         lableMappingName: lableMappingName,
         textContent: "",
@@ -952,19 +981,22 @@ export default {
       var attrs = this.configureType.attrs;
       if (attrs.length > 0) {
         for (let i of attrs) {
+          //遍历属性,
+
           if (i.attrMapping) {
+            //判断属性是否映射
             var dictValues = this.dictValues;
-            var attrId = undefined;
             for (let j of dictValues) {
               if (i.attrName == j.value && i.attrMappingName == j.label) {
-                attrId = j.id;
+                //如果字典表中有映射数据,直接添加id值attrKeys上
                 i.attrKeys = j.id;
                 break;
               }
             }
 
-            if (i.attrKeys == undefined || attrId == undefined) {
-              var description = "";
+            if (i.attrKeys == undefined) {
+              //字典表中没有映射数据,就先添加至字典表中
+              var description = ""; //为字典表中description字段创建数据
               if (this.template == "comp_param_type") {
                 description = "构件建模";
               } else if (this.template == "hardware_param_type") {
@@ -981,58 +1013,68 @@ export default {
                 description = "其他模型";
               }
               var SysDict = {
+                //字典表对象
                 value: i.attrName,
                 type: this.template,
                 label: i.attrMappingName,
                 description: description,
                 sort: 0
               };
-              await addDict(SysDict);
+              await addDict(SysDict); //发送同步请求添加新数据值字典表中
               await getDictValue(this.template).then(response => {
+                //更新前端页面字典表数据
                 this.dictValues = response.data.data;
               });
             }
           } else {
-            Vue.set(i, "attrKeys", undefined);
-            Vue.set(i, "attrMappingName", i.attrName);
+            Vue.set(i, "attrKeys", undefined); //属性不映射attrKeys为undefined
+            Vue.set(i, "attrMappingName", i.attrName); //属性不映射,属性名不做处理
           }
           Vue.set(currentXmlMap.attributeMap, i.attrName, ""); //遍历添加属性
         }
         if (attrs.length > 0) {
           await getDictValue(this.template).then(response => {
-            this.dictValues = response.data.data;
-            for (let i of attrs) {
-              if (i.attrMapping) {
+            this.dictValues = response.data.data; //刷新页面上字典表数据
+            for (var i = 0; i < attrs.length; i++) {
+              //对映射的属性名,字典表中又没有对应映射数据的数据,存入attrKeys字段上
+              if (attrs[i].attrMapping) {
                 var dictValues = this.dictValues;
                 for (let j of dictValues) {
-                  if (i.attrName == j.value && i.attrMappingName == j.label) {
-                    i.attrKeys = j.id;
+                  if (
+                    attrs[i].attrName == j.value &&
+                    attrs[i].attrMappingName == j.label
+                  ) {
+                    attrs[i].attrKeys = j.id;
                     break;
                   }
                 }
               }
-              if (i.attrConfigType == "selectComm") {
+              if (attrs[i].attrConfigType == "selectComm") {
                 //匹配下拉框中的数据来源
-                if (i.dataKey == "dict") {
+                if (attrs[i].dataKey == "dict") {
                   this.selectDatas = this.dictValues;
-                } else if (i.dataKey == "dbtab_structlibs") {
-                } else if (i.dataKey == "[]") {
-                  this.selectDatas = [];
+                } else if (attrs[i].dataKey == "dbtab_structlibs") {
+                } else if (attrs[i].dataKey == "[]") {
                 } else {
-                  getDictValue(i.dataKey).then(res => {
+                  getDictValue(attrs[i].dataKey).then(res => {
                     this.selectDatas = res.data.data;
                   });
                 }
+              }
+              if (attrs[i].attrConfigType == "checkBoxComm") {
+                //待定
+                Vue.set(currentXmlMap.attributeMap, attrs[i].attrName, "[]"); //遍历添加属性
               }
             }
           });
         }
       }
 
-      var str = parseObjToStr(this.configureType);
+      var str = parseObjToStr(this.configureType); //把configureType对象转化为字符串
 
       Vue.set(currentXmlMap.attributeMap, "configureType", str); //获取新增的属性
       if (this.lablePosition == "in") {
+        //判断标签添加的位置
         if (
           this.currentXmlMap.children == null ||
           this.currentXmlMap.children == undefined
@@ -1061,19 +1103,20 @@ export default {
     async eidtLable() {
       //编辑标签
       var mappingData = this.dictValues;
-      this.currentXmlMap.lableName = this.configureType.lableName;
-      this.currentXmlMap.lableMappingName = this.lableMappingName;
+      this.currentXmlMap.lableName = this.configureType.lableName; //获取到标签名
 
       if (this.configureType.lableMapping) {
+        //判断标签名是否需要映射
         var lableId = undefined;
         for (let j of mappingData) {
           if (
             this.configureType.lableName == j.value &&
             this.lableMappingName == j.label
           ) {
+            //判断标签名与映射名在字典表中是否存在
             this.currentXmlMap.lableMappingName = this.lableMappingName;
             lableId = j.id;
-            Vue.set(this.configureType, "mappingKeys", j.id);
+            Vue.set(this.configureType, "mappingKeys", j.id); //标签名映射后把对应的字典表中的id存放到mappingKeys字段中
             break;
           }
         }
@@ -1082,6 +1125,7 @@ export default {
           this.configureType.mappingKeys == undefined ||
           lableId == undefined
         ) {
+          //如果字典表中没有此标签名与映射名的数据就先在字典中存上
           this.currentXmlMap.lableMappingName = this.lableMappingName;
           var description = "";
           if (this.template == "comp_param_type") {
@@ -1107,8 +1151,9 @@ export default {
             sort: 0
           };
 
-          await addDict(SysDict);
+          await addDict(SysDict); //添加新数据到字典表中
           await getDictValue(this.template).then(response => {
+            //页面刷新字典表数据
             this.dictValues = response.data.data;
           });
           if (this.configureType.lableMapping) {
@@ -1139,8 +1184,9 @@ export default {
       if (attrs.length > 0) {
         for (let i of attrs) {
           if (i.attrMapping) {
-            var dictValues = this.dictValues;
+            //判断属性是否映射
             var attrId = undefined;
+            var dictValues = this.dictValues;
             for (let j of dictValues) {
               if (i.attrName == j.value && i.attrMappingName == j.label) {
                 attrId = j.id;
@@ -1202,7 +1248,6 @@ export default {
                   this.selectDatas = this.dictValues;
                 } else if (i.dataKey == "dbtab_structlibs") {
                 } else if (i.dataKey == "[]") {
-                  this.selectDatas = [];
                 } else {
                   getDictValue(i.dataKey).then(res => {
                     this.selectDatas = res.data.data;
@@ -1236,8 +1281,10 @@ export default {
     },
 
     copyNode() {
+      //复制节点(标签)
       let copyXmlMaps = JSON.parse(JSON.stringify(this.currentXmlMap));
       if (this.lablePosition == "in") {
+        //选择粘贴的位置,添加为子标签
         if (
           this.currentPasteXmlMap.children == null ||
           this.currentPasteXmlMap.children == undefined
@@ -1247,6 +1294,7 @@ export default {
         }
         this.currentPasteXmlMap.xmlEntityMaps.push(copyXmlMaps);
       } else if (this.lablePosition == "up") {
+        //添加到标签上面
         var index = this.parentPasteXmlMap.xmlEntityMaps.indexOf(
           this.currentPasteXmlMap
         );
@@ -1254,6 +1302,7 @@ export default {
         this.parentPasteXmlMap.xmlEntityMaps.splice(index, 0, copyXmlMaps);
         //this.parentXmlMap.children.splice(index, 0, currentXmlMap);
       } else if (this.lablePosition == "down") {
+        //添加到标签下面
         var index = this.parentPasteXmlMap.xmlEntityMaps.indexOf(
           this.currentPasteXmlMap
         );
@@ -1269,10 +1318,11 @@ export default {
       //保存
       Vue.set(this.BaseTemplateBTO, "baseTemplate", this.BaseTemplate);
       Vue.set(this.BaseTemplateBTO, "xmlEntityMap", this.XmlEntityMap);
-      editBaseTemplate(this.BaseTemplateBTO).then(repsonse => {
+      console.log(this.BaseTemplateBTO);
+      addObj(this.BaseTemplateBTO).then(repsonse => {
         if (repsonse.data.code == 0) {
           console.log("保存成功");
-          this.$router.replace("/admin/basetemplate");
+          this.$router.replace("/admin/basetemplate"); //保存成功后.跳转到首页
         } else {
           console.log("保存失败");
         }
@@ -1280,16 +1330,13 @@ export default {
     },
 
     ////////////////////////////////////////////////////////////////////////////////////
+    isCheckBox(attribute) {}, //复选框待用
 
     /* 上传文件 */
     UploadImage(attr, param) {
-      //console.log("attrValue",attrValue)
-      console.log("param", param);
-      console.log("attr", attr);
       getUploadFilesUrl(param).then(res => {
         /* 给文本框赋值 */
         var filePath = res.data.data;
-
         var attributeMap = this.currentXmlMap.attributeMap;
         attributeMap[attr.attrName] = filePath;
       });
@@ -1297,18 +1344,20 @@ export default {
 
     handleLength(attr) {
       //公式编辑器
-
       this.formulaDialogParams.dialogFormVisible = true;
       this.attribute = attr;
     },
 
+    // onFileSuccess(rootFile, file, response, chunk) {
+    //   //上传文件夹
+    // },
+
     //上传文件夹
     saveLeftData(paths) {
-      //待定,需使用到上传文件夹的开发人员来给出所要的数据格式
+      //待定
       console.log("路径", paths);
       //this.compValueType.paths = paths;
     },
-
     getTreeData(XmlEntityMap) {
       //递归添加children
       var attrMap = XmlEntityMap.attributeMap;
@@ -1382,9 +1431,10 @@ export default {
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
-    this.BaseTemplate = this.$route.query.BaseTemplate;
+    this.BaseTemplate = this.$route.query.BaseTemplate; //从路由地址中获取表要的参数
     var tempType = this.BaseTemplate.tempType;
     if (tempType == "构件模型") {
+      //根据模板类型来获取字典表映射数据
       this.template = "comp_param_type";
     } else if (tempType == "硬件模型") {
       this.template = "hardware_param_type";
@@ -1400,10 +1450,10 @@ export default {
       this.template = "other_param_type";
     }
     getDictValue(this.template).then(response => {
-      this.dictValues = response.data.data;
+      this.dictValues = response.data.data; //获取字典表映射数据
       editParseXml(this.BaseTemplate).then(response => {
         this.XmlEntityMap = response.data.data;
-        this.getTreeData(this.XmlEntityMap);
+        this.getTreeData(this.XmlEntityMap); //递归生成树状结构的数据
         this.xmlEntityMaps.push(this.XmlEntityMap);
       });
     });

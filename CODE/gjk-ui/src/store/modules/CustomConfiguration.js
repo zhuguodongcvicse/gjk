@@ -8,7 +8,8 @@ const CustomConfiguration = {
       netWorkIn : new Map(),
       netWorkData : getStore({ name: 'netWorkData' })||{},
       netWorkOut : new Map(),
-      partList : new Array(),
+      partList : getStore({name: 'themeData'}) || new Array(),
+      xmlDataMap : getStore({name: 'xmlDataMap'}) || new Map(),
     },
     actions: {
         //存储subscribe整体数据
@@ -77,9 +78,12 @@ const CustomConfiguration = {
         //解析主题配置xml将数据存储
         AnalysisXML({
           commit
-        },params) {
+        },xmlParams) {
           return new Promise((resolve, reject) => {
-            commit('SET_XMLData', params)
+            var params = xmlParams.params
+            var id = xmlParams.id
+            console.log("params",params,id)
+            commit('SET_XMLData', {params,id})
             resolve()
           })
         },
@@ -140,11 +144,13 @@ const CustomConfiguration = {
             type:"session"
           })
         },
-        SET_XMLData: (state, params) => {
-          console.log(1111111111);
+        SET_XMLData: (state, {params,id}) => {
+          console.log(1111111111,id);
           state.themeData = params.themeData
           state.netWorkData = params.netWorkData
           state.partList = params.partList
+         // state.xmlDataMap.set(id,params)
+          state.xmlDataMap[id] = params
           setStore({
             name: 'themeData',
             content: state.themeData,
@@ -155,6 +161,17 @@ const CustomConfiguration = {
             content: state.netWorkData,
             type:"session"
           })
+          setStore({
+            name: 'partList',
+            content: state.partList,
+            type:"session"
+          })
+          setStore({
+            name: 'xmlDataMap',
+            content: state.xmlDataMap,
+            type:"session"
+          })
+
         },
         SET_NetWorkIn :(state,{key,value}) =>{
           state.netWorkIn.set(key,JSON.parse(JSON.stringify(value)));
@@ -229,6 +246,7 @@ const CustomConfiguration = {
           for(var [key, value] of  state.netWorkIn){
             if(key == params){
               state.netWorkIn.delete(key)
+              console.log("删除后商店数据IN",state.netWorkIn)
             }
           }
          },

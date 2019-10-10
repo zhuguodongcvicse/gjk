@@ -1,5 +1,7 @@
 <template>
-  <div class="app-container pro_project_index_14s pro_project_height_14s pull-auto h100_14s table_cursor_14s_1008">
+  <div
+    class="app-container pro_project_index_14s pro_project_height_14s pull-auto h100_14s table_cursor_14s_1008"
+  >
     <basic-container>
       <avue-crud
         ref="crud"
@@ -42,16 +44,20 @@
                 <select-tree :treeData="hardwareTreeData" multiple :id.sync="hardwareSelectArray"></select-tree>
                 </el-form-item>-->
                 <el-form-item label="构件筛选">
-                  <select-tree :treeData="screenLibsTree" multiple :id.sync="screenLibsIdArray" />
+                  <select-tree :treeData="screenLibsTree" multiple :id.sync="screenLibsIdArray"/>
                 </el-form-item>
                 <el-form-item label="构件选择">
-                  <select-tree :treeData="compTreeData" multiple :id.sync="compSelectArray" />
+                  <select-tree :treeData="compTreeData" multiple :id.sync="compSelectArray"/>
                   <el-button type="primary" @click="selectAllComp">全选</el-button>
                 </el-form-item>
                 <el-form-item label="软件框架选择">
                   <span style="color: red;" v-show="platformFlag">{{platformNameTs}}未选择</span>
-                  <el-select class="text_align_center_14s" v-model="softwareSelectString" multiple placeholder="请选择"
-                             @change="selectSoftwareClk"
+                  <el-select
+                    class="text_align_center_14s"
+                    v-model="softwareSelectString"
+                    multiple
+                    placeholder="请选择"
+                    @change="selectSoftwareClk"
                   >
                     <el-option
                       v-for="item in softwareTreeData"
@@ -60,16 +66,18 @@
                       :value="item.id"
                     >
                       <span style="float: left">{{ item.softwareName }}(v{{item.version}}.0)</span>
-                      <span style="float: right; color: #8492a6; font-size: 13px;margin-right: 30px;">{{ item.description }}</span>
+                      <span
+                        style="float: right; color: #8492a6; font-size: 13px;margin-right: 30px;"
+                      >{{ item.description }}</span>
                     </el-option>
                   </el-select>
                   <!--<el-select v-model="softwareSelectString" placeholder="请选择">-->
-                    <!--<el-option-->
-                      <!--v-for="item in softwareTreeData"-->
-                      <!--:key="item.id"-->
-                      <!--:label="item.label"-->
-                      <!--:value="item.id"-->
-                    <!--&gt;</el-option>-->
+                  <!--<el-option-->
+                  <!--v-for="item in softwareTreeData"-->
+                  <!--:key="item.id"-->
+                  <!--:label="item.label"-->
+                  <!--:value="item.id"-->
+                  <!--&gt;</el-option>-->
                   <!--</el-select>-->
                 </el-form-item>
                 <el-form-item label="BSP选择">
@@ -99,14 +107,18 @@
 
               <div class="control-container bsp_footer_btn_14s text_align_right_14s">
                 <el-form-item>
-                  <el-button type="primary" :disabled="platformFlag" @click.native="handleSaveComp">提交申请</el-button>
+                  <el-button
+                    type="primary"
+                    :disabled="platformFlag"
+                    @click.native="handleSaveComp"
+                  >提交申请</el-button>
                   <el-button type="button" @click.native="handleCancleComp">取消</el-button>
                 </el-form-item>
               </div>
             </el-form>
           </el-dialog>
-          <br />
-          <br />
+          <br>
+          <br>
         </template>
         <template slot-scope="scope" slot="menu">
           <el-button
@@ -183,13 +195,14 @@ export default {
       }
     };
     return {
+      projectsTemp: "",
       project: {},
       compHaveChildArray: [],
       formLabelAlign: {
         projectName: "",
         number: "",
         hardware: "",
-        processName: "",
+        processName: ""
       },
       labelPosition: "right",
       dialogTableVisible: false,
@@ -232,12 +245,12 @@ export default {
           { validator: proNameSameNameCheck, trigger: "blur" }
         ]
       },
-      softwareSelectString:[],
-      platformFlag:false,
+      softwareSelectString: [],
+      platformFlag: false,
       //提示平台大类是否被选中
-      platformNameTs:"",
+      platformNameTs: "",
       //流程ID
-      procedureId:"",
+      procedureId: ""
     };
   },
   watch: {
@@ -248,16 +261,16 @@ export default {
           this.$delete(this.compSelectArray, index);
         }
       }
-      console.log("compSelectArray:", this.compSelectArray);
+      // console.log("compSelectArray:", this.compSelectArray);
     },
     softwareSelectString: function() {
-      console.log("softwareSelectString:", this.softwareSelectString);
+      // console.log("softwareSelectString:", this.softwareSelectString);
     },
     bspSelectString: function() {
-      console.log("bspSelectString:", this.bspSelectString);
+      // console.log("bspSelectString:", this.bspSelectString);
     },
     project: function() {
-      console.log("project:", this.project);
+      // console.log("project:", this.project);
     },
     screenLibsIdArray() {
       this.getTableData();
@@ -289,16 +302,16 @@ export default {
     },
     getCreateData() {
       getProNameListByUserId(this.userInfo.userId).then(Response => {
-        console.log("proNameListByUserId:", Response.data.data);
+        // console.log("proNameListByUserId:", Response.data.data);
         this.proNameList = Response.data.data;
       });
       getSoftwareTree().then(Response => {
         this.softwareTreeData = Response.data.data;
-        console.log("softwareTreeData:", this.softwareTreeData);
+        // console.log("softwareTreeData:", this.softwareTreeData);
       });
       getBSPTree().then(Response => {
         this.bspTreeData = Response.data.data;
-        console.log("bspTreeData：", this.bspTreeData);
+        // console.log("bspTreeData：", this.bspTreeData);
       });
       // this.foundChild(this.compTreeData, this.compHaveChildArray);
       // console.log(this.compHaveChildArray, "+++++++++++++");
@@ -327,7 +340,7 @@ export default {
       getAllComp().then(Response => {
         // console.log("Response:", Response);
         this.compTreeData = Response.data.data;
-        console.log("compTreeData:", this.compTreeData);
+        // console.log("compTreeData:", this.compTreeData);
       });
     },
     foundChild(data, array) {
@@ -354,19 +367,19 @@ export default {
       this.project.defaultBspId = this.bspSelectString;
       this.project.userId = this.userInfo.userId;
       //给工作模式ID赋值
-      
+
       saveProject(this.project).then(Response => {
         // console.log("11111111111111111111111111111",Response.data.data);
         this.project.id = Response.data.data.id;
         saveProProcess(this.project.id, this.project.processName).then(
           Response => {
-            console.log("得到saveProProcess的返回结果：",Response)
-            for(var i=0;i<Response.data.data.length;i++){
-              if(Response.data.data[i].fileType=='9'){
-                this.procedureId=Response.data.data[i].id
+            // console.log("得到saveProProcess的返回结果：", Response);
+            for (var i = 0; i < Response.data.data.length; i++) {
+              if (Response.data.data[i].fileType == "9") {
+                this.procedureId = Response.data.data[i].id;
               }
             }
-            console.log("this.procedureId" + this.procedureId)
+            // console.log("this.procedureId" + this.procedureId);
             //保存软件框架
             this.changeProcedureSoftwareId();
             // this.softwareSelectString = []
@@ -378,24 +391,27 @@ export default {
             //   //校验是否选中所有平台大类
             //   this.checkoutPlatform();
             // })
-          saveProCompList(this.project.id, this.compSelectArray).then(
-            Response => {
-              let approval = {};
-              approval.userId = this.userInfo.userId;
-              approval.applyId = this.project.id;
-              approval.applyType = "2";
-              approval.libraryType = "7";
-              if (this.applyUser != "") {
-                approval.applyUserId = this.applyUser;
+            saveProCompList(this.project.id, this.compSelectArray).then(
+              Response => {
+                let approval = {};
+                approval.userId = this.userInfo.userId;
+                approval.applyId = this.project.id;
+                approval.applyType = "2";
+                approval.libraryType = "7";
+                if (this.applyUser != "") {
+                  approval.applyUserId = this.applyUser;
+                }
+                approval.approvalState = "0";
+                //提交记录到审批管理库
+                saveApproval(approval).then(Response => {
+                  saveApprovalApply(
+                    Response.data.data.id,
+                    this.compSelectArray
+                  );
+                });
               }
-              approval.approvalState = "0";
-              //提交记录到审批管理库
-              saveApproval(approval).then(Response => {
-                saveApprovalApply(Response.data.data.id, this.compSelectArray);
-              });
-            }
-          )
-        }
+            );
+          }
         );
         this.dialogTableVisible = false;
         Object.assign(this.formLabelAlign, this.$options.data().formLabelAlign);
@@ -506,7 +522,15 @@ export default {
       this.getList();
     },
     handleRowClick(row, event, column) {
-      this.$store.dispatch("setTmpProject", row);
+      // console.log("this.tableData",this.tableData)
+      for (const i in this.tableData) {
+        this.tableData[i].showFlag = 1;
+        if (this.tableData[i].id == row.id) {
+          this.tableData[i].showFlag = 0;
+        }
+      }
+      this.$store.dispatch("setProjectTreeShow", this.tableData);
+
       this.$router.push({ path: "/pro/manager" });
       // this.$notify({
       //   showClose: false,
@@ -517,20 +541,20 @@ export default {
     getSoftwareSelectList() {
       //得到平台大类
       getPlatformList().then(Response => {
-        this.platformDataList = Response.data.data
-        console.log("平台大类：", this.platformDataList)
-      })
+        this.platformDataList = Response.data.data;
+        // console.log("平台大类：", this.platformDataList);
+      });
       getSoftwareSelect().then(Response => {
-        console.log("软件框架库下拉列表：", Response.data.data)
+        // console.log("软件框架库下拉列表：", Response.data.data);
         let datas = Response.data.data;
         let softwareTreeDataList = [];
         for (var i = 0; i < datas.length; i++) {
           if (datas[i].description != "") {
-            softwareTreeDataList.push(datas[i])
+            softwareTreeDataList.push(datas[i]);
           }
         }
         this.softwareTreeData = softwareTreeDataList;
-      })
+      });
     },
     //修改软件框架值改变
     selectSoftwareClk(val) {
@@ -544,7 +568,7 @@ export default {
       }
       //至少选中一个
       if (val.length > 1) {
-        console.log("当前选中的值", val)
+        // console.log("当前选中的值", val);
         //遍历下拉框得到平台名称
         var lastPlatformName = "";
         for (var i = 0; i < this.softwareTreeData.length; i++) {
@@ -552,43 +576,50 @@ export default {
             lastPlatformName = this.softwareTreeData[i].description;
           }
         }
-        console.log("最后选中的平台大类：", lastPlatformName)
-        console.log("选中的平台大类名称：", valNameArr)
+        // console.log("最后选中的平台大类：", lastPlatformName);
+        // console.log("选中的平台大类名称：", valNameArr);
         //根据分号拆分平台类
-        lastPlatformName = lastPlatformName.substring(0, lastPlatformName.length - 1)
+        lastPlatformName = lastPlatformName.substring(
+          0,
+          lastPlatformName.length - 1
+        );
         var platformNameArr = lastPlatformName.split(";");
-        console.log("拆分后的平台类名：", platformNameArr)
+        // console.log("拆分后的平台类名：", platformNameArr);
         for (var k = 0; k < platformNameArr.length; k++) {
           for (var m = 0; m < val.length - 1; m++) {
             if (valNameArr[m].indexOf(platformNameArr[k]) != -1) {
-              console.log("进入删除数组元素：" + m)
+              // console.log("进入删除数组元素：" + m);
               val.splice(m, 1);
-              valNameArr.splice(m,1)
+              valNameArr.splice(m, 1);
             }
           }
         }
       }
-      this.softwareSelectNameString=valNameArr
+      this.softwareSelectNameString = valNameArr;
       this.checkoutPlatform();
     },
-    checkoutPlatform(){
+    checkoutPlatform() {
       var disabledPlatformName = "";
       for (var i = 0; i < this.platformDataList.length; i++) {
         //是否选中标志
-        let vFlag = true
+        let vFlag = true;
         for (var j = 0; j < this.softwareSelectString.length; j++) {
-          if ((this.softwareSelectNameString[j]).indexOf(this.platformDataList[i].name)!=-1) {
-            vFlag = false
+          if (
+            this.softwareSelectNameString[j].indexOf(
+              this.platformDataList[i].name
+            ) != -1
+          ) {
+            vFlag = false;
           }
         }
         if (vFlag) {
-          disabledPlatformName += this.platformDataList[i].name+",";
+          disabledPlatformName += this.platformDataList[i].name + ",";
         }
       }
-      this.platformFlag=false;
+      this.platformFlag = false;
       if (disabledPlatformName != "") {
-        this.platformFlag=true;
-        this.platformNameTs=disabledPlatformName;
+        this.platformFlag = true;
+        this.platformNameTs = disabledPlatformName;
       }
     },
     changeProcedureSoftwareId() {
@@ -599,10 +630,10 @@ export default {
         });
         return;
       }
-      console.log("修改软件构件库保存：", this.softwareSelectString)
+      // console.log("修改软件构件库保存：", this.softwareSelectString);
       let prodetail = {};
       prodetail.id = this.procedureId;
-      prodetail.description = (this.softwareSelectString).join(";");
+      prodetail.description = this.softwareSelectString.join(";");
       updatePartSoftwareAndPlatform(prodetail).then(response => {
         if (response.data.data) {
           this.$message({
