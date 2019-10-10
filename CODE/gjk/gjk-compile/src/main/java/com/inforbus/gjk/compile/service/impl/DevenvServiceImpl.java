@@ -221,8 +221,8 @@ public class DevenvServiceImpl implements DevenvService{
 	//编译 linux 
 	private String linux(String filePath,String fileName) {
 		//通过filePath 截取流程名称 用来创建父级目录
-		String ProcessName = filePath.substring(0,filePath.indexOf("流程APP"));
-		ProcessName = ProcessName.substring(ProcessName.lastIndexOf("_")+1,ProcessName.length());
+		String ProcessName = filePath.substring(0,filePath.lastIndexOf("APP"));
+		ProcessName = ProcessName.substring(ProcessName.lastIndexOf(File.separator)+1,ProcessName.length());
 		System.out.println("流程名称===="+ProcessName);
 		//手动创建目录
 		//执行linux命令编译 项目
