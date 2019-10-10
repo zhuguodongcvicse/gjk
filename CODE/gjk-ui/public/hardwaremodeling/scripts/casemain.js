@@ -476,13 +476,13 @@ function initEditor(editor) {
 		var graphName = graph.name
 		console.log("graphName", graphName)
 		if (graphName == null) {
+			frontCaseForDeployment = graph.toJSON()
 			//配置的ip nodeID 
 			let ifSetIPSuccess = setNodeIDAndIP()
 			if (!ifSetIPSuccess) {
 				return
 			}
 			// console.log("graph", graph.toJSON())
-			frontCaseForDeployment = graph.toJSON()
 			//连线关系
 			createLinkData()
 			graphList.fJson = JSON.parse(JSON.stringify(graphList.fJson))
