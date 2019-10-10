@@ -21,6 +21,8 @@
         v-bind:style="{cursor:'pointer','vertical-align':'middle','position': 'absolute','top': '50%','left': '50%','transform': 'translate(-50%, -50%)'}"
       >
     </div>
+    <!--遮罩层-->
+    <div id="fullbg" class="fullbg_14s" v-bind:style="rightClass"></div>
     <!--右边主体-->
     <div class="mb_main" v-bind:style="rightClass">
       <!-- 主体视图层 -->
@@ -232,6 +234,7 @@ export default {
       return { x: ev.clientX + scrollLeft, y: ev.clientY + scrollTop };
     }, //移动
     dragMousedown(ev) {
+      document.getElementById('fullbg').style.display='block';
       let _this = this;
       let boxWidth = this.$refs.contail.offsetWidth;
       let oEvent = ev || event;
@@ -270,6 +273,7 @@ export default {
         }
       };
       document.onmouseup = function() {
+         document.getElementById('fullbg').style.display='none';
         document.onmousemove = null;
         document.onmouseup = null;
       };
@@ -286,9 +290,9 @@ export default {
         this.rightClass.width = "calc(100% - " + this.rightClass.left + ")";
       } else {
         to_img.setAttribute("src", "/img/to_left.png");
-        this.leftClass.width = "230px";
+        this.leftClass.width = "261px";
         this.imgClass.left = "260px";
-        this.rightClass.left = "275px";
+        this.rightClass.left = "266px";
         // this.imgClass.left = this.leftClass.width;
         // this.rightClass.left =
         "calc(" + this.imgClass.left + " + " + this.imgClass.width + ")";
