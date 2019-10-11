@@ -337,7 +337,7 @@ export default {
               cmpItem.data.attributeListData = JSON.parse(
                 JSON.stringify(attrList)
               );
-              console.log("11111111111111111", JSON.stringify(cmpItem.data));
+              // console.log("11111111111111111", JSON.stringify(cmpItem.data));
             }
           }
         }

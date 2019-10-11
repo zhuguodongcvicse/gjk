@@ -142,25 +142,33 @@ export default {
       //如果不存在，调用方法解析基础模板文件获得系数配置中的列表树
       if (Response.data.data) {
         getSysConfigXmlEntityMap(this.$route.query.sysId).then(Response => {
-          // console.log("Response:", Response.data.data);
+          // console.log(
+          //   "44444444444444Response:",
+          //   JSON.parse(JSON.stringify(Response.data.data))
+          // );
           this.xmlEntityMap = Response.data.data;
           this.callBackNodePartXml = [];
           for (let item of Response.data.data.xmlEntityMaps) {
             if (item.lableName == "coefConfig") {
-              this.callBackCoefficentXml = item;
+              this.callBackCoefficentXml = JSON.parse(JSON.stringify(item));
             } else {
-              this.callBackNodePartXml.push(item);
+              this.callBackNodePartXml.push(JSON.parse(JSON.stringify(item)));
             }
           }
         });
       } else {
         getSysConfigModelXml().then(Response => {
+          // console.log("5555555555555555554Response:", Response.data.data);
           this.modelNodePartXmlEntityMap = [];
           for (let item of Response.data.data.xmlEntityMaps) {
             if (item.lableName == "coefConfig") {
-              this.modelcoefConfigXmlEntityMap = item;
+              this.modelcoefConfigXmlEntityMap = JSON.parse(
+                JSON.stringify(item)
+              );
             } else {
-              this.modelNodePartXmlEntityMap.push(item);
+              this.modelNodePartXmlEntityMap.push(
+                JSON.parse(JSON.stringify(item))
+              );
             }
           }
         });
