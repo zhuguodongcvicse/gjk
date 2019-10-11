@@ -350,6 +350,7 @@
             <el-col :span="4">标签名</el-col>
             <el-col :span="4">
               <!-- <el-input v-model="configureType.lableName" placeholder="请输入标签名"></el-input> -->
+
               <el-select
                 v-model="configureType.lableName"
                 filterable
@@ -414,8 +415,9 @@
             <!--属性名-->
             <el-table-column label="属性名">
               <template slot-scope="scope">
+                 <el-input v-model="scope.row.attrName" placeholder="请输入属性名" @change.native="attrNameChange(scope.row)"></el-input>
                 <!-- <el-input v-model="scope.row.attrName" placeholder="请输入属性名"></el-input> -->
-                <el-select
+                <!-- <el-select
                   v-model="scope.row.attrName"
                   filterable
                   allow-create
@@ -427,7 +429,7 @@
                     :label="item.value"
                     :value="item.value"
                   ></el-option>
-                </el-select>
+                </el-select> -->
               </template>
             </el-table-column>
             <!--属性名是否映射-->
@@ -785,6 +787,9 @@ export default {
   },
   //方法集合
   methods: {
+    attrNameChange(row){
+console.log("1234567890-=-098765432",row)
+    },
     getNodeData(data, node) {
       //点击获取节点
       console.log("当前data", data);
