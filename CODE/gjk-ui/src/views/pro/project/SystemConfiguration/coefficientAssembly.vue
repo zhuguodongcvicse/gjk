@@ -9,7 +9,7 @@
 
           <el-tree class="pro_project_systemconfiguration_coe_tree_14s" :data="coefficientTreeData" @node-click="handleNodeClick"/>
     </el-col>
-    
+
     <el-col :span="19" class="coefficientassembly_14s">
           <el-row>
             <el-col :span="24" class="nodeText">
@@ -62,7 +62,7 @@
                   >删除</el-button>
                 </template>
               </el-table-column>
-              
+
           </el-table>
 
           <div align="center" class="table_add_div_14s" v-if="showTable">
@@ -115,7 +115,7 @@
                   >删除</el-button>
                 </template>
               </el-table-column>
-              
+
           </el-table>
 
           <div align="center" class="table_add_div_14s">
@@ -128,7 +128,7 @@
     </div>
   </el-row>
 </template>
-  
+
 <script>
 import { mapGetters } from "vuex";
 export default {
