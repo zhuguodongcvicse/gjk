@@ -200,8 +200,8 @@ export default {
          if(this.formInline.region == this.partList[p].partName){
             for(var i in this.partList[p].components){
               if(this.formLabelAlign.name == this.partList[p].components[i].compId){
-                for(var a in this.partList[p].components[i].inParamenter){
-                  if(this.partList[p].components[i].inParamenter[a].type == "DATA"){
+                for(var a in this.partList[p].components[i].outParamenter){
+                  if(this.partList[p].components[i].outParamenter[a].type == "DATA"){
                         this.outPreames.push({
                           lable:this.partList[p].components[i].outParamenter[a].name,
                           value:this.partList[p].components[i].outParamenter[a].name

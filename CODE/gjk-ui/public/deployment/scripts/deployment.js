@@ -20,17 +20,13 @@ var baknum2 = 0.5;
 var baknum3 = 0.5;
 var baknum4 = 0.5;
 var components;
+var verdict = false;
 // 子接收父参数
 function handleMessageFromParent(event) {
-	//console.log("event.data", event.data)
 	deployment = event.data.params[0].frontCaseForDeployment;
-	//	console.log('deployment',deployment);
 	json = JSON.parse(deployment);
-	//console.log('json', json)
 	linkArray = event.data.params[1][0];
 	arrows = event.data.params[1][1];
-	//console.log('link---', linkArray);
-	//console.log('arrows', arrows)
 	switch (event.data.cmd) {
 		case 'getAllList':
 			init();
@@ -928,6 +924,18 @@ function initEditor(editor) {
 					startData = dragInfo.data.parent;
 					console.log("刚开始移动", startData);
 					//graph.sendToTop(data);
+					for (const i in startData.children.datas) {
+						if (startData.children.datas[i].id != data.id) {
+							if (startData.children.datas[i]._mn3.partname == data._mn3.partname) {
+								if (startData != data.parent) {
+									verdict = true;
+								}
+
+
+							}
+						}
+					}
+					console.log("刚开始移动的判断verdict", verdict)
 				} else {
 					dragInfo = null;
 				}
@@ -956,12 +964,7 @@ function initEditor(editor) {
 				console.log("oldSlot", oldSlot);
 				var slot = findSlot(data, evt);
 				console.log("slot", slot);
-
-
 				console.log("移动后的对象", data.parent);
-
-
-
 				//所点击当前构件的所属部件
 				var partname = data._mn3.partname;
 				//	console.log("data",data.id);
@@ -974,16 +977,50 @@ function initEditor(editor) {
 						if (startData.children.datas[i]._mn3.partname == data._mn3.partname) {
 							if (startData != data.parent) {
 								showMessage('该芯片上还有其他同部件构件请一起移动', 'success', 2000)
-
 								graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-								console.log("++++++++++++++++++++data", data)
-								data.parent = startData;
+								startData == data.parent;
 							}
-							dragInfo = null;
+
 
 						}
 					}
 				}
+				if (data.x > startData.x + 45 && verdict == false) {
+
+					if (startData != data.parent) {
+						graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+						data.parent = startData;
+					} else {
+						graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+					}
+				}
+				if (data.x < startData.x + 7.5 && verdict == false) {
+					//alert(6666);
+					if (startData != data.parent) {
+						graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+						data.parent = startData;
+					}
+					graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+				}
+				if (data.y > startData.y + 45 && verdict == false) {
+					if (startData != data.parent) {
+						graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+						data.parent = startData;
+					}
+					graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+				}
+				if (data.y < startData.y + 7.5 && verdict == false) {
+					//alert(6666);
+					if (startData != data.parent) {
+						graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+						data.parent = startData;
+					}
+					graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+				}
+
+				dragInfo = null;
+				verdict = false;
+				graph.selectionModel.clear();
 			}
 		})
 	}
@@ -1056,28 +1093,41 @@ function initEditor(editor) {
 	graph.popupmenu.getMenuItems = function (graph, data, evt) {
 		if (data) {
 			return [
-				/* 			{
-								text: '选中芯片', action: function () {
-									var data = graph.getElement(evt);
-									var chipId = data.id;
-									chipIds.push(chipId);
-									console.log('************chipIds',chipIds);
-								}
-							
-							}, */
 				{
-					text: '选中其部件下所有构件', action: function () {
+					text: '选中该构件移动', action: function () {
+						graph.select(data);
+						verdict = true;
+						if (data._mn3.partname == null && data.image == "images/芯片.svg" || data.image == "rack") {
+							showMessage('请选择构件', 'success', 2000)
+							graph.selectionModel.clear();
+						}
+					}
+
+				},
+				{
+					text: '选中同一部件下构件移动', action: function () {
 						var data = graph.getElement(evt);
 						var partname = data._mn3.partname;
 						graph.forEach(function (data) {
 							if (data._mn3.partname == partname) {
 								//	console.log(data);
+								verdict = true;
 								graph.select(data);
 							}
 						})
-						if (data._mn3.partname == null && data.image != "images/芯片.svg") {
-							alert('请选择构件');
+						if (data._mn3.partname == null && data.image == "images/芯片.svg" || data.image == "rack") {
+							showMessage('请选择构件', 'success', 2000)
+							graph.selectionModel.clear();
 						}
+					}
+
+				},
+				{
+					text: '取消所有选中元素', action: function () {
+						/* var data = graph.getElement(evt);
+						var chipId = data.id;
+						chipIds.push(chipId); */
+						graph.selectionModel.clear();
 					}
 
 				},
