@@ -9,23 +9,18 @@
       <el-tabs class="sysConfig_tab_14s">
         <el-tab-pane label="节点&部件配置">
           <el-card class="nodeAndAssemblyCard">
-            <!--  <div slot="header" class="nodeHead">
-              <span class="headTextSize">节点&部件配置</span>
-            </div>-->
             <node-part-assembly
               @nodePartXmlEntityMap="nodePartXmlEntityMap"
+              :modelXmlEntityMap="modelNodePartXmlEntityMap"
               :callBackXml="callBackNodePartXml"
             />
           </el-card>
         </el-tab-pane>
         <el-tab-pane label="系数配置">
           <el-card class="coefficientConfigurationCard">
-            <!--  <div slot="header" class="nodeHead">
-              <span class="headTextSize">系数配置</span>
-            </div>-->
             <coefficient-assembly
-              :xmlEntityMap="coefConfigXmlEntityMap"
               @xmlEntityMapChange="xmlEntityMapChange"
+              :modelXmlEntityMap="modelcoefConfigXmlEntityMap"
               :callBackXml="callBackCoefficentXml"
             />
           </el-card>
@@ -58,24 +53,29 @@ export default {
   data() {
     //这里存放数据
     return {
+      nodePartXml: [],
+      coefficentXml: {},
+
       //最终生成的xmlEntityMap的值
       xmlEntityMap: {
         lableName: "sysConfig",
         xmlEntityMaps: []
       },
+
       //读取模板文件之后向系统配置子页面传递系数配置相关值
-      coefConfigXmlEntityMap: {},
+      modelcoefConfigXmlEntityMap: {},
+      //读取模板文件向NodePart页面传递相关EntityMap
+      modelNodePartXmlEntityMap: [],
 
-      nodePartXml: [],
-      coefficentXml: {},
-
+      //回显node页面
       callBackNodePartXml: [],
+      //回显系数配置页面
       callBackCoefficentXml: {}
     };
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["userInfo", "chipsOfHardwarelibs"])
+    ...mapGetters(["userInfo"])
   },
   //监控data中的数据变化
   watch: {
@@ -102,13 +102,6 @@ export default {
         // console.log("xmlEntityMap:", this.xmlEntityMap);
       },
       deep: true
-    },
-    chipsOfHardwarelibs: {
-      immediate: true,
-      handler: function() {
-        console.log("chipsOfHardwarelibs", this.chipsOfHardwarelibs);
-      },
-      deep: true
     }
   },
   //方法集合
@@ -122,7 +115,7 @@ export default {
       this.coefficentXml = params;
     },
     saveSysConfigXmlFile() {
-      // console.log("xmlEntityMap:", this.xmlEntityMap);
+      // console.log("xmlEntityMap:", JSON.stringify(this.xmlEntityMap));
       // console.log("sysId:", this.$route.query.sysId);
       handlerSaveSysXml(this.xmlEntityMap, this.$route.query.sysId).then(
         Response => {
@@ -162,10 +155,12 @@ export default {
         });
       } else {
         getSysConfigModelXml().then(Response => {
-          // console.log("getSysConfigModelXml:", Response.data.data.xmlEntityMaps);
+          this.modelNodePartXmlEntityMap = [];
           for (let item of Response.data.data.xmlEntityMaps) {
             if (item.lableName == "coefConfig") {
-              this.coefConfigXmlEntityMap = item;
+              this.modelcoefConfigXmlEntityMap = item;
+            } else {
+              this.modelNodePartXmlEntityMap.push(item);
             }
           }
         });

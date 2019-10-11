@@ -1,129 +1,130 @@
 <template>
   <el-row :gutter="5" class="pro_project_systemconfiguration_coe_14s">
-    <el-col :span="5" >
-          <el-row>
-            <el-col :span="24" class="nodeText">
-              <span>列表</span>
-            </el-col>
-          </el-row>
+    <el-col :span="5">
+      <el-row>
+        <el-col :span="24" class="nodeText">
+          <span>列表</span>
+        </el-col>
+      </el-row>
 
-          <el-tree class="pro_project_systemconfiguration_coe_tree_14s" :data="coefficientTreeData" @node-click="handleNodeClick"/>
+      <el-tree
+        class="pro_project_systemconfiguration_coe_tree_14s"
+        :data="coefficientTreeData"
+        @node-click="handleNodeClick"
+      />
     </el-col>
-    
+
     <el-col :span="19" class="coefficientassembly_14s">
-          <el-row>
-            <el-col :span="24" class="nodeText">
-              <span>信息配置</span>
-            </el-col>
-          </el-row>
-          <el-table  class="coe_table1_14s" :data="messageConfData" border>
-              <el-table-column label="路径系数" prop="filename_coef">
-                <template slot-scope="{row}">
-                  <el-input v-model="row.filename_coef" size="mini" v-if="row.isShow"/>
-                  <span size="mini" v-else>{{row.filename_coef}}</span>
-                </template>
-              </el-table-column>
+      <el-row>
+        <el-col :span="24" class="nodeText">
+          <span>信息配置</span>
+        </el-col>
+      </el-row>
+      <el-table class="coe_table1_14s" :data="messageConfData" border>
+        <el-table-column label="路径系数" prop="filename_coef">
+          <template slot-scope="{row}">
+            <el-input v-model="row.filename_coef" size="mini" v-if="row.isShow" />
+            <span size="mini" v-else>{{row.filename_coef}}</span>
+          </template>
+        </el-table-column>
 
-              <el-table-column label="数量" prop="count">
-                <template slot-scope="{row}">
-                  <el-input v-model="row.count" size="mini" v-if="row.isShow"/>
-                  <span size="mini" v-else>{{row.count}}</span>
-                </template>
-              </el-table-column>
+        <el-table-column label="数量" prop="count">
+          <template slot-scope="{row}">
+            <el-input v-model="row.count" size="mini" v-if="row.isShow" />
+            <span size="mini" v-else>{{row.count}}</span>
+          </template>
+        </el-table-column>
 
-              <el-table-column label="文件路径" prop="filename">
-                <template slot-scope="{row}">
-                  <el-input v-model="row.filename" size="mini" v-if="row.isShow"/>
-                  <span size="mini" v-else>{{row.filename}}</span>
-                </template>
-              </el-table-column>
+        <el-table-column label="文件路径" prop="filename">
+          <template slot-scope="{row}">
+            <el-input v-model="row.filename" size="mini" v-if="row.isShow" />
+            <span size="mini" v-else>{{row.filename}}</span>
+          </template>
+        </el-table-column>
 
-              <el-table-column label="路径索引" prop="filename_index">
-                <template slot-scope="{row}">
-                  <el-input v-model="row.filename_index" size="mini" v-if="row.isShow"/>
-                  <span size="mini" v-else>{{row.filename_index}}</span>
-                </template>
-              </el-table-column>
+        <el-table-column label="路径索引" prop="filename_index">
+          <template slot-scope="{row}">
+            <el-input v-model="row.filename_index" size="mini" v-if="row.isShow" />
+            <span size="mini" v-else>{{row.filename_index}}</span>
+          </template>
+        </el-table-column>
 
-              <el-table-column label="系数长度" prop="coeflen">
-                <template slot-scope="{row}">
-                  <el-input v-model="row.coeflen" size="mini" v-if="row.isShow"/>
-                  <span size="mini" v-else>{{row.coeflen}}</span>
-                </template>
-              </el-table-column>
+        <el-table-column label="系数长度" prop="coeflen">
+          <template slot-scope="{row}">
+            <el-input v-model="row.coeflen" size="mini" v-if="row.isShow" />
+            <span size="mini" v-else>{{row.coeflen}}</span>
+          </template>
+        </el-table-column>
 
-              <el-table-column fixed="right" label="操作" header-align="center">
-                <template slot-scope="{row,$index}">
-                  <el-button
-                    type="danger"
-                    plain
-                    size="mini"
-                    @click.native="deleteMessageConfDataRow($index, row,'0')"
-                  >删除</el-button>
-                </template>
-              </el-table-column>
-              
-          </el-table>
+        <el-table-column fixed="right" label="操作" header-align="center">
+          <template slot-scope="{row,$index}">
+            <el-button
+              type="danger"
+              plain
+              size="mini"
+              @click.native="deleteMessageConfDataRow($index, row,'0')"
+            >删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
 
-          <div align="center" class="table_add_div_14s" v-if="showTable">
-            <el-button type="text" @click="addMessageConfDataRow">
-              <font class="addtabrow_btn_14s" >添加</font>
-            </el-button>
-          </div>
+      <div align="center" class="table_add_div_14s" v-if="showTable">
+        <el-button type="text" @click="addMessageConfDataRow">
+          <font class="addtabrow_btn_14s">添加</font>
+        </el-button>
+      </div>
     </el-col>
     <div class="coefficientassembly_bottom_14s">
       <el-col :span="24" class="nodeText">
-          <span>扩展配置</span>
+        <span>扩展配置</span>
       </el-col>
       <el-col :span="24">
-          <el-table :data="extendConfData" border>
-              <el-table-column label="变量名称" prop="varname">
-                <template slot-scope="{row}">
-                  <el-input v-model="row.varname" size="mini" v-if="row.isShow"/>
-                  <span size="mini" v-else>{{row.varname}}</span>
-                </template>
-              </el-table-column>
+        <el-table :data="extendConfData" border>
+          <el-table-column label="变量名称" prop="varname">
+            <template slot-scope="{row}">
+              <el-input v-model="row.varname" size="mini" v-if="row.isShow" />
+              <span size="mini" v-else>{{row.varname}}</span>
+            </template>
+          </el-table-column>
 
-              <el-table-column label="路径系数" prop="filename_coef">
-                <template slot-scope="{row}">
-                  <el-input v-model="row.filename_coef" size="mini" v-if="row.isShow"/>
-                  <span size="mini" v-else>{{row.filename_coef}}</span>
-                </template>
-              </el-table-column>
+          <el-table-column label="路径系数" prop="filename_coef">
+            <template slot-scope="{row}">
+              <el-input v-model="row.filename_coef" size="mini" v-if="row.isShow" />
+              <span size="mini" v-else>{{row.filename_coef}}</span>
+            </template>
+          </el-table-column>
 
-              <el-table-column label="数量" prop="count">
-                <template slot-scope="{row}">
-                  <el-input v-model="row.count" size="mini" v-if="row.isShow"/>
-                  <span size="mini" v-else>{{row.count}}</span>
-                </template>
-              </el-table-column>
+          <el-table-column label="数量" prop="count">
+            <template slot-scope="{row}">
+              <el-input v-model="row.count" size="mini" v-if="row.isShow" />
+              <span size="mini" v-else>{{row.count}}</span>
+            </template>
+          </el-table-column>
 
-              <el-table-column label="文件路径" prop="filename">
-                <template slot-scope="{row}">
-                  <el-input v-model="row.filename" size="mini" v-if="row.isShow"/>
-                  <span size="mini" v-else>{{row.filename}}</span>
-                </template>
-              </el-table-column>
+          <el-table-column label="文件路径" prop="filename">
+            <template slot-scope="{row}">
+              <el-input v-model="row.filename" size="mini" v-if="row.isShow" />
+              <span size="mini" v-else>{{row.filename}}</span>
+            </template>
+          </el-table-column>
 
-              <el-table-column fixed="right" label="操作" header-align="center">
-                <template slot-scope="{row,$index}">
-                  <el-button
-                    type="danger"
-                    plain
-                    size="mini"
-                    @click.native="deleteExtendConfDataRow($index, row,'0')"
-                  >删除</el-button>
-                </template>
-              </el-table-column>
-              
-          </el-table>
+          <el-table-column fixed="right" label="操作" header-align="center">
+            <template slot-scope="{row,$index}">
+              <el-button
+                type="danger"
+                plain
+                size="mini"
+                @click.native="deleteExtendConfDataRow($index, row,'0')"
+              >删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
 
-          <div align="center" class="table_add_div_14s">
-            <el-button type="text" @click="addExtendConfDataRow">
-              <font class="addtabrow_btn_14s" >添加</font>
-            </el-button>
-          </div>
-
+        <div align="center" class="table_add_div_14s">
+          <el-button type="text" @click="addExtendConfDataRow">
+            <font class="addtabrow_btn_14s">添加</font>
+          </el-button>
+        </div>
       </el-col>
     </div>
   </el-row>
@@ -133,7 +134,7 @@
 import { mapGetters } from "vuex";
 export default {
   //父级页面读取配置模板之后传递给此页面的系数配置的相关值
-  props: ["xmlEntityMap", "callBackXml"],
+  props: ["modelXmlEntityMap", "callBackXml"],
   data() {
     //这里存放数据
     return {
@@ -219,12 +220,12 @@ export default {
       deep: true
     },
     //当父级页面传值过来时将值进行解析,此方法只会在父级页面解析模板文件向此页面传值时执行一次
-    "xmlEntityMap.xmlEntityMaps": function() {
+    "modelXmlEntityMap.xmlEntityMaps": function() {
       //定义临时变量存放需要配置的coef的名字，之后显示在树上
       let coefTreeNodeName = [];
-      if (this.xmlEntityMap.xmlEntityMaps != undefined) {
+      if (this.modelXmlEntityMap.xmlEntityMaps != undefined) {
         //循环查询出所有结尾是coef的节点，将名字存放到临时变量上
-        for (let item of this.xmlEntityMap.xmlEntityMaps) {
+        for (let item of this.modelXmlEntityMap.xmlEntityMaps) {
           // if (this.confirmEnding(item.lableName, "Coef")) {
           if (item.lableName != "userSpace") {
             coefTreeNodeName.push(item);
@@ -348,5 +349,4 @@ export default {
 </script>
 <style lang='scss' scoped>
 //@import url('/cdn/element-ui/2.4.11/theme-chalk/index.css'); 引入公共css类
-
 </style>
