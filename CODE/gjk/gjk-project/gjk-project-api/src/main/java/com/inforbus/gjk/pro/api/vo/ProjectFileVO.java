@@ -48,6 +48,10 @@ public class ProjectFileVO extends Model<ProjectFileVO> {
 	 */
 	private String bspId;
 	/**
+	 * 是否是文件
+	 */
+	private String isDirectory;
+	/**
 	 * @Fields delFlag : 0--正常 1--删除
 	 */
 	private String delFlag;
@@ -84,6 +88,19 @@ public class ProjectFileVO extends Model<ProjectFileVO> {
 		this.filePath = filePath;
 		this.parentId = parentId;
 		this.procedureId = procedureId;
+	}
+
+	public ProjectFileVO(String fileId, String fileName, String showName, String fileType, String filePath,
+						 String parentId, String procedureId, String isDirectory) {
+		super();
+		this.fileId = fileId;
+		this.fileName = fileName;
+		this.showName = showName;
+		this.fileType = fileType;
+		this.filePath = filePath;
+		this.parentId = parentId;
+		this.procedureId = procedureId;
+		this.isDirectory = isDirectory;
 	}
 
 	public ProjectFileVO(ProjectFile file) {

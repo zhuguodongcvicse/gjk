@@ -126,13 +126,17 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 
 	private void addAppFileTree(List<ProjectFileVO> tree, String parentId, File file, String processId) {
 		String fileId = IdGenerate.uuid();
-		tree.add(new ProjectFileVO(fileId, file.getName(), file.getName(), "app",
-				file.getParentFile().getAbsolutePath(), parentId, processId));
+
 		if (file.isDirectory()) {
+			tree.add(new ProjectFileVO(fileId, file.getName(), file.getName(), "app",
+					file.getParentFile().getAbsolutePath(), parentId, processId, "0"));
 			File[] childFileList = file.listFiles();
 			for (File childFile : childFileList) {
 				addAppFileTree(tree, fileId, childFile, processId);
 			}
+		} else {
+			tree.add(new ProjectFileVO(fileId, file.getName(), file.getName(), "app",
+					file.getParentFile().getAbsolutePath(), parentId, processId, "1"));
 		}
 	}
 
