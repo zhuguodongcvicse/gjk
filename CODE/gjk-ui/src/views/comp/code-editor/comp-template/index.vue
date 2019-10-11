@@ -145,8 +145,11 @@ export default {
                   .dispatch("setStruceType")
                   .then(() => {
                     this.$router.push({
-                      name: "测试添加",
-                      query: { type: "add" }
+                      path: "/comp/showComp/addAndEditComp",
+                      query: {
+                        type: "add",
+                        proFloName: "添加构件"
+                      }
                     });
                   })
                   .catch(() => {

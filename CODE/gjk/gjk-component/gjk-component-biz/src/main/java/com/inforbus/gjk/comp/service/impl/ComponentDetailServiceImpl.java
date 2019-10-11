@@ -17,11 +17,14 @@
 package com.inforbus.gjk.comp.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.inforbus.gjk.common.core.entity.XmlEntity;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
@@ -62,6 +65,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,8 +80,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import java.io.IOException;
 
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
 //import org.jsoup.Jsoup;
 //import org.jsoup.nodes.Document;
 //import org.jsoup.nodes.Element;
@@ -420,6 +422,32 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 //		}
 	}
 
+	private void getStructIds(XmlEntityMap xmlEnt, Set<String> Ids) {
+		if (ObjectUtils.isNotEmpty(xmlEnt)) {
+			// 判断有没有属性Attribute
+			if (ObjectUtils.isNotEmpty(xmlEnt.getAttributeMap())) {
+				if (xmlEnt.getLableName() == "选择变量" || xmlEnt.getLableName() == "variable") {
+					System.out.println("带有structId 的项：" + JSONUtil.toJsonPrettyStr(xmlEnt));
+				}
+				String val = xmlEnt.getAttributeMap().get("structId");
+				if (StringUtils.isNotEmpty(val)) {
+					Ids.add(val.replace("_*", ""));
+				}
+			}
+			// 判断有没有下级标签list
+			if (ObjectUtils.isNotEmpty(xmlEnt.getXmlEntityMaps())) {
+				for (XmlEntityMap chXmlEnt : xmlEnt.getXmlEntityMaps()) {
+					try {
+						this.getStructIds(chXmlEnt, Ids);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+	}
+
 	/**
 	 * @Title: createXmlFile
 	 * @Description: 根据xmlMap 生成文件
@@ -435,6 +463,13 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	@Override
 	public boolean createXmlFile(XmlEntityMap entity, String token, String compId) {
 		File file = this.createFile(token, compId);
+		Set<String> Ids = Sets.newHashSet();
+		this.getStructIds(entity, Ids);
+		//删除已有的当前构件所对应的结构体
+		compMapper.deleteCompAndStruct(compId);
+		for (String structId : Ids) {
+			compMapper.saveCompAndStruct(IdGenerate.uuid(),compId,structId);			
+		}
 		// 创建文件
 		return XmlFileHandleUtil.createXmlFile(entity, file);
 //		Component component = compMapper.getCompById(compId);

@@ -350,7 +350,8 @@ export default {
             if (isx) {
               item.dataKey.push(
                 { value: "DATA", label: "DATA" },
-                { value: "STRUCTTYPE", label: "STRUCTTYPE" }
+                { value: "STRUCTTYPE", label: "STRUCTTYPE" },
+                { value: "IMMEDIATE", label: "IMMEDIATE" }
               );
             } else {
               item.dataKey.push(
@@ -853,30 +854,7 @@ export default {
         this.handleDialogParam(tree, data, "");
       });
     },
-    //预处理部分参数
-    analysisXmlDataParam(params) {
-      //处理数据中的部分参数
-      params.nodeData.forEach(nodes => {
-        nodes.forEach(node => {
-          if (node.attrMappingName === this.bllxParam) {
-            // fetchStrInPointer().then(res => {
-            //   let selectParam = res.data.data;
-            //   //从下拉列表中获取
-            //   let selectData = selectParam.find(item => {
-            //     return item.label === node.lableName;
-            //   });
-            //   //从头文件中获取
-            //   if (false) {
-            //   }
-            //   //从下拉列表中获取
-            //   else if (selectData) {
-            //     node.lableName = selectData.value;
-            //   }
-            // });
-          }
-        });
-      });
-    },
+
     //递归返回树形数据
     handleDialogParam(params, retArray, parentKey) {
       ///预处理部分参数
@@ -908,7 +886,6 @@ export default {
             for (let key2 in parentArr[key1]) {
               //设置名字"名称"
               if (parentArr[key1][key2].attrMappingName === this.nameParam) {
-                console.log("parent.lableName = parentArr[key1][key2].lableName",parent.lableName , parentArr[key1][key2].lableName)
                 parent.lableName = parentArr[key1][key2].lableName = key;
               } else if (
                 parentArr[key1][key2].attrMappingName === this.bllxParam
@@ -924,11 +901,12 @@ export default {
               ) {
                 parentArr[key1][key2].lableName = "STRUCTTYPE";
               } else {
-                parentArr[key1][key2].lableName = "";
+                // parentArr[key1][key2].lableName = "";
               }
             }
           }
           this.$set(parent, "children", [deepClone(child)]);
+
           retArray.push(parent);
         } else {
           if (endKey.includes(".")) {
@@ -996,8 +974,6 @@ export default {
               }
             }
             // 给结构体赋值 structId structName
-            // tree.assigParamName =
-            //   parentTree.assigParamName + tree.assigParamName;
             tree.nodeData[0][1].lableName = parentTree.nodeData[0][1].lableName;
             tree.nodeData[0][2].lableName = parentTree.nodeData[0][2].lableName;
           } else {
@@ -1025,7 +1001,7 @@ export default {
             // 给结构体赋值 structId structName
             tree.nodeData[0][0].lableName =
               parentTree.assigParamName + tree.lableName;
-            tree.nodeData[0][1].lableName = parentTree.assigParamName;
+            tree.nodeData[0][1].lableName = parentTree.nodeData[0][1].lableName;
             tree.nodeData[0][2].lableName = parentTree.assigStructType;
           } else {
             tree.nodeData[0][0].lableName = tree.lableName;

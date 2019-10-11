@@ -48,8 +48,8 @@ export default [{
             name: '编辑',
             component: () => import('@/views/comp/component/textEdit')
         }, {
-            path: 'addComp1',
-            name: '测试添加',
+            path: 'addAndEditComp',
+            name: 'addAndEditComp',
             component: () => import('@/views/comp/code-editor/comp-params'),
             meta: {
                 keepAlive: true,// 需要被缓存src\views\comp\code-editor\comp-params
