@@ -476,13 +476,14 @@ function initEditor(editor) {
 		var graphName = graph.name
 		console.log("graphName", graphName)
 		if (graphName == null) {
+			frontCaseForDeployment = graph.toJSON()
 			//配置的ip nodeID 
-			let ifSetIPSuccess = setNodeIDAndIP()
+			setNodeIDAndIP()
+			let ifSetIPSuccess = checkIP()
 			if (!ifSetIPSuccess) {
 				return
 			}
 			// console.log("graph", graph.toJSON())
-			frontCaseForDeployment = graph.toJSON()
 			//连线关系
 			createLinkData()
 			graphList.fJson = JSON.parse(JSON.stringify(graphList.fJson))
@@ -497,7 +498,8 @@ function initEditor(editor) {
 			return
 		} else if (graphName == '背部视图') {
 			//配置的ip nodeID 
-			let ifSetIPSuccess = setNodeIDAndIP()
+			setNodeIDAndIP()
+			let ifSetIPSuccess = checkIP()
 			if (!ifSetIPSuccess) {
 				return
 			}
@@ -536,7 +538,8 @@ function initEditor(editor) {
 		} else if (graphName == '正面视图') {
 			frontCaseForDeployment = graph.toJSON()
 			//配置的ip nodeID
-			let ifSetIPSuccess = setNodeIDAndIP()
+			setNodeIDAndIP()
+			let ifSetIPSuccess = checkIP()
 			if (!ifSetIPSuccess) {
 				return
 			}
@@ -616,11 +619,6 @@ function initEditor(editor) {
 					for (const j in graphList.fJson[n].datas[i].json.properties.frontBoardList) {
 						if (graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList != null) {
 							for (const k in graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList) {
-								//如果存在未配置IP的芯片则弹出提示
-								if (graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].IP == null || graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].IP == '') {
-									alert("存在未配置IP的芯片")
-									return false
-								}
 								//带有IP的临时数据赋给数据
 								for (const m in chipListTemp) {
 									if (graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].uniqueId.indexOf(chipListTemp[m].uniqueId) != -1) {
@@ -645,6 +643,27 @@ function initEditor(editor) {
 			}
 		}
 		return true
+	}
+	
+	function checkIP(){
+		for (const i in graphList.fJson) {
+			for (const j in graphList.fJson[i].datas) {
+				if (graphList.fJson[i].datas[j].json.properties != null && graphList.fJson[i].datas[j].json.properties.caseName != null) {
+					for (const k in graphList.fJson[i].datas[j].json.properties.frontBoardList) {
+						if (graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList != null) {
+							for (const m in graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList) {
+								//如果存在未配置IP的芯片则弹出提示
+								if (graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList[m].IP == null || graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList[m].IP == '') {
+									alert("存在未配置IP的芯片")
+									return false
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return true;
 	}
 	//连线的接口放到数组，为绘画准备数据，同时放到map
 	function setLinkList() {

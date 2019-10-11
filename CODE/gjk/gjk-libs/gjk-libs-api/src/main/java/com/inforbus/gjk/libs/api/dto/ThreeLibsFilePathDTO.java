@@ -15,4 +15,9 @@ public class ThreeLibsFilePathDTO {
 	 */
 	private String filePath;
 	
+	/**
+	 * 文件编码格式
+	 */
+	private String code;
+	
 }

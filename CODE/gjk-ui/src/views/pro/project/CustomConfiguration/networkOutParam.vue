@@ -57,7 +57,7 @@ export default {
      formLabelAlign:{
       handler:function(newValue, oldValue){
         this.init();
-        if(this.funcConfigKey != ""){
+        if(this.funcConfigKey != "" && this.cleanState != "1"){
            this.$store.dispatch('getNetworkOut', {key:"network_out*"+this.funcConfigKey,value:this.funcConfigData})
         }
        
@@ -93,12 +93,18 @@ export default {
         // }
       ],
       //保存页面数据
-      funcConfigData : new Map()
+      funcConfigData : new Map(),
+      //网络配置xml数据
+      netWorkData : {},
+      //流程建模xml数据
+      partList : {},
+      //删除状态
+      cleanState : ""
     };
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["netWorkOut","netWorkData","partList"])
+    ...mapGetters(["netWorkOut","xmlDataMap"])
   },
   //方法集合
   methods: {
@@ -109,6 +115,7 @@ export default {
       this.funcConfigKey = funcConfigKey;
     },
      clean(){
+      this.cleanState = "1"
       this.formLabelAlign.type = ""
       this.formLabelAlign.ip = ""
       this.formLabelAlign.port = ""
@@ -143,6 +150,7 @@ export default {
       this.funcConfigData.set("protocol__name",this.formLabelAlign.protocol)
     },
     echo(funcConfigData){
+      this.cleanState = "0"
       if(funcConfigData != undefined){
         var funcConfigMap = new Map(funcConfigData);
          this.state = "2"
@@ -167,29 +175,35 @@ export default {
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
     this.$store.dispatch('cleanNetworkOut')
+    this.netWorkData = this.xmlDataMap[this.$route.query.sysId].netWorkData
+     this.partList = this.xmlDataMap[this.$route.query.sysId].partList
    //console.log("输出网络配置netWork_Out xml数据",this.netWorkData.xmlEntityMaps[0].xmlEntityMaps);
-    for(var i =0;i<this.netWorkData.xmlEntityMaps[1].xmlEntityMaps.length;i++){
-      // for(var p in this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].attributeMap){
-      //   this.funcConfigData.set(this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].lableName+"__"+p,this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].attributeMap[p]);
-      // }
-      this.funcConfigData.set(this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].lableName+"__name",{id:this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].attributeMap.compId,name:this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].attributeMap.compName,funName:this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].attributeMap.name})
-      for(var j =0;j<this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps.length;j++){
-        for(var s in this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].attributeMap){
-          this.funcConfigData.set(this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].lableName+"__"+s,this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].attributeMap[s]);
-        }
-      }
-       this.$store.dispatch('getNetworkOut', {key:this.netWorkData.xmlEntityMaps[1].lableName+"*"+this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].lableName+"*"+i,value:this.funcConfigData})
-    }
-    this.formLabelAlign.type = this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[0].attributeMap.compName
-    for(var a = 0;a<this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps.length;a++){
-      if(this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[a].lableName == "ip"){
-        this.formLabelAlign.ip = this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[a].attributeMap.name
-      }else if(this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[a].lableName == "port"){
-        this.formLabelAlign.port = this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[a].attributeMap.name
-      }else{
-        this.formLabelAlign.protocol = this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[a].attributeMap.name
-      }
-    }
+   if(this.netWorkData.xmlEntityMaps != null){
+     for(var i =0;i<this.netWorkData.xmlEntityMaps[1].xmlEntityMaps.length;i++){
+       // for(var p in this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].attributeMap){
+       //   this.funcConfigData.set(this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].lableName+"__"+p,this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].attributeMap[p]);
+       // }
+       this.funcConfigData.set(this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].lableName+"__name",{id:this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].attributeMap.compId,name:this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].attributeMap.compName,funName:this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].attributeMap.name})
+       for(var j =0;j<this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps.length;j++){
+         for(var s in this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].attributeMap){
+           this.funcConfigData.set(this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].lableName+"__"+s,this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].attributeMap[s]);
+         }
+       }
+        this.$store.dispatch('getNetworkOut', {key:this.netWorkData.xmlEntityMaps[1].lableName+"*"+this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].lableName+"*"+i,value:this.funcConfigData})
+     }
+     this.state = "1"
+     this.formLabelAlign.type = this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[0].attributeMap.compName
+     for(var a = 0;a<this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps.length;a++){
+       if(this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[a].lableName == "ip"){
+         this.formLabelAlign.ip = this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[a].attributeMap.name
+       }else if(this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[a].lableName == "port"){
+         this.formLabelAlign.port = this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[a].attributeMap.name
+       }else{
+         this.formLabelAlign.protocol = this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[a].attributeMap.name
+       }
+     }
+
+   }
      remote("netWork_protocolName").then(res => {
       this.options = res.data.data;
     })

@@ -473,10 +473,10 @@ export default {
             this.dynamicValidateForm.domains[0][index].appState === "Stoped"
           ) {
             this.banArray[index].pauseBan = "not-allowed";
-            this.banArray[index].pauseBan = "not-allowed";
             this.banArray[index].stopBan = "not-allowed";
             this.banArray[index].earthBan = "not-allowed";
             this.banArray[index].closeBan = "not-allowed";
+            this.banArray[index].playBan = "not-allowed";
 
             this.banArray[index].downClick = true;
             this.banArray[index].oClick = true;

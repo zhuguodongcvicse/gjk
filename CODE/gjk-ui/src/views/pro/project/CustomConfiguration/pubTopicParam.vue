@@ -7,7 +7,7 @@
         <el-form :inline="true" :model="formInline" class="demo-form-inline">
           <el-form-item label="startCmp">
             <el-select v-model="formInline.region" placeholder="">
-             <el-option 
+             <el-option
                 v-for="item in part"
                 :key="item.value"
                 :label="item.label"
@@ -16,13 +16,13 @@
               >
               </el-option>
             </el-select>
-           
+
           </el-form-item>
           <el-form-item label="endCmp">
             <el-input v-model="formInline.user" placeholder="审批人"></el-input>
           </el-form-item>
           <!--<el-form-item>
-             <el-button type="primary" @click="select">查询</el-button> 
+             <el-button type="primary" @click="select">查询</el-button>
           </el-form-item>-->
         </el-form>
       </el-col>
@@ -82,8 +82,8 @@
     </el-row>
   </div>
   <!-- <el-row :gutter="5">
-    
-    
+
+
   </el-row>-->
 </template>
 
@@ -131,7 +131,7 @@ export default {
   },
   data() {
     //这里存放数据
-    
+
     return {
       funcNameMap: new Map,
       compId : "",
@@ -174,18 +174,22 @@ export default {
       },
       //funcConfigData : new Map()
       //funcConfig列表值
-      funcConfigLabel : "",   
+      funcConfigLabel : "",
       //父组件中的topickey
       topicKey : "",
       //父组件点击后所取出的数据
       mapFuncConfig : new Map(),
       //父组件点击后的状态
-       clickState:""
+       clickState:"",
+       //xml数据
+      themeData:{},
+      //解析流程建模数据
+      partList:{}
     };
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["pubMapCustomConfig","themeData","partList"])
+    ...mapGetters(["pubMapCustomConfig","xmlDataMap"])
   },
   //方法集合
   methods: {
@@ -196,8 +200,8 @@ export default {
          if(this.formInline.region == this.partList[p].partName){
             for(var i in this.partList[p].components){
               if(this.formLabelAlign.name == this.partList[p].components[i].compId){
-                for(var a in this.partList[p].components[i].inParamenter){
-                  if(this.partList[p].components[i].inParamenter[a].type == "DATA"){
+                for(var a in this.partList[p].components[i].outParamenter){
+                  if(this.partList[p].components[i].outParamenter[a].type == "DATA"){
                         this.outPreames.push({
                           lable:this.partList[p].components[i].outParamenter[a].name,
                           value:this.partList[p].components[i].outParamenter[a].name
@@ -224,7 +228,7 @@ export default {
                label:this.partList[p].components[i].compName,
                value:this.partList[p].components[i].compId
              });
-             
+
            }
          }
        }
@@ -247,7 +251,7 @@ export default {
       }
     },
     clean(){
-      this.clickState = "1"
+      this.cleanState = "1"
       this.formInline.user = ""
       this.formInline.region = ""
       this.formLabelAlign.name = ""
@@ -255,6 +259,7 @@ export default {
       this.data = []
     },
     handleNodeClick(e) {
+      this.cleanState = "0"
       this.funcConfigLabel =  e.id+"*"+e.label;
      // console.log("商店中取出数据",this.pubMapCustomConfig)
       var topicData = this.pubMapCustomConfig.get("publish*"+this.topicKey);
@@ -277,6 +282,7 @@ export default {
 
     },
     echo(topic,state){
+      this.cleanState = "0"
       console.log("this.pubMapCustomConfig",topic)
       this.data = [];
       console.log("父页面")
@@ -318,7 +324,7 @@ export default {
       this.topicKey = key
     },
     select(){
-      
+
     },
     init(){
        this.topicData.user = "startCmp*"+this.formInline.user;
@@ -351,11 +357,14 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    console.log("pubtopicParam",this.themeData.xmlEntityMaps[1].xmlEntityMaps)
-    // console.log("pubtopic中的数据",this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps)
-     console.log("1111111111111",this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps)
     this.$store.dispatch('cleanPubMapCustomConfig')
-    for(var i = 0;i<this.themeData.xmlEntityMaps[1].xmlEntityMaps.length;i++){
+    this.themeData = this.xmlDataMap[this.$route.query.sysId].themeData
+    this.partList = this.xmlDataMap[this.$route.query.sysId].partList
+    //  console.log("pubtopicParam",this.themeData.xmlEntityMaps[1].xmlEntityMaps)
+    // // console.log("pubtopic中的数据",this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps)
+    //  console.log("1111111111111",this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps)
+    if(this.themeData.xmlEntityMaps != null){
+       for(var i = 0;i<this.themeData.xmlEntityMaps[1].xmlEntityMaps.length;i++){
       this.topicData.funcConfig.clear()
       for(var j = 0;j<this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps.length;j++){
         if(this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].lableName == "startCmp"){
@@ -366,14 +375,14 @@ export default {
          var dataStream = {
            funcName:this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[0].lableName+"*"+this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[0].attributeMap.compId+"*"+this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[0].attributeMap.name+"*"+this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[0].attributeMap.compName,
            funcInterface:this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[1].lableName+"*"+this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[1].attributeMap.name,
-         }; 
+         };
         //  console.log("解析xmldataStream",dataStream)
          this.topicData.funcConfig.set(j+"*"+this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].lableName,dataStream);
         }
       }
       this.$store.dispatch('getPubMapCustomConfig', {key:this.themeData.xmlEntityMaps[1].lableName+"*"+i+"*"+this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].lableName,value:this.topicData})
     }
-   
+
     var key = this.themeData.xmlEntityMaps[1].lableName+"*0*"+this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].lableName
     this.mapFuncConfig = this.pubMapCustomConfig.get(key)
     this.clickState = "1"
@@ -390,9 +399,11 @@ export default {
         }
       );
     }
-    this.funcConfigLabel = this.data[0].id+"*"+this.data[0].label
-    this.formLabelAlign.name = this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compName
-    this.formLabelAlign.region = this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[1].attributeMap.name 
+      this.funcConfigLabel = this.data[0].id+"*"+this.data[0].label
+      this.formLabelAlign.name = this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compName
+      this.formLabelAlign.region = this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[1].attributeMap.name
+    }
+
      for(var k =0;k<this.partList.length;k++){
       this.part.push(
         {
@@ -404,11 +415,13 @@ export default {
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
-     this.$nextTick(function(){
+    if(this.data.length > 0){
+      this.$nextTick(function(){
         this.$refs.tree.setCurrentKey(this.data[0].id);
         //  this.funcConfigLabel = this.data[0].label
         //  console.log(" this.funcConfigLabel", this.funcConfigLabel);
       })
+    }
   },
   beforeCreate() {}, //生命周期 - 创建之前
   beforeMount() {}, //生命周期 - 挂载之前

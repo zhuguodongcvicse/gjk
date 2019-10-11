@@ -68,12 +68,13 @@ export default {
       defaultProps: {
         children: "children",
         label: "label"
-      }
+      },
+      netWorkData : {},
     };
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["netWorkOut","netWorkData"])
+    ...mapGetters(["netWorkOut","xmlDataMap"])
   },
   //方法集合
   methods: {
@@ -102,7 +103,9 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    for(var i = 0;i<this.netWorkData.xmlEntityMaps[1].xmlEntityMaps.length;i++){
+    this.netWorkData = this.xmlDataMap[this.$route.query.sysId].netWorkData
+    if(this.netWorkData.xmlEntityMaps != null){
+      for(var i = 0;i<this.netWorkData.xmlEntityMaps[1].xmlEntityMaps.length;i++){
       this.data.push(
         {
           label:this.netWorkData.xmlEntityMaps[1].xmlEntityMaps[i].lableName,
@@ -111,13 +114,17 @@ export default {
       );
     }
     this.index = this.data[this.data.length-1].id+1
+    }
+    
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
-     this.$nextTick(function(){
+    if(this.data.length > 0){
+       this.$nextTick(function(){
         this.$refs.tree.setCurrentKey(this.data[0].id);
         this.$refs.networkParam.getFuncConfigKey(this.data[0].label+"*"+this.data[0].id);
       })
+    }
   },
   beforeCreate() {}, //生命周期 - 创建之前
   beforeMount() {}, //生命周期 - 挂载之前

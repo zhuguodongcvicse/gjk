@@ -205,8 +205,10 @@ public class XmlFileHandleUtil {
 	 * @return
 	 */
 	private static Element analysisToElement(Document document, XmlEntityMap xmlEntityMap) {
-
-		Element xmlNode = document.createElement(xmlEntityMap.getLableName());
+		Element xmlNode = null;
+		if(!"".equals(xmlEntityMap.getLableName())) {
+			xmlNode = document.createElement(xmlEntityMap.getLableName());
+		}
 
 		if (xmlEntityMap.getTextContent() != null) {
 			xmlNode.setTextContent(xmlEntityMap.getTextContent());
@@ -221,11 +223,15 @@ public class XmlFileHandleUtil {
 		if (xmlEntityMap.getXmlEntityMaps() != null) {
 			for (XmlEntityMap entity : xmlEntityMap.getXmlEntityMaps()) {
 				Element element = analysisToElement(document, entity);
-				xmlNode.appendChild(element);
+				if(element!= null) {
+					xmlNode.appendChild(element);
+				}
+				
 			}
 		}
-
-		document.appendChild(xmlNode);
+		if(xmlNode!= null) {
+			document.appendChild(xmlNode);
+		}
 
 		return xmlNode;
 	}
