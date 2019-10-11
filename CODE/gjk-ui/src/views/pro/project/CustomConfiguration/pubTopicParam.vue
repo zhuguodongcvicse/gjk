@@ -7,7 +7,7 @@
         <el-form :inline="true" :model="formInline" class="demo-form-inline">
           <el-form-item label="startCmp">
             <el-select v-model="formInline.region" placeholder="">
-             <el-option 
+             <el-option
                 v-for="item in part"
                 :key="item.value"
                 :label="item.label"
@@ -16,13 +16,13 @@
               >
               </el-option>
             </el-select>
-           
+
           </el-form-item>
           <el-form-item label="endCmp">
             <el-input v-model="formInline.user" placeholder="审批人"></el-input>
           </el-form-item>
           <!--<el-form-item>
-             <el-button type="primary" @click="select">查询</el-button> 
+             <el-button type="primary" @click="select">查询</el-button>
           </el-form-item>-->
         </el-form>
       </el-col>
@@ -82,8 +82,8 @@
     </el-row>
   </div>
   <!-- <el-row :gutter="5">
-    
-    
+
+
   </el-row>-->
 </template>
 
@@ -131,7 +131,7 @@ export default {
   },
   data() {
     //这里存放数据
-    
+
     return {
       funcNameMap: new Map,
       compId : "",
@@ -174,7 +174,7 @@ export default {
       },
       //funcConfigData : new Map()
       //funcConfig列表值
-      funcConfigLabel : "",   
+      funcConfigLabel : "",
       //父组件中的topickey
       topicKey : "",
       //父组件点击后所取出的数据
@@ -228,7 +228,7 @@ export default {
                label:this.partList[p].components[i].compName,
                value:this.partList[p].components[i].compId
              });
-             
+
            }
          }
        }
@@ -324,7 +324,7 @@ export default {
       this.topicKey = key
     },
     select(){
-      
+
     },
     init(){
        this.topicData.user = "startCmp*"+this.formInline.user;
@@ -375,7 +375,7 @@ export default {
          var dataStream = {
            funcName:this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[0].lableName+"*"+this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[0].attributeMap.compId+"*"+this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[0].attributeMap.name+"*"+this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[0].attributeMap.compName,
            funcInterface:this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[1].lableName+"*"+this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[1].attributeMap.name,
-         }; 
+         };
         //  console.log("解析xmldataStream",dataStream)
          this.topicData.funcConfig.set(j+"*"+this.themeData.xmlEntityMaps[1].xmlEntityMaps[i].xmlEntityMaps[j].lableName,dataStream);
         }
@@ -401,7 +401,7 @@ export default {
     }
       this.funcConfigLabel = this.data[0].id+"*"+this.data[0].label
       this.formLabelAlign.name = this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compName
-      this.formLabelAlign.region = this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[1].attributeMap.name 
+      this.formLabelAlign.region = this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[1].attributeMap.name
     }
 
      for(var k =0;k<this.partList.length;k++){
@@ -421,7 +421,7 @@ export default {
         //  this.funcConfigLabel = this.data[0].label
         //  console.log(" this.funcConfigLabel", this.funcConfigLabel);
       })
-    } 
+    }
   },
   beforeCreate() {}, //生命周期 - 创建之前
   beforeMount() {}, //生命周期 - 挂载之前
