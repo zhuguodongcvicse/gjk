@@ -315,11 +315,14 @@ export default {
       let data = this.nodeFormParam;
       // 变量类型内容
       let bllxName;
+      let lbName;
       data.forEach(items => {
         items.forEach(item => {
           // 如果是变量类型，将变量类型当前内容赋入
           if (item.attrMappingName === this.bllxParam) {
             bllxName = item.lableName;
+          } else if (item.attrMappingName === this.lbParam) {
+            lbName = item.lableName;
           }
         });
       });
@@ -332,33 +335,43 @@ export default {
               return;
             }
             if (item.attrMappingName === this.lengthParam) {
-              if (isx) {
-                item.isShow = true;
-              } else {
-                item.lableName = "";
-                item.isShow = false;
-              }
+              item.isShow = isx ? true : false;
+              item.lableName = isx ? item.lableName : "";
             }
           }
           // 如果是类别，根据变量类型内容处理选择内容
           if (item.attrMappingName === this.lbParam) {
+            let name = item.lableName;
+            data.forEach(data1 => {
+              data1.forEach(data2 => {
+                if (data2.attrMappingName === this.fzParam) {
+                  data2.lableName = name === "IMMEDIATE" ? data2.lableName : "";
+                  data2.isShow = name === "IMMEDIATE" ? true : false;
+                } else if (data2.attrMappingName === this.xzblPaeam) {
+                  data2.isShow =
+                    name === "IMMEDIATE"
+                      ? false
+                      : name === "DATA"
+                      ? false
+                      : true;
+                  data2.lableName = name === "IMMEDIATE" ? "" : data2.lableName;
+                }
+              });
+            });
             let isx = bllxName.includes("*");
             if (bllxName === null || bllxName === undefined) {
               return;
             }
-            item.dataKey = [];
-            if (isx) {
-              item.dataKey.push(
-                { value: "DATA", label: "DATA" },
-                { value: "STRUCTTYPE", label: "STRUCTTYPE" },
-                { value: "IMMEDIATE", label: "IMMEDIATE" }
-              );
-            } else {
-              item.dataKey.push(
-                { value: "STRUCTTYPE", label: "STRUCTTYPE" },
-                { value: "IMMEDIATE", label: "IMMEDIATE" }
-              );
-            }
+            item.dataKey = isx
+              ? [
+                  { value: "DATA", label: "DATA" },
+                  { value: "STRUCTTYPE", label: "STRUCTTYPE" },
+                  { value: "IMMEDIATE", label: "IMMEDIATE" }
+                ]
+              : [
+                  { value: "STRUCTTYPE", label: "STRUCTTYPE" },
+                  { value: "IMMEDIATE", label: "IMMEDIATE" }
+                ];
           }
         });
       });

@@ -275,3 +275,11 @@ export function deleteProcedureById(procedureId) {
     url: "/pro/manager/deleteProcedureById/" + procedureId
   })
 }
+
+export function deleteSelectFile(filePath) {
+  return request({
+    method: "post",
+    url: "/pro/manager/deleteSelectFile",
+    data: filePath
+  })
+}

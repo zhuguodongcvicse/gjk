@@ -25,6 +25,7 @@ public class ProjectTree extends TreeNode {
 	private String filePath;
 	private String processId;
 	private String icon;
+	private String isDirectory;
 
 	public ProjectTree() {
 	}
@@ -60,6 +61,7 @@ public class ProjectTree extends TreeNode {
 		this.bspId = vo.getBspId();
 		this.fileName = vo.getFileName();
 		this.filePath = vo.getFilePath();
+		this.isDirectory = vo.getIsDirectory();
 	}
 
 }

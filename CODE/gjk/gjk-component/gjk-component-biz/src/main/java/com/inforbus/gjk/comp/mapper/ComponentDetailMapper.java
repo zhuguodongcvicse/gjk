@@ -59,6 +59,15 @@ public interface ComponentDetailMapper extends BaseMapper<ComponentDetail> {
 	 * @return 
 	 */
 	ComponentDetail getCompXMl(@Param("compId") String compId);
+	/**
+	 * @Title: getCompXMl
+	 * @Description:  获取对应构件的XML
+	 * @Author xiaohe
+	 * @DateTime 2019年5月5日 下午4:30:00
+	 * @param compId 构件编号
+	 * @return 
+	 */
+	ComponentDetail getCommCompXMl(@Param("compId") String compId);
 	
 	/**
 	 * @Title: saveCompDetail

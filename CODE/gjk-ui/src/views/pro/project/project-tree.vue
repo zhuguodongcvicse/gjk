@@ -215,7 +215,8 @@ import {
   updatePartSoftwareAndPlatform,
   showPartSoftwareAndPlatform,
   getPlatformList,
-  deleteProcedureById
+  deleteProcedureById,
+  deleteSelectFile
 } from "@/api/pro/manager";
 import { addObj as saveApp, getAppByProcessId } from "@/api/pro/app";
 import { getSoftwareTree } from "@/api/libs/software";
@@ -248,6 +249,7 @@ export default {
       }
     };
     return {
+      appComponentId: "",
       filePathName: "",
       platformDataList: [],
       platformNameTs: "",
@@ -263,7 +265,7 @@ export default {
       addProcedureDialogVisible: false,
       procedureNameList: [],
       form: {
-        procedureName: "",
+        procedureName: ""
       },
 
       deleteProcedureDialogVisible: false,
@@ -325,7 +327,7 @@ export default {
           this.$delete(this.compSelectArray, index);
         }
       }
-      console.log("compSelectArray:", this.compSelectArray);
+      // console.log("compSelectArray:", this.compSelectArray);
     }
   },
   computed: {
@@ -373,19 +375,32 @@ export default {
       // console.log("permissions", this.permissions);
       fetchProList(this.userInfo.userId)
         .then(response => {
-          this.projects = response.data.data;
-          this.temp_currProject = response.data.data[0];
+          // console.log("response.data.data ", response.data.data);
+          if (this.$store.state.projectTreeShow.projectTreeShow.length != 0) {
+            this.projects = this.$store.state.projectTreeShow.projectTreeShow;
+            // console.log("this.projects",this.projects)
+            for (const i in this.projects) {
+              if (this.projects[i].showFlag == 0) {
+                this.temp_currProject = this.projects[i];
+              }
+            }
+          } else {
+            this.projects = response.data.data;
+            this.temp_currProject = response.data.data[0];
+          }
+          this.getTreeData(this.temp_currProject.id);
+          // console.log("this.temp_currProject",this.temp_currProject)
           /* 查询项目树 */
-          if (JSON.stringify(this.tmpProject) !== "{}") {
+          /* if (JSON.stringify(this.tmpProject) !== "{}") {
             this.getTreeData(this.tmpProject.id);
             this.temp_currProject = this.tmpProject;
           } else {
             this.getTreeData(this.temp_currProject.id);
             this.temp_currProject = response.data.data[0];
-          }
+          } */
         })
         .catch(err => {
-          console.log("err: ", err);
+          // console.log("err: ", err);
         });
     },
     changeHeight() {
@@ -483,15 +498,48 @@ export default {
     },
     //查询树
     getTreeData(proId) {
+      // console.log("proId",proId)
       fetchProTree(proId).then(async response => {
         this.treeData = response.data.data;
         // this.$router.push({ path: "/comp/manager/dispose",query:{processName: this.treeData[0].children[0].name} });
-        // console.log(this.treeData);
+        this.addIsComplie(this.treeData);
+        console.log("treeData", this.treeData);
+
         // console.log("this.liucheng::",this.treeData[0].children[0].name);
       });
     },
+    addIsComplie(treeData) {
+      for (let node of treeData) {
+        if (node.label == "App组件工程") {
+          Vue.set(node, "isComplie", true);
+          this.appComponentId = node.id;
+        } else if (node.parentId == this.appComponentId) {
+          if (node.label == "bsp" || node.label == "Image") {
+            Vue.set(node, "isComplie", false);
+          } else {
+            Vue.set(node, "isComplie", true);
+          }
+        } else {
+          Vue.set(node, "isComplie", false);
+        }
+        if (node.children != null && node.children.length > 0) {
+          this.addIsComplie(node.children);
+        }
+      }
+    },
     changeProjectCommand(project) {
-      // console.log(project);
+      // console.log("project", project);
+      // console.log("this.projects", this.projects);
+      if (project && project.id) {
+        for (const i in this.projects) {
+          this.projects[i].showFlag = 1;
+          if (this.projects[i].id == project.id) {
+            this.projects[i].showFlag = 0;
+          }
+        }
+      }
+      this.$store.dispatch("setProjectTreeShow", this.projects);
+      // console.log("this.projects", this.projects);
       // this.showProjects = false
       this.temp_currProject = project;
       this.$store.dispatch("setTmpProject", project);
@@ -504,7 +552,7 @@ export default {
     nodeContextmenuClick(item) {
       // this.loading=true;
       if (item == "集成代码生成") {
-        console.log("userInfouserInfouserInfo", this.userInfo.name);
+        // console.log("userInfouserInfouserInfo", this.userInfo.name);
         codeGeneration(this.procedureId, this.userInfo.name).then(res => {});
         const loading = this.$loading({
           lock: true,
@@ -521,10 +569,10 @@ export default {
         //得到平台大类
         getPlatformList().then(Response => {
           this.platformDataList = Response.data.data;
-          console.log("平台大类：", this.platformDataList);
+          // console.log("平台大类：", this.platformDataList);
         });
         getSoftwareSelect().then(Response => {
-          console.log("软件框架库下拉列表：", Response.data.data);
+          // console.log("软件框架库下拉列表：", Response.data.data);
           let datas = Response.data.data;
           let softwareTreeDataList = [];
           for (var i = 0; i < datas.length; i++) {
@@ -533,7 +581,7 @@ export default {
             }
           }
           this.softwareTreeData = softwareTreeDataList;
-          console.log("this.procedureId" + this.procedureId);
+          // console.log("this.procedureId" + this.procedureId);
           this.softwareSelectString = [];
           showPartSoftwareAndPlatform(this.procedureId).then(Response => {
             for (var k = 0; k < Response.data.data.length; k++) {
@@ -579,205 +627,246 @@ export default {
           });
         });
 
-        $(".rightmenu").hide();
-      } else if (item == "添加流程") {
-        this.addProcedureDialogVisible = true;
-      } else if (item == "申请构件") {
-        this.addProCompDialogVisible = true;
-      } else if (item == "删除流程") {
-        this.deleteProcedureDialogVisible = true;
-      }
-    },
-    //修改软件框架值改变
-    selectSoftwareClk(val) {
-      var valNameArr = [];
-      for (var j = 0; j < val.length; j++) {
-        for (var i = 0; i < this.softwareTreeData.length; i++) {
-          if (this.softwareTreeData[i].id == val[j]) {
-            valNameArr.push(this.softwareTreeData[i].description);
-          }
-        }
-      }
-      //至少选中一个
-      if (val.length > 1) {
-        console.log("当前选中的值", val);
-        //遍历下拉框得到平台名称
-        var lastPlatformName = "";
-        for (var i = 0; i < this.softwareTreeData.length; i++) {
-          if (this.softwareTreeData[i].id == val[val.length - 1]) {
-            lastPlatformName = this.softwareTreeData[i].description;
-          }
-        }
-        console.log("最后选中的平台大类：", lastPlatformName);
-        console.log("选中的平台大类名称：", valNameArr);
-        //根据分号拆分平台类
-        lastPlatformName = lastPlatformName.substring(
-          0,
-          lastPlatformName.length - 1
-        );
-        var platformNameArr = lastPlatformName.split(";");
-        console.log("拆分后的平台类名：", platformNameArr);
-        for (var k = 0; k < platformNameArr.length; k++) {
-          for (var m = 0; m < val.length - 1; m++) {
-            if (valNameArr[m].indexOf(platformNameArr[k]) != -1) {
-              console.log("进入删除数组元素：" + m);
-              val.splice(m, 1);
-              valNameArr.splice(m, 1);
-            }
-          }
-        }
-      }
-      this.softwareSelectNameString = valNameArr;
-      this.checkoutPlatform();
-    },
-    checkoutPlatform() {
-      var disabledPlatformName = "";
-      for (var i = 0; i < this.platformDataList.length; i++) {
-        //是否选中标志
-        let vFlag = true;
-        for (var j = 0; j < this.softwareSelectString.length; j++) {
-          if (
-            this.softwareSelectNameString[j].indexOf(
-              this.platformDataList[i].name
-            ) != -1
-          ) {
-            vFlag = false;
-          }
-        }
-        if (vFlag) {
-          disabledPlatformName += this.platformDataList[i].name + ",";
-        }
-      }
-      this.platformFlag = false;
-      if (disabledPlatformName != "") {
-        this.platformFlag = true;
-        this.platformNameTs = disabledPlatformName;
-      }
-    },
-    dialogBeforeClose(done) {
-      done();
-    },
-    closeAddProcedureDialog() {
-      this.addProcedureDialogVisible = false;
-    },
-    closeAddProCompDialog() {
-      this.addProCompDialogVisible = false;
-    },
-    closeSoftwareDialog() {
-      this.softwareDialogVisible = false;
-    },
-    closeSelectAppImageDialog() {
-      this.selectPhotoDialogVisible = false;
-      this.$refs.appImage.clearFiles();
-      this.imageUrl = "";
-    },
-    closeBspDialog() {
-      this.bspDialogVisible = false;
-    },
-    addProcedure() {
-      saveProProcess(
-        this.temp_currProject.id,
-        this.form.procedureName
-      ).then(response => {
-        this.closeAddProcedureDialog();
-        this.reload();
-      });
-    },
-    deleteProcedure() {
-      deleteProcedureById(this.procedureId).then(Response => {
-        this.deleteProcedureDialogVisible = false;
-        if (Response.data.data) {
-          this.$message({
-            message: "此流程删除成功",
-            type: "success"
-          });
-        } else {
-          this.$message.error("此流程删除失败。");
-        }
-        this.reload();
-      });
-    },
-    addProComp() {
-      saveProCompList(this.temp_currProject.id, this.compSelectArray).then(
-        response => {
-          let approval = {};
-          approval.userId = this.userInfo.userId;
-          approval.applyId = this.temp_currProject.id;
-          approval.applyType = "2";
-          approval.libraryType = "7";
-          if (this.applyUser != "") {
-            approval.applyUserId = this.applyUser;
-          }
-          approval.approvalState = "0";
-          //提交记录到审批管理库
-          saveApproval(approval).then(Response => {
-            saveApprovalApply(Response.data.data.id, this.compSelectArray);
-            this.closeAddProCompDialog();
-            this.$message({
-              message: "申请成功，请等候审批。",
-              type: "success"
-            });
-          });
-        }
-      );
-    },
-    changeProcedureSoftwareId() {
-      if (this.softwareSelectString.length == 0) {
-        this.$message({
-          message: "请至少选择一个软件框架",
-          type: "error"
-        });
-        return;
-      }
-      console.log("修改软件构件库保存：", this.softwareSelectString);
-      let prodetail = {};
-      prodetail.id = this.procedureId;
-      prodetail.description = this.softwareSelectString.join(";");
-      updatePartSoftwareAndPlatform(prodetail).then(response => {
-        if (response.data.data) {
-          this.$message({
-            message: "修改成功",
-            type: "success"
-          });
-        } else {
-          this.$message.error("修改失败");
-        }
-      });
-      this.closeSoftwareDialog();
-      this.reload();
-    },
-    changeProcedureBspId() {
-      let prodetail = {};
-      prodetail.id = this.procedureId;
-      prodetail.bspId = this.bspSelectString;
-      updateProcedureDetail(prodetail).then(response => {
-        if (response.data.data) {
-          this.$message({
-            message: "修改成功",
-            type: "success"
-          });
-        } else {
-          this.$message.error("修改失败");
-        }
-      });
-      this.closeBspDialog();
-      this.reload();
-    },
-    nodeContextmenu(event, data) {
-      // this.handleNodeClick(data)
-      console.log("ddddddddd", data);
-      // if (data.parentType == "9") {
-      if (data.type == "9") {
-        this.menus = [
-          "集成代码生成",
-          "修改软件框架",
-          "修改BSP",
-          "APP组件工程生成",
-          "删除流程"
-        ];
-        this.procedureId = data.id;
-        this.softwareSelectString = data.softwareId;
-        this.bspSelectString = data.bspId;
+                    $(".rightmenu").hide();
+                } else if (item == "添加流程") {
+                    this.addProcedureDialogVisible = true;
+                } else if (item == "申请构件") {
+                    this.addProCompDialogVisible = true;
+                } else if (item == "删除流程") {
+                    this.deleteProcedureDialogVisible = true;
+                } else if (item == "删除") {
+                    let filePath = {filePath: ""};
+                    filePath.filePath =
+                        this.fileData.filePath + "\\" + this.fileData.fileName;
+                    // console.log("this.fileData", this.fileData);
+                    // console.log("this.treeData", this.treeData[0]);
+
+                    // var filePathTemp = {filePathTemp: 'D:/14S_GJK_GIT/gjk/gjk/project/project11/Flow1流程/模型/222'};
+                    // console.log("filePath", filePath);
+                    // console.log("filePathTemp", filePathTemp)
+                    deleteSelectFile(filePath).then(response => {
+                        // console.log("response", response);
+                        if (response.data == true) {
+                            let flowFile = this.treeData[0].children;
+                            let appList;
+                            for (const i in flowFile) {
+                                if (flowFile[i].id == this.fileData.processId) {
+                                    appList = flowFile[i].children[1].children;
+                                }
+                            }
+                            var targetNode;
+                            for (const i in appList) {
+                                if (appList[i].id == this.fileData.id) {
+                                    appList.splice(i, 1);
+                                    return;
+                                } else {
+                                    targetNode = this.findTargetNode(appList[i], this.fileData);
+                                }
+                            }
+                            // console.log("targetNode", targetNode);
+                        }
+                    });
+                }
+            },
+            findTargetNode(currentNodeObj, targetNodeObj) {
+                for (const i in currentNodeObj.children) {
+                    if (currentNodeObj.children[i].id == targetNodeObj.id) {
+                        currentNodeObj.children.splice(i, 1);
+                        return currentNodeObj;
+                    } else {
+                        this.findTargetNode(currentNodeObj.children[i], targetNodeObj);
+                    }
+                }
+            },
+            //修改软件框架值改变
+            selectSoftwareClk(val) {
+                var valNameArr = [];
+                for (var j = 0; j < val.length; j++) {
+                    for (var i = 0; i < this.softwareTreeData.length; i++) {
+                        if (this.softwareTreeData[i].id == val[j]) {
+                            valNameArr.push(this.softwareTreeData[i].description);
+                        }
+                    }
+                }
+                //至少选中一个
+                if (val.length > 1) {
+                    // console.log("当前选中的值", val);
+                    //遍历下拉框得到平台名称
+                    var lastPlatformName = "";
+                    for (var i = 0; i < this.softwareTreeData.length; i++) {
+                        if (this.softwareTreeData[i].id == val[val.length - 1]) {
+                            lastPlatformName = this.softwareTreeData[i].description;
+                        }
+                    }
+                    // console.log("最后选中的平台大类：", lastPlatformName);
+                    // console.log("选中的平台大类名称：", valNameArr);
+                    //根据分号拆分平台类
+                    lastPlatformName = lastPlatformName.substring(
+                        0,
+                        lastPlatformName.length - 1
+                    );
+                    var platformNameArr = lastPlatformName.split(";");
+                    // console.log("拆分后的平台类名：", platformNameArr);
+                    for (var k = 0; k < platformNameArr.length; k++) {
+                        for (var m = 0; m < val.length - 1; m++) {
+                            if (valNameArr[m].indexOf(platformNameArr[k]) != -1) {
+                                // console.log("进入删除数组元素：" + m);
+                                val.splice(m, 1);
+                                valNameArr.splice(m, 1);
+                            }
+                        }
+                    }
+                }
+                this.softwareSelectNameString = valNameArr;
+                this.checkoutPlatform();
+            },
+            checkoutPlatform() {
+                var disabledPlatformName = "";
+                for (var i = 0; i < this.platformDataList.length; i++) {
+                    //是否选中标志
+                    let vFlag = true;
+                    for (var j = 0; j < this.softwareSelectString.length; j++) {
+                        if (
+                            this.softwareSelectNameString[j].indexOf(
+                                this.platformDataList[i].name
+                            ) != -1
+                        ) {
+                            vFlag = false;
+                        }
+                    }
+                    if (vFlag) {
+                        disabledPlatformName += this.platformDataList[i].name + ",";
+                    }
+                }
+                this.platformFlag = false;
+                if (disabledPlatformName != "") {
+                    this.platformFlag = true;
+                    this.platformNameTs = disabledPlatformName;
+                }
+            },
+            dialogBeforeClose(done) {
+                done();
+            },
+            closeAddProcedureDialog() {
+                this.addProcedureDialogVisible = false;
+            },
+            closeAddProCompDialog() {
+                this.addProCompDialogVisible = false;
+            },
+            closeSoftwareDialog() {
+                this.softwareDialogVisible = false;
+            },
+            closeSelectAppImageDialog() {
+                this.selectPhotoDialogVisible = false;
+                this.$refs.appImage.clearFiles();
+                this.imageUrl = "";
+            },
+            closeBspDialog() {
+                this.bspDialogVisible = false;
+            },
+            addProcedure() {
+                saveProProcess(this.temp_currProject.id, this.form.procedureName).then(
+                    response => {
+                        this.closeAddProcedureDialog();
+                        this.reload();
+                    }
+                );
+            },
+            deleteProcedure() {
+                deleteProcedureById(this.procedureId).then(Response => {
+                    this.deleteProcedureDialogVisible = false;
+                    if (Response.data.data) {
+                        this.$message({
+                            message: "此流程删除成功",
+                            type: "success"
+                        });
+                    } else {
+                        this.$message.error("此流程删除失败。");
+                    }
+                    this.reload();
+                });
+            },
+            addProComp() {
+                saveProCompList(this.temp_currProject.id, this.compSelectArray).then(
+                    response => {
+                        let approval = {};
+                        approval.userId = this.userInfo.userId;
+                        approval.applyId = this.temp_currProject.id;
+                        approval.applyType = "2";
+                        approval.libraryType = "7";
+                        if (this.applyUser != "") {
+                            approval.applyUserId = this.applyUser;
+                        }
+                        approval.approvalState = "0";
+                        //提交记录到审批管理库
+                        saveApproval(approval).then(Response => {
+                            saveApprovalApply(Response.data.data.id, this.compSelectArray);
+                            this.closeAddProCompDialog();
+                            this.$message({
+                                message: "申请成功，请等候审批。",
+                                type: "success"
+                            });
+                        });
+                    }
+                );
+            },
+            changeProcedureSoftwareId() {
+                if (this.softwareSelectString.length == 0) {
+                    this.$message({
+                        message: "请至少选择一个软件框架",
+                        type: "error"
+                    });
+                    return;
+                }
+                // console.log("修改软件构件库保存：", this.softwareSelectString);
+                let prodetail = {};
+                prodetail.id = this.procedureId;
+                prodetail.description = this.softwareSelectString.join(";");
+                updatePartSoftwareAndPlatform(prodetail).then(response => {
+                    if (response.data.data) {
+                        this.$message({
+                            message: "修改成功",
+                            type: "success"
+                        });
+                    } else {
+                        this.$message.error("修改失败");
+                    }
+                });
+                this.closeSoftwareDialog();
+                this.reload();
+            },
+            changeProcedureBspId() {
+                let prodetail = {};
+                prodetail.id = this.procedureId;
+                prodetail.bspId = this.bspSelectString;
+                updateProcedureDetail(prodetail).then(response => {
+                    if (response.data.data) {
+                        this.$message({
+                            message: "修改成功",
+                            type: "success"
+                        });
+                    } else {
+                        this.$message.error("修改失败");
+                    }
+                });
+                this.closeBspDialog();
+                this.reload();
+            },
+            nodeContextmenu(event, data) {
+                // this.handleNodeClick(data)
+                // console.log("ddddddddd", data);
+                // if (data.parentType == "9") {
+                if (data.type == "9") {
+                    this.menus = [
+                        "集成代码生成",
+                        "修改软件框架",
+                        "修改BSP",
+                        "APP组件工程生成",
+                        "删除流程"
+                    ];
+                    this.procedureId = data.id;
+                    this.softwareSelectString = data.softwareId;
+                    this.bspSelectString = data.bspId;
 
         let modelList = data.children[0].children;
         for (let item of modelList) {
@@ -785,7 +874,7 @@ export default {
             this.procedureModelId = item.id;
           }
         }
-      } else if (data.type == "app") {
+      } else if (data.type == "app" && data.isComplie) {
         this.procedureId = data.processId;
         this.menus = ["编译"];
         this.fileData = data;

@@ -61,6 +61,7 @@
                 plain
                 @click="handleDel(scope.row,scope.index)"
               >删除</el-button>
+              <!-- v-show="scope.row.applyState=='1'?false:scope.row.applyState=='2'?false:true" -->
             </el-tooltip>
             <el-tooltip class="item" effect="dark" content="入库" placement="top">
               <el-button
@@ -200,7 +201,8 @@ export default {
       this.importCompFileList.push(param.file);
     },
     beforeAvatarUpload(file) {
-      const isZIP = file.type === "application/x-zip-compressed";
+      const isZIP =
+        file.type === "application/x-zip-compressed" || "application/zip";
       if (!isZIP) {
         this.$message.error(
           "上传文件格式只能是压缩文件，请传入构件库导出的压缩文件。"

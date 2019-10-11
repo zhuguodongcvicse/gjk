@@ -138,14 +138,20 @@
       <!-- Tabs标签页左向 -->
       <el-tabs>
         <el-tab-pane label="网络配置">
-          <span class="font14">网络输入</span>
-          <el-table :data="cmpForm.networkInData" border>
+          <span class="font14" v-if="cmpForm.networkInData!=null">网络输入</span>
+          <el-table :data="cmpForm.networkInData" border v-if="cmpForm.networkInData!=null">
+            <!-- <template v-for="(col) in networkColumnArray">
+              <el-table-column :prop="col.prop" :label="col.label" :key="col.prop" fixed></el-table-column>
+            </template>-->
             <el-table-column label="网络传输协议" prop="protocol" fixed />
             <el-table-column label="IP地址" prop="ip" fixed />
             <el-table-column label="端口号" prop="port" fixed />
           </el-table>
-          <span class="font14">网络输出</span>
-          <el-table :data="cmpForm.networkOutData" border>
+          <span class="font14" v-if="cmpForm.networkOutData!=null">网络输出</span>
+          <el-table :data="cmpForm.networkOutData" border v-if="cmpForm.networkOutData!=null">
+            <!-- <template v-for="(col) in networkColumnArray">
+              <el-table-column :prop="col.prop" :label="col.label" :key="col.prop" fixed></el-table-column>
+            </template>-->
             <el-table-column label="网络传输协议" prop="protocol" fixed />
             <el-table-column label="IP地址" prop="ip" fixed />
             <el-table-column label="端口号" prop="port" fixed />
@@ -155,18 +161,21 @@
           <el-row>
             <el-col :span="6">
               <el-tree
-                :data="attributeListData"
+                :data="cmpForm.attributeListData"
                 :props="defaultProps"
                 @node-click="handleNodeClick"
               />
             </el-col>
             <el-col :span="18">
               <span class="font14">配置信息</span>
-              <el-table :data="cmpForm.attributeTableData" border>
-                <el-table-column label="协议" prop="protocol" fixed />
+              <el-table :data="attributeTableData" border>
+                <template v-for="(col) in attrColumnArray">
+                  <el-table-column :prop="col.prop" :label="col.label" :key="col.prop" fixed></el-table-column>
+                </template>
+                <!-- <el-table-column label="协议" prop="protocol" fixed />
                 <el-table-column label="cellNum" prop="cellNum" fixed />
                 <el-table-column label="名称" prop="name" fixed />
-                <el-table-column label="cellSize" prop="cellSize" fixed />
+                <el-table-column label="cellSize" prop="cellSize" fixed />-->
               </el-table>
             </el-col>
           </el-row>
@@ -175,82 +184,22 @@
     </el-form>
   </div>
 </template>
-  
+
 <script>
 import { mapGetters } from "vuex";
-import { constants } from "crypto";
 export default {
   props: ["type"],
   data() {
     //这里存放数据
     return {
       clientHeight: "", //20190827  获取屏幕高度
-      cpuXmlEntityMap: {
-        lableName: "node",
-        attributeMap: {},
-        xmlEntityMaps: [
-          {
-            lableName: "cmpDeploy",
-            xmlEntityMaps: []
-          }
-        ]
-      },
-      cmpXmlEntityMap: {
-        lableName: "cmp",
-        attributeMap: {},
-        xmlEntityMaps: [
-          {
-            lableName: "coreDeploy",
-            xmlEntityMaps: [
-              {
-                lableName: "CMM_Read",
-                attributeMap: {}
-              },
-              {
-                lableName: "CMM_Write",
-                attributeMap: {}
-              },
-              {
-                lableName: "CMM_Compute",
-                attributeMap: {}
-              }
-            ]
-          },
-          {
-            lableName: "tmpBuf",
-            attributeMap: {}
-          },
-          {
-            lableName: "moniBuf",
-            attributeMap: {}
-          },
-          {
-            lableName: "shmConfig",
-            xmlEntityMaps: [
-              {
-                lableName: "Shm",
-                attributeMap: {}
-              }
-            ]
-          },
-          {
-            lableName: "network_in",
-            xmlEntityMaps: []
-          },
-          {
-            lableName: "network_out",
-            xmlEntityMaps: []
-          }
-        ]
-      },
+
       cpuForm: {
         nodeID: "",
         osCoreIDs: "",
         ipConfig: "",
         osCoreSum: ""
       },
-      osCoreID: "",
-      CMMCoreID: "",
       cmpForm: {
         cmpId: "",
         funcName: "",
@@ -268,48 +217,25 @@ export default {
         shm_index: "0",
         networkInData: [],
         networkOutData: [],
-        attributeTableData: []
+        attributeListData: []
       },
-      CordIDs: [
-        {
-          key: "1",
-          value: "001"
-        },
-        {
-          key: "2",
-          value: "002"
-        },
-        {
-          key: "3",
-          value: "003"
-        },
-        {
-          key: "4",
-          value: "004"
-        }
-      ],
-      attributeListData: [
-        // {
-        //   label: "属性列表1",
-        //   data: [{
-        //       protocol: "1",
-        //       cellNum: "38000",
-        //       name: "API Return",
-        //       cellSize: "8192"
-        //     }]
-        // }
-      ],
+
+      CordIDs: [],
+      attributeTableData: [],
+
+      attrColumnArray: [],
+      networkColumnArray: [],
       defaultProps: {
         label: "label"
       },
+
       typeLabel: ""
     };
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["elements", "permissions", "userInfo", "isCollapse"])
+    ...mapGetters(["userInfo"])
   },
-
   //20190827  控制高度
   mounted() {
     // 获取浏览器可视区域高度
@@ -323,210 +249,27 @@ export default {
   //监控data中的数据变化
   watch: {
     typeLabel: function() {
-      // console.log("111111111111111111111111", this.type);
+      const tmpType = JSON.parse(JSON.stringify(this.type));
       this.CordIDs = [];
-      let num = null;
+      if (this.type.coreNum != undefined && this.type.coreNum != null) {
+        let num = new Number(this.type.coreNum);
+        for (let i = 0; i < num; i++) {
+          let item = { key: i, value: i + "" };
+          this.CordIDs.push(item);
+        }
+      }
       if (this.type.sign == "cpu") {
-        if (this.type.chipData != undefined && this.type.chipData != null) {
-          num = new Number(this.type.chipData.coreNum);
-        }
-
-        if (this.type.data != null) {
-          Object.assign(this.cpuForm, this.$options.data().cpuForm);
-          this.cpuForm = this.type.data.formData;
-        } else {
-          Object.assign(this.cpuForm, this.$options.data().cpuForm);
-        }
-
-        if (this.type.chipData != undefined && this.type.chipData != null) {
-          this.cpuForm.nodeID = this.type.chipData.nodeID;
-          this.cpuForm.ipConfig = this.type.chipData.IP;
-        }
+        this.cpuForm = this.type.data;
       } else if (this.type.sign == "cmp") {
-        if (this.type.coreNum != undefined && this.type.coreNum != null) {
-          num = new Number(this.type.coreNum);
-        }
-
-        if (this.type.data != null) {
-          Object.assign(this.cmpForm, this.$options.data().cmpForm);
-          this.cmpForm = this.type.data.formData;
-          this.attributeListData = this.type.attributeListData;
-        } else {
-          Object.assign(this.cmpForm, this.$options.data().cmpForm);
-        }
-      }
-
-      for (let i = 0; i < num; i++) {
-        let item = { key: i, value: i + "" };
-        this.CordIDs.push(item);
-      }
-
-      //获取APIReturn给页面赋值
-      if (this.type.apiReturn != undefined || this.type.apiReturn != null) {
-        if (this.type.sign == "cmp") {
-          this.cmpForm.cmpName = this.type.apiReturn[0];
-          this.cmpForm.funcName = this.type.apiReturn[1];
-          this.cmpForm.cmpId = this.type.apiReturn[2];
-          this.attributeListData = [];
-          for (let item of this.type.apiReturn) {
-            if (item.msg != undefined) {
-              if (item.msg == "network_in") {
-                this.cmpForm.networkInData = item.data;
-              }
-              if (item.msg == "network_out") {
-                this.cmpForm.networkOutData = item.data;
-              }
-              if (item.msg.indexOf("属性") >= 0) {
-                let attr = {};
-                attr.label = item.msg;
-                attr.data = item.data;
-                this.attributeListData.push(attr);
-              }
-            }
-          }
-        }
+        this.cmpForm = this.type.data;
       }
     },
     type: {
       handler: function() {
         this.typeLabel = this.type.label;
+        // console.log("111111111111111111", this.type);
       },
       immediate: true
-    },
-    cpuForm: {
-      handler: function() {
-        Object.assign(
-          this.cpuXmlEntityMap,
-          this.$options.data().cpuXmlEntityMap
-        );
-        this.cordIdArrayToCodeId();
-        //赋值到xmlEntityMap中
-        this.$set(this.cpuXmlEntityMap.attributeMap, "id", this.cpuForm.nodeID);
-        this.$set(
-          this.cpuXmlEntityMap.attributeMap,
-          "osCoreSum",
-          this.cpuForm.osCoreIDs.length + ""
-        );
-        this.$set(
-          this.cpuXmlEntityMap.attributeMap,
-          "ipConfig",
-          this.cpuForm.ipConfig
-        );
-        this.$set(this.cpuXmlEntityMap.attributeMap, "osCoreID", this.osCoreID);
-        this.type.data = {
-          xmlEntityMaps: JSON.parse(JSON.stringify(this.cpuXmlEntityMap)),
-          formData: JSON.parse(JSON.stringify(this.cpuForm))
-        };
-      },
-      deep: true
-    },
-    cmpForm: {
-      handler: function() {
-        Object.assign(
-          this.cmpXmlEntityMap,
-          this.$options.data().cmpXmlEntityMap
-        );
-        //储存cmp标签的属性信息
-        this.$set(this.cmpXmlEntityMap.attributeMap, "id", this.cmpForm.cmpId);
-        this.$set(
-          this.cmpXmlEntityMap.attributeMap,
-          "cmpName",
-          this.cmpForm.cmpName
-        );
-        this.$set(
-          this.cmpXmlEntityMap.attributeMap,
-          "funcName",
-          this.cmpForm.funcName
-        );
-        //储存CMM_Read标签的属性信息
-        this.$set(
-          this.cmpXmlEntityMap.xmlEntityMaps[0].xmlEntityMaps[0].attributeMap,
-          "coreSum",
-          this.cmpForm.CMM_Read_coreID.length + ""
-        );
-        this.cmmCordIdArrayToCodeId(this.cmpForm.CMM_Read_coreID);
-        this.$set(
-          this.cmpXmlEntityMap.xmlEntityMaps[0].xmlEntityMaps[0].attributeMap,
-          "coreID",
-          this.CMMCoreID
-        );
-        //储存CMM_Write标签的属性信息
-        this.$set(
-          this.cmpXmlEntityMap.xmlEntityMaps[0].xmlEntityMaps[1].attributeMap,
-          "coreSum",
-          this.cmpForm.CMM_Write_coreID.length + ""
-        );
-        this.cmmCordIdArrayToCodeId(this.cmpForm.CMM_Write_coreID);
-        this.$set(
-          this.cmpXmlEntityMap.xmlEntityMaps[0].xmlEntityMaps[1].attributeMap,
-          "coreID",
-          this.CMMCoreID
-        );
-        //储存CMM_Compute标签的属性信息
-        this.$set(
-          this.cmpXmlEntityMap.xmlEntityMaps[0].xmlEntityMaps[2].attributeMap,
-          "coreSum",
-          this.cmpForm.CMM_Compute_coreID.length + ""
-        );
-        this.cmmCordIdArrayToCodeId(this.cmpForm.CMM_Compute_coreID);
-        this.$set(
-          this.cmpXmlEntityMap.xmlEntityMaps[0].xmlEntityMaps[2].attributeMap,
-          "coreID",
-          this.CMMCoreID
-        );
-        //储存tmpBuf标签的属性信息
-        this.$set(
-          this.cmpXmlEntityMap.xmlEntityMaps[1].attributeMap,
-          "baseAddr",
-          this.cmpForm.tmpBuf_baseAddr
-        );
-        this.$set(
-          this.cmpXmlEntityMap.xmlEntityMaps[1].attributeMap,
-          "size",
-          this.cmpForm.tmpBuf_size
-        );
-        //储存moniBuf标签的属性信息
-        this.$set(
-          this.cmpXmlEntityMap.xmlEntityMaps[2].attributeMap,
-          "baseAddr",
-          this.cmpForm.moniBuf_baseAddr
-        );
-        this.$set(
-          this.cmpXmlEntityMap.xmlEntityMaps[2].attributeMap,
-          "size",
-          this.cmpForm.moniBuf_size
-        );
-        //储存Shm标签的属性信息
-        this.$set(
-          this.cmpXmlEntityMap.xmlEntityMaps[3].xmlEntityMaps[0].attributeMap,
-          "size",
-          this.cmpForm.shm_size
-        );
-        this.$set(
-          this.cmpXmlEntityMap.xmlEntityMaps[3].xmlEntityMaps[0].attributeMap,
-          "varname",
-          this.cmpForm.shm_varname
-        );
-        this.$set(
-          this.cmpXmlEntityMap.xmlEntityMaps[3].xmlEntityMaps[0].attributeMap,
-          "ShmId",
-          this.cmpForm.shm_ShmId
-        );
-        this.$set(
-          this.cmpXmlEntityMap.xmlEntityMaps[3].xmlEntityMaps[0].attributeMap,
-          "index",
-          this.cmpForm.shm_index
-        );
-        // 存network_in/out对应的标签;
-        this.networkConFig();
-        // 存属性列表对应的标签;
-        this.attributeListDateConfig();
-        this.type.data = {
-          xmlEntityMaps: JSON.parse(JSON.stringify(this.cmpXmlEntityMap)),
-          formData: JSON.parse(JSON.stringify(this.cmpForm))
-        };
-      },
-      deep: true
     },
 
     //20190827  如果 `clientHeight` 发生改变，这个函数就会运行
@@ -537,64 +280,8 @@ export default {
   //方法集合
   methods: {
     handleNodeClick(attributeListData) {
-      this.cmpForm.attributeTableData = attributeListData.data;
-    },
-    cordIdArrayToCodeId() {
-      this.osCoreID = "";
-      for (let i of this.cpuForm.osCoreIDs) {
-        this.osCoreID += i + "-";
-      }
-      this.osCoreID = this.osCoreID.substr(0, this.osCoreID.length - 1);
-    },
-    cmmCordIdArrayToCodeId(cordArray) {
-      let cordIdStr = "";
-      for (let i of cordArray) {
-        cordIdStr += i + "_";
-      }
-      cordIdStr = cordIdStr.substr(0, cordIdStr.length - 1);
-      this.CMMCoreID = cordIdStr;
-    },
-    networkConFig() {
-      for (let item of this.cmpForm.networkInData) {
-        let attr = {};
-        this.$set(attr, "port", item.port);
-        this.$set(attr, "ip", item.ip);
-        this.$set(attr, "protocol", item.protocol);
-        this.cmpXmlEntityMap.xmlEntityMaps[4].xmlEntityMaps.push({
-          lableName: "netconfig",
-          attributeMap: attr
-        });
-      }
-      for (let item of this.cmpForm.networkOutData) {
-        let attr = {};
-        this.$set(attr, "port", item.port);
-        this.$set(attr, "ip", item.ip);
-        this.$set(attr, "protocol", item.protocol);
-        this.cmpXmlEntityMap.xmlEntityMaps[5].xmlEntityMaps.push({
-          lableName: "netconfig",
-          attributeMap: attr
-        });
-      }
-    },
-    attributeListDateConfig() {
-      if (this.attributeListData != null) {
-        for (let item of this.attributeListData) {
-          let xmlEntityMap = { lableName: "", xmlEntityMaps: [] };
-          xmlEntityMap.lableName = item.label;
-          for (let i of item.data) {
-            let xml = {};
-            this.$set(xml, "protocol", i.protocol);
-            this.$set(xml, "cellNum", i.cellNum);
-            this.$set(xml, "name", i.name);
-            this.$set(xml, "cellSize", i.cellSize);
-            xmlEntityMap.xmlEntityMaps.push({
-              lableName: "属性",
-              attributeMap: xml
-            });
-          }
-          this.cmpXmlEntityMap.xmlEntityMaps.push(xmlEntityMap);
-        }
-      }
+      this.attributeTableData = attributeListData.data;
+      this.attrColumnArray = attributeListData.children.column;
     },
 
     //20190827   动态修改样式

@@ -301,6 +301,13 @@
 		WHERE
 		cd1.id=cd2.paraent_id AND cd1.id=#{imgId}
 	</select>
+	<select id="getCommImgFile"
+		resultType="com.inforbus.gjk.comp.api.entity.ComponentDetail">
+		SELECT cd1.id,cd2.file_name,cd2.file_path FROM
+		gjk_common_component_detail cd1, gjk_common_component_detail cd2
+		WHERE
+		cd1.id=cd2.paraent_id AND cd1.id=#{imgId}
+	</select>
 
 	<select id="queryTable" resultType="map">
 		select table_name tableName,
@@ -328,4 +335,18 @@
 		DELETE FROM `gjk_comp_struct` WHERE
 		`comp_id`=#{compId}
 	</delete>
+	<select id="selectByComms" resultMap="componentMap">
+		SELECT
+		id,
+		comp_id,
+		comp_name,
+		comp_funcname,
+		user_id,
+		version,
+		comp_img,
+		description
+		FROM
+		gjk_common_component WHERE id IN ( SELECT comp_id FROM
+		gjk_project_comp a WHERE a.project_id = #{proId} AND a.can_use = 0)
+	</select>
 </mapper>

@@ -155,18 +155,18 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
             long millis = System.currentTimeMillis();
             String path = "gjk"+ File.separator+"baseTemplate"+File.separator + baseTemplate.getTempName() + String.valueOf(millis) + ".xml";
             File newPath = new File(LOCALPATH + path);//保存的位置,文件名称由模板名称+时间毫秒值组成
-            FileInputStream in = null;
-            FileOutputStream out = null;
+            FileInputStream in = null;//输入流对象
+            FileOutputStream out = null;//输出流对象
             try {
                 in = new FileInputStream(oldPath);
                 out = new FileOutputStream(newPath);
                 int len = 0;
-                byte[] bytes = new byte[1024];
-                while ((len = in.read(bytes)) != -1) {
+                byte[] bytes = new byte[1024];//接收数据的数组
+                while ((len = in.read(bytes)) != -1) {//循环解读写数据,复制文件
                     out.write(bytes, 0, len);
                 }
-                baseTemplate.setTempPath(path);
-                baseMapper.updateById(baseTemplate);
+                baseTemplate.setTempPath(path);//更改新的路径
+                baseMapper.updateById(baseTemplate);//把新的数据更细至数据库
                 return true;
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -175,14 +175,14 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
             } finally {
                 if (in != null) {
                     try {
-                        in.close();
+                        in.close();//关闭输入流
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
                 if(out!=null){
                     try {
-                        out.close();
+                        out.close();//关闭输出流
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

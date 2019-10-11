@@ -184,7 +184,9 @@ export default {
                 });
               }
               handleSaveCompMap(saveComp, "Component", comp.id).then(res => {
-                this.$route.query.compId = comp.id;
+                this.$router.push({
+                  path: "/comp/showComp/index"
+                });
                 this.reload();
                 loading.close();
               });

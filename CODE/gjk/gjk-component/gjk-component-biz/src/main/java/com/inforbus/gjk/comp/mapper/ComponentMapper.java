@@ -151,7 +151,15 @@ public interface ComponentMapper extends BaseMapper<Component> {
 	 * @return
 	 */
 	ComponentDetail getImgFile(@Param("imgId") String imgId);
-
+	/**
+	 * @Title: getImgFile
+	 * @Description: 获取构件图片
+	 * @Author cvics
+	 * @DateTime 2019年5月23日 上午11:34:43
+	 * @param imgId 图片Id
+	 * @return
+	 */
+	ComponentDetail getCommImgFile(@Param("imgId") String imgId);
 	/**
 	 * 查询表列信息
 	 *
@@ -179,4 +187,14 @@ public interface ComponentMapper extends BaseMapper<Component> {
 	 * @param compId 构件Id
 	 */
 	void deleteCompAndStruct( @Param("compId") String compId);
+
+	/**
+	 * @Title: selectByComms
+	 * @Description: 查询项目对应公共构件
+	 * @Author xiaohe
+	 * @DateTime 2019年10月12日 下午5:04:23
+	 * @param proId
+	 * @return 
+	 */
+	List<Component> selectByComms( @Param("proId") String proId);
 }

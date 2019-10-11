@@ -215,9 +215,9 @@ public class AppController {
 		String aa = bb.substring(0,bb.lastIndexOf("/"));
 		aa = aa.substring(0,aa.lastIndexOf("/"));
 		//packinfo文件路径（客户自存自取的路径）
-		String selfSoftToHardResult = gitFilePath + aa + File.separator +  softToHardResult + File.separator + "packinfo.xml";
+		String selfSoftToHardResult = gitFilePath + aa + File.separator + generateCodeResult  + File.separator + "packinfo.xml";
 		//组件划分方案路径（自存自取）
-		String selfGenerateCodeResult = gitFilePath + aa + File.separator +  generateCodeResult + File.separator + "组件划分方案.xml";
+		String selfGenerateCodeResult = gitFilePath + aa + File.separator + softToHardResult   + File.separator + "组件划分方案.xml";
 		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
 		boolean returnVal ;
 		try {
@@ -381,7 +381,7 @@ public class AppController {
 		String aa = bb.substring(0,bb.lastIndexOf("/"));
 		aa = aa.substring(0,aa.lastIndexOf("/"));
 		//packinfo文件路径（客户自存自取的路径）
-		String selfSoftToHardResult = gitFilePath + aa + File.separator +  softToHardResult + File.separator + "packinfo.xml";
+		String selfSoftToHardResult = gitFilePath + aa + File.separator + generateCodeResult  + File.separator + "packinfo.xml";
 		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
 		boolean returnVal ;
 		try {
@@ -413,9 +413,9 @@ public class AppController {
 		String aa = bb.substring(0,bb.lastIndexOf("/"));
 		aa = aa.substring(0,aa.lastIndexOf("/"));
 		//packinfo文件路径（客户自存自取的路径）
-		String selfSoftToHardResult = gitFilePath + aa + File.separator +  softToHardResult + File.separator + "packinfo.xml";
+		String selfSoftToHardResult = gitFilePath + aa + File.separator + generateCodeResult  + File.separator + "packinfo.xml";
 		//组件划分方案路径（自存自取）
-		String selfGenerateCodeResult = gitFilePath + aa + File.separator +  generateCodeResult + File.separator + "组件划分方案.xml";
+		String selfGenerateCodeResult = gitFilePath + aa + File.separator +  softToHardResult + File.separator + "组件划分方案.xml";
 		// 还未给接口，自己模拟的接口  + File.separator +
 		ExternalIOTransUtils.appTaskExport(appDataDTO.getFlowId(), gitFilePath + File.separator + "gjk/APPDownload/" + File.separator + appDataDTO.getTaskInfoPath(),
 				gitFilePath + appDataDTO.getAppProPath(), appDataDTO.getSysconfigPath(), selfSoftToHardResult, selfGenerateCodeResult);

@@ -522,26 +522,30 @@ export default {
       });
     },
     customFileUpload(event) {
-      console.log("el-upload数据", event);
-      this.file = event.file;
-      console.log("文件", this.file);
-      var formData = new FormData();
-      formData.append("file", this.file);
-      console.log(formData);
-      importFile(formData).then(res => {
-        console.log("导入后的数据", res.data.data);
-        res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
-          if (tmp.lableName !== "arrow") {
-            /* 将查询的东西插入到临时 */
-            // this.tempParam.push(tmp);
-            // 使用map将 数据对应上
-            this.tmpMaps.set(tmp.attributeMap.id, tmp);
-          }
-        });
-        this.postMessageData.cmd = "clickCompLoading";
-        this.postMessageData.params = res.data.data.json;
+     if(confirm("是否清空当前画布构件")){
+        this.postMessageData.cmd = "cleanCanvas";
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
-      });
+        console.log("el-upload数据", event);
+        this.file = event.file;
+        console.log("文件", this.file);
+        var formData = new FormData();
+        formData.append("file", this.file);
+        console.log(formData);
+        importFile(formData).then(res => {
+          console.log("导入后的数据", res.data.data);
+          res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
+            if (tmp.lableName !== "arrow") {
+              /* 将查询的东西插入到临时 */
+              // this.tempParam.push(tmp);
+              // 使用map将 数据对应上
+              this.tmpMaps.set(tmp.attributeMap.id, tmp);
+            }
+          });
+          this.postMessageData.cmd = "clickCompLoading";
+          this.postMessageData.params = res.data.data.json;
+          this.$refs.gjkIframe.sendMessage(this.postMessageData);
+        });
+      }
     },
     submit(event) {
       event.preventDefault();

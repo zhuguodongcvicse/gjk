@@ -3,15 +3,33 @@
   <div class="pro_project_textedits_14s">
     <div class="textedits_div1_14s">
     <el-form>
-      <el-form-item label="文件名：">
-        <label>{{fileName}}</label>
-        <!-- <el-input v-model="fileName" placeholder="文件名" style="width: 600px"></el-input> -->
-      </el-form-item>
       <el-form-item>
         <!-- <monaco-editor :textContext="textContext"></monaco-editor> -->
-        <div>
+        <div style="margin:20px 0px 0px 20px">
           <div class="textedits_btn_14s">
-            <el-button type="primary" icon="el-icon-thirdsave" size="mini" @click.native="save">保存</el-button>
+            <el-form :model="editorForm" inline="inline">
+              <el-form-item>
+                <el-button
+                  type="primary"
+                  icon="el-icon-thirdsave"
+                  size="mini"
+                  @click.native="save"
+                >保存</el-button>
+              </el-form-item>
+              <el-form-item label="编码格式：">
+                <el-select
+                  v-model="editorForm.editorData"
+                  placeholder="请选择编码格式(默认UTF-8)"
+                  @change="editorChange"
+                  style="width:300px"
+                >
+                  <el-option label="UTF-8" value="UTF-8"></el-option>
+                  <el-option label="Unicode" value="Unicode"></el-option>
+                  <el-option label="UTF-16BE" value="UTF-16BE"></el-option>
+                  <el-option label="GBK" value="GBK"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-form>
           </div>
           <div class="code-editor-container">
             <!-- 程序文本编辑器 -->
@@ -54,6 +72,9 @@ export default {
   data() {
     //这里存放数据
     return {
+      editorForm: {
+        editorData: ""
+      },
       fileName: "",
       textContext: "",
       threeLibsFilePathDTO: {},
@@ -69,6 +90,8 @@ export default {
     $route: {
       immediate: true,
       handler: function() {
+        //为最新内容时下拉选为空
+        this.editorForm.editorData ="";
         this.fileName = this.$route.query.appFileName;
         this.threeLibsFilePathDTO.filePathName = this.$route.query.filePath;
         readAlgorithmfile(this.threeLibsFilePathDTO).then(response => {
@@ -77,25 +100,23 @@ export default {
       },
       deep: true
     },
-    //  textLog :{
-    //    handler:function(newValue, oldValue){
-    //      //创建新的label
-    //      $("#textedits_lable").append("<button type='button' class='el-button el-button--primary el-button--mini' onclick='project(this)'><i class='el-icon-thirdproject'></i><span>"+this.textLog.split("@%#@*+-+@")[0]+"</span></button>");
-    //      //隐藏所有日志div
-    //      $("#textedits_log").find("div").each(function(){
-    //        $(this).hide();
-    //      });
-    //      //创建新的日志div并展示
-    //      $("#textedits_log").append("<div pid='"+this.textLog.split("@%#@*+-+@")[0]+"' class='el-textarea'><textarea autocomplete='off' rows='10' class='el-textarea__inner' style='min-height: 35px;'>"+this.textLog.split("@%#@*+-+@")[1]+"</textarea></div>");
-    //      //以前的代码
-    //      //this.inputText = this.textLog;
-    //    }
-    // }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {},
   //方法集合
   methods: {
+    //文件编码格式改变时调用后台方法
+    editorChange() {
+      //文件路徑
+      this.threeLibsFilePathDTO.filePathName = this.$route.query.filePath;
+      this.threeLibsFilePathDTO.code = this.editorForm.editorData;
+      console.log(this.threeLibsFilePathDTO);
+      readAlgorithmfile(this.threeLibsFilePathDTO).then(response => {
+        //文件内容
+          this.textContext = response.data.data.textContext.split("@%#@*+-+@")[1];
+      });
+    },
+    //保存修改的文本内容
     save() {
       this.threeLibsFilePathDTO.filePath = this.$route.query.filePath;
       this.threeLibsFilePathDTO.filePathName = this.textContext;
