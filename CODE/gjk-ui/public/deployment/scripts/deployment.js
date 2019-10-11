@@ -893,7 +893,7 @@ function initEditor(editor) {
 			graph.moveElements([element], bounds.x - element.x, bounds.y - element.y)
 		}
 		var dragInfo = {};
-		var startData = null;
+		var startData ;
 		graph.interactionDispatcher.addListener(function (evt) {
 			if (evt.kind === EVENT_CREATE_ELEMENT_BY_JSON) {
 				if (evt.roots.length === 1) {
@@ -928,7 +928,7 @@ function initEditor(editor) {
 						if (startData.children.datas[i].id != data.id) {
 							if (startData.children.datas[i]._mn3.partname == data._mn3.partname) {
 								if (startData != data.parent) {
-									verdict = true;
+									verdict = false;
 								}
 
 
@@ -955,7 +955,6 @@ function initEditor(editor) {
 			}
 			if (evt.kind == Q.InteractionEvent.ELEMENT_MOVE_END) {
 				unhighlight();
-
 				//console.log('hostELEMENT_MOVE_START',host);
 
 				//var data = dragInfo.data;
@@ -978,49 +977,34 @@ function initEditor(editor) {
 							if (startData != data.parent) {
 								showMessage('该芯片上还有其他同部件构件请一起移动', 'success', 2000)
 								graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-								startData == data.parent;
+								 data.parent = startData;
 							}
-
-
 						}
 					}
 				}
-				if (data.x > startData.x + 45 && verdict == false) {
+			if (data.x > startData.x + 45 && verdict == false) {
+					graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+					data.parent = startData;
+			}
+			if (data.x < startData.x + 7.5 && verdict == false) {
+					graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+					data.parent = startData;
+			}
+			if (data.y > startData.y + 45 && verdict == false) {
+					graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+					data.parent = startData;
+			}
+			if (data.y < startData.y + 7.5 && verdict == false) {
+					graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+					data.parent = startData;			
+			}
 
-					if (startData != data.parent) {
-						graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-						data.parent = startData;
-					} else {
-						graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-					}
-				}
-				if (data.x < startData.x + 7.5 && verdict == false) {
-					//alert(6666);
-					if (startData != data.parent) {
-						graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-						data.parent = startData;
-					}
-					graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-				}
-				if (data.y > startData.y + 45 && verdict == false) {
-					if (startData != data.parent) {
-						graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-						data.parent = startData;
-					}
-					graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-				}
-				if (data.y < startData.y + 7.5 && verdict == false) {
-					//alert(6666);
-					if (startData != data.parent) {
-						graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-						data.parent = startData;
-					}
-					graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-				}
 
-				dragInfo = null;
+
+			//	dragInfo = null;
 				verdict = false;
 				graph.selectionModel.clear();
+			//	startData = null;
 			}
 		})
 	}

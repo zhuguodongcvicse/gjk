@@ -113,54 +113,54 @@ public class SftpUtil {
     }
     
     
-    public static void main(String[] args) {
-    	String wPath = "D:\\doudou\\compile\\compile\\syliox";
-    	String lPath = "/gjk/project";
-    	try {
-    		SftpUtil.uploadFilesToServer(wPath, lPath,"192.168.234.129","root1","root", new SftpProgressMonitor() {
-				
-				@Override
-				public void init(int op, String src, String dest, long max) {
-					// TODO Auto-generated method stub
-					System.out.println(" 正在上传 " + src + " 到 " + dest + " , 文件大小： " + (double) (max / 1024) + "kb");
-				}
-				
-				@Override
-				public void end() {
-					// TODO Auto-generated method stub
-					System.out.println("上传成功");
-				}
-				
-				@Override
-				public boolean count(long count) {
-					// TODO Auto-generated method stub
-					return true;
-				}
-			});
-    	}catch(Exception e) {
-    		e.printStackTrace();
-    	}
-    	ChannelSftpSingleton.channelSftpNull();
-    	ChannelSftp chSftp = null;
-        try {
-            chSftp = ChannelSftpSingleton.getInstance().getChannelSftp("192.168.234.129","root1","root");
-        } catch (JSchException e) {
-            e.printStackTrace();
-        }
-    	try {
-			download("/gjk/project/srFrame_Mul.zip","/gjk/project/srFrame_Mul.zip","D:\\doudou_\\test",chSftp);
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	try {
-			ChannelSftpSingleton.getInstance().closeChannel();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	ChannelSftpSingleton.channelSftpNull();
-    }
+//    public static void main(String[] args) {
+//    	String wPath = "D:\\doudou\\compile\\compile\\syliox";
+//    	String lPath = "/gjk/project";
+//    	try {
+//    		SftpUtil.uploadFilesToServer(wPath, lPath,"192.168.234.129","root1","root", new SftpProgressMonitor() {
+//				
+//				@Override
+//				public void init(int op, String src, String dest, long max) {
+//					// TODO Auto-generated method stub
+//					System.out.println(" 正在上传 " + src + " 到 " + dest + " , 文件大小： " + (double) (max / 1024) + "kb");
+//				}
+//				
+//				@Override
+//				public void end() {
+//					// TODO Auto-generated method stub
+//					System.out.println("上传成功");
+//				}
+//				
+//				@Override
+//				public boolean count(long count) {
+//					// TODO Auto-generated method stub
+//					return true;
+//				}
+//			});
+//    	}catch(Exception e) {
+//    		e.printStackTrace();
+//    	}
+//    	ChannelSftpSingleton.channelSftpNull();
+//    	ChannelSftp chSftp = null;
+//        try {
+//            chSftp = ChannelSftpSingleton.getInstance().getChannelSftp("192.168.234.129","root1","root");
+//        } catch (JSchException e) {
+//            e.printStackTrace();
+//        }
+//    	try {
+//			download("/gjk/project/srFrame_Mul.zip","/gjk/project/srFrame_Mul.zip","D:\\doudou_\\test",chSftp);
+//		} catch (UnsupportedEncodingException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//    	try {
+//			ChannelSftpSingleton.getInstance().closeChannel();
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//    	ChannelSftpSingleton.channelSftpNull();
+//    }
  
 }
 
