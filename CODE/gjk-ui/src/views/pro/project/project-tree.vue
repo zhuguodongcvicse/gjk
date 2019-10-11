@@ -3,7 +3,7 @@
     <!-- <component-save ref="dialog" @save="saveComponent"></component-save> -->
     <!-- 当前项目 -->
     <div class="project_tree_14s">
-      <img src="/img/theme/night/logo/proImg.png" ondragstart="return false;">
+      <img src="/img/theme/night/logo/proImg.png" ondragstart="return false;" />
       <!-- 项目切换 -->
       <el-dropdown class="project_tree_dropdown" @command="changeProjectCommand">
         <span class="el-dropdown-link">
@@ -86,7 +86,7 @@
     >
       <el-form ref="form" label-width="80px">
         <el-form-item label="构件筛选">
-          <select-tree :treeData="screenLibsTree" multiple :id.sync="screenLibsIdArray"/>
+          <select-tree :treeData="screenLibsTree" multiple :id.sync="screenLibsIdArray" />
         </el-form-item>
         <el-form-item label="构件选择">
           <select-tree
@@ -186,7 +186,7 @@
         :http-request="appImageUploadFunc"
         :on-change="onchange"
       >
-        <img v-if="imageUrl" :src="imageUrl" class="avatar">
+        <img v-if="imageUrl" :src="imageUrl" class="avatar" />
         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
       </el-upload>
       <el-checkbox v-model="localDeploymentPlan">本地部署方案</el-checkbox>
@@ -248,6 +248,7 @@ export default {
       }
     };
     return {
+      appComponentId: "",
       filePathName: "",
       platformDataList: [],
       platformNameTs: "",
@@ -380,7 +381,7 @@ export default {
             for (const i in this.projects) {
               if (this.projects[i].showFlag == 0) {
                 this.temp_currProject = this.projects[i];
-               }
+              }
             }
           } else {
             this.projects = response.data.data;
@@ -500,9 +501,30 @@ export default {
       fetchProTree(proId).then(async response => {
         this.treeData = response.data.data;
         // this.$router.push({ path: "/comp/manager/dispose",query:{processName: this.treeData[0].children[0].name} });
-        // console.log(this.treeData);
+        this.addIsComplie(this.treeData);
+        console.log("treeData", this.treeData);
+
         // console.log("this.liucheng::",this.treeData[0].children[0].name);
       });
+    },
+    addIsComplie(treeData) {
+      for (let node of treeData) {
+        if (node.label == "App组件工程") {
+          Vue.set(node, "isComplie", true);
+          this.appComponentId = node.id;
+        } else if (node.parentId == this.appComponentId) {
+          if (node.label == "bsp" || node.label == "Image") {
+            Vue.set(node, "isComplie", false);
+          } else {
+            Vue.set(node, "isComplie", true);
+          }
+        } else {
+          Vue.set(node, "isComplie", false);
+        }
+        if (node.children != null && node.children.length > 0) {
+          this.addIsComplie(node.children);
+        }
+      }
     },
     changeProjectCommand(project) {
       // console.log("project", project);
@@ -789,7 +811,7 @@ export default {
     },
     nodeContextmenu(event, data) {
       // this.handleNodeClick(data)
-      // console.log("ddddddddd", data);
+      console.log("ddddddddd", data);
       // if (data.parentType == "9") {
       if (data.type == "9") {
         this.menus = [
@@ -809,7 +831,7 @@ export default {
             this.procedureModelId = item.id;
           }
         }
-      } else if (data.type == "app") {
+      } else if (data.type == "app" && data.isComplie) {
         this.procedureId = data.processId;
         this.menus = ["编译"];
         this.fileData = data;
