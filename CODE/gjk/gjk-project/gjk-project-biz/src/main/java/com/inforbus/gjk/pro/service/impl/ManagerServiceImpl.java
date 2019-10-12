@@ -179,32 +179,28 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		files.add(modelFile);
 
 		filePath += modelFile.getFileName() + File.separator;
-		ProjectFile file = new ProjectFile(IdGenerate.uuid(), projectId, -1,  "流程建模", "11", filePath,
-				modelFile.getId(), null, null);
+		ProjectFile file = new ProjectFile(IdGenerate.uuid(), projectId, -1, "流程建模", "11", filePath, modelFile.getId(),
+				null, null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, "硬件建模", "12", filePath, modelFile.getId(), null,
-				null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, "硬件建模", "12", filePath, modelFile.getId(), null, null);
 		files.add(file);
 
 		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, "软硬件映射配置", "13", filePath, modelFile.getId(), null,
 				null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, "方案展示", "14", filePath, modelFile.getId(), null,
-				null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, "方案展示", "14", filePath, modelFile.getId(), null, null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId,  -1, "部署图", "15", filePath, modelFile.getId(), null,
-				null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, "部署图", "15", filePath, modelFile.getId(), null, null);
 		files.add(file);
 
 		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, "自定义配置", "16", filePath, modelFile.getId(), null,
 				null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, "系统配置", "17", filePath, modelFile.getId(), null,
-				null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, "系统配置", "17", filePath, modelFile.getId(), null, null);
 		files.add(file);
 
 		for (ProjectFile projectFile : files) {
@@ -358,7 +354,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				processFileName = proDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml";
 			}
 			if (projectFile.getFileType().equals("16")) {
-				customizeFileName = proDetailPath + projectFile.getFilePath() + "自定义配置__网络配置.xml"; 
+				customizeFileName = proDetailPath + projectFile.getFilePath() + "自定义配置__网络配置.xml";
 			}
 
 		}
@@ -374,12 +370,13 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		// 解析返回值
 		Map<String, List<Object>> map = new HashMap<>();
-		//if (customizefile.exists() && packinfofile.exists() && processfile.exists()) {
+		// if (customizefile.exists() && packinfofile.exists() && processfile.exists())
+		// {
 		// 获取客户api的返回值
 		Map<String, List<String>> apiReturnStringList = ExternalIOTransUtils.getCmpSysConfig(customizeFileName,
-					packinfoFileName, processFileName);
+				packinfoFileName, processFileName);
 		analysisApiReturnStringList(apiReturnStringList, map);
-		//}
+		// }
 
 		return map;
 	}
@@ -727,7 +724,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			// 获取流程对应记录
 			ProjectFile proFile = this.getById(proceId);
 			// 根据"员工号_项目名称_流程名称APP"格式创建App的名字及路径
-			appFilePath = proDetailPath + "gjk" + File.separator + "APP" + File.separator + userName + "_"
+			appFilePath = proDetailPath + this.getById(modelId).getFilePath() + File.separator + userName + "_"
 					+ projectMapper.getProById(projectFile.getProjectId()).getProjectName() + "_"
 					+ proFile.getFileName() + "APP" + File.separator;
 
@@ -907,7 +904,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			SylixosUtil.updateSylixos(assemblyName, softwareName);
 		} else if (makefileType.trim().toLowerCase().startsWith("Linux".toLowerCase())) {
 			LinuxUtil.updateLinux(cFilePathList, assemblyName, ".c");
-			LinuxUtil.updateLinux(linuxCFilePath, assemblyName, ".c");
+			// LinuxUtil.updateLinux(linuxCFilePath, assemblyName, ".c");
 		}
 	}
 
@@ -1471,10 +1468,10 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 //				if (!newFile.getParentFile().exists()) {
 //					newFile.getParentFile().mkdirs();
 //				}
-				if(newFile.exists()) {
+				if (newFile.exists()) {
 					newFile.delete();
 				}
-				//newFile.createNewFile();
+				// newFile.createNewFile();
 				file.transferTo(newFile);
 				ExternalIOTransUtils.parseSystemPara(flowName, upLoadFile, filePath);
 			} catch (Exception e) {
@@ -1540,7 +1537,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	public R getPlatformList() {
 		return new R<>(baseMapper.getPlatformList());
 	}
-@Override
+
+	@Override
 	public boolean deleteProcedureById(String procedureId) {
 		try {
 			List<ProjectFile> projectFiles = new ArrayList<>();
@@ -1561,4 +1559,39 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			e.printStackTrace();
 			return false;
 		}
-	}}
+	}
+
+	@Override
+	public boolean deleteFilesFromLocal(Map filePath) {
+		Set set = filePath.keySet();
+		String keyUrl = (String) set.iterator().next();
+		String url = (String) filePath.get(keyUrl);
+		File file = new File(url);
+		if (!file.exists()) {
+			return false;
+		} else {
+			deleteChildFile(file);
+		}
+		return !file.exists();
+	}
+
+	public void deleteChildFile(File file){
+		if (file.isDirectory()){
+			File[] files = file.listFiles();
+			if (files.length == 0) {
+				file.delete();
+			} else {
+				for (File fileTemp : files) {
+					if (fileTemp.isDirectory()){
+						deleteChildFile(fileTemp);
+					} else {
+						fileTemp.delete();
+					}
+				}
+				deleteChildFile(file);
+			}
+		} else {
+			file.delete();
+		}
+	}
+}

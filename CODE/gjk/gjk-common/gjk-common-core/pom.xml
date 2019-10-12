@@ -12,7 +12,7 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns="http://maven.apache.org/POM/4.0.0"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>1.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.inforbus</groupId>
 		<artifactId>gjk-common</artifactId>
@@ -92,10 +92,17 @@
 		</dependency>
 		<dependency>
 			<groupId>gjk.softRadarInf</groupId>
-			<artifactId>softRadarInf</artifactId>
+			<artifactId>gjk-softRadarInf</artifactId>
 			<version>1.0</version>
 			<scope>system</scope>
-			<systemPath>${basedir}/src/main/resources/lib/gjk-softRadarInf-1.0.jar</systemPath>
+			<systemPath>${pom.basedir}/src/main/resources/lib/gjk-softRadarInf-1.0.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>gjk.nddsjava</groupId>
+			<artifactId>nddsjava</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${pom.basedir}/src/main/resources/lib/nddsjava.jar</systemPath>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
 		<!-- <dependency>

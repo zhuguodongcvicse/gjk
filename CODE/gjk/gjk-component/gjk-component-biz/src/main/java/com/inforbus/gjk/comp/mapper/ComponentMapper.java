@@ -159,4 +159,24 @@ public interface ComponentMapper extends BaseMapper<Component> {
 	 * @return
 	 */
 	List<Map<String, String>> queryColumns(String tableName);
+
+	/**
+	 * @Title: saveCompAndStruct
+	 * @Description: 保存构件与结构体的关系
+	 * @Author xiaohe
+	 * @DateTime 2019年10月10日 下午1:43:04
+	 * @param id 主键
+	 * @param compId 构件编号
+	 * @param structId 结构体编号
+	 */
+	void saveCompAndStruct(@Param("id") String id, @Param("compId") String compId, @Param("structId") String structId);
+
+	/**
+	 * @Title: deleteCompAndStruct
+	 * @Description: 删除构件与结构体的对应关系
+	 * @Author xiaohe
+	 * @DateTime 2019年10月10日 下午3:40:05
+	 * @param compId 构件Id
+	 */
+	void deleteCompAndStruct( @Param("compId") String compId);
 }
