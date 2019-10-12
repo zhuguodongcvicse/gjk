@@ -1,22 +1,22 @@
 DELETE FROM gjk_algorithm;	
 DELETE FROM gjk_app;
+DELETE FROM gjk_app_part_platform_software;
 DELETE FROM gjk_approval;
 DELETE FROM gjk_approval_apply;
 DELETE FROM gjk_approval_detail;
-DELETE FROM gjk_base_template;
+DELETE FROM gjk_base_template WHERE temp_id != '1';
 DELETE FROM gjk_bsp;
 DELETE FROM gjk_bsp_detail;
 DELETE FROM gjk_bsp_file;
+DELETE FROM gjk_chipsfromhardwarelibs
 DELETE FROM gjk_common_component;
 DELETE FROM gjk_common_component_detail;
 DELETE FROM gjk_comp_img WHERE id != '1';
+DELETE FROM gjk_comp_struct;
 DELETE FROM gjk_compmanage;
 DELETE FROM gjk_component;
 DELETE FROM gjk_component_detail WHERE id != '1';
 DELETE FROM gjk_directory;
-DELETE FROM gjk_hardwarelib__board_chip_detail;
-DELETE FROM gjk_hardwarelib__board_inf_detail;
-DELETE FROM gjk_hardwarelib__case_board_detail;
 DELETE FROM gjk_hardwarelib_board;
 DELETE FROM gjk_hardwarelib_case;
 DELETE FROM gjk_hardwarelib_chip;
@@ -25,7 +25,7 @@ DELETE FROM gjk_hardwarelib_inf;
 DELETE FROM gjk_hardwarelibs;
 DELETE FROM gjk_platform;
 DELETE FROM gjk_project;
-DELETE FROM gjk_project_comp;`gjk_component`
+DELETE FROM gjk_project_comp;
 DELETE FROM gjk_project_detail;
 DELETE FROM gjk_project_plan;
 DELETE FROM gjk_software;
@@ -36,4 +36,4 @@ DELETE FROM gjk_structlibs;
 DELETE FROM gjk_temp;
 DELETE FROM gjk_temp_attr_detail;
 DELETE FROM gjk_test;
-commit；
+commit;

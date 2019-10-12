@@ -298,8 +298,8 @@ export default {
         //加载结构体
         this.$store.dispatch("setStruceType").then(() => {
           this.$router.push({
-            path: "/comp/showComp/addComp1",
-            query: { compId: row.id, type: "edit" }
+            path: "/comp/showComp/addAndEditComp",
+            query: { compId: row.id, type: "edit", proFloName: "编辑构件" }
           });
         });
       });
@@ -311,8 +311,8 @@ export default {
         //加载结构体
         this.$store.dispatch("setStruceType").then(() => {
           this.$router.push({
-            path: "/comp/showComp/addComp1",
-            query: { compId: row.id, type: "copy" }
+            path: "/comp/showComp/addAndEditComp",
+            query: { compId: row.id, type: "copy", proFloName: "复制构件" }
           });
         });
       });

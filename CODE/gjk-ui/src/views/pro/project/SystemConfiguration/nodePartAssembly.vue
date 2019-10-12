@@ -205,12 +205,11 @@ export default {
 
     getNodeTree() {
       getCoeffNodeTree(this.$route.query.sysId).then(Response => {
-        console.log("getCoeffNodeTree", Response.data.data);
+        // console.log("getCoeffNodeTree", Response.data.data);
         this.treeData = [];
         for (let node of Response.data.data) {
           let cpuItem = {
             label: node.nodeName,
-            cpuName: node.nodeName,
             sign: "cpu",
             data: JSON.parse(JSON.stringify(this.cpuData)),
             children: []
@@ -219,7 +218,6 @@ export default {
             for (let rootPartItem of node.rootPart) {
               let rootChildItem = {
                 label: rootPartItem.partName,
-                cmpName: rootPartItem.partName,
                 sign: "cmp",
                 data: JSON.parse(JSON.stringify(this.cmpData))
               };
@@ -230,7 +228,6 @@ export default {
             for (let backupPartItem of node.backupParts) {
               let backupChildItem = {
                 label: backupPartItem.partName,
-                cmpName: backupPartItem.partName,
                 sign: "cmp"
               };
               cpuItem.children.push(backupChildItem);
@@ -249,7 +246,7 @@ export default {
           chipsData = JSON.parse(Response.data.chips);
           for (let node of this.treeData) {
             for (let chip of chipsData) {
-              if (node.cpuName == chip.nodeID) {
+              if (node.label == chip.nodeID) {
                 node.label = chip.IP;
                 node.data.nodeID = chip.nodeID;
                 node.data.ipConfig = chip.IP;
@@ -271,25 +268,24 @@ export default {
       getSysConfigApiReturn(this.$route.query.sysId).then(Response => {
         this.getModelStructurebyModelXmlEntityMap();
         let cmpObj = Response.data.data;
-        console.log("cmpObj", cmpObj);
         for (let node of this.treeData) {
           if (node.children.length > 0) {
             for (let cmpItem of node.children) {
               let attrList = JSON.parse(JSON.stringify(this.modelStructure));
               for (const key in cmpObj) {
                 const element = cmpObj[key];
-                if (key == cmpItem.cmpName) {
+                if (key == cmpItem.label) {
                   cmpItem.apiReturn = element;
                   cmpItem.data.cmpName = element[0];
                   cmpItem.data.funcName = element[1];
                   cmpItem.data.cmpId = element[2];
                   this.coreStrToCoreArray(element[4], "_");
-                  cmpItem.data.CMM_Read_coreID = JSON.parse(
-                    JSON.stringify(this.cordId)
-                  );
-                  cmpItem.data.CMM_Write_coreID = JSON.parse(
-                    JSON.stringify(this.cordId)
-                  );
+                  // cmpItem.data.CMM_Read_coreID = JSON.parse(
+                  //   JSON.stringify(this.cordId)
+                  // );
+                  // cmpItem.data.CMM_Write_coreID = JSON.parse(
+                  //   JSON.stringify(this.cordId)
+                  // );
                   cmpItem.data.CMM_Compute_coreID = JSON.parse(
                     JSON.stringify(this.cordId)
                   );
@@ -318,7 +314,11 @@ export default {
                                       dataItem[attr.prop]
                                     );
                                   } else {
-                                    this.$set(indexData, attr.prop, "");
+                                    this.$set(
+                                      indexData,
+                                      attr.prop,
+                                      attr.defaultStr
+                                    );
                                   }
                                 }
                                 attrDataList.push(indexData);
@@ -505,89 +505,115 @@ export default {
       this.$emit("nodePartXmlEntityMap", this.treeXmlEntityMap);
     },
     setNodeTreeByCallBackXmlMap() {
-      this.treeData = [];
-      for (let item of this.callBackXml) {
-        let data = { label: "", sign: "cpu", data: null, children: [] };
-        data.label = item.attributeMap.ipConfig;
-        let cpu = JSON.parse(JSON.stringify(this.cpuData));
-        cpu.nodeID = item.attributeMap.id;
-        cpu.ipConfig = item.attributeMap.ipConfig;
-        this.coreStrToCoreArray(item.attributeMap.osCoreID, "-");
-        cpu.osCoreIDs = this.cordId;
-        data.data = cpu;
-        // data.data = { formData: {} };
-        // data.data.formData = cpu;
-        for (let childItem of item.xmlEntityMaps[0].xmlEntityMaps) {
-          let cmp = { label: "", sign: "cmp", data: null };
-          cmp.label = childItem.attributeMap.cmpName;
-          let dataForm = JSON.parse(JSON.stringify(this.cmpData));
-          dataForm.cmpId = childItem.attributeMap.id;
-          dataForm.funcName = childItem.attributeMap.funcName;
-          dataForm.cmpName = childItem.attributeMap.cmpName;
-          this.coreStrToCoreArray(
-            childItem.xmlEntityMaps[0].xmlEntityMaps[0].attributeMap.coreID,
-            "_"
-          );
-          dataForm.CMM_Read_coreID = this.cordId;
-          this.coreStrToCoreArray(
-            childItem.xmlEntityMaps[0].xmlEntityMaps[1].attributeMap.coreID,
-            "_"
-          );
-          dataForm.CMM_Write_coreID = this.cordId;
-          this.coreStrToCoreArray(
-            childItem.xmlEntityMaps[0].xmlEntityMaps[2].attributeMap.coreID,
-            "_"
-          );
-          dataForm.CMM_Compute_coreID = this.cordId;
-          dataForm.tmpBuf_baseAddr =
-            childItem.xmlEntityMaps[1].attributeMap.baseAddr;
-          dataForm.tmpBuf_size = childItem.xmlEntityMaps[1].attributeMap.size;
-          dataForm.moniBuf_baseAddr =
-            childItem.xmlEntityMaps[2].attributeMap.baseAddr;
-          dataForm.moniBuf_size = childItem.xmlEntityMaps[2].attributeMap.size;
-          dataForm.shm_size =
-            childItem.xmlEntityMaps[3].xmlEntityMaps[0].attributeMap.size;
-          dataForm.shm_varname =
-            childItem.xmlEntityMaps[3].xmlEntityMaps[0].attributeMap.varname;
-          dataForm.shm_ShmId =
-            childItem.xmlEntityMaps[3].xmlEntityMaps[0].attributeMap.ShmId;
-          if (childItem.xmlEntityMaps[4].xmlEntityMaps != null) {
-            for (let netWorkIn of childItem.xmlEntityMaps[4].xmlEntityMaps) {
-              let netWorkInData = netWorkIn.attributeMap;
-              dataForm.networkInData.push(netWorkInData);
+      getChipsfromhardwarelibs(this.$route.query.sysId).then(Response => {
+        if (Response.data.chips) {
+          let chipsData = JSON.parse(Response.data.chips);
+          this.treeData = [];
+          for (let item of this.callBackXml) {
+            let data = {
+              label: "",
+              sign: "cpu",
+              coreNum: "",
+              data: null,
+              children: []
+            };
+            data.label = item.attributeMap.ipConfig;
+            let cpu = JSON.parse(JSON.stringify(this.cpuData));
+            cpu.nodeID = item.attributeMap.id;
+            cpu.ipConfig = item.attributeMap.ipConfig;
+            this.coreStrToCoreArray(item.attributeMap.osCoreID, "-");
+            cpu.osCoreIDs = this.cordId;
+            data.data = cpu;
+            let coreNum = "";
+            for (let chip of chipsData) {
+              if (data.label == chip.IP) {
+                coreNum = chip.coreNum;
+                data.coreNum = coreNum;
+              }
             }
-          }
-          if (childItem.xmlEntityMaps[5].xmlEntityMaps != null) {
-            for (let netWorkOut of childItem.xmlEntityMaps[5].xmlEntityMaps) {
-              let netWorkOutData = netWorkOut.attributeMap;
-              dataForm.networkOutData.push(netWorkOutData);
-            }
-          }
-          let attributeListData = [];
-          for (let i = 4; i < childItem.xmlEntityMaps.length; i++) {
-            if (
-              childItem.xmlEntityMaps[i].lableName != "network_in" &&
-              childItem.xmlEntityMaps[i].lableName != "network_out"
-            ) {
-              this.setAttrListByXmlMap(
-                attributeListData,
-                childItem.xmlEntityMaps[i]
-              );
-            }
-          }
-          dataForm.attributeListData = attributeListData;
+            for (let childItem of item.xmlEntityMaps[0].xmlEntityMaps) {
+              let cmp = {
+                label: "",
+                sign: "cmp",
+                coreNum: coreNum,
+                data: null
+              };
+              cmp.label = childItem.attributeMap.cmpName;
+              let dataForm = JSON.parse(JSON.stringify(this.cmpData));
+              dataForm.cmpId = childItem.attributeMap.id;
+              dataForm.funcName = childItem.attributeMap.funcName;
 
-          cmp.data = dataForm;
-          data.children.push(cmp);
+              dataForm.cmpName = childItem.attributeMap.cmpName;
+              this.coreStrToCoreArray(
+                childItem.xmlEntityMaps[0].xmlEntityMaps[0].attributeMap.coreID,
+                "_"
+              );
+              dataForm.CMM_Read_coreID = this.cordId;
+              this.coreStrToCoreArray(
+                childItem.xmlEntityMaps[0].xmlEntityMaps[1].attributeMap.coreID,
+                "_"
+              );
+              dataForm.CMM_Write_coreID = this.cordId;
+              this.coreStrToCoreArray(
+                childItem.xmlEntityMaps[0].xmlEntityMaps[2].attributeMap.coreID,
+                "_"
+              );
+              dataForm.CMM_Compute_coreID = this.cordId;
+              dataForm.tmpBuf_baseAddr =
+                childItem.xmlEntityMaps[1].attributeMap.baseAddr;
+              dataForm.tmpBuf_size =
+                childItem.xmlEntityMaps[1].attributeMap.size;
+              dataForm.moniBuf_baseAddr =
+                childItem.xmlEntityMaps[2].attributeMap.baseAddr;
+              dataForm.moniBuf_size =
+                childItem.xmlEntityMaps[2].attributeMap.size;
+              dataForm.shm_size =
+                childItem.xmlEntityMaps[3].xmlEntityMaps[0].attributeMap.size;
+              dataForm.shm_varname =
+                childItem.xmlEntityMaps[3].xmlEntityMaps[0].attributeMap.varname;
+              dataForm.shm_ShmId =
+                childItem.xmlEntityMaps[3].xmlEntityMaps[0].attributeMap.ShmId;
+              if (childItem.xmlEntityMaps[4].xmlEntityMaps != null) {
+                for (let netWorkIn of childItem.xmlEntityMaps[4]
+                  .xmlEntityMaps) {
+                  let netWorkInData = netWorkIn.attributeMap;
+                  dataForm.networkInData.push(netWorkInData);
+                }
+              }
+              if (childItem.xmlEntityMaps[5].xmlEntityMaps != null) {
+                for (let netWorkOut of childItem.xmlEntityMaps[5]
+                  .xmlEntityMaps) {
+                  let netWorkOutData = netWorkOut.attributeMap;
+                  dataForm.networkOutData.push(netWorkOutData);
+                }
+              }
+              let attributeListData = [];
+              for (let i = 4; i < childItem.xmlEntityMaps.length; i++) {
+                if (
+                  childItem.xmlEntityMaps[i].lableName != "network_in" &&
+                  childItem.xmlEntityMaps[i].lableName != "network_out"
+                ) {
+                  this.setAttrListByXmlMap(
+                    attributeListData,
+                    childItem.xmlEntityMaps[i]
+                  );
+                }
+              }
+              dataForm.attributeListData = attributeListData;
+
+              cmp.data = dataForm;
+              data.children.push(cmp);
+            }
+            this.treeData.push(data);
+          }
         }
-        this.treeData.push(data);
-      }
+      });
     },
     coreStrToCoreArray(str, splitStr) {
       this.cordId = [];
       if (str.indexOf(splitStr) >= 0) {
         this.cordId = str.split(splitStr);
-      } else {
+      } else if (str.trim() != "") {
         this.cordId.push(str);
       }
     },
@@ -677,7 +703,8 @@ export default {
                 for (let key in i) {
                   modelItem.children.column.push({
                     prop: key,
-                    label: key
+                    label: key,
+                    defaultStr: i[key]
                   });
                 }
               }

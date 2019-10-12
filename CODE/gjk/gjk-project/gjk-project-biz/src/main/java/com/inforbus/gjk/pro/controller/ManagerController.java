@@ -550,6 +550,12 @@ public class ManagerController {
 		return new R<>(managerService.createNetWorkXML(entity, proDetailId, name));
 	}
 
+	@PostMapping("deleteSelectFile")
+	public boolean deleteSelectFile(@RequestBody Map filePath){
+		boolean deleteFlag = managerService.deleteFilesFromLocal(filePath);
+		return deleteFlag;
+	}
+
 	// 解析自定义配置xml
 	@PutMapping
 	@RequestMapping("/analysisThemeXML/{proDetailId}")
