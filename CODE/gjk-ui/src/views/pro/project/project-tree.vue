@@ -919,7 +919,7 @@ export default {
     saveAppImage() {
       const loading = this.$loading({
         lock: true,
-        text: "App组建工程生成中......",
+        text: "App组件工程生成中......",
         spinner: "el-icon-loading",
         background: "rgba(0, 0, 0, 0.7)"
       });
@@ -933,55 +933,71 @@ export default {
         this.userInfo.username,
         this.procedureModelId,
         this.appDirPath
-      ).then(Response => {
-        if (Response.data.data != null) {
-          let app = Response.data.data;
-          let params = new FormData();
-          params.append("file", this.appImageFile);
-          params.append("appJSON", JSON.stringify(app));
-          appImageUpload(params).then(Response => {
-            let appRecord = Response.data.data;
-            if (appRecord != null) {
-              if (this.localDeploymentPlan) {
-                this.$set(appRecord, "localDeploymentPlan", "0");
-              } else {
-                this.$set(appRecord, "localDeploymentPlan", "1");
-              }
-              saveApp(appRecord).then(saveAppBoolean => {
-                if (saveAppBoolean.data.data != null) {
-                  this.$message({
-                    showClose: true,
-                    message: "生成App组件工程成功",
-                    type: "success"
-                  });
+      )
+        .then(Response => {
+          if (Response.data.data != null) {
+            let app = Response.data.data;
+            let params = new FormData();
+            params.append("file", this.appImageFile);
+            params.append("appJSON", JSON.stringify(app));
+            appImageUpload(params)
+              .then(Response => {
+                let appRecord = Response.data.data;
+                if (appRecord != null) {
+                  if (this.localDeploymentPlan) {
+                    this.$set(appRecord, "localDeploymentPlan", "0");
+                  } else {
+                    this.$set(appRecord, "localDeploymentPlan", "1");
+                  }
+                  saveApp(appRecord)
+                    .then(saveAppBoolean => {
+                      if (saveAppBoolean.data.data != null) {
+                        this.$message({
+                          showClose: true,
+                          message: "生成App组件工程成功",
+                          type: "success"
+                        });
+                      } else {
+                        this.$message({
+                          showClose: true,
+                          message: "保存APP数据库记录失败。",
+                          type: "error"
+                        });
+                      }
+                    })
+                    .catch(() => {
+                      this.$message({
+                        showClose: true,
+                        message: "保存APP数据库记录失败。",
+                        type: "error"
+                      });
+                      this.closeSelectAppImageDialog();
+                      loading.close();
+                      this.reload();
+                    });
                 } else {
                   this.$message({
                     showClose: true,
-                    message: "保存APP数据库记录失败。",
+                    message: "保存组件图片失败。",
                     type: "error"
                   });
                 }
+              })
+              .catch(() => {
+                this.closeSelectAppImageDialog();
+                loading.close();
+                this.reload();
               });
-            } else {
-              this.$message({
-                showClose: true,
-                message: "保存组件图片失败。",
-                type: "error"
-              });
-            }
-          });
-        } else {
-          this.$message({
-            showClose: true,
-            message:
-              "生成App组件工程失败，请确认所有需要配置的页面都配置完成并保存。",
-            type: "error"
-          });
-        }
-        this.closeSelectAppImageDialog();
-        loading.close();
-        this.reload();
-      });
+          }
+          this.closeSelectAppImageDialog();
+          loading.close();
+          this.reload();
+        })
+        .catch(() => {
+          this.closeSelectAppImageDialog();
+          loading.close();
+          this.reload();
+        });
     },
     removeComponent(component) {
       // this.$confirm('确定删除构件【' + component.displayName + '】？', '提示', {

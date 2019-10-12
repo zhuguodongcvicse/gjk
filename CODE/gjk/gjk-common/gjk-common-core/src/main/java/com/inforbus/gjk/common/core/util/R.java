@@ -23,7 +23,6 @@ import java.io.Serializable;
 
 import com.inforbus.gjk.common.core.constant.CommonConstants;
 
-
 /**
  * 响应信息主体
  *
@@ -44,7 +43,6 @@ public class R<T> implements Serializable {
 	@Getter
 	@Setter
 	private String msg = "success";
-
 
 	@Getter
 	@Setter
@@ -69,5 +67,12 @@ public class R<T> implements Serializable {
 		super();
 		this.msg = e.getMessage();
 		this.code = CommonConstants.FAIL;
+	}
+
+	public R setAllAttr(int code, String msg, T data) {
+		this.code = code;
+		this.msg = msg;
+		this.data = data;
+		return this;
 	}
 }
