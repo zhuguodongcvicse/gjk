@@ -97,7 +97,7 @@ public class DictController {
 	 * @return 同类型字典
 	 */
 	@GetMapping("/type/{type}")
-	@Cacheable(value = "dict_details", key = "#type")
+	//@Cacheable(value = "dict_details", key = "#type")
 	public R getDictByType(@PathVariable String type) {
 		return new R<>(sysDictService.list(Wrappers.<SysDict>query().lambda().eq(SysDict::getType, type)));
 	}
@@ -146,11 +146,11 @@ public class DictController {
 	}
 
 	/**
-	 * 通过字典类型查找字典
-	 *
-	 * @param type 类型
-	 * @return 同类型字典
-	 */
+ * 通过字典类型查找字典
+ *
+ * @param type 类型
+ * @return 同类型字典
+ */
 	/**
 	 * @Title: getDictValue
 	 * @Description:
@@ -222,4 +222,24 @@ public class DictController {
 				.selectList((Wrappers.<SysDict>query().lambda().eq(SysDict::getType, "comp_selectbin_type"))));
 		return new R<>(maps);
 	}
+
+	/**
+	 * 通过字典类型与 remarks字段查找字典
+	 *
+	 * @param DictVO 类型
+	 * @return 同类型字典
+	 */
+	/**
+	 * @Title: getDicts
+	 * @Description:
+	 * @Author cvicse
+	 * @DateTime 2019年10月11日 20:51:02
+	 * @return
+	 */
+	@PutMapping("/typeAndRemarks")
+	// @Cacheable(value = "dict_details", key = "#type")
+	public R getDicts(@RequestBody DictVO dictVO) {
+		return new R<>(sysDictService.getDictsByTypeAndRemarks(dictVO));
+	}
+
 }

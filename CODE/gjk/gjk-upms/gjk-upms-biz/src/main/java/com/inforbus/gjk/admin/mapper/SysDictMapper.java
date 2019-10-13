@@ -53,4 +53,6 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
     List<DictVO> getDictsByNameAndType(@Param("query")SysDict sysDict);
 
     List<SysDict> getDictTypes();
+
+    List<DictVO> getDictsByTypeAndRemarks(DictVO dictVO);
 }
