@@ -175,8 +175,16 @@ export default {
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
     this.$store.dispatch('cleanNetworkOut')
-    this.netWorkData = this.xmlDataMap[this.$route.query.sysId].netWorkData
-     this.partList = this.xmlDataMap[this.$route.query.sysId].partList
+     for(var x = 0;x<this.xmlDataMap.length;x++){
+      for(var i in this.xmlDataMap[x]) {
+        if(i==this.$route.query.sysId){
+          this.netWorkData = this.xmlDataMap[x][i].netWorkData
+          this.partList = this.xmlDataMap[x][i].partList
+        }
+      }
+    }
+    // this.netWorkData = this.xmlDataMap[this.$route.query.sysId].netWorkData
+    //  this.partList = this.xmlDataMap[this.$route.query.sysId].partList
    //console.log("输出网络配置netWork_Out xml数据",this.netWorkData.xmlEntityMaps[0].xmlEntityMaps);
    if(this.netWorkData.xmlEntityMaps != null){
      for(var i =0;i<this.netWorkData.xmlEntityMaps[1].xmlEntityMaps.length;i++){

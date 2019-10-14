@@ -82,4 +82,15 @@
 	where a.del_flag = '0' AND a.remarks ='selectType' AND a.type
 	!="comp_selectbin_type" GROUP BY type
 	</select>
+
+	<!--通过字典类型与 remarks字段查找字典-->
+	<select id="getDictsByTypeAndRemarks" parameterType="com.inforbus.gjk.admin.api.vo.DictVO" resultType="com.inforbus.gjk.admin.api.vo.DictVO">
+		SELECT DISTINCT
+		*
+		FROM sys_dict a
+		where a.del_flag = '0'
+		AND a.remarks = #{remarks}
+		AND a.type = #{type}
+		order by create_time DESC
+	</select>
 </mapper>

@@ -104,7 +104,16 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-     this.themeData = this.xmlDataMap[this.$route.query.sysId].themeData
+    console.log("刷新后的数据this.xmlDataMap",this.xmlDataMap,this.$route.query.sysId)
+    console.log("+++++++++++++++++++++++++++",this.netWorkData)
+    for(var x = 0;x<this.xmlDataMap.length;x++){
+      for(var i in this.xmlDataMap[x]) {
+        if(i==this.$route.query.sysId){
+           this.themeData = this.xmlDataMap[x][i].themeData
+        }
+      }
+    }
+    // this.themeData = this.xmlDataMap[this.$route.query.sysId].themeData
      if(this.themeData.xmlEntityMaps != null){
        for(var i = 0;i<this.themeData.xmlEntityMaps[0].xmlEntityMaps.length;i++){
         this.data.push({

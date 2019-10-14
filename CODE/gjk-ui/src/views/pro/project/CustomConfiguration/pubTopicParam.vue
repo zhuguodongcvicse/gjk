@@ -358,8 +358,16 @@ export default {
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
     this.$store.dispatch('cleanPubMapCustomConfig')
-    this.themeData = this.xmlDataMap[this.$route.query.sysId].themeData
-    this.partList = this.xmlDataMap[this.$route.query.sysId].partList
+    for(var x = 0;x<this.xmlDataMap.length;x++){
+      for(var i in this.xmlDataMap[x]) {
+        if(i==this.$route.query.sysId){
+           this.themeData = this.xmlDataMap[x][i].themeData
+           this.partList = this.xmlDataMap[x][i].partList
+        }
+      }
+    }
+    //this.themeData = this.xmlDataMap[this.$route.query.sysId].themeData
+    //this.partList = this.xmlDataMap[this.$route.query.sysId].partList
     //  console.log("pubtopicParam",this.themeData.xmlEntityMaps[1].xmlEntityMaps)
     // // console.log("pubtopic中的数据",this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps)
     //  console.log("1111111111111",this.themeData.xmlEntityMaps[1].xmlEntityMaps[0].xmlEntityMaps)

@@ -386,9 +386,8 @@ export default {
           var map = new Map(value);
            this.funcConfigEntityMaps.xmlEntityMaps = []
           for(var [k, val] of map){
-             console.log("数据比较111111",k.split("__")[0])
-             console.log("数据比较222222",key.split("*")[1])
            if(k.split("__")[0] == key.split("*")[1]){
+             console.log("+++++++++++++",k);
                this.funcConfigEntityMaps.attributeMap = {}
               this.$set(
                this.funcConfigEntityMaps.attributeMap,
@@ -399,6 +398,15 @@ export default {
                this.$set(
                this.funcConfigEntityMaps.attributeMap,
              "compId",val.id); 
+             for(var pl = 0; pl < this.partList.length;pl++){
+                for(var plcom =0; plcom<this.partList[pl].components.length;plcom++){
+                  if(val.id == this.partList[pl].components[plcom].compId){
+                     this.$set(
+                        this.funcConfigEntityMaps.attributeMap,
+                      "cmpName",this.partList[pl].partName); 
+                  }
+                }
+             }
              console.log("网络配置参数",val)
            }else{
              this.entityMaps.attributeMap = {}
