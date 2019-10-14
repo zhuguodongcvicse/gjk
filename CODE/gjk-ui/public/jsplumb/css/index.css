@@ -13,6 +13,12 @@
   -webkit-user-select: none;
   -webkit-user-drag: none;
 }
+.pa1{
+  /* border: 2px solid red; */
+  position: absolute;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
 /* .pa:hover {
   border: 1px solid #777; 
 } */
@@ -156,6 +162,7 @@ div.desc {
   left: 0;
   right: 0;
   background-color: #FFFFFF;
+ 
 }
 .line {
   display: block;
@@ -189,7 +196,7 @@ div.desc {
 .public_jsplumb_left_14s select{border:1px solid #ddd;padding:3px 5px;margin-bottom:5px;margin-left:10px;}
 
 .public_jsplumb_right2_14s{position: absolute;background-color: rgba(137,189,189,0.5);border:1px solid rgb(137,189,189);}
-.public_jsplumb_right1_14s{height: calc(100% - 16px) ;overflow: scroll;width:83.6%;}
+.public_jsplumb_right1_14s{height: calc(99.9% - 70px) ;overflow: scroll;width:83.8%;}
 .public_jsplumb_right1_14s::-webkit-scrollbar {width:8px;height:8px;background:rgb(105, 122, 146);}
 .public_jsplumb_right1_14s::-webkit-scrollbar-thumb {
   border-radius: 3px;

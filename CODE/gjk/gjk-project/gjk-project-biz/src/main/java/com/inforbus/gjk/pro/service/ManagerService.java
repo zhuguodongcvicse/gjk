@@ -281,4 +281,6 @@ public interface ManagerService extends IService<ProjectFile> {
 	R getPlatformList();
 
 	public boolean deleteProcedureById(String procedureId);
+
+    boolean deleteFilesFromLocal(Map filePath);
 }

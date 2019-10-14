@@ -215,7 +215,8 @@ import {
   updatePartSoftwareAndPlatform,
   showPartSoftwareAndPlatform,
   getPlatformList,
-  deleteProcedureById
+  deleteProcedureById,
+  deleteSelectFile
 } from "@/api/pro/manager";
 import { addObj as saveApp, getAppByProcessId } from "@/api/pro/app";
 import { getSoftwareTree } from "@/api/libs/software";
@@ -232,6 +233,7 @@ import { getPath } from "@/api/compile/devenv";
 import { mapGetters } from "vuex";
 import selectTree from "./selectTree";
 import { codeGeneration } from "@/api/pro/project";
+
 export default {
   // components: { ComponentSave },
   components: {
@@ -391,12 +393,12 @@ export default {
           // console.log("this.temp_currProject",this.temp_currProject)
           /* 查询项目树 */
           /* if (JSON.stringify(this.tmpProject) !== "{}") {
-            this.getTreeData(this.tmpProject.id);
-            this.temp_currProject = this.tmpProject;
-          } else {
-            this.getTreeData(this.temp_currProject.id);
-            this.temp_currProject = response.data.data[0];
-          } */
+                          this.getTreeData(this.tmpProject.id);
+                          this.temp_currProject = this.tmpProject;
+                        } else {
+                          this.getTreeData(this.temp_currProject.id);
+                          this.temp_currProject = response.data.data[0];
+                        } */
         })
         .catch(err => {
           // console.log("err: ", err);
@@ -633,6 +635,48 @@ export default {
         this.addProCompDialogVisible = true;
       } else if (item == "删除流程") {
         this.deleteProcedureDialogVisible = true;
+      } else if (item == "删除") {
+        let filePath = { filePath: "" };
+        filePath.filePath =
+          this.fileData.filePath + "\\" + this.fileData.fileName;
+        // console.log("this.fileData", this.fileData);
+        // console.log("this.treeData", this.treeData[0]);
+
+        // var filePathTemp = {filePathTemp: 'D:/14S_GJK_GIT/gjk/gjk/project/project11/Flow1流程/模型/222'};
+        // console.log("filePath", filePath);
+        // console.log("filePathTemp", filePathTemp)
+        deleteSelectFile(filePath).then(response => {
+          // console.log("response", response);
+          if (response.data == true) {
+            let flowFile = this.treeData[0].children;
+            let appList;
+            for (const i in flowFile) {
+              if (flowFile[i].id == this.fileData.processId) {
+                appList = flowFile[i].children[1].children;
+              }
+            }
+            var targetNode;
+            for (const i in appList) {
+              if (appList[i].id == this.fileData.id) {
+                appList.splice(i, 1);
+                return;
+              } else {
+                targetNode = this.findTargetNode(appList[i], this.fileData);
+              }
+            }
+            // console.log("targetNode", targetNode);
+          }
+        });
+      }
+    },
+    findTargetNode(currentNodeObj, targetNodeObj) {
+      for (const i in currentNodeObj.children) {
+        if (currentNodeObj.children[i].id == targetNodeObj.id) {
+          currentNodeObj.children.splice(i, 1);
+          return currentNodeObj;
+        } else {
+          this.findTargetNode(currentNodeObj.children[i], targetNodeObj);
+        }
       }
     },
     //修改软件框架值改变
@@ -811,7 +855,7 @@ export default {
     },
     nodeContextmenu(event, data) {
       // this.handleNodeClick(data)
-      console.log("ddddddddd", data);
+      // console.log("ddddddddd", data);
       // if (data.parentType == "9") {
       if (data.type == "9") {
         this.menus = [
@@ -824,7 +868,6 @@ export default {
         this.procedureId = data.id;
         this.softwareSelectString = data.softwareId;
         this.bspSelectString = data.bspId;
-
         let modelList = data.children[0].children;
         for (let item of modelList) {
           if (item.type == "11") {
@@ -833,10 +876,14 @@ export default {
         }
       } else if (data.type == "app" && data.isComplie) {
         this.procedureId = data.processId;
-        this.menus = ["编译"];
+        this.menus = ["编译", "删除"];
         this.fileData = data;
       } else if (data.parentId == "-1") {
         this.menus = ["添加流程", "申请构件"];
+      } else if (data.type == "app") {
+        this.procedureId = data.processId;
+        this.menus = ["删除"];
+        this.fileData = data;
       } else {
         this.menus = [];
       }
@@ -886,7 +933,6 @@ export default {
     beforeAvatarUpload(file) {
       const isJPG = file.type === "image/jpeg";
       const isLt2M = file.size / 1024 / 1024 < 2;
-
       if (!isJPG) {
         this.$message.error("上传头像图片只能是 JPG 格式!");
       }
@@ -1109,10 +1155,13 @@ export default {
       } else if (node.label == "App组件工程") {
         test = this.website.publicSvg + "icon-svg/组件.svg";
         //文件夹
-      } else if (node.childNodes.length > 0) {
+      } else if (node.data.isDirectory == "0") {
         test = this.website.publicSvg + "icon-svg/文件夹.svg";
-        //其他
       } else {
+        /* else if (node.childNodes.length > 0) {
+                  test = this.website.publicSvg + "icon-svg/文件夹.svg";
+                  //其他
+                }*/
         test = this.website.publicSvg + "icon-svg/空.svg";
       }
       //流程
@@ -1127,7 +1176,7 @@ export default {
       return (
         <span class="custom-tree-node">
           <img src={test} style={css} />
-          <span>{node.label}</span>
+          <span> {node.label} </span>
         </span>
       );
     },

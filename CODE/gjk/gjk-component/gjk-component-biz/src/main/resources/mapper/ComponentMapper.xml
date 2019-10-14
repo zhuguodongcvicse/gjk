@@ -319,4 +319,13 @@
 		order
 		by ordinal_position
 	</select>
+	<insert id="saveCompAndStruct">
+		INSERT INTO `gjk_comp_struct`(`id`, `comp_id`,
+		`struct_id`) VALUES
+		(#{id}, #{compId}, #{structId})
+	</insert>
+	<delete id="deleteCompAndStruct">
+		DELETE FROM `gjk_comp_struct` WHERE
+		`comp_id`=#{compId}
+	</delete>
 </mapper>

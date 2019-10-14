@@ -79,14 +79,14 @@
           plain
           @click.native="isShow_14s=isShow_14s===true?false:true"
         >{{isShow_14s===true?"隐藏":"显示"}}</el-button>
-        <div ref="sliderc" v-show="isShow_14s" class="sliderc">
+        <!-- <div ref="sliderc" v-show="isShow_14s" class="sliderc">
           <img
             ref="to_left"
             src="/img/to_left.png"
             alt="收缩"
             v-bind:style="{cursor:'pointer','vertical-align':'middle','position': 'absolute','top': '50%','left': '50%','transform': 'translate(-50%, -50%)'}"
           />
-        </div>
+        </div> -->
         <params-define
           ref="paramsDefine"
           v-show="isShow_14s"
@@ -214,9 +214,26 @@ export default {
             //从保存的临时数据中找到复制的数据并存储在ctrlXmlParam中
             this.ctrlXmlParam.set(id, this.tmpMaps.get(id));
           });
+          sessionStorage.setItem("vueCopyData", JSON.stringify(this.ctrlXmlParam));
           console.log("赋值Ctrl C:", tmpId); //复制 c
         } else if (newParam.state === 4) {
-          var ctrlParam = deepClone(this.ctrlXmlParam.get(newParam.oldTmpId)); //增加构件到tmpMaps
+          //console.log("9999999999999",JSON.parse(sessionStorage.getItem("vueCopyData")))
+          console.log(newParam.oldTmpId)
+          // if(this.ctrlXmlParam.length > 0){
+          //   console.log("没跨流程")
+          //   ctrlParam = deepClone(this.ctrlXmlParam.get(newParam.oldTmpId)); //增加构件到tmpMaps
+          // }else{
+            var ctrlParam;
+            var ctrlXmlParamMap = JSON.parse(sessionStorage.getItem("vueCopyData"));
+            for(let i = 0;i<ctrlXmlParamMap.length;i++){
+              if(ctrlXmlParamMap[i][0] == newParam.oldTmpId){
+                ctrlParam = deepClone(ctrlXmlParamMap[i][1])
+              }
+            }
+            console.log("跨流程复制数据",ctrlXmlParamMap)
+           // var ctrlParam = ctrlXmlParamMap.get(newParam.oldTmpId);
+          //}
+          //var 
           console.log("粘贴Ctrl V:", ctrlParam); //粘贴
           ctrlParam.attributeMap.id = newParam.newTmpId;
           this.$set(
