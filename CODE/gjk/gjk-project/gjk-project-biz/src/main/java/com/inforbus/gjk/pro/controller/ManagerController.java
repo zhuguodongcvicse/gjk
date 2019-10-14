@@ -509,7 +509,7 @@ public class ManagerController {
 		List<ProjectFile> lists = managerService.getFilePathListById((String) map.get("id"));
 		for (ProjectFile ls : lists) {
 			if (ls.getFileType().equals("11")) {
-				workModeFilePath = ls.getFilePath() + ls.getFileName() + ".xml";
+				workModeFilePath = gitDetailPath +  File.separator + ls.getFilePath() + ls.getFileName() + ".xml";
 			}
 			// 方案展示的路径
 			// if (ls.getFileType().equals("14")) {
