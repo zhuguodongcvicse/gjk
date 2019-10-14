@@ -110,7 +110,15 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    this.themeData = this.xmlDataMap[this.$route.query.sysId].themeData
+    for(var x = 0;x<this.xmlDataMap.length;x++){
+      for(var i in this.xmlDataMap[x]) {
+        if(i==this.$route.query.sysId){
+           this.themeData = this.xmlDataMap[x][i].themeData
+           //this.partList = this.xmlDataMap[x][i].partList
+        }
+      }
+    }
+    //this.themeData = this.xmlDataMap[this.$route.query.sysId].themeData
     if(this.themeData.xmlEntityMaps != null){
       for(var i = 0;i<this.themeData.xmlEntityMaps[1].xmlEntityMaps.length;i++){
        this.data.push({

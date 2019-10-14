@@ -88,4 +88,15 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 		return dictTypes;
 	}
 
+	/**
+	 * 通过字典类型与 remarks字段查找字典
+	 *
+	 * @param DictVO
+	 * @return List<DictVO>
+	 */
+	@Override
+	public List<DictVO> getDictsByTypeAndRemarks(DictVO dictVO) {
+		return sysDictMapper.getDictsByTypeAndRemarks(dictVO);
+	}
+
 }

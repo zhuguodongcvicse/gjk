@@ -54,4 +54,5 @@ public interface SysDictService extends IService<SysDict> {
 
 	List<DictType> getDictTypes();
 
+	List<DictVO> getDictsByTypeAndRemarks(DictVO dictVO);
 }
