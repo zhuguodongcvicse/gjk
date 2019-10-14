@@ -8,8 +8,8 @@ const CustomConfiguration = {
       netWorkIn : new Map(),
       netWorkData : getStore({ name: 'netWorkData' })||{},
       netWorkOut : new Map(),
-      partList : getStore({name: 'themeData'}) || new Array(),
-      xmlDataMap : getStore({name: 'xmlDataMap'}) || new Map(),
+      partList : getStore({name: 'partList'}) || new Array(),
+      xmlDataMap : getStore({name: 'xmlDataMap'}) || new Array(),
     },
     actions: {
         //存储subscribe整体数据
@@ -150,7 +150,9 @@ const CustomConfiguration = {
           state.netWorkData = params.netWorkData
           state.partList = params.partList
          // state.xmlDataMap.set(id,params)
-          state.xmlDataMap[id] = params
+          var xmlDataObj = {}
+          xmlDataObj[id] = params
+          state.xmlDataMap.push(xmlDataObj)
           setStore({
             name: 'themeData',
             content: state.themeData,
@@ -171,7 +173,7 @@ const CustomConfiguration = {
             content: state.xmlDataMap,
             type:"session"
           })
-
+          console.log("商店state.xmlDataMap++++++++++++",state.xmlDataMap)
         },
         SET_NetWorkIn :(state,{key,value}) =>{
           state.netWorkIn.set(key,JSON.parse(JSON.stringify(value)));

@@ -46,6 +46,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.inforbus.gjk.common.core.constant.CommonConstants;
 import com.inforbus.gjk.common.core.entity.StringRef;
 import com.inforbus.gjk.common.core.entity.XmlEntity;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
@@ -679,7 +680,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @return
 	 */
 	@Override
-	public App appAssemblyProjectCreate(String userName, String procedureId, String bspDirPath) {
+	public R appAssemblyProjectCreate(String userName, String procedureId, String bspDirPath) {
+		R r = new R<>();
 		App app = null;
 
 		// 获取流程记录
@@ -709,7 +711,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				// 解析流程模型xml获取所有根组件
 				hardwareNodes = ProcedureXmlAnalysis.getHardwareNodeList(file);
 			} catch (Exception e) {
-				logger.error("解析流程文件错误，请确保流程xml文件配置正确。");
+				logger.error("解析流程文件错误，请确保流程建模配置正确。");
+				return r.setAllAttr(CommonConstants.FAIL, "解析流程文件错误，请确保流程建模配置正确。", null);
 			}
 
 			List<Map<String, Object>> maps = null;
@@ -719,11 +722,13 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				maps = (List<Map<String, Object>>) JSONArray.parse(chipStr);
 			} catch (Exception e) {
 				logger.error("获取硬件建模数据失败，请确保硬件建模配置正确。");
+				r.setAllAttr(CommonConstants.FAIL, "获取硬件建模数据失败，请确保硬件建模配置正确。", null);
+				return r;
 			}
 
 			// 获取流程对应记录
 			ProjectFile proFile = this.getById(proceId);
-			// 根据"员工号_项目名称_流程名称APP"格式创建App的名字及路径
+			// 根据"员工号_项目名称_流程名称APP"格式创建App的名字及路径，并存放在流程文件夹下
 			appFilePath = proDetailPath + this.getById(modelId).getFilePath() + File.separator + userName + "_"
 					+ projectMapper.getProById(projectFile.getProjectId()).getProjectName() + "_"
 					+ proFile.getFileName() + "APP" + File.separator;
@@ -736,16 +741,32 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 			// 遍历所有根组件，创建根组件文件夹
 			for (HardwareNode hardwareNode : hardwareNodes) {
+				boolean flag = false;
 				for (Map<String, Object> map : maps) {
 					if (map.containsKey("nodeID") && hardwareNode.getNodeName().equals(map.get("nodeID").toString())) {
+						flag = true;
 						for (Part part : hardwareNode.getRootPart()) {
 							partnamePlatformMap.put(part.getPartName(), map.get("hrTypeName").toString());
-							createAssemblyDir(appFilePath, part, map.get("hrTypeName").toString(),
+							createAssemblyDir(r, appFilePath, part, map.get("hrTypeName").toString(),
 									partPlatformSoftwares, integerCodeFilePath);
+							if (CommonConstants.FAIL.equals(r.getCode())) {
+								return r;
+							}
 						}
 					}
 				}
+				if (!flag) {
+					logger.error("流程建模与硬件建模数据匹配错误，请重新配置流程建模与硬件建模。");
+					return r.setAllAttr(CommonConstants.FAIL, "流程建模与硬件建模数据匹配错误，请重新配置流程建模与硬件建模。", null);
+				}
 			}
+
+			// 拷贝bsp对应的文件夹到app组件工程目录下
+			createBspDir(r, bspDirPath, appFilePath);
+			if (CommonConstants.FAIL.equals(r.getCode())) {
+				return r;
+			}
+
 			app.setPartnamePlatform(JSONArray.toJSONString(partnamePlatformMap));
 			app.setFileName(new File(appFilePath).getName());
 			app.setFilePath(new File(appFilePath).getParent().substring(proDetailPath.length()));
@@ -753,25 +774,33 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			app.setProcessId(proceId);
 			app.setFlowId(flowId);
 
-			// 拷贝bsp对应的文件夹到app组件工程目录下
-			createBspDir(bspDirPath, appFilePath);
+			r.setData(app);
+			r.setMsg("生成App组件工程文件夹成功。");
 
 			JGitUtil.commitAndPush(appFilePath, "上传App组件工程");
+			return r;
+		} else {
+			return r.setAllAttr(CommonConstants.FAIL, "流程配置xml文件不存在，请重新配置流程。", null);
 		}
-
-		return app;
 	}
 
-	private void createBspDir(String bspDirPath, String appFilePath) {
+	private void createBspDir(R r, String bspDirPath, String appFilePath) {
 		String bspFilePath = appFilePath + "bsp" + File.separator;
 		File bspFile = new File(bspFilePath);
 		if (!bspFile.exists()) {
 			bspFile.mkdirs();
 		}
+		if ("".equals(bspDirPath)) {
+			logger.error("寻找BSP错误，请重新配置流程的BSP");
+			r.setAllAttr(CommonConstants.FAIL, "寻找BSP错误，请重新配置流程的BSP。", null);
+			return;
+		}
 		try {
 			FileUtil.copyDir(proDetailPath + bspDirPath, bspFilePath);
 		} catch (IOException e) {
 			logger.error("复制BSP文件夹错误，请联系系统管理员");
+			r.setAllAttr(CommonConstants.FAIL, "复制BSP文件夹错误，请联系系统管理员", null);
+			return;
 		}
 	}
 
@@ -782,7 +811,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @param appFilePath      app组件工程文件路径
 	 * @param part             组件
 	 */
-	private void createAssemblyDir(String appFilePath, Part part, String libsType,
+	private void createAssemblyDir(R r, String appFilePath, Part part, String libsType,
 			List<PartPlatformSoftware> partPlatformSoftwares, String integerCodeFilePath) {
 		// 创建根组件文件夹的名称及文件路径
 		String assemblyName = appFilePath + part.getPartName();
@@ -802,16 +831,27 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			}
 		}
 
-		try {
-			// 将软件框架所有子文件及文件夹拷贝到根组件文件夹中
-			if (!"".equals(softwareFilePath)) {
-				FileUtil.copyDir(proDetailPath + softwareFilePath, assemblyName);
-			}
-		} catch (IOException e) {
-			logger.error("复制软件框架文件夹错误，请联系系统管理员");
+		if ("".equals(softwareFilePath)) {
+			logger.error(part.getPartName() + "寻找软件框架错误，请配置" + libsType + "对应的软件框架。");
+			r.setAllAttr(CommonConstants.FAIL, part.getPartName() + "寻找软件框架错误，请配置" + libsType + "对应的软件框架。", null);
+			return;
 		}
 
-		String makefileType = getMakefileTypeByProperties(platformName);
+		try {
+			// 将软件框架所有子文件及文件夹拷贝到根组件文件夹中
+			FileUtil.copyDir(proDetailPath + softwareFilePath, assemblyName);
+		} catch (IOException e) {
+			logger.error("复制软件框架" + softwareName + "文件夹错误，请联系系统管理员。");
+			r.setAllAttr(CommonConstants.FAIL, "复制软件框架" + softwareName + "文件夹错误，请联系系统管理员。", null);
+			return;
+		}
+
+		R propertiesReturn = getMakefileTypeByProperties(platformName);
+		if (CommonConstants.FAIL.equals(propertiesReturn.getCode())) {
+			r.setAllAttr(CommonConstants.FAIL, propertiesReturn.getMsg(), null);
+			return;
+		}
+		String makefileType = (String) propertiesReturn.getData();
 
 		// 查找组件文件夹下文件夹名为App的文件夹路径
 		String appFilePathName = FileUtil.getSelectStrFilePath(assemblyName, "App");
@@ -835,7 +875,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			}
 		} catch (IOException e) {
 			logger.error("复制集成代码失败，请联系管理员。");
-			e.printStackTrace();
+			r.setAllAttr(CommonConstants.FAIL, "复制集成代码失败，请联系管理员。", null);
+			return;
 		}
 
 		// 创建空集合，存储所有.h文件路径
@@ -857,8 +898,11 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		selectFileExtensionList.add(".c");
 		selectFileExtensionList.add(".cpp");
 
-		getCompCHFileAndSave(part, assemblyName, includeFilePath, srcFilePath, hFilePathSet, hMakeFilePathSet,
+		getCompCHFileAndSave(r, part, assemblyName, includeFilePath, srcFilePath, hFilePathSet, hMakeFilePathSet,
 				cFilePathSet, cMakeFilePathSet, apiNeedStringSet, compFuncNameList, selectFileExtensionList);
+		if (CommonConstants.FAIL.equals(r.getCode())) {
+			return;
+		}
 
 		FileUtil.getSelectStrFilePathList(linuxCFilePathSet, partIntegerCodeFilePath, selectFileExtensionList);
 
@@ -869,18 +913,11 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			ExternalIOTransUtils.modifySpbInclude(apiFileList,
 					new File(appFilePathName).getParentFile().getAbsolutePath());
 		} catch (IOException e) {
-			logger.error("调用客户接口失败，请联系管理员。");
 			e.printStackTrace();
+			logger.error("调用客户接口失败，请联系管理员。");
+			r.setAllAttr(CommonConstants.FAIL, "调用客户接口失败，请联系管理员。", null);
+			return;
 		}
-//		try {
-//			// 原始需求调用客户接口,apiFileList中存添加的.c .cpp .h文件不带后缀的文件名
-//			List<String> apiFileList = new ArrayList<String>();
-//			apiFileList.addAll(apiNeedStringSet);
-//			ExternalIOTransUtils.modifySpbInclude(apiFileList, appFilePathName);
-//		} catch (IOException e) {
-//			logger.error("调用客户接口失败，请联系管理员。");
-//			e.printStackTrace();
-//		}
 
 //		try {
 //			// 调用客户接口,list中存添加的构件的函数名
@@ -896,19 +933,26 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		List<String> cFilePathList = (List<String>) getListBySet(cFilePathSet);
 		List<String> linuxCFilePath = (List<String>) getListBySet(linuxCFilePathSet);
 
-		if (makefileType.trim().toLowerCase().equals("VS2010".toLowerCase())) {
-			modifyVs2010MakeFile(assemblyName, hMakeFilePathList, cMakeFilePathList);
-		} else if (makefileType.trim().toLowerCase().equals("Workbench".toLowerCase())) {
-			WorkbenchUtil.updateWorkbench(assemblyName);
-		} else if (makefileType.trim().toLowerCase().equals("Sylixos".toLowerCase())) {
-			SylixosUtil.updateSylixos(assemblyName, softwareName);
-		} else if (makefileType.trim().toLowerCase().startsWith("Linux".toLowerCase())) {
-			LinuxUtil.updateLinux(cFilePathList, assemblyName, ".c");
-			// LinuxUtil.updateLinux(linuxCFilePath, assemblyName, ".c");
+		try {
+			if (makefileType.trim().toLowerCase().equals("VS2010".toLowerCase())) {
+				modifyVs2010MakeFile(r, assemblyName, hMakeFilePathList, cMakeFilePathList);
+			} else if (makefileType.trim().toLowerCase().equals("Workbench".toLowerCase())) {
+				WorkbenchUtil.updateWorkbench(assemblyName);
+			} else if (makefileType.trim().toLowerCase().equals("Sylixos".toLowerCase())) {
+				SylixosUtil.updateSylixos(assemblyName, softwareName);
+			} else if (makefileType.trim().toLowerCase().startsWith("Linux".toLowerCase())) {
+				LinuxUtil.updateLinux(cFilePathList, assemblyName, ".c");
+				// LinuxUtil.updateLinux(linuxCFilePath, assemblyName, ".c");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("调用" + makefileType + "工具类修改MakeFile文件失败，请联系管理员。");
+			r.setAllAttr(CommonConstants.FAIL, "调用" + makefileType + "工具类修改MakeFile文件失败，请联系管理员。", null);
+			return;
 		}
 	}
 
-	private void getCompCHFileAndSave(Part part, String assemblyName, String includeFilePath, String srcFilePath,
+	private void getCompCHFileAndSave(R r, Part part, String assemblyName, String includeFilePath, String srcFilePath,
 			Set<String> hFilePathSet, Set<String> hMakeFilePathSet, Set<String> cFilePathSet,
 			Set<String> cMakeFilePathSet, Set<String> apiNeedStringSet, List<String> compFuncNameList,
 			List<String> selectFileExtensionList) {
@@ -936,7 +980,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				String hFileName = new File(hFilePath).getName();
 				apiNeedStringSet.add(hFileName.substring(0, hFileName.lastIndexOf(".")));
 			} catch (Exception e) {
-				logger.error("拷贝h文件错误，请联系管理员。");
+				logger.error("复制.h文件错误，请联系管理员。");
+				r.setAllAttr(CommonConstants.FAIL, "复制" + hFilePath + "文件到" + includeFilePath + "路径下错误，请联系管理员。", null);
+				return;
 			}
 		}
 
@@ -951,12 +997,14 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				String cFileName = new File(cFilePath).getName();
 				apiNeedStringSet.add(cFileName.substring(0, cFileName.lastIndexOf(".")));
 			} catch (IOException e) {
-				logger.error("拷贝c文件错误，请联系管理员。");
+				logger.error("复制.c文件错误，请联系管理员。");
+				r.setAllAttr(CommonConstants.FAIL, "复制" + cFilePath + "文件到" + srcFilePath + "路径下错误，请联系管理员。", null);
+				return;
 			}
 		}
 	}
 
-	private String getMakefileTypeByProperties(String platformName) {
+	private R getMakefileTypeByProperties(String platformName) {
 		String makefileType = null;
 		// 获取当前类的路径
 		String filePath = ManagerServiceImpl.class.getResource("").getPath();
@@ -966,6 +1014,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		} catch (UnsupportedEncodingException e1) {
 			e1.printStackTrace();
 			logger.error("中文路径转义失败。");
+			return new R<>(CommonConstants.FAIL, "中文路径转义失败。", null);
 		}
 		// 找到bootstrap.properties的地址
 		filePath = filePath.substring(0, filePath.indexOf("target/classes/") + "target/classes/".length())
@@ -978,13 +1027,14 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			makefileType = father.get(platformName).toString();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			logger.error("读取配置文件失败，请检查配置文件中配置是否正确");
+			logger.error("读取配置文件失败，请检查配置文件中" + platformName + "配置是否正确");
+			return new R<>(CommonConstants.FAIL, "读取配置文件失败，请检查配置文件中" + platformName + "配置是否正确", null);
 		}
 
-		return makefileType;
+		return new R<>(makefileType);
 	}
 
-	private void modifyVs2010MakeFile(String assemblyName, List<String> hMakeFilePathList,
+	private void modifyVs2010MakeFile(R r, String assemblyName, List<String> hMakeFilePathList,
 			List<String> cMakeFilePathList) {
 		// 获取makeFile文件,vs2010中的.filters文件
 		Set<String> makeFileList = new HashSet<String>();
@@ -994,6 +1044,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			List<String> list = new ArrayList<>();
 			list.addAll(makeFileList);
 			filtersFileName = list.get(0);
+		} else {
+			r.setAllAttr(CommonConstants.FAIL, "查找" + assemblyName + "路径下.filters文件失败，请确认选择的软件框架正确及其他配置正确。", null);
+			return;
 		}
 		// 获取makeFile文件,vs2010中的. vcxproj文件
 		String vcxprojFileName = null;
@@ -1003,6 +1056,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			List<String> list = new ArrayList<>();
 			list.addAll(makeFileList);
 			vcxprojFileName = list.get(0);
+		} else {
+			r.setAllAttr(CommonConstants.FAIL, "查找" + assemblyName + "路径下.vcxproj文件失败，请确认选择的软件框架正确及其他配置正确。", null);
+			return;
 		}
 
 		// 调用makeFile工具类，传入参数makeFile文件路径、需要修改的文件路径集合、文件类型

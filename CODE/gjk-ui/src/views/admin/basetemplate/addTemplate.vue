@@ -8,9 +8,9 @@
       <div class="filter-container">
         <el-button-group>
           <el-button type="primary" icon="plus" @click="addSonLable">添加</el-button>
-          <el-button type="primary" icon="edit" @click="isEidtLable=true">编辑</el-button>
+          <el-button type="primary" icon="edit" @click="eidtLableDialog">编辑</el-button>
           <el-button type="primary" icon="delete" @click="handleDelete">删除</el-button>
-          <el-button type="primary" icon="delete" @click="isCopyNode=true">复制节点</el-button>
+          <el-button type="primary" icon="delete" @click="copyNodesDialog">复制节点</el-button>
           <el-button type="primary" @click="save">保存</el-button>
         </el-button-group>
       </div>
@@ -149,8 +149,8 @@
           <el-row>
             <el-col :span="4">标签名</el-col>
             <el-col :span="5">
-              <!-- <el-input v-model="configureType.lableName" placeholder="请输入标签名"></el-input> -->
-              <el-select
+              <el-input v-model="configureType.lableName" placeholder="请输入标签名"></el-input>
+              <!-- <el-select
                 v-model="configureType.lableName"
                 filterable
                 allow-create
@@ -162,7 +162,7 @@
                   :label="item.value"
                   :value="item.value"
                 ></el-option>
-              </el-select>
+              </el-select>-->
             </el-col>
             <!--标签名是否映射选择-->
             <el-col :span="3">是否映射</el-col>
@@ -215,7 +215,12 @@
             <el-table-column label="属性名">
               <template slot-scope="scope">
                 <!-- <el-input v-model="scope.row.attrName" placeholder="请输入属性名"></el-input> -->
-                <el-select
+                <el-input
+                  v-model="scope.row.attrName"
+                  placeholder="请输入属性名"
+                  @change.native="attrNameChange(scope.row)"
+                ></el-input>
+                <!-- <el-select
                   v-model="scope.row.attrName"
                   filterable
                   allow-create
@@ -227,7 +232,7 @@
                     :label="item.value"
                     :value="item.value"
                   ></el-option>
-                </el-select>
+                </el-select>-->
               </template>
             </el-table-column>
             <!--选择属性名是否映射-->
@@ -254,7 +259,7 @@
                   placeholder="映射名"
                 >
                   <el-option
-                    v-for="item in dictValues"
+                    v-for="item in scope.row.mappingData"
                     :key="item.label"
                     :label="item.label"
                     :value="item.label"
@@ -349,9 +354,9 @@
           <el-row>
             <el-col :span="4">标签名</el-col>
             <el-col :span="4">
-              <!-- <el-input v-model="configureType.lableName" placeholder="请输入标签名"></el-input> -->
+              <el-input v-model="configureType.lableName" placeholder="请输入标签名"></el-input>
 
-              <el-select
+              <!-- <el-select
                 v-model="configureType.lableName"
                 filterable
                 allow-create
@@ -363,7 +368,7 @@
                   :label="item.value"
                   :value="item.value"
                 ></el-option>
-              </el-select>
+              </el-select>-->
             </el-col>
             <!--标签名是否映射-->
             <el-col :span="3">是否映射</el-col>
@@ -415,7 +420,11 @@
             <!--属性名-->
             <el-table-column label="属性名">
               <template slot-scope="scope">
-                 <el-input v-model="scope.row.attrName" placeholder="请输入属性名" @change.native="attrNameChange(scope.row)"></el-input>
+                <el-input
+                  v-model="scope.row.attrName"
+                  placeholder="请输入属性名"
+                  @change.native="attrNameChange(scope.row)"
+                ></el-input>
                 <!-- <el-input v-model="scope.row.attrName" placeholder="请输入属性名"></el-input> -->
                 <!-- <el-select
                   v-model="scope.row.attrName"
@@ -429,7 +438,7 @@
                     :label="item.value"
                     :value="item.value"
                   ></el-option>
-                </el-select> -->
+                </el-select>-->
               </template>
             </el-table-column>
             <!--属性名是否映射-->
@@ -456,7 +465,7 @@
                   placeholder="映射名"
                 >
                   <el-option
-                    v-for="item in dictValues"
+                    v-for="item in scope.row.mappingData"
                     :key="item.label"
                     :label="item.label"
                     :value="item.label"
@@ -580,13 +589,16 @@
   </div>
 </template>
 <script>
-import { parseStrToObj } from "@/util/util";
-import { parseObjToStr } from "@/util/util";
-import { parseXml } from "@/api/admin/basetemplate"; //解析xml
-import { addObj } from "@/api/admin/basetemplate"; //保存
-import { getDictValue } from "@/api/admin/dict"; //获取字典数据
-import { getDicts, getDictTypes, remote } from "@/api/admin/dict"; //获取字典数据
-import { addObj as addDict } from "@/api/admin/dict"; //添加数据到字典中
+import { parseStrToObj, parseObjToStr } from "@/util/util";
+import { parseXml, addObj } from "@/api/admin/basetemplate"; //解析xml
+import {
+  getDicts,
+  getDictTypes,
+  remote,
+  getDictMappingData,
+  getDictValue,
+  addObj as addDict
+} from "@/api/admin/dict"; //获取字典数据
 import { type } from "os";
 import { getUploadFilesUrl } from "@/api/comp/componentdetail"; //文件上传接口
 import filesUpload from "@/views/comp/code-editor/files-upload"; //文件夹上传组件
@@ -624,6 +636,7 @@ export default {
     //这里存放数据
 
     return {
+      DictVO: {},
       actionOptions: [], //动作下拉框值的
       BaseTemplateBTO: {}, //保存模板使用对象
       BaseTemplate: {}, //模板对象
@@ -787,10 +800,17 @@ export default {
   },
   //方法集合
   methods: {
-    attrNameChange(row){
-console.log("1234567890-=-098765432",row)
+    attrNameChange(row) {
+      //属性名改变,映射数组跟着改变的方法
+      var SysDict = {
+        value: row.attrName,
+        type: this.template
+      };
+      getDicts(SysDict).then(response => {
+        row.mappingData = response.data.data;
+      });
     },
-    getNodeData(data, node) {
+    async getNodeData(data, node) {
       //点击获取节点
       console.log("当前data", data);
       console.log("当前node", node);
@@ -801,7 +821,6 @@ console.log("1234567890-=-098765432",row)
       var configureType = {};
       if (attributeMap != null) {
         //获取标签上属性的配置方式
-
         var str = attributeMap["configureType"];
         configureType = parseStrToObj(str);
         this.configureType = configureType;
@@ -817,6 +836,16 @@ console.log("1234567890-=-098765432",row)
 
         if (attrs != undefined && attrs.length > 0) {
           for (var i = 0; i < attrs.length; i++) {
+            
+              var SysDict = {
+                value: attrs[i].attrName,
+                type: this.template
+              };
+              await getDicts(SysDict).then(response => {
+                attrs[i].mappingData = response.data.data;
+              });
+            
+
             if (attrs[i].attrConfigType == "selectComm") {
               //匹配下拉框中的数据来源
               if (attrs[i].dataKey == "dict") {
@@ -854,11 +883,10 @@ console.log("1234567890-=-098765432",row)
         this.currentXmlMap.lableName == "" ||
         this.currentXmlMap.lableName == undefined
       ) {
-        this.$confirm("请选择一个标签", "提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
+        this.$message({
+          message: "警告，请选择一个树节点",
           type: "warning"
-        }).then(() => {});
+        });
       } else {
         this.isAddLable = true;
         this.lableName = "";
@@ -885,7 +913,8 @@ console.log("1234567890-=-098765432",row)
         actionType: "",
         isShow: true,
         attrKeys: undefined,
-        attrConfigType: ""
+        attrConfigType: "",
+        mappingData: []
       });
     },
 
@@ -943,10 +972,11 @@ console.log("1234567890-=-098765432",row)
             type: this.template,
             label: lableMappingName,
             description: description,
+            remarks: "mapperType",
             sort: 0
           };
           await addDict(SysDict); //发送同步请求,存数据到字典表中
-          await getDictValue(this.template).then(response => {
+          await getDictMappingData(this.DictVO).then(response => {
             //发送同步请求,查询字典表数据
             this.dictValues = response.data.data; //刷新页面字典表数据
           });
@@ -1021,10 +1051,11 @@ console.log("1234567890-=-098765432",row)
                 type: this.template,
                 label: i.attrMappingName,
                 description: description,
+                remarks: "mapperType",
                 sort: 0
               };
               await addDict(SysDict); //发送同步请求添加新数据值字典表中
-              await getDictValue(this.template).then(response => {
+              await getDictMappingData(this.DictVO).then(response => {
                 //更新前端页面字典表数据
                 this.dictValues = response.data.data;
               });
@@ -1036,7 +1067,7 @@ console.log("1234567890-=-098765432",row)
           Vue.set(currentXmlMap.attributeMap, i.attrName, ""); //遍历添加属性
         }
         if (attrs.length > 0) {
-          await getDictValue(this.template).then(response => {
+          await getDictMappingData(this.DictVO).then(response => {
             this.dictValues = response.data.data; //刷新页面上字典表数据
             for (var i = 0; i < attrs.length; i++) {
               //对映射的属性名,字典表中又没有对应映射数据的数据,存入attrKeys字段上
@@ -1102,6 +1133,20 @@ console.log("1234567890-=-098765432",row)
       this.lablePosition = "in";
       this.isAddLable = false;
     },
+    //编辑标签弹对话框的方法
+    eidtLableDialog() {
+      if (
+        this.currentXmlMap.lableName == "" ||
+        this.currentXmlMap.lableName == undefined
+      ) {
+        this.$message({
+          message: "警告，请选择一个树节点",
+          type: "warning"
+        });
+      } else {
+        this.isEidtLable = true;
+      }
+    },
 
     async eidtLable() {
       //编辑标签
@@ -1151,11 +1196,12 @@ console.log("1234567890-=-098765432",row)
             type: this.template,
             label: this.lableMappingName,
             description: description,
+            remarks: "mapperType",
             sort: 0
           };
 
           await addDict(SysDict); //添加新数据到字典表中
-          await getDictValue(this.template).then(response => {
+          await getDictMappingData(this.DictVO).then(response => {
             //页面刷新字典表数据
             this.dictValues = response.data.data;
           });
@@ -1220,6 +1266,7 @@ console.log("1234567890-=-098765432",row)
                 type: this.template,
                 label: i.attrMappingName,
                 description: description,
+                remarks: "mapperType",
                 sort: 0
               };
 
@@ -1233,7 +1280,7 @@ console.log("1234567890-=-098765432",row)
           Vue.set(this.currentXmlMap.attributeMap, i.attrName, ""); //遍历添加属性
         }
         if (attrs.length > 0) {
-          await getDictValue(this.template).then(response => {
+          await getDictMappingData(this.DictVO).then(response => {
             this.dictValues = response.data.data;
             for (let i of attrs) {
               if (i.attrMapping) {
@@ -1268,19 +1315,43 @@ console.log("1234567890-=-098765432",row)
 
     handleDelete() {
       //删除标签
-      this.$confirm("此操作将永久删除, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
-        if (this.parentXmlMap.length > 0) {
-          var index = this.parentXmlMap.indexOf(this.currentXmlMap);
-          this.parentXmlMap.splice(index, 1);
-        } else {
-          var index = this.parentXmlMap.children.indexOf(this.currentXmlMap);
-          this.parentXmlMap.children.splice(index, 1);
-        }
-      });
+      if (
+        this.currentXmlMap.lableName == "" ||
+        this.currentXmlMap.lableName == undefined
+      ) {
+        this.$message({
+          message: "警告，请选择一个树节点",
+          type: "warning"
+        });
+      } else {
+        this.$confirm("此操作将永久删除此标签, 是否继续?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(() => {
+          if (this.parentXmlMap.length > 0) {
+            var index = this.parentXmlMap.indexOf(this.currentXmlMap);
+            this.parentXmlMap.splice(index, 1);
+          } else {
+            var index = this.parentXmlMap.children.indexOf(this.currentXmlMap);
+            this.parentXmlMap.children.splice(index, 1);
+          }
+        });
+      }
+    },
+
+    copyNodesDialog() {
+      if (
+        this.currentXmlMap.lableName == "" ||
+        this.currentXmlMap.lableName == undefined
+      ) {
+        this.$message({
+          message: "警告，请选择一个被复制的树节点",
+          type: "warning"
+        });
+      } else {
+        this.isCopyNode = true;
+      }
     },
 
     copyNode() {
@@ -1317,18 +1388,63 @@ console.log("1234567890-=-098765432",row)
       this.isCopyNode = false;
     },
 
+    //删除configureType中attrs数组对象中的mappingData属性
+    deleteMappingData(XmlEntityMap) {
+      var attrMap = XmlEntityMap.attributeMap;
+      var configureType = undefined;
+      if (attrMap != null && attrMap != undefined) {
+        for (let i in attrMap) {
+          //提取configureType对象
+          if (i === "configureType") {
+            configureType = parseStrToObj(attrMap[i]);
+          }
+        }
+        if (configureType != undefined) {
+          //判断configureType对象是否存在
+          var attrs = configureType.attrs;
+          if (attrs != undefined && attrs.length > 0) {
+            //判断标签上是否拥有属性
+            for (let i of attrs) {
+              //遍历属性
+              Vue.delete(i, "mappingData");
+            }
+          }
+          var str = parseObjToStr(configureType);
+          Vue.set(XmlEntityMap.attributeMap, "configureType", str);
+        }
+        if (
+          XmlEntityMap.xmlEntityMaps != null &&
+          XmlEntityMap.xmlEntityMaps.length > 0
+        ) {
+          for (var i = 0; i < XmlEntityMap.xmlEntityMaps.length; i++) {
+            this.deleteMappingData(XmlEntityMap.xmlEntityMaps[i]); //递归
+          }
+        }
+      }
+    },
+
     save() {
       //保存
-      Vue.set(this.BaseTemplateBTO, "baseTemplate", this.BaseTemplate);
-      Vue.set(this.BaseTemplateBTO, "xmlEntityMap", this.XmlEntityMap);
-      console.log(this.BaseTemplateBTO);
-      addObj(this.BaseTemplateBTO).then(repsonse => {
-        if (repsonse.data.code == 0) {
-          console.log("保存成功");
-          this.$router.replace("/admin/basetemplate"); //保存成功后.跳转到首页
-        } else {
-          console.log("保存失败");
-        }
+      this.$confirm("此操作将要保存此模板, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        this.deleteMappingData(this.XmlEntityMap);
+        Vue.set(this.BaseTemplateBTO, "baseTemplate", this.BaseTemplate);
+        Vue.set(this.BaseTemplateBTO, "xmlEntityMap", this.XmlEntityMap);
+        console.log(this.BaseTemplateBTO);
+        addObj(this.BaseTemplateBTO).then(repsonse => {
+          if (repsonse.data.code == 0) {
+            this.$message({
+              message: "模板保存成功",
+              type: "success"
+            });
+            this.$router.replace("/admin/basetemplate"); //保存成功后.跳转到首页
+          } else {
+            this.$message.error("模板保存失败");
+          }
+        });
       });
     },
 
@@ -1396,6 +1512,7 @@ console.log("1234567890-=-098765432",row)
             //判断标签上是否拥有属性
             for (let i of attrs) {
               //遍历属性
+
               if (i.attrMapping) {
                 //判断属性名是否映射
                 for (let j of dictValues) {
@@ -1407,7 +1524,10 @@ console.log("1234567890-=-098765432",row)
               } else {
                 Vue.set(i, "attrMappingName", i.attrName); //否则显示原始属性名
               }
+              Vue.set(i, "mappingData", []);
             }
+            var str = parseObjToStr(configureType);
+            Vue.set(XmlEntityMap.attributeMap, "configureType", str);
           }
         } else {
           //如果xml文件中没有configureType对象,使用递归给每个标签上添加configureType属性,此对象带有默认值
@@ -1427,7 +1547,8 @@ console.log("1234567890-=-098765432",row)
               actionType: "",
               isShow: true,
               attrKeys: undefined,
-              attrConfigType: "inputComm"
+              attrConfigType: "inputComm",
+              mappingData: []
             });
           }
           Vue.set(XmlEntityMap, "lableMappingName", XmlEntityMap.lableName);
@@ -1491,7 +1612,11 @@ console.log("1234567890-=-098765432",row)
     var BaseTemplatePathDTO = {
       path: this.BaseTemplate.baseTemplatePath
     };
-    getDictValue(this.template).then(response => {
+    this.DictVO = {
+      type: this.template,
+      remarks: "mapperType"
+    };
+    getDictMappingData(this.DictVO).then(response => {
       //获取到字典表中固定类型的数据
       this.dictValues = response.data.data;
       //this.attrDicts = response.data.data;

@@ -934,18 +934,35 @@ export default {
     },
     //处理中英文映射
     analysisMapping(from) {
-      var showName = from.lableName;
-      var attrs = [];
+      //标签名是否要中英文映射
       var attrObj = eval("(" + from.attributeMap.configureType + ")");
+      let showName;
+      if (attrObj.lableMapping) {
+        let param = this.compChineseMapping.find(item => {
+          return item.id === attrObj.mappingKeys;
+        });
+        showName = param === undefined ? from.lableName : param.label;
+      } else {
+        showName = from.lableName;
+      }
+      // var showName = from.lableName;
+      var attrs = [];
       if (attrObj.hasOwnProperty("attrs")) {
         attrObj.attrs.forEach(con => {
           con.keys = randomLenNum(5, true);
           con.lableName = from.attributeMap[con.attrName];
           if (con.hasOwnProperty("attrMapping") && con.attrMapping) {
-            let val = this.compChineseMapping.find(item => {
-              return item.label === con.attrKeys;
+            //基于标签名
+            // let val = this.compChineseMapping.find(item => {
+            //   return item.label === con.attrKeys;
+            // });
+            // con.attrMappingName = val === undefined ? con.attrName : val.value;
+            /* 基于id */
+            let valParam = this.compChineseMapping.find(item => {
+              return item.id === con.attrKeys;
             });
-            con.attrMappingName = val === undefined ? con.attrName : val.value;
+            con.attrMappingName =
+              valParam === undefined ? con.attrName : valParam.label;
           } else if (
             attrObj.attrs !== undefined &&
             attrObj.attrs.length === 1

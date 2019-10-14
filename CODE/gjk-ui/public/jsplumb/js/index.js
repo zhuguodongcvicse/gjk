@@ -24,7 +24,10 @@ var selectNodeId = ""
 var connectionData = []
 //是否与vue页面进行数据交互
 //var isInteraction = false
-
+//鼠标在当前画布的位置X
+var div_rightX = ""
+//鼠标在当前画布的位置Y
+var div_rightY = ""
 //var loadingState = true;
 //存储上一次点击的构件id
 var lastTimeId = ""
@@ -184,6 +187,9 @@ var gjTemplateId;
 function dropNode(template, position) {
 	//console.log(position);
 	position.left -= $('#side-buttons').outerWidth()
+	position.left = position.left + $(areaId).scrollLeft()
+	position.top = position.top + $(areaId).scrollTop()
+	console.log("position+++++++++++++++",position)
 	position.id = uuid.v1()
 	//position.generateId = uuid.v1
 	gjTemplateId = position.id;
@@ -472,7 +478,7 @@ function addDraggable(id) {
 					var t1 = $a.context.offsetTop;
 					var h1 = $a.context.offsetLeft;
 					topList[i] = t1 - t0;
-					leftList[i] = h1 - h0 + 170;
+					leftList[i] = h1 - h0 + 140; //220
 				}
 			} else {
 				oldPosition.push(saveNodePosition(id))
@@ -589,6 +595,24 @@ function appendDiv() {
 
 var mousedownState = 0;
 var canvasState = false
+//初始固定画布大小
+function fixDiv(){
+	var fixDivStr = "<div class='pa1' id='0' style='top:'4000px';left:'6100px';border:'2px solid red' '>1111111111</div>"
+	$('body').append(fixDivStr);
+}
+// var div_right = document.getElementById('drop-bg')
+// div_right.onmousemove=function(event){
+// 	console.log(event)
+// 	var e=event || window.event;
+// 	var m_x=e.clientX;
+// 	var m_y=e.clientY;
+// 	var mainL=this.offsetLeft;
+// 	var mainT=this.offsetTop;
+// 	div_rightX = m_x-mainL;
+// 	div_rightY = m_y-mainT;
+// 	console.log("XXXXXXXXXXXXXXXXXXXXXXX",e.offsetX)
+// 	console.log("YYYYYYYYYYYYYYYYYYYYYYY",e.offsetY)
+// }
 //入口方法
 function main() {
 	window.clearInterval(int);
@@ -602,6 +626,7 @@ function main() {
 	$(areaId).droppable({
 		scope: 'ss',
 		drop: function (event, ui) {
+			console.log("+++++++++", $(areaId).scrollTop())
 			dropNode(ui.draggable[0].dataset.template, ui.position)
 			//$('#propertybar').show();
 			var gj = getGj(ui.draggable[0].dataset.template);
@@ -824,7 +849,7 @@ function saveNodeJson(nodeId) {
 			id: nodeId
 		});
 	});
-
+	console.log("当前画布的数据+++++++++++++++++",canvasData)
 	nodes.push({
 		blockId: nodeId,
 		//nodetype: $elem.attr('data-nodetype'),
@@ -832,10 +857,12 @@ function saveNodeJson(nodeId) {
 		positionY: parseInt($("#" + nodeId).css("top"), 10),
 		imageId: i,
 		//text: $('#' + $elem.attr('id') + '-heading').find("div").find("div").html(),
-		outPointsData: dat[i].outputList,
-		inPointsData: dat[i].inputList,
-		compImg: dat[i].compImg,
-		compId: dat[i].id
+		outPointsData: canvasData.get(nodeId).outputList,
+		inPointsData: canvasData.get(nodeId).inputList,
+		compImg: canvasData.get(nodeId).compImg,
+		compId: canvasData.get(nodeId).id,
+		nodeData : canvasData.get(nodeId)
+
 	});
 	var connections = [];
 	$.each(jsPlumb.getConnections(), function (idx, connection) {
@@ -1250,7 +1277,8 @@ jsPlumb.bind("connectionDragStop", function (info) {
 		} else {
 			//获取源节点数据下标
 			var sourceGj = $('#' + source + '-heading')[0].dataset.id;
-			sourceType = dat[sourceGj].outputList[sourceUid.split("*")[0]].dataTypeName;
+			//sourceType = dat[sourceGj].outputList[sourceUid.split("*")[0]].dataTypeName;
+			sourceType = canvasData.get(source).outputList[sourceUid.split("*")[0]].dataTypeName
 			//console.log("源节点属性else",sourceType);
 		}
 
@@ -1273,11 +1301,12 @@ jsPlumb.bind("connectionDragStop", function (info) {
 		} else {
 			//获取目标节点数据下标
 			var targetGj = $('#' + target + '-heading')[0].dataset.id;
-			targetType = dat[targetGj].inputList[targetUid.split("*")[0]].dataTypeName;
-			//console.log("目标节点属性else",targetType);
+			targetType = canvasData.get(target).inputList[targetUid.split("*")[0]].dataTypeName 
+			//targetType = dat[targetGj].inputList[targetUid.split("*")[0]].dataTypeName;
+			console.log("目标节点属性else",targetType);
 		}
-		// console.log("源节点类型",sourceType);
-		// console.log("目标节点类型",targetType);
+		console.log("源节点类型",sourceType);
+		console.log("目标节点类型",targetType);
 		// console.log("连线关系",connectionData)
 		var isConnect = false
 		if (sourceType == targetType) {
@@ -1759,6 +1788,7 @@ document.onkeydown = function () {
 				copyPream.push(copyJson)
 				copyData = copyPream
 			}
+			sessionStorage.setItem("copyData", JSON.stringify(copyData));
 			for (var a = 0; a < idList.length; a++) {
 				jsPlumb.remove(idList[a])
 			}
@@ -1819,7 +1849,8 @@ function pasteJson(pasteDataJson) {
 	//console.log(nodes);
 	$.each(nodes, function (index, elem) {
 		var newId = uuid.v1()
-		canvasData.set(newId, canvasData.get(elem.blockId))
+		//console.log("画布数据",canvasData,elem.blockId);
+		canvasData.set(newId, elem.nodeData)
 		connectionMap.set(elem.blockId, newId)
 		// console.log("画布数据",canvasData);	
 		// console.log("节点ID",elem.blockId)
@@ -2181,6 +2212,7 @@ function cleanCanvas(){
 		jsPlumb.remove($elem.attr('id'))
 	})
 }
+//保存流程图为json字符串
 function saveFlowchart() {
 	//画布节点信息
 	var nodes = [];
@@ -2209,10 +2241,11 @@ function saveFlowchart() {
 			positionY: parseInt($elem.css("top"), 10),
 			imageId: i,
 			//text: $('#' + $elem.attr('id') + '-heading').find("div").find("div").html(),
-			outPointsData: dat[i].outputList,
-			inPointsData: dat[i].inputList,
-			compImg: dat[i].compImg,
-			compId: dat[i].compId
+			outPointsData: canvasData.get($elem.attr('id')).outputList,
+			inPointsData: canvasData.get($elem.attr('id')).inputList,
+			compImg: canvasData.get($elem.attr('id')).compImg,
+			compId: canvasData.get($elem.attr('id')).compId,
+			nodeData : canvasData.get($elem.attr('id'))
 		});
 		//nodes.push(jsonendpoints);
 		//outPointsData.push(dat[i].outputList);
@@ -2298,6 +2331,7 @@ function loadJson(loadJson) {
 	var addPoinrData = loadJson.addPointParam;
 	//console.log(nodes);
 	$.each(nodes, function (index, elem) {
+		canvasData.set(elem.blockId,elem.nodeData)
 		var Template1 = ""
 		Template1 +=
 			"<div class='pa' id='" + elem.blockId + "' style='top:" + elem.positionY + "px;left:" + elem.positionX + "px'>" +
@@ -2673,52 +2707,77 @@ $('.div_right').bind({
 });
 
 //画布初始比例
-// var scale = 1
-// $(".div_right").bind('mousewheel DOMMouseScroll', function (event) { //on也可以 bind监听
-// 	var wheel = event.originalEvent.wheelDelta;
-// 	var detal = event.originalEvent.detail;
-// 	if (event.originalEvent.wheelDelta && event.ctrlKey == true) { //判断浏览器IE,谷歌滚轮事件        
-// 		//禁止页面触发比例缩放
-// 		event.preventDefault()
-// 		if (wheel > 0) { //当滑轮向上滚动时 
-// 			if (scale < 1.6) {
-// 				scale = scale + 0.2
-// 				$(".div_right").css({
-// 					"-webkit-transform": `scale(${scale})`,
-// 					"-moz-transform": `scale(${scale})`,
-// 					"-ms-transform": `scale(${scale})`,
-// 					"-o-transform": `scale(${scale})`,
-// 					"transform": `scale(${scale})`
-// 				})
-// 				jsPlumb.setSuspendDrawing(false, true)
-// 			}
+var scale = 1
+$(".div_right").bind('mousewheel DOMMouseScroll', function (event) { //on也可以 bind监听
+	var wheel = event.originalEvent.wheelDelta;
+	var detal = event.originalEvent.detail;
+	if (event.originalEvent.wheelDelta && event.ctrlKey == true) { //判断浏览器IE,谷歌滚轮事件        
+		//禁止页面触发比例缩放
+		event.preventDefault()
+		if (wheel > 0) { //当滑轮向上滚动时 
+			if (scale < 1.6) {
+				scale = scale + 0.2
+				$(".div_right").css({
+					"-webkit-transform": `scale(${scale})`,
+					"-moz-transform": `scale(${scale})`,
+					"-ms-transform": `scale(${scale})`,
+					"-o-transform": `scale(${scale})`,
+					"transform": `scale(${scale})`
+				})
+				// $('.pa').each(function(index,elem){
+				// 	var $elem = $(elem);
+				// 	var pointArray = jsPlumb.getEndpoints($elem.attr('id'))
+				// 	$.map(pointArray,function(point){
+				// 		console.log("每个锚点",point)
+				// 		$(point.canvas).css({
+				// 			"-webkit-transform": `scale(${scale})`,
+				// 			"-moz-transform": `scale(${scale})`,
+				// 			"-ms-transform": `scale(${scale})`,
+				// 			"-o-transform": `scale(${scale})`,
+				// 			"transform": `scale(${scale})`
+				// 		})
+				// 		jsPlumb.setSuspendDrawing(true)
+				// 	})
+				// })
+				// $.each(jsPlumb.getConnections(), function (idx, connection) {
+				// 	console.log("每条连线",connection)
+				// 	$(connection.canvas).css({
+				// 		"-webkit-transform": `scale(${scale})`,
+				// 			"-moz-transform": `scale(${scale})`,
+				// 			"-ms-transform": `scale(${scale})`,
+				// 			"-o-transform": `scale(${scale})`,
+				// 			"transform": `scale(${scale})`
+				// 	})
+				// })
+				
+			}
 
-// 		}
-// 		if (wheel < 0) { //当滑轮向下滚动时  
-// 			console.log(wheel)
-// 			if(scale>0.6){
-// 				scale = scale - 0.2
-// 				$(".div_right").css({
-// 					"-webkit-transform": `scale(${scale})`,
-// 					"-moz-transform": `scale(${scale})`,
-// 					"-ms-transform": `scale(${scale})`,
-// 					"-o-transform": `scale(${scale})`,
-// 					"transform": `scale(${scale})`
-// 				})
-// 				jsPlumb.setSuspendDrawing(false, true)
-// 			}	
-// 		}
-// 	} else if (event.originalEvent.detail) {  //Firefox滚轮事件  
-// 		if (detal > 0) { //当滑轮向下滚动时  
+		}
+		if (wheel < 0) { //当滑轮向下滚动时  
+			console.log(wheel)
+			if(scale>0.6){
+				scale = scale - 0.2
+				$(".div_right").css({
+					"-webkit-transform": `scale(${scale})`,
+					"-moz-transform": `scale(${scale})`,
+					"-ms-transform": `scale(${scale})`,
+					"-o-transform": `scale(${scale})`,
+					"transform": `scale(${scale})`
+				})
+				jsPlumb.setSuspendDrawing(false, true)
+			}	
+		}
+	} else if (event.originalEvent.detail) {  //Firefox滚轮事件  
+		if (detal > 0) { //当滑轮向下滚动时  
 
-// 		}
-// 		if (detal < 0) { //当滑轮向上滚动时  
+		}
+		if (detal < 0) { //当滑轮向上滚动时  
 
-// 		}
+		}
 
-// 	}
+	}
 
-// });
+});
 
 // $("#mySelect").bind("change",function(){
 // 	var id = ""

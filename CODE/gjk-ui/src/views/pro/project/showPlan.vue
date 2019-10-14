@@ -125,7 +125,7 @@ export default {
           // ffff.方案 = Response.data.data.xmlEntityMaps[i].attributeMap.name;
           //展示方案名时，只展示文件名
           let stri = (Response.data.data.xmlEntityMaps[i].attributeMap.name).substring((Response.data.data.xmlEntityMaps[i].attributeMap.name).lastIndexOf("\\")+1);
-          ffff.方案 = stri.substring(0,stri.lastIndexOf("."));
+          ffff.方案 = stri;
           for (var j = 0; j < ooooo.length; j++) {
             for (
               var p = 0;
@@ -157,8 +157,6 @@ export default {
     //实现单选
     handleCurrentChange(row) {
       this.tableDate.forEach(item => {
-        console.log("item.方案：",item.方案);
-        console.log("row.方案：：",row.方案);
         //实现单选
         if (item.方案 != row.方案) {
           item.checked = false;
@@ -168,13 +166,11 @@ export default {
           for (var j = 0; j < this.planSelected.xmlEntityMaps.length; j++) {
              str = (this.planSelected.xmlEntityMaps[j].attributeMap.name).substring((this.planSelected.xmlEntityMaps[j].attributeMap.name).lastIndexOf("\\")+1);
             if (
-              // row.方案 === this.planSelected.xmlEntityMaps[j].attributeMap.name
-              row.方案 === str.substring(0,str.lastIndexOf("."))
+              row.方案 === str
             ) {
               this.filePath = this.planSelected.xmlEntityMaps[
                 j
               ].attributeMap.filepath;
-              // console.log();
               console.log("pppppppp:::",this.filePath);
             }
           }
