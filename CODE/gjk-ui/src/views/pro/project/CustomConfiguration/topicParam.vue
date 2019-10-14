@@ -378,9 +378,17 @@ export default {
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
     this.$store.dispatch("cleanSubMapCustomConfig")
-    this.themeData = this.xmlDataMap[this.$route.query.sysId].themeData
-    console.log("解析xml所得数据+++++++++",this.themeData)
-    this.partList = this.xmlDataMap[this.$route.query.sysId].partList
+    for(var x = 0;x<this.xmlDataMap.length;x++){
+      for(var i in this.xmlDataMap[x]) {
+        if(i==this.$route.query.sysId){
+           this.themeData = this.xmlDataMap[x][i].themeData
+           this.partList = this.xmlDataMap[x][i].partList
+        }
+      }
+    }
+    //this.themeData = this.xmlDataMap[this.$route.query.sysId].themeData
+    //console.log("解析xml所得数据+++++++++",this.themeData)
+    //this.partList = this.xmlDataMap[this.$route.query.sysId].partList
    //console.log("topicParam",this.themeData.xmlEntityMaps[0].xmlEntityMaps)
     // console.log("topic中的数据",this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps)
     if(this.themeData.xmlEntityMaps != null){
