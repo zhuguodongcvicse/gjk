@@ -75,3 +75,11 @@ export function getDictTypes () {
 
   })
 }
+
+export function getDictMappingData (dict) {
+  return request({
+    url: '/admin/dict/typeAndRemarks',
+    method: 'put',
+    data:dict
+  })
+}
