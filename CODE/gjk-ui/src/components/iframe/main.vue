@@ -17,11 +17,11 @@ export default {
     NProgress.configure({ showSpinner: false });
   },
   mounted() {
-    this.load();
-    this.resize();
-    window.addEventListener("message", this.handleMessage); // 子接收方式二参数
     const _this = this;
     this.$nextTick(() => {
+      _this.load();
+      _this.resize();
+      window.addEventListener("message", _this.handleMessage); // 子接收方式二参数
       const iframe = document.querySelector("#iframe");
       if (iframe.attachEvent) {
         _this.$emit("on-sendMessage");
