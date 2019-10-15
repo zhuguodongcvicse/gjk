@@ -39,12 +39,16 @@
           class="el-icon-circle-plus"
           style="padding:0px"
           type="text"
+          :readonly="readonly"
+          v-show="!disabled"
           @click.native="appendTreeNode(nodeParam,dataParam,storeParam)"
         ></el-button>
         <el-button
           class="el-icon-delete-solid"
           style="padding:0px"
           type="text"
+          :readonly="readonly"
+          v-show="!disabled"
           @click.native="removeTreeNode(nodeParam,dataParam,storeParam)"
         ></el-button>
       </span>
@@ -60,7 +64,9 @@ export default {
     nodeParam: { type: Object, required: true },
     dataParam: { type: Object, required: true },
     storeParam: { type: Object, required: true },
-    moduleType: { type: String }
+    moduleType: { type: String },
+    readonly: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false }
   },
   components: {},
   data() {

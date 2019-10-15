@@ -37,6 +37,8 @@
           :tableXmlParams="params"
           :moduleType="moduleType"
           :flowUids="formXmlParam.uids"
+          :readonly="readonly"
+          :disabled="disabled"
           @jsplumbUidsChange="$emit('jsplumbUidsChange', $event)"
         ></params-tree>
       </el-col>

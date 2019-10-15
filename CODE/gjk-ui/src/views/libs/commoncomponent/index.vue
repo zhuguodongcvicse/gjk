@@ -32,8 +32,7 @@
             </el-form-item>
             <el-form-item label>
               <el-button type="primary" @click="exportCompFunc">导出</el-button>
-            </el-form-item>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </el-form-item>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <el-form-item label="搜索:">
               <el-input v-model="selectString" size="mini"></el-input>
             </el-form-item>
@@ -52,12 +51,7 @@
           ></el-button>
         </template>
         <template slot-scope="scope" slot="menu">
-          <el-button
-            type="primary"
-            size="small"
-            plain
-            @click="handleEdit(scope.row,scope.index)"
-          >查看</el-button>
+          <el-button type="primary" size="small" plain @click="handleEdit(scope.row,scope.index)">查看</el-button>
           <!-- <el-button
             type="primary"
             v-if="permissions.libs_commoncomponent_edit"
@@ -120,7 +114,8 @@ import {
   delObj,
   getAllVersionByCompId,
   screenComp,
-  createZipFile
+  createZipFile,
+  getCompView
 } from "@/api/libs/commoncomponent";
 import { fetchAlgorithmTree } from "@/api/admin/algorithm";
 import { fetchTestTree } from "@/api/admin/test";
@@ -278,7 +273,21 @@ export default {
       this.$refs.crud.rowAdd();
     },
     handleEdit(row, index) {
-      this.$refs.crud.rowEdit(row, index);
+      getCompView(row).then(res => {
+        this.$store.dispatch("setSaveXmlMaps", res.data.data.compBasicMap).then(() => {
+          this.$store
+            .dispatch("setChineseMapping", "comp_param_type")
+            .then(() => {
+              //加载结构体
+              this.$store.dispatch("setStruceType").then(() => {
+                this.$router.push({
+                  path: "/comp/showComp/commView",
+                  query: { compId: row.id, type: "view" }
+                });
+              });
+            });
+        });
+      });
     },
     handleDel(row, index) {
       this.$refs.crud.rowDel(row, index);

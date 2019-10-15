@@ -8,10 +8,11 @@
       <el-col :span="moduleType==='comp'? 6 : 10" style="margin-top:12px;">
         <el-input v-model="filterText" placeholder="筛选条件。。" style="height: 24px;line-height: 24px;">
           <el-button
-            v-show="moduleType==='comp'"
+            v-show="moduleType==='comp'||!disabled"
             slot="append"
             icon="el-icon-circle-plus"
             size="mini"
+            :readonly="readonly"
             @click="confirmAppendTreeNode"
           ></el-button>
         </el-input>
@@ -217,7 +218,9 @@ export default {
           nodeParam: node,
           dataParam: data,
           storeParam: store,
-          moduleType: this.moduleType
+          moduleType: this.moduleType,
+          readonly: this.readonly,
+          disabled: this.disabled
         },
         on: {
           clickTreeNode: (s, d, n) => this.getNodeData(s, d, n),

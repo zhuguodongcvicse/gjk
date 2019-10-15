@@ -17,17 +17,29 @@
 package com.inforbus.gjk.libs.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.FileUtil;
+import com.inforbus.gjk.common.core.util.UploadFilesUtils;
+import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
 import com.inforbus.gjk.libs.api.entity.CommonComponent;
 import com.inforbus.gjk.libs.api.entity.CommonComponentDetail;
+import com.inforbus.gjk.libs.api.vo.CommCompDetailVO;
+import com.inforbus.gjk.libs.api.vo.TreeUtil;
 import com.inforbus.gjk.libs.mapper.CommonComponentDetailMapper;
 import com.inforbus.gjk.libs.service.CommonComponentDetailService;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -75,7 +87,7 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 			for (CommonComponentDetail detail : commonComponentDetailList) {
 				String originalFileName = gitFilePath + detail.getFilePath() + File.separator + detail.getFileName();
 				detail.setFilePath(compPath + detail.getFilePath().substring(subStr.length()));
-				File originalFile = new File(originalFileName);	
+				File originalFile = new File(originalFileName);
 				if (!originalFile.exists()) {
 					continue;
 				}
@@ -96,6 +108,88 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 	@Override
 	public List<CommonComponentDetail> getAllCompDetailByCompId(List<CommonComponent> compList) {
 		return baseMapper.getAllCompDetailByCompId(compList);
+	}
+
+	@Override
+	public Map<String, Object> getCommCompView(CommonComponent comp) {
+		Map<String, Object> fileMap = Maps.newHashMap();
+
+		List<CommonComponentDetail> vos = baseMapper.selectList(
+				Wrappers.<CommonComponentDetail>query().lambda().eq(CommonComponentDetail::getCompId, comp.getId()));
+		for (CommonComponentDetail parent : vos) {
+			// ①查询构件文件解析
+			File file = null;
+			String path = parent.getFileName();
+			if ("xml".equals(parent.getFileType())) {
+				file = new File(
+						JGitUtil.getLOCAL_REPO_PATH() + File.separator + parent.getFilePath() + File.separator + path);
+				fileMap.put("compBasicMap", XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file));
+			}
+
+		}
+		return fileMap;
+	}
+
+	/**
+	 * 递归生成文件树的vo并保存到List<CompDetailVO>中
+	 * 
+	 * @param tree
+	 * @param parentId
+	 * @param file
+	 */
+	private void addCommCompDetailTree(List<CommCompDetailVO> tree, String parentId, File file) {
+		String fileId = IdGenerate.uuid();
+		tree.add(
+				new CommCompDetailVO(fileId, file.getName(), "", file.getParentFile().getAbsolutePath(), parentId, ""));
+		if (file.isDirectory()) {
+			File[] childFileList = file.listFiles();
+			for (File childFile : childFileList) {
+				addCommCompDetailTree(tree, fileId, childFile);
+			}
+		}
+	}
+
+	@Override
+	public List<CommCompDetailVO> getCommCompViewTree(CommonComponent comp) {
+		List<CommCompDetailVO> tree = Lists.newArrayList();
+//		将构件转成树
+		tree.add(new CommCompDetailVO(comp.getId(), comp.getCompName(), "", "", "-1", comp.getVersion()));
+		List<CommonComponentDetail> vos = baseMapper.selectList(
+				Wrappers.<CommonComponentDetail>query().lambda().eq(CommonComponentDetail::getCompId, comp.getId()));
+		for (CommonComponentDetail parent : vos) {
+			System.out.println(parent.getFileName() + "   ");
+
+			if (parent.getFileName().endsWith("jpeg") || parent.getFileName().endsWith("png")
+					|| parent.getFileName().endsWith("jpg")) {
+				String base64 = "";
+				try {
+					base64 = UploadFilesUtils.fileToEncodeBase64(new File(JGitUtil.getLOCAL_REPO_PATH()
+							+ parent.getFilePath() + File.separator + parent.getFileName()));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				tree.add(new CommCompDetailVO(parent.getId(), parent.getFileName(), parent.getFileType(), "data:image/png;base64," +base64,
+						parent.getParaentId(), parent.getVersion()));
+			} else {
+				tree.add(new CommCompDetailVO(parent.getId(), parent.getFileName(), parent.getFileType(),
+						JGitUtil.getLOCAL_REPO_PATH() + parent.getFilePath(), parent.getParaentId(),
+						parent.getVersion()));
+			}
+			// ②查询构件详情转树形
+			String[] fileType = new String[] { "algorithmfile", "testfile", "platformfile" };
+			File file = null;
+			if (Arrays.asList(fileType).contains(parent.getFileType())) {
+				file = new File(
+						JGitUtil.getLOCAL_REPO_PATH() + parent.getFilePath() + File.separator + parent.getFileName());
+				if (file.isDirectory()) {
+					File[] childFileList = file.listFiles();
+					for (File childFile : childFileList) {
+						addCommCompDetailTree(tree, parent.getId(), childFile);
+					}
+				}
+			}
+		}
+		return tree;
 	}
 
 }
