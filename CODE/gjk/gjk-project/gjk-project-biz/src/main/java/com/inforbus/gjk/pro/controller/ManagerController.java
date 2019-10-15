@@ -410,7 +410,7 @@ public class ManagerController {
 		// 客户exe文件全路径
 		String exe = JGitUtil.getSoftToHard();// "D:\\14S_GJK_GIT\\gjk\\gjk\\exe\\exe.exe";
 		// 调用客户接口执行exe
-		String[] strArray = new String[] { exe, hardWareFilePath, mapConfigPath, sysParamFilePath, workSpacePath };
+		String[] strArray = new String[] { exe, hardWareFilePath, mapConfigPath, sysParamFilePath };
 		try {
 			Process process = Runtime.getRuntime().exec(strArray);
 			InputStreamReader reader = new InputStreamReader(process.getInputStream());
