@@ -152,6 +152,6 @@ export default {
 .code-editor-container {
   top: 25px;
   left: 0px;
-  height: 100%;
+  height: 80%;
 }
 </style>
