@@ -2092,7 +2092,7 @@ function save() {
 		var source = connection.sourceId;
 		//获取源构件中数据id
 		var sourceGj = $('#' + source + '-heading')[0].dataset.id;
-		console.log("sourceGj", sourceGj);
+		//console.log("sourceGj", sourceGj);
 		//var dataSouGjId = dat[sourceGj].id
 		//获取画布源锚点uuid
 		var sourceuid = connection.endpoints[0].getUuid();
@@ -2122,12 +2122,18 @@ function save() {
 			var sourceUuid = str[0];
 			//获取数据输出参数
 			//var sourcePrame = dat[sourceGj].outputList[sourceUuid].dataTypeName;
-			sourDataTypeName = dat[sourceGj].outputList[sourceUuid].dataTypeName;
-			sourVariableName = dat[sourceGj].outputList[sourceUuid].variableName;
-			sourLength = dat[sourceGj].outputList[sourceUuid].lengthName;
+			// sourDataTypeName = dat[sourceGj].outputList[sourceUuid].dataTypeName;
+			// sourVariableName = dat[sourceGj].outputList[sourceUuid].variableName;
+			// sourLength = dat[sourceGj].outputList[sourceUuid].lengthName;
+			sourDataTypeName = canvasData.get(str[2]).outputList[sourceUuid].dataTypeName;
+			sourVariableName = canvasData.get(str[2]).outputList[sourceUuid].variableName;
+			sourLength = canvasData.get(str[2]).outputList[sourceUuid].lengthName;
 		}
-		console.log("arrow数据11111111",dat[sourceGj])
-		var sourCompName = dat[sourceGj].functionName;
+		//console.log("arrow数据11111111",dat[sourceGj])
+		// var sourCompName = dat[sourceGj].functionName;
+		// console.log("数据比较",sourCompName)
+		var sourCompName = canvasData.get(source).functionName;
+		//console.log("数据比较+++++++++",sourCompName)
 		var sourcePrame = sourDataTypeName + " " + sourVariableName + "_" + sourCompName
 
 		//获取画布目标节点id
@@ -2156,13 +2162,17 @@ function save() {
 			tarVariableName = addPointParam[addTPointParamindex].data.variableName;
 		} else {
 			var str = targetid.split('*');
+			//console.log("+++++++++++++++",str)
 			var targetUuid = str[0];
-			tarDataTypeName = dat[targetGj].inputList[targetUuid].dataTypeName;
-			tarVariableName = dat[targetGj].inputList[targetUuid].variableName;
+			// tarDataTypeName = dat[targetGj].inputList[targetUuid].dataTypeName;
+			// tarVariableName = dat[targetGj].inputList[targetUuid].variableName;
+			tarDataTypeName = canvasData.get(str[2]).inputList[targetUuid].dataTypeName;
+			tarVariableName = canvasData.get(str[2]).inputList[targetUuid].variableName;
 		}
 
 		//获取数据输入参数
-		var tarCompName = dat[targetGj].functionName;
+		//var tarCompName = dat[targetGj].functionName;
+		var tarCompName = canvasData.get(target).functionName
 		var targetPrame = tarDataTypeName + " " + tarVariableName + "_" + tarCompName
 
 		//拼接source与target
@@ -2202,7 +2212,7 @@ function save() {
 
 	});
 	connects = { arrow: con };
-	console.log("arrow串", JSON.stringify(connects));
+	//console.log("arrow串", JSON.stringify(connects));
 	return JSON.stringify(connects);
 }
 //清空当前画布构件
@@ -2282,7 +2292,7 @@ function saveFlowchart() {
 	//flowChart.outPointsData = outPointsData;
 	//flowChart.inPointsData = inPointsData;
 	var flowChartJson = JSON.stringify(flowChart);
-	console.log("流程图数据", flowChartJson);
+	//console.log("流程图数据", flowChartJson);
 	return flowChartJson;
 }
 
@@ -2437,8 +2447,8 @@ function loadJson(loadJson) {
 		var addPoinrIndex = 0;
 		var midpoints = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
 		$.each(endpoints, function (index, endpoint) {
-			console.log("idsss", endpoint.id);
-			console.log("elem.blockId", elem.blockId)
+			//console.log("idsss", endpoint.id);
+			//console.log("elem.blockId", elem.blockId)
 			if (endpoint.id == elem.blockId) {
 				var config = JSON.parse(JSON.stringify(getBaseNodeConfig()))
 				if (endpoint.anchorX == 0) {
