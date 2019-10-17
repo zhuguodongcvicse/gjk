@@ -91,12 +91,13 @@
           :on-success="handleAvatarSuccess"
           :on-change="onchange"
           :http-request="UploadImage"
+          :before-upload="beforeAvatarUpload"
+          accept="image/jpeg, image/jpg, image/png"
         >
-          <!-- :before-upload="beforeAvatarUpload" -->
           <div class="avatar-uploader icon_choose_imgdiv_14s" v-bind:style="divStyle">
             <img v-if="compImg.imgPath" :src="compImg.imgPath" class="icon_choose_img_14s" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-            <i class="icon_choose_i_14s" ></i>
+            <i class="icon_choose_i_14s"></i>
           </div>
         </el-upload>
       </el-form-item>
@@ -136,25 +137,25 @@ export default {
   },
   methods: {
     handleAvatarSuccess(res, file) {
-      console.log("00000000000000");
       this.imageUrl = URL.createObjectURL(file.raw);
     },
     beforeAvatarUpload(file) {
-      const isJPG = file.type === "image/jpeg";
-      const isLt2M = file.size / 1024 / 1024 < 2;
-      const isPNG = file.type === "image/png";
-      if (!isJPG && !isPNG) {
-        this.$message.error("上传头像图片只能是 JPG 和 PNG 格式!");
+      var testmsg = /^image\/(jpeg|png|jpg)$/.test(file.type);
+      // const isJPG = file.type === "image/jpeg";
+      const isLt2M = file.size / 1024 / 1024 < 1;
+      // const isPNG = file.type === "image/png";
+      if (!testmsg) {
+        this.$message.error("上传头像图片格式为 JPG 和 PNG，请重新选择图片!");
       }
       if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 2MB!");
+        this.$message.error("上传头像图片大小不能超过 2MB，请重新选择图片!");
       }
       return isJPG && isLt2M;
     },
     //组装保存img数据
     submitUpload() {
       this.imgValue.dialogVisible = false;
-      this.$emit("img-file",this.file);
+      this.$emit("img-file", this.file);
     },
     UploadImage(files) {
       this.file = files.file; //设置行文件（file）
@@ -194,6 +195,5 @@ export default {
 };
 </script>
 <style>
-
 </style>
 

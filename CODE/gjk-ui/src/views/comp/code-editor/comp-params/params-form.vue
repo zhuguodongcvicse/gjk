@@ -501,16 +501,14 @@ export default {
             if (path.includes(":")) {
               this.$store.dispatch("GetParseHeaderObj", path).then(() => {
                 let base = deepClone(this.paramsFormXmlParams);
-                this.paramsFormXmlParams=[]
+                this.paramsFormXmlParams = [];
                 let input = this.headerFile.inputXmlMapParams;
                 let output = this.headerFile.outputXmlMapParams;
                 let paramsFormXml = [];
                 params.forEach(param => {
                   let fromParam = deepClone(param);
                   if (param.lableName === "输入") {
-                   console.log("计算前********************",deepClone(input), fromParam)
                     this.itemTypeChangeAssignmenDataParam(input, fromParam);
-                   console.log("计算后********************",deepClone(fromParam), fromParam)
                     param = input;
                   }
                   if (param.lableName === "输出") {
@@ -678,27 +676,37 @@ export default {
     },
     //处理属性是否显示及中英文映射
     analysisAttrConfigType(attr) {
-      var showName = attr.lableName;
+      var attrObj = eval("(" + attr.attributeMap.configureType + ")");
+      //标签名是否要中英文映射
+      let showName;
+      if (attrObj.lableMapping) {
+        let param = this.compChineseMapping.find(item => {
+          return item.id === attrObj.mappingKeys;
+        });
+        showName = param === undefined ? attr.lableName : param.label;
+      } else {
+        showName = attr.lableName;
+      }
       var attrs = [];
       if (attr.hasOwnProperty("attributeMap") && attr.attributeMap !== null) {
-        var attrObj = eval("(" + attr.attributeMap.configureType + ")");
         if (attrObj.hasOwnProperty("attrs")) {
           attrObj.attrs.forEach(con => {
             //排除不显示的属性
             if (con.isShow) {
               con.lableName = attr.attributeMap[con.attrName];
               if (con.hasOwnProperty("attrMapping") && con.attrMapping) {
-                let val = this.compChineseMapping.find(item => {
-                  return item.label === con.attrKeys;
-                });
-                con.attrMappingName =
-                  val === undefined ? con.attrName : val.value;
-                /* 基于id */
-                // let valParam = this.compChineseMapping.find(item => {
-                //   return item.id === con.attrKeys;
+                //基于标签名
+                // let val = this.compChineseMapping.find(item => {
+                //   return item.label === con.attrKeys;
                 // });
                 // con.attrMappingName =
-                //   valParam === undefined ? con.attrName : valParam.value;
+                //   val === undefined ? con.attrName : val.value;
+                /* 基于id */
+                let valParam = this.compChineseMapping.find(item => {
+                  return item.id === con.attrKeys;
+                });
+                con.attrMappingName =
+                  valParam === undefined ? con.attrName : valParam.label;
               } else if (attrObj.attrs.length == 1) {
                 con.attrMappingName = showName;
               } else {

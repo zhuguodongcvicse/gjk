@@ -28,7 +28,7 @@
             stripe
             @cell-click="handleNodeClick"
           >
-            <el-table-column prop="label" style="text-align:right;" align="right"></el-table-column>
+            <el-table-column prop="label" align="left"></el-table-column>
           </el-table>
         </el-col>
         <el-col :span="14">
@@ -359,7 +359,7 @@ export default {
 </script>
 <style lang='scss' scoped>
 .el-table .cell {
-  text-align: left!important;
+  text-align: left !important;
 }
 //@import url(); 引入公共css类
 </style>

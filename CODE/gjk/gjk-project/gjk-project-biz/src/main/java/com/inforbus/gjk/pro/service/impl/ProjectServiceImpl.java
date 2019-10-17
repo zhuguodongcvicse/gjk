@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.inforbus.gjk.admin.api.entity.SysUser;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
+import com.inforbus.gjk.pro.api.dto.FilePathDTO;
 import com.inforbus.gjk.pro.api.dto.ProjectInfoDTO;
 import com.inforbus.gjk.pro.api.entity.Hardwarelibs;
 import com.inforbus.gjk.pro.api.entity.ProComp;
@@ -28,12 +29,17 @@ import com.inforbus.gjk.pro.api.entity.Project;
 import com.inforbus.gjk.pro.mapper.ProjectMapper;
 import com.inforbus.gjk.pro.service.ProjectService;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import sun.rmi.runtime.Log;
+
+import javax.xml.transform.OutputKeys;
 
 /**
  * 资源管理
@@ -44,117 +50,182 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Service("projectService")
 public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> implements ProjectService {
 
-	/**
-	 * 资源管理简单分页查询
-	 * 
-	 * @param project 资源管理
-	 * @return
-	 */
-	@Override
-	public IPage<Project> getProjectPage(Page<Project> page, Project project) {
-		return baseMapper.getProjectPage(page, project);
-	}
+    /**
+     * 资源管理简单分页查询
+     *
+     * @param project 资源管理
+     * @return
+     */
+    @Override
+    public IPage<Project> getProjectPage(Page<Project> page, Project project) {
+        return baseMapper.getProjectPage(page, project);
+    }
 
-	@Override
-	public Project savePro(Project project) {
+    @Override
+    public Project savePro(Project project) {
 //		Project pro = getProByProName(project.getProjectName());
 //		if (pro != null) {
 //			return pro;
 //		}
-		project.setId(IdGenerate.uuid());
-		baseMapper.savePro(project);
-		return this.getById(project.getId());
-	}
+        project.setId(IdGenerate.uuid());
+        baseMapper.savePro(project);
+        return this.getById(project.getId());
+    }
 
-	@Override
-	public Project getProById(String id) {
-		return baseMapper.getProById(id);
-	}
+    @Override
+    public Project getProById(String id) {
+        return baseMapper.getProById(id);
+    }
 
-	private Project getProByProName(String projectName) {
-		return baseMapper.getProByProName(projectName);
-	}
+    private Project getProByProName(String projectName) {
+        return baseMapper.getProByProName(projectName);
+    }
 
-	/**
-	 * @Title: getUsernameByUserId
-	 * @Description: 根据userID查询用户名
-	 * @Author cvics
-	 * @DateTime 2019年5月8日 下午8:58:51
-	 * @param userId
-	 * @return
-	 */
-	private SysUser getUsernameByUserId(String userId) {
-		return baseMapper.getUsernameByUserId(userId);
-	}
+    /**
+     * @param userId
+     * @return
+     * @Title: getUsernameByUserId
+     * @Description: 根据userID查询用户名
+     * @Author cvics
+     * @DateTime 2019年5月8日 下午8:58:51
+     */
+    private SysUser getUsernameByUserId(String userId) {
+        return baseMapper.getUsernameByUserId(userId);
+    }
 
-	/**
-	 * @Title: getByUserId
-	 * @Description: 获取用户列表
-	 * @Author xiaohe
-	 * @DateTime 2019年4月24日 上午8:33:32
-	 * @param userId用户编号
-	 * @return
-	 * @see com.inforbus.gjk.pro.service.ManagerService#getByUserId(java.lang.String)
-	 */
-	@Override
-	public List<Project> getByUserId(String userId) {
-		return baseMapper.getByUserId(userId);
-	}
-	@Override
-	public List<String> getProNameListByUserId(String userId) {
-		List<Project> projects = getByUserId(userId);
-		List<String> proNameList = new ArrayList<String>();
-		for (Project project : projects) {
-			proNameList.add(project.getProjectName());
-		}
-		return proNameList;
-	}
-	private void saveProComp(ProComp proComp) {
-		baseMapper.saveProComp(proComp);
-	}
+    /**
+     * @param userId用户编号
+     * @return
+     * @Title: getByUserId
+     * @Description: 获取用户列表
+     * @Author xiaohe
+     * @DateTime 2019年4月24日 上午8:33:32
+     * @see com.inforbus.gjk.pro.service.ManagerService#getByUserId(java.lang.String)
+     */
+    @Override
+    public List<Project> getByUserId(String userId) {
+        return baseMapper.getByUserId(userId);
+    }
 
-	private ProComp getIdByProIdCompId(ProComp proComp) {
-		return baseMapper.getIdByProIdCompId(proComp);
-	}
+    @Override
+    public List<String> getProNameListByUserId(String userId) {
+        List<Project> projects = getByUserId(userId);
+        List<String> proNameList = new ArrayList<String>();
+        for (Project project : projects) {
+            proNameList.add(project.getProjectName());
+        }
+        return proNameList;
+    }
 
-	public List<ProComp> getAllByProIdCompId(String projectId, List<String> compList) {
-		List<ProComp> proComps = new ArrayList<ProComp>();
-		for (String compId : compList) {
-			ProComp proComp = new ProComp(null, compId, projectId);
-			proComp = getIdByProIdCompId(proComp);
-			if (proComp != null) {
-				proComp.setCanUse("0");
-				proComps.add(proComp);
-			}
-		}
-		return proComps;
-	}
+    private void saveProComp(ProComp proComp) {
+        baseMapper.saveProComp(proComp);
+    }
 
-	public List<ProComp> saveProCompList(String projectId, List<String> compList) {
-		List<ProComp> proComps = new ArrayList<ProComp>();
-		ProComp proComp = null;
-		for (String compId : compList) {
-			proComp = getIdByProIdCompId(new ProComp(null, compId, projectId));
-			if (proComp == null) {
-				proComp = new ProComp(IdGenerate.uuid(), compId, projectId);
-				saveProComp(proComp);
-			}
-			proComps.add(proComp);
-		}
-		return proComps;
-	}
+    private ProComp getIdByProIdCompId(ProComp proComp) {
+        return baseMapper.getIdByProIdCompId(proComp);
+    }
 
-	@Override
-	public ProjectInfoDTO getProMessage(String projectId) {
-		ProjectInfoDTO infoDTO = new ProjectInfoDTO();
-		Project project = getProById(projectId);
-		infoDTO.setProjectName(project.getProjectName());
-		infoDTO.setUserName(getUsernameByUserId(project.getUserId()).getName());
-		infoDTO.setCreateTime(project.getCreateTime());
-		infoDTO.setUpdateTime(project.getUpdateTime());
-		infoDTO.setProjectImg(project.getProjectImg());
-		infoDTO.setDescription(project.getDescription());
-		return infoDTO;
-	}
+    public List<ProComp> getAllByProIdCompId(String projectId, List<String> compList) {
+        List<ProComp> proComps = new ArrayList<ProComp>();
+        for (String compId : compList) {
+            ProComp proComp = new ProComp(null, compId, projectId);
+            proComp = getIdByProIdCompId(proComp);
+            if (proComp != null) {
+                proComp.setCanUse("0");
+                proComps.add(proComp);
+            }
+        }
+        return proComps;
+    }
+    /**
+     * @param filePathDTO
+     * @return
+     * @Title: uploadFile
+     * @Description: 项目树右键菜单上传文件
+     * @Author wang
+     * @DateTime 2019年10月17日 13:54:34
+     */
+    @Override
+    public boolean uploadFile(FilePathDTO filePathDTO) {
+        if (filePathDTO != null) {
+            File oldFile = new File(filePathDTO.getOldFilePath());//创建将要增加的文件的file对象
+            File newFile = new File(filePathDTO.getNewFilePath());//增加到的位置的对象
+            if (oldFile.exists() && newFile.exists()) {
+                File uploadFile = new File(newFile, filePathDTO.getFileName());//将要增加的文件file对象
+                FileInputStream in = null;
+                FileOutputStream out = null;
+                try {
+                    if(!uploadFile.exists()){//判断文件是否在将要增加的路径下存在
+                        uploadFile.createNewFile();//新建将要增加文件
+                        in = new FileInputStream(oldFile);
+                        out = new FileOutputStream(uploadFile);
+                        int len = 0;
+                        byte[] bytes = new byte[1024];
+                        while ((len = in.read(bytes)) != -1) {//循环读写
+                            out.write(bytes, 0, len);
+                        }
+                        System.out.println("文件增加成功");
+                    }else {//文件已存在,替换掉,给出提示
+                        in = new FileInputStream(oldFile);
+                        out = new FileOutputStream(uploadFile);
+                        int len = 0;
+                        byte[] bytes = new byte[1024];
+                        while ((len = in.read(bytes)) != -1) {
+                            out.write(bytes, 0, len);
+                        }
+                        System.out.println("此文件已存在,被替换");
+                    }
+                    return true;
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    if (in!=null){
+                        try {
+                            in.close();//关闭输入流
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    if (out != null){
+                        try {
+                            out.close();//关闭输出流
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public List<ProComp> saveProCompList(String projectId, List<String> compList) {
+        List<ProComp> proComps = new ArrayList<ProComp>();
+        ProComp proComp = null;
+        for (String compId : compList) {
+            proComp = getIdByProIdCompId(new ProComp(null, compId, projectId));
+            if (proComp == null) {
+                proComp = new ProComp(IdGenerate.uuid(), compId, projectId);
+                saveProComp(proComp);
+            }
+            proComps.add(proComp);
+        }
+        return proComps;
+    }
+
+    @Override
+    public ProjectInfoDTO getProMessage(String projectId) {
+        ProjectInfoDTO infoDTO = new ProjectInfoDTO();
+        Project project = getProById(projectId);
+        infoDTO.setProjectName(project.getProjectName());
+        infoDTO.setUserName(getUsernameByUserId(project.getUserId()).getName());
+        infoDTO.setCreateTime(project.getCreateTime());
+        infoDTO.setUpdateTime(project.getUpdateTime());
+        infoDTO.setProjectImg(project.getProjectImg());
+        infoDTO.setDescription(project.getDescription());
+        return infoDTO;
+    }
 
 }

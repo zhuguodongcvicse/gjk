@@ -26,6 +26,7 @@ import com.inforbus.gjk.libs.service.ApprovalApplyService;
 import com.inforbus.gjk.libs.service.ApprovalService;
 import lombok.AllArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -91,6 +92,9 @@ public class ApprovalController {
 	@PutMapping
 	@PreAuthorize("@pms.hasPermission('libs_approval_edit')")
 	public R update(@RequestBody Approval approval) {
+		if (approval.getApprovalState() != null) {
+			approval.setApprovalTime(LocalDateTime.now());
+		}
 		return new R<>(approvalService.updateById(approval));
 	}
 
