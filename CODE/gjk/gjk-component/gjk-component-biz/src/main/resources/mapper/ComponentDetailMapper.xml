@@ -96,7 +96,19 @@
 	<select id="getCompXMl" resultMap="componentDetailMap">
 		select
 		<include refid="compDetailSql" />
-		from gjk_component_detail
+		from gjk_common_component_detail
+		<where>
+			<if test="compId != null and compId.trim() != ''">
+				AND comp_id = Cast(#{compId} AS Binary(32))
+			</if>
+			AND file_type = 'xml'
+		</where>
+	</select>
+	<!-- getCompXMl查询XML -->
+	<select id="getCommCompXMl" resultMap="componentDetailMap">
+		select
+		<include refid="compDetailSql" />
+		from gjk_common_component_detail
 		<where>
 			<if test="compId != null and compId.trim() != ''">
 				AND comp_id = Cast(#{compId} AS Binary(32))
@@ -197,16 +209,15 @@
 			`id` =Cast(#{compDetail.id} AS Binary(32))
 		</where>
 	</update>
-	
+
 	<!-- 根据树节点的构件库详细信息的id查找文件路径 -->
-	<select id="getFilePathById"
-		
-		resultMap="componentDetailMap">
+	<select id="getFilePathById" resultMap="componentDetailMap">
 		SELECT
 		*
-		FROM gjk_component_detail
+		FROM
+		gjk_component_detail
 		where id=#{id}
-			
+
 	</select>
-	
+
 </mapper>

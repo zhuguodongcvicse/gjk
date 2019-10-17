@@ -1,13 +1,19 @@
 package com.inforbus.gjk.common.core.util;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
@@ -82,7 +88,7 @@ public class UploadFilesUtils {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		
+
 		} finally {
 			url = new String(uploadFile.getPath().replace("\\", "/"));
 		}
@@ -225,4 +231,67 @@ public class UploadFilesUtils {
 		}
 	}
 
+	/**
+	 * @Title: base64ToFile
+	 * @Description: 将base64字节流转文件
+	 * @Author xiaohe
+	 * @DateTime 2019年10月14日 下午3:29:20
+	 * @param file
+	 * @param base64
+	 * @throws IOException
+	 */
+	public static void base64ToFile(File file, String base64) throws IOException {
+		BufferedOutputStream bos = null;
+		java.io.FileOutputStream fos = null;
+		byte[] bytes = Base64.getDecoder().decode(base64);
+		fos = new java.io.FileOutputStream(file);
+		bos = new BufferedOutputStream(fos);
+		bos.write(bytes);
+		if (ObjectUtils.isNotEmpty(bos)) {
+			bos.close();
+		}
+		if (ObjectUtils.isNotEmpty(fos)) {
+			fos.close();
+		}
+	}
+
+	/**
+	 * @Title: getBase64ByInputStream
+	 * @Description: 将inputStream 转Base64字符串
+	 * @Author xiaohe
+	 * @DateTime 2019年10月14日 下午4:43:03
+	 * @param inputStream
+	 * @return
+	 */
+	public static String getBase64ByInputStream(InputStream inputStream) throws IOException {
+		byte[] data = null;
+		ByteArrayOutputStream swapStream = new ByteArrayOutputStream();
+		byte[] buff = new byte[100];
+		int index = 0;
+		while ((index = inputStream.read(buff, 0, 100)) > 0) {
+			swapStream.write(buff, 0, index);
+		}
+		data = swapStream.toByteArray();
+		if (ObjectUtils.isNotEmpty(inputStream)) {
+			inputStream.close();
+		}
+		return new String(Base64.getEncoder().encode(data));
+	}
+
+	/**
+	 * @Title: encodeBase64File
+	 * @Description: 将文件转BASE64
+	 * @Author xiaohe
+	 * @DateTime 2019年10月14日 下午8:46:20
+	 * @param path
+	 * @return
+	 * @throws Exception
+	 */
+	public static String fileToEncodeBase64(File file) throws IOException {
+		FileInputStream inputFile = new FileInputStream(file);
+		byte[] buffer = new byte[(int) file.length()];
+		inputFile.read(buffer);
+		inputFile.close();
+		return new String(Base64.getEncoder().encode(buffer));
+	}
 }

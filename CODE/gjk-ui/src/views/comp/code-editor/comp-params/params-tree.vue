@@ -315,11 +315,14 @@ export default {
       let data = this.nodeFormParam;
       // 变量类型内容
       let bllxName;
+      let lbName;
       data.forEach(items => {
         items.forEach(item => {
           // 如果是变量类型，将变量类型当前内容赋入
           if (item.attrMappingName === this.bllxParam) {
             bllxName = item.lableName;
+          } else if (item.attrMappingName === this.lbParam) {
+            lbName = item.lableName;
           }
         });
       });
@@ -332,33 +335,43 @@ export default {
               return;
             }
             if (item.attrMappingName === this.lengthParam) {
-              if (isx) {
-                item.isShow = true;
-              } else {
-                item.lableName = "";
-                item.isShow = false;
-              }
+              item.isShow = isx ? true : false;
+              item.lableName = isx ? item.lableName : "";
             }
           }
           // 如果是类别，根据变量类型内容处理选择内容
           if (item.attrMappingName === this.lbParam) {
+            let name = item.lableName;
+            data.forEach(data1 => {
+              data1.forEach(data2 => {
+                if (data2.attrMappingName === this.fzParam) {
+                  data2.lableName = name === "IMMEDIATE" ? data2.lableName : "";
+                  data2.isShow = name === "IMMEDIATE" ? true : false;
+                } else if (data2.attrMappingName === this.xzblPaeam) {
+                  data2.isShow =
+                    name === "IMMEDIATE"
+                      ? false
+                      : name === "DATA"
+                      ? false
+                      : true;
+                  data2.lableName = name === "IMMEDIATE" ? "" : data2.lableName;
+                }
+              });
+            });
             let isx = bllxName.includes("*");
             if (bllxName === null || bllxName === undefined) {
               return;
             }
-            item.dataKey = [];
-            if (isx) {
-              item.dataKey.push(
-                { value: "DATA", label: "DATA" },
-                { value: "STRUCTTYPE", label: "STRUCTTYPE" },
-                { value: "IMMEDIATE", label: "IMMEDIATE" }
-              );
-            } else {
-              item.dataKey.push(
-                { value: "STRUCTTYPE", label: "STRUCTTYPE" },
-                { value: "IMMEDIATE", label: "IMMEDIATE" }
-              );
-            }
+            item.dataKey = isx
+              ? [
+                  { value: "DATA", label: "DATA" },
+                  { value: "STRUCTTYPE", label: "STRUCTTYPE" },
+                  { value: "IMMEDIATE", label: "IMMEDIATE" }
+                ]
+              : [
+                  { value: "STRUCTTYPE", label: "STRUCTTYPE" },
+                  { value: "IMMEDIATE", label: "IMMEDIATE" }
+                ];
           }
         });
       });
@@ -921,18 +934,35 @@ export default {
     },
     //处理中英文映射
     analysisMapping(from) {
-      var showName = from.lableName;
-      var attrs = [];
+      //标签名是否要中英文映射
       var attrObj = eval("(" + from.attributeMap.configureType + ")");
+      let showName;
+      if (attrObj.lableMapping) {
+        let param = this.compChineseMapping.find(item => {
+          return item.id === attrObj.mappingKeys;
+        });
+        showName = param === undefined ? from.lableName : param.label;
+      } else {
+        showName = from.lableName;
+      }
+      // var showName = from.lableName;
+      var attrs = [];
       if (attrObj.hasOwnProperty("attrs")) {
         attrObj.attrs.forEach(con => {
           con.keys = randomLenNum(5, true);
           con.lableName = from.attributeMap[con.attrName];
           if (con.hasOwnProperty("attrMapping") && con.attrMapping) {
-            let val = this.compChineseMapping.find(item => {
-              return item.label === con.attrKeys;
+            //基于标签名
+            // let val = this.compChineseMapping.find(item => {
+            //   return item.label === con.attrKeys;
+            // });
+            // con.attrMappingName = val === undefined ? con.attrName : val.value;
+            /* 基于id */
+            let valParam = this.compChineseMapping.find(item => {
+              return item.id === con.attrKeys;
             });
-            con.attrMappingName = val === undefined ? con.attrName : val.value;
+            con.attrMappingName =
+              valParam === undefined ? con.attrName : valParam.label;
           } else if (
             attrObj.attrs !== undefined &&
             attrObj.attrs.length === 1

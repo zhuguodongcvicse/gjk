@@ -108,6 +108,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	private CompImgMapper compImgMapper;
 	@Autowired
 	private ComponentDetailService componentDetailService;
+
 	private static final String compDetailPath = JGitUtil.getLOCAL_REPO_PATH();
 
 	/**
@@ -255,12 +256,17 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		Map<String, XmlEntityMap> xmlEntityMap = Maps.newHashMap();
 		// 查询流程
 //		String pro = compDetailMapper.selectById(proId).getParaentId();
-		List<Component> comps = baseMapper.selectList(Wrappers.<Component>query().lambda().inSql(Component::getId,
-				"SELECT comp_id FROM gjk_project_comp a WHERE  a.project_id='" + proId + "' and a.can_use = 0"));
+		//查询公共构件的
+		List<Component> comps = baseMapper.selectByComms(proId);
+//		List<Component> comps = baseMapper.selectList(Wrappers.<Component>query().lambda().inSql(Component::getId,
+//				"SELECT comp_id FROM gjk_project_comp a WHERE  a.project_id='" + proId + "' and a.can_use = 0"));
 		System.out.println(comps);
 //		List<Component> comps = baseMapper.listCompByUserId(proId);
 		for (Component comp : comps) {
-			ComponentDetail vo = compDetailMapper.getCompXMl(comp.getId());
+			// 查询基本构件中的明细
+//			ComponentDetail vo = compDetailMapper.getCompXMl(comp.getId());
+			// 查询公共构件中的明细
+			ComponentDetail vo = compDetailMapper.getCommCompXMl(comp.getId());
 			if (vo != null) {
 				String path = vo.getFileName();
 				File file = null;
