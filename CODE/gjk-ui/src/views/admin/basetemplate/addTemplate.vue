@@ -1496,12 +1496,17 @@ export default {
             configureType.lableMapping != undefined &&
             configureType.lableMapping
           ) {
+            var flag = true;
             //判断标签名是否映射
             for (let i of dictValues) {
               if (configureType.mappingKeys == i.id) {
                 Vue.set(XmlEntityMap, "lableMappingName", i.label); //如果映射查询字典,设置标签映射名
+                flag = false;
                 break;
               }
+            }
+            if(flag){
+              Vue.set(XmlEntityMap, "lableMappingName", XmlEntityMap.lableName);
             }
           } else {
             //不映射的话页面显示原始标签名

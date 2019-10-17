@@ -227,6 +227,13 @@ export function codeGeneration(proDetailId,username) {
   })
   }
 
-
+//集成代码生成
+export function uploadFile(obj) {
+  return request({
+    url: '/pro/project/uploadFile',
+    method: 'put',
+    data:obj
+  })
+  }
 
 

@@ -21,6 +21,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.inforbus.gjk.pro.api.dto.FilePathDTO;
 import com.inforbus.gjk.pro.api.dto.ProjectInfoDTO;
 import com.inforbus.gjk.pro.api.entity.Hardwarelibs;
 import com.inforbus.gjk.pro.api.entity.ProComp;
@@ -107,5 +108,7 @@ public interface ProjectService extends IService<Project> {
 	 * @return
 	 */
 	List<ProComp> getAllByProIdCompId(String projectId, List<String> compList);
+
+    boolean uploadFile(FilePathDTO filePathDTO);
 
 }
