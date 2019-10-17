@@ -316,61 +316,10 @@ export const getPrintSize = (size) => {
  * 判断是不是基本类型和指针
  */
 export const getStrType = (str) => {
+  const dataType = ["short", "int", "long", "long long", "unsigned short", "unsigned int", "unsigned long", "unsigned long long", "char", "unsigned char", "signed char", "bool", "double", "float", "long double", "string"];
   let isPoint = str.includes("*")
   let type = str.replace("*", "")
-  let isType = false
-  switch (type) {
-    //整形
-    case "short":
-      isType = true
-      break;
-    case "int":
-      isType = true
-      break;
-    //浮点形
-    case "long":
-      isType = true
-      break;
-    case "long long":
-      isType = true
-      break;
-    case "unsigned short":
-      isType = true
-      break;
-    case "unsigned int":
-      isType = true
-      break;
-    case "unsigned long":
-      isType = true
-      break;
-    case "unsigned long long":
-      isType = true
-      break;
-    case "char":
-      isType = true
-      break;
-    case "unsigned char":
-      isType = true
-      break;
-    case "signed char":
-      isType = true
-      break;
-    case "bool":
-      isType = true
-      break;
-    case "double":
-      isType = true
-      break;
-    case "float":
-      isType = true
-      break;
-    case "long double":
-      isType = true
-      break;
-    case "string":
-      isType = true
-      break;
-  }
+  let isType = dataType.includes(type)
   return { isType, isPoint }
 }
 export const parseStrToObj = (str) => {//替换字符串中的'为" 再转换为对象

@@ -138,6 +138,7 @@ export default {
       iframeParams: "", //iframe返回的信息及状态
       tmp: new Map(), //tmp xmlEntity临时值
       tmpMaps: new Map(), //tmpMaps xmlEntityMaps临时值
+      deleteParamMaps:new Map(),//删除时保存的临时数据
       postMessageData: {
         //传值
         cmd: "", //用于switch 判断
@@ -174,8 +175,10 @@ export default {
         if (newParam.state === 0) {
           /* 增加构件到tmp 新0911*/
           console.log("接收数据后处理。。。。。添加", this.xmlMaps);
-          let arrMap = deepClone(this.xmlMaps[newParam.gjId]); //从基础的数据中获取
-          console.log("从基础的数据获取", arrMap);
+          let arrMap = deepClone(this.deleteParamMaps.get(newParam.tmpId)); //从删除的数据中获取
+          if (!arrMap) {
+            arrMap = deepClone(this.xmlMaps[newParam.gjId]); //从基础的数据中获取
+          }
           arrMap.attributeMap.id = newParam.tmpId;
           this.$set(
             arrMap.xmlEntityMaps[0].xmlEntityMaps,
@@ -188,9 +191,9 @@ export default {
           //this.tmpMaps.delete(newParam.tmpId); //删除临时的tmp
           //console.log("临时数据",newParam.tmpId)
           for (var i = 0; i < newParam.tmpId.length; i++) {
+            this.deleteParamMaps.set(newParam.tmpId[i],this.tmpMaps.get(newParam.tmpId[i]))
             this.tmpMaps.delete(newParam.tmpId[i]);
           }
-          console.log("接收数据后处理。。。。。删除", this.tmpMaps);
           //删除临时的tmp
           //this.tmp.delete(newParam.tmpId);
           this.saveXmlMaps.xmlEntityMaps = [];

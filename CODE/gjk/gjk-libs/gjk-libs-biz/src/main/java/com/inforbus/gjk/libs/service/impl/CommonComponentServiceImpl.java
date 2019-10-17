@@ -385,4 +385,15 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		return compDictVOs;
 	}
 
+	@Override
+	public IPage<CommonComponent> getCompListByString(Page page, List<String> selectStringList) {
+		return baseMapper.getCompListByString(page, selectStringList);
+	}
+
+	@Override
+	public IPage<CommonComponent> getCompListByStringAndLibsId(Page page, List<String> libsList,
+			List<String> selectStringList) {
+		return baseMapper.getCompListByStringAndLibsId(page, libsList, selectStringList);
+	}
+
 }

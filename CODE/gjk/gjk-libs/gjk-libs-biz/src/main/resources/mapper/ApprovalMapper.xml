@@ -124,6 +124,7 @@
 				AND description = #{approval.description}
 			</if>
 		</where>
+
 	</select>
 
 	<insert id="saveApprovalApply"

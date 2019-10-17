@@ -1488,15 +1488,19 @@ export default {
             configureType = parseStrToObj(attrMap[i]);
           }
         }
-
-        var dictValues = this.dictValues;
+        var dictValues = this.dictValues;       
         if (configureType.lableMapping) {
+          var flag = true;
           for (let i of dictValues) {
             if (configureType.mappingKeys == i.id) {
               Vue.set(XmlEntityMap, "lableMappingName", i.label);
+              flag = false;
               break;
             }
           }
+          if(flag){
+              Vue.set(XmlEntityMap, "lableMappingName", XmlEntityMap.lableName);
+            }
         } else {
           Vue.set(XmlEntityMap, "lableMappingName", configureType.lableName);
         }

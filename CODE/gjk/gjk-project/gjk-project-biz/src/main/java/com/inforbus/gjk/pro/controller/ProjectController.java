@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.log.annotation.SysLog;
+import com.inforbus.gjk.pro.api.dto.FilePathDTO;
 import com.inforbus.gjk.pro.api.entity.Hardwarelibs;
 import com.inforbus.gjk.pro.api.entity.ProComp;
 import com.inforbus.gjk.pro.api.entity.Project;
@@ -158,6 +159,19 @@ public class ProjectController {
 		return new R<>(proCompService.updateAllProComp(proComps));
 	}
 
+	/**
+	 * @param filePathDTO
+	 * @return
+	 * @Title: uploadFile
+	 * @Description: 项目树右键菜单上传文件功能
+	 * @Author wang
+	 * @DateTime 2019年10月17日 13:54:34
+	 */
+	@SysLog("增加文件")
+	@PutMapping("/uploadFile")
+	public R uploadFile(@RequestBody FilePathDTO filePathDTO) {
+		return new R<>(projectService.uploadFile(filePathDTO));
+	}
 	@GetMapping("/logs")
 	public R getlogs() {
 		List<String> s = new ArrayList<String>();

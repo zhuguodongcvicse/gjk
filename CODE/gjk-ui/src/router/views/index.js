@@ -30,7 +30,7 @@ export default [{
     children: [{
         path: 'index',
         name: '构件信息',
-        component: () => import('@/views/comp/component/showComp')
+        component: () => import('@/views/comp/component/index')
     },
     {
         path: '/comp/showComp',

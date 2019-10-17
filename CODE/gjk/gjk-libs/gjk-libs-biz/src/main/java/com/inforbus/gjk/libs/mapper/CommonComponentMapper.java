@@ -91,4 +91,24 @@ public interface CommonComponentMapper extends BaseMapper<CommonComponent> {
 	 * @return
 	 */
 	List<Map<String, String>> queryColumns(String tableName);
+
+	/**
+	 * 根据list中的每一项元素对comp_id，comp_name，comp_funcname，description进行模糊查询
+	 * 
+	 * @param selectStringList
+	 * @return
+	 */
+	IPage<CommonComponent> getCompListByString(Page page, @Param("selectStringList") List<String> selectStringList);
+
+	/**
+	 * 联合查询 根据list中的每一项元素对comp_id，comp_name，comp_funcname，description进行模糊查询
+	 * 根据算法和测试的树节点筛选构件
+	 * 
+	 * @param page
+	 * @param libsList
+	 * @param selectStringList
+	 * @return
+	 */
+	IPage<CommonComponent> getCompListByStringAndLibsId(Page page, @Param("libsList") List<String> libsList,
+			@Param("selectStringList") List<String> selectStringList);
 }
