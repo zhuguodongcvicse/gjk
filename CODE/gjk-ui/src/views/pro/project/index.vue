@@ -44,10 +44,10 @@
                 <select-tree :treeData="hardwareTreeData" multiple :id.sync="hardwareSelectArray"></select-tree>
                 </el-form-item>-->
                 <el-form-item label="构件筛选">
-                  <select-tree :treeData="screenLibsTree" multiple :id.sync="screenLibsIdArray"/>
+                  <select-tree :treeData="screenLibsTree" multiple :id.sync="screenLibsIdArray" />
                 </el-form-item>
                 <el-form-item label="构件选择">
-                  <select-tree :treeData="compTreeData" multiple :id.sync="compSelectArray"/>
+                  <select-tree :treeData="compTreeData" multiple :id.sync="compSelectArray" />
                   <el-button type="primary" @click="selectAllComp">全选</el-button>
                 </el-form-item>
                 <el-form-item label="软件框架选择">
@@ -117,17 +117,17 @@
               </div>
             </el-form>
           </el-dialog>
-          <br>
-          <br>
+          <br />
+          <br />
         </template>
         <template slot-scope="scope" slot="menu">
-          <el-button
+          <!-- <el-button
             type="primary"
             v-if="permissions.pro_project_edit"
             size="small"
             plain
             @click="handleEdit(scope.row,scope.index)"
-          >编辑</el-button>
+          >编辑</el-button>-->
           <el-button
             type="danger"
             v-if="permissions.pro_project_del"
