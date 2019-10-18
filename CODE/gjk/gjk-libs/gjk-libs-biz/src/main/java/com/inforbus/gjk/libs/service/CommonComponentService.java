@@ -18,6 +18,8 @@ package com.inforbus.gjk.libs.service;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -96,5 +98,25 @@ public interface CommonComponentService extends IService<CommonComponent> {
 	 * @return
 	 */
 	List<CompDictVO> getCompDictList(List<String> compIdList);
+
+	/**
+	 * 根据list中的每一项元素对comp_id，comp_name，comp_funcname，description进行模糊查询
+	 * 
+	 * @param selectStringList
+	 * @return
+	 */
+	IPage<CommonComponent> getCompListByString(Page page, List<String> selectStringList);
+
+	/**
+	 * 联合查询 根据list中的每一项元素对comp_id，comp_name，comp_funcname，description进行模糊查询
+	 * 根据算法和测试的树节点筛选构件
+	 * 
+	 * @param page
+	 * @param libsList
+	 * @param selectStringList
+	 * @return
+	 */
+	IPage<CommonComponent> getCompListByStringAndLibsId(Page page, List<String> libsList,
+			List<String> selectStringList);
 
 }

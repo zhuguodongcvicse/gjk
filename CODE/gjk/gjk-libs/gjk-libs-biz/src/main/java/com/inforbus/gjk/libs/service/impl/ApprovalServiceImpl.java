@@ -16,6 +16,7 @@
  */
 package com.inforbus.gjk.libs.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,9 +66,11 @@ public class ApprovalServiceImpl extends ServiceImpl<ApprovalMapper, Approval> i
 	@Override
 	public Approval saveApproval(Approval approval) {
 		approval.setId(IdGenerate.uuid());
+		approval.setApplyTime(LocalDateTime.now());
+		approval.setCreateTime(approval.getApplyTime());
 		try {
 			baseMapper.saveApproval(approval);
-			return getApprovalById(approval.getId());
+			return this.getById(approval.getId());
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("保存记录错误");

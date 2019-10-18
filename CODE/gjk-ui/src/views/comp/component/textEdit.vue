@@ -1,11 +1,11 @@
 <!--  -->
 <template>
   <!-- <monaco-editor :textContext="textContext"></monaco-editor> -->
-  <div class="comp_component_textedit_14s">
-    <el-form class="textdeit_form_14s">
+  <div style="margin-top:10px">
+    <el-form >
       <el-form-item>
         <div style="margin:20px 0px 0px 20px">
-          <div class="form_btn_14s">
+          <div >
             <el-form :model="editorForm" inline="inline">
               <el-form-item>
                 <el-button
@@ -30,7 +30,7 @@
               </el-form-item>
             </el-form>
           </div>
-          <div class="code-editor-container">
+          <div class="code-editor-container" style="margin-top:20px">
             <!-- 程序文本编辑器 -->
             <monaco-editor class="editor" v-model="textContext" language="c"></monaco-editor>
           </div>
@@ -131,4 +131,9 @@ export default {
 };
 </script>
 <style>
+/* 程序文本编辑器的大小 */
+.editor {
+  width: calc(90% - 120px);
+  height: 600px;
+}
 </style>

@@ -195,6 +195,32 @@
         <el-button type="primary" @click="saveAppImage">确 定</el-button>
       </div>
     </el-dialog>
+    <!--增加文件弹窗-->
+    <el-dialog
+      title="请您选择将要增加的文件"
+      :visible.sync="isUploadFile"
+      width="50%"
+      custom-class="dialog_selectPhotoDialogVisible_14s"
+    >
+      <el-input placeholder="选择文件" v-model="filename" :readonly="true">
+        <span slot="append" size="mini">
+          <el-upload
+            action="/comp/componentdetail/uploadUrl"
+            size="mini"
+            :show-file-list="false"
+            :http-request="UploadFile"
+          >
+            <el-button :style="{padding:'7px 30px'}" type="primary">
+              <i class="el-icon-folder"></i>
+            </el-button>
+          </el-upload>
+        </span>
+      </el-input>
+      <div slot="footer">
+        <el-button @click="isUploadFile = false,filename = ''">取 消</el-button>
+        <el-button type="primary" @click="saveUploadFile">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -202,7 +228,7 @@ import $ from "jquery";
 import { fetchAlgorithmTree } from "@/api/admin/algorithm";
 import { fetchTestTree } from "@/api/admin/test";
 import { getUserhasApplyAuto } from "@/api/admin/user";
-import { saveProProcess, saveProCompList } from "@/api/pro/project";
+import { saveProProcess, saveProCompList, uploadFile } from "@/api/pro/project";
 
 import {
   fetchProList,
@@ -250,6 +276,10 @@ export default {
       }
     };
     return {
+      currentNodeData: {},
+      filePath: "",
+      filename: "",
+      isUploadFile: false,
       appComponentId: "",
       filePathName: "",
       platformDataList: [],
@@ -509,6 +539,7 @@ export default {
         // console.log("this.liucheng::",this.treeData[0].children[0].name);
       });
     },
+    //对能够编译的构件工程文件夹做处理
     addIsComplie(treeData) {
       for (let node of treeData) {
         if (node.label == "App组件工程") {
@@ -636,37 +667,46 @@ export default {
       } else if (item == "删除流程") {
         this.deleteProcedureDialogVisible = true;
       } else if (item == "删除") {
-        let filePath = { filePath: "" };
-        filePath.filePath =
-          this.fileData.filePath + "\\" + this.fileData.fileName;
-        // console.log("this.fileData", this.fileData);
-        // console.log("this.treeData", this.treeData[0]);
+        this.$confirm("此操作将要删除此文件, 是否继续?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(() => {
+          let filePath = { filePath: "" };
+          filePath.filePath =
+            this.fileData.filePath + "\\" + this.fileData.fileName;
+          // console.log("this.fileData", this.fileData);
+          // console.log("this.treeData", this.treeData[0]);
 
-        // var filePathTemp = {filePathTemp: 'D:/14S_GJK_GIT/gjk/gjk/project/project11/Flow1流程/模型/222'};
-        // console.log("filePath", filePath);
-        // console.log("filePathTemp", filePathTemp)
-        deleteSelectFile(filePath).then(response => {
-          // console.log("response", response);
-          if (response.data == true) {
-            let flowFile = this.treeData[0].children;
-            let appList;
-            for (const i in flowFile) {
-              if (flowFile[i].id == this.fileData.processId) {
-                appList = flowFile[i].children[1].children;
+          // var filePathTemp = {filePathTemp: 'D:/14S_GJK_GIT/gjk/gjk/project/project11/Flow1流程/模型/222'};
+          // console.log("filePath", filePath);
+          // console.log("filePathTemp", filePathTemp)
+          deleteSelectFile(filePath).then(response => {
+            // console.log("response", response);
+            if (response.data == true) {
+              let flowFile = this.treeData[0].children;
+              let appList;
+              for (const i in flowFile) {
+                if (flowFile[i].id == this.fileData.processId) {
+                  appList = flowFile[i].children[1].children;
+                }
               }
-            }
-            var targetNode;
-            for (const i in appList) {
-              if (appList[i].id == this.fileData.id) {
-                appList.splice(i, 1);
-                return;
-              } else {
-                targetNode = this.findTargetNode(appList[i], this.fileData);
+              var targetNode;
+              for (const i in appList) {
+                if (appList[i].id == this.fileData.id) {
+                  appList.splice(i, 1);
+                  return;
+                } else {
+                  targetNode = this.findTargetNode(appList[i], this.fileData);
+                }
               }
+              // console.log("targetNode", targetNode);
             }
-            // console.log("targetNode", targetNode);
-          }
+          });
         });
+      } else if (item == "增加文件") {
+        this.isUploadFile = true;
+      } else if (item == "增加文件夹") {
       }
     },
     findTargetNode(currentNodeObj, targetNodeObj) {
@@ -855,7 +895,8 @@ export default {
     },
     nodeContextmenu(event, data) {
       // this.handleNodeClick(data)
-      // console.log("ddddddddd", data);
+      console.log("项目树数据", data);
+      this.currentNodeData = data;
       // if (data.parentType == "9") {
       if (data.type == "9") {
         this.menus = [
@@ -874,12 +915,20 @@ export default {
             this.procedureModelId = item.id;
           }
         }
-      } else if (data.type == "app" && data.isComplie) {
+      } else if (
+        data.type == "app" &&
+        data.isComplie &&
+        data.isDirectory == "0"
+      ) {
         this.procedureId = data.processId;
-        this.menus = ["编译", "删除"];
+        this.menus = ["编译", "删除", "增加文件"];
         this.fileData = data;
       } else if (data.parentId == "-1") {
         this.menus = ["添加流程", "申请构件"];
+      } else if (data.type == "app" && data.isDirectory == "0") {
+        this.procedureId = data.processId;
+        this.menus = ["删除", "增加文件"];
+        this.fileData = data;
       } else if (data.type == "app") {
         this.procedureId = data.processId;
         this.menus = ["删除"];
@@ -1200,6 +1249,41 @@ export default {
         .find("img")
         .eq(0)
         .attr("src", this.website.publicSvg + "icon-svg/文件夹收起.svg");
+    },
+    /* 上传文件 */
+    UploadFile(param) {
+      console.log("param", param);
+      getUploadFilesUrl(param).then(res => {
+        this.filePath = res.data.data;
+        this.filename = param.file.name;
+      });
+    },
+    saveUploadFile() {
+      var FilePathDTO = {
+        oldFilePath: this.filePath,
+        newFilePath:
+          this.currentNodeData.filePath + "\\" + this.currentNodeData.fileName,
+        fileName: this.filename
+      };
+      console.log("FilePathDTO", FilePathDTO);
+      uploadFile(FilePathDTO)
+        .then(res => {
+          if (res.data.data) {
+            this.$message({
+              message: "文件增加成功",
+              type: "success"
+            });
+            this.reload();
+          } else {
+            this.$message.error("文件增加失败");
+          }
+          this.filename = "";
+          this.isUploadFile = false;
+          this.currentNodeData = {};
+        })
+        .catch(error => {
+          this.$message.error("文件增加失败"); //todo
+        });
     }
   }
 };
