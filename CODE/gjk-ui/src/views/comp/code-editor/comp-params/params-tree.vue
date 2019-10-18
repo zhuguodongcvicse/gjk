@@ -941,10 +941,19 @@ export default {
       var attrObj = eval("(" + from.attributeMap.configureType + ")");
       let showName;
       if (attrObj.lableMapping) {
+        //基于标签名
+        let val = this.compChineseMapping.find(item => {
+          return item.label === con.attrKeys;
+        });
         let param = this.compChineseMapping.find(item => {
           return item.id === attrObj.mappingKeys;
         });
-        showName = param === undefined ? from.lableName : param.label;
+        showName =
+          param === undefined
+            ? val === undefined
+              ? from.attrName
+              : val.value
+            : param.label;
       } else {
         showName = from.lableName;
       }
@@ -956,16 +965,20 @@ export default {
           con.lableName = from.attributeMap[con.attrName];
           if (con.hasOwnProperty("attrMapping") && con.attrMapping) {
             //基于标签名
-            // let val = this.compChineseMapping.find(item => {
-            //   return item.label === con.attrKeys;
-            // });
+            let val = this.compChineseMapping.find(item => {
+              return item.label === con.attrKeys;
+            });
             // con.attrMappingName = val === undefined ? con.attrName : val.value;
             /* 基于id */
             let valParam = this.compChineseMapping.find(item => {
               return item.id === con.attrKeys;
             });
             con.attrMappingName =
-              valParam === undefined ? con.attrName : valParam.label;
+              valParam === undefined
+                ? val === undefined
+                  ? con.attrName
+                  : val.value
+                : valParam.label;
           } else if (
             attrObj.attrs !== undefined &&
             attrObj.attrs.length === 1
