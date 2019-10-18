@@ -134,15 +134,19 @@ export default {
   data() {
     //验证模板名称是否重复
     var validateTempName = (rule, value, callback) => {
-      checkTempName(value).then(response => {
-        if (window.boxType === "edit") callback();
-        let result = response.data.data;
-        if (result !== null) {
-          callback(new Error("模板名已经存在"));
-        } else {
-          callback();
-        }
-      });
+      if (/^[0-9a-zA-Z\u4e00-\u9fa5_]{2,225}$/.test(value) == false) {
+        callback("请输入正确的模板名,模板名最少俩位,可包含汉字、字母、数字");
+      } else {
+        checkTempName(value).then(response => {
+          if (window.boxType === "edit") callback();
+          let result = response.data.data;
+          if (result !== null) {
+            callback(new Error("模板名已经存在"));
+          } else {
+            callback();
+          }
+        });
+      }
     };
     return {
       isAddTemplate: false,
@@ -189,7 +193,7 @@ export default {
           { validator: validateTempName, trigger: "blur" }
         ],
         tempType: [
-          { required: true, message: "请选择或输入模板类型", trigger: "blur" }
+          { required: true, message: "请选择或输入模板类型", trigger: "change" }
         ],
         fileName: [
           { required: true, message: "请选择模板文件", trigger: "blur" }

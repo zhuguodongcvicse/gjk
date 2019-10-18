@@ -139,8 +139,8 @@ export default {
 <style>
 /* 程序文本编辑器的大小 */
 .editor {
-  width: 1500px;
-  height: 1000px;
+  width: calc(90% - 120px);
+  height: 600px;
 }
 </style>
 
