@@ -8,10 +8,11 @@
       <el-col :span="moduleType==='comp'? 6 : 10" style="margin-top:12px;">
         <el-input v-model="filterText" placeholder="筛选条件。。" style="height: 24px;line-height: 24px;">
           <el-button
-            v-show="moduleType==='comp'"
+            v-show="moduleType==='comp'||!disabled"
             slot="append"
             icon="el-icon-circle-plus"
             size="mini"
+            :readonly="readonly"
             @click="confirmAppendTreeNode"
           ></el-button>
         </el-input>
@@ -217,7 +218,9 @@ export default {
           nodeParam: node,
           dataParam: data,
           storeParam: store,
-          moduleType: this.moduleType
+          moduleType: this.moduleType,
+          readonly: this.readonly,
+          disabled: this.disabled
         },
         on: {
           clickTreeNode: (s, d, n) => this.getNodeData(s, d, n),
@@ -938,10 +941,19 @@ export default {
       var attrObj = eval("(" + from.attributeMap.configureType + ")");
       let showName;
       if (attrObj.lableMapping) {
+        //基于标签名
+        let val = this.compChineseMapping.find(item => {
+          return item.label === con.attrKeys;
+        });
         let param = this.compChineseMapping.find(item => {
           return item.id === attrObj.mappingKeys;
         });
-        showName = param === undefined ? from.lableName : param.label;
+        showName =
+          param === undefined
+            ? val === undefined
+              ? from.attrName
+              : val.value
+            : param.label;
       } else {
         showName = from.lableName;
       }
@@ -953,16 +965,20 @@ export default {
           con.lableName = from.attributeMap[con.attrName];
           if (con.hasOwnProperty("attrMapping") && con.attrMapping) {
             //基于标签名
-            // let val = this.compChineseMapping.find(item => {
-            //   return item.label === con.attrKeys;
-            // });
+            let val = this.compChineseMapping.find(item => {
+              return item.label === con.attrKeys;
+            });
             // con.attrMappingName = val === undefined ? con.attrName : val.value;
             /* 基于id */
             let valParam = this.compChineseMapping.find(item => {
               return item.id === con.attrKeys;
             });
             con.attrMappingName =
-              valParam === undefined ? con.attrName : valParam.label;
+              valParam === undefined
+                ? val === undefined
+                  ? con.attrName
+                  : val.value
+                : valParam.label;
           } else if (
             attrObj.attrs !== undefined &&
             attrObj.attrs.length === 1

@@ -21,6 +21,7 @@ var baknum3 = 0.5;
 var baknum4 = 0.5;
 var components;
 var verdict = false;
+var movedate;
 // 子接收父参数
 function handleMessageFromParent(event) {
 	deployment = event.data.params[0].frontCaseForDeployment;
@@ -604,7 +605,7 @@ function initEditor(editor) {
 	//以下保存按钮
 	var toolbarDiv = editor.toolbar;
 	var button = document.createElement('button');
-	button.textContent = '生成XML文件';
+	button.textContent = '保存';
 	button.className = 'boarddesign_board_14s';
 	toolbarDiv.appendChild(button)
 	button.onclick = function (evt) {
@@ -880,6 +881,7 @@ function initEditor(editor) {
 
 		function findSlot(element, evt) {
 			var xy = graph.toLogical(evt.event);
+			//var xy = element.location;
 			var type = element.get('type');
 
 			function canDrop(data) {
@@ -890,10 +892,10 @@ function initEditor(editor) {
 		function adaptBounds(element, slot) {
 			element.parent = element.host = slot;
 			var bounds = slot.getBounds();
-			graph.moveElements([element], bounds.x - element.x, bounds.y - element.y)
+			/* graph.moveElements([element], bounds.x - element.x, bounds.y - element.y) */
 		}
 		var dragInfo = {};
-		var startData ;
+		var startData;
 		graph.interactionDispatcher.addListener(function (evt) {
 			if (evt.kind === EVENT_CREATE_ELEMENT_BY_JSON) {
 				if (evt.roots.length === 1) {
@@ -915,7 +917,7 @@ function initEditor(editor) {
 			}
 			if (evt.kind == Q.InteractionEvent.ELEMENT_MOVE_START) {
 				var type = data.get('type');
-				if (type && (type == 'card' || type == 'port' || type == 'item')) {
+				 if (type && (type == 'card' || type == 'port' || type == 'item' || type == null)) { 
 					dragInfo = {
 						data: data,
 						x: data.x,
@@ -935,10 +937,9 @@ function initEditor(editor) {
 							}
 						}
 					}
-					console.log("刚开始移动的判断verdict", verdict)
-				} else {
+				 } else {
 					dragInfo = null;
-				}
+				} 
 				return;
 			}
 			if (!dragInfo) {
@@ -971,40 +972,61 @@ function initEditor(editor) {
 				var host = findCellHost(evt, data);
 				console.log("host", host)
 				console.log("===============data", data)
-				for (const i in startData.children.datas) {
-					if (startData.children.datas[i].id != data.id) {
-						if (startData.children.datas[i]._mn3.partname == data._mn3.partname) {
-							if (startData != data.parent) {
-								showMessage('该芯片上还有其他同部件构件请一起移动', 'success', 2000)
-								graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-								 data.parent = startData;
+				if(startData !=  null){
+					for (const i in startData.children.datas) {
+						if (startData.children.datas[i].id != data.id) {
+							if (startData.children.datas[i]._mn3.partname == data._mn3.partname) {
+								if (startData != data.parent) {
+									showMessage('该芯片上还有其他同部件构件请一起移动', 'error', 2000)
+									graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+									data.parent = startData;
+								}
 							}
 						}
 					}
+
+			
+				if (data.x > startData.x + 45 && verdict == false) {
+					graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+					data.parent = startData;
 				}
-			if (data.x > startData.x + 45 && verdict == false) {
+				if (data.x < startData.x + 7.5 && verdict == false) {
 					graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
 					data.parent = startData;
-			}
-			if (data.x < startData.x + 7.5 && verdict == false) {
+				}
+				if (data.y > startData.y + 45 && verdict == false) {
 					graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
 					data.parent = startData;
-			}
-			if (data.y > startData.y + 45 && verdict == false) {
+				}
+				if (data.y < startData.y + 7.5 && verdict == false) {
 					graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
 					data.parent = startData;
+				}
 			}
-			if (data.y < startData.y + 7.5 && verdict == false) {
-					graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-					data.parent = startData;			
-			}
+				console.log("++++++++++++", data)
+				console.log("++++++++++++", data.host)
 
-
-
-			//	dragInfo = null;
+ 		 	/* if(data.host != null){ */
+				if ( data.host ==  null && verdict == true) {
+					showMessage('请将构件移动到芯片上', 'error', 5000)
+				/* 	for (const index in movedate) {
+						console.log("okokokokokoko111111", movedate[index]);
+						var gjdata = movedate[index];
+					//	if (gjdata.properties.partname == data._mn3.partname) {
+						graph.moveElements([gjdata], dragInfo.x - data.x, dragInfo.y - data.y)
+					//	}
+					} */
+				} else if(verdict == true){
+					showMessage('已成功移动到IP为'+data.parent.properties.IP+'芯片上', 'success', 5000)
+				}
+			/*	} else{
+					console.log("movedatemovedatemovedatemovedate",movedate)
+					for (const index in movedate) {
+							graph.moveElements([movedate[index]], dragInfo.x -data.x, dragInfo.y - data.y)
+					}
+				}  */
 				verdict = false;
 				graph.selectionModel.clear();
-			//	startData = null;
 			}
 		})
 	}
@@ -1037,8 +1059,9 @@ function initEditor(editor) {
 		if (evt.kind != Q.InteractionEvent.ELEMENT_CREATED && evt.kind != Q.InteractionEvent.ELEMENT_MOVE_END) {
 			return;
 		}
+		movedate = evt.datas;
 		var data = evt.data;
-		//			console.log('EVT',evt.datas)//这里可以获取当前移动的所有图元
+		console.log('EVT',evt.datas)//这里可以获取当前移动的所有图元
 		if (!data || data.get('type') !== 'item') {
 			return;
 		}
@@ -1046,7 +1069,10 @@ function initEditor(editor) {
 		//		console.log('host',host);
 		data.host = data.parent = host;
 		evt.datas.forEach(function (data) { data.host = data.parent = host; })
-		data._mn3.cpuid = host.properties.nodeID;
+		if (host != null) {
+			data._mn3.cpuid = host.properties.nodeID;
+		}
+
 		/* 	for(var i in data){
 			
 				console.log('CPUid',	data._mn3.cpuid);
@@ -1059,7 +1085,7 @@ function initEditor(editor) {
 		var data = graph.getElement(evt);
 		if (data) {
 			var children = data.toChildren();
-			console.log("children", children);
+/* 			console.log("children", children); */
 
 		}
 	}

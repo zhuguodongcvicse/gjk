@@ -37,6 +37,8 @@
           :tableXmlParams="params"
           :moduleType="moduleType"
           :flowUids="formXmlParam.uids"
+          :readonly="readonly"
+          :disabled="disabled"
           @jsplumbUidsChange="$emit('jsplumbUidsChange', $event)"
         ></params-tree>
       </el-col>
@@ -680,10 +682,19 @@ export default {
       //标签名是否要中英文映射
       let showName;
       if (attrObj.lableMapping) {
+        //基于标签名
+        let val = this.compChineseMapping.find(item => {
+          return item.label === con.attrKeys;
+        });
         let param = this.compChineseMapping.find(item => {
           return item.id === attrObj.mappingKeys;
         });
-        showName = param === undefined ? attr.lableName : param.label;
+        showName =
+          param === undefined
+            ? val === undefined
+              ? from.attrName
+              : val.value
+            : param.label;
       } else {
         showName = attr.lableName;
       }
@@ -696,9 +707,9 @@ export default {
               con.lableName = attr.attributeMap[con.attrName];
               if (con.hasOwnProperty("attrMapping") && con.attrMapping) {
                 //基于标签名
-                // let val = this.compChineseMapping.find(item => {
-                //   return item.label === con.attrKeys;
-                // });
+                let val = this.compChineseMapping.find(item => {
+                  return item.label === con.attrKeys;
+                });
                 // con.attrMappingName =
                 //   val === undefined ? con.attrName : val.value;
                 /* 基于id */
@@ -706,7 +717,11 @@ export default {
                   return item.id === con.attrKeys;
                 });
                 con.attrMappingName =
-                  valParam === undefined ? con.attrName : valParam.label;
+                  valParam === undefined
+                    ? val === undefined
+                      ? con.attrName
+                      : val.value
+                    : valParam.label;
               } else if (attrObj.attrs.length == 1) {
                 con.attrMappingName = showName;
               } else {

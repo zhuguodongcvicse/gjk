@@ -22,6 +22,7 @@ import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.log.annotation.SysLog;
 import com.inforbus.gjk.libs.api.entity.CommonComponent;
 import com.inforbus.gjk.libs.api.entity.CommonComponentDetail;
+import com.inforbus.gjk.libs.api.vo.TreeUtil;
 import com.inforbus.gjk.libs.service.CommonComponentDetailService;
 import com.inforbus.gjk.libs.service.CommonComponentService;
 
@@ -116,4 +117,14 @@ public class CommonComponentDetailController {
 		return new R<>(commonComponentDetailService.removeById(id));
 	}
 
+	@PostMapping("/compView")
+	public R getCommCompView(@RequestBody CommonComponent comp) {
+		return new R<>(commonComponentDetailService.getCommCompView(comp));
+	}
+
+	@PostMapping("/compViewTree/{compId}")
+	public R getCommCompViewTree(@PathVariable String compId) {
+		return new R<>(TreeUtil.buildCommCompTree(
+				commonComponentDetailService.getCommCompViewTree(commonComponentService.getById(compId)), "-1"));
+	}
 }

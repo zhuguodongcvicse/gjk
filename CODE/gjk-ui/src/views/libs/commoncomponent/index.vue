@@ -118,6 +118,7 @@ import {
   delObj,
   getAllVersionByCompId,
   screenComp,
+  getCompView,
   getCompListByString,
   getCompListByStringAndLibsId,
   createZipFile
@@ -322,22 +323,21 @@ export default {
       this.$refs.crud.rowAdd();
     },
     handleEdit(row, index) {
-      //加载结构体
-      this.$store
-        .dispatch("setStruceType")
-        .then(() => {
-          this.$router.push({
-            path: "/comp/showComp/addAndEditComp",
-            query: { compId: row.id, type: "display", proFloName: "查看构件" }
-          });
-        })
-        .catch(() => {
-          this.$message({
-            message: "跳转错误",
-            type: "error"
-          });
+      getCompView(row).then(res => {
+        this.$store.dispatch("setSaveXmlMaps", res.data.data.compBasicMap).then(() => {
+          this.$store
+            .dispatch("setChineseMapping", "comp_param_type")
+            .then(() => {
+              //加载结构体
+              this.$store.dispatch("setStruceType").then(() => {
+                this.$router.push({
+                  path: "/comp/showComp/commView",
+                  query: { compId: row.id, type: "view" }
+                });
+              });
+            });
         });
-      // this.$refs.crud.rowEdit(row, index);
+      });
     },
     handleDel(row, index) {
       this.$refs.crud.rowDel(row, index);

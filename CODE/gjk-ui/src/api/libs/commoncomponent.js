@@ -149,3 +149,16 @@ export function createZipFile(commonCompList) {
     }, 0)
   })
 }
+export function getCompView(obj) {
+  return request({
+    url: '/libs/commoncomponentdetail/compView',
+    method: 'post',
+    data: obj
+  })
+}
+export function compViewTree(compId) {
+  return request({
+    url: '/libs/commoncomponentdetail/compViewTree/' + compId,
+    method: 'post'
+  })
+}
