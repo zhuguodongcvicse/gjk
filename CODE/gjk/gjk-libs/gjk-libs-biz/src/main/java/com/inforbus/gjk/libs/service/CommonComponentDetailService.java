@@ -17,6 +17,7 @@
 package com.inforbus.gjk.libs.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -25,6 +26,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.inforbus.gjk.libs.api.entity.CommonComponent;
 import com.inforbus.gjk.libs.api.entity.CommonComponentDetail;
+import com.inforbus.gjk.libs.api.vo.CommCompDetailVO;
 
 /**
  * 公共构件库表
@@ -57,4 +59,23 @@ public interface CommonComponentDetailService extends IService<CommonComponentDe
 	 * @return
 	 */
 	List<CommonComponentDetail> getAllCompDetailByCompId(@Param("compList") List<CommonComponent> compList);
+	/**
+	 * @Title: getCommCompView
+	 * @Description: 根据构件编号查询构件详情及文件
+	 * @Author xiaohe
+	 * @DateTime 2019年10月17日 上午11:02:23
+	 * @param compId 构件编号
+	 * @return 
+	 */
+	Map<String, Object> getCommCompView(CommonComponent compId);
+
+	/**
+	 * @Title: getCommCompViewTree
+	 * @Description: 查询构件树
+	 * @Author xiaohe
+	 * @DateTime 2019年10月17日 下午4:26:28
+	 * @param compId
+	 * @return 
+	 */
+	List<CommCompDetailVO> getCommCompViewTree(CommonComponent comp);
 }
