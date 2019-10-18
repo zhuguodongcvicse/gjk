@@ -1,7 +1,7 @@
 <!--  -->
 <template>
-  <div class="pro_project_textedits_14s">
-    <div class="textedits_div1_14s">
+  <div  style="margin-top:10px">
+    <div >
     <el-form>
       <el-form-item>
         <!-- <monaco-editor :textContext="textContext"></monaco-editor> -->
@@ -31,7 +31,7 @@
               </el-form-item>
             </el-form>
           </div>
-          <div class="code-editor-container">
+          <div class="code-editor-container" style="margin-top:20px">
             <!-- 程序文本编辑器 -->
             <monaco-editor class="editor" v-model="textContext" language="c"></monaco-editor>
           </div>
@@ -167,5 +167,8 @@ export default {
 // }
 </script>
 <style>
-
+.editor {
+  width: calc(100% - 20px);
+  height: 600px;
+}
 </style>

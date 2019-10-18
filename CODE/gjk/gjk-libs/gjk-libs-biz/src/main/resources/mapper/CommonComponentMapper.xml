@@ -182,4 +182,60 @@
 		by ordinal_position
 	</select>
 
+	<select id="getCompListByString" resultMap="commonComponentMap">
+		SELECT
+		<include refid="commonComponentSql" />
+		FROM gjk_common_component
+		<where>
+			<foreach collection="selectStringList" item="item"
+				index="index" open=" " separator="or" close=" ">
+				comp_id LIKE '%${item}%'
+				OR
+				comp_name LIKE '%${item}%'
+				OR
+				comp_funcname LIKE '%${item}%'
+				OR
+				description LIKE '%${item}%'
+			</foreach>
+		</where>
+	</select>
+
+	<select id="getCompListByStringAndLibsId"
+		resultMap="commonComponentMap">
+		SELECT a.* FROM(
+		SELECT
+		<include refid="commonComponentSql" />
+		FROM gjk_common_component
+		<where>
+			id in(
+			SELECT comp_id
+			FROM gjk_common_component_detail
+			where libs_id in
+			<foreach collection="libsList" item="item" index="index"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+			)
+		</where>
+		)a , (
+		SELECT
+		<include refid="commonComponentSql" />
+		FROM gjk_common_component
+		<where>
+			<foreach collection="selectStringList" item="item"
+				index="index" open=" " separator="or" close=" ">
+				comp_id LIKE '%${item}%'
+				OR
+				comp_name LIKE '%${item}%'
+				OR
+				comp_funcname LIKE '%${item}%'
+				OR
+				description LIKE '%${item}%'
+			</foreach>
+		</where>
+		)b
+		where a.id = b.id
+
+	</select>
+
 </mapper>

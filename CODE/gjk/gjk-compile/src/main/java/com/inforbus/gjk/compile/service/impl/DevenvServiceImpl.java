@@ -354,13 +354,14 @@ public class DevenvServiceImpl implements DevenvService{
 		}
 		try {
 			SftpUtil.download(makeFilePath+"/"+fileName+".zip",makeFilePath+"/"+fileName+".zip",dPath,chSftp);
-			
+			//todo,需取得一个下载成功或失败的标志
 			//推送消息到rabbitmq中
 			this.rabbitmqTemplate.convertAndSend("gjkmq" , fileName+"===@@@===\n下载完毕");
 			
 			//解压到工程Debug目录下
 			try {
 				unZipFiles(dPath+"\\"+fileName+".zip",filePath+"\\Debug");
+				//todo ,解压成功或失败的判断以及处理
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

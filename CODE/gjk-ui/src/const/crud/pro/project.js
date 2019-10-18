@@ -31,6 +31,7 @@ export const tableOption = {
       label: '项目标识',
       prop: 'id',
       hide: true,
+      editDisabled: true
     },
     {
       label: '项目名称',
@@ -38,7 +39,9 @@ export const tableOption = {
     },
     {
       label: '工作模式标识',
-      prop: 'flowId'
+      prop: 'flowId',
+      editDisabled: true,
+      hide: true,
     },
     {
       label: '用户ID',
@@ -66,11 +69,13 @@ export const tableOption = {
     },
     {
       label: '创建时间',
-      prop: 'createTime'
+      prop: 'createTime',
+      editDisabled: true
     },
     {
       label: '修改时间',
-      prop: 'updateTime'
+      prop: 'updateTime',
+      editDisabled: true
     },
   ]
 }

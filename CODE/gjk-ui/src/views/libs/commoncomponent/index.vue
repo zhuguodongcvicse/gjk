@@ -77,7 +77,11 @@
         class="libs_commoncomponent_index_dialog_14s"
       >
         <div>
-          <avue-crud :data="allVersionTableData" :option="tableOption">
+          <avue-crud
+            :data="allVersionTableData"
+            :option="tableOption"
+            @selection-change="versionSelectionChange"
+          >
             <template slot="version" slot-scope="scope">
               <el-tag>v{{scope.row.version}}</el-tag>
             </template>
@@ -114,8 +118,10 @@ import {
   delObj,
   getAllVersionByCompId,
   screenComp,
-  createZipFile,
-  getCompView
+  getCompView,
+  getCompListByString,
+  getCompListByStringAndLibsId,
+  createZipFile
 } from "@/api/libs/commoncomponent";
 import { fetchAlgorithmTree } from "@/api/admin/algorithm";
 import { fetchTestTree } from "@/api/admin/test";
@@ -181,16 +187,15 @@ export default {
   },
   mounted: function() {},
   watch: {
-    // algorithmSelectArray() {
-    //   console.log("11111111111111", this.algorithmSelectArray);
-    // },
-    // testSelectArray() {
-    //   console.log("22222222222222", this.testSelectArray);
-    // }
     screenLibsSelectArray() {
       console.log("screenLibsSelectArray", this.screenLibsSelectArray);
-      console.log(this.listQuery);
       this.getTableData();
+    },
+    selectString() {
+      this.getTableData();
+    },
+    exportCompList() {
+      console.log("1111111111111111", this.exportCompList);
     }
   },
   methods: {
@@ -202,6 +207,11 @@ export default {
     selectionChange(list) {
       console.log("selectionChange", list);
       this.exportCompList = list;
+    },
+    versionSelectionChange(list) {
+      // for (let item of list) {
+      //   this.exportCompList.push(item);
+      // }
     },
     getLibsTree() {
       fetchAlgorithmTree(this.listQuery).then(response => {
@@ -228,14 +238,53 @@ export default {
     },
     getTableData() {
       this.loading = true;
-      if (this.screenLibsSelectArray.length == 0) {
-        this.isShowHistoricVersion = true;
-        this.getList();
-      } else {
+      if (
+        this.screenLibsSelectArray.length > 0 &&
+        this.selectString.trim() != ""
+      ) {
+        this.isShowHistoricVersion = false;
+        this.getCompListByStringAndLibsId();
+      } else if (this.screenLibsSelectArray.length > 0) {
         this.isShowHistoricVersion = false;
         this.getScreenComp();
+      } else if (this.selectString.trim() != "") {
+        this.isShowHistoricVersion = false;
+        this.getCompListBySelectString();
+      } else {
+        this.isShowHistoricVersion = true;
+        this.getList();
       }
       this.loading = false;
+    },
+    getCompListByStringAndLibsId() {
+      this.tableLoading = true;
+      let list = [];
+      list.push(JSON.parse(JSON.stringify(this.screenLibsSelectArray)));
+      if (this.selectString.indexOf(" ") >= 0) {
+        list.push(this.selectString.split(" "));
+      } else {
+        list.push([this.selectString]);
+      }
+      getCompListByStringAndLibsId(this.listQuery, list).then(Response => {
+        this.tableData = Response.data.data.records;
+        this.page.total = Response.data.data.total;
+        this.tableLoading = false;
+      });
+    },
+    getCompListBySelectString() {
+      this.tableLoading = true;
+      let list = [];
+      if (this.selectString.indexOf(" ") >= 0) {
+        list = this.selectString.split(" ");
+      } else {
+        list.push(this.selectString);
+      }
+      console.log("11111111111111111", list);
+      getCompListByString(this.listQuery, list).then(Response => {
+        this.tableData = Response.data.data.records;
+        this.page.total = Response.data.data.total;
+        this.tableLoading = false;
+      });
     },
     getScreenComp() {
       this.tableLoading = true;
@@ -247,8 +296,9 @@ export default {
     },
     getList() {
       this.tableLoading = true;
-      this.$set(this.listQuery, "version", "max");
-      fetchList(this.listQuery).then(response => {
+      let page = JSON.parse(JSON.stringify(this.listQuery));
+      this.$set(page, "version", "max");
+      fetchList(page).then(response => {
         this.tableData = response.data.data.records;
         this.page.total = response.data.data.total;
         this.tableLoading = false;

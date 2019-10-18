@@ -35,19 +35,20 @@
               label-width="120px"
               :model="formLabelAlign"
               :rules="projectRules"
+              ref="formLabelAlignRef"
             >
               <div class="bsp_tab_14s">
-                <el-form-item label="项目名称1" prop="projectName">
+                <el-form-item label="项目名称" prop="projectName">
                   <el-input v-model="formLabelAlign.projectName"></el-input>
                 </el-form-item>
                 <!-- <el-form-item label="硬件选择">
                 <select-tree :treeData="hardwareTreeData" multiple :id.sync="hardwareSelectArray"></select-tree>
                 </el-form-item>-->
                 <el-form-item label="构件筛选">
-                  <select-tree :treeData="screenLibsTree" multiple :id.sync="screenLibsIdArray"/>
+                  <select-tree :treeData="screenLibsTree" multiple :id.sync="screenLibsIdArray" />
                 </el-form-item>
                 <el-form-item label="构件选择">
-                  <select-tree :treeData="compTreeData" multiple :id.sync="compSelectArray"/>
+                  <select-tree :treeData="compTreeData" multiple :id.sync="compSelectArray" />
                   <el-button type="primary" @click="selectAllComp">全选</el-button>
                 </el-form-item>
                 <el-form-item label="软件框架选择">
@@ -80,8 +81,8 @@
                   <!--&gt;</el-option>-->
                   <!--</el-select>-->
                 </el-form-item>
-                <el-form-item label="BSP选择">
-                  <el-select v-model="bspSelectString" placeholder="请选择">
+                <el-form-item label="BSP选择" prop="bspSelectString">
+                  <el-select v-model="formLabelAlign.bspSelectString" placeholder="请选择">
                     <el-option
                       v-for="item in bspTreeData"
                       :key="item.id"
@@ -90,8 +91,8 @@
                     ></el-option>
                   </el-select>
                 </el-form-item>
-                <el-form-item label="请选择审批人">
-                  <el-select v-model="applyUser" placeholder="请选择">
+                <el-form-item label="请选择审批人" prop="applyUser">
+                  <el-select v-model="formLabelAlign.applyUser" placeholder="请选择">
                     <el-option
                       v-for="item in applyUserSelect"
                       :key="item.value"
@@ -100,7 +101,7 @@
                     ></el-option>
                   </el-select>
                 </el-form-item>
-                <el-form-item label="流程名称">
+                <el-form-item label="流程名称" prop="processName">
                   <el-input v-model="formLabelAlign.processName"></el-input>
                 </el-form-item>
               </div>
@@ -117,17 +118,17 @@
               </div>
             </el-form>
           </el-dialog>
-          <br>
-          <br>
+          <br />
+          <br />
         </template>
         <template slot-scope="scope" slot="menu">
-          <el-button
+          <!-- <el-button
             type="primary"
             v-if="permissions.pro_project_edit"
             size="small"
             plain
             @click="handleEdit(scope.row,scope.index)"
-          >编辑</el-button>
+          >编辑</el-button>-->
           <el-button
             type="danger"
             v-if="permissions.pro_project_del"
@@ -187,11 +188,23 @@ export default {
   data() {
     var proNameSameNameCheck = (rule, value, callback) => {
       // console.log("11111111111111111111111111", rule, value, callback);
-      for (let item of this.proNameList) {
-        if (value === item) {
-          // console.log("2222222222222222", item, value);
-          callback(new Error("项目名已存在，请重新输入。"));
+      if (/^[0-9a-zA-Z\u4e00-\u9fa5]{2,225}$/.test(value) == false) {
+        callback("请输入正确的项目名,项目名最少俩位,可包含汉字、字母、数字");
+      } else {
+        for (let item of this.proNameList) {
+          if (value === item) {
+            // console.log("2222222222222222", item, value);
+            callback(new Error("项目名已存在，请重新输入。"));
+          }
         }
+        callback();
+      }
+    };
+    var processNameCheck = (rule, value, callback) => {
+      if (/^[0-9a-zA-Z\u4e00-\u9fa5]{2,225}$/.test(value) == false) {
+        callback("请输入正确的流程名,流程名最少俩位,可包含汉字、字母、数字");
+      } else {
+        callback();
       }
     };
     return {
@@ -202,6 +215,8 @@ export default {
         projectName: "",
         number: "",
         hardware: "",
+        bspSelectString: "",
+        applyUser: "",
         processName: ""
       },
       labelPosition: "right",
@@ -232,9 +247,7 @@ export default {
       softwareTreeData: [],
       softwareSelectString: "",
       bspTreeData: [],
-      bspSelectString: "",
 
-      applyUser: "",
       applyUserSelect: [],
 
       proNameList: [],
@@ -243,6 +256,14 @@ export default {
         projectName: [
           { required: true, message: "请输入", trigger: "blur" },
           { validator: proNameSameNameCheck, trigger: "blur" }
+        ],
+        bspSelectString: [
+          { required: true, message: "请选择", trigger: "change" }
+        ],
+        applyUser: [{ required: true, message: "请选择", trigger: "change" }],
+        processName: [
+          { required: true, message: "请输入", trigger: "blur" },
+          { validator: processNameCheck, trigger: "blur" }
         ]
       },
       softwareSelectString: [],
@@ -266,8 +287,11 @@ export default {
     softwareSelectString: function() {
       // console.log("softwareSelectString:", this.softwareSelectString);
     },
-    bspSelectString: function() {
-      // console.log("bspSelectString:", this.bspSelectString);
+    "formLabelAlign.bspSelectString": function() {
+      // console.log("bspSelectString:", this.formLabelAlign.bspSelectString);
+    },
+    "formLabelAlign.applyUser": function() {
+      console.log("formLabelAlign.applyUser:", this.formLabelAlign.applyUser);
     },
     project: function() {
       // console.log("project:", this.project);
@@ -361,62 +385,89 @@ export default {
     },
 
     handleSaveComp() {
-      this.project.projectName = this.formLabelAlign.projectName;
-      this.project.processName = this.formLabelAlign.processName;
-      // this.project.defaultSoftwareId = this.softwareSelectString;
-      this.project.defaultBspId = this.bspSelectString;
-      this.project.userId = this.userInfo.userId;
-      //给工作模式ID赋值
+      this.$refs.formLabelAlignRef.validate((valid, object) => {
+        if (valid) {
+          this.project.projectName = this.formLabelAlign.projectName;
+          this.project.processName = this.formLabelAlign.processName;
+          // this.project.defaultSoftwareId = this.softwareSelectString;
+          this.project.defaultBspId = this.formLabelAlign.bspSelectString;
+          this.project.userId = this.userInfo.userId;
+          //给工作模式ID赋值
 
-      saveProject(this.project).then(Response => {
-        // console.log("11111111111111111111111111111",Response.data.data);
-        this.project.id = Response.data.data.id;
-        saveProProcess(this.project.id, this.project.processName).then(
-          Response => {
-            // console.log("得到saveProProcess的返回结果：", Response);
-            for (var i = 0; i < Response.data.data.length; i++) {
-              if (Response.data.data[i].fileType == "9") {
-                this.procedureId = Response.data.data[i].id;
-              }
-            }
-            // console.log("this.procedureId" + this.procedureId);
-            //保存软件框架
-            this.changeProcedureSoftwareId();
-            // this.softwareSelectString = []
-            // showPartSoftwareAndPlatform(this.procedureId).then(Response => {
-            //   for (var k = 0; k < Response.data.data.length; k++) {
-            //     this.softwareSelectString.push(Response.data.data[k].softwareId)
-            //     this.softwareSelectNameString.push(Response.data.data[k].platformName)
-            //   }
-            //   //校验是否选中所有平台大类
-            //   this.checkoutPlatform();
-            // })
-            saveProCompList(this.project.id, this.compSelectArray).then(
-              Response => {
-                let approval = {};
-                approval.userId = this.userInfo.userId;
-                approval.applyId = this.project.id;
-                approval.applyType = "2";
-                approval.libraryType = "7";
-                if (this.applyUser != "") {
-                  approval.applyUserId = this.applyUser;
-                }
-                approval.approvalState = "0";
-                //提交记录到审批管理库
-                saveApproval(approval).then(Response => {
-                  saveApprovalApply(
-                    Response.data.data.id,
-                    this.compSelectArray
+          saveProject(this.project)
+            .then(Response => {
+              // console.log("11111111111111111111111111111",Response.data.data);
+              this.project.id = Response.data.data.id;
+              saveProProcess(this.project.id, this.project.processName).then(
+                Response => {
+                  // console.log("得到saveProProcess的返回结果：", Response);
+                  for (var i = 0; i < Response.data.data.length; i++) {
+                    if (Response.data.data[i].fileType == "9") {
+                      this.procedureId = Response.data.data[i].id;
+                    }
+                  }
+                  // console.log("this.procedureId" + this.procedureId);
+                  //保存软件框架
+                  this.changeProcedureSoftwareId();
+                  // this.softwareSelectString = []
+                  // showPartSoftwareAndPlatform(this.procedureId).then(Response => {
+                  //   for (var k = 0; k < Response.data.data.length; k++) {
+                  //     this.softwareSelectString.push(Response.data.data[k].softwareId)
+                  //     this.softwareSelectNameString.push(Response.data.data[k].platformName)
+                  //   }
+                  //   //校验是否选中所有平台大类
+                  //   this.checkoutPlatform();
+                  // })
+                  if (this.compSelectArray.length <= 0) {
+                    this.compSelectArray = null;
+                  }
+                  saveProCompList(this.project.id, this.compSelectArray).then(
+                    Response => {
+                      let approval = {};
+                      approval.userId = this.userInfo.userId;
+                      approval.applyId = this.project.id;
+                      approval.applyType = "2";
+                      approval.libraryType = "7";
+                      console.log(
+                        "2222222222222222222222",
+                        this.formLabelAlign.applyUser
+                      );
+                      if (this.formLabelAlign.applyUser != "") {
+                        console.log(
+                          "11111111111111111111111111",
+                          this.formLabelAlign.applyUser
+                        );
+                        approval.applyUserId = this.formLabelAlign.applyUser;
+                      }
+                      approval.approvalState = "0";
+                      //提交记录到审批管理库
+                      if (this.compSelectArray == null) {
+                        this.compSelectArray = [];
+                      }
+                      saveApproval(approval).then(Response => {
+                        saveApprovalApply(
+                          Response.data.data.id,
+                          this.compSelectArray
+                        );
+                        Object.assign(
+                          this.formLabelAlign,
+                          this.$options.data().formLabelAlign
+                        );
+                        this.dialogTableVisible = false;
+                      });
+                    }
                   );
-                });
+                }
+              );
+            })
+            .catch(error => {
+              if (this.compSelectArray == null) {
+                this.compSelectArray = [];
               }
-            );
-          }
-        );
-        this.dialogTableVisible = false;
-        Object.assign(this.formLabelAlign, this.$options.data().formLabelAlign);
+            });
+          this.reload();
+        }
       });
-      this.reload();
     },
     handleCancleComp() {
       this.dialogTableVisible = false;

@@ -180,4 +180,17 @@ public class CommonComponentController {
 		return new R<>(commonComponentService.getCompDictList(compIdList));
 	}
 
+	@PostMapping("/getCompListByString/{current}/{size}")
+	public R<?> getCompListByString(@PathVariable Integer current, @PathVariable Integer size,
+			@RequestBody List<String> selectList) {
+		return new R<>(commonComponentService.getCompListByString(new Page<>(current, size), selectList));
+	}
+
+	@PostMapping("/getCompListByStringAndLibsId/{current}/{size}")
+	public R<?> getCompListByStringAndLibsId(@PathVariable Integer current, @PathVariable Integer size,
+			@RequestBody List<List<String>> list) {
+		return new R<>(commonComponentService.getCompListByStringAndLibsId(new Page<>(current, size), list.get(0),
+				list.get(1)));
+	}
+
 }

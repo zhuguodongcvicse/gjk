@@ -110,6 +110,22 @@ export function getCompDict(compIdList) {
   })
 }
 
+export function getCompListByString(listQuery, selectList) {
+  return request({
+    url: '/libs/commoncomponent/getCompListByString/' + listQuery.current + "/" + listQuery.size,
+    method: 'post',
+    data: selectList
+  })
+}
+
+export function getCompListByStringAndLibsId(listQuery, list) {
+  return request({
+    url: '/libs/commoncomponent/getCompListByStringAndLibsId/' + listQuery.current + "/" + listQuery.size,
+    method: 'post',
+    data: list
+  })
+}
+
 export function createZipFile(commonCompList) {
   return request({
     url: '/libs/commoncomponent/createZipFile',
