@@ -1,12 +1,13 @@
 <template>
   <el-dialog
     class="comp_component_storageApply_14s"
-    title="批量构件入库申请"
+    title="查看"
     :visible.sync="dialog"
     width="50%"
-    :before-close="dialogBeforeClose"
+    :before-close="dialogClose"
+    :append-to-body="true"
   >
-    <span>是否将以下构件及相关文件提交入库？</span>
+    <!-- <span>是否将以下构件及相关文件提交入库？</span>
     <el-form>
       <el-form-item label="入库审批人">
         <el-select v-model="applyUser" placeholder="请选择">
@@ -18,7 +19,7 @@
           ></el-option>
         </el-select>
       </el-form-item>
-    </el-form>
+    </el-form>-->
     <avue-crud ref="crud" :data="tableData" :option="tableOption">
       <template slot-scope="scope" slot="menu">
         <el-tooltip class="item" effect="dark" content="查看" placement="top">
@@ -33,8 +34,8 @@
     </avue-crud>
 
     <span slot="footer" class="dialog-footer">
-      <el-button @click="dialogBeforeClose">取 消</el-button>
-      <el-button type="primary" @click="storageApplyComp">入库</el-button>
+      <el-button @click="dialogClose">取 消</el-button>
+      <!-- <el-button type="primary" @click="storageApplyComp">入库</el-button> -->
     </span>
 
     <el-dialog
@@ -42,8 +43,7 @@
       :visible.sync="compMessageDialogVisible"
       width="35%"
       :before-close="dialogBeforeClose"
-      :modal-append-to-body="false"
-      :close-on-click-modal="false"
+      :append-to-body="true"
     >
       <div>
         <el-form size="mini" label-position="right" label-width="100px">
@@ -58,15 +58,11 @@
               ref="tree"
               :data="compTreeData"
               :default-expand-all="true"
-              :check-on-click-node="true"
-              @check-change="handleCheckChange"
+              :default-expanded-keys="defaultExpandIds"
             ></el-tree>
           </el-form-item>
         </el-form>
       </div>
-      <!-- <div slot="footer">
-        <el-button @click="dialogBeforeClose">关闭</el-button>
-      </div>-->
     </el-dialog>
   </el-dialog>
 </template>
@@ -76,9 +72,13 @@ import { mapGetters } from "vuex";
 import { tableOption } from "@/const/crud/comp/component";
 import { fetchCompLists, putObj } from "@/api/comp/component";
 //当引用的方法重名时，使用as取别名区分
-import { putObj as approvalPutObj } from "@/api/libs/approval";
+import {
+  saveApproval,
+  getIdByApplyId,
+  putObj as approvalPutObj
+} from "@/api/libs/approval";
 import { getUserhasApplyAuto } from "@/api/admin/user";
-import { saveApproval, getIdByApplyId } from "@/api/libs/approval";
+import { getTreeDefaultExpandIds } from "@/util/util";
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
 export default {
@@ -107,21 +107,15 @@ export default {
       applyUser: "",
 
       compMessageDialogVisible: false,
-      compMessage: {}
+      compMessage: {},
+
+      defaultExpandIds: []
     };
   },
   //监控data中的数据变化
   watch: {
     compList: function() {
-      if (this.compList.length == 0) {
-        this.dialog = false;
-        this.$message({
-          message: "导入的构件已存在，请勿重复导入。",
-          type: "warning"
-        });
-      } else {
-        this.tableData = this.compList;
-      }
+      this.tableData = this.compList;
     }
   },
   //方法集合
@@ -132,89 +126,56 @@ export default {
       this.compName = this.compMessage.compName;
       this.compId = this.compMessage.compId;
       fetchCompLists(this.compMessage.id, true).then(Response => {
+        let defaultExpandIds = [];
+        getTreeDefaultExpandIds(Response.data.data, defaultExpandIds, 0, 2);
+        this.defaultExpandIds = defaultExpandIds;
         this.compTreeData = Response.data.data;
       });
+    },
+    dialogClose() {
+      this.$emit("setImportCompDialog", false);
     },
     dialogBeforeClose(done) {
       done();
     },
-    handleCheckChange() {
-      let res = this.$refs.tree.getCheckedNodes();
-      this.selectNodeArray = [];
-      res.forEach(item => {
-        if (this.compMessage.id != item.id) {
-          this.selectNodeArray.push(item);
-        }
-      });
-    },
+    // handleCheckChange() {
+    //   let res = this.$refs.tree.getCheckedNodes();
+    //   this.selectNodeArray = [];
+    //   res.forEach(item => {
+    //     if (this.compMessage.id != item.id) {
+    //       this.selectNodeArray.push(item);
+    //     }
+    //   });
+    // },
     //提交入库的方法
     storageApplyComp() {
-      //   let approval = {};
-      //   approval.userId = this.userInfo.userId;
-      //   approval.applyId = this.compMessage.id;
-      //   approval.applyType = "1";
-      //   approval.libraryType = "1";
-      //   approval.approvalState = "0";
-      //   if (this.applyUser != "") {
-      //     approval.applyUserId = this.applyUser;
-      //   }
-      //   //如果审批状态是未提交或为空，提交审批记录
-      //   if (
-      //     this.compMessage.applyState == "0" ||
-      //     this.compMessage.applyState == null
-      //   ) {
-      //     //提交记录到审批管理库
-      //     saveApproval(approval).then(Response => {
-      //       let comp = {};
-      //       comp.id = this.compMessage.id;
-      //       comp.applyState = "1";
-      //       comp.applyDesc = "已提交申请，请等待库管理员审批";
-      //       //修改构件审批状态成已提交申请
-      //       putObj(comp).then(Response => {
-      //         this.$message({
-      //           message: "已提交申请，请等待库管理员审批",
-      //           type: "success"
-      //         });
-      //       });
-      //     });
-      //     //如果申请状态为被驳回，可以再次提交审批
-      //   } else if (this.compMessage.applyState == "3") {
-      //     let comp = {};
-      //     comp.id = this.compMessage.id;
-      //     comp.applyState = "4";
-      //     comp.applyDesc = "已提交申请，请等待库管理员审批";
-      //     //修改状态成被驳回后提交申请
-      //     putObj(comp).then(Response => {
-      //       getIdByApplyId(this.compMessage.id).then(Response => {
-      //         let modifyApply = {};
-      //         modifyApply.id = Response.data.data.id;
-      //         modifyApply.approvalState = "4";
-      //         modifyApply.description =
-      //           "前次申请被驳回理由：" + this.compMessage.applyDesc;
-      //         //将前次被驳回理由当做审批备注，修改审批记录
-      //         approvalPutObj(modifyApply).then(Response => {
-      //           this.$message({
-      //             message: "已提交申请，请等待库管理员审批",
-      //             type: "success"
-      //           });
-      //         });
-      //       });
-      //     });
-      //     //如果申请状态为已提交，不可以提交审批
-      //   } else if (this.compMessage.applyState == "1") {
+      // let approval = {};
+      // approval.userId = this.userInfo.userId;
+      // approval.applyId = this.compMessage.id;
+      // //入库
+      // approval.applyType = "1";
+      // //批量构件
+      // approval.libraryType = "8";
+      // approval.approvalState = "0";
+      // if (this.applyUser != "") {
+      //   approval.applyUserId = this.applyUser;
+      // }
+      // //提交记录到审批管理库
+      // saveApproval(approval).then(Response => {
+      //   let comp = {};
+      //   comp.id = this.compMessage.id;
+      //   comp.applyState = "1";
+      //   comp.applyDesc = "已提交申请，请等待库管理员审批";
+      //   //修改构件审批状态成已提交申请
+      //   putObj(comp).then(Response => {
       //     this.$message({
-      //       message: "该构件已提交审批，请勿重复提交！",
-      //       type: "warning"
+      //       message: "已提交申请，请等待库管理员审批",
+      //       type: "success"
       //     });
-      //     //如果申请状态为审批已通过，不可以提交审批
-      //   } else if (this.compMessage.applyState == "2") {
-      //     this.$message({
-      //       message: "该构件已通过审批！",
-      //       type: "warning"
-      //     });
-      //   }
-      //   this.reload();
-      //   this.dialogStateShow(false);
+      //   });
+      // });
+      // this.reload();
+      // this.dialogStateShow(false);
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
