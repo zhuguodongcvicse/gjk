@@ -227,7 +227,7 @@ export function codeGeneration(proDetailId,username) {
   })
   }
 
-//集成代码生成
+//项目树增加文件
 export function uploadFile(obj) {
   return request({
     url: '/pro/project/uploadFile',
@@ -236,4 +236,21 @@ export function uploadFile(obj) {
   })
   }
 
+//项目树增加文件夹
+export function uploadFolder(obj) {
+  return request({
+    url: '/pro/project/uploadFolder',
+    method: 'post',
+    data:obj,
+    headers: { "Content-Type": "multipart/form-data" }
+  })
+  }
 
+  //项目树增加文件夹
+export function uploadFiles(obj) {
+  return request({
+    url: '/pro/project/uploadFiles',
+    method: 'put',
+    data:obj,
+  })
+  }

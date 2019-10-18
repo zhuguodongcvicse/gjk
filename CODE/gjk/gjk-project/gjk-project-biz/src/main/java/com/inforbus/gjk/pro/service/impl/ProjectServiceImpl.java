@@ -21,7 +21,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.inforbus.gjk.admin.api.entity.SysUser;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
+import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.pro.api.dto.FilePathDTO;
+import com.inforbus.gjk.pro.api.dto.FolderPathDTO;
 import com.inforbus.gjk.pro.api.dto.ProjectInfoDTO;
 import com.inforbus.gjk.pro.api.entity.Hardwarelibs;
 import com.inforbus.gjk.pro.api.entity.ProComp;
@@ -199,6 +201,65 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             }
         }
         return false;
+    }
+
+    /**
+     * @param folderPathDTO
+     * @return String
+     * @Title: uploadFiles
+     * @Description: 项目树右键菜单上传文件夹
+     * @Author wang
+     * @DateTime 2019年10月18日 15:40:57
+     */
+    @Override
+    public String uploadFiles(FolderPathDTO folderPathDTO) {
+        File amisFolder = new File(folderPathDTO.getAmisPath());//上传的目的地
+        if (!amisFolder.exists()){
+            return "目标文件夹不存在";
+        }
+        List<String> filePaths = folderPathDTO.getFilePaths();//被上传的文件路径集合
+        for (String filePath : filePaths) {
+            int i = filePath.indexOf("upload"+File.separator);//截取出路径中upload后的字符串
+            String subFilePath = filePath.substring(i+7);//被上传的文件夹
+            String folderPath = subFilePath.substring(0, subFilePath.lastIndexOf(File.separator));//被上传的文件夹名称
+            File amisFolder2 = new File(folderPathDTO.getAmisPath() + File.separator + folderPath);//被上传文件夹对象
+            File amisFile = new File(folderPathDTO.getAmisPath() + File.separator + subFilePath);
+            FileInputStream in = null;//输入流
+            FileOutputStream out = null;//输出流
+            try {
+                amisFolder2.mkdirs();//创建上传文件夹目录
+                amisFile.createNewFile();//创建文件
+                in = new FileInputStream(filePath);
+                out = new FileOutputStream(amisFile);
+                int len = 0;
+                byte[] bytes = new byte[1024];
+                while ((len = in.read(bytes))!=-1){//循环读写文件数据
+                    out.write(bytes, 0, len);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return "文件不存在";
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "增加文件夹失败";
+            }finally {
+                if (in!=null){
+                    try {
+                        in.close();//关闭输入流
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (out!=null){
+                    try {
+                        out.close();//关闭输出流
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return "增加文件成功";
     }
 
     public List<ProComp> saveProCompList(String projectId, List<String> compList) {
