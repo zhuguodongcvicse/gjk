@@ -202,24 +202,101 @@
       width="50%"
       custom-class="dialog_selectPhotoDialogVisible_14s"
     >
-      <el-input placeholder="选择文件" v-model="filename" :readonly="true">
-        <span slot="append" size="mini">
-          <el-upload
-            action="/comp/componentdetail/uploadUrl"
-            size="mini"
-            :show-file-list="false"
-            :http-request="UploadFile"
-          >
-            <el-button :style="{padding:'7px 30px'}" type="primary">
-              <i class="el-icon-folder"></i>
-            </el-button>
-          </el-upload>
-        </span>
-      </el-input>
+      <el-form label-width="80px" :model="file" :rules="fileRules" ref="fileRef">
+        <el-form-item label="文件名称" prop="fileName">
+          <el-input placeholder="选择文件" v-model="file.fileName" :readonly="true">
+            <span slot="append" size="mini">
+              <el-upload
+                action="/comp/componentdetail/uploadUrl"
+                size="mini"
+                :show-file-list="false"
+                :http-request="UploadFile"
+              >
+                <el-button :style="{padding:'7px 30px'}" type="primary">
+                  <i class="el-icon-folder"></i>
+                </el-button>
+              </el-upload>
+            </span>
+          </el-input>
+        </el-form-item>
+      </el-form>
       <div slot="footer">
-        <el-button @click="isUploadFile = false,filename = ''">取 消</el-button>
+        <el-button @click="isUploadFile = false,file.fileName = ''">取 消</el-button>
         <el-button type="primary" @click="saveUploadFile">确 定</el-button>
       </div>
+    </el-dialog>
+    <!--增加文件夹-->
+    <el-dialog
+      title="请您选择将要增加的文件夹"
+      class="libs_bsp_dialog_14s libs_software_dialog_14s"
+      width="40%"
+      :visible.sync="isUploadBTN"
+    >
+      <el-form :label-position="labelPosition">
+        <!-- <el-input v-model="frameFilePath" placeholder="软件框架文件夹" ></el-input> -->
+        <uploader :options="optionsUploader" :key="uploader_key" ref="uploader" :autoStart="false">
+          <el-form-item label="文件选择" label-width="90px">
+            <uploader-unsupport></uploader-unsupport>
+            <div>
+              <uploader-btn :directory="true">
+                <template slot-scope="scope">
+                  <el-tag type="info" size="mini">选择文件夹</el-tag>
+                </template>
+              </uploader-btn>
+            </div>
+          </el-form-item>
+          <el-form-item>
+            <uploader-files>
+              <template slot-scope="filess">
+                <div class="bsp_tab_14s">
+                  <el-table :data="filess.files">
+                    <el-table-column label="名称">
+                      <template slot-scope="scope">{{ scope.row.name }}</template>
+                    </el-table-column>
+                    <!-- <el-table-column label="路径">
+                      <template slot-scope="scope">{{ scope.row.relativePath }}</template>
+                    </el-table-column>-->
+                    <el-table-column label="文件大小">
+                      <template slot-scope="scope">
+                        <uploader-file :file="scope.row" :list="false" :key="scope.index">
+                          <template slot-scope="kk">{{ kk.formatedSize }}</template>
+                        </uploader-file>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="操作">
+                      <template slot-scope="scope">
+                        <el-button
+                          size="small"
+                          type="danger"
+                          plain
+                          @click="remove(scope.row,filess.files)"
+                        >移除</el-button>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                  <div class="control-container bsp_tab_btn_14s text_align_center_14s">
+                    <el-button
+                      plain
+                      size="small"
+                      type="danger"
+                      @click="removeAll(filess.files)"
+                    >全部取消</el-button>
+                  </div>
+                </div>
+
+                <div class="control-container bsp_footer_btn_14s text_align_right_14s">
+                  <el-button size="small" type="primary" @click="resumes(filess.files)">全部上传</el-button>
+                  <el-button type @click="isUploadBTN = false">取消</el-button>
+                </div>
+              </template>
+            </uploader-files>
+          </el-form-item>
+        </uploader>
+
+        <el-form-item label>
+          <!-- <el-button type="primary" @click="handleSaveSoftware">提交</el-button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -->
+        </el-form-item>
+      </el-form>
     </el-dialog>
   </div>
 </template>
@@ -228,7 +305,13 @@ import $ from "jquery";
 import { fetchAlgorithmTree } from "@/api/admin/algorithm";
 import { fetchTestTree } from "@/api/admin/test";
 import { getUserhasApplyAuto } from "@/api/admin/user";
-import { saveProProcess, saveProCompList, uploadFile } from "@/api/pro/project";
+import {
+  saveProProcess,
+  saveProCompList,
+  uploadFile,
+  uploadFolder,
+  uploadFiles
+} from "@/api/pro/project";
 
 import {
   fetchProList,
@@ -276,10 +359,20 @@ export default {
       }
     };
     return {
-      currentNodeData: {},
-      filePath: "",
-      filename: "",
-      isUploadFile: false,
+      uploader_key: new Date().getTime(),
+      optionsUploader: {
+        // target: img(),
+        target: "/libs/software/upload",
+        testChunks: false
+      },
+      labelPosition: "right",
+      isUploadBTN: false, //上传文件夹弹窗
+      currentNodeData: {}, //当前节点数据对象
+      filePath: "", //上传路径
+      file: {
+        fileName: "" //文件名
+      },
+      isUploadFile: false, //上传文件弹窗
       appComponentId: "",
       filePathName: "",
       platformDataList: [],
@@ -331,7 +424,9 @@ export default {
       localDeploymentPlan: true,
 
       fileData: {},
-
+      fileRules: {
+        fileName: [{ required: true, message: "请选择文件", trigger: "change" }]
+      },
       projectRules: {
         procedureName: [
           { required: true, message: "请输入", trigger: "blur" },
@@ -707,6 +802,7 @@ export default {
       } else if (item == "增加文件") {
         this.isUploadFile = true;
       } else if (item == "增加文件夹") {
+        this.isUploadBTN = true;
       }
     },
     findTargetNode(currentNodeObj, targetNodeObj) {
@@ -921,13 +1017,13 @@ export default {
         data.isDirectory == "0"
       ) {
         this.procedureId = data.processId;
-        this.menus = ["编译", "删除", "增加文件"];
+        this.menus = ["编译", "删除", "增加文件", "增加文件夹"];
         this.fileData = data;
       } else if (data.parentId == "-1") {
         this.menus = ["添加流程", "申请构件"];
       } else if (data.type == "app" && data.isDirectory == "0") {
         this.procedureId = data.processId;
-        this.menus = ["删除", "增加文件"];
+        this.menus = ["删除", "增加文件", "增加文件夹"];
         this.fileData = data;
       } else if (data.type == "app") {
         this.procedureId = data.processId;
@@ -1252,37 +1348,95 @@ export default {
     },
     /* 上传文件 */
     UploadFile(param) {
-      console.log("param", param);
       getUploadFilesUrl(param).then(res => {
         this.filePath = res.data.data;
-        this.filename = param.file.name;
+        this.file.fileName = param.file.name;
+        console.log("fileName",this.file.fileName);
       });
     },
     saveUploadFile() {
-      var FilePathDTO = {
-        oldFilePath: this.filePath,
-        newFilePath:
-          this.currentNodeData.filePath + "\\" + this.currentNodeData.fileName,
-        fileName: this.filename
-      };
-      console.log("FilePathDTO", FilePathDTO);
-      uploadFile(FilePathDTO)
-        .then(res => {
-          if (res.data.data) {
-            this.$message({
-              message: "文件增加成功",
-              type: "success"
+      this.$refs.fileRef.validate(valid => {
+        if (valid) {
+          var FilePathDTO = {
+            oldFilePath: this.filePath,
+            newFilePath:
+              this.currentNodeData.filePath +
+              "\\" +
+              this.currentNodeData.fileName,
+            fileName: this.file.fileName
+          };
+          console.log("FilePathDTO", FilePathDTO);
+          uploadFile(FilePathDTO)
+            .then(res => {
+              if (res.data.data) {
+                this.$message({
+                  message: "文件增加成功",
+                  type: "success"
+                });
+                this.reload();
+              } else {
+                this.$message.error("文件增加失败");
+              }
+              this.file.filename = "";
+              this.isUploadFile = false;
+              this.currentNodeData = {};
+            })
+            .catch(error => {
+              this.$message.error("文件增加失败"); //todo
             });
-            this.reload();
+        }
+      });
+    },
+    // 文件移除功能
+    remove(filerow, files) {
+      console.log("files:::", files);
+      files.forEach((e, index) => {
+        if (filerow.id === e.id) {
+          files.splice(index, 1);
+        }
+      });
+    },
+    // 全部取消功能
+    removeAll(files) {
+      files.splice(0, files.length);
+      this.isAble = false;
+    },
+    resumes(files) {
+      let formData = new FormData();
+      for (let file of files) {
+        formData.append("file", file.file);
+      }
+      uploadFolder(formData)
+        .then(res => {
+          var folderPathDTO = res.data.data;
+          if (
+            folderPathDTO.filePaths != null &&
+            folderPathDTO.filePaths.length > 0
+          ) {
+            console.log("folderPathDTO", folderPathDTO);
+            (folderPathDTO.amisPath =
+              this.currentNodeData.filePath +
+              "\\" +
+              this.currentNodeData.fileName),
+              uploadFiles(folderPathDTO)
+                .then(res => {
+                  this.$message({
+                    message: res.data.data,
+                    type: "success"
+                  });
+                  this.reload();
+                })
+                .catch(error => {
+                  this.$message.error("文件增加失败"); //todo
+                });
           } else {
-            this.$message.error("文件增加失败");
+            this.$message.error("文件增加失败"); //todo
           }
-          this.filename = "";
-          this.isUploadFile = false;
+          this.isUploadBTN = false;
           this.currentNodeData = {};
         })
         .catch(error => {
-          this.$message.error("文件增加失败"); //todo
+          this.$message.error(error);
         });
     }
   }

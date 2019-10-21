@@ -23,7 +23,6 @@ const projectTreeShow = {
                 content: state.projectTreeShow,
                 type: "local"
             })
-            console.log("state", state)
         }
     }
 }

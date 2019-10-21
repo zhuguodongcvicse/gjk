@@ -51,6 +51,7 @@
                 size="mini"
                 plain
                 @click="handleEdit(scope.row,scope.index)"
+                v-show="scope.row.applyState=='1'?false:scope.row.applyState=='2'?false:true"
               >编辑</el-button>
             </el-tooltip>
             <el-tooltip class="item" effect="dark" content="删除" placement="top">
@@ -60,6 +61,7 @@
                 size="mini"
                 plain
                 @click="handleDel(scope.row,scope.index)"
+                v-show="scope.row.applyState=='1'?false:scope.row.applyState=='2'?false:true"
               >删除</el-button>
               <!-- v-show="scope.row.applyState=='1'?false:scope.row.applyState=='2'?false:true" -->
             </el-tooltip>
@@ -69,7 +71,7 @@
                 plain
                 size="mini"
                 @click="storageApply(scope.row,scope.index)"
-                :disabled="scope.row.applyState=='1'?true:scope.row.applyState=='2'?true:false"
+                v-if="scope.row.applyState=='1'?false:scope.row.applyState=='2'?false:true"
               >入库</el-button>
             </el-tooltip>
           </el-button-group>
@@ -82,13 +84,13 @@
       @storageApplyDialogState="storageApplyDialogState"
       :compItemMsg="compItemMsg"
     />
-    <import-storage-apply :compList="importCompIdList" :dialog="importCompApplyDialogVisible" />
     <comp-template :templateData="templateData"></comp-template>
     <el-dialog
       title="批量导入构件"
       :visible.sync="importCompDialogVisible"
       width="width"
       :before-close="dialogBeforeClose"
+      :append-to-body="true"
     >
       <i>请上传构件库导出的压缩包(上传文件编码格式为zip)</i>
       <br />
@@ -112,6 +114,11 @@
         <el-button type="primary" @click="importCompFile">确 定</el-button>
       </div>
     </el-dialog>
+    <import-storage-apply
+      :compList="importCompIdList"
+      :dialog="importCompApplyDialogVisible"
+      @setImportCompDialog="setImportCompDialog"
+    />
   </div>
 </template>
 
@@ -216,6 +223,13 @@ export default {
 
       return isZIP /*&& isLt2M*/;
     },
+    setImportCompDialog(bool) {
+      this.importCompApplyDialogVisible = bool;
+      if (!bool) {
+        this.closeImportCompDialog();
+        this.reload();
+      }
+    },
     dialogBeforeClose(done) {
       done();
       this.$refs.importComp.clearFiles();
@@ -236,8 +250,14 @@ export default {
         let params = new FormData();
         params.append("file", this.importCompFileList[0]);
         importCompZipUpload(params).then(Response => {
-          this.importCompApplyDialogVisible = true;
-          this.importCompIdList = Response.data.data;
+          if (Response.data.data == null) {
+            this.$message.warning("上传的压缩包内容错误，请重新选择文件上传。");
+          } else if (Response.data.data.length <= 0) {
+            this.$message.warning("上传的构件已存在，请重新选择文件上传。");
+          } else {
+            this.importCompApplyDialogVisible = true;
+            this.importCompIdList = Response.data.data;
+          }
         });
       }
     },

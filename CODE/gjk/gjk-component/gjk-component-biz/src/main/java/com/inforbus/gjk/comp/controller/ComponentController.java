@@ -141,7 +141,7 @@ public class ComponentController {
 	@DeleteMapping("/{id}")
 	@PreAuthorize("@pms.hasPermission('comp_component_del')")
 	public R removeById(@PathVariable String id) {
-		return new R<>(componentService.removeById(id));
+		return new R<>(componentService.deleteCompAndCompDetail(id));
 	}
 
 	/**
@@ -270,6 +270,7 @@ public class ComponentController {
 	public R getCompDict() {
 		return new R<>(componentService.getCompDictList());
 	}
+
 	/**
 	 * @Title: analysisXmlFile
 	 * @Description: 解析构件基础模板

@@ -52,6 +52,14 @@ public interface ComponentService extends IService<Component> {
 	IPage<Component> getComponentPage(Page<Component> page, Component component);
 
 	/**
+	 * 删除构件并删除构件详细信息
+	 * 
+	 * @param compId
+	 * @return
+	 */
+	boolean deleteCompAndCompDetail(String compId);
+
+	/**
 	 * @Title: getComponentCompDetailById
 	 * @Description: 根据构件ID关联查询
 	 * @Author cvicse
