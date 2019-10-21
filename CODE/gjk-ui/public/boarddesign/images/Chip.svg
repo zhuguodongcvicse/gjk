@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="46px" height="47px" viewBox="0 0 46 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.2 (67145) - http://www.bohemiancoding.com/sketch -->
+    <title>Chip</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="0%" y1="49.9973389%" x2="100%" y2="50%" id="linearGradient-1">
+            <stop stop-color="#484848" offset="0%"></stop>
+            <stop stop-color="#404040" offset="14.9588341%"></stop>
+            <stop stop-color="#2C2C2C" offset="31.8646643%"></stop>
+            <stop stop-color="#181818" offset="86.2026897%"></stop>
+            <stop stop-color="#2F2F2F" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="6.93390393%" y1="0%" x2="82.1604642%" y2="105.861023%" id="linearGradient-2">
+            <stop stop-color="#3F3F3F" offset="0%"></stop>
+            <stop stop-color="#232323" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="14所-硬件" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="画板-copy" transform="translate(-89.000000, -104.000000)">
+            <g id="芯片" transform="translate(89.000000, 104.000000)">
+                <g id="分组-9" transform="translate(6.000000, 0.000000)" fill="#D8D8D8" stroke="#2D2D2D">
+                    <rect id="矩形" x="0.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-63" x="4.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-64" x="8.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-65" x="12.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-66" x="16.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-67" x="20.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-68" x="24.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-69" x="28.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-70" x="32.5" y="0.5" width="1" height="3"></rect>
+                </g>
+                <g id="分组-8" transform="translate(6.000000, 43.000000)" fill="#D8D8D8" stroke="#2D2D2D">
+                    <rect id="矩形-copy-71" x="0.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-72" x="4.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-73" x="8.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-74" x="12.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-78" x="16.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-79" x="20.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-80" x="24.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-81" x="28.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-82" x="32.5" y="0.5" width="1" height="3"></rect>
+                </g>
+                <g id="分组-8-copy" transform="translate(2.000000, 25.000000) rotate(-270.000000) translate(-2.000000, -25.000000) translate(-15.000000, 23.000000)" fill="#D8D8D8" stroke="#2D2D2D">
+                    <rect id="矩形-copy-71" x="0.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-72" x="4.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-73" x="8.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-74" x="12.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-78" x="16.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-79" x="20.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-80" x="24.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-81" x="28.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-82" x="32.5" y="0.5" width="1" height="3"></rect>
+                </g>
+                <g id="分组-8-copy-2" transform="translate(44.000000, 25.000000) rotate(-270.000000) translate(-44.000000, -25.000000) translate(27.000000, 23.000000)" fill="#D8D8D8" stroke="#2D2D2D">
+                    <rect id="矩形-copy-71" x="0.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-72" x="4.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-73" x="8.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-74" x="12.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-78" x="16.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-79" x="20.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-80" x="24.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-81" x="28.5" y="0.5" width="1" height="3"></rect>
+                    <rect id="矩形-copy-82" x="32.5" y="0.5" width="1" height="3"></rect>
+                </g>
+                <rect id="矩形" stroke="url(#linearGradient-2)" stroke-width="2" fill="url(#linearGradient-1)" x="4" y="5" width="38" height="38" rx="2"></rect>
+            </g>
+        </g>
+    </g>
+</svg>
