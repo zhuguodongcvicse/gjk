@@ -41,14 +41,14 @@ var allInfList = []
 var InternalLinkArr = []
 var calculateBoardLinkType
 var calculateBoardIoType
-Q.registerImage('rack', 'images/机箱.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
-Q.registerImage('card', 'images/前板卡.svg');
-Q.registerImage('behindcard', 'images/后板卡.svg');
-Q.registerImage('cell', 'images/芯片.svg');
-Q.registerImage('optical', 'images/光纤口.svg');
-Q.registerImage('port', 'images/圆口.svg');
-Q.registerImage('serial', 'images/串口.svg');
-Q.registerImage('ePort', 'images/网口.svg');
+Q.registerImage('rack', 'images/Crate.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
+Q.registerImage('card', 'images/BeforeTheBoard.svg');
+Q.registerImage('behindcard', 'images/AfterTheBoard.svg');
+Q.registerImage('cell', 'images/Chip.svg');
+Q.registerImage('optical', 'images/OpticalFiberMouth.svg');
+Q.registerImage('port', 'images/RoundMouth.svg');
+Q.registerImage('serial', 'images/SerialPort.svg');
+Q.registerImage('ePort', 'images/InternetAccess.svg');
 
 function RectElement() {
 	Q.doSuperConstructor(this, RectElement, arguments);
@@ -272,7 +272,7 @@ function handleMessageFromParent(event) {
 					},
 					showLabel: true,
 					type: 'Q.RectElement',
-					image: 'images/芯片.svg',
+					image: 'images/Chip.svg',
 					styles: {
 						'label.color': '#FFF',
 						'label.position': 'cm',
@@ -304,7 +304,7 @@ function handleMessageFromParent(event) {
 						},
 						showLabel: true,
 						type: 'Q.RectElement',
-						image: 'images/光纤口.svg',
+						image: 'images/OpticalFiberMouth.svg',
 					}
 				}
 			}
@@ -328,7 +328,7 @@ function handleMessageFromParent(event) {
 						},
 						showLabel: true,
 						type: 'Q.RectElement',
-						image: 'images/网口.svg',
+						image: 'images/InternetAccess.svg',
 					}
 				}
 			}
@@ -352,7 +352,7 @@ function handleMessageFromParent(event) {
 						},
 						showLabel: true,
 						type: 'Q.RectElement',
-						image: 'images/圆口.svg',
+						image: 'images/RoundMouth.svg',
 					}
 				}
 			}
@@ -376,7 +376,7 @@ function handleMessageFromParent(event) {
 						},
 						showLabel: true,
 						type: 'Q.RectElement',
-						image: 'images/串口.svg',
+						image: 'images/SerialPort.svg',
 					}
 				}
 			}
@@ -593,7 +593,7 @@ function createBehindCard(slot) {
 	var width = 62,
 		height = 400;
 	var card = createNode({
-		image: 'images/后板卡.svg',
+		image: 'images/AfterTheBoard.svg',
 		x: width.x,
 		y: height.y,
 		width: width,
@@ -634,7 +634,7 @@ function createCard(slot) {
 	var width = 62,
 		height = 400;
 	var card = createNode({
-		image: 'images/前板卡.svg',
+		image: 'images/BeforeTheBoard.svg',
 		x: width.x,
 		y: height.y,
 		width: width,
@@ -861,11 +861,11 @@ function initEditor(editor) {
 				}
 				var currentElement = graph.getElement(evt.event);
 				console.log("currentElement", currentElement)
-				if (currentElement && currentElement.image == 'images/前板卡.svg') {
+				if (currentElement && currentElement.image == 'images/BeforeTheBoard.svg') {
 					//	node.host = currentElement;
-				} else if (currentElement && currentElement.image == 'images/后板卡.svg') {
+				} else if (currentElement && currentElement.image == 'images/AfterTheBoard.svg') {
 					//	node.host = currentElement;
-				} else if (currentElement && currentElement.image == 'images/芯片.svg') {
+				} else if (currentElement && currentElement.image == 'images/Chip.svg') {
 					graph.removeElement(node);
 					return
 				} else {
@@ -1059,7 +1059,7 @@ function initEditor(editor) {
 				console.log("data", data);
 			}
 		}
-		if (image == 'images/芯片.svg') {
+		if (image == 'images/Chip.svg') {
 			return {
 				group: '芯片属性',
 				properties: [{
@@ -1085,7 +1085,7 @@ function initEditor(editor) {
 				]
 			}
 		}
-		if (image == 'images/光纤口.svg') {
+		if (image == 'images/OpticalFiberMouth.svg') {
 			return {
 				group: '接口属性',
 				properties: [{

@@ -615,10 +615,9 @@ public class ManagerController {
 		return new R<>(obj);
 	}
 
-	public static void main(String[] args) {
-		getCmd();
-	}
-
+	/*
+	 * public static void main(String[] args) { getCmd(); }
+	 */
 	public static void getCmd() {
 		String path = "D:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE";
 		File dir = new File(path);

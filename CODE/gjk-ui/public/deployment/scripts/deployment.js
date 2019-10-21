@@ -22,6 +22,7 @@ var baknum4 = 0.5;
 var components;
 var verdict = false;
 var movedate;
+var CHIPdate = [];
 // 子接收父参数
 function handleMessageFromParent(event) {
 	deployment = event.data.params[0].frontCaseForDeployment;
@@ -39,13 +40,14 @@ var postMessageParentData = {
 	cmd: "",//用于switch 判断
 	params: []//具体参数
 };
-Q.registerImage('rack', 'images/机箱.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
-Q.registerImage('card', 'images/前板卡.svg');
-Q.registerImage('cell', 'images/芯片.svg');
-Q.registerImage('optical', 'images/光纤口.svg');
-Q.registerImage('port', 'images/圆口.svg');
-Q.registerImage('serial', 'images/串口.svg');
-Q.registerImage('ePort', 'images/网口.svg');
+Q.registerImage('rack', 'images/Crate.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
+Q.registerImage('card', 'images/BeforeTheBoard.svg');
+Q.registerImage('behindcard', 'images/AfterTheBoard.svg');
+Q.registerImage('cell', 'images/Chip.svg');
+Q.registerImage('optical', 'images/OpticalFiberMouth.svg');
+Q.registerImage('port', 'images/RoundMouth.svg');
+Q.registerImage('serial', 'images/SerialPort.svg');
+Q.registerImage('ePort', 'images/InternetAccess.svg');
 function RectElement() {
 	Q.doSuperConstructor(this, RectElement, arguments);
 	this.resizable = false;
@@ -396,7 +398,7 @@ function initEditor(editor) {
 	for (var i in linkArray) {
 		for (var l in json.datas) {
 			//真数据放开 并nodeID替换成nodeID
-			if (json.datas[l].json.image == 'images/芯片.svg') {
+			if (json.datas[l].json.image == 'images/Chip.svg') {
 				if (linkArray[i].nodeName == json.datas[l].json.properties.nodeID) {
 					//if (linkArray[i].nodeName == json.datas[l].json.properties.nodeID) {
 					var math = parseInt(1000 * Math.random());
@@ -634,7 +636,7 @@ function initEditor(editor) {
 					rootPart.partName = data.datas[i].json.properties.partname;
 					//遍历芯片
 					for (var j in data.datas) {
-						if (data.datas[j].json.image == 'images/芯片.svg' && data.datas[j]._refId != null) {
+						if (data.datas[j].json.image == 'images/Chip.svg' && data.datas[j]._refId != null) {
 							refid = data.datas[j]._refId;
 							nodeID = data.datas[j].json.properties.nodeID;
 						}
@@ -656,7 +658,7 @@ function initEditor(editor) {
 
 					//遍历芯片
 					for (var j in data.datas) {
-						if (data.datas[j].json.image == 'images/芯片.svg' && data.datas[j]._refId != null) {
+						if (data.datas[j].json.image == 'images/Chip.svg' && data.datas[j]._refId != null) {
 							refid = data.datas[j]._refId;
 							nodeID = data.datas[j].json.properties.nodeID;
 						}
@@ -688,7 +690,15 @@ function initEditor(editor) {
 	button.onclick = function () {
 		toggleFullScreen()
 	}
-
+	//芯片显示按钮
+	var toolbarDiv = editor.toolbar;
+	var button = document.createElement('button');
+	button.textContent = '画布跳转';
+	button.className = 'boarddesign_board_14s';
+	toolbarDiv.appendChild(button)
+	button.onclick = function () {
+		showchip()
+	}
 	function initToolbar() {
 		//网状画布 
 		var graph = editor.graph;
@@ -738,7 +748,7 @@ function initEditor(editor) {
 				}
 			}
 		}
-		if (image == "images/芯片.svg") {
+		if (image == "images/Chip.svg") {
 			return {
 				group: '芯片属性',
 				properties: [{
@@ -926,14 +936,16 @@ function initEditor(editor) {
 					startData = dragInfo.data.parent;
 					console.log("刚开始移动", startData);
 					//graph.sendToTop(data);
-					for (const i in startData.children.datas) {
-						if (startData.children.datas[i].id != data.id) {
-							if (startData.children.datas[i]._mn3.partname == data._mn3.partname) {
-								if (startData != data.parent) {
-									verdict = false;
+					if(startData != null){
+						for (const i in startData.children.datas) {
+							if (startData.children.datas[i].id != data.id) {
+								if (startData.children.datas[i]._mn3.partname == data._mn3.partname) {
+									if (startData != data.parent) {
+										verdict = false;
+									}
+	
+	
 								}
-
-
 							}
 						}
 					}
@@ -1008,23 +1020,26 @@ function initEditor(editor) {
 
  		 	/* if(data.host != null){ */
 				if ( data.host ==  null && verdict == true) {
-					showMessage('请将构件移动到芯片上', 'error', 5000)
-				/* 	for (const index in movedate) {
-						console.log("okokokokokoko111111", movedate[index]);
-						var gjdata = movedate[index];
-					//	if (gjdata.properties.partname == data._mn3.partname) {
-						graph.moveElements([gjdata], dragInfo.x - data.x, dragInfo.y - data.y)
-					//	}
-					} */
-				} else if(verdict == true){
-					showMessage('已成功移动到IP为'+data.parent.properties.IP+'芯片上', 'success', 5000)
-				}
-			/*	} else{
-					console.log("movedatemovedatemovedatemovedate",movedate)
-					for (const index in movedate) {
-							graph.moveElements([movedate[index]], dragInfo.x -data.x, dragInfo.y - data.y)
+					showMessage('请将构件移动到芯片上', 'error', 5000);
+					if (data.x > data.host.x + 45 || data.x < data.host.x + 7.5 ||
+						data.y > data.host.y + 45 || data.y < data.host.y + 7.5) {
+						for(var i =0;i<movedate.length;i++){
+							movedate[i].parent = startData;
+							movedate[i].host = startData;
+							graph.moveElements([movedate[i]],dragInfo.x - movedate[i].x, dragInfo.y - movedate[i].y+i*3)
+						}
 					}
-				}  */
+				} else if(verdict == true){
+					//showMessage('已成功移动到IP为'+data.parent.properties.IP+'芯片上', 'success', 5000);
+					if (data.x > data.host.x + 45|| data.x < data.host.x + 7.5 ||
+						data.y > data.host.y + 45 || data.y < data.host.y + 7.5) {
+						for(var i =0;i<movedate.length;i++){
+							movedate[i].parent = startData;
+							movedate[i].host = startData;
+							graph.moveElements([movedate[i]],dragInfo.x - movedate[i].x,  dragInfo.y - movedate[i].y+i*3)
+						}
+					}
+				}
 				verdict = false;
 				graph.selectionModel.clear();
 			}
@@ -1034,7 +1049,7 @@ function initEditor(editor) {
 		var xy = graph.toLogical(evt.event);
 		var cell;
 		function canDrop(data) {
-			return data.image == 'images/芯片.svg';
+			return data.image == 'images/Chip.svg';
 		}
 
 		function isItem(data) {
@@ -1056,12 +1071,12 @@ function initEditor(editor) {
 		return cell;
 	}
 	graph.interactionDispatcher.addListener(function (evt) {
+		movedate = evt.datas;
+		//console.log('EVT',evt.datas)//这里可以获取当前移动的所有图元
 		if (evt.kind != Q.InteractionEvent.ELEMENT_CREATED && evt.kind != Q.InteractionEvent.ELEMENT_MOVE_END) {
 			return;
 		}
-		movedate = evt.datas;
 		var data = evt.data;
-		console.log('EVT',evt.datas)//这里可以获取当前移动的所有图元
 		if (!data || data.get('type') !== 'item') {
 			return;
 		}
@@ -1079,6 +1094,7 @@ function initEditor(editor) {
 				data._mn3.cpuid  = host.properties.nodeID;
 			} */
 		//	console.log('22222EVT',evt.datas)
+
 	})
 
 	graph.onclick = function (evt) {
@@ -1098,8 +1114,6 @@ function initEditor(editor) {
 		})
 	}
 	//右键选中其部件下所有构件功能
-	var chipIds = [];
-	var chipData = [];
 	graph.popupmenu.getMenuItems = function (graph, data, evt) {
 		if (data) {
 			return [
@@ -1107,7 +1121,8 @@ function initEditor(editor) {
 					text: '选中该构件移动', action: function () {
 						graph.select(data);
 						verdict = true;
-						if (data._mn3.partname == null && data.image == "images/芯片.svg" || data.image == "rack") {
+						console.log("-------",data)
+						if (data._mn3.partname == null && data.image == "images/Chip.svg" || data.image == "rack" || data.image == "images/BeforeTheBoard.svg") {
 							showMessage('请选择构件', 'success', 2000)
 							graph.selectionModel.clear();
 						}
@@ -1125,7 +1140,7 @@ function initEditor(editor) {
 								graph.select(data);
 							}
 						})
-						if (data._mn3.partname == null && data.image == "images/芯片.svg" || data.image == "rack") {
+						if (data._mn3.partname == null && data.image == "images/Chip.svg" || data.image == "rack" || data.image == "images/BeforeTheBoard.svg") {
 							showMessage('请选择构件', 'success', 2000)
 							graph.selectionModel.clear();
 						}
@@ -1141,7 +1156,7 @@ function initEditor(editor) {
 					}
 
 				},
-				/* 			{
+							/* {
 								text: '显示选中芯片', action: function () {
 									var data = graph.getElement(evt);
 									var partname = data._mn3.partname;
@@ -1149,11 +1164,12 @@ function initEditor(editor) {
 									for(var i in chipIds){
 										createCard() ;
 				
-								/* 		function createCard() {
+								 		function createCard() {
 											//var bounds = slot.getBounds();
 											var port = createNode({
 												image: 'images/cpu.svg',
 												x: 0,
+
 												y: 0,
 												width: 400,
 												height: 400
@@ -1163,25 +1179,21 @@ function initEditor(editor) {
 											port.setStyle(Q.Styles.LABEL_ANCHOR_POSITION, Q.Position.CENTER_MIDDLE);
 											port.setStyle(Q.Styles.LABEL_POSITION, Q.Position.CENTER_MIDDLE);
 											return port;
-										} *
+										} 
 									}
 								}
 							
-							}, */
-				/* {
+							},  */
+				 {
 					text: '选中芯片显示芯片', action: function () {
 						var data = graph.getElement(evt);
 					//	if( data.image  == "images/芯片.svg"){
-							console.log(data);
-						//	graph.select(data);
 							var deploymentsJson = graph.toJSON();
 							console.log('deploymentsJson',deploymentsJson);
-							console.log('chipIds',chipIds);
-						
-							//	console.log('deploymentsJson.datas[i]._refId',deploymentsJson.datas[i]._refId);
-							var deploymentsJsonbak = graph.toJSON();	
-					
-							for(var j in chipIds){
+							console.log("选中芯片数据",data)
+							CHIPdate.push(data);
+							console.log("选中芯片数据数据",CHIPdate)
+						/* 	for(var j in chipIds){
 							for ( var i in deploymentsJson.datas){
 								
 								console.log('2*********chipIds',chipIds[j]);
@@ -1195,23 +1207,67 @@ function initEditor(editor) {
 								}
 								
 								}
-							}
-							console.log("&&&&chipData",chipData)
+							} */
+			/* 				console.log("&&&&chipData",chipData)
 							console.log('deploymentsJson222',deploymentsJson);
 							deploymentsJson.datas = []
 							deploymentsJson.datas=chipData;
-							graph.clear();
-			
-							graph.parseJSON(deploymentsJson, { transform: false })
+							graph.clear(); 
+							graph.parseJSON(deploymentsJson, { transform: false }) */
 					//	}
 					}
-				} */
+				} 
 			];
 
 		}
 	}
 	initInteraction();
 }
+//显示芯片方法
+var falg = true;
+var deploymentsJsonbak
+function showchip(){
+	if(falg){
+		 deploymentsJsonbak = graph.toJSON();
+		graph.clear(); 
+		console.log("取到选中芯片数据数据",CHIPdate)
+		for(var i=0;i<CHIPdate.length;i++){
+			createCard();
+			graph.moveToCenter();
+		}
+		for (const i in CHIPdate) {
+		//	for (const j in CHIPdate[i].children.datas) {
+				for(var index= 0;index<CHIPdate[i].children.datas.length;index++){
+					console.log("----------",index)
+				}
+		//	}
+		}
+		CHIPdate =[];
+		falg=false;
+	}else{
+		graph.clear(); 
+		console.log("5555555555555",deploymentsJsonbak)
+		graph.parseJSON(deploymentsJsonbak, { transform: false })
+		graph.moveToCenter();
+		falg=true;
+	}
+}
+
+function createCard() {
+	//var bounds = slot.getBounds();
+	var port = createNode({
+		image: 'images/Chip.svg',
+		x: 0,
+		y: 0,
+		width: 80,
+		height: 80
+	});
+	port.set('type', 'port');
+	//port.name = 'DSP芯片';
+	port.setStyle(Q.Styles.LABEL_ANCHOR_POSITION, Q.Position.CENTER_MIDDLE);
+	port.setStyle(Q.Styles.LABEL_POSITION, Q.Position.CENTER_MIDDLE);
+	return port;
+} 
 //全屏方法代码
 function toggleFullScreen() {
 	if (!document.fullscreenElement && // alternative standard method
