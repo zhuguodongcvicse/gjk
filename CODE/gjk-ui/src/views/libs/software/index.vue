@@ -23,7 +23,7 @@
             v-if="permissions.libs_software_add"
           >新 增</el-button>
 
-          <el-dialog class="libs_bsp_dialog_14s libs_software_dialog_14s" width="40%" :visible.sync="dialogTableVisible">
+           <el-dialog class="libs_bsp_dialog_14s libs_software_dialog_14s" width="40%" :visible.sync="dialogTableVisible">
             <el-form :label-position="labelPosition"  :model="formLabelAlign">
 
 

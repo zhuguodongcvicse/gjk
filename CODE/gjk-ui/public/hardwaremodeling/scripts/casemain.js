@@ -22,13 +22,15 @@ var backAllCaseJsonTemp
 var linkList = []
 var linkGraphList = { datas: [] }
 var clickCheckedChip
-Q.registerImage('rack', 'images/机箱.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
-Q.registerImage('card', 'images/前板卡.svg');
-Q.registerImage('cell', 'images/芯片.svg');
-Q.registerImage('optical', 'images/光纤口.svg');
-Q.registerImage('port', 'images/圆口.svg');
-Q.registerImage('serial', 'images/串口.svg');
-Q.registerImage('ePort', 'images/网口.svg');
+
+Q.registerImage('rack', 'images/Crate.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
+Q.registerImage('card', 'images/BeforeTheBoard.svg');
+Q.registerImage('behindcard', 'images/AfterTheBoard.svg');
+Q.registerImage('cell', 'images/Chip.svg');
+Q.registerImage('optical', 'images/OpticalFiberMouth.svg');
+Q.registerImage('port', 'images/RoundMouth.svg');
+Q.registerImage('serial', 'images/SerialPort.svg');
+Q.registerImage('ePort', 'images/InternetAccess.svg');
 
 // 子接收父参数
 function handleMessageFromParent(event) {
@@ -48,7 +50,7 @@ function handleMessageFromParent(event) {
 			//主板json
 			for (var i = 0; i < caseArr.length; i++) {
 				board_json[i] = {
-					image: 'images/机箱图标.jpg',
+					image: 'images/CaseIco.jpg',
 					json: caseArr[i],
 					ondrop: 'ondropLoadJSON', //do any thing by your self when drop into the graph
 					showLabel: true
@@ -145,9 +147,9 @@ function ondropLoadJSON(evt, graph, center, options) {
 	//校验机箱上的图元不许移动
 	for (index in frontjson.datas) {
 		var image = frontjson.datas[index].json.image;
-		if (image == 'images/芯片.svg' || image == 'images/光纤口.svg' || image == 'images/网口.svg'
-			|| image == 'images/圆口.svg' || image == 'images/串口.svg' || image == 'images/前板卡.svg'
-			|| image == 'images/后板卡.svg') {
+		if (image == 'images/Chip.svg' || image == 'images/OpticalFiberMouth.svg' || image == 'images/InternetAccess.svg'
+			|| image == 'images/RoundMouth.svg' || image == 'images/SerialPort.svg' || image == 'images/BeforeTheBoard.svg'
+			|| image == 'images/AfterTheBoard.svg') {
 			frontjson.datas[index].json.movable = false;
 		}
 		if (frontjson.datas[index].json.properties.chipName != null) {
@@ -158,9 +160,9 @@ function ondropLoadJSON(evt, graph, center, options) {
 	//校验后机箱上的图元不许移动
 	for (index in bJsonObj.datas) {
 		var image = bJsonObj.datas[index].json.image;
-		if (image == 'images/芯片.svg' || image == 'images/光纤口.svg' || image == 'images/网口.svg'
-			|| image == 'images/圆口.svg' || image == 'images/串口.svg' || image == 'images/前板卡.svg'
-			|| image == 'images/后板卡.svg' || image == 'rack') {
+		if (image == 'images/Chip.svg' || image == 'images/OpticalFiberMouth.svg' || image == 'images/InternetAccess.svg'
+		|| image == 'images/RoundMouth.svg' || image == 'images/SerialPort.svg' || image == 'images/BeforeTheBoard.svg'
+		|| image == 'images/AfterTheBoard.svg'|| image == 'rack') {
 			bJsonObj.datas[index].json.movable = false;
 		}
 	}
@@ -1118,7 +1120,7 @@ function initEditor(editor) {
 			// data.set('rackname', data._mn3.caseName);
 			// data.set('boardnum', data._mn3.bdnum);
 		}
-		if (image == 'images/芯片.svg') {
+		if (image == 'images/Chip.svg') {
 			return {
 				group: '芯片属性',
 				properties: [{
@@ -1149,7 +1151,7 @@ function initEditor(editor) {
 			}
 		}
 		// console.log("data",data)
-		if (image == 'images/光纤口.svg') {
+		if (image == 'images/OpticalFiberMouth.svg') {
 			return {
 				group: '接口属性',
 				properties: [{
@@ -1167,7 +1169,7 @@ function initEditor(editor) {
 				]
 			}
 		}
-		if (image == 'images/前板卡.svg' || image == 'images/后板卡.svg') {
+		if (image == 'images/AfterTheBoard.svg' || image == 'images/BeforeTheBoard.svg') {
 			return {
 				group: '主板属性',
 				properties: [{
@@ -1297,13 +1299,13 @@ function initEditor(editor) {
 			if (evt.kind == Q.InteractionEvent.ELEMENT_CREATED && evt.data instanceof Q.Edge) {
 				var edge = evt.data;
 				//校验只能接口连线
-				if (evt.data.from.image != 'images/光纤口.svg' && evt.data.from.image != 'images/圆口.svg' &&
-					evt.data.from.image != 'images/网口.svg' && evt.data.from.image != 'images/串口.svg'
+				if (evt.data.from.image != 'images/OpticalFiberMouth.svg' && evt.data.from.image != 'images/RoundMouth.svg' &&
+					evt.data.from.image != 'images/InternetAccess.svg' && evt.data.from.image != 'images/SerialPort.svg'
 				) {
 					graph.removeElement(edge);
 				}
-				if (evt.data.to.image != 'images/光纤口.svg' && evt.data.to.image != 'images/圆口.svg' &&
-					evt.data.to.image != 'images/网口.svg' && evt.data.to.image != 'images/串口.svg'
+				if (evt.data.to.image != 'images/OpticalFiberMouth.svg' && evt.data.to.image != 'images/RoundMouth.svg' &&
+					evt.data.to.image != 'images/InternetAccess.svg' && evt.data.to.image != 'images/SerialPort.svg'
 				) {
 					graph.removeElement(edge);
 				}

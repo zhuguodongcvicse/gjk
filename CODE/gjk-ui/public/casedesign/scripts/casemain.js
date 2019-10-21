@@ -38,13 +38,14 @@ var fSlotNum
 var bSlotNum
 var fpgaBoardLinkType
 //var uniqueId
-Q.registerImage('rack', 'images/机箱.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
-Q.registerImage('card', 'images/前板卡.svg');
-Q.registerImage('cell', 'images/芯片.svg');
-Q.registerImage('optical', 'images/光纤口.svg');
-Q.registerImage('port', 'images/圆口.svg');
-Q.registerImage('serial', 'images/串口.svg');
-Q.registerImage('ePort', 'images/网口.svg');
+Q.registerImage('rack', 'images/Crate.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
+Q.registerImage('card', 'images/BeforeTheBoard.svg');
+Q.registerImage('behindcard', 'images/AfterTheBoard.svg');
+Q.registerImage('cell', 'images/Chip.svg');
+Q.registerImage('optical', 'images/OpticalFiberMouth.svg');
+Q.registerImage('port', 'images/RoundMouth.svg');
+Q.registerImage('serial', 'images/SerialPort.svg');
+Q.registerImage('ePort', 'images/InternetAccess.svg');
 
 // 子接收父参数
 function handleMessageFromParent(event) {
@@ -62,7 +63,7 @@ function handleMessageFromParent(event) {
 					boardObj.datas[0].json.properties.id = boardArr[i].id
 					var boardstr = JSON.stringify(boardObj)
 					board_json[i] = {
-						image: 'images/前板卡模板.svg',
+						image: 'images/BeforeTheBoardTemplate.svg',
 						json: boardstr,
 						ondrop: 'ondropLoadJSON',
 						showLabel: true,
@@ -75,7 +76,7 @@ function handleMessageFromParent(event) {
 					boardObj.datas[0].json.properties.id = boardArr[i].id
 					var boardstr = JSON.stringify(boardObj)
 					backboard_json[i] = {
-						image: 'images/前板卡模板.svg',
+						image: 'images/AfterTheBoardTemplate.svg',
 						json: boardstr,
 						ondrop: 'ondropLoadJSON', //do any thing by your self when drop into the graph
 						showLabel: true,
@@ -191,8 +192,8 @@ function ondropLoadJSON(evt, graph, center, options) {
 	//校验主板上的芯片接口不许移动
 	for (index in jsonObj.datas) {
 		var image = jsonObj.datas[index].json.image;
-		if (image == 'images/芯片.svg' || image == 'images/光纤口.svg' || image == 'images/网口.svg'
-			|| image == 'images/圆口.svg' || image == 'images/串口.svg'
+		if (image == 'images/Chip.svg' || image == 'images/OpticalFiberMouth.svg' || image == 'images/InternetAccess.svg'
+			|| image == 'images/RoundMouth.svg' || image == 'images/SerialPort.svg'
 		) {
 			jsonObj.datas[index].json.movable = false;
 		}
@@ -201,7 +202,7 @@ function ondropLoadJSON(evt, graph, center, options) {
 	if (jsonObj.datas[0].json.properties.boardType == '2') {
 		var newjson = graph.toJSON();
 		for (i in newjson.datas) {
-			if (newjson.datas[i].json.image == 'images/后板卡.svg' && newjson.datas[i].json.properties.boardType == '2') {
+			if (newjson.datas[i].json.image == 'images/AfterTheBoard.svg' && newjson.datas[i].json.properties.boardType == '2') {
 				jsonObj == null;
 				alert("该类型主板只允许放置一个")
 				return jsonObj;
@@ -1155,7 +1156,7 @@ function initEditor(editor) {
 				// console.log("data", data)
 			}
 		}
-		if (image == 'images/芯片.svg') {
+		if (image == 'images/Chip.svg') {
 			return {
 				group: '芯片属性',
 				properties: [{
@@ -1181,7 +1182,7 @@ function initEditor(editor) {
 				]
 			}
 		}
-		if (image == 'images/光纤口.svg') {
+		if (image == 'images/OpticalFiberMouth.svg') {
 			return {
 				group: '接口属性',
 				properties: [{
@@ -1199,7 +1200,7 @@ function initEditor(editor) {
 				]
 			}
 		}
-		if (image == 'images/前板卡.svg' || image == 'images/后板卡.svg') {
+		if (image == 'images/BeforeTheBoard.svg' || image == 'images/AfterTheBoard.svg') {
 			return {
 				group: '主板属性',
 				properties: [{

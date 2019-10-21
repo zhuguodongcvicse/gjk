@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.2 (67145) - http://www.bohemiancoding.com/sketch -->
+    <title>RoundMouth</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="38.518161%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#FAF8F2" offset="0%"></stop>
+            <stop stop-color="#DAD7CF" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="87.1931632%" y1="21.5068113%" x2="15.6901335%" y2="82.6130802%" id="linearGradient-2">
+            <stop stop-color="#BBBBBB" offset="0%"></stop>
+            <stop stop-color="#858585" offset="100%"></stop>
+        </linearGradient>
+        <circle id="path-3" cx="10.0857143" cy="10.0857143" r="9.28571429"></circle>
+        <filter x="-11.6%" y="-11.6%" width="123.2%" height="123.2%" filterUnits="objectBoundingBox" id="filter-4">
+            <feGaussianBlur stdDeviation="1.5" in="SourceAlpha" result="shadowBlurInner1"></feGaussianBlur>
+            <feOffset dx="0" dy="1" in="shadowBlurInner1" result="shadowOffsetInner1"></feOffset>
+            <feComposite in="shadowOffsetInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0.737909226   0 0 0 0 0.737909226   0 0 0 0 0.737909226  0 0 0 0.5 0" type="matrix" in="shadowInnerInner1"></feColorMatrix>
+        </filter>
+        <linearGradient x1="72.401506%" y1="7.4067582%" x2="23.5576564%" y2="91.9309827%" id="linearGradient-5">
+            <stop stop-color="#989898" offset="0%"></stop>
+            <stop stop-color="#D1D1D1" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="33.3758134%" y1="13.5197182%" x2="64.5660859%" y2="85.0542396%" id="linearGradient-6">
+            <stop stop-color="#F6AA4A" offset="0%"></stop>
+            <stop stop-color="#F7A843" offset="54.8182908%"></stop>
+            <stop stop-color="#F3D681" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="25.7637316%" y1="0%" x2="76.7178395%" y2="93.6618137%" id="linearGradient-7">
+            <stop stop-color="#FFFFFF" offset="0%"></stop>
+            <stop stop-color="#A2A2A2" offset="100%"></stop>
+        </linearGradient>
+        <circle id="path-8" cx="10.142857" cy="10.142857" r="7.74085528"></circle>
+        <filter x="-14.5%" y="-14.5%" width="129.1%" height="129.1%" filterUnits="objectBoundingBox" id="filter-9">
+            <feGaussianBlur stdDeviation="1.5" in="SourceAlpha" result="shadowBlurInner1"></feGaussianBlur>
+            <feOffset dx="0" dy="1" in="shadowBlurInner1" result="shadowOffsetInner1"></feOffset>
+            <feComposite in="shadowOffsetInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0.0600021259   0 0 0 0 0.0600021259   0 0 0 0 0.0600021259  0 0 0 0.668931159 0" type="matrix" in="shadowInnerInner1"></feColorMatrix>
+        </filter>
+        <linearGradient x1="33.3758134%" y1="13.5197182%" x2="70.214124%" y2="100%" id="linearGradient-10">
+            <stop stop-color="#000000" offset="0%"></stop>
+            <stop stop-color="#373636" offset="64.7159278%"></stop>
+            <stop stop-color="#000000" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="14所-硬件" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="画板-copy" transform="translate(-112.000000, -432.000000)">
+            <g id="圆口" transform="translate(112.000000, 432.000000)">
+                <g id="分组-4">
+                    <g id="3">
+                        <use fill="url(#linearGradient-1)" fill-rule="evenodd" xlink:href="#path-3"></use>
+                        <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-3"></use>
+                        <use stroke="url(#linearGradient-2)" stroke-width="0.3" xlink:href="#path-3"></use>
+                    </g>
+                    <circle id="2" stroke="url(#linearGradient-5)" stroke-width="0.5" fill="url(#linearGradient-1)" cx="10" cy="10.4428571" r="8.14285714"></circle>
+                    <g id="1">
+                        <use fill="url(#linearGradient-6)" fill-rule="evenodd" xlink:href="#path-8"></use>
+                        <use fill="black" fill-opacity="1" filter="url(#filter-9)" xlink:href="#path-8"></use>
+                        <use stroke="url(#linearGradient-7)" stroke-width="0.5" xlink:href="#path-8"></use>
+                    </g>
+                    <circle id="1-copy" fill="url(#linearGradient-10)" cx="10.1428572" cy="10.1428572" r="4.48969615"></circle>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

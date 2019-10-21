@@ -31,6 +31,10 @@ export default [{
         path: 'index',
         name: '构件信息',
         component: () => import('@/views/comp/component/index')
+    },{
+        path: 'commView',
+        name: '查看构件',
+        component: () => import('@/views/libs/commoncomponent/commView')
     },
     {
         path: '/comp/showComp',

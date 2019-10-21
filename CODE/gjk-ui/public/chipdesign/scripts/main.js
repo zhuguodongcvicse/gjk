@@ -3,14 +3,14 @@ var inf_uuid;
 var chipArr;
 var infArr;
 var infOfChipList = []
-Q.registerImage('rack', 'images/机箱.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
-Q.registerImage('card', 'images/前板卡.svg');
-Q.registerImage('behindcard', 'images/后板卡.svg');
-Q.registerImage('cell', 'images/芯片.svg');
-Q.registerImage('optical', 'images/光纤口.svg');
-Q.registerImage('port', 'images/圆口.svg');
-Q.registerImage('serial', 'images/串口.svg');
-Q.registerImage('ePort', 'images/网口.svg');
+Q.registerImage('rack', 'images/Case.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
+Q.registerImage('card', 'images/BeforeTheBoard.svg');
+Q.registerImage('behindcard', 'images/AfterTheBoard.svg');
+Q.registerImage('cell', 'images/Chip.svg');
+Q.registerImage('optical', 'images/OpticalFiberMouth.svg');
+Q.registerImage('port', 'images/RoundMouth.svg');
+Q.registerImage('serial', 'images/SerialPort.svg');
+Q.registerImage('ePort', 'images/InternetAccess.svg');
 
 function RectElement() {
 	Q.doSuperConstructor(this, RectElement, arguments);
@@ -94,7 +94,7 @@ function handleMessageFromParent(event) {
 							id: infArr[i].id
 						},
 						type: 'Q.RectElement',
-						image: 'images/黄色圆口.svg',
+						image: 'images/YellowRoundMouth.svg',
 					}
 				}
 			}

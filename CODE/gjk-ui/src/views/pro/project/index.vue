@@ -396,8 +396,16 @@ export default {
 
           saveProject(this.project)
             .then(Response => {
-              // console.log("11111111111111111111111111111",Response.data.data);
               this.project.id = Response.data.data.id;
+              let projectsTemp = this.$store.state.projectTreeShow.projectTreeShow;
+              if (projectsTemp.length != 0) {
+                for (const i in projectsTemp) {
+                  projectsTemp[i].showFlag = 1
+                }
+              }
+              this.project.showFlag = 0
+              projectsTemp.push(this.project);
+              this.$store.dispatch("setProjectTreeShow", projectsTemp);
               saveProProcess(this.project.id, this.project.processName).then(
                 Response => {
                   // console.log("得到saveProProcess的返回结果：", Response);

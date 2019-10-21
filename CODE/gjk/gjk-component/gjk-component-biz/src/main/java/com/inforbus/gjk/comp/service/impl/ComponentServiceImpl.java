@@ -123,6 +123,30 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	}
 
 	@Override
+	public boolean deleteCompAndCompDetail(String compId) {
+		List<ComponentDetail> details = compDetailMapper.listCompDetailByCompId(compId);
+		try {
+			Component comp = this.getById(compId);
+			String filePath = compDetailPath + "gjk" + File.separator + "component" + File.separator
+					+ comp.getCompName() + File.separator + comp.getVersion() + File.separator;
+
+			// 删除构件
+			this.removeById(compId);
+			// 删除构件详细信息
+			for (ComponentDetail detail : details) {
+				componentDetailService.removeById(detail.getId());
+			}
+			// 删除构件相关文件
+			cn.hutool.core.io.FileUtil.del(filePath);
+
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	@Override
 	public ComponentVO getComponentCompDetailById(String id) {
 		return baseMapper.getComponentCompDetailById(id);
 	}
@@ -256,7 +280,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		Map<String, XmlEntityMap> xmlEntityMap = Maps.newHashMap();
 		// 查询流程
 //		String pro = compDetailMapper.selectById(proId).getParaentId();
-		//查询公共构件的
+		// 查询公共构件的
 		List<Component> comps = baseMapper.selectByComms(proId);
 //		List<Component> comps = baseMapper.selectList(Wrappers.<Component>query().lambda().inSql(Component::getId,
 //				"SELECT comp_id FROM gjk_project_comp a WHERE  a.project_id='" + proId + "' and a.can_use = 0"));
@@ -327,13 +351,8 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			// 修改主表信息
 			baseMapper.editComp(component);
 		} else {
-			List<String> versionList = getVersionByCompId(component);
 			component.setId(IdGenerate.uuid());
-			if (versionList.size() != 0) {
-				component.setVersion((double) (versionList.size() + 1) + "");
-			} else {
-				component.setVersion("1.0");
-			}
+			component.setVersion(getVersion(component));
 			baseMapper.saveComp(component);
 		}
 		return component;
@@ -346,6 +365,26 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			list.add(comp.getVersion());
 		}
 		return list;
+	}
+
+	/**
+	 * 设置构件版本号，若是第一次，设为1.0，否则设为最高版本加1
+	 * 
+	 * @param component
+	 * @return
+	 */
+	private String getVersion(Component component) {
+		List<Double> versions = new ArrayList<Double>();
+		for (String version : getVersionByCompId(component)) {
+			versions.add(Double.parseDouble(version));
+		}
+		// 对版本号List进行排序
+		Collections.sort(versions);
+		if (versions.size() != 0) {
+			return versions.get(versions.size() - 1) + 1 + "";
+		} else {
+			return 1.0 + "";
+		}
 	}
 
 	private List<CompVO> getAllComp() {
@@ -525,11 +564,18 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 
 			String descDirPath = filePath.substring(0, filePath.lastIndexOf("."));
 			// 解压zip文件夹
-			unZipFiles(filePath, filePath.substring(0, filePath.lastIndexOf(".")));
+			unZipFiles(filePath, descDirPath);
 
-			String excelFilePath = descDirPath + File.separator + "component" + File.separator + "MySQL.xls";
-
-			return readExcel(descDirPath, excelFilePath);
+			List<Component> components = null;
+			if ("component".equals(new File(descDirPath).listFiles()[0].getName())) {
+				String excelFilePath = descDirPath + File.separator + "component" + File.separator + "MySQL.xls";
+				components = readExcel(descDirPath, excelFilePath);
+				// 删除压缩包
+				cn.hutool.core.io.FileUtil.del(filePath);
+				// 删除解压包
+				cn.hutool.core.io.FileUtil.del(descDirPath);
+			}
+			return components;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -640,20 +686,14 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			String beforeDetailFilePath = "gjk" + File.separator + "component" + File.separator + comp.getCompName()
 					+ File.separator + comp.getVersion() + File.separator;
 
-			List<Double> versions = new ArrayList<Double>();
-			for (String version : getVersionByCompId(comp)) {
-				versions.add(Double.parseDouble(version));
-			}
-			// 对版本号List进行排序
-			Collections.sort(versions);
-			if (versions.size() != 0) {
-				comp.setVersion((versions.get(versions.size() - 1) + 1 + ""));
-			} else {
-				comp.setVersion(1.0 + "");
-			}
-
+			comp.setVersion(getVersion(comp));
+			comp.setApplyState("0");
+			comp.setApplyDesc("未申请入库");
+			comp.setCreateTime(LocalDateTime.now());
+			comp.setUpdateTime(null);
 			// 保存构件
 			baseMapper.saveComp(comp);
+
 			for (ComponentDetail detail : componentDetails) {
 				String filePath = detail.getFilePath().substring(beforeDetailFilePath.length());
 				detail.setFilePath("gjk" + File.separator + "component" + File.separator + comp.getCompName()
