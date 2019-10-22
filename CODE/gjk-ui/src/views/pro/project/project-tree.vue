@@ -460,6 +460,8 @@ export default {
     ...mapGetters(["userInfo", "tmpProject", "permissions", "website"])
   },
   created: function() {
+    console.log("this.website.publicSvg",this.website.publicSvg)
+    console.log("+++++++++++++++")
     this.getProjects();
     getSoftwareTree().then(Response => {
       this.softwareTreeData = Response.data.data;
@@ -1295,23 +1297,23 @@ export default {
         test = this.website.publicSvg + "icon-svg/comp.svg";
         //模型文件夹
       } else if (node.label == "模型") {
-        test = this.website.publicSvg + "icon-svg/模型.svg";
+        test = this.website.publicSvg + "icon-svg/model.svg";
         //组件工程
       } else if (node.label == "App组件工程") {
-        test = this.website.publicSvg + "icon-svg/组件.svg";
+        test = this.website.publicSvg + "icon-svg/component.svg";
         //文件夹
       } else if (node.data.isDirectory == "0") {
-        test = this.website.publicSvg + "icon-svg/文件夹.svg";
+        test = this.website.publicSvg + "icon-svg/folder.svg";
       } else {
         /* else if (node.childNodes.length > 0) {
-                  test = this.website.publicSvg + "icon-svg/文件夹.svg";
+                  test = this.website.publicSvg + "icon-svg/folder.svg";
                   //其他
                 }*/
-        test = this.website.publicSvg + "icon-svg/空.svg";
+        test = this.website.publicSvg + "icon-svg/empty.svg";
       }
       //流程
       if (node.level == 2) {
-        test = this.website.publicSvg + "icon-svg/流程.svg";
+        test = this.website.publicSvg + "icon-svg/process.svg";
       }
       //第一级目录设置无图片
       if (node.level == 1) {
@@ -1336,7 +1338,7 @@ export default {
       $(el)
         .find("img")
         .eq(0)
-        .attr("src", this.website.publicSvg + "icon-svg/文件夹.svg");
+        .attr("src", this.website.publicSvg + "icon-svg/folder.svg");
     },
     //树关闭后运行方法
     handleNodeCollapse(data, node, val) {
@@ -1344,7 +1346,7 @@ export default {
       $(el)
         .find("img")
         .eq(0)
-        .attr("src", this.website.publicSvg + "icon-svg/文件夹收起.svg");
+        .attr("src", this.website.publicSvg + "icon-svg/folderPackup.svg");
     },
     /* 上传文件 */
     UploadFile(param) {

@@ -212,7 +212,7 @@ export default {
     nodeExpand(data,node,val) {
       //替换svg
       var el = val.$el;
-      $(el).find("img").eq(0).attr("src",this.website.publicSvg+"icon-svg/文件夹.svg");
+      $(el).find("img").eq(0).attr("src",this.website.publicSvg+"icon-svg/folder.svg");
 
       let aChildren = data.children;
       if (aChildren.length > 0) {
@@ -224,7 +224,7 @@ export default {
     nodeCollapse(data,node,val) {
       //替换svg
       var el = val.$el;
-      $(el).find("img").eq(0).attr("src",this.website.publicSvg+"icon-svg/文件夹收起.svg");
+      $(el).find("img").eq(0).attr("src",this.website.publicSvg+"icon-svg/folderPackup.svg");
 
       this.oExpandedKey[data.id] = false;
       // 如果有子节点
@@ -342,10 +342,10 @@ export default {
         test = this.website.publicSvg+"icon-svg/txt.svg";
       //文件夹
       }else if(node.childNodes.length > 0){
-        test = this.website.publicSvg+"icon-svg/文件夹收起.svg";
+        test = this.website.publicSvg+"icon-svg/folderPackup.svg";
       //其他
       }else{
-        test = this.website.publicSvg+"icon-svg/空.svg";
+        test = this.website.publicSvg+"icon-svg/empty.svg";
       }
       return (
         <span class="custom-tree-node">

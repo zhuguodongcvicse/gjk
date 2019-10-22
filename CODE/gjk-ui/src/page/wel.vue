@@ -36,6 +36,11 @@ import { getUserhasApplyAuto } from "@/api/admin/user";
 export default {
   name: "wel",
   data() {
+    var returnApprovalPage = () => {
+      this.$router.push({
+        path: "/library/ce"
+      });
+    };
     return {
       activeNames: ["1", "2", "3", "4"],
       DATA: [],
@@ -48,11 +53,10 @@ export default {
         span: 8,
         data: [
           {
-            // click: function(item) {
-            //   alert(JSON.stringify(item));
-            // },
+            click: function(item) {
+              returnApprovalPage();
+            },
             title: "审批待处理通知",
-            href: "/#/library/ce",
             count: "",
             icon: "el-icon-message",
             color: "#ffffff"
@@ -134,5 +138,4 @@ export default {
 </script>
 
 <style scoped="scoped" lang="scss">
-
 </style>
