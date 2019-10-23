@@ -335,9 +335,9 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	 */
 	private File createFile(String token, String compId) {
 		Component component = compMapper.getCompById(compId);
-		String absolutePath = compDetailPath + compUserFilePath + File.separator + component.getCompName()
+		String absolutePath = compDetailPath + compUserFilePath + File.separator + component.getCompId()
 				+ File.separator + component.getVersion() + File.separator;
-		String gitRelativePath = compUserFilePath + File.separator + component.getCompName() + File.separator
+		String gitRelativePath = compUserFilePath + File.separator + component.getCompId() + File.separator
 				+ component.getVersion() + File.separator;
 		File f = new File(absolutePath);
 		if (!f.exists()) {
@@ -772,7 +772,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		String strType = maps.get("fileType").toString() + "file";
 		String fileType = ("algorithmfile").equals(strType) ? "算法文件"
 				: ("testfile").equals(strType) ? "测试文件" : ("platformfile").equals(strType) ? "平台文件" : "";
-		String newPath = compUserFilePath + File.separator + maps.get("compName").toString() + File.separator
+		String newPath = compUserFilePath + File.separator + maps.get("compId").toString() + File.separator
 				+ maps.get("version").toString() + File.separator;
 
 		ComponentDetail detdirs = baseMapper.selectOne(Wrappers.<ComponentDetail>query().lambda()

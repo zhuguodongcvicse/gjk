@@ -489,6 +489,8 @@ export default {
     //基本属性解析
     itemTypeChange(baseData, params) {
       let config = this.analysisConfigureType(baseData);
+        console.log("config",config)
+        console.log("params",params)
       config.attrs.forEach(attr => {
         if (attr.attrConfigType === "uploadComm") {
           let analysisBaseFile = this.analysisBaseFile;
@@ -531,8 +533,25 @@ export default {
           }
           let obj = {};
           obj[str] = this.files;
+          obj["fileTypeTemp"] = attr.actionType;
+          let ifExistSameFile = -1;
           if (JSON.stringify(obj) !== "{}") {
-            analysisBaseFile.push(obj);
+              if (analysisBaseFile.length != 0){
+                  for (let i in analysisBaseFile) {
+                      if (analysisBaseFile[i].fileTypeTemp == attr.actionType) {
+                          ifExistSameFile = i;
+                          break;
+                      }
+                  }
+                  if (ifExistSameFile != -1) {
+                      analysisBaseFile.splice(ifExistSameFile, 1);
+                      analysisBaseFile.push(obj);
+                  } else {
+                      analysisBaseFile.push(obj);
+                  }
+              } else {
+                  analysisBaseFile.push(obj);
+              }
             this.$store.dispatch("setAnalysisBaseFile", analysisBaseFile);
           }
         }

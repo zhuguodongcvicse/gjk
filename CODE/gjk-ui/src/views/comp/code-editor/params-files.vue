@@ -300,8 +300,10 @@ export default {
     },
     //保存对应文件
     fetchSavefiles(param) {
+        console.log("this.compValueType",this.compValueType)
       let savefiles = {
         compValue: param.id,
+        compId: param.compId,
         compName: param.compName,
         libsID: this.compValueType.libsID,
         version: param.version,
