@@ -104,4 +104,15 @@ public interface AppMapper extends BaseMapper<App> {
 	 * @return
 	 */
 	Project getprojectByProjectId(@Param("id") String id);
+	
+	/**
+	 * 通过id删除app的数据
+	 */
+	void deleteAppByAPPId(@Param("id") String id);
+	/**
+	 * 通过id查询app的数据
+	 * @param id
+	 * @return
+	 */
+	App selectAPPByAPPId(@Param("id") String id);
 }

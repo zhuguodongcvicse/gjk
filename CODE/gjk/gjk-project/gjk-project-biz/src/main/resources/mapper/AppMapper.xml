@@ -204,4 +204,20 @@
 		gjk_project pd WHERE pd.id=#{id}
 	</select>
 
+	<!-- 根据appid删除app数据 -->
+	<delete id="deleteAppByAPPId"
+		parameterType="com.inforbus.gjk.pro.api.entity.App">
+		DELETE FROM gjk_app WHERE id=#{id}
+	</delete>
+
+	<!-- 根据 appid 获取app内容，并删除文件夹 -->
+	<select id="selectAPPByAPPId" resultMap="appMap">
+		SELECT
+		<include refid="appSql" />
+		FROM gjk_app
+		<where>
+			id = #{id}
+		</where>
+	</select>
+
 </mapper>

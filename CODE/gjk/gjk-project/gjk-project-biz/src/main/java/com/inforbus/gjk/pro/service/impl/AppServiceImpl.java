@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
+import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.pro.api.entity.App;
 import com.inforbus.gjk.pro.api.entity.Project;
 import com.inforbus.gjk.pro.api.entity.ProjectFile;
@@ -153,6 +154,19 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	@Override
 	public Project getprojectByProjectId(String id) {
 		return baseMapper.getprojectByProjectId(id);
+	}
+
+	@Override
+	public void deleteAppByAPPId(String id) {
+		App appData= baseMapper.selectAPPByAPPId(id);
+		String appPath = proDetailPath + appData.getFilePath() + File.separator + appData.getFileName();
+		UploadFilesUtils.delFolder(appPath);
+		baseMapper.deleteAppByAPPId(id);
+	}
+
+	@Override
+	public App selectAPPByAPPId(String id) {
+		return baseMapper.selectAPPByAPPId(id);
 	}
 
 }
