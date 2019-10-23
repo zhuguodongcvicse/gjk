@@ -3,7 +3,7 @@
     <!-- <component-save ref="dialog" @save="saveComponent"></component-save> -->
     <!-- 当前项目 -->
     <div class="project_tree_14s">
-      <img src="/img/theme/night/logo/proImg.png" ondragstart="return false;" />
+      <img src="/img/theme/night/logo/proImg.png" ondragstart="return false;" /> 
       <!-- 项目切换 -->
       <el-dropdown class="project_tree_dropdown" @command="changeProjectCommand">
         <span class="el-dropdown-link">

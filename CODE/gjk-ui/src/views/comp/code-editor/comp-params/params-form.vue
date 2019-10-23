@@ -703,7 +703,7 @@ export default {
       if (attrObj.lableMapping) {
         //基于标签名
         let val = this.compChineseMapping.find(item => {
-          return item.label === con.attrKeys;
+          return item.label === attrObj.attrKeys;
         });
         let param = this.compChineseMapping.find(item => {
           return item.id === attrObj.mappingKeys;

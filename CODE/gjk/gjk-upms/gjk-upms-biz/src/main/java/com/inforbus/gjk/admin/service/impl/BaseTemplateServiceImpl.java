@@ -16,6 +16,7 @@
  */
 package com.inforbus.gjk.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -150,6 +151,12 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
      */
     @Override
     public boolean update(BaseTemplate baseTemplate) {
+        BaseTemplate template = new BaseTemplate();
+        template.setTempName(baseTemplate.getTempName());
+        BaseTemplate one = baseMapper.selectOne(new QueryWrapper<>(template));//查找数据库中,模板名称是否存在
+        if(one != null){
+            baseMapper.deleteById(one.getTempId());//删除模板名称重复的数据
+        }
         File oldPath = new File(LOCALPATH + baseTemplate.getTempPath());//保存的位置,文件名称由模板名称+时间毫秒值组成
         if (oldPath.exists()) {
             long millis = System.currentTimeMillis();
@@ -166,7 +173,8 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
                     out.write(bytes, 0, len);
                 }
                 baseTemplate.setTempPath(path);//更改新的路径
-                baseMapper.updateById(baseTemplate);//把新的数据更细至数据库
+                baseTemplate.setUpdateTime(LocalDateTime.now());
+                baseMapper.insert(baseTemplate);//把新的数据更细至数据库
                 return true;
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -187,8 +195,10 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
                         e.printStackTrace();
                     }
                 }
+
             }
         }
+        oldPath.delete();
         return false;
     }
 

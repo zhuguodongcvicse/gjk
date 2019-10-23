@@ -31,13 +31,14 @@ export const tableOption = {
   menuWidth: "150",//操作菜单栏的宽度
   border: true,
   index: true,
-  // indexLabel: '#',
+  indexLabel: "序号",
   stripe: true,
   menuAlign: 'center',
   align: 'center',
   editBtn: false,
   delBtn: false,
   addBtn: false,
+  
   column: [
     // {
     //   label: '模板标识',
@@ -59,6 +60,11 @@ export const tableOption = {
     {
       label: '模板类型',
       prop: 'tempType',
+      //dicUrl: '/admin/dict/type/libs_temp_type',
+    },
+    {
+      label: '版本',
+      prop: 'tempVersion',
       //dicUrl: '/admin/dict/type/libs_temp_type',
     },
     {
