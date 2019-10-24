@@ -34,6 +34,7 @@ import org.springframework.util.ResourceUtils;
 
 import java.io.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 基础模板
@@ -200,6 +201,11 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
         }
         oldPath.delete();
         return false;
+    }
+
+    @Override
+    public List<BaseTemplate> getBaseTemplate() {
+        return baseMapper.selectList(null);
     }
 
 }

@@ -17,8 +17,21 @@
       <el-col :span="4">
         <label class="showlabel">构件建模</label>
       </el-col>
-      <el-col :span="10"></el-col>
+      <el-col :span="10">
+        <el-select v-model="selectBaseTemplateValue" placeholder="请选择">
+          <el-option
+            v-for="item in this.allBaseTemplate"
+            :key="item.tempPath"
+            :label="item.tempName"
+            :value="item.tempPath">
+            <span style="float: left">{{ item.tempName }}</span>
+            <span style="float: right; color: #8492a6; font-size: 13px">{{ item.tempPath }}</span>
+          </el-option>
+        </el-select>
+      </el-col>
+
     </el-header>
+
     <el-main>
       <el-row>
         <el-col :span="18">
@@ -85,7 +98,9 @@ import { getObjType, deepClone } from "@/util/util";
 import {
   handleSaveCompMap,
   saveComp,
-  getCompFiles
+  getCompFiles,
+    analysisXmlFile,
+    analysisBaseTemplateXmlFile
 } from "@/api/comp/component";
 import { saveStructMap } from "@/api/libs/structlibs";
 export default {
@@ -96,6 +111,7 @@ export default {
   data() {
     //这里存放数据
     return {
+      selectBaseTemplateValue: '',
       //构件基本信息
       component: {},
       // 文件列表
@@ -105,7 +121,7 @@ export default {
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["userInfo", "saveXmlMaps", "headerFile", "analysisBaseFile"])
+    ...mapGetters(["userInfo", "saveXmlMaps", "headerFile", "analysisBaseFile", "allBaseTemplate"])
   },
   //监控data中的数据变化
   watch: {
@@ -137,6 +153,21 @@ export default {
         this.component = tmpComponent;
       },
       deep: true
+    },
+    selectBaseTemplateValue: {
+        handler: function(selectBaseTemplateValue) {
+            console.log("+++++++++selectBaseTemplateValue",selectBaseTemplateValue)
+            let allBaseTemplateTemp = this.allBaseTemplate
+            console.log("allBaseTemplateTemp",allBaseTemplateTemp)
+            for (const i in allBaseTemplateTemp) {
+                if (allBaseTemplateTemp[i].tempPath == selectBaseTemplateValue){
+                    this.changeBaseTemplate(allBaseTemplateTemp[i].tempPath);
+                    break
+                }
+            }
+            // this.changeBaseTemplate(selectBaseTemplateValue);
+        },
+        deep: true
     }
   },
   //方法集合
@@ -165,8 +196,6 @@ export default {
       });
       saveComp(this.component).then(res => {
         let comp = res.data.data;
-        console.log("this.component",this.component)
-          console.log("comp",comp)
         this.$refs.saveAlgorithmFiles.fetchSavefiles(comp).then(() => {
           this.$refs.saveTestFiles.fetchSavefiles(comp).then(() => {
             this.$refs.savePlatformFiles.fetchSavefiles(comp).then(res => {
@@ -196,10 +225,25 @@ export default {
           });
         });
       });
+    },
+    changeBaseTemplate(tempPath) {
+        analysisXmlFile(tempPath).then(response => {
+            console.log("response", response);
+            this.$store.dispatch("setFetchStrInPointer");
+            //保存加载的数据
+            this.$store.dispatch("setSaveXmlMaps", response.data.data)
+                .catch(() => {
+                    this.$message({
+                        message: "保存加载的数据出错",
+                        type: "error"
+                    });
+                });
+        });
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
+    this.selectBaseTemplateValue = this.$route.query.defauleBaseTemplate[0].tempName
     if (this.$route.query.compId != undefined) {
       this.component.id = this.$route.query.compId;
       //查询构件文件

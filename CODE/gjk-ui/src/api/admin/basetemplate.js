@@ -90,6 +90,13 @@ export function checkTempName(tempName) {
   return request({
     url: '/admin/basetemplate/checkTempName/'+tempName,
     method: 'get',
-    
+
+  })
+}
+
+export function getBaseTemplate() {
+  return request({
+    url: '/admin/basetemplate/getBaseTemplate',
+    method: 'get'
   })
 }

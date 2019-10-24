@@ -23,6 +23,8 @@ import com.inforbus.gjk.admin.api.dto.BaseTemplateDTO;
 import com.inforbus.gjk.admin.api.entity.BaseTemplate;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 
+import java.util.List;
+
 /**
  * 基础模板
  *
@@ -74,5 +76,7 @@ public interface BaseTemplateService extends IService<BaseTemplate> {
 	 * @return boolean
 	 */
 	boolean update(BaseTemplate baseTemplate);
+
+	List<BaseTemplate> getBaseTemplate();
 
 }

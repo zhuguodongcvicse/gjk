@@ -300,7 +300,6 @@ export default {
     },
     //保存对应文件
     fetchSavefiles(param) {
-        console.log("this.compValueType",this.compValueType)
       let savefiles = {
         compValue: param.id,
         compId: param.compId,
@@ -465,6 +464,7 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
+      console.log("file")
     if (this.$route.query.compId === undefined) {
       this.getDefaultImg();
     }

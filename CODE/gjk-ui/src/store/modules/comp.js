@@ -9,6 +9,7 @@ const comp = {
         analysisBaseFile: getStore({ name: 'analysisBaseFile' }) || [],
         cjUnitParam: getStore({ name: 'cjUnitParam' }) || {},
         strInPointer: getStore({ name: 'strInPointer' }) || [],
+        allBaseTemplate: getStore({ name: 'allBaseTemplate' }) || []
     },
     actions: {
         //绑定下拉框的值
@@ -47,6 +48,16 @@ const comp = {
                 }
             })
         },
+      setAllBaseTemplate({ commit }, allBaseTemplate) {
+        return new Promise((resolve, reject) => {
+          try {
+            commit('SET_ALLBASETEMPLATE', allBaseTemplate);
+            resolve();
+          } catch (e) {
+            reject(e)
+          }
+        })
+      },
         setChineseMapping({ commit }, param) {
             return new Promise((resolve, reject) => {
                 remote(param).then(res => {
@@ -82,6 +93,14 @@ const comp = {
                 type: "session"
             })
         },
+      SET_ALLBASETEMPLATE: (state, allBaseTemplate) => {
+        state.allBaseTemplate = allBaseTemplate
+        setStore({
+          name: 'allBaseTemplate',
+          content: state.allBaseTemplate,
+          type: "session"
+        })
+      },
         SET_CHINESEMAPPING: (state, param) => {
             state.compChineseMapping = param
             setStore({

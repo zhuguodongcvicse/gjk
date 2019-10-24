@@ -108,6 +108,7 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
+      console.log("define")
     if (this.$route.query.processId) {
       getChipsfromhardwarelibs(this.$route.query.processId).then(Response => {
         if (Response.data.chips) {

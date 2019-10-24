@@ -813,6 +813,7 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   async created() {
+      console.log("form")
     //清空文件中的数据
     this.$store.dispatch("clearAnalysisBaseFile");
   },

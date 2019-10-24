@@ -120,16 +120,15 @@ export default {
           params
         )
       ).then(response => {
-        console.log(response, "0000000");
+          console.log("response",response)
         this.tableData = response.data.data.records;
         this.page.total = response.data.data.total;
         this.listLoading = false;
       });
     },
     handleUseTemplate(params) {
-      console.log("handleUseTemplate", params.tempPath);
       analysisXmlFile(params.tempPath).then(response => {
-        console.log(response, "1111111");
+        console.log("response", response);
         this.templateData.templateVisible = false;
         this.$store.dispatch("setFetchStrInPointer");
         //保存加载的数据

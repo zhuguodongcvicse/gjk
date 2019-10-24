@@ -131,7 +131,7 @@ export function saveCompImg(param) {
     headers: { "Content-Type": "multipart/form-data" },
     data: params
   })
-} 
+}
 
 export function modifyComp(comp) {
   return request({
@@ -150,6 +150,18 @@ export function getCompDict() {
 export function analysisXmlFile(filePath) {
   let params = new FormData();
   params.append("filePath", filePath);
+  return request({
+    url: '/comp/component/analysisXmlFile',
+    method: 'post',
+    headers: { "Content-Type": "multipart/form-data" },
+    data: params
+  })
+}
+
+export function analysisBaseTemplateXmlFile(filePath) {
+  console.log("filePath",filePath)
+  let params = {filePath}
+  console.log("params",params)
   return request({
     url: '/comp/component/analysisXmlFile',
     method: 'post',
