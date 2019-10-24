@@ -34,12 +34,15 @@
     ></el-input>
     <!-- @change="$emit('change', $event)" -->
     <!-- 下拉框 -->
+
     <el-select
       v-if="lableType ==='selectComm'"
       v-model="itemParam"
       :placeholder="placeholder"
       filterable
       allow-create
+      :multiple="multiple"
+      collapse-tags
       size="medium"
       default-first-option
       v-bind:style="'width:100%'"
@@ -51,7 +54,7 @@
       <el-option
         v-for="(item,index) in selectOptions"
         :key="index"
-        :label="item.label"
+        :label="item.rightShowName === undefined?item.label:item.label + '<' + item.rightShowName + '>' "
         :value="item.value"
       >
         <span style="float: left">{{ item.label }}</span>
@@ -120,6 +123,7 @@ export default {
     placeholder: { type: String, default: "" }, //组件的placeholder值
     readonly: { type: Boolean, default: false }, //组件是否可读
     disabled: { type: Boolean, default: false }, //组件是否禁用
+    multiple: { type: Boolean, default: false }, //组件是否禁用
     dictKey: [String, Array] //当组件是selectComm时 下拉框数据值
   },
   model: {
@@ -192,6 +196,9 @@ export default {
               this.selectOptions = this.dictKey;
             }
           }
+          if (Boolean(this.multiple)) {
+            this.multiple = Boolean(this.multiple);
+          }
         }
         if (this.lableType === "switchComm") {
           value = Boolean(value);
@@ -243,7 +250,7 @@ export default {
           size: param.file.size
         };
         this.itemParam = res.data.data;
-        this.$emit("fileChange", file);
+        this.$emit("fileChange", file, param);
       });
     }
   },

@@ -165,11 +165,13 @@ export default {
       });
       saveComp(this.component).then(res => {
         let comp = res.data.data;
+        console.log("this.component",this.component)
+          console.log("comp",comp)
         this.$refs.saveAlgorithmFiles.fetchSavefiles(comp).then(() => {
           this.$refs.saveTestFiles.fetchSavefiles(comp).then(() => {
             this.$refs.savePlatformFiles.fetchSavefiles(comp).then(res => {
               //保存构件文件//保存图标文件
-              this.$refs.saveCompImg.saveCompImg(comp);
+              // this.$refs.saveCompImg.saveCompImg(comp);
               let saveComp = deepClone(this.saveDBXmlMaps);
               // console.log("saveDBXmlMapssaveDBXmlMapssaveDBXmlMaps", saveComp);
               // 需要更改函数路径

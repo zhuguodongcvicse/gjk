@@ -128,7 +128,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		try {
 			Component comp = this.getById(compId);
 			String filePath = compDetailPath + "gjk" + File.separator + "component" + File.separator
-					+ comp.getCompName() + File.separator + comp.getVersion() + File.separator;
+					+ comp.getCompId() + File.separator + comp.getVersion() + File.separator;
 
 			// 删除构件
 			this.removeById(compId);

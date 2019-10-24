@@ -211,4 +211,12 @@ export function getAppByProcessId (obj) {
   })
 }
 
+export function deleteAppByAPPId(id) {
+  return request({
+    url: '/pro/app/deleteAppByAPPId/' + id,
+    method: 'post'
+  })
+}
+
+
 

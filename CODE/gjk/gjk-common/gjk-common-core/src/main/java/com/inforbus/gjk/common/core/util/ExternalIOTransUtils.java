@@ -241,15 +241,15 @@ public class ExternalIOTransUtils {
 	 * 导出
 	 * 
 	 * @param appId                 APP对应的流程ID
-	 * @param taskInfoPath          Git临时路径，之后下载到前台
+	 * @param appName          APP名称
 	 * @param appPath               APP工程文件夹路径
 	 * @param sysconfigPath         系统配置模块XML路径
 	 * @param packinfoPath          客户自存自取路径
 	 * @param cmpDeployPlanFilePath 客户自存自取路径
 	 */
-	public static void appTaskExport(int appId, String taskInfoPath, String appPath, String sysconfigPath,
+	public static void appTaskExport(int appId, String appName, String appPath, String sysconfigPath,
 			String packinfoPath, String cmpDeployPlanFilePath) {
-		appInterface.appTaskExport(appId, taskInfoPath, appPath, sysconfigPath, packinfoPath, cmpDeployPlanFilePath);
+		appInterface.appTaskExport(appId, appName, appPath, sysconfigPath, packinfoPath, cmpDeployPlanFilePath);
 	}
 
 	/**

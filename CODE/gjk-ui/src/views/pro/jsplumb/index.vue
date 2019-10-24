@@ -20,6 +20,7 @@
             multiple
             :show-file-list="false"
             :http-request="customFileUpload"
+            accept=".zip"
           >
             <el-button type="primary" plain size="small">导入</el-button>
           </el-upload>

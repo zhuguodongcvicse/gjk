@@ -136,10 +136,7 @@ div.desc {
   bottom: 0;
   left: 15%;
   right: 0;
-  background-image: url(../img/背景网格.png);
-  width: 2000px;
-  height: 3000px;
-  overflow: auto;
+  background-image: url(../img/beijingwangge.png);
   background-repeat: no-repeat;
   /* background-size: 100% 100%; */
   /* -moz-background-size:100% 100%; */
@@ -256,7 +253,7 @@ div.desc {
   .public_jsplumb_right1_14s{height:92%;overflow: scroll;width:83.6%;}
 }
 .fz{
-  background-image: url(../img/仿真图标.png)
+  background-image: url(../img/fangzhentubiao.png)
 }
 .ui-selected {
   box-shadow:0px 0px 15px 5px #6cf

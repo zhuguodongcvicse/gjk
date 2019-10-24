@@ -549,7 +549,8 @@ function checkDat() {
 				$(".div_left").css("right", 87 +"%")
 				$(".div_right").css("left", 13 + "%")
 			}
-			$(".div_right").css("width", ($(".div_right").width()+(e.clientX - BR))-60 + "px")
+			$(".div_right").css("width", 85.5 + "%")
+			//console.log($(".div_right").width()+(e.clientX - BR)-100)
 			//根据鼠标事件相对位置计算出div的position
 			
 			return false;
@@ -2717,77 +2718,77 @@ $('.div_right').bind({
 });
 
 //画布初始比例
-var scale = 1
-$(".div_right").bind('mousewheel DOMMouseScroll', function (event) { //on也可以 bind监听
-	var wheel = event.originalEvent.wheelDelta;
-	var detal = event.originalEvent.detail;
-	if (event.originalEvent.wheelDelta && event.ctrlKey == true) { //判断浏览器IE,谷歌滚轮事件        
-		//禁止页面触发比例缩放
-		event.preventDefault()
-		if (wheel > 0) { //当滑轮向上滚动时 
-			if (scale < 1.6) {
-				scale = scale + 0.2
-				$(".div_right").css({
-					"-webkit-transform": `scale(${scale})`,
-					"-moz-transform": `scale(${scale})`,
-					"-ms-transform": `scale(${scale})`,
-					"-o-transform": `scale(${scale})`,
-					"transform": `scale(${scale})`
-				})
-				// $('.pa').each(function(index,elem){
-				// 	var $elem = $(elem);
-				// 	var pointArray = jsPlumb.getEndpoints($elem.attr('id'))
-				// 	$.map(pointArray,function(point){
-				// 		console.log("每个锚点",point)
-				// 		$(point.canvas).css({
-				// 			"-webkit-transform": `scale(${scale})`,
-				// 			"-moz-transform": `scale(${scale})`,
-				// 			"-ms-transform": `scale(${scale})`,
-				// 			"-o-transform": `scale(${scale})`,
-				// 			"transform": `scale(${scale})`
-				// 		})
-				// 		jsPlumb.setSuspendDrawing(true)
-				// 	})
-				// })
-				// $.each(jsPlumb.getConnections(), function (idx, connection) {
-				// 	console.log("每条连线",connection)
-				// 	$(connection.canvas).css({
-				// 		"-webkit-transform": `scale(${scale})`,
-				// 			"-moz-transform": `scale(${scale})`,
-				// 			"-ms-transform": `scale(${scale})`,
-				// 			"-o-transform": `scale(${scale})`,
-				// 			"transform": `scale(${scale})`
-				// 	})
-				// })
+// var scale = 1
+// $(".div_right").bind('mousewheel DOMMouseScroll', function (event) { //on也可以 bind监听
+// 	var wheel = event.originalEvent.wheelDelta;
+// 	var detal = event.originalEvent.detail;
+// 	if (event.originalEvent.wheelDelta && event.ctrlKey == true) { //判断浏览器IE,谷歌滚轮事件        
+// 		//禁止页面触发比例缩放
+// 		event.preventDefault()
+// 		if (wheel > 0) { //当滑轮向上滚动时 
+// 			if (scale < 1.6) {
+// 				scale = scale + 0.2
+// 				$(".div_right").css({
+// 					"-webkit-transform": `scale(${scale})`,
+// 					"-moz-transform": `scale(${scale})`,
+// 					"-ms-transform": `scale(${scale})`,
+// 					"-o-transform": `scale(${scale})`,
+// 					"transform": `scale(${scale})`
+// 				})
+// 				// $('.pa').each(function(index,elem){
+// 				// 	var $elem = $(elem);
+// 				// 	var pointArray = jsPlumb.getEndpoints($elem.attr('id'))
+// 				// 	$.map(pointArray,function(point){
+// 				// 		console.log("每个锚点",point)
+// 				// 		$(point.canvas).css({
+// 				// 			"-webkit-transform": `scale(${scale})`,
+// 				// 			"-moz-transform": `scale(${scale})`,
+// 				// 			"-ms-transform": `scale(${scale})`,
+// 				// 			"-o-transform": `scale(${scale})`,
+// 				// 			"transform": `scale(${scale})`
+// 				// 		})
+// 				// 		jsPlumb.setSuspendDrawing(true)
+// 				// 	})
+// 				// })
+// 				// $.each(jsPlumb.getConnections(), function (idx, connection) {
+// 				// 	console.log("每条连线",connection)
+// 				// 	$(connection.canvas).css({
+// 				// 		"-webkit-transform": `scale(${scale})`,
+// 				// 			"-moz-transform": `scale(${scale})`,
+// 				// 			"-ms-transform": `scale(${scale})`,
+// 				// 			"-o-transform": `scale(${scale})`,
+// 				// 			"transform": `scale(${scale})`
+// 				// 	})
+// 				// })
 				
-			}
+// 			}
 
-		}
-		if (wheel < 0) { //当滑轮向下滚动时  
-			console.log(wheel)
-			if(scale>0.6){
-				scale = scale - 0.2
-				$(".div_right").css({
-					"-webkit-transform": `scale(${scale})`,
-					"-moz-transform": `scale(${scale})`,
-					"-ms-transform": `scale(${scale})`,
-					"-o-transform": `scale(${scale})`,
-					"transform": `scale(${scale})`
-				})
-				jsPlumb.setSuspendDrawing(false, true)
-			}	
-		}
-	} else if (event.originalEvent.detail) {  //Firefox滚轮事件  
-		if (detal > 0) { //当滑轮向下滚动时  
+// 		}
+// 		if (wheel < 0) { //当滑轮向下滚动时  
+// 			console.log(wheel)
+// 			if(scale>0.6){
+// 				scale = scale - 0.2
+// 				$(".div_right").css({
+// 					"-webkit-transform": `scale(${scale})`,
+// 					"-moz-transform": `scale(${scale})`,
+// 					"-ms-transform": `scale(${scale})`,
+// 					"-o-transform": `scale(${scale})`,
+// 					"transform": `scale(${scale})`
+// 				})
+// 				jsPlumb.setSuspendDrawing(false, true)
+// 			}	
+// 		}
+// 	} else if (event.originalEvent.detail) {  //Firefox滚轮事件  
+// 		if (detal > 0) { //当滑轮向下滚动时  
 
-		}
-		if (detal < 0) { //当滑轮向上滚动时  
+// 		}
+// 		if (detal < 0) { //当滑轮向上滚动时  
 
-		}
+// 		}
 
-	}
+// 	}
 
-});
+// });
 
 // $("#mySelect").bind("change",function(){
 // 	var id = ""
