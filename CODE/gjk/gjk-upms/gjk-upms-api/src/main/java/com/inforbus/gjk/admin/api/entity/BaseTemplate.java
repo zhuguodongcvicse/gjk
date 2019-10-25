@@ -75,5 +75,5 @@ public class BaseTemplate extends Model<BaseTemplate> {
 	/**
 	 *控制版本字段
 	 */
-	private String tempVersion;
+	private Integer tempVersion;
 }

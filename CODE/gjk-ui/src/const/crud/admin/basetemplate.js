@@ -65,13 +65,12 @@ export const tableOption = {
     {
       label: '版本',
       prop: 'tempVersion',
-      //dicUrl: '/admin/dict/type/libs_temp_type',
     },
     {
       label: '创建时间',
       prop: 'createTime',
       type: 'datetime',
-      format: 'yyyy-MM-dd',
+      format: 'yyyy-MM-dd hh:mm:ss',
       editDisabled: true,
       addDisplay: false,
       span: 12
@@ -80,7 +79,7 @@ export const tableOption = {
       label: '修改时间',
       prop: 'updateTime',
       type: 'datetime',
-      format: 'yyyy-MM-dd',
+      format: 'yyyy-MM-dd hh:mm:ss',
       editDisabled: true,
       addDisplay: false,
       span: 12

@@ -400,7 +400,7 @@ public class DevenvServiceImpl implements DevenvService{
 			e.printStackTrace();
 		}
 
-		return null;
+		return "编译成功";
 	}
 	
 	/**

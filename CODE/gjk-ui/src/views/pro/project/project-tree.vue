@@ -3,7 +3,7 @@
     <!-- <component-save ref="dialog" @save="saveComponent"></component-save> -->
     <!-- 当前项目 -->
     <div class="project_tree_14s">
-      <img src="/img/theme/night/logo/proImg.png" ondragstart="return false;" /> 
+      <img src="/img/theme/night/logo/proImg.png" ondragstart="return false;" />
       <!-- 项目切换 -->
       <el-dropdown class="project_tree_dropdown" @command="changeProjectCommand">
         <span class="el-dropdown-link">
@@ -460,8 +460,8 @@ export default {
     ...mapGetters(["userInfo", "tmpProject", "permissions", "website"])
   },
   created: function() {
-    console.log("this.website.publicSvg",this.website.publicSvg)
-    console.log("+++++++++++++++")
+    console.log("this.website.publicSvg", this.website.publicSvg);
+    console.log("+++++++++++++++");
     this.getProjects();
     getSoftwareTree().then(Response => {
       this.softwareTreeData = Response.data.data;
@@ -678,7 +678,7 @@ export default {
     handleSwitch() {
       // this.showProjects = !this.showProjects
     },
-    nodeContextmenuClick(item) {
+    async nodeContextmenuClick(item) {
       // this.loading=true;
       if (item == "集成代码生成") {
         // console.log("userInfouserInfouserInfo", this.userInfo.name);
@@ -731,31 +731,61 @@ export default {
       } else if (item == "APP组件工程生成") {
         this.selectPhotoDialogVisible = true;
       } else if (item == "编译") {
-        let filePath = { filePath: "" };
-        filePath.filePath =
-          this.fileData.filePath + "\\" + this.fileData.fileName;
-        // filePath.filePath = this.fileData.filePath
-        //getPath({path:"D:\\\CCode\\\ConsoleApplication1\\\ConsoleApplication1.sln"});
-        //将 文件夹名称 和 数据 一起返回给textEdits.vue
+        if (this.currentNodeData.label == "App组件工程") {
+          for (let i of this.currentNodeData.children) {
+            if (i.isComplie) {
+              let filePath = { filePath: "" };
+              filePath.filePath = i.filePath + "\\" + i.fileName;
+              // filePath.filePath = this.fileData.filePath
+              //getPath({path:"D:\\\CCode\\\ConsoleApplication1\\\ConsoleApplication1.sln"});
+              //将 文件夹名称 和 数据 一起返回给textEdits.vue
+              var platformType = "";
+              //获取平台类型
+              await getAppByProcessId({
+                fileName: i.fileName,
+                procedureId: this.procedureId
+              }).then(val => {
+                platformType = val.data.data;
+              });
+              await getPath({
+                path: filePath.filePath,
+                fileName: i.fileName,
+                platformType: platformType
+              }).then(val => {
+                // this.$store.dispatch(
+                //   "saveConsoleLog",
+                //   this.fileData.fileName + "===@@@===" + val.data.data
+                // );
+                //this.$store.dispatch("saveTextLog",val.data.data)
+              });
+            }
+          }
+        } else {
+          let filePath = { filePath: "" };
+          filePath.filePath =
+            this.fileData.filePath + "\\" + this.fileData.fileName;
+          // filePath.filePath = this.fileData.filePath
+          //getPath({path:"D:\\\CCode\\\ConsoleApplication1\\\ConsoleApplication1.sln"});
+          //将 文件夹名称 和 数据 一起返回给textEdits.vue
 
-        //获取平台类型
-        getAppByProcessId({
-          fileName: this.fileData.fileName,
-          procedureId: this.procedureId
-        }).then(val => {
-          getPath({
-            path: filePath.filePath,
+          //获取平台类型
+          getAppByProcessId({
             fileName: this.fileData.fileName,
-            platformType: val.data.data
+            procedureId: this.procedureId
           }).then(val => {
-            // this.$store.dispatch(
-            //   "saveConsoleLog",
-            //   this.fileData.fileName + "===@@@===" + val.data.data
-            // );
-            //this.$store.dispatch("saveTextLog",val.data.data)
+            getPath({
+              path: filePath.filePath,
+              fileName: this.fileData.fileName,
+              platformType: val.data.data
+            }).then(val => {
+              // this.$store.dispatch(
+              //   "saveConsoleLog",
+              //   this.fileData.fileName + "===@@@===" + val.data.data
+              // );
+              //this.$store.dispatch("saveTextLog",val.data.data)
+            });
           });
-        });
-
+        }
         $(".rightmenu").hide();
       } else if (item == "添加流程") {
         this.addProcedureDialogVisible = true;
@@ -1353,7 +1383,7 @@ export default {
       getUploadFilesUrl(param).then(res => {
         this.filePath = res.data.data;
         this.file.fileName = param.file.name;
-        console.log("fileName",this.file.fileName);
+        console.log("fileName", this.file.fileName);
       });
     },
     saveUploadFile() {

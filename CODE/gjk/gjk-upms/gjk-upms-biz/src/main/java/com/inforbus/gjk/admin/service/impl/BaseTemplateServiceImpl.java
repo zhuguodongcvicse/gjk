@@ -89,6 +89,8 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
         if (!localPath.exists()) {//判断文件是否存在
             return false;
         }
+        baseTemplate.setUpdateTime(LocalDateTime.now());
+        baseMapper.updateById(baseTemplate);
         return XmlFileHandleUtil.createXmlFile(xmlEntityMap, localPath);//保存成功返回true
     }
 
@@ -124,6 +126,12 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
             baseTemplate.setCreateTime(LocalDateTime.now());
             baseTemplate.setDelFlag("0");
             baseTemplate.setTempPath("gjk"+File.separator+"baseTemplate" + File.separator+ baseTemplate.getTempName() + String.valueOf(millis) + ".xml");
+            Integer version = baseMapper.getMaxVersion(baseTemplate.getTempType());
+            if (version == null){
+                baseTemplate.setTempVersion(1);
+            }else {
+                baseTemplate.setTempVersion(version+1);
+            }
             baseMapper.insert(baseTemplate);//xml文件生成成功后,数据库存储一条数据
             return true;
         }
@@ -151,12 +159,12 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
      */
     @Override
     public boolean update(BaseTemplate baseTemplate) {
-        BaseTemplate template = new BaseTemplate();
-        template.setTempName(baseTemplate.getTempName());
-        BaseTemplate one = baseMapper.selectOne(new QueryWrapper<>(template));//查找数据库中,模板名称是否存在
-        if(one != null){
-            baseMapper.deleteById(one.getTempId());//删除模板名称重复的数据
-        }
+//        BaseTemplate template = new BaseTemplate();
+//        template.setTempName(baseTemplate.getTempName());
+//        BaseTemplate one = baseMapper.selectOne(new QueryWrapper<>(template));//查找数据库中,模板名称是否存在
+//        if(one != null){
+//            baseMapper.deleteById(one.getTempId());//删除模板名称重复的数据
+//        }
         File oldPath = new File(LOCALPATH + baseTemplate.getTempPath());//保存的位置,文件名称由模板名称+时间毫秒值组成
         if (oldPath.exists()) {
             long millis = System.currentTimeMillis();
@@ -174,7 +182,7 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
                 }
                 baseTemplate.setTempPath(path);//更改新的路径
                 baseTemplate.setUpdateTime(LocalDateTime.now());
-                baseMapper.insert(baseTemplate);//把新的数据更细至数据库
+                baseMapper.updateById(baseTemplate);//把新的数据更细至数据库
                 return true;
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

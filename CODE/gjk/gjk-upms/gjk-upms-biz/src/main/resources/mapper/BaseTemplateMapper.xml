@@ -70,12 +70,16 @@
             <if test="baseTemplate.remarks != null and baseTemplate.remarks.trim() != ''">
                 AND remarks = #{baseTemplate.remarks}
             </if>
-            <if test="baseTemplate.tempVersion != null and baseTemplate.tempVersion.trim() != ''">
+            <if test="baseTemplate.tempVersion != null ">
                 AND temp_version = #{baseTemplate.tempVersion}
             </if>
         </where>
         order by create_time DESC
     </select>
 
+    <select id="getMaxVersion" parameterType="String" resultType="Integer">
+        select Max(temp_version) from gjk_base_template
+        where temp_type = #{tempType}
+    </select>
 
 </mapper>

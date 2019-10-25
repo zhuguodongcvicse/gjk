@@ -49,14 +49,14 @@
               <!--单选框配置方式-->
               <el-row v-if="attribute.attrConfigType=='switchComm'">
                 <el-switch
-                    v-model="currentXmlMap.attributeMap[attribute.attrName]"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949"
-                    active-value="true"
-                    inactive-value="false"
-                  ></el-switch>
+                  v-model="currentXmlMap.attributeMap[attribute.attrName]"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                  active-value="true"
+                  inactive-value="false"
+                ></el-switch>
                 <!-- <el-radio v-model="currentXmlMap.attributeMap[attribute.attrName]" label="Y">是</el-radio>
-                <el-radio v-model="currentXmlMap.attributeMap[attribute.attrName]" label="N">否</el-radio> -->
+                <el-radio v-model="currentXmlMap.attributeMap[attribute.attrName]" label="N">否</el-radio>-->
               </el-row>
               <!--select下拉框配置方式-->
               <el-select
@@ -289,7 +289,7 @@
                 <el-select
                   size="medium"
                   v-model="scope.row.dataKey"
-                  v-if="scope.row.attrConfigType=='selectComm'"                 
+                  v-if="scope.row.attrConfigType=='selectComm'"
                 >
                   <el-option-group
                     v-for="group in dataKeys"
@@ -806,7 +806,7 @@ export default {
         attrKeys: undefined,
         attrConfigType: "inputComm",
         dataKey: "[]",
-        multiple:false,
+        multiple: false,
         mappingData: []
       });
     },
@@ -1331,35 +1331,20 @@ export default {
         this.deleteMappingData(this.XmlEntityMap);
         Vue.set(this.BaseTemplateBTO, "baseTemplate", this.BaseTemplate);
         Vue.set(this.BaseTemplateBTO, "xmlEntityMap", this.XmlEntityMap);
-        checkTempName(this.BaseTemplate.tempName)
-          .then(res => {
-            if (res.data.data == null) {
-              addObj(this.BaseTemplateBTO).then(repsonse => {
-                if (repsonse.data.code == 0) {
-                  this.$message({
-                    message: "模板保存成功",
-                    type: "success"
-                  });
-                  this.$router.replace("/admin/basetemplate"); //保存成功后.跳转到首页
-                  var tag1 = this.tag;
-                  menuTag(this.$route.path, "remove", this.tagList, tag1);
-                } else {
-                  this.$message.error("模板保存失败");
-                }
-              });
-            } else {
-              this.$message({
-                message: "此模板名已存在,无法保存,请重新增加",
-                type: "warning"
-              });
-            }
-          })
-          .catch(error => {
+
+        addObj(this.BaseTemplateBTO).then(repsonse => {
+          if (repsonse.data.code == 0) {
             this.$message({
-              message: "此模板名已存在,无法保存,请重新增加",
-              type: "warning"
+              message: "模板保存成功",
+              type: "success"
             });
-          });
+            this.$router.replace("/admin/basetemplate"); //保存成功后.跳转到首页
+            var tag1 = this.tag;
+            menuTag(this.$route.path, "remove", this.tagList, tag1);
+          } else {
+            this.$message.error("模板保存失败");
+          }
+        });
       });
     },
 
@@ -1589,7 +1574,6 @@ export default {
         }
       }
     }
-    
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
@@ -1614,7 +1598,7 @@ export default {
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
     //console.log("this.$route.query",this.$route.query)
-    this.BaseTemplate = JSON.parse( this.$route.query.BaseTemplate);
+    this.BaseTemplate = JSON.parse(this.$route.query.BaseTemplate);
     this.template = this.$route.query.template;
     var BaseTemplatePathDTO = {
       path: this.BaseTemplate.baseTemplatePath
