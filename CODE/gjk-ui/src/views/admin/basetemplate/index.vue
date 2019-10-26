@@ -31,7 +31,7 @@
               <el-button
                 type="primary"
                 v-if="permissions.admin_basetemplate_edit"
-                icon="el-icon-check"
+                icon="el-icon-edit-outline"
                 size="medium"
                 plain
                 @click="handleEdit(scope.row,scope.index)"
@@ -41,10 +41,20 @@
               <el-button
                 type="success"
                 v-if="permissions.admin_basetemplate_edit"
-                icon="el-icon-check"
+                icon="el-icon-edit"
                 size="medium"
                 plain
                 @click="editTemplate(scope.row,scope.index)"
+              ></el-button>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="复制模板" placement="top">
+              <el-button
+                type="success"
+                v-if="permissions.admin_basetemplate_edit"
+                icon="el-icon-document-copy"
+                size="medium"
+                plain
+                @click="copyTemplate(scope.row,scope.index)"
               ></el-button>
             </el-tooltip>
             <el-tooltip class="item" effect="dark" content="删除" placement="top">
@@ -66,11 +76,11 @@
     <el-dialog title="新增模板" :visible.sync="isAddTemplate" width="40%" v-if="isAddTemplate">
       <el-form label-width="80px" :model="BaseTemplate" :rules="rules" ref="BaseTemplate">
         <!--新增模板的名称,不可重复-->
-        <el-form-item label="模板名称" prop="tempName">
+        <el-form-item label="模板名称">
           <el-input v-model="BaseTemplate.tempName" placeholder="请输入模板名称"></el-input>
         </el-form-item>
         <!--模板的类型-->
-        <el-form-item label="模板类型">
+        <el-form-item label="模板类型" prop="tempType">
           <el-select
             v-model="BaseTemplate.tempType"
             filterable
@@ -103,9 +113,7 @@
             </span>
           </el-input>
         </el-form-item>
-        <el-form-item label="版本" prop="tempVersion">
-          <el-input v-model="BaseTemplate.tempVersion" placeholder="版本"></el-input>
-        </el-form-item>
+
         <!--备注-->
         <el-form-item label="备注">
           <el-input v-model="BaseTemplate.remarks" placeholder="备注"></el-input>
@@ -120,7 +128,7 @@
     <el-dialog title="编辑" :visible.sync="isEidtTemplate" width="50%" v-if="isEidtTemplate">
       <el-form label-width="80px" :model="baseTemplateVO" :rules="eidtRules" ref="baseTemplateRef">
         <!--新增模板的名称,不可重复-->
-        <el-form-item label="模板名称" prop="tempName">
+        <el-form-item label="模板名称">
           <el-input v-model="baseTemplateVO.tempName" placeholder="请输入模板名称"></el-input>
         </el-form-item>
         <!--模板的类型-->
@@ -139,9 +147,6 @@
               :value="item.value"
             ></el-option>
           </el-select>
-        </el-form-item>
-        <el-form-item label="版本" prop="tempVersion">
-          <el-input v-model="baseTemplateVO.tempVersion" placeholder="版本"></el-input>
         </el-form-item>
 
         <!--备注-->
@@ -167,8 +172,10 @@ import {
 } from "@/api/admin/basetemplate";
 import { tableOption } from "@/const/crud/admin/basetemplate";
 import { getUploadFilesUrl } from "@/api/comp/componentdetail"; //文件上传接口
+import { parseXml } from "@/api/admin/basetemplate"; //解析xml
 import { mapGetters } from "vuex";
 import { truncate } from "fs";
+import { parse } from "path";
 export default {
   name: "basetemplate",
   components: {},
@@ -191,7 +198,7 @@ export default {
           .catch(error => {
             callback(new Error("模板名已经存在"));
           });
-          callback();
+        callback();
       }
     };
     return {
@@ -243,19 +250,19 @@ export default {
       },
       //新增表单验证规则
       rules: {
-        tempName: [
-          { required: true, message: "请输入模板名称", trigger: "blur" },
-          { validator: validateTempName, trigger: "blur" }
-        ],
+        // tempName: [
+        //   { required: true, message: "请输入模板名称", trigger: "blur" },
+        //   { validator: validateTempName, trigger: "blur" }
+        // ],
         tempType: [
-          { required: true, message: "请选择或输入模板类型", trigger: "blur" }
+          { required: true, message: "请选择或输入模板类型", trigger: "change" }
         ],
         fileName: [
           { required: true, message: "请选择模板文件", trigger: "blur" }
-        ],
-        tempVersion: [
-          { required: true, message: "请输入版本号", trigger: "blur" }
         ]
+        // tempVersion: [
+        //   { required: true, message: "请输入版本号", trigger: "blur" }
+        // ]
       },
       eidtRules: {
         tempName: [
@@ -330,7 +337,7 @@ export default {
               path: "/basetemplate/addTemplate",
               query: {
                 template: "hardware_param_type",
-                BaseTemplate: this.BaseTemplate
+                BaseTemplate: JSON.stringify(this.BaseTemplate)
               }
             });
           } else if (value == "软硬件映射配置模型") {
@@ -338,7 +345,7 @@ export default {
               path: "/basetemplate/addTemplate",
               query: {
                 template: "hsm_param_type",
-                BaseTemplate: this.BaseTemplate
+                BaseTemplate: JSON.stringify(this.BaseTemplate)
               }
             });
           } else if (value == "主题配置模型") {
@@ -346,7 +353,7 @@ export default {
               path: "/basetemplate/addTemplate",
               query: {
                 template: "theme_param_type",
-                BaseTemplate: this.BaseTemplate
+                BaseTemplate: JSON.stringify(this.BaseTemplate)
               }
             });
           } else if (value == "网络配置模型") {
@@ -354,7 +361,7 @@ export default {
               path: "/basetemplate/addTemplate",
               query: {
                 template: "network_param_type",
-                BaseTemplate: this.BaseTemplate
+                BaseTemplate: JSON.stringify(this.BaseTemplate)
               }
             });
           } else if (value == "系统配置模型") {
@@ -362,7 +369,7 @@ export default {
               path: "/basetemplate/addTemplate",
               query: {
                 template: "sysconfig_param_type",
-                BaseTemplate: this.BaseTemplate
+                BaseTemplate: JSON.stringify(this.BaseTemplate)
               }
             });
           } else {
@@ -370,7 +377,7 @@ export default {
               path: "/basetemplate/addTemplate",
               query: {
                 template: "other_param_type",
-                BaseTemplate: this.BaseTemplate
+                BaseTemplate: JSON.stringify(this.BaseTemplate)
               }
             });
           }
@@ -488,7 +495,32 @@ export default {
           //路由跳转至编辑模板文件页面
           path: "/basetemplate/editTemplate",
           query: {
-            BaseTemplate: JSON.stringify(row) 
+            BaseTemplate: JSON.stringify(row)
+          }
+        });
+      });
+    },
+    //复制模板功能
+    copyTemplate(row, index) {
+      console.log("row",row.tempPath);
+      this.$confirm("是否确认复制" + row.tempName + "模板", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        var BaseTemplatePathDTO = {
+          path: "D:\\14S_GJK_GIT\\gjk\\"+row.tempPath
+        };
+        parseXml(BaseTemplatePathDTO).then(res => {
+          var XmlEntityMap = res.data.data;
+          if (XmlEntityMap != null) {
+            var BaseTemplateBTO = {};
+            Vue.set(BaseTemplateBTO, "baseTemplate", row);
+            Vue.set(BaseTemplateBTO, "xmlEntityMap", XmlEntityMap);
+
+            addObj(BaseTemplateBTO).then(repsonse => {
+              this.refreshChange();
+            });
           }
         });
       });

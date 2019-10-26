@@ -3,855 +3,494 @@
     <div class="dispose_btn">
       <el-button type="primary" plain size="mini" @click.native="handleSavePro">保存</el-button>
       <!-- <el-button type="primary" icon="el-icon-share">静态检查</el-button> -->
-      <el-button type="primary" plain size="mini" :disabled="isAble" @click="softwareClick">软硬件映射</el-button>
+      <el-button type="primary" plain size="mini" :disabled="isAble" @click="softwareClick">软硬件配置</el-button>
     </div>
     <el-row class="admin_dispose_row">
-      <el-col :span="10" class="admin_dispose_left">
-        <div class="grid-content">
-          <!-- 方案路径-->
-          <el-input class="dispose_inp1_hidden" v-model="inputPath" hidden></el-input>
-          <!-- <el-input v-model="entity.xmlEntitys[0].attributeNameValue" class="dispose_inp1_hidden"></el-input> -->
-
-          <div class="div1">
-            <div align="center" class="dispose_tit">
-              <span class="fontsize2">裕量</span>
-            </div>
-            <!-- 引用自定义组件 -->
-            <!-- ：type自定义的，:type="margin"参数名；:type="'margin'"字符串 -->
-            <!-- <show-input :component="component" :show="true" :type="'margin'" @model-change="handleEditPro"></show-input> -->
-            <!-- 裕量的回显################################################################### -->
-            <div class="dispose_form1">
-              <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" label-width="82px">
-                <el-form-item
-                  v-for="(domain, index) in dynamicValidateForm.domains"
-                  :label="domain.lableName"
-                  :key="domain.key"
-                  :prop="'domains.' + index + '.value'"
+      <el-form ref="form" label-width="100px">
+        <el-col :span="10" class="admin_dispose_left">
+          <div id="box">
+            <div class="div1">
+              <!-- 引用自定义组件 -->
+              <template v-for="(params,index) in form.xmlEntityMaps">
+                <div
+                  class="admin_dispose_14s"
+                  v-if="analysisConfigureType(params).lableType === 'form'"
+                  :key="index"
                 >
-                  <el-input v-model="domain.attributeNameValue"></el-input>
-                </el-form-item>
-              </el-form>
-            </div>
-          </div>
-
-          <div class="div1">
-            <div align="center" class="dispose_tit">
-              <span class="fontsize2">标识</span>
-            </div>
-            <!-- <show-selects v-bind:message="sig" :component="component" v-bind:choose="identification" :show="true" :type="'identification'" @model-change="handleEditPro"></show-selects> -->
-            <!-- 标识的回显################################################################### -->
-            <div class="dispose_form1">
-              <el-form :model="identificationForm" ref="identificationForm" label-width="82px">
-                <el-form-item
-                  v-for="(domain, index) in identificationForm.domains"
-                  :label="domain.lableName"
-                  :key="domain.key"
-                  :prop="'domains.' + index + '.value'"
-                  :rules="{
-              required: true, message: '域名不能为空', trigger: 'blur'
-            }"
-                >
-                  <el-select v-model="domain.attributeNameValue" placeholder="请选择">
-                    <template v-if="domain.lableName==='优化目标'">
-                      <el-option
-                        v-for="item in messageTarget"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                      >
-                        <span class="fl_14s">{{ item.label }}</span>
-                        <span class="fr_14s fontsize1">{{ item.value }}</span>
-                      </el-option>
-                    </template>
-                    <template v-if="domain.lableName==='映射功能'">
-                      <el-option
-                        v-for="item in messageResult"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                      >
-                        <span class="fl_14s">{{ item.label }}</span>
-                        <span class="fr_14s fontsize1">{{ item.value }}</span>
-                      </el-option>
-                    </template>
-                  </el-select>
-                </el-form-item>
-              </el-form>
-            </div>
-          </div>
-
-          <div class="div1">
-            <div align="center" class="dispose_tit">
-              <span class="fontsize2">系统验证参数</span>
-            </div>
-            <div class="dispose_form1">
-              <!--<show-input :component="component"  :show="true" :type="'parameter'" @model-change="handleEditPro"></show-input> -->
-              <!-- 系统验证参数的回显################################################################### -->
-              <el-form :model="parameterForm" ref="parameterForm" label-width="82px">
-                <el-form-item
-                  v-for="(domain, index) in parameterForm.domains"
-                  :label="domain.lableName"
-                  :key="domain.key"
-                  :prop="'domains.' + index + '.value'"
-                >
-                  <el-input v-model="domain.attributeNameValue"></el-input>
-                </el-form-item>
-              </el-form>
-            </div>
-          </div>
-
-          <span>&nbsp;&nbsp;</span>
-        </div>
-      </el-col>
-
-      <hr class="dispose_grid_hr_14s" />
-
-      <el-col :span="13" class="admin_dispose_right">
-        <div class="grid-content dispose_grid_14s">
-          <div class="dispose_grid_tit">
-            <span class="fontsize2">工作模式</span>
-          </div>
-          <!-- 工作模式的属性值-->
-          <div class="dispose_grid_form">
-            <el-input v-model="processName" size="mini" hidden></el-input>
-            <el-form :model="form" label-width="82px" :inline="false">
-              <el-form-item label="参数路径：">
-                <el-input v-model="actions" size="mini" :disabled="true"></el-input>
-
-                <el-upload
-                  action="/pro/manager/getWorking"
-                  :on-change="testOnChange"
-                  class="upload-demo inline-block"
-                  multiple
-                  :show-file-list="false"
-                  :http-request="customFileUpload"
-                >
-                  <el-button size="mini" plain type="primary" icon="el-icon-search"></el-button>
-                </el-upload>
-              </el-form-item>
-            </el-form>
-
-            <el-form :inline="false" label-width="82px" class="demo-form-inline">
-              <!-- 获取的直接显示 -->
-              <el-form-item label="流程名：">
-                <!-- <el-input v-model="entity.xmlEntitys[4].xmlEntitys[1].attributeNameValue" size="mini" :disabled="true" ></el-input> -->
-                <el-input v-model="processName" size="mini" :disabled="true"></el-input>
-              </el-form-item>
-            </el-form>
-
-            <div class="div2">
-              <div class="dispose_grid_tit">
-                <span class="fontsize2">内存空间</span>
-              </div>
-              <label></label>
-              <!-- <show-select v-bind:message="spa" :component="component" v-bind:choose="space" :show="true" :type="'space'" @model-changes="handleEditPro2"></show-select> -->
-              <!-- 内存空间的回显################################################################### -->
-              <div class="dispose_grid_form_inp">
-                <el-form :model="spaceForm" ref="spaceForm" label-width="82px">
+                  <div align="center" class="dispose_tit">
+                    <span class="fontsize2">{{params.lableName}}</span>
+                  </div>
                   <el-form-item
-                    v-for="(domain, index) in spaceForm.domains"
-                    :label="domain.lableName"
-                    :key="domain.key"
-                    :prop="'domains.' + index + '.value'"
+                    v-for=" (showParam,$index) in analysisAttrConfigType(params.xmlEntityMaps)"
+                    :label="showParam.attrMappingName"
+                    :key="$index"
                   >
-                    <el-input v-model="domain.attributeNameValue"></el-input>
+                    <form-item-type
+                      v-model="showParam.lableName"
+                      :lableType="showParam.attrConfigType"
+                      :dictKey="showParam.dataKey"
+                      :multiple="showParam.multiple"
+                      placeholder="请选择"
+                      @change="itemTypeChange(showParam,params.xmlEntityMaps,params)"
+                    ></form-item-type>
                   </el-form-item>
-                </el-form>
-              </div>
+                </div>
+              </template>
             </div>
-
-            <div class="dispose_grid_select">
-              <el-form :inline="false" label-width="82px" class="demo-form-inline">
-                <el-form-item label="起始构件：">
-                  <!-- <el-select v-model="entity.xmlEntitys[4].xmlEntitys[4].attributeNameValue" placeholder="请选择" size="mini"> -->
-                  <el-select v-model="selectBegin" placeholder="请选择" @change="changeComponent()">
-                    <!-- <el-option label="构件1" value="begin1">
-                  </el-option>
-                    <el-option label="构件2" value="begin2"></el-option>-->
-                    <el-option
-                      v-for="item in selectComponent"
-                      :key="item.value"
-                      :label="item.label + ',' + item.value"
-                      :value="item.value"
-                    >
-                      <span class="fl_14s">{{ item.label }}</span>
-                      <span class="fr_14s fontsize1">{{ item.value }}</span>
-                    </el-option>
-                  </el-select>
+          </div>
+        </el-col>
+        <hr class="dispose_grid_hr_14s" />
+        <el-col :span="13" class="admin_dispose_right">
+          <div class="grid-content dispose_grid_14s" id="box">
+            <template v-for="(params,index) in form.xmlEntityMaps">
+              <div
+                class="admin_dispose_14s"
+                v-if="analysisConfigureType(params).lableType == 'tabTS'"
+                :key="index"
+              >
+                <div align="center" class="dispose_tit">
+                  <span class="fontsize2">{{params.lableName}}</span>
+                </div>
+                <el-form-item
+                  v-for=" (showParam,$index) in analysisAttrConfigType(params.xmlEntityMaps)"
+                  :label="showParam.attrMappingName"
+                  :key="$index"
+                >
+                  <form-item-type
+                    v-model="showParam.lableName"
+                    :lableType="showParam.attrConfigType"
+                    :dictKey="selectComponent"
+                    :multiple="showParam.multiple"
+                    @change="itemTypeChange(showParam,params.xmlEntityMaps,form)"
+                    @fileChange="customFileUpload"
+                  ></form-item-type>
                 </el-form-item>
-              </el-form>
-            </div>
-
-            <el-form :inline="false" label-width="82px" class="demo-form-inline">
-              <el-form-item label="结束构件：">
-                <!-- <el-select v-model="entity.xmlEntitys[4].xmlEntitys[5].attributeNameValue" placeholder="请选择" size="mini"> -->
-                <el-select v-model="selectEnd" placeholder="请选择" @change="changeComponent()">
-                  <el-option
-                    v-for="item in selectComponent"
-                    :key="item.value"
-                    :label="item.label + ',' + item.value"
-                    :value="item.value"
-                  >
-                    <span class="fl_14s">{{ item.label }}</span>
-                    <span class="fr_14s fontsize1">{{ item.value }}</span>
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-form>
-
-            <div class="div2">
-              <div class="dispose_grid_tit">
-                <span class="fontsize2">特殊处理</span>
-                <el-button
-                  @click="addDomain"
-                  type="primary"
-                  plain
-                  icon="el-icon-plus"
-                  size="small"
-                >新增</el-button>
-              </div>
-              <label></label>
-              <!-- <show-handle v-bind:message="han1" :component="component" :show="true" v-bind:choose="handle1" :type="'handle1'" @model-changess="handleEditPro3"></show-handle> -->
-              <!--特殊处理的回显###################################################################  -->
-
-              <div class="dispose_grid_tscl">
-                <el-form :model="handlerForm" ref="handlerForm">
-                  <el-form-item
-                    v-for="(domain, index) in handlerForm.domains"
-                    :label="domain.lableName"
-                    :key="domain.key"
-                    :prop="'domains.' + index + '.value'"
-                    :rules="{
-                  required: true, message: '域名不能为空', trigger: 'blur'
-                }"
-                  >
-                    <br />
-                    <div class="dispose_grid_select">
-                      <el-form label-width="82px">
-                        <el-form-item label="构件名">
-                          <el-select
-                            v-model="domain.xmlEntitys[0].attributeNameValue"
-                            multiple
-                            placeholder="请选择构件名"
-                          >
-                            <el-option
-                              @click.native.prevent="editParamxz(domain)"
-                              v-for="item in selectComponent"
-                              :key="item.value"
-                              :label="item.label + ',' + item.value"
-                              :value="item.label"
-                            >
-                              <span class="fl_14s">{{ item.label }}</span>
-                              <span class="fr_14s fontsize1">{{ item.value }}</span>
-                            </el-option>
-                          </el-select>
-                          <el-button
-                            class="dispose_grid_del"
-                            plain
-                            @click.prevent="removeDomain(domain)"
-                          >删除</el-button>
-                        </el-form-item>
-                      </el-form>
+                <template v-for=" (showParam,index) in params.xmlEntityMaps">
+                  <template v-if="analysisConfigureType(showParam).lableType === 'tabTS'">
+                    <div align="center" class="dispose_tit" :key="index">
+                      <span class="fontsize2">{{showParam.lableName}}</span>
                     </div>
-                  </el-form-item>
-                </el-form>
-              </div>
-            </div>
+                    <el-form-item
+                      v-for=" (param,$index) in analysisAttrConfigType(showParam.xmlEntityMaps)"
+                      :label="param.attrMappingName"
+                      :key="$index"
+                    >
+                      <form-item-type
+                        v-model="param.lableName"
+                        :lableType="param.attrConfigType"
+                        :dictKey="selectComponent"
+                        @change="itemTypeChange(param,showParam.xmlEntityMaps,form)"
+                      ></form-item-type>
+                      <!-- :multiple="param.multiple" -->
+                    </el-form-item>
+                  </template>
+                </template>
 
-            <div class="dispose_grid_radio">
-              <el-form :inline="true" class="demo-form-inline">
-                <el-form-item label="是否进行软硬件映射：">
-                  <!-- <el-radio-group v-model="entity.xmlEntitys[4].xmlEntitys[7].attributeNameValue" size="medium" @change="handleEditPros"> -->
-                  <el-radio-group v-model="whether" size="medium">
-                    <el-radio label="Y"></el-radio>
-                    <el-radio label="N"></el-radio>
-                  </el-radio-group>
-                </el-form-item>
-              </el-form>
-            </div>
+                <template v-for=" (showParam,showName) in specalHandleData">
+                  <div align="center" class="dispose_tit" :key="showName">
+                    <span class="fontsize2">{{showName}}</span>
+                  </div>
+                  <el-form-item :label="showParam.attrMappingName" :key="showName">
+                    <!-- {{showParam.lableName}}{{showParam.dataKey}} -->
+                    <form-item-type
+                      v-model="showParam.lableName"
+                      :lableType="showParam.attrConfigType"
+                      :dictKey="showParam.dataKey"
+                      :multiple="showParam.multiple"
+                    ></form-item-type>
+                  </el-form-item>
+                </template>
+              </div>
+            </template>
           </div>
-        </div>
-      </el-col>
+        </el-col>
+      </el-form>
     </el-row>
   </div>
 </template>
 <script>
+import formItemType from "@/views/comp/code-editor/comp-params/form-item-type";
 import showSelect from "@/views/admin/dispose/showSelect";
 import showInput from "@/views/admin/dispose/showInput";
 import showSelectSingle from "@/views/admin/dispose/showSelectSingle";
 import showHandle from "@/views/admin/dispose/showHandle";
 import {
+  handlerSaveSysXml,
   handleSavePro,
   rollbackDispose,
   getProcessName,
-  getSoftProcessFilePath,
   getFilePathListById,
   getSysConfigXmlEntityMap,
   getProcessFilePathById,
+  getSoftProcessFilePath,
   getWorking
 } from "@/api/pro/manager";
 import { getDictValue, remote } from "@/api/admin/dict";
+import { mapGetters } from "vuex";
 
 export default {
   components: {
     "show-select": showSelect,
     "show-selects": showSelectSingle,
     "show-input": showInput,
-    "show-handle": showHandle
+    "show-handle": showHandle,
+    "form-item-type": formItemType
   },
   datas: [],
   data() {
     return {
-      inputPath: "方案路径1",
-      selectBegin: "",
-      selectEnd: "",
+      form: {},
+      baseSpecalHandle: {},
+      baseSpecalHandles: [],
+      // baseSpecalHandless: {},
+      specalHandleData: {},
+      //结束构件函数名
       selectEndFunctionName: "",
+      //起始构件函数名
       selectBeginFunctionName: "",
-      selectEndCompId: "",
-      selectBeginCompId: "",
-      whether: "",
-      //裕量的form
-      dynamicValidateForm: {
-        domains: []
-      },
-      dynamicValidateForms: {},
-      //系统验证参数的form
-      parameterForm: {
-        domains: []
-      },
-      //内存空间的form
-      spaceForm: {
-        domains: []
-      },
-      //标识的form
-      identificationForm: {
-        domains: []
-      },
-      //特殊处理的form
-      handlerForm: {
-        domains: []
-      },
-      messageResult: [],
-      messageTarget: [],
-      length: "",
-      arrays: [],
-      xml: {
-        // lableName: "",
-        xmlEntitys: []
-      },
-      xmlValues: [],
-      xmlValue: [],
-      res: [
-        {
-          lableName: "",
-          xmlEntitys: [
-            {
-              lableName: "构件名",
-              attributeName: "name",
-              attributeNameValue: []
-            }
-          ]
-        }
-      ],
-      //构件的选择
-      selectComponent: [
-        // {
-        //   label: "构件1",
-        //   value: "nodeId1"
-        // },
-        // {
-        //   label: "构件2",
-        //   value: "nodeId2"
-        // }
-      ],
-
-      xmlMaps: {
-        lableName: "root",
-        attributeMap: "",
-        xmlEntityMaps: [
-          {
-            lableName: "方案路径",
-            attributeMap: {},
-            xmlEntityMaps: []
-          },
-          {
-            lableName: "标识",
-            attributeMap: {},
-            xmlEntityMaps: []
-          },
-          {
-            lableName: "裕量",
-            attributeMap: {},
-            xmlEntityMaps: []
-          },
-          {
-            lableName: "系统验证参数",
-            attributeMap: {},
-            xmlEntityMaps: []
-          },
-          {
-            lableName: "工作模式",
-            attributeMap: {},
-            xmlEntityMaps: [
-              {
-                lableName: "参数路径",
-                attributeMap: {},
-                xmlEntityMaps: []
-              },
-              {
-                lableName: "流程名",
-                attributeMap: {},
-                xmlEntityMaps: []
-              },
-              {
-                lableName: "流程文件",
-                attributeMap: {},
-                xmlEntityMaps: []
-              },
-              {
-                lableName: "内存空间",
-                attributeMap: {},
-                xmlEntityMaps: []
-              },
-              {
-                lableName: "起始构件",
-                attributeMap: {},
-                xmlEntityMaps: []
-              },
-              {
-                lableName: "结束构件",
-                attributeMap: {},
-                xmlEntityMaps: []
-              }
-            ]
-          }
-        ]
-      },
-
-      message: [],
-      isAble: true,
-      component: {},
-      entity: {
-        lableName: "root",
-
-        xmlEntitys: [
-          {
-            lableName: "方案路径",
-            attributeName: "name",
-            attributeNameValue: ""
-          },
-          {
-            lableName: "标识",
-            xmlEntitys: []
-          },
-          {
-            lableName: "裕量",
-            xmlEntitys: []
-          },
-          {
-            lableName: "系统验证参数",
-            xmlEntitys: []
-          },
-          {
-            lableName: "工作模式",
-            attributeName: "name",
-            attributeNameValue: "",
-            xmlEntitys: [
-              {
-                lableName: "参数路径",
-                attributeName: "name",
-                attributeNameValue: ""
-              },
-              {
-                lableName: "流程名",
-                attributeName: "name",
-                attributeNameValue: ""
-              },
-              {
-                lableName: "流程文件",
-                attributeName: "name",
-                attributeNameValue: ""
-              },
-              {
-                lableName: "内存空间",
-                xmlEntitys: []
-              },
-              {
-                lableName: "起始构件",
-                attributeName: "name",
-                attributeNameValue: "",
-                attributeCompId: "compId",
-                attributeCompIdValue: ""
-              },
-              {
-                lableName: "结束构件",
-                attributeName: "name",
-                attributeNameValue: "",
-                attributeCompId: "compId",
-                attributeCompIdValue: ""
-              },
-              {
-                lableName: "是否进行软硬件映射",
-                attributeName: "name",
-                attributeNameValue: ""
-              }
-            ]
-          }
-        ]
-      },
       //流程文件
       workModeFilePath: "",
       //方案路径
       planFilePath: "",
+      planFilePaths: "方案路径",
+      workModeFilePaths: "流程文件",
+      //流程名
       processName: "",
-      actions: "",
-      handle1: "handle1",
-      space: "space",
-      identification: "signals",
-      sig: [],
-      spa: [],
-      han1: [],
-      domain: {},
-      upon: "",
-      form: {
-        name: ""
-      }
+      processNames: "流程名",
+      //"是否进行软硬件映射"
+      yesORno: "是否进行软硬件映射",
+      //"工作模式"
+      workModel: "工作模式",
+      //构件名下拉选
+      selectComponent: [],
+      //工作模式id
+      flowId: "",
+      //特殊处理多选构件数组
+      specalHandleSelect: [],
+      isAble: true
     };
   },
+
+  watch: {
+    specalHandleData: {
+      // immediate: true,
+      handler: function(specalHandleData) {
+        let baseData = JSON.parse(JSON.stringify(this.baseSpecalHandle));
+        let tmpHandle = JSON.parse(JSON.stringify(this.baseSpecalHandles));
+        for (let items of tmpHandle) {
+          items.xmlEntityMaps = [];
+          for (let val in specalHandleData) {
+            let tmpData = [];
+            for (let item of specalHandleData[val].lableName) {
+              if (val === items.lableName) {
+                baseData.attributeMap.name = item;
+                items.xmlEntityMaps.push(JSON.parse(JSON.stringify(baseData)));
+              }
+            }
+          }
+        }
+        let tmpForm = JSON.parse(JSON.stringify(this.form.xmlEntityMaps));
+        for (let item of tmpForm) {
+          if (item.xmlEntityMaps != null) {
+            for (let items of item.xmlEntityMaps) {
+              //给特殊处理赋值
+              let ty = this.analysisConfigureType(items);
+              if (ty.lableType === "specalHandle") {
+                for (let tmp in tmpHandle) {
+                  if (tmpHandle[tmp].lableName === items.lableName) {
+                    this.$set(
+                      items,
+                      "xmlEntityMaps",
+                      tmpHandle[tmp].xmlEntityMaps
+                    );
+                  }
+                }
+              }
+            }
+          }
+        }
+        this.form.xmlEntityMaps = tmpForm;
+      },
+      deep: true
+    }
+  },
+
   created() {
-    //获取下拉列表的值
-    remote("softToHardConfig_result").then(res => {
-      this.messageResult = res.data.data;
-    });
-    remote("softToHardConfig_target").then(res => {
-      this.messageTarget = res.data.data;
-    });
+    this.$store.dispatch("setChineseMapping", "hsm_param_type");
     getSoftProcessFilePath(this.$route.query.proId).then(val => {
-      console.log("BBBBBB:", val);
       this.workModeFilePath = val.data.data.split("@###@###@@")[0];
       this.planFilePath = val.data.data.split("@###@###@@")[1];
-    }),
-      //获取构件名
-      getProcessFilePathById(this.$route.query.proId)
-        .then(val => {
-          console.log("aaaa::::===", val);
-          this.selectComponent = [];
-          if (val.data.data != null) {
-            for (let item of val.data.data) {
-              let selectComp = {};
-              selectComp.label = item.compName;
-              selectComp.value = item.compId;
-              selectComp.functionName = item.functionName;
-              selectComp.compId = item.compId;
-              this.selectComponent.push(selectComp);
+    });
+    //获取流程名
+    getProcessName(this.$route.query.pareId)
+      .then(val => {
+        this.processName = val.data.data.fileName;
+        this.flowId = val.data.data.flowId;
+      })
+      .then(Response => {
+        //map
+        getSysConfigXmlEntityMap(this.$route.query.proId).then(Response => {
+          this.form = Response.data.data;
+          //给方案路径赋值
+          for (let item of this.form.xmlEntityMaps) {
+            if (item.lableName === this.planFilePaths) {
+              item.attributeMap.name = this.planFilePath;
             }
-          } else {
-            this.$message.error("缺少流程配置文件，请先配置流程。");
           }
-        })
-        .then(val => {
-          getProcessName(this.$route.query.pareId).then(val => {
-            this.processName = val.data.data.fileName;
-          });
-          rollbackDispose(this.$route.query.proId).then(val => {
-            console.log("77777", val.data.data);
-            //方案路径的回显
-            // this.inputPath=val.data.data.xmlEntitys[0].attributeNameValue;
-            //参数路径的回显
-            this.actions =
-              val.data.data.xmlEntitys[4].xmlEntitys[0].attributeNameValue;
-            //流程名的回显
-            // this.processName = this.$route.query.processName;
-            //起始构件的回显
-            console.log("function:::", this.selectComponent);
-            for (let item of this.selectComponent) {
+          let selectVal = {};
+          for (let item of this.form.xmlEntityMaps) {
+            if (item.lableName === this.workModel) {
+              item.attributeMap.name = this.processName;
               if (
-                val.data.data.xmlEntitys[4].xmlEntitys[4]
-                  .attributeCompIdValue === item.compId
+                item.attributeMap.SN === null ||
+                item.attributeMap.SN === undefined
               ) {
-                this.selectBegin = item.label + "," + item.value;
-                this.selectBeginFunctionName = item.functionName;
-                this.selectBeginCompId = item.compId;
+              } else {
+                item.attributeMap.SN = this.flowId;
               }
             }
-            // this.selectBegin =
-            //   val.data.data.xmlEntitys[4].xmlEntitys[4].attributeNameValue;
-            //结束构件的回显
-            for (let item of this.selectComponent) {
-              console.log(
-                item,
-                val.data.data.xmlEntitys[4].xmlEntitys[5].attributeCompIdValue
-              );
-              if (
-                val.data.data.xmlEntitys[4].xmlEntitys[5]
-                  .attributeCompIdValue === item.compId
-              ) {
-                this.selectEnd = item.label + "," + item.value;
-                this.selectEndFunctionName = item.functionName;
-                this.selectEndCompId = item.compId;
-              }
-            }
+            if (item.xmlEntityMaps != null) {
+              let tmpVal = {};
+              for (let items of item.xmlEntityMaps) {
+                //给流程文件赋值
+                if (items.lableName === this.workModeFilePaths) {
+                  items.attributeMap.name = this.workModeFilePath;
+                }
+                //给流程名赋值
+                if (items.lableName === this.processNames) {
+                  items.attributeMap.name = this.processName;
+                }
+                if (
+                  this.analysisConfigureType(items).lableType === "specalHandle"
+                ) {
+                  //基础的SpecalHandle
+                  // this.baseSpecalHandle = items.xmlEntityMaps[0];
+                  this.baseSpecalHandle = items.xmlEntityMaps[0];
+                  this.baseSpecalHandles.push(items);
 
-            // this.selectEnd =
-            //   val.data.data.xmlEntitys[4].xmlEntitys[5].attributeNameValue;
-            //是否进行软硬件映射的回显
-            this.whether =
-              val.data.data.xmlEntitys[4].xmlEntitys[6].attributeNameValue;
-            //裕量的回显
-            val.data.data.xmlEntitys[2].xmlEntitys.forEach(element => {
-              this.dynamicValidateForm.domains.push({
-                lableName: element.lableName,
-                attributeName: "name",
-                attributeNameValue: element.attributeNameValue
-              });
-            });
-            //系统验证参数的回显
-            val.data.data.xmlEntitys[3].xmlEntitys.forEach(element => {
-              this.parameterForm.domains.push({
-                lableName: element.lableName,
-                attributeName: "name",
-                attributeNameValue: element.attributeNameValue
-              });
-            });
-            //内存空间的回显
-            val.data.data.xmlEntitys[4].xmlEntitys[3].xmlEntitys.forEach(
-              element => {
-                this.spaceForm.domains.push({
-                  lableName: element.lableName,
-                  attributeName: "name",
-                  attributeNameValue: element.attributeNameValue
-                });
-              }
-            );
-            //标识的回显
-            val.data.data.xmlEntitys[1].xmlEntitys.forEach(element => {
-              //从字典里获取标识的值
-              getDictValue("signals").then(response => {
-                //给标识赋值
-                this.message = response.data.data;
-              });
-              this.identificationForm.domains.push({
-                lableName: element.lableName,
-                attributeName: "name",
-                attributeNameValue: element.attributeNameValue
-              });
-            });
-            //特殊处理的回显
-            this.indexs = "";
-            //var index;
-            for (let item of val.data.data.xmlEntitys[4].xmlEntitys) {
-              this.indexs = val.data.data.xmlEntitys[4].xmlEntitys.indexOf(
-                item
-              );
-              if (this.indexs > 6) {
-                length = this.indexs - 6;
-                this.arrays = val.data.data.xmlEntitys[4].xmlEntitys.slice(
-                  -length
-                );
+                  getProcessFilePathById(this.$route.query.proId).then(val => {
+                    //处理处理属性是否显示及中英文映射
+                    let vals = this.analysisAttrConfigType(items.xmlEntityMaps);
+                    //处理多个属性名的值
+                    let a = [];
+                    for (let val of vals) {
+                      tmpVal = JSON.parse(JSON.stringify(val));
+                      a.push(val.lableName);
+                    }
+                    let selectComponent = [];
+                    if (val.data.data != null) {
+                      for (let item of val.data.data) {
+                        let selectComp = {};
+                        selectComp.label = item.compName;
+                        selectComp.value = item.functionName;
+                        selectComp.rightShowName = item.compId;
+                        selectComp.rightName = item.compId;
+                        selectComp.functionName = item.functionName;
+                        selectComp.compId = item.compId;
+                        selectComponent.push(selectComp);
+                      }
+                      //设置下拉框的值
+                      tmpVal.dataKey = selectComponent;
+                      tmpVal.lableName = a;
+                      //设置特殊处理的值
+                      this.$set(selectVal, items.lableName, tmpVal);
+                    } else {
+                      this.$message.error("缺少流程配置文件，请先配置流程。");
+                    }
+                  });
+                }
               }
             }
-            // 对取到的特殊处理数组分析
-            for (var i = 0; i < length; i++) {
-              // 下拉列表值组装
-              var arr = [];
-              this.arrays[i].xmlEntitys.forEach(element => {
-                //console.log("element",element);
-                arr.push(element.attributeNameValue);
-              });
-              this.res[0].lableName = this.arrays[i].lableName;
-              this.res[0].xmlEntitys[0].lableName = this.arrays[i].lableName;
-              this.res[0].xmlEntitys[0].attributeName = this.arrays[
-                i
-              ].attributeName;
-              this.res[0].xmlEntitys[0].attributeNameValue = JSON.parse(
-                JSON.stringify(arr)
-              );
-              this.handlerForm.domains.push(
-                JSON.parse(JSON.stringify(this.res[0]))
-              );
-
-              this.specialHandle();
-            }
-          });
+          }
+          this.specalHandleData = selectVal;
         });
+      });
   },
 
   //监听属性 类似于data概念
-  computed: {},
+  computed: {
+    ...mapGetters(["compChineseMapping"]),
+    copyForm() {
+      return JSON.parse(JSON.stringify(this.form));
+    }
+  },
   //监控data中的数据变化
-  watch: {},
+  // watch: {},
   //方法集合
   methods: {
-    customFileUpload(event) {
+    customFileUpload(xx, event) {
       var formData = new FormData();
       formData.append("file", event.file);
       getWorking(formData, this.processName, this.$route.query.pareId);
-      console.log("111111", this.$route.query);
+    },
+    itemTypeChange(fromParam, toParam, form) {
+      toParam.forEach(item => {
+        this.attributeAssignmen(
+          item,
+          this.analysisConfigureType(fromParam),
+          fromParam.lableName
+        );
+      });
+    },
+    //给属性赋值---回写
+    attributeAssignmen(tabParam, configureType, lableName) {
+      for (let key in tabParam.attributeMap) {
+        configureType.attrs.forEach(attr => {
+          if (
+            tabParam.lableName === configureType.lableName &&
+            key === attr.attrName
+          ) {
+            tabParam.attributeMap[key] = lableName;
+          }
+        });
+      }
+    },
+    //处理中英文映射
+    //处理属性是否显示及中英文映射
+    analysisAttrConfigType(attra) {
+      var attrs = [];
+      for (let attr of attra) {
+        //     //标签名是否要中英文映射
+        var attrObj = eval("(" + attr.attributeMap.configureType + ")");
+        let showName;
+        if (attrObj.lableMapping) {
+          //基于标签名
+          let val = this.compChineseMapping.find(item => {
+            return item.label === attrObj.attrKeys;
+          });
+          let param = this.compChineseMapping.find(item => {
+            return item.id === attrObj.mappingKeys;
+          });
+          showName =
+            param === undefined
+              ? val === undefined
+                ? attr.attrName
+                : val.value
+              : param.label;
+        } else {
+          showName = attr.lableName;
+        }
+        if (attr.hasOwnProperty("attributeMap") && attr.attributeMap !== null) {
+          var attrObj = eval("(" + attr.attributeMap.configureType + ")");
+          if (attrObj.hasOwnProperty("attrs")) {
+            attrObj.attrs.forEach(con => {
+              //排除不显示的属性
+              if (con.isShow) {
+                con.lableName = attr.attributeMap[con.attrName];
+                if (con.hasOwnProperty("attrMapping") && con.attrMapping) {
+                  //基于标签名
+                  let val = this.compChineseMapping.find(item => {
+                    return item.label === con.attrKeys;
+                  }); /* 基于id */ // con.attrMappingName = val === undefined ? con.attrName : val.value;
+                  let valParam = this.compChineseMapping.find(item => {
+                    return item.id === con.attrKeys;
+                  });
+                  con.attrMappingName =
+                    valParam === undefined
+                      ? val === undefined
+                        ? con.attrName
+                        : val.value
+                      : valParam.label;
+                } else if (attrObj.attrs.length == 1) {
+                  con.attrMappingName = showName;
+                } else {
+                  con.attrMappingName = con.attrName;
+                }
+                //将原有的属性及配置都给附带上
+                con.attributeMap = attr.attributeMap;
+                attrs.push(con);
+              }
+            });
+          } else {
+            //处理没有属性标签
+            attrs.push({
+              attrMappingName: showName,
+              isShow: false,
+              attributeMap: attr.attributeMap,
+              xmlEntityMaps: attr.xmlEntityMaps
+            });
+          }
+        }
+      }
+      return attrs;
+    },
+
+    //处理ConfigureType
+    analysisConfigureType(config) {
+      return eval("(" + config.attributeMap.configureType + ")");
     },
     //软硬件配置
     softwareClick() {
       //调用接口
       getFilePathListById(this.$route.query.proId).then(editor => {
         console.log("this.editor::::", editor.data.data);
-        // simplePlan(editor.data.data).then(response => {
-        //   console.log(";;;;;");
-        // });
-      });
-    },
-    //构件的选择与展示
-    changeComponent() {
-      this.selectComponent.forEach(element => {
-        if (element.value === this.selectEnd) {
-          this.selectEnd = element.label + ", " + element.value;
-          this.selectEndFunctionName = element.functionName;
-          this.selectEndCompId = element.compId;
-        }
-        if (element.value === this.selectBegin) {
-          this.selectBegin = element.label + ", " + element.value;
-          this.selectBeginCompId = element.compId;
-          this.selectBeginFunctionName = element.functionName;
-        }
       });
     },
 
-    editParamxz() {
-      this.specialHandle();
-      console.log("cdcdcdcdcd", this.entity);
-    },
-    //特殊处理的逻辑关系
-    specialHandle() {
-      Object.assign(this.xml, this.$options.data().xml);
-      this.xmlValues = [];
-      for (let item of this.handlerForm.domains) {
-        let index = this.handlerForm.domains.indexOf(item);
-        this.xml.lableName = this.handlerForm.domains[index].lableName;
-        this.xmlValue = [];
-        for (let item of this.handlerForm.domains[index].xmlEntitys[0]
-          .attributeNameValue) {
-          let xmlEntity = {};
-          xmlEntity.lableName = "构件名";
-          xmlEntity.attributeName = "name";
-          xmlEntity.attributeNameValue = item;
-          this.xmlValue.push(xmlEntity);
-        }
-        this.xml.xmlEntitys = this.xmlValue;
-        this.xmlValues.push(JSON.parse(JSON.stringify(this.xml)));
-      }
-    },
-
+    //存软硬件映射信息
     handleSavePro() {
-      //存软硬件映射信息
       const loading = this.$loading({
         lock: true,
         text: "保存软硬件映射信息中。。。",
         spinner: "el-icon-loading",
         background: "rgba(0, 0, 0, 0.7)"
       });
-      console.log("cdcdcdcdc:::", this.entity);
-      //给方案路径赋值
-      this.entity.xmlEntitys[0].attributeNameValue = this.planFilePath;
-      //给起始构件赋值(存到xml中的是构件函数名)
-      this.entity.xmlEntitys[4].xmlEntitys[4].attributeNameValue = this.selectBeginFunctionName;
-      this.entity.xmlEntitys[4].xmlEntitys[4].attributeCompIdValue = this.selectBeginCompId;
-      //给结束构件赋值
-      // this.entity.xmlEntitys[4].xmlEntitys[5].attributeNameValue = this.selectEnd.split(
-      //   ","
-      // )[0];
-      this.entity.xmlEntitys[4].xmlEntitys[5].attributeNameValue = this.selectEndFunctionName;
-      this.entity.xmlEntitys[4].xmlEntitys[5].attributeCompIdValue = this.selectEndCompId;
-      //给是否进行软硬件映射赋值
-      this.entity.xmlEntitys[4].xmlEntitys[6].attributeNameValue = this.whether;
-      //给裕量赋值
-      this.entity.xmlEntitys[2].xmlEntitys = this.dynamicValidateForm.domains;
-      //给系统验证参数赋值
-      this.entity.xmlEntitys[3].xmlEntitys = this.parameterForm.domains;
-      //给工作模式赋值
-      this.entity.xmlEntitys[4].attributeNameValue = this.processName;
-      //给参数路径赋值
-      this.entity.xmlEntitys[4].xmlEntitys[0].attributeNameValue = this.actions;
-      //给流程名赋值
-      this.entity.xmlEntitys[4].xmlEntitys[1].attributeNameValue = this.processName;
-      //给流程文件赋值
-      this.entity.xmlEntitys[4].xmlEntitys[2].attributeNameValue = this.workModeFilePath;
-      //给内存空间赋值
-      this.entity.xmlEntitys[4].xmlEntitys[3].xmlEntitys = this.spaceForm.domains;
-      //给标志赋值
-      this.entity.xmlEntitys[1].xmlEntitys = this.identificationForm.domains;
-      //初始时“软硬件配置”按钮禁用，点击保存之后，若“是否进行软硬件映射”为‘Y’，则“软硬件配置”按钮可用
-      if (this.entity.xmlEntitys[4].xmlEntitys[6].attributeNameValue == "Y") {
-        this.isAble = false;
-      }
-      //给特殊处理赋值;取特殊处理回显的值
-      this.specialHandle();
-      for (let item of this.xmlValues) {
-        console.log("item::::--", item);
-        this.entity.xmlEntitys[4].xmlEntitys.push(item);
+      for (let item of this.form.xmlEntityMaps) {
+        if (item.lableName === this.workModel) {
+          if (item.xmlEntityMaps != null) {
+            for (let items of item.xmlEntityMaps) {
+              //给流程文件赋值
+              if (
+                items.lableName === this.yesORno &&
+                items.attributeMap.name === "true"
+              ) {
+                this.isAble = false;
+              }
+            }
+          }
+        }
       }
 
-      console.log("33333", this.entity);
-      //存构件基本信息
-      //console.log("458487989+8", JSON.stringify(this.entity));
-      console.log("this.proid:::", this.$route.query.proId);
-      handleSavePro(this.entity, this.$route.query.proId)
-        .then(editor => {
-          setTimeout(() => {
-            loading.close();
-            this.$message({
-              showClose: true,
-              message: "保存成功",
-              type: "success"
-            });
-          }, 500);
-          //TODO:跳转路由
-          //  this.$router.push({ path: this.tagWel.value });
-        })
-        .catch(() => {
-          //this.refreshCode();
-        });
-    },
-
-    //配置参数路径
-    testOnChange(file) {
-      console.log(file);
-      this.actions = "./" + file.name;
-      //组装xml格式
-      this.entity.xmlEntitys[4].xmlEntitys[0].attributeNameValue = this.actions;
-    },
-
-    addDomain() {
-      this.$prompt("请输入特殊处理的标签名", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        inputPattern: /\S/,
-        inputErrorMessage: "不能为空！"
-      })
-        //解决新增问题，新增的要和回显的数据使用保存一致
-        .then(({ value }) => {
-          this.res[0].lableName = value;
-          this.res[0].xmlEntitys[0].lableName = "";
-          this.res[0].xmlEntitys[0].attributeName = "";
-          this.res[0].xmlEntitys[0].attributeNameValue = "";
-          this.handlerForm.domains.push(
-            JSON.parse(JSON.stringify(this.res[0]))
-          );
-        })
-        .catch(() => {
+      //保存xmlMap
+      handlerSaveSysXml(this.form, this.$route.query.proId).then(editor => {
+        setTimeout(() => {
+          loading.close();
           this.$message({
-            type: "info",
-            message: "取消输入"
+            showClose: true,
+            message: "保存成功",
+            type: "success"
           });
-        });
-    },
-    //删除一个特殊处理
-    removeDomain(item) {
-      var index = this.handlerForm.domains.indexOf(item);
-      if (index !== -1) {
-        this.handlerForm.domains.splice(index, 1);
-      }
+        }, 500);
+      });
     }
   }
 };
 </script>
 
 <style>
+#box {
+  /* height:calc(50% - 220px); */
+  height: 650px;
+  overflow: auto;
+}
+
+#box::-webkit-scrollbar {
+  width: 6px;
+  height: 16px;
+  background-color: #c3c2c2;
+}
+
+/*定义滚动条轨道 内阴影+圆角*/
+#box::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background-color: #f5f5f5;
+}
+
+/*定义滑块 内阴影+圆角*/
+#box::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: ins0et 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #d0cece;
+}
 </style>

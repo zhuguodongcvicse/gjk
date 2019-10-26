@@ -36,5 +36,7 @@ public interface BaseTemplateMapper extends BaseMapper<BaseTemplate> {
     */
   IPage<BaseTemplate> getBaseTemplatePage(Page page, @Param("baseTemplate") BaseTemplate baseTemplate);
 
+  Integer getMaxVersion (String tempType);
+
 
 }
