@@ -237,7 +237,7 @@ export default {
           let type = this.analysisConfigureType(params).lableType;
           // console.log("params-form.vue预处理层级参数", params,type);
           if (type === "tabTS") {
-            console.log("params-form.vue中预处理层级参数", params);
+            // console.log("params-form.vue中预处理层级参数", params);
             this.isShowCJTableData = true;
             this.$set(this.cjBaseData, key, baseData[key]); //设置基础数据
             if (params.xmlEntityMaps) {
@@ -263,10 +263,7 @@ export default {
     saveXnTableData: {
       handler: function(table) {
         //将性能属性的值返回给父级页面
-        console.log(
-          "paramsFormXmlParamsparamsFormXmlParamsparamsFormXmlParams",
-          table
-        );
+        // console.log("paramsFormXmlParamsparamsFormXmlParamsparamsFormXmlParams",table);
         // this.$emit("change", table, this.paramType);
       },
       deep: true
@@ -274,7 +271,7 @@ export default {
     cjBaseData: {
       handler: function(table) {
         //将性能属性的值返回给父级页面
-        console.log("cjBaseDatacjBaseData将性能属性的值返回给父级页面", table);
+        // console.log("cjBaseDatacjBaseData将性能属性的值返回给父级页面", table);
         this.$emit("change", table, this.paramType);
       },
       deep: true
@@ -326,11 +323,7 @@ export default {
     paramsFormXmlParams: {
       immediate: true,
       handler: function(paramsFormXmlParams) {
-        console.log(
-          "保存的数据。。。。。。",
-          paramsFormXmlParams,
-          this.paramType
-        );
+        // console.log("保存的数据。。。。。。",paramsFormXmlParams,this.paramType);
         //将值返回给父级组件
         this.$emit("change", paramsFormXmlParams, this.paramType);
       },
@@ -343,7 +336,7 @@ export default {
         //层级属性中的所属节点
         let saveStoreData = {}; //所属部件
         let saveStoreTabsData = {};
-        console.log("所属部件所属部件所属部件所属部件", tmpCJData);
+        // console.log("所属部件所属部件所属部件所属部件", tmpCJData);
         for (let key in tmpCJData) {
           if (tmpCJData[key].lableName === "所属部件") {
             saveStoreData = tmpCJData[key];
@@ -352,7 +345,7 @@ export default {
           }
         }
         if (saveStoreData) {
-          console.log("/层级属性中的节点是******所属部件...", saveStoreData);
+          // console.log("/层级属性中的节点是******所属部件...", saveStoreData);
           let findKey =
             this.$route.query.processId + "-" + saveStoreData.attributeMap.name;
           let cjTableSel = [];
@@ -365,7 +358,7 @@ export default {
           };
           this.$store.dispatch("setAnalysisCjUnitParam", { findKey, value });
 
-          console.log("saveStoreTabsData", saveStoreTabsData);
+          // console.log("saveStoreTabsData", saveStoreTabsData);
           let arrayTabData = []; //表格数据
           let arrayColData = []; //表单数据
           // let arrayTabDatax = {};
@@ -394,15 +387,12 @@ export default {
                 }
                 tabData.push(colData);
               }
-              console.log(
-                "将部署配置中的表单arrayColData元素和表格arrayTabData元素合并",
-                arrayColData.concat(tabData)
-              );
+              // console.log("将部署配置中的表单arrayColData元素和表格arrayTabData元素合并",arrayColData.concat(tabData));
               //将部署配置中的表单arrayColData元素和表格arrayTabData元素合并
               this.cjBaseData[key].xmlEntityMaps = arrayColData.concat(tabData);
             }
           }
-          console.log("层级属性中  改变后的数据。。。。", this.cjBaseData);
+          // console.log("层级属性中  改变后的数据。。。。", this.cjBaseData);
         }
       },
       deep: true
@@ -470,15 +460,12 @@ export default {
                 }
                 tabData.push(colData);
               }
-              console.log(
-                "将部署配置中的表单arrayColData元素和表格arrayTabData元素合并",
-                arrayColData.concat(tabData)
-              );
+              // console.log("将部署配置中的表单arrayColData元素和表格arrayTabData元素合并",arrayColData.concat(tabData));
               //将部署配置中的表单arrayColData元素和表格arrayTabData元素合并
               this.cjBaseData[key].xmlEntityMaps = arrayColData.concat(tabData);
             }
           }
-          console.log("层级属性中  改变后的数据。。。。", this.cjBaseData);
+          // console.log("层级属性中  改变后的数据。。。。", this.cjBaseData);
         }
       },
       deep: true
@@ -489,8 +476,6 @@ export default {
     //基本属性解析
     itemTypeChange(baseData, params) {
       let config = this.analysisConfigureType(baseData);
-        console.log("config",config)
-        console.log("params",params)
       config.attrs.forEach(attr => {
         if (attr.attrConfigType === "uploadComm") {
           let analysisBaseFile = this.analysisBaseFile;
@@ -813,7 +798,6 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   async created() {
-      console.log("form")
     //清空文件中的数据
     this.$store.dispatch("clearAnalysisBaseFile");
   },

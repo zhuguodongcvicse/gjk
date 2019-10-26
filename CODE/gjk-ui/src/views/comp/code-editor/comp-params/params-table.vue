@@ -166,7 +166,7 @@ export default {
       handler: function(tableData) {
         let saveTable = [];
         tableData.forEach(tabs => {
-          console.log("baseDatabaseDatabaseData",tabs)
+          // console.log("baseDatabaseDatabaseData",tabs)
           let saveRow = deepClone(this.baseTabOptionData);
           let baseData = deepClone(this.baseTabOptionData);
           //处理variable 的赋值
@@ -226,22 +226,22 @@ export default {
         obj["id"] = randomLenNum(4, true);
         obj["hasChildren"] = true;
       });
-      console.log("objobjobj", JSON.stringify(obj));
+      // console.log("objobjobj", JSON.stringify(obj));
       return obj;
     },
     //加载结构体
     tableStructLoad(tree, treeNode, resolve) {
-      console.log("tree, treeNode, resolve", tree, treeNode, resolve);
+      // console.log("tree, treeNode, resolve", tree, treeNode, resolve);
       let structParam = this.getNewStructType(tree);
       structParam.dbId = structParam.dbId.replace("_*", "");
       this.$set(structParam, "queryParam", "");
       getStructTree(structParam).then(r => {
-        console.log("0000000000", res.data.data);
+        // console.log("0000000000", res.data.data);
       });
       let xxx = JSON.parse(
         '{"名称":{"attrMappingName":"名称","attrKeys":"showCompName","attrMapping":true,"attrConfigType":"inputComm","attrName":"name","isShow":true,"lableName":"piPara1","key":"15671496074184791"},"id":"15671496074181264","hasChildren":false,"变量类型":{"dataKey":"dbtab_structlibs","actionType":"xxx","attrConfigType":"selectComm","attrName":"name","isShow":true,"lableName":"float*","attrMappingName":"变量类型","key":"15671496074183222"},"长度":{"actionType":"xxx","attrConfigType":"formulaComm","attrName":"name","isShow":true,"lableName":"","attrMappingName":"长度","key":"15671496074187036"},"类别":{"attrMappingName":"类别","attrKeys":"assignmentType","attrMapping":true,"attrConfigType":"selectComm","attrName":"name","isShow":true,"lableName":"DATA","key":"15671496074183982"},"赋值":{"attrConfigType":"inputComm","attrName":"name","isShow":true,"lableName":"222","attrMappingName":"赋值","key":"15671496074184588"},"选择变量":{"attrConfigType":"inputComm","attrName":"name","isShow":true,"lableName":"333","attrMappingName":"选择变量","key":"15671496074189383"},"参数1":{"attrKeys":"param1","attrMapping":true,"attrConfigType":"formulaComm","attrName":"name","isShow":true,"lableName":"444","attrMappingName":"参数1","key":"15671496074181334"},"参数2":{"attrKeys":"param2","attrMapping":true,"attrConfigType":"formulaComm","attrName":"name","isShow":true,"lableName":"444","attrMappingName":"参数2","key":"15671496074181343"},"参数3":{"attrKeys":"param3","attrMapping":true,"attrConfigType":"formulaComm","attrName":"name","isShow":true,"lableName":"444","attrMappingName":"参数3","key":"15671496074185140"},"参数4":{"attrKeys":"param4","attrMapping":true,"attrConfigType":"formulaComm","attrName":"name","isShow":true,"lableName":"444","attrMappingName":"参数4","key":"15671496074184657"},"参数5":{"attrKeys":"param5","attrMapping":true,"attrConfigType":"formulaComm","attrName":"name","isShow":true,"lableName":"444","attrMappingName":"参数5","key":"15671496074188236"},"参数6":{"attrKeys":"param6","attrMapping":true,"attrConfigType":"formulaComm","attrName":"name","isShow":true,"lableName":"444","attrMappingName":"参数6","key":"15671496074189729"}}'
       );
-      console.log("xxxxxxxx", xxx);
+      // console.log("xxxxxxxx", xxx);
       setTimeout(() => {
         resolve([xxx]);
       }, 1000);
@@ -366,7 +366,7 @@ export default {
           }
         }
       } else if (col.attrMappingName === leiBie) {
-        console.log("col, row", col, row[leiBie].lableName);
+        // console.log("col, row", col, row[leiBie].lableName);
         if (row[leiBie].lableName === "SPREAD") {
           row.hasChildren = true;
         } else {
@@ -520,7 +520,7 @@ export default {
     },
     //添加表格新行
     addNewTableRow(tabData, tabOption) {
-      console.log("newTableOption", tabData, tabOption);
+      // console.log("newTableOption", tabData, tabOption);
       let obj = {};
       let column = deepClone(tabOption);
       column.forEach(cols => {
@@ -531,7 +531,7 @@ export default {
     //添加表格行
     addTableRow(tabData, tabOption) {
       let column = deepClone(tabOption);
-      console.log("item.attrMappingName === form.attrMappingName", column);
+      // console.log("item.attrMappingName === form.attrMappingName", column);
       column.forEach(cols => {
         cols.forEach(col => {
           col.lableName = "";

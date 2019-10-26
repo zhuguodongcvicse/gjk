@@ -374,6 +374,7 @@ export default {
     },
     //关闭前事件触发方法
     handleClose(done) {
+        console.log("done",done)
       this.$confirm("确认关闭？")
         .then(_ => {
           done();
@@ -382,6 +383,7 @@ export default {
     },
 
     dialogState(state) {
+        console.log("state",state)
       let param = {};
       if (state === "ok") {
         this.showModelToXmlEntity();

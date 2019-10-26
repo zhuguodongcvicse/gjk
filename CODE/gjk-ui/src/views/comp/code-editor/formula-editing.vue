@@ -44,7 +44,7 @@
                     v-for="item in group.options"
                     :key="item.id"
                     :value="item.dbId"
-                    :label="item.fparamType"
+                    :label="item.fparamType + '__v' + item.version"
                   >
                     <span class="fl_14s">{{item.fparamType}}</span>
                     <span
@@ -97,11 +97,11 @@ import { mapGetters } from "vuex";
 import { getStructTree } from "@/api/libs/structlibs";
 export default {
   //import引入的组件需要注入到对象中才能使用
-  props: ["fatherModel", "fileParamType"],
-  components: {},
+  props: ["fatherModel", "fileParamType", "stuctShowFlag"],
   data() {
     //这里存放数据
     return {
+      stuctShowFlagChild: this.stuctShowFlag,
       options: {
         header: false,
         height: 250,
@@ -160,10 +160,32 @@ export default {
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["headerFile", "structType", "tmpStructLength"])
+    ...mapGetters(["headerFile", "structType", "tmpStructLength", "defaultShowStruct"])
   },
   //监控data中的数据变化
   watch: {
+      stuctShowFlag: {
+      immediate: true,
+      handler: function(stuctShowFlag) {
+          this.stuctShowFlagChild = stuctShowFlag
+          if (Object.keys(this.defaultShowStruct).length != 0 && this.defaultShowStruct[this.stuctShowFlagChild]) {
+              this.structform = this.defaultShowStruct[this.stuctShowFlagChild]
+          }
+
+      },
+      deep: true
+    },
+    /*defaultShowStruct: {
+        handler: function(params) {
+            console.log("this.defaultShowStruct",this.defaultShowStruct)
+            console.log("this.stuctShowFlagChild",this.stuctShowFlagChild)
+            console.log("this.stuctShowFlag",this.stuctShowFlag)
+            console.log("this.defaultShowStruct[this.stuctShowFlagChild]",this.defaultShowStruct[this.stuctShowFlagChild])
+            // this.structform = this.defaultShowStruct[this.stuctShowFlagChild]
+            console.log("this.structform",this.structform)
+        },
+        deep: true
+    },*/
     tmpStructLength: {
       immediate: true,
       handler: function(params) {
@@ -184,30 +206,57 @@ export default {
       handler: function(params) {
         let struct;
         let variableSel = JSON.parse(JSON.stringify(this.variableSel));
-        variableSel.find(item => {
-          item.options.find(it => {
-            if (it.dbId === params.variable) {
-              struct = it;
+        // console.log("params",params)
+        // console.log("variableSel",variableSel)
+        let indexNumOfParam
+        if (params.variable){
+          indexNumOfParam = params.variable.indexOf('v')
+            // console.log("indexNumOfParam",indexNumOfParam)
+            if (indexNumOfParam != -1){
+                let structTypeTemp = params.variable.slice(0,indexNumOfParam-2)
+                let structVersionTemp = params.variable.slice(indexNumOfParam + 1)
+                // console.log("structTypeTemp",structTypeTemp)
+                // console.log("structVersionTemp",structVersionTemp)
+                variableSel.find(item => {
+                    // console.log("item",item)
+                    item.options.find(it => {
+                        if (it.fparamType === structTypeTemp && it.version === structVersionTemp) {
+                            struct = it;
+                        }
+                    });
+                });
+            } else {
+                variableSel.find(item => {
+                    // console.log("item",item)
+                    item.options.find(it => {
+                        if (it.dbId === params.variable) {
+                            struct = it;
+                        }
+                    });
+                });
             }
-          });
-        });
-        if (struct) {
+        }
+      // console.log("struct", struct)
+      if (struct) {
           struct.dbId = struct.dbId.replace("_*", "");
           this.$set(struct, "queryParam", params.fparamName);
           let childrenParam;
           getStructTree(struct).then(res => {
-            childrenParam = JSON.parse(JSON.stringify(res.data.data));
-            if (res.data.data.length === 0) {
-              let headerFile = this.headerFile;
-              if (headerFile) {
-                childrenParam = this.headerFile.structParams[
-                  struct.fparamType.replace("*", "")
-                ].children;
+              // console.log("res",res)
+              childrenParam = JSON.parse(JSON.stringify(res.data.data));
+              // console.log("childrenParam",childrenParam)
+              if (res.data.data.length === 0) {
+                  let headerFile = this.headerFile;
+                  if (headerFile) {
+                      childrenParam = this.headerFile.structParams[
+                          struct.fparamType.replace("*", "")
+                          ].children;
+                  }
               }
-            }
-            this.treeStructParam = childrenParam;
+              this.treeStructParam = childrenParam;
           });
-        }
+      }
+        // console.log("structform",this.structform)
       },
       deep: true
     },
@@ -253,6 +302,7 @@ export default {
       };
     },
     handleNodeClick(node) {
+        console.log("node",node)
       this.tmpLengthVal += node.label;
     },
     // 双击赋值
@@ -291,6 +341,7 @@ export default {
       }
     },
     getStructSel() {
+
       this.storeLengthVal = this.storeLengthVal;
       const sels = JSON.parse(JSON.stringify(this.structType));
       for (let i = 0; i < sels.length; i++) {
@@ -303,7 +354,13 @@ export default {
         el.fparamType = el.fparamType + "*";
         this.variableSel[1].options.push(el);
       }
-      this.structform.variable = "CMP_PARA";
+      // console.log("this.defaultShowStruct",this.defaultShowStruct)
+      if (Object.keys(this.defaultShowStruct).length != 0) {
+          this.structform.variable = this.defaultShowStruct.variable
+      } else {
+          this.structform.variable = this.variableSel[1].options[0].fparamType + '__v' + this.variableSel[1].options[0].version;
+          // console.log("this.structform",this.structform)
+      }
     },
     getStructTrees() {
       let struct = {};
@@ -326,6 +383,37 @@ export default {
       this.fatherModel.dialogFormVisible = false;
     },
     addColParam() {
+      let struct
+      let variableSel = JSON.parse(JSON.stringify(this.variableSel));
+        let indexNumOfParam
+        if (this.structform.variable){
+            indexNumOfParam = this.structform.variable.indexOf('v')
+            if (indexNumOfParam != -1){
+                let structTypeTemp = this.structform.variable.slice(0,indexNumOfParam-2)
+                let structVersionTemp = this.structform.variable.slice(indexNumOfParam + 1)
+                variableSel.find(item => {
+                    item.options.find(it => {
+                        if (it.fparamType === structTypeTemp && it.version === structVersionTemp) {
+                            struct = it;
+                        }
+                    });
+                });
+            } else {
+                variableSel.find(item => {
+                    item.options.find(it => {
+                        if (it.dbId === this.structform.variable) {
+                            struct = it;
+                        }
+                    });
+                });
+            }
+        }
+      this.structform.variable = struct.fparamType + '__v' + struct.version;
+      let defaultShowStructList
+      Object.keys(this.defaultShowStruct).length != 0?defaultShowStructList = {}:defaultShowStructList = this.defaultShowStruct
+      defaultShowStructList[this.stuctShowFlagChild] = this.structform
+      this.$store.dispatch("setDefaultShowStruct", defaultShowStructList);
+
       this.fatherModel.tmpLengthVal.attributeNameValue = this.tmpLengthVal;
       this.$set(this.fatherModel.tmpLengthVal, "strcutObj", this.retStruct);
       this.fatherModel.dialogFormVisible = false;

@@ -94,7 +94,8 @@
       size="medium"
       :readonly="readonly"
       :disabled="disabled"
-      @dblclick.native="handleLength(itemParam)"
+      :stuctShowFlag="stuctShowFlag"
+      @dblclick.native="handleLength($event)"
       v-on:blur="onBlurNative"
     ></el-input>
     <!-- @change="$emit('change', $event)" -->
@@ -102,6 +103,7 @@
       v-if="lableType ==='formulaComm'  || lableType ==='assignmenComm'"
       :fatherModel="formulaDialogParams"
       :fileParamType="lableType"
+      :stuctShowFlag="stuctShowFlag"
     ></formula-editing>
   </span>
 </template>
@@ -124,7 +126,8 @@ export default {
     readonly: { type: Boolean, default: false }, //组件是否可读
     disabled: { type: Boolean, default: false }, //组件是否禁用
     multiple: { type: Boolean, default: false }, //组件是否禁用
-    dictKey: [String, Array] //当组件是selectComm时 下拉框数据值
+    dictKey: [String, Array], //当组件是selectComm时 下拉框数据值
+
   },
   model: {
     prop: "itemValue", // 注意，是prop，不带s。我在写这个速记的时候，多写了一个s，调试到怀疑人生
@@ -136,6 +139,7 @@ export default {
   data() {
     //这里存放数据
     return {
+      stuctShowFlag: "",
       itemParam: [String, Boolean, Array, Number],
       selectOptions: [],
       //公式编辑器
@@ -237,7 +241,9 @@ export default {
       this.$emit("onBlurNative");
     },
     //公式编辑器
-    handleLength(param) {
+    handleLength(e) {
+      console.log("公式编辑器param")
+      this.stuctShowFlag = e.currentTarget.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.childNodes.item(0).innerText + '_' + e.currentTarget.parentNode.parentNode.parentNode.childNodes.item(0).innerText
       this.formulaDialogParams.tmpLengthVal.attributeNameValue = this.itemValue;
       this.formulaDialogParams.dialogFormVisible = true;
     },

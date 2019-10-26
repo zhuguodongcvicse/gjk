@@ -99,7 +99,7 @@ export default {
   //方法集合
   methods: {
     saveParamsDefineXmlParams: function(dataParam, nameType) {
-      console.log("params-define.vue中。需要保存的数据结构******", dataParam);
+      // console.log("params-define.vue中。需要保存的数据结构******", dataParam);
       this.$emit("change", dataParam,nameType);
     },
     analysisConfigureType(config) {
@@ -108,7 +108,6 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-      console.log("define")
     if (this.$route.query.processId) {
       getChipsfromhardwarelibs(this.$route.query.processId).then(Response => {
         if (Response.data.chips) {

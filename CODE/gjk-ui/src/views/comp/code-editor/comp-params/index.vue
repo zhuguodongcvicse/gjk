@@ -156,9 +156,7 @@ export default {
     },
     selectBaseTemplateValue: {
         handler: function(selectBaseTemplateValue) {
-            console.log("+++++++++selectBaseTemplateValue",selectBaseTemplateValue)
             let allBaseTemplateTemp = this.allBaseTemplate
-            console.log("allBaseTemplateTemp",allBaseTemplateTemp)
             for (const i in allBaseTemplateTemp) {
                 if (allBaseTemplateTemp[i].tempPath == selectBaseTemplateValue){
                     this.changeBaseTemplate(allBaseTemplateTemp[i].tempPath);
@@ -184,7 +182,7 @@ export default {
         }
       }
       this.saveDBXmlMaps = dBXmlMaps;
-      console.log("index.vue中。需要保存的数据结构******", this.saveDBXmlMaps);
+      // console.log("index.vue中。需要保存的数据结构******", this.saveDBXmlMaps);
     },
     clickHandleSaveComp() {
       //存构件基本信息
@@ -228,7 +226,7 @@ export default {
     },
     changeBaseTemplate(tempPath) {
         analysisXmlFile(tempPath).then(response => {
-            console.log("response", response);
+            // console.log("response", response);
             this.$store.dispatch("setFetchStrInPointer");
             //保存加载的数据
             this.$store.dispatch("setSaveXmlMaps", response.data.data)

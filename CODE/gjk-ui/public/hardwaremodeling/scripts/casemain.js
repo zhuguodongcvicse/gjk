@@ -479,7 +479,8 @@ function initEditor(editor) {
 		console.log("graphName", graphName)
 		if (graphName == null) {
 			frontCaseForDeployment = graph.toJSON()
-			//配置的ip nodeID 
+      console.log("graphList", graphList)
+			//配置的ip nodeID
 			setNodeIDAndIP()
 			let ifSetIPSuccess = checkIP()
 			if (!ifSetIPSuccess) {
@@ -499,7 +500,7 @@ function initEditor(editor) {
 			console.log("postMessageParentData--first", postMessageParentData)
 			return
 		} else if (graphName == '背部视图') {
-			//配置的ip nodeID 
+			//配置的ip nodeID
 			setNodeIDAndIP()
 			let ifSetIPSuccess = checkIP()
 			if (!ifSetIPSuccess) {
@@ -646,7 +647,7 @@ function initEditor(editor) {
 		}
 		return true
 	}
-	
+
 	function checkIP(){
 		for (const i in graphList.fJson) {
 			for (const j in graphList.fJson[i].datas) {
@@ -656,7 +657,9 @@ function initEditor(editor) {
 							for (const m in graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList) {
 								//如果存在未配置IP的芯片则弹出提示
 								if (graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList[m].IP == null || graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList[m].IP == '') {
-									alert("存在未配置IP的芯片")
+									console.log("frontBoardList[k].chipList[m].IP", graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList[m].IP )
+                  console.log("graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList",graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList)
+								  alert("存在未配置IP的芯片")
 									return false
 								}
 							}
@@ -865,7 +868,7 @@ function initEditor(editor) {
 		}
 
 		toolbar.appendChild(button)
-		//网状画布 
+		//网状画布
 		//	var graph = editor.graph;
 		//不可改变形状大小
 		graph.editable = false;
@@ -1343,7 +1346,7 @@ function initEditor(editor) {
 				return;
 			}
 			//机箱移动结束后刷新对应一面机箱的坐标
-			if (evt.kind == Q.InteractionEvent.ELEMENT_MOVE_END) {//data.properties.caseName != null && 
+			if (evt.kind == Q.InteractionEvent.ELEMENT_MOVE_END) {//data.properties.caseName != null &&
 				// console.log("data", data)
 				moveLocation = data.location
 				if (data.properties.frontBoardList != null) {

@@ -345,7 +345,7 @@ export default {
       this.currNode = data;
       let parentType = data.parentType;
       //给input框赋值
-      console.log(this.compValueAndType);
+      // console.log(this.compValueAndType);
       this.algorithm = data.name;
       this.compValueType.libsID = data.id;
       this.visible2 = false;
@@ -384,11 +384,11 @@ export default {
     },
 
     algorithmOnRemove(file, fileList) {
-      console.log(file, fileList);
+      // console.log(file, fileList);
     },
 
     algorithmHandlePreview(file) {
-      console.log(file);
+      // console.log(file);
     },
 
     testOnChange(file, fileList) {
@@ -403,11 +403,11 @@ export default {
     },
 
     testOnRemove(file, fileList) {
-      console.log(file, fileList);
+      // console.log(file, fileList);
     },
 
     testHandlePreview(file) {
-      console.log(file);
+      // console.log(file);
     },
 
     platformOnChange(file, fileList) {
@@ -422,11 +422,11 @@ export default {
     },
 
     platformOnRemove(file, fileList) {
-      console.log(file, fileList);
+      // console.log(file, fileList);
     },
 
     platformHandlePreview(file) {
-      console.log(file);
+      // console.log(file);
     }
 
     // algorithmSubmitUpload() {
@@ -464,7 +464,6 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-      console.log("file")
     if (this.$route.query.compId === undefined) {
       this.getDefaultImg();
     }

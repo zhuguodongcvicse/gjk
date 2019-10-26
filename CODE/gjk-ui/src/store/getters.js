@@ -26,6 +26,7 @@ const getters = {
   tmpProject: state => state.struct.tmpProject,
   structType: state => state.struct.structType,
   cjAttribute: state => state.struct.cjAttribute,
+  defaultShowStruct: state => state.struct.defaultShowStruct,
   pointHFile: state => state.struct.pointHFile,
   subMapCustomConfig : state => state.CustomConfiguration.subMapCustomConfig,
   pubMapCustomConfig : state => state.CustomConfiguration.pubMapCustomConfig,
