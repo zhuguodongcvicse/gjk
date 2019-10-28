@@ -68,9 +68,10 @@ public class DevenvServiceImpl implements DevenvService{
 	
 	@Autowired
 	private AmqpTemplate rabbitmqTemplate;
-	
+
+
 	@Override
-	public String Command(String path1,String fileName,String platformType) {
+	public String Command(String path1,String fileName,String platformType,String token) {
 		Set<String> filePathList = new TreeSet<String>();
 		//VS编译
 		String fileEndName = ".sln";
@@ -88,13 +89,13 @@ public class DevenvServiceImpl implements DevenvService{
 					if (childFile.getName().endsWith(fileEndName)) {
 						//filePathList.add(file.getAbsolutePath());
 						isFile = true;
-						str = devenv(childFile.getAbsolutePath(),fileName);
+						str = devenv(childFile.getAbsolutePath(),fileName,token);
 					} 
 				}
 			}else if(platformType.equals("Sylixos")){
 				//判断是否是Sylixos平台
 				isFile = true;
-				str = sylixos(file.getAbsolutePath(),fileName);
+				str = sylixos(file.getAbsolutePath(),fileName,token);
 			}else if(platformType.equals("Workbench")) {
 				//判断是否是Workbench平台
 				isFile = true;
@@ -102,11 +103,12 @@ public class DevenvServiceImpl implements DevenvService{
 				List<String> list = new ArrayList<String>();
 				FileUtil.getSelectStrFilePathList(set,file.getAbsolutePath(),"Makefile");
 				list.addAll(set);
-				str = workbench(list.get(0),fileName);
+				str = workbench(list.get(0),fileName,token);
 			}else if(platformType.equals("Linux")) {
 				//判断是否是 Linux平台
 				isFile = true;
-				linux(file.getAbsolutePath(),fileName);
+				str = linux(file.getAbsolutePath(), fileName,token);
+
 			}
 		}else {
 			System.out.println("传入路径错误，请联系管理员。");
@@ -116,13 +118,13 @@ public class DevenvServiceImpl implements DevenvService{
 			FileUtil.getSelectStrFilePathList(filePathList,path1,fileEndName);
 			if(filePathList.size()>0) {
 				for(String slnPath : filePathList) {
-					str = devenv(slnPath,fileName);
+					str = devenv(slnPath,fileName,token);
 				}
 			}
 		}
 		return str;
 	}
-	private String devenv(String slnpath,String fileName) {
+	private String devenv(String slnpath,String fileName,String token) {
 		String strCommand = "";
 		//String path = "D:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE";
 		File dir = new File(vsPath);
@@ -144,7 +146,7 @@ public class DevenvServiceImpl implements DevenvService{
 				//System.out.println(line);
 				//strCommand += "\n"+line; 
 				//推送消息到rabbitmq中
-				this.rabbitmqTemplate.convertAndSend("gjkmq" , fileName+"===@@@===\n"+line);
+				this.rabbitmqTemplate.convertAndSend(token , fileName+"===@@@===\n"+line);
 			}
 			//System.out.println("111111"+strCommand);
 		} catch (IOException e) {
@@ -155,7 +157,7 @@ public class DevenvServiceImpl implements DevenvService{
 	}
 
 	//编译 sylixos 
-	private String sylixos(String sylixosPath,String fileName) {
+	private String sylixos(String sylixosPath,String fileName,String token) {
 		String strCommand = "";
 		//File dir = new File(syPath);
 		File dir = new File(sylixosPath);
@@ -178,7 +180,7 @@ public class DevenvServiceImpl implements DevenvService{
 				System.out.println(line);
 				//strCommand += "\n"+line; 
 				//推送消息到rabbitmq中
-				this.rabbitmqTemplate.convertAndSend("gjkmq" , fileName+"===@@@===\n"+line);
+				this.rabbitmqTemplate.convertAndSend(token , fileName+"===@@@===\n"+line);
 			}
 			//System.out.println("111111"+strCommand);
 		} catch (IOException e) {
@@ -189,7 +191,7 @@ public class DevenvServiceImpl implements DevenvService{
 	}
 
 	//编译 workbench 
-	private String workbench(String slnpath,String fileName) {
+	private String workbench(String slnpath,String fileName,String token) {
 		String strCommand = "";
 		//String path = "D:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE";
 		File dir = new File(wbPath);
@@ -208,7 +210,7 @@ public class DevenvServiceImpl implements DevenvService{
 				//System.out.println(line);
 				//strCommand += "\n"+line; 
 				//推送消息到rabbitmq中
-				this.rabbitmqTemplate.convertAndSend("gjkmq" , fileName+"===@@@===\n"+line);
+				this.rabbitmqTemplate.convertAndSend(token , fileName+"===@@@===\n"+line);
 			}
 			//System.out.println("111111"+strCommand);
 		} catch (IOException e) {
@@ -219,7 +221,7 @@ public class DevenvServiceImpl implements DevenvService{
 	}
 
 	//编译 linux 
-	private String linux(String filePath,String fileName) {
+	private String linux(String filePath,String fileName,String token) {
 		//通过filePath 截取流程名称 用来创建父级目录
 		String ProcessName = filePath.substring(0,filePath.lastIndexOf("APP"));
 		ProcessName = ProcessName.substring(ProcessName.lastIndexOf(File.separator)+1,ProcessName.length());
@@ -306,7 +308,8 @@ public class DevenvServiceImpl implements DevenvService{
 				System.out.println(temp);
 				
 				//推送消息到rabbitmq中
-				this.rabbitmqTemplate.convertAndSend("gjkmq" , fileName+"===@@@===\n"+temp);
+				//this.rabbitmqTemplate.convertAndSend(token , token+"===@@@==="+fileName+"===@@@===\n"+temp);
+				this.rabbitmqTemplate.convertAndSend(token , fileName+"===@@@===\n"+temp);
 			}
 
 			//失败返回
@@ -316,7 +319,7 @@ public class DevenvServiceImpl implements DevenvService{
 				System.out.println(temp);
 				
 				//推送消息到rabbitmq中
-				this.rabbitmqTemplate.convertAndSend("gjkmq" , fileName+"===@@@===\n"+temp);
+				this.rabbitmqTemplate.convertAndSend(token , fileName+"===@@@===\n"+temp);
 			}
 
 			//执行打包命令
@@ -330,7 +333,7 @@ public class DevenvServiceImpl implements DevenvService{
 				System.out.println(temp);
 				
 				//推送消息到rabbitmq中
-				this.rabbitmqTemplate.convertAndSend("gjkmq" , fileName+"===@@@===\n"+temp);
+				this.rabbitmqTemplate.convertAndSend(token , fileName+"===@@@===\n"+temp);
 			}
 
 			if(session != null) {
@@ -356,7 +359,7 @@ public class DevenvServiceImpl implements DevenvService{
 			SftpUtil.download(makeFilePath+"/"+fileName+".zip",makeFilePath+"/"+fileName+".zip",dPath,chSftp);
 			//todo,需取得一个下载成功或失败的标志
 			//推送消息到rabbitmq中
-			this.rabbitmqTemplate.convertAndSend("gjkmq" , fileName+"===@@@===\n下载完毕");
+			this.rabbitmqTemplate.convertAndSend(token , fileName+"===@@@===\n下载完毕");
 			
 			//解压到工程Debug目录下
 			try {

@@ -76,7 +76,7 @@
         </where>
         order by create_time DESC
     </select>
-
+    <!--查询最大版本号-->
     <select id="getMaxVersion" parameterType="String" resultType="Integer">
         select Max(temp_version) from gjk_base_template
         where temp_type = #{tempType}

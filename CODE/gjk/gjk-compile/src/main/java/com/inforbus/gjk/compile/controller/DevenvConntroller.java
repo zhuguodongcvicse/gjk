@@ -21,14 +21,16 @@ public class DevenvConntroller {
 	private final DevenvService devenvService;
 	//@Autowired
 	//private AmqpTemplate rabbitmqTemplate;
+
 	@PutMapping(value = "/Command")
 	public R Command(@RequestBody Map<String, String> map) {
 		String path =map.get("path");
 		String fileName =map.get("fileName");
 		String platformType = map.get("platformType");
+		String token = map.get("token");
 		String str = null;
 		synchronized (this){
-			str = devenvService.Command(path,fileName,platformType);
+			str = devenvService.Command(path,fileName,platformType,token);
 		}
 
 		//推送消息到rabbitmq中
