@@ -5,25 +5,22 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
 import org.ho.yaml.Yaml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 
 import com.google.common.base.Charsets;
 
@@ -69,21 +66,31 @@ public class JGitUtil {
 
 	static {
 		// 获取当前类的路径
-		String filePath = JGitUtil.class.getResource("").getPath();
-		try {
-			// 中文乱码问题
-			filePath = URLDecoder.decode(filePath, "utf-8");
-		} catch (UnsupportedEncodingException e1) {
-			e1.printStackTrace();
-		}
+//		String filePath = JGitUtil.class.getResource("").getPath();
+//		try {
+//			// 中文乱码问题
+//			filePath = URLDecoder.decode(filePath, "utf-8");
+//		} catch (UnsupportedEncodingException e1) {
+//			e1.printStackTrace();
+//		}
 		// 找到bootstrap.properties的地址
-		filePath = filePath.substring(0, filePath.indexOf("target/classes/") + "target/classes/".length())
-				+ "bootstrap.properties";
-		File dumpFile = new File(filePath);
+//		filePath = filePath.substring(0, filePath.indexOf("target/classes/") + "target/classes/".length())
+//				+ "bootstrap.properties";
+//		File dumpFile = new File(filePath);
 
+		File file = null;
 		Map father;
 		try {
-			father = Yaml.loadType(dumpFile, HashMap.class);
+			// 通过流的方式来读取配置文件，解决打成jar包后无法读取配置文件的问题
+			ClassPathResource classPathResource = new ClassPathResource("bootstrap.properties");
+			InputStream inputStream = classPathResource.getInputStream();
+			// 建立临时文件
+			file = File.createTempFile("bootstrap", ".properties");
+			// 将信息写入临时文件
+			FileUtils.copyInputStreamToFile(inputStream, file);
+			
+			// 解析配置信息
+			father = Yaml.loadType(file, HashMap.class);
 			LOCAL_REPO_PATH = father.get("git.local.path").toString();
 			LOCAL_REPOGIT_CONFIG = father.get("git.local.config").toString();
 			REMOTE_REPO_URI = father.get("git.remote.uri").toString();
@@ -96,7 +103,7 @@ public class JGitUtil {
 			generatecode = father.get("git.local.generateCodePath").toString();
 			softToHard = father.get("git.local.mapSoftToHardPath").toString();
 			defaultEncoding = father.get("gjk.code.encodeing").toString();
-		} catch (FileNotFoundException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
