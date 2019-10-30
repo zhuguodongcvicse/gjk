@@ -68,9 +68,9 @@ export function handleSaveComp(obj, token, compId) {
     data: obj
   })
 }
-export function handleSaveCompMap(obj, token, compId) {
+export function handleSaveCompMap(obj, token, compId, userCurrent) {
   return request({
-    url: '/comp/componentdetail/createXmlFileMap/' + token + '/' + compId,
+    url: '/comp/componentdetail/createXmlFileMap/' + token + '/' + compId + '/' + userCurrent,
     method: 'put',
     data: obj
   })

@@ -333,11 +333,11 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	 * @param compId
 	 * @return 空文件文件
 	 */
-	private File createFile(String token, String compId) {
+	private File createFile(String token, String compId, String userCurrent) {
 		Component component = compMapper.getCompById(compId);
-		String absolutePath = compDetailPath + compUserFilePath + File.separator + component.getCompId()
+		String absolutePath = compDetailPath + compUserFilePath + File.separator + userCurrent + File.separator + component.getCompId()
 				+ File.separator + component.getVersion() + File.separator;
-		String gitRelativePath = compUserFilePath + File.separator + component.getCompId() + File.separator
+		String gitRelativePath = compUserFilePath + File.separator + userCurrent + File.separator + component.getCompId() + File.separator
 				+ component.getVersion() + File.separator;
 		File f = new File(absolutePath);
 		if (!f.exists()) {
@@ -376,7 +376,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 
 	@Override
 	public boolean createXmlFile(XmlEntity entity, String token, String compId) {
-		File file = this.createFile(token, compId);
+		File file = this.createFile(token, compId, null);
 		return XmlFileHandleUtil.createXmlFile(entity, file);
 //		Component component = compMapper.getCompById(compId);
 //
@@ -463,8 +463,8 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	 *      java.lang.String, java.lang.String)
 	 */
 	@Override
-	public boolean createXmlFile(XmlEntityMap entity, String token, String compId) {
-		File file = this.createFile(token, compId);
+	public boolean createXmlFile(XmlEntityMap entity, String token, String compId, String userCurrent) {
+		File file = this.createFile(token, compId, userCurrent);
 		Set<String> Ids = Sets.newHashSet();
 		this.getStructIds(entity, Ids);
 		// 删除已有的当前构件所对应的结构体
@@ -768,11 +768,13 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 //		Map<String, String> keyMap = Maps.newHashMap();
 		// 存储要保存的文件明细对象
 //		List<ComponentDetail> saveDetdirs = Lists.newArrayList();
+
 		// 文件类型
+		String userCurrent = maps.get("userCurrent").toString();
 		String strType = maps.get("fileType").toString() + "file";
 		String fileType = ("algorithmfile").equals(strType) ? "算法文件"
 				: ("testfile").equals(strType) ? "测试文件" : ("platformfile").equals(strType) ? "平台文件" : "";
-		String newPath = compUserFilePath + File.separator + maps.get("compId").toString() + File.separator
+		String newPath = compUserFilePath + File.separator + userCurrent + File.separator + maps.get("compId").toString() + File.separator
 				+ maps.get("version").toString() + File.separator;
 
 		ComponentDetail detdirs = baseMapper.selectOne(Wrappers.<ComponentDetail>query().lambda()

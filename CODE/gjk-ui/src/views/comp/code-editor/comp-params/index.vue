@@ -7,7 +7,7 @@
           type="primary"
           size="mini"
           icon="el-icon-edit"
-          @click.native="clickHandleSaveComp"
+          @click.native="inputCompBackupInfo"
         >
           <span v-if="this.$route.query.type === 'add'">保存</span>
           <span v-else-if="this.$route.query.type ==='edit'">修改</span>
@@ -18,7 +18,7 @@
         <label class="showlabel">构件建模</label>
       </el-col>
       <el-col :span="10">
-        <el-select v-model="selectBaseTemplateValue" placeholder="请选择">
+        <el-select v-model="selectBaseTemplateValue" placeholder="请选择" v-if="this.$route.query.type === 'add'">
           <el-option
             v-for="item in this.allBaseTemplate"
             :key="item.tempPath"
@@ -85,6 +85,19 @@
         </el-col>
       </el-row>
     </el-main>
+
+    <el-dialog
+      title="提示"
+      :visible.sync="dialogVisibleOfComBackup"
+      width="30%">
+      <el-input placeholder="请输入备注内容" v-model="compBackupinfo" clearable>
+      </el-input>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisibleOfComBackup = false">取 消</el-button>
+        <el-button type="primary" @click="clickHandleSaveComp">确 定</el-button>
+      </span>
+    </el-dialog>
+
   </el-container>
 </template>
 <script>
@@ -111,6 +124,8 @@ export default {
   data() {
     //这里存放数据
     return {
+      compBackupinfo: '',
+      dialogVisibleOfComBackup: false,
       selectBaseTemplateValue: '',
       //构件基本信息
       component: {},
@@ -184,6 +199,9 @@ export default {
       this.saveDBXmlMaps = dBXmlMaps;
       // console.log("index.vue中。需要保存的数据结构******", this.saveDBXmlMaps);
     },
+    inputCompBackupInfo() {
+      this.dialogVisibleOfComBackup = true
+    },
     clickHandleSaveComp() {
       //存构件基本信息
       const loading = this.$loading({
@@ -192,6 +210,7 @@ export default {
         spinner: "el-icon-loading",
         background: "rgba(0, 0, 0, 0.7)"
       });
+      this.component.compBackupinfo = this.compBackupinfo
       saveComp(this.component).then(res => {
         let comp = res.data.data;
         this.$refs.saveAlgorithmFiles.fetchSavefiles(comp).then(() => {
@@ -212,7 +231,8 @@ export default {
                   this.$store.dispatch("clearParseHeaderObj");
                 });
               }
-              handleSaveCompMap(saveComp, "Component", comp.id).then(res => {
+              let userCurrent = this.userInfo.username
+              handleSaveCompMap(saveComp, "Component", comp.id, userCurrent).then(res => {
                 this.$router.push({
                   path: "/comp/showComp/index"
                 });
@@ -241,15 +261,20 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    this.selectBaseTemplateValue = this.$route.query.defauleBaseTemplate[0].tempName
+    if (this.$route.query.type === "add") {
+        this.selectBaseTemplateValue = this.$route.query.defauleBaseTemplate[0].tempName
+    }
     if (this.$route.query.compId != undefined) {
       this.component.id = this.$route.query.compId;
       //查询构件文件
       getCompFiles(this.$route.query.compId).then(res => {
+        // console.log("res",res)
         //基本构件
+        this.compBackupinfo =  res.data.data.comp.compBackupinfo
         this.component = res.data.data.comp;
         this.$store.dispatch("setSaveXmlMaps", res.data.data.compBasicMap);
         this.fileList = res.data.data;
+        this.$store.dispatch("setFileListOfComponent", res.data.data);
       });
     }
     // this.saveXmlMaps = this.$route.params;

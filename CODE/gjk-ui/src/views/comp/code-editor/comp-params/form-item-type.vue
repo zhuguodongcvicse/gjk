@@ -117,6 +117,7 @@ import { mapGetters } from "vuex";
 import { fetchStrInPointer } from "@/api/libs/structlibs";
 import { getOwnPlatform } from "@/api/admin/platform";
 import formulaEditing from "../formula-editing";
+import {randomUuid} from "../../../../util/util";
 export default {
   //import引入的组件需要注入到对象中才能使用
   props: {
@@ -139,7 +140,7 @@ export default {
   data() {
     //这里存放数据
     return {
-      stuctShowFlag: "",
+      stuctShowFlag: {stuctShowFlagTemp:'',randomNumTemp: 0},
       itemParam: [String, Boolean, Array, Number],
       selectOptions: [],
       //公式编辑器
@@ -242,8 +243,11 @@ export default {
     },
     //公式编辑器
     handleLength(e) {
-      console.log("公式编辑器param")
-      this.stuctShowFlag = e.currentTarget.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.childNodes.item(0).innerText + '_' + e.currentTarget.parentNode.parentNode.parentNode.childNodes.item(0).innerText
+      // console.log("公式编辑器param")
+      //找到输入框的“输入输出”标识 和“参数X”的标识并拼接当做store中的key
+      this.stuctShowFlag.stuctShowFlagTemp = e.currentTarget.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.childNodes.item(0).innerText + '_' + e.currentTarget.parentNode.parentNode.parentNode.childNodes.item(0).innerText
+      //避免多次调用组件时监听不到标识的变化赋值一个随机变量
+      this.stuctShowFlag.randomNumTemp = Math.random()
       this.formulaDialogParams.tmpLengthVal.attributeNameValue = this.itemValue;
       this.formulaDialogParams.dialogFormVisible = true;
     },

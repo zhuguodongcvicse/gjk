@@ -58,7 +58,7 @@ public class Component extends Model<Component> {
 	/**
 	 * 描述
 	 */
-	private String description;
+	private String compBackupinfo;
 	/**
 	 * 审批状态
 	 */

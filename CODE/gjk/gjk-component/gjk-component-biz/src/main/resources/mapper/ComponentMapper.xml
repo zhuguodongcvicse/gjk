@@ -25,7 +25,7 @@
 		<result property="compImg" column="comp_img" />
 		<result property="createTime" column="create_time" />
 		<result property="updateTime" column="update_time" />
-		<result property="description" column="description" />
+		<result property="compBackupinfo" column="comp_backupinfo" />
 		<result property="applyState" column="apply_state" />
 		<result property="applyDesc" column="apply_desc" />
 		<result property="delFlag" column="del_flag" />
@@ -63,7 +63,7 @@
 		comp_img,
 		create_time,
 		update_time,
-		description,
+		comp_backupinfo,
 		apply_state,
 		apply_desc,
 		del_flag
@@ -77,7 +77,7 @@
 		user_id,
 		version,
 		comp_img,
-		description,
+		comp_backupinfo,
 		apply_state,
 		apply_desc
 	</sql>
@@ -92,7 +92,7 @@
 		comp.comp_img,
 		comp.create_time,
 		comp.update_time,
-		comp.description,
+		comp.comp_backupinfo,
 		comp.apply_state,
 		comp.apply_desc,
 		comp.del_flag,
@@ -148,8 +148,8 @@
 				AND update_time = #{component.updateTime}
 			</if>
 			<if
-				test="component.description != null and component.description.trim() != ''">
-				AND description = #{component.description}
+				test="component.compBackupinfo != null and component.compBackupinfo.trim() != ''">
+				AND comp_backupinfo = #{component.compBackupinfo}
 			</if>
 			<if
 				test="component.applyState != null and component.applyState.trim() != ''">
@@ -216,7 +216,7 @@
 		#{comp.userId},
 		#{comp.version},
 		#{comp.compImg},
-		#{comp.description},
+		#{comp.compBackupinfo},
 		#{comp.applyState},
 		#{comp.applyDesc})
 	</insert>

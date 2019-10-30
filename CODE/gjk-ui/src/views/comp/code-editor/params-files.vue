@@ -136,7 +136,7 @@ export default {
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["pointHFile", "analysisBaseFile"]),
+    ...mapGetters(["pointHFile", "analysisBaseFile", "userInfo"]),
     //用于处理监听时新旧对象的是否一样的问题
     analysisBaseFileData() {
       return JSON.parse(JSON.stringify(this.analysisBaseFile));
@@ -186,8 +186,10 @@ export default {
       deep: true
     },
     fileLists: function(param) {
+      // console.log("param - watch",param)
       //回显文件列表
       let paramFile = param[this.fileType + "file"];
+      // console.log("paramFile - watch", paramFile)
       // console.log("imgimgimgimg", this.fileType, paramFile);
       if (paramFile !== undefined) {
         if (this.fileType === "img") {
@@ -199,6 +201,7 @@ export default {
             this.compValueType.libsID = paramFile.filePath.id;
           }
           this.compValueType.paths = this.filesPath = paramFile.filevo;
+          // console.log("this.compValueType - watch",this.compValueType)
         }
       }
     },
@@ -307,7 +310,8 @@ export default {
         libsID: this.compValueType.libsID,
         version: param.version,
         fileType: this.fileType,
-        paths: this.compValueType.paths
+        paths: this.compValueType.paths,
+        userCurrent: this.userInfo.username
       };
       return Promise.resolve(fetchSavefiles(savefiles));
     },

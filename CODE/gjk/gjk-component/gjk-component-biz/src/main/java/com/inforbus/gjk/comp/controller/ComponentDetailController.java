@@ -145,10 +145,10 @@ public class ComponentDetailController {
 		return new R<>(componentDetailService.createXmlFile(entity, token, compId));
 	}
 	@PutMapping
-	@RequestMapping("/createXmlFileMap/{token}/{compId}")
+	@RequestMapping("/createXmlFileMap/{token}/{compId}/{userCurrent}")
 	public R createXmlFileMap(@RequestBody XmlEntityMap entity, @PathVariable("token") String token,
-			@PathVariable("compId") String compId) {
-		return new R<>(componentDetailService.createXmlFile(entity, token, compId));
+			@PathVariable("compId") String compId, @PathVariable("userCurrent") String userCurrent) {
+		return new R<>(componentDetailService.createXmlFile(entity, token, compId, userCurrent));
 	}
 
 	/**

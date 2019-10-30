@@ -76,6 +76,7 @@ export default {
         if (newParam === undefined) {
           this.analysisParamsDefineXmlParams = [];
         } else {
+          // console.log("newParam-watch",newParam)
           newParam.forEach(item => {
             let type = this.analysisConfigureType(item).lableType;
             let lableName = item.lableName;

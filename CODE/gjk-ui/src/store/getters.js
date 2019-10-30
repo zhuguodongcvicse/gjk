@@ -41,6 +41,7 @@ const getters = {
   consoleLog : state => state.gjkConsole.consoleLog,
   saveXmlMaps : state => state.comp.saveXmlMaps,
   allBaseTemplate : state => state.comp.allBaseTemplate,
+  fileListOfComponent : state => state.comp.fileListOfComponent,
   compChineseMapping : state => state.comp.compChineseMapping,
   selectBindValue : state => state.comp.selectBindValue,
   analysisBaseFile : state => state.comp.analysisBaseFile,

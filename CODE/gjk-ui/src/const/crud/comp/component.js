@@ -22,7 +22,6 @@ export const tableOption = {
   indexLabel: '序号',
   stripe: true,
   menuAlign: 'center',
-  stripe: true,
   align: 'center',
   editBtn: false,
   delBtn: false,
@@ -92,8 +91,8 @@ export const tableOption = {
       prop: 'updateTime'
     },
     {
-      label: '描述',
-      prop: 'description'
+      label: '备注信息',
+      prop: 'compBackupinfo'
     },
   ]
 }
