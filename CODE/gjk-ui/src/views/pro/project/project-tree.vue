@@ -358,7 +358,7 @@ export default {
       }
     };
     return {
-      token:"",
+      token: "",
       uploader_key: new Date().getTime(),
       optionsUploader: {
         // target: img(),
@@ -457,9 +457,16 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["userInfo", "tmpProject", "permissions", "website","consoleLog","access_token"])
+    ...mapGetters([
+      "userInfo",
+      "tmpProject",
+      "permissions",
+      "website",
+      "consoleLog",
+      "access_token"
+    ])
   },
-  created: function() {   
+  created: function() {
     console.log("this.website.publicSvg", this.website.publicSvg);
     console.log("+++++++++++++++");
     this.getProjects();
@@ -481,7 +488,7 @@ export default {
         this.applyUserSelect.push(user);
       }
     });
-    this.token = this.$store.getters.access_token;//获取到登录的token
+    this.token = this.$store.getters.access_token; //获取到登录的token
   },
   mounted: function() {
     // this.initTreeCard()
@@ -747,19 +754,21 @@ export default {
                 procedureId: this.procedureId
               }).then(val => {
                 platformType = val.data.data;
-              });
-              await getPath({
-                path: filePath.filePath,
-                fileName: i.fileName,
-                platformType: platformType,
-                token:this.token
-              }).then(val => {
-                // this.$store.dispatch(
-                //   "saveConsoleLog",
-                //   this.fileData.fileName + "===@@@===" + val.data.data
-                // );
-                //this.$store.dispatch("saveTextLog",val.data.data)
-                
+                getPath({
+                  path: filePath.filePath,
+                  fileName: i.fileName,
+                  platformType: platformType,
+                  token: this.token
+                }).then(val => {
+                  // this.$store.dispatch(
+                  //   "saveConsoleLog",
+                  //   this.fileData.fileName + "===@@@===" + val.data.data
+                  // );
+                  //this.$store.dispatch("saveTextLog",val.data.data)
+                  this.$message({
+                    message: val.data.data
+                  });
+                });
               });
             }
           }
@@ -780,7 +789,7 @@ export default {
               path: filePath.filePath,
               fileName: this.fileData.fileName,
               platformType: val.data.data,
-              token:this.token
+              token: this.token
             }).then(val => {
               //this.$store.state.consoleLog = "编译信息"
               // this.$store.dispatch(
@@ -789,7 +798,10 @@ export default {
               // );
               // this.$store.dispatch("saveTextLog",val.data.data)
               console.log("响应了");
-               //this.connect();
+              //this.connect();
+              this.$message({
+                message: val.data.data
+              });
             });
           });
         }
