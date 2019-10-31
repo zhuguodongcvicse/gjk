@@ -218,5 +218,11 @@ export function deleteAppByAPPId(id) {
   })
 }
 
+export function returnFilePath() {
+  return request({
+    url: '/pro/app/returnFilePath',
+    method: 'post',
+  })
+}
 
 

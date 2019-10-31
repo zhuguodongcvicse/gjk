@@ -158,6 +158,8 @@
 // import Img from '/img/appImage/logo.png'
 //引入显示分页的组件
 import showPage from "@/views/pro/project/showApp/showPage";
+import { getAppByProcessId } from "@/api/pro/app";
+import { getPath } from "@/api/compile/devenv";
 import {
   getAllApp,
   getAppVosPage,
@@ -174,7 +176,8 @@ import {
   getProcessByProjectId,
   getprojectByProjectId,
   handleDown,
-  deleteAppByAPPId
+  deleteAppByAPPId,
+  returnFilePath
 } from "@/api/pro/app";
 export default {
   //import引入的组件需要注入到对象中才能使用
@@ -488,12 +491,29 @@ export default {
           let mm = {};
           mm.oriFilePath = this.appFilePath;
           mm.downloadAPPFileName = this.appName;
-          handleDown(mm).then(res => {
-          });
+          handleDown(mm).then(res => {});
         });
     },
     //编译图标
-    playClick(domain, index) {},
+    playClick(domain, index) {
+      returnFilePath({
+        }).then(vals => {
+          //获取组件名，及平台类型
+          for (let key in JSON.parse(domain.partnamePlatform)) {
+            let value = JSON.parse(domain.partnamePlatform)[key];
+            getPath({
+              path: vals.data.data + domain.filePath + "/" + domain.fileName,
+              fileName: key,
+              platformType: value,
+              token: this.$store.getters.access_token
+            }).then(val => {
+              this.$message({
+                message: val.data.data
+              });
+            });
+          }
+        })
+    },
     //加载图标
     loadingClick(domain, index) {
       //APP组件工程生成，<组件名称，对应平台大类属性>
