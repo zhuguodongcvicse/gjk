@@ -8,7 +8,7 @@ DELETE FROM gjk_base_template WHERE temp_id != '1';
 DELETE FROM gjk_bsp;
 DELETE FROM gjk_bsp_detail;
 DELETE FROM gjk_bsp_file;
-DELETE FROM gjk_chipsfromhardwarelibs
+DELETE FROM gjk_chipsfromhardwarelibs;
 DELETE FROM gjk_common_component;
 DELETE FROM gjk_common_component_detail;
 DELETE FROM gjk_comp_img WHERE id != '1';
