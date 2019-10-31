@@ -205,7 +205,12 @@ public class AppController {
 	public R getAppVosPage(@PathVariable String fileName) {
 		return new R<>(appService.getAppVosPage(fileName));
 	}
-
+	
+	@PostMapping(value = "/returnFilePath")
+	public R returnFilePath() {
+		return new R<>(gitFilePath);
+	}
+		
 	/**
 	 * 注册
 	 * 
