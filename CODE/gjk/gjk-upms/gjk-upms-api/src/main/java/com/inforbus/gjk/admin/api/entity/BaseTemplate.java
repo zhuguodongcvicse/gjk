@@ -71,4 +71,9 @@ public class BaseTemplate extends Model<BaseTemplate> {
 	*/
 	private String remarks;
 
+
+	/**
+	 *控制版本字段
+	 */
+	private Integer tempVersion;
 }

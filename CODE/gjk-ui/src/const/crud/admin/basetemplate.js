@@ -31,13 +31,14 @@ export const tableOption = {
   menuWidth: "150",//操作菜单栏的宽度
   border: true,
   index: true,
-  // indexLabel: '#',
+  indexLabel: "序号",
   stripe: true,
   menuAlign: 'center',
   align: 'center',
   editBtn: false,
   delBtn: false,
   addBtn: false,
+  
   column: [
     // {
     //   label: '模板标识',
@@ -62,10 +63,14 @@ export const tableOption = {
       //dicUrl: '/admin/dict/type/libs_temp_type',
     },
     {
+      label: '版本',
+      prop: 'tempVersion',
+    },
+    {
       label: '创建时间',
       prop: 'createTime',
       type: 'datetime',
-      format: 'yyyy-MM-dd',
+      format: 'yyyy-MM-dd hh:mm:ss',
       editDisabled: true,
       addDisplay: false,
       span: 12
@@ -74,7 +79,7 @@ export const tableOption = {
       label: '修改时间',
       prop: 'updateTime',
       type: 'datetime',
-      format: 'yyyy-MM-dd',
+      format: 'yyyy-MM-dd hh:mm:ss',
       editDisabled: true,
       addDisplay: false,
       span: 12

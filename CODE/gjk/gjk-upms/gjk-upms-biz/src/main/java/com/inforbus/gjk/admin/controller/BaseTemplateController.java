@@ -44,6 +44,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -175,5 +176,10 @@ public class BaseTemplateController {
 		BaseTemplate baseTemplate = new BaseTemplate();
 		baseTemplate.setTempName(tempName);
 		return new R<>(baseTemplateService.getOne(new QueryWrapper<>(baseTemplate)));
+	}
+
+	@GetMapping("/getBaseTemplate")
+	public List<BaseTemplate> getBaseTemplate() {
+		return baseTemplateService.getBaseTemplate();
 	}
 }

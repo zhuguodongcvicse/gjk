@@ -24,8 +24,15 @@ const struct = {
     //保存计算长度
     tmpStructLength: getStore({ name: 'tmpStructLength' }) || [],
     tmpStructContent: getStore({ name: 'tmpStructContent' }) || {},
+    defaultShowStruct: getStore({ name: 'defaultShowStruct'}) || {}
   },
   actions: {
+    //设置默认显示的结构体变量类型
+    setDefaultShowStruct({ commit }, value) {
+      return new Promise(() => {
+        commit('SET_DEFAULTSHOWSTRUST', value);
+      })
+    },
     //设置临时的头文件中结构体
     setTmpStructContent({ commit }, value) {
       return new Promise(() => {
@@ -178,6 +185,14 @@ const struct = {
       setStore({
         name: 'tmpProject',
         content: state.tmpProject,
+        type: "session"
+      })
+    },
+    SET_DEFAULTSHOWSTRUST: (state, param) => {
+      state.defaultShowStruct = param
+      setStore({
+        name: 'defaultShowStruct',
+        content: state.defaultShowStruct,
         type: "session"
       })
     },

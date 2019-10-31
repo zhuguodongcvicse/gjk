@@ -100,7 +100,7 @@ export default {
           this.insertMsgVisible = true;
           Object.assign(this.$data, this.$options.data());
         } else {
-          console.log("error submit!!");
+          // console.log("error submit!!");
           return false;
         }
       });

@@ -282,6 +282,7 @@ public class ComponentController {
 	@PostMapping(path = "/analysisXmlFile", consumes = { "multipart/mixed", "multipart/form-data" })
 //	@Cacheable(value = "compDicts{filePath}")
 	public R<?> analysisXmlFile(@RequestParam(value = "filePath", required = false) String filePath) {
+		System.out.println("filePath" + filePath);
 		return new R<>(componentService.analysisXmlFile(filePath));
 	}
 
@@ -297,5 +298,11 @@ public class ComponentController {
 	@PostMapping(path = "/importCompZipUpload", consumes = { "multipart/mixed", "multipart/form-data" })
 	public R<?> appImageUpload(@RequestParam(value = "file", required = false) MultipartFile ufile) {
 		return new R<>(componentService.analysisZipFile(ufile));
+	}
+	@PostMapping(path = "/checkComp")
+	public R checkComp(@RequestBody List<Object> obj){
+		System.out.println(obj);
+		componentService.checkComp(obj);
+		return new R<>();
 	}
 }

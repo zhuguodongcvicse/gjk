@@ -12,12 +12,6 @@
           >
             <el-button slot="append" type="primary" @click="searchApp">搜 索</el-button>
           </el-input>
-          <!-- <input
-            v-model="searchAppName"
-            :inline="true"
-            class="showapp_input_14s"
-          >
-          <el-button type="primary"  @click="searchApp">搜 索</el-button>-->
           <el-button type="primary" class="showapp_form_btn" plain @click="refreshApp">刷 新</el-button>
         </el-form-item>
         <br />
@@ -141,46 +135,8 @@
           <img class="appImage" :src="`/pro/app/appImg/${domain.id}`" />
         </div>
       </el-form-item>
-      <!-- 目前用的是文件上传失败的钩子，因为只需要出现一次，今后要改成文件上传成功时的钩子on-success -->
-      <!-- <el-form-item label class="showapp_form2">
-        <el-upload action="xx" :on-error="addDomain">
-          <el-button class="showapp_form2_btn" icon="el-icon-plus" plain></el-button>
-        </el-upload>
-      </el-form-item>-->
       <br />
-      <!-- <div style="position:absolute; right:80px; margin-top:20px"> -->
-      <!--
-      <div align="center" >
-        <el-form-item label>
-      -->
-      <!-- 分页的组件 -->
-      <!-- <show-page :total="total"></show-page> -->
-      <!--</el-form-item>
-      </div>-->
     </el-form>
-    <!-- 导出的弹框 -->
-    <el-dialog
-      class="showapp_dialog_14s"
-      title="导出"
-      :visible.sync="dialogVisible"
-      width="50%"
-      :before-close="handleClose"
-    >
-      <span slot="footer" class="dialog-footer">
-        <el-form :label-position="labelPosition" label-width="150px" :model="downLoadInfo">
-          <el-form-item class="showapp_dialog_item text_align_left_14s" label="APP名称 ">
-            <el-input v-model="appName" class="showapp_dialog_inp1" placeholder="APP名称"></el-input>
-          </el-form-item>
-          <!-- <el-form-item class="showapp_dialog_item text_align_left_14s" label="导出路径 " >
-            <el-input v-model="appFile" class="showapp_dialog_inp2" placeholder="导出路径" ></el-input>
-            <el-button class="showapp_dialog_btn" type="primary" size="mini" @click="handleDown">导 出</el-button>
-          </el-form-item>-->
-        </el-form>
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="handleDown">导 出</el-button>
-        <!-- <el-button type="primary" @click="dialogVisible = false">确 定</el-button> -->
-      </span>
-    </el-dialog>
     <!-- 分页的组件 -->
     <div align="center" class="showapp_page_14s">
       <el-pagination
@@ -202,6 +158,8 @@
 // import Img from '/img/appImage/logo.png'
 //引入显示分页的组件
 import showPage from "@/views/pro/project/showApp/showPage";
+import { getAppByProcessId } from "@/api/pro/app";
+import { getPath } from "@/api/compile/devenv";
 import {
   getAllApp,
   getAppVosPage,
@@ -217,7 +175,9 @@ import {
   editAppState,
   getProcessByProjectId,
   getprojectByProjectId,
-  handleDown
+  handleDown,
+  deleteAppByAPPId,
+  returnFilePath
 } from "@/api/pro/app";
 export default {
   //import引入的组件需要注入到对象中才能使用
@@ -241,14 +201,11 @@ export default {
       },
       //调接口传的参数
       appDataDTO: {},
-      dialogVisible: false,
-      downLoadInfo: {},
       appData: [],
       appName: "",
       appFile: "",
       appFilePath: "",
       total: 0,
-      labelPosition: "right",
       banArray: [],
       // //展开click事件的禁用
       // oClick: false,
@@ -513,7 +470,6 @@ export default {
     //导出按钮
     downloadClick(domain, index) {
       console.log(domain);
-      this.dialogVisible = true;
       this.appName = domain.fileName;
       this.isAble = false;
       this.appFilePath = domain.filePath + "/" + domain.fileName + "/";
@@ -527,26 +483,37 @@ export default {
       this.appDataDTO.appProPath = domain.filePath + "/" + domain.fileName;
       //系统配置模块xml路径
       this.appDataDTO.sysconfigPath = domain.sysconfigFilePath;
-      //packinfo文件路径（客户自存自取的路径）
-      // this.appDataDTO.packinfoPath = "";
-      //组件划分方案路径（自存自取）
-      // this.appDataDTO.cmpDeployPlanFilePath = "";
 
       //导出接口
-      appTaskExport(this.appDataDTO).then(res => {});
-    },
-    //文件夹的下载
-    handleDown() {
-      let mm = {};
-      mm.oriFilePath = this.appFilePath;
-      mm.downloadAPPFileName = this.appName;
-      handleDown(mm).then(res => {
-        console.log("res:::", res);
-      });
-      this.dialogVisible = false;
+      appTaskExport(this.appDataDTO)
+        .then(res => {})
+        .then(Response => {
+          let mm = {};
+          mm.oriFilePath = this.appFilePath;
+          mm.downloadAPPFileName = this.appName;
+          handleDown(mm).then(res => {});
+        });
     },
     //编译图标
-    playClick(domain, index) {},
+    playClick(domain, index) {
+      returnFilePath({
+        }).then(vals => {
+          //获取组件名，及平台类型
+          for (let key in JSON.parse(domain.partnamePlatform)) {
+            let value = JSON.parse(domain.partnamePlatform)[key];
+            getPath({
+              path: vals.data.data + domain.filePath + "/" + domain.fileName,
+              fileName: key,
+              platformType: value,
+              token: this.$store.getters.access_token
+            }).then(val => {
+              this.$message({
+                message: val.data.data
+              });
+            });
+          }
+        })
+    },
     //加载图标
     loadingClick(domain, index) {
       //APP组件工程生成，<组件名称，对应平台大类属性>
@@ -560,7 +527,7 @@ export default {
       //系统配置模块XML路径
       this.appDataDTO.sysconfigPath = domain.sysconfigFilePath;
       //APP工程文件夹路径
-      this.appDataDTO.appProPath =  domain.filePath + "/" + domain.fileName;
+      this.appDataDTO.appProPath = domain.filePath + "/" + domain.fileName;
       appLoadStart(this.appDataDTO).then(res => {
         if (res.data.data === true) {
           domain.appState = "Loaded";
@@ -841,13 +808,17 @@ export default {
     //配置
     wrenchClick(domain, index) {},
     //删除
-    closeClick(domain, index) {},
-    //添加新的app
-    // addDomain() {
-    //   this.dynamicValidateForm.domains.push({
-    //     value: ""
-    //   });
-    // },
+    closeClick(domain, index) {
+      this.$confirm("此操作将永久删除, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        deleteAppByAPPId(domain.id).then(res => {
+          this.reload();
+        });
+      });
+    },
     //删除
     removeApp(item) {
       var index = this.dynamicValidateForm.domains.indexOf(item);

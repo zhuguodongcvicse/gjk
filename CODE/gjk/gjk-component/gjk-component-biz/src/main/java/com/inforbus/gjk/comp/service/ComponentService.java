@@ -183,4 +183,9 @@ public interface ComponentService extends IService<Component> {
 	 * @param ufile
 	 */
 	List<Component> analysisZipFile(MultipartFile ufile);
+	/**
+	 * 检查更新
+	 * @param obj
+	 */
+	void checkComp(List<Object> obj);
 }

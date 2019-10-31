@@ -153,6 +153,7 @@ export default {
   watch: {
     value(v1) {
       this.leftData = v1;
+      console.log("v1 - watch",v1)
     },
     leftData(v) {
       this.$emit("retValue", v);

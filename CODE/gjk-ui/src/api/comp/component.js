@@ -68,9 +68,9 @@ export function handleSaveComp(obj, token, compId) {
     data: obj
   })
 }
-export function handleSaveCompMap(obj, token, compId) {
+export function handleSaveCompMap(obj, token, compId, userCurrent) {
   return request({
-    url: '/comp/componentdetail/createXmlFileMap/' + token + '/' + compId,
+    url: '/comp/componentdetail/createXmlFileMap/' + token + '/' + compId + '/' + userCurrent,
     method: 'put',
     data: obj
   })
@@ -131,7 +131,7 @@ export function saveCompImg(param) {
     headers: { "Content-Type": "multipart/form-data" },
     data: params
   })
-} 
+}
 
 export function modifyComp(comp) {
   return request({
@@ -158,11 +158,30 @@ export function analysisXmlFile(filePath) {
   })
 }
 
+export function analysisBaseTemplateXmlFile(filePath) {
+  console.log("filePath",filePath)
+  let params = {filePath}
+  console.log("params",params)
+  return request({
+    url: '/comp/component/analysisXmlFile',
+    method: 'post',
+    headers: { "Content-Type": "multipart/form-data" },
+    data: params
+  })
+}
+
 export function importCompZipUpload(param) {
   return request({
     method: "post",
     url: "/comp/component/importCompZipUpload",
     headers: { "Content-Type": "multipart/form-data" },
     data: param
+  })
+}
+export function checkComp(obj){
+  return request({
+    method:"post",
+    url:"/comp/component/checkComp",
+    data:obj
   })
 }

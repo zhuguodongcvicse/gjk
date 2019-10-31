@@ -218,7 +218,8 @@ export default {
       "cjUnitParam",
       "chipsOfHardwarelibs",
       "analysisBaseFile",
-      "headerFile"
+      "headerFile",
+      "fileListOfComponent"
     ])
   },
   //监控data中的数据变化
@@ -227,17 +228,19 @@ export default {
     formXmlParam: {
       immediate: true,
       handler: function(paramsFormXmlParams) {
+        // console.log("paramsFormXmlParams-watch",paramsFormXmlParams)
         this.paramsFormXmlParams = [];
         let xnShowTable = [];
         this.saveXnTableData = {};
         this.cjBaseDataOption = [];
         let baseData = JSON.parse(JSON.stringify(paramsFormXmlParams));
+        // console.log("baseData",baseData)
         for (let key in baseData) {
           const params = baseData[key];
           let type = this.analysisConfigureType(params).lableType;
           // console.log("params-form.vue预处理层级参数", params,type);
           if (type === "tabTS") {
-            console.log("params-form.vue中预处理层级参数", params);
+            // console.log("params-form.vue中预处理层级参数", params);
             this.isShowCJTableData = true;
             this.$set(this.cjBaseData, key, baseData[key]); //设置基础数据
             if (params.xmlEntityMaps) {
@@ -258,15 +261,13 @@ export default {
         }
         this.paramsFormXmlParams = baseData;
         this.xnTableData = xnShowTable;
+        // console.log("this.paramsFormXmlParams-watch",this.paramsFormXmlParams)
       }
     },
     saveXnTableData: {
       handler: function(table) {
         //将性能属性的值返回给父级页面
-        console.log(
-          "paramsFormXmlParamsparamsFormXmlParamsparamsFormXmlParams",
-          table
-        );
+        // console.log("paramsFormXmlParamsparamsFormXmlParamsparamsFormXmlParams",table);
         // this.$emit("change", table, this.paramType);
       },
       deep: true
@@ -274,7 +275,7 @@ export default {
     cjBaseData: {
       handler: function(table) {
         //将性能属性的值返回给父级页面
-        console.log("cjBaseDatacjBaseData将性能属性的值返回给父级页面", table);
+        // console.log("cjBaseDatacjBaseData将性能属性的值返回给父级页面", table);
         this.$emit("change", table, this.paramType);
       },
       deep: true
@@ -326,11 +327,7 @@ export default {
     paramsFormXmlParams: {
       immediate: true,
       handler: function(paramsFormXmlParams) {
-        console.log(
-          "保存的数据。。。。。。",
-          paramsFormXmlParams,
-          this.paramType
-        );
+        // console.log("保存的数据。。。。。。",paramsFormXmlParams,this.paramType);
         //将值返回给父级组件
         this.$emit("change", paramsFormXmlParams, this.paramType);
       },
@@ -343,7 +340,7 @@ export default {
         //层级属性中的所属节点
         let saveStoreData = {}; //所属部件
         let saveStoreTabsData = {};
-        console.log("所属部件所属部件所属部件所属部件", tmpCJData);
+        // console.log("所属部件所属部件所属部件所属部件", tmpCJData);
         for (let key in tmpCJData) {
           if (tmpCJData[key].lableName === "所属部件") {
             saveStoreData = tmpCJData[key];
@@ -352,7 +349,7 @@ export default {
           }
         }
         if (saveStoreData) {
-          console.log("/层级属性中的节点是******所属部件...", saveStoreData);
+          // console.log("/层级属性中的节点是******所属部件...", saveStoreData);
           let findKey =
             this.$route.query.processId + "-" + saveStoreData.attributeMap.name;
           let cjTableSel = [];
@@ -365,7 +362,7 @@ export default {
           };
           this.$store.dispatch("setAnalysisCjUnitParam", { findKey, value });
 
-          console.log("saveStoreTabsData", saveStoreTabsData);
+          // console.log("saveStoreTabsData", saveStoreTabsData);
           let arrayTabData = []; //表格数据
           let arrayColData = []; //表单数据
           // let arrayTabDatax = {};
@@ -394,15 +391,12 @@ export default {
                 }
                 tabData.push(colData);
               }
-              console.log(
-                "将部署配置中的表单arrayColData元素和表格arrayTabData元素合并",
-                arrayColData.concat(tabData)
-              );
+              // console.log("将部署配置中的表单arrayColData元素和表格arrayTabData元素合并",arrayColData.concat(tabData));
               //将部署配置中的表单arrayColData元素和表格arrayTabData元素合并
               this.cjBaseData[key].xmlEntityMaps = arrayColData.concat(tabData);
             }
           }
-          console.log("层级属性中  改变后的数据。。。。", this.cjBaseData);
+          // console.log("层级属性中  改变后的数据。。。。", this.cjBaseData);
         }
       },
       deep: true
@@ -470,15 +464,12 @@ export default {
                 }
                 tabData.push(colData);
               }
-              console.log(
-                "将部署配置中的表单arrayColData元素和表格arrayTabData元素合并",
-                arrayColData.concat(tabData)
-              );
+              // console.log("将部署配置中的表单arrayColData元素和表格arrayTabData元素合并",arrayColData.concat(tabData));
               //将部署配置中的表单arrayColData元素和表格arrayTabData元素合并
               this.cjBaseData[key].xmlEntityMaps = arrayColData.concat(tabData);
             }
           }
-          console.log("层级属性中  改变后的数据。。。。", this.cjBaseData);
+          // console.log("层级属性中  改变后的数据。。。。", this.cjBaseData);
         }
       },
       deep: true
@@ -488,10 +479,15 @@ export default {
   methods: {
     //基本属性解析
     itemTypeChange(baseData, params) {
+      console.log("baseData",baseData)
+      console.log("params",params)
       let config = this.analysisConfigureType(baseData);
+      console.log("config",config)
       config.attrs.forEach(attr => {
         if (attr.attrConfigType === "uploadComm") {
           let analysisBaseFile = this.analysisBaseFile;
+          console.log("analysisBaseFile",analysisBaseFile)
+          console.log("attr",attr)
           let str = "";
           //平台
           if (attr.actionType === "analysisPlatformFile") {
@@ -531,9 +527,26 @@ export default {
           }
           let obj = {};
           obj[str] = this.files;
+          obj["fileTypeTemp"] = attr.actionType;
+          let ifExistSameFile = -1;
           if (JSON.stringify(obj) !== "{}") {
-            analysisBaseFile.push(obj);
-            this.$store.dispatch("setAnalysisBaseFile", analysisBaseFile);
+              if (analysisBaseFile.length != 0){
+                  for (let i in analysisBaseFile) {
+                      if (analysisBaseFile[i].fileTypeTemp == attr.actionType) {
+                          ifExistSameFile = i;
+                          break;
+                      }
+                  }
+                  if (ifExistSameFile != -1) {
+                      analysisBaseFile.splice(ifExistSameFile, 1);
+                      analysisBaseFile.push(obj);
+                  } else {
+                      analysisBaseFile.push(obj);
+                  }
+              } else {
+                  analysisBaseFile.push(obj);
+              }
+            // this.$store.dispatch("setAnalysisBaseFile", analysisBaseFile);
           }
         }
       });
@@ -684,7 +697,7 @@ export default {
       if (attrObj.lableMapping) {
         //基于标签名
         let val = this.compChineseMapping.find(item => {
-          return item.label === con.attrKeys;
+          return item.label === attrObj.attrKeys;
         });
         let param = this.compChineseMapping.find(item => {
           return item.id === attrObj.mappingKeys;

@@ -239,7 +239,7 @@ export default {
   watch: {
     tabBaseParam: {
       handler: function(value) {
-        console.log("00000000000000000", value);
+        // console.log("00000000000000000", value);
       },
       deep: true
     },
@@ -257,7 +257,7 @@ export default {
     //预处理返回数据给子页面
     showDialogTableParam: {
       handler: function(showDialogTableParam) {
-        console.log("showDialogTableParam", showDialogTableParam);
+        // console.log("showDialogTableParam", showDialogTableParam);
         //形参表保存实体转化为显示实体
         this.xmlEntityToShowModel(showDialogTableParam);
         //将值返回给父级组件
@@ -268,7 +268,7 @@ export default {
     Aform: {
       handler: function(aform) {
         let obj = this.variableSel.find(item => {
-          console.log("item.dbId === aform.name;", item.dbId, aform.name);
+          // console.log("item.dbId === aform.name;", item.dbId, aform.name);
           return item.dbId === aform.name;
         });
 
@@ -298,7 +298,7 @@ export default {
     leftHandleRowClick(row) {
       this.fTableCurrentRow = row;
       this.handleSelectChange(row);
-      console.log("//选中左侧this.fTableCurrentRow", row);
+      // console.log("//选中左侧this.fTableCurrentRow", row);
     },
     //右侧行双击事件
     handleRowClick(row, event) {
@@ -319,7 +319,7 @@ export default {
           this.fTableCurrentRow.fparamValue = param;
           // this.fTableCurrentRow.dbId = obj.dbId;
           this.fTableCurrentRow.fdataId = obj.dbId;
-          console.log("this.fTableCurrentRow.dbId", this.fTableCurrentRow);
+          // console.log("this.fTableCurrentRow.dbId", this.fTableCurrentRow);
         } else {
           this.$message({ message: "数据类型不匹配", type: "warning" });
         }
@@ -347,7 +347,7 @@ export default {
     //形参表格赋值类型Select框改变事件调用方法
     handleSelectChange(row) {
       this.variableSel = [];
-      console.log("rowrowrowrow", row);
+      // console.log("rowrowrowrow", row);
       if (row.assignType == "DATA") {
         this.Aform.name = "NULL";
       } else if (row.assignType == "IMMEDIATE") {
@@ -376,7 +376,7 @@ export default {
         // this.fTableCurrentRow = {};
         let showParams = new Array();
         // this.fTableShowDataTOshowParams(showParams, this.fTableShowData);
-        console.log("showParamsshowParamsshowParams", showParams);
+        // console.log("showParamsshowParamsshowParams", showParams);
         // param = {
         //   showParams: new Map().set(this.FformParam.name, showParams),
         //   state: false,
@@ -398,7 +398,7 @@ export default {
     },
     //要显示的数据
     fTableShowDataTOshowParams(toParam, fromParam) {
-      console.log("toParam, fromParam", toParam, fromParam);
+      // console.log("toParam, fromParam", toParam, fromParam);
       for (var i in fromParam) {
         const from = fromParam[i];
         if (from.children.length > 0) {
@@ -425,7 +425,7 @@ export default {
     },
     //将结构体在树形数据上回显
     xmlTreeStructValues(toParam, fromParam) {
-      console.log("toParam0000, fromParam1111", toParam, fromParam);
+      // console.log("toParam0000, fromParam1111", toParam, fromParam);
       for (var i in toParam) {
         const to = toParam[i];
         const rootModel = deepClone(this.rootStructParam);
@@ -451,13 +451,13 @@ export default {
     },
     //将结构体数据转树形数据
     xmlTreeShowTabValues(toParam, fromParam) {
-      console.log("toParam, fromParam", toParam, fromParam);
+      // console.log("toParam, fromParam", toParam, fromParam);
       toParam.forEach(to => {
         const rootModel = deepClone(this.rootStructParam);
         let attributeNameValue = "";
         const separator = rootModel.fparamType.indexOf("*") != -1 ? "->" : ".";
         to.fdataName = rootModel.fparamName + separator + to.assigParamName;
-        console.log("totototototototototo", to);
+        // console.log("totototototototototo", to);
         if (to.children.length > 0) {
         } else {
         }
@@ -470,7 +470,7 @@ export default {
       this.rootStructParam = sendParam.sendStructParam;
       //表头数据
       this.tabOptionData = sendParam.sendTableOption;
-      console.log("this.tabOptionData", this.tabOptionData);
+      // console.log("this.tabOptionData", this.tabOptionData);
       // 当前形参结构体
       let structParam = sendParam.sendStructParam;
       //将要回写的值及显示的值
@@ -478,7 +478,7 @@ export default {
       //基础行数据
       let tabBaseParam = sendParam.sendTabBaseParam;
 
-      console.log("deepClone(this.tabBaseParam)", tabBaseParam);
+      // console.log("deepClone(this.tabBaseParam)", tabBaseParam);
       let queryId = structParam.dbId.replace("_*", "");
       //设置下拉框
       this.structOptions = ["DATA", "IMMEDIATE", "SCRUCTTYPE"];
@@ -534,13 +534,9 @@ export default {
     },
     convertFTableRow(fRow) {
       const rootModel = deepClone(this.rootStructParam);
-      console.log("fRowfRowfRowfRow", fRow, deepClone(this.tabBaseParam));
+      // console.log("fRowfRowfRowfRow", fRow, deepClone(this.tabBaseParam));
       let attributeNameValue = "";
-      console.log(
-        rootModel,
-        "rootModelrootModelrootModel",
-        fRow.assigParamName
-      );
+      // console.log(rootModel,"rootModelrootModelrootModel",fRow.assigParamName);
       // const separator = rootModel.fparamType.indexOf("*") != -1 ? "->" : ".";
       // if (this.isNotStruct) {
       //   attributeNameValue = rootModel.name + separator + fRow.assigParamName;

@@ -136,7 +136,7 @@ export default {
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["pointHFile", "analysisBaseFile"]),
+    ...mapGetters(["pointHFile", "analysisBaseFile", "userInfo"]),
     //用于处理监听时新旧对象的是否一样的问题
     analysisBaseFileData() {
       return JSON.parse(JSON.stringify(this.analysisBaseFile));
@@ -186,8 +186,10 @@ export default {
       deep: true
     },
     fileLists: function(param) {
+      // console.log("param - watch",param)
       //回显文件列表
       let paramFile = param[this.fileType + "file"];
+      // console.log("paramFile - watch", paramFile)
       // console.log("imgimgimgimg", this.fileType, paramFile);
       if (paramFile !== undefined) {
         if (this.fileType === "img") {
@@ -199,6 +201,7 @@ export default {
             this.compValueType.libsID = paramFile.filePath.id;
           }
           this.compValueType.paths = this.filesPath = paramFile.filevo;
+          // console.log("this.compValueType - watch",this.compValueType)
         }
       }
     },
@@ -302,11 +305,13 @@ export default {
     fetchSavefiles(param) {
       let savefiles = {
         compValue: param.id,
+        compId: param.compId,
         compName: param.compName,
         libsID: this.compValueType.libsID,
         version: param.version,
         fileType: this.fileType,
-        paths: this.compValueType.paths
+        paths: this.compValueType.paths,
+        userCurrent: this.userInfo.username
       };
       return Promise.resolve(fetchSavefiles(savefiles));
     },
@@ -344,7 +349,7 @@ export default {
       this.currNode = data;
       let parentType = data.parentType;
       //给input框赋值
-      console.log(this.compValueAndType);
+      // console.log(this.compValueAndType);
       this.algorithm = data.name;
       this.compValueType.libsID = data.id;
       this.visible2 = false;
@@ -383,11 +388,11 @@ export default {
     },
 
     algorithmOnRemove(file, fileList) {
-      console.log(file, fileList);
+      // console.log(file, fileList);
     },
 
     algorithmHandlePreview(file) {
-      console.log(file);
+      // console.log(file);
     },
 
     testOnChange(file, fileList) {
@@ -402,11 +407,11 @@ export default {
     },
 
     testOnRemove(file, fileList) {
-      console.log(file, fileList);
+      // console.log(file, fileList);
     },
 
     testHandlePreview(file) {
-      console.log(file);
+      // console.log(file);
     },
 
     platformOnChange(file, fileList) {
@@ -421,11 +426,11 @@ export default {
     },
 
     platformOnRemove(file, fileList) {
-      console.log(file, fileList);
+      // console.log(file, fileList);
     },
 
     platformHandlePreview(file) {
-      console.log(file);
+      // console.log(file);
     }
 
     // algorithmSubmitUpload() {

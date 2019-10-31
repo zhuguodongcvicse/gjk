@@ -142,6 +142,17 @@ public class AppController {
 	public R removeById(@PathVariable String id) {
 		return new R<>(appService.removeById(id));
 	}
+	
+	/**
+	 * 通过id删除一条记录
+	 * 
+	 * @param id
+	 * @return R
+	 */
+	@PostMapping("/deleteAppByAPPId/{id}")
+	public void deleteAppByAPPId(@PathVariable("id") String id) {
+		appService.deleteAppByAPPId(id);
+	}
 
 	/**
 	 * 获取所有app组件，用于展示
@@ -194,7 +205,12 @@ public class AppController {
 	public R getAppVosPage(@PathVariable String fileName) {
 		return new R<>(appService.getAppVosPage(fileName));
 	}
-
+	
+	@PostMapping(value = "/returnFilePath")
+	public R returnFilePath() {
+		return new R<>(gitFilePath);
+	}
+		
 	/**
 	 * 注册
 	 * 
@@ -399,7 +415,7 @@ public class AppController {
 	 * 导出
 	 * 
 	 * @param appId                 APP对应的流程ID
-	 * @param taskInfoPath          Git临时路径，之后下载到前台
+	 * @param appName               APP名称
 	 * @param appPath               APP工程文件夹路径
 	 * @param sysconfigPath         系统配置模块XML路径
 	 * @param packinfoPath          客户自存自取路径
@@ -416,9 +432,9 @@ public class AppController {
 		String selfSoftToHardResult = gitFilePath + aa + File.separator + generateCodeResult  + File.separator + "packinfo.xml";
 		//组件划分方案路径（自存自取）
 		String selfGenerateCodeResult = gitFilePath + aa + File.separator +  softToHardResult + File.separator + "组件划分方案.xml";
+		String appPath = gitFilePath + aa + File.separator + appDataDTO.getAppProPath();
 		// 还未给接口，自己模拟的接口  + File.separator +
-		ExternalIOTransUtils.appTaskExport(appDataDTO.getFlowId(), gitFilePath + File.separator + "gjk/APPDownload/" + File.separator + appDataDTO.getTaskInfoPath(),
-				gitFilePath + appDataDTO.getAppProPath(), appDataDTO.getSysconfigPath(), selfSoftToHardResult, selfGenerateCodeResult);
+		ExternalIOTransUtils.appTaskExport(appDataDTO.getFlowId(), appDataDTO.getAppName(), appPath, appDataDTO.getSysconfigPath(), selfSoftToHardResult, selfGenerateCodeResult);
 	}
 
 	/**

@@ -45,16 +45,11 @@ visoConfig.baseStyle = {
   //hoverPaintStyle: { stroke: 'blue' },
   isSource: true, // 是否可以拖动（作为连线起点）
  // connector: ['Flowchart', { gap: 0, cornerRadius: 5,stub:10 }],  // 连接线的样式种类有[Bezier],[Flowchart],[StateMachine ],[Straight ]
-  connector: ["Flowchart", { stub: [-5,-5], gap: 0,midpoint:5, cornerRadius: -5, alwaysRespectStubs: true }],
+  connector: ["Flowchart", { stub: [-5,-5], gap: 8,midpoint:5, cornerRadius: 5, alwaysRespectStubs: true }],
   //connector:["Flowchart", { curviness:50 }],
   isTarget: true, // 是否可以放置（连线终点）
   maxConnections: -1, // 设置连接点最多可以连接几条线
   connectorOverlays: [
-    ['Arrow', {
-      width: 10,
-      length: 10,
-      location: 0.1
-    }],
     ['Arrow', {
       width: 10,
       length: 10,
@@ -63,8 +58,13 @@ visoConfig.baseStyle = {
     ['Arrow', {
       width: 10,
       length: 10,
-      location: 0.7
+      location: 0.6
     }],
+    // ['Arrow', {
+    //   width: 10,
+    //   length: 10,
+    //   location: 0.7
+    // }],
     ['Label', {
       label:'<div class ="fz" style="width:16px;height:9px; display:none"></div>',//<div style="border:1px solid red">11</div>
       cssClass: '',

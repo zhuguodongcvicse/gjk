@@ -260,10 +260,7 @@ export default {
       //给树赋值显示值
       node["id"] = randomUuid(); //new Number(randomLenNum(5, false));
       node["lableName"] = base.attributeMap.name;
-      console.log(
-        "base.attributeMap.namebase.attributeMap.name",
-        base.attributeMap
-      );
+      // console.log("base.attributeMap.namebase.attributeMap.name",base.attributeMap);
       node["assigParamName"] = "";
       node["assigStructType"] = "";
       let xmlChild = base.xmlEntityMaps;
@@ -848,7 +845,7 @@ export default {
         let dataTree = [];
         //处理返回树形结构,此处没有问题
         this.convertXmlToRootXml(treeDataAll, dataTree);
-        console.log("1234567890-0987654321", dataTree);
+        // console.log("1234567890-0987654321", dataTree);
         this.treeData = dataTree;
         if (this.treeData !== undefined && this.treeData.length > 0) {
           // 当前表单
@@ -1096,7 +1093,8 @@ export default {
   },
 
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() {
+  },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   beforeCreate() {}, //生命周期 - 创建之前

@@ -83,7 +83,7 @@ function handleMessageFromParent(event) {
 			//主板json
 			for (var i = 0; i < caseArr.length; i++) {
 				board_json[i] = {
-					image: 'images/机箱图标.jpg',
+					image: 'images/CaseIco.jpg',
 					json: caseArr[i],
 					ondrop: 'ondropLoadJSON', //do any thing by your self when drop into the graph
 					showLabel: true

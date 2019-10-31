@@ -98,7 +98,7 @@ public interface ComponentDetailService extends IService<ComponentDetail> {
 	 * @param entity
 	 * @param token
 	 */
-	boolean createXmlFile(XmlEntityMap entMap, String token, String compId);
+	boolean createXmlFile(XmlEntityMap entMap, String token, String compId, String userCurrent);
 
 	/**
 	 * @param ufile

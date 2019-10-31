@@ -76,6 +76,7 @@ export default {
         if (newParam === undefined) {
           this.analysisParamsDefineXmlParams = [];
         } else {
+          // console.log("newParam-watch",newParam)
           newParam.forEach(item => {
             let type = this.analysisConfigureType(item).lableType;
             let lableName = item.lableName;
@@ -99,7 +100,7 @@ export default {
   //方法集合
   methods: {
     saveParamsDefineXmlParams: function(dataParam, nameType) {
-      console.log("params-define.vue中。需要保存的数据结构******", dataParam);
+      // console.log("params-define.vue中。需要保存的数据结构******", dataParam);
       this.$emit("change", dataParam,nameType);
     },
     analysisConfigureType(config) {

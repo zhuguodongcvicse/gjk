@@ -197,4 +197,9 @@ public interface ComponentMapper extends BaseMapper<Component> {
 	 * @return 
 	 */
 	List<Component> selectByComms( @Param("proId") String proId);
+	
+	/**
+	 * 检查更新
+	 */
+	List<Component> checkComp(@Param("compIdList") List<String> compIdList);
 }

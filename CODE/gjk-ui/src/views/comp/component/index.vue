@@ -21,8 +21,8 @@
             type="primary"
             icon="el-icon-edit el-icon--left"
             size="small"
-            @click="templateData.templateVisible = true"
-          >新增</el-button>
+            @click="goToAddCompPage()"
+          >新增</el-button><!-- @click="templateData.templateVisible = true" -->
           <!-- <el-button size="small">
             <i class="el-icon-download el-icon--left"></i>导出
           </el-button>-->
@@ -130,8 +130,10 @@ import {
   putObj,
   delObj,
   getCompDict,
-  importCompZipUpload
+  importCompZipUpload,
+  analysisXmlFile
 } from "@/api/comp/component";
+import { getBaseTemplate } from "@/api/admin/basetemplate";
 import { getStructTree } from "@/api/libs/structlibs";
 import { tableOption } from "@/const/crud/comp/component";
 import { mapGetters } from "vuex";
@@ -194,6 +196,58 @@ export default {
     }
   },
   methods: {
+    goToAddCompPage(){
+        getBaseTemplate().then(response => {
+            console.log("response", response)
+            let defauleBaseTemplate = response.data
+            this.$store.dispatch("setAllBaseTemplate", response.data)
+            analysisXmlFile(response.data[0].tempPath).then(response => {
+                console.log("response", response);
+                this.$store.dispatch("setFetchStrInPointer");
+                //保存加载的数据
+                this.$store
+                    .dispatch("setSaveXmlMaps", response.data.data)
+                    .then(() => {
+                        //加载中英文映射
+                        this.$store
+                            .dispatch("setChineseMapping", "comp_param_type")
+                            .then(() => {
+                                //加载结构体
+                                this.$store
+                                    .dispatch("setStruceType")
+                                    .then(() => {
+                                        this.$router.push({
+                                            path: "/comp/showComp/addAndEditComp",
+                                            query: {
+                                                type: "add",
+                                                proFloName: "添加构件",
+                                                defauleBaseTemplate: defauleBaseTemplate
+                                            }
+                                        });
+                                    })
+                                    .catch(() => {
+                                        this.$message({
+                                            message: "保存加载的数据出错",
+                                            type: "error"
+                                        });
+                                    });
+                            })
+                            .catch(() => {
+                                this.$message({
+                                    message: "保存加载的数据出错",
+                                    type: "error"
+                                });
+                            });
+                        })
+                    .catch(() => {
+                        this.$message({
+                            message: "保存加载的数据出错",
+                            type: "error"
+                        });
+                    });
+            });
+        })
+    },
     onExceed(file, fileList) {
       this.$message.warning(
         `当前限制选择1个文件，本次选择了 ${

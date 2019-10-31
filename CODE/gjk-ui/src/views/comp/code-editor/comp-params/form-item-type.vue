@@ -34,12 +34,15 @@
     ></el-input>
     <!-- @change="$emit('change', $event)" -->
     <!-- 下拉框 -->
+
     <el-select
       v-if="lableType ==='selectComm'"
       v-model="itemParam"
       :placeholder="placeholder"
       filterable
       allow-create
+      :multiple="multiple"
+      collapse-tags
       size="medium"
       default-first-option
       v-bind:style="'width:100%'"
@@ -51,7 +54,7 @@
       <el-option
         v-for="(item,index) in selectOptions"
         :key="index"
-        :label="item.label"
+        :label="item.rightShowName === undefined?item.label:item.label + '<' + item.rightShowName + '>' "
         :value="item.value"
       >
         <span style="float: left">{{ item.label }}</span>
@@ -91,7 +94,8 @@
       size="medium"
       :readonly="readonly"
       :disabled="disabled"
-      @dblclick.native="handleLength(itemParam)"
+      :stuctShowFlag="stuctShowFlag"
+      @dblclick.native="handleLength($event)"
       v-on:blur="onBlurNative"
     ></el-input>
     <!-- @change="$emit('change', $event)" -->
@@ -99,6 +103,7 @@
       v-if="lableType ==='formulaComm'  || lableType ==='assignmenComm'"
       :fatherModel="formulaDialogParams"
       :fileParamType="lableType"
+      :stuctShowFlag="stuctShowFlag"
     ></formula-editing>
   </span>
 </template>
@@ -112,6 +117,7 @@ import { mapGetters } from "vuex";
 import { fetchStrInPointer } from "@/api/libs/structlibs";
 import { getOwnPlatform } from "@/api/admin/platform";
 import formulaEditing from "../formula-editing";
+import {randomUuid} from "../../../../util/util";
 export default {
   //import引入的组件需要注入到对象中才能使用
   props: {
@@ -120,7 +126,9 @@ export default {
     placeholder: { type: String, default: "" }, //组件的placeholder值
     readonly: { type: Boolean, default: false }, //组件是否可读
     disabled: { type: Boolean, default: false }, //组件是否禁用
-    dictKey: [String, Array] //当组件是selectComm时 下拉框数据值
+    multiple: { type: Boolean, default: false }, //组件是否禁用
+    dictKey: [String, Array], //当组件是selectComm时 下拉框数据值
+
   },
   model: {
     prop: "itemValue", // 注意，是prop，不带s。我在写这个速记的时候，多写了一个s，调试到怀疑人生
@@ -132,6 +140,7 @@ export default {
   data() {
     //这里存放数据
     return {
+      stuctShowFlag: {stuctShowFlagTemp:'',randomNumTemp: 0},
       itemParam: [String, Boolean, Array, Number],
       selectOptions: [],
       //公式编辑器
@@ -192,6 +201,9 @@ export default {
               this.selectOptions = this.dictKey;
             }
           }
+          if (Boolean(this.multiple)) {
+            this.multiple = Boolean(this.multiple);
+          }
         }
         if (this.lableType === "switchComm") {
           value = Boolean(value);
@@ -230,7 +242,12 @@ export default {
       this.$emit("onBlurNative");
     },
     //公式编辑器
-    handleLength(param) {
+    handleLength(e) {
+      // console.log("公式编辑器param")
+      //找到输入框的“输入输出”标识 和“参数X”的标识并拼接当做store中的key
+      this.stuctShowFlag.stuctShowFlagTemp = e.currentTarget.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.childNodes.item(0).innerText + '_' + e.currentTarget.parentNode.parentNode.parentNode.childNodes.item(0).innerText
+      //避免多次调用组件时监听不到标识的变化赋值一个随机变量
+      this.stuctShowFlag.randomNumTemp = Math.random()
       this.formulaDialogParams.tmpLengthVal.attributeNameValue = this.itemValue;
       this.formulaDialogParams.dialogFormVisible = true;
     },
@@ -243,7 +260,7 @@ export default {
           size: param.file.size
         };
         this.itemParam = res.data.data;
-        this.$emit("fileChange", file);
+        this.$emit("fileChange", file, param);
       });
     }
   },
