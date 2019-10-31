@@ -178,3 +178,10 @@ export function importCompZipUpload(param) {
     data: param
   })
 }
+export function checkComp(obj){
+  return request({
+    method:"post",
+    url:"/comp/component/checkComp",
+    data:obj
+  })
+}

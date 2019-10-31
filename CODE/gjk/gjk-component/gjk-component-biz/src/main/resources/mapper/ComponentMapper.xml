@@ -349,4 +349,21 @@
 		gjk_common_component WHERE id IN ( SELECT comp_id FROM
 		gjk_project_comp a WHERE a.project_id = #{proId} AND a.can_use = 0)
 	</select>
+	
+	<select id="checkComp" resultMap="componentMap">
+		SELECT
+		id,
+		comp_id,
+		comp_name,
+		comp_funcname,
+		user_id,
+		version,
+		comp_img,
+		description
+		FROM 
+		gjk_common_component WHERE comp_id IN
+		<foreach collection = "compIdList" item = "compId" index = "index"  open="(" close=")" separator=",">
+			#{compId}
+		</foreach>
+	</select>
 </mapper>

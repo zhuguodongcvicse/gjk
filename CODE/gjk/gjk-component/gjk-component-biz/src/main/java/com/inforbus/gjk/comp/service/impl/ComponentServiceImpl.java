@@ -49,6 +49,8 @@ import com.inforbus.gjk.comp.service.ComponentDetailService;
 import com.inforbus.gjk.comp.service.ComponentService;
 
 import cn.hutool.db.sql.Wrapper;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import sun.misc.BASE64Encoder;
 
@@ -67,6 +69,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -83,6 +86,7 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -108,6 +112,8 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	private CompImgMapper compImgMapper;
 	@Autowired
 	private ComponentDetailService componentDetailService;
+	@Autowired
+	private AmqpTemplate rabbitmqTemplate;
 
 	private static final String compDetailPath = JGitUtil.getLOCAL_REPO_PATH();
 
@@ -818,6 +824,54 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	@Override
+	/**
+	 * 检查更新
+	 */
+	public void checkComp(List<Object> obj) {
+		int compNumber = 0;
+		String strJson = "";
+		String token = "";
+		Map<String, String> compIdMap = new HashMap<String,String>();
+		Map<String, String> compNameMap = new HashMap<String,String>();
+		Map<String, String> versionMap = new HashMap<String,String>();
+		List<String> compIdList = new ArrayList<String>();
+		//List<String> idList = new ArrayList<String>();
+		JSONArray compJson = JSONUtil.parseArray(obj);
+		for(int i = 0;i<compJson.size();i++) {
+			JSONObject job = compJson.getJSONObject(i);
+			compIdList.add((String) job.get("compId"));
+			//idList.add((String) job.get("id"));
+			compIdMap.put((String)job.get("id"), (String)job.get("compId"));
+			compNameMap.put((String)job.get("id"), (String)job.get("compName"));
+			versionMap.put((String)job.get("id"), (String)job.get("version"));
+			token = (String)job.get("token");
+			
+		}
+		List<Component> compList = baseMapper.checkComp(compIdList);
+		List<Double> versions = new ArrayList<Double>();
+		
+		for(Map.Entry<String, String> entry : compIdMap.entrySet()){
+		    for(Component comp : compList) {
+		    	if(entry.getValue().equals(comp.getCompId())) {
+		    		versions.add(Double.parseDouble(comp.getVersion()));
+		    	}
+		    }
+		    if(versions.size()>1) {
+		    	compNumber +=1;
+		    }
+		    Collections.sort(versions);
+	    	versions.get(versions.size()-1);
+	    	strJson += compNameMap.get(entry.getKey())+"：当前版本"+versionMap.get(entry.getKey())+";  最高版本为"+versions.get(versions.size()-1)+"\n";
+	    	versions.clear();
+		}
+		System.out.println(strJson);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+		
+		String consoleStr = "<<"+sdf.format(new Date())+"  total  "+compJson.size()+"  updated  "+compNumber+"  Not updated  "+(compJson.size()-compNumber)+"  >>\n"+strJson;
+		this.rabbitmqTemplate.convertAndSend(token , "lcjm"+"===@@@==="+consoleStr);
+		
 	}
 
 }

@@ -24,6 +24,7 @@
           >
             <el-button type="primary" plain size="small">导入</el-button>
           </el-upload>
+           <el-button type="primary" plain size="small" @click="sendMessage('checkComp')">检查更新</el-button>
           <!-- <el-button type="primary" plain size="small" @click="submit($event)">导入</el-button> -->
         </el-button-group>
         <el-select
@@ -105,7 +106,7 @@
 import { mapGetters } from "vuex";
 import gjkIframe from "@/components/iframe/main";
 import paramsDefine from "@/views/comp/code-editor/comp-params/params-define";
-import { getCompList } from "@/api/comp/component";
+import { getCompList,checkComp } from "@/api/comp/component";
 import {
   editProJSON,
   findProJSON,
@@ -293,7 +294,9 @@ export default {
                 attributeMap: {
                   start: e.start,
                   end: e.end,
-                  length: e.length
+                  length: e.length,
+                  endId :e.endId,
+                  stateId:e.stateId
                 }
               });
             });
@@ -459,7 +462,22 @@ export default {
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
         console.log("1111111111111111111111111111", this.$refs.paramsDefine);
         this.$refs.paramsDefine.screenfull();
-      } else {
+      } else if(state === "checkComp"){
+        console.log(this.dtos)
+        let checkList = []
+        let compList = {}
+        for(var value of this.dtos){
+          compList = {}
+          compList.id = value.id
+          compList.compId = value.compId
+          compList.compName = value.compName
+          compList.version = value.version
+          compList.token = this.$store.getters.access_token
+          checkList.push(compList)
+        }
+        checkComp(checkList)
+      }
+       else {
         remote("connectionType").then(val => {
           this.postMessageData.cmd = "getCompDtos";
           this.postMessageData.params = this.dtos;
