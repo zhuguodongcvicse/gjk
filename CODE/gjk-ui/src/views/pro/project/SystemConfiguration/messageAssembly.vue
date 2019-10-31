@@ -1,181 +1,166 @@
 <template>
   <div class="pro_project_systemconfiguration_message_14s" ref="message_14s">
     <!-- 配置cpu的form表单 -->
-    <el-form
-      ref="cpuForm"
-      label-position="right"
-      label-width="80px"
-      :model="cpuForm"
-      v-if="type.sign==='cpu'"
-    >
-      <el-form-item label="节点ID">
-        <el-input v-model="cpuForm.nodeID" />
-      </el-form-item>
-      <el-form-item label="内核ID">
-        <el-select v-model="cpuForm.osCoreIDs" placeholder="请选择" multiple>
-          <el-option v-for="item in CordIDs" :key="item.key" :label="item.value" :value="item.key" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="IP地址">
-        <el-input v-model="cpuForm.ipConfig" />
-      </el-form-item>
+    <el-form label-position="right" label-width="80px" v-if="type.lableName==='node'">
+      <el-divider>{{type.lableName}}</el-divider>
+      <template v-for="(col) in cpuFormAttr">
+        <el-form-item :label="col.attrMappingName" v-if="col.isShow">
+          <form-item-type
+            v-model="type.attributeMap[col.attrName]"
+            :lableType="col.attrConfigType"
+            :dictKey="CordIDs"
+          ></form-item-type>
+        </el-form-item>
+      </template>
     </el-form>
+
     <!-- 配置cmp的form表单 -->
-
-    <el-form
-      ref="cmpForm"
-      label-position="right"
-      label-width="100px"
-      :model="cmpForm"
-      v-if="type.sign==='cmp'"
-    >
-      <el-row :gutter="5">
-        <el-col :span="24">
-          <el-form-item label="部件ID">
-            <el-input v-model="cmpForm.cmpId" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="24">
-          <el-form-item label="方法名称">
-            <el-input v-model="cmpForm.funcName" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="24">
-          <el-form-item label="部件名称">
-            <el-input v-model="cmpForm.cmpName" />
-          </el-form-item>
-        </el-col>
+    <el-form label-position="right" label-width="80px" v-if="type.lableName==='cmp'">
+      <el-divider>{{type.lableName}}</el-divider>
+      <el-row :gutter="5" v-if="cmpAttr.length>0">
+        <template v-for="(col) in cmpAttr">
+          <el-col :span="24">
+            <el-form-item :label="col.attrMappingName" v-if="col.isShow">
+              <form-item-type
+                v-model="type.attributeMap[col.attrName]"
+                :lableType="col.attrConfigType"
+                :dictKey="col.dataKey"
+              ></form-item-type>
+            </el-form-item>
+          </el-col>
+        </template>
       </el-row>
 
-      <div class="pro_project_systemconfiguration_message_div">
-        <span class="fl_14s w100_14s font2 text_align_left_14s">内核部署</span>
-        <el-form-item label="CMM_Read" label-width="100px">
-          <!-- select选择器 -->
-          <el-select v-model="cmpForm.CMM_Read_coreID" placeholder="请选择" multiple>
-            <el-option
-              v-for="item in CordIDs"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="CMM_Write" label-width="100px">
-          <!-- select选择器 -->
-          <el-select v-model="cmpForm.CMM_Write_coreID" placeholder="请选择" multiple>
-            <el-option
-              v-for="item in CordIDs"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="CMP_Compute" label-width="100px">
-          <!-- select选择器 -->
-          <el-select v-model="cmpForm.CMM_Compute_coreID" placeholder="请选择" multiple>
-            <el-option
-              v-for="item in CordIDs"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key"
-            ></el-option>
-          </el-select>
-        </el-form-item>
+      <div v-if="cmmXml.xmlEntityMaps.length>0">
+        <el-divider>{{parseStrToObj(cmmXml.attributeMap.configureType).attrMappingName}}</el-divider>
+        <template v-for="(xml) in cmmXml.xmlEntityMaps">
+          <template v-for="(col) in parseStrToObj(xml.attributeMap.configureType).attrs">
+            <el-form-item
+              :label="parseStrToObj(xml.attributeMap.configureType).lableName"
+              v-if="col.isShow"
+              label-width="100px"
+            >
+              <form-item-type
+                v-model="xml.attributeMap[col.attrName]"
+                :lableType="col.attrConfigType"
+                :dictKey="CordIDs"
+              ></form-item-type>
+            </el-form-item>
+          </template>
+        </template>
       </div>
-      <el-row :gutter="5" class="pro_project_systemconfiguration_message_div">
-        <el-col :span="24">
-          <span class="fl_14s w100_14s font2 text_align_left_14s">tmpBuf</span>
-        </el-col>
-        <el-col :span="24">
-          <el-form-item label="起始地址" label-width="100px">
-            <el-input v-model="cmpForm.tmpBuf_baseAddr" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="24">
-          <el-form-item label="Size" label-width="100px">
-            <el-input v-model="cmpForm.tmpBuf_size" />
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row :gutter="5" class="pro_project_systemconfiguration_message_div">
-        <el-col :span="24">
-          <span class="fl_14s w100_14s font2 text_align_left_14s">moniBuf</span>
-        </el-col>
-        <el-col :span="24">
-          <el-form-item label="起始地址" label-width="100px">
-            <el-input v-model="cmpForm.moniBuf_baseAddr" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="24">
-          <el-form-item label="Size" label-width="100px">
-            <el-input v-model="cmpForm.moniBuf_size" />
-          </el-form-item>
-        </el-col>
+
+      <el-row :gutter="5" v-if="bufXml.length>0">
+        <template v-for="(xml) in bufXml">
+          <el-col :span="24">
+            <el-divider>{{parseStrToObj(xml.attributeMap.configureType).lableName}}</el-divider>
+          </el-col>
+          <template v-for="(col) in parseStrToObj(xml.attributeMap.configureType).attrs">
+            <el-col :span="24">
+              <el-form-item :label="col.attrMappingName" v-if="col.isShow" label-width="80px">
+                <form-item-type
+                  v-model="xml.attributeMap[col.attrName]"
+                  :lableType="col.attrConfigType"
+                ></form-item-type>
+              </el-form-item>
+            </el-col>
+          </template>
+        </template>
       </el-row>
 
-      <el-row :gutter="5" class="pro_project_systemconfiguration_message_div">
+      <el-row :gutter="5" v-if="shmComfig!={}">
         <el-col :span="24">
-          <span class="fl_14s w100_14s font2 text_align_left_14s">shmConfig</span>
+          <el-divider>{{parseStrToObj(shmComfig.attributeMap.configureType).lableName}}</el-divider>
         </el-col>
-        <el-col :span="24">
-          <el-form-item label="Size" label-width="100px">
-            <el-input v-model="cmpForm.shm_size" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="24">
-          <el-form-item label="变量名称" label-width="100px">
-            <el-input v-model="cmpForm.shm_varname" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="24">
-          <el-form-item label="ShmId" label-width="100px">
-            <el-input v-model="cmpForm.shm_ShmId" />
-          </el-form-item>
-        </el-col>
+        <el-table :data="shmComfig.xmlEntityMaps" border height="250" max-height="250">
+          <template v-for="(col) in shmColumn">
+            <el-table-column
+              :prop="col.attrName"
+              :label="col.attrMappingName"
+              :key="col.attrName"
+              v-if="col.isShow"
+            >
+              <template slot-scope="{row}">
+                <form-item-type
+                  v-model="row.attributeMap[col.attrName]"
+                  :lableType="col.attrConfigType"
+                ></form-item-type>
+              </template>
+            </el-table-column>
+          </template>
+
+          <el-table-column fixed="right" label="操作" header-align="center">
+            <template slot-scope="{row,$index}">
+              <el-button
+                type="danger"
+                plain
+                size="mini"
+                @click.native="deleteShmDataRow($index, row)"
+              >删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <div align="center" class="table_add_div_14s">
+          <el-button type="text" @click="addShmDataRow">
+            <font class="addtabrow_btn_14s">添加</font>
+          </el-button>
+        </div>
       </el-row>
 
-      <!-- Tabs标签页左向 -->
       <el-tabs>
-        <el-tab-pane label="网络配置">
-          <span class="font14" v-if="cmpForm.networkInData!=null">网络输入</span>
-          <el-table :data="cmpForm.networkInData" border v-if="cmpForm.networkInData!=null">
-            <!-- <template v-for="(col) in networkColumnArray">
-              <el-table-column :prop="col.prop" :label="col.label" :key="col.prop" fixed></el-table-column>
-            </template>-->
-            <el-table-column label="网络传输协议" prop="protocol" fixed />
-            <el-table-column label="IP地址" prop="ip" fixed />
-            <el-table-column label="端口号" prop="port" fixed />
-          </el-table>
-          <span class="font14" v-if="cmpForm.networkOutData!=null">网络输出</span>
-          <el-table :data="cmpForm.networkOutData" border v-if="cmpForm.networkOutData!=null">
-            <!-- <template v-for="(col) in networkColumnArray">
-              <el-table-column :prop="col.prop" :label="col.label" :key="col.prop" fixed></el-table-column>
-            </template>-->
-            <el-table-column label="网络传输协议" prop="protocol" fixed />
-            <el-table-column label="IP地址" prop="ip" fixed />
-            <el-table-column label="端口号" prop="port" fixed />
-          </el-table>
+        <el-tab-pane label="网络配置" v-if="networkArray.length>0">
+          <template v-for="(network) in networkArray">
+            <el-divider>{{parseStrToObj(network.attributeMap.configureType).lableName}}</el-divider>
+            <el-table
+              :data="network.xmlEntityMaps"
+              border
+              height="150"
+              max-height="150"
+              v-if="network.xmlEntityMaps.length>0"
+            >
+              <template
+                v-for="(col) in parseStrToObj(
+                    network.xmlEntityMaps[0].attributeMap.configureType
+                  ).attrs"
+              >
+                <el-table-column
+                  :prop="col.attrName"
+                  :label="col.attrMappingName"
+                  :key="col.attrName"
+                  v-if="col.isShow"
+                >
+                  <template slot-scope="{row}">{{row.attributeMap[col.attrName]}}</template>
+                </el-table-column>
+              </template>
+            </el-table>
+          </template>
         </el-tab-pane>
+
         <el-tab-pane label="扩展属性">
           <el-row>
             <el-col :span="6">
-              <el-tree
-                :data="cmpForm.attributeListData"
-                :props="defaultProps"
-                @node-click="handleNodeClick"
-              />
+              <el-tree :data="extendListData" :props="defaultProps" @node-click="handleNodeClick" />
             </el-col>
+
             <el-col :span="18">
-              <span class="font14">配置信息</span>
-              <el-table :data="attributeTableData" border>
-                <template v-for="(col) in attrColumnArray">
-                  <el-table-column :prop="col.prop" :label="col.label" :key="col.prop" fixed></el-table-column>
-                </template>
-                <!-- <el-table-column label="协议" prop="protocol" fixed />
-                <el-table-column label="cellNum" prop="cellNum" fixed />
-                <el-table-column label="名称" prop="name" fixed />
-                <el-table-column label="cellSize" prop="cellSize" fixed />-->
+              <el-table :data="extendTableData" border height="400" max-height="400">
+                <div v-if="extendTableData.length>0">
+                  <template
+                    v-for="(col) in parseStrToObj(
+                    extendTableData[0].attributeMap.configureType
+                  ).attrs"
+                  >
+                    <el-table-column
+                      :prop="col.attrName"
+                      :label="col.attrMappingName"
+                      :key="col.attrName"
+                      v-if="col.isShow"
+                    >
+                      <template slot-scope="{row}">{{row.attributeMap[col.attrName]}}</template>
+                    </el-table-column>
+                  </template>
+                </div>
               </el-table>
             </el-col>
           </el-row>
@@ -187,87 +172,103 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { parseStrToObj } from "@/util/util";
+import formItemType from "@/views/comp/code-editor/comp-params/form-item-type";
 export default {
-  props: ["type"],
+  props: ["type", "cordNum"],
+  components: {
+    "form-item-type": formItemType
+  },
   data() {
     //这里存放数据
     return {
       clientHeight: "", //20190827  获取屏幕高度
 
-      cpuForm: {
-        nodeID: "",
-        osCoreIDs: "",
-        ipConfig: "",
-        osCoreSum: ""
-      },
-      cmpForm: {
-        cmpId: "",
-        funcName: "",
-        cmpName: "",
-        CMM_Read_coreID: "",
-        CMM_Write_coreID: "",
-        CMM_Compute_coreID: "",
-        tmpBuf_baseAddr: "",
-        tmpBuf_size: "",
-        moniBuf_baseAddr: "",
-        moniBuf_size: "",
-        shm_size: "",
-        shm_varname: "",
-        shm_ShmId: "",
-        shm_index: "0",
-        networkInData: [],
-        networkOutData: [],
-        attributeListData: []
-      },
-
       CordIDs: [],
-      attributeTableData: [],
 
-      attrColumnArray: [],
-      networkColumnArray: [],
+      //cpu属性列表
+      cpuFormAttr: [],
+      //cmp属性列表
+      cmpAttr: [],
+
+      //cmm
+      cmmXml: {},
+      labelMappingName: "",
+      cmmXml: [],
+
+      //buf
+      bufXml: [],
+
+      //shm
+      shmComfig: {},
+      shmColumn: [],
+      shmCopyModel: {},
+
+      networkArray: [],
+
+      extendListData: [],
+      extendTableData: [],
       defaultProps: {
-        label: "label"
-      },
-
-      typeLabel: ""
+        label: (data, node) => {
+          return parseStrToObj(data.attributeMap.configureType).lableName;
+        }
+      }
     };
   },
   //监听属性 类似于data概念
   computed: {
     ...mapGetters(["userInfo"])
   },
-  //20190827  控制高度
-  mounted() {
-    // 获取浏览器可视区域高度
-    this.clientHeight = `${document.documentElement.clientHeight}`; //document.body.clientWidth;
-    //console.log(self.clientHeight);
-    window.onresize = function temp() {
-      this.clientHeight = `${document.documentElement.clientHeight}`;
-    };
-  }, //20190827  end
 
   //监控data中的数据变化
   watch: {
-    typeLabel: function() {
-      const tmpType = JSON.parse(JSON.stringify(this.type));
-      this.CordIDs = [];
-      if (this.type.coreNum != undefined && this.type.coreNum != null) {
-        let num = new Number(this.type.coreNum);
-        for (let i = 0; i < num; i++) {
-          let item = { key: i, value: i + "" };
-          this.CordIDs.push(item);
-        }
-      }
-      if (this.type.sign == "cpu") {
-        this.cpuForm = this.type.data;
-      } else if (this.type.sign == "cmp") {
-        this.cmpForm = this.type.data;
-      }
-    },
     type: {
       handler: function() {
-        this.typeLabel = this.type.label;
-        // console.log("111111111111111111", this.type);
+        Object.assign(this.$data, this.$options.data());
+        this.CordIDs = [];
+        if (this.cordNum != null) {
+          let num = new Number(this.cordNum);
+          for (let i = 0; i < num; i++) {
+            let item = { key: i, label: i, value: i + "" };
+            this.CordIDs.push(item);
+          }
+        }
+        if (this.type.lableName == "node") {
+          let attr = parseStrToObj(this.type.attributeMap.configureType);
+          this.cpuFormAttr = attr.attrs;
+        } else if (this.type.lableName == "cmp") {
+          let attr = parseStrToObj(this.type.attributeMap.configureType);
+          this.cmpAttr = attr.attrs;
+          if (
+            this.type.xmlEntityMaps != null &&
+            this.type.xmlEntityMaps.length > 0
+          ) {
+            for (let childXmlMap of this.type.xmlEntityMaps) {
+              let childAttr = parseStrToObj(
+                childXmlMap.attributeMap.configureType
+              );
+              if (childAttr.lableType == "coreDeployDiv") {
+                this.cmmXml = childXmlMap;
+              } else if (childAttr.lableType == "buf") {
+                this.bufXml.push(childXmlMap);
+              } else if (childAttr.lableType == "shm") {
+                this.shmComfig = childXmlMap;
+                if (this.shmComfig.xmlEntityMaps.length > 0) {
+                  this.shmColumn = parseStrToObj(
+                    this.shmComfig.xmlEntityMaps[0].attributeMap.configureType
+                  ).attrs;
+                  this.shmCopyModel = JSON.parse(
+                    JSON.stringify(this.shmComfig.xmlEntityMaps[0])
+                  );
+                }
+              } else if (childAttr.lableType == "networkTable") {
+                this.networkArray.push(childXmlMap);
+              } else if (childAttr.lableType == "treeTable") {
+                this.extendListData.push(childXmlMap);
+              }
+            }
+          }
+        }
       },
       immediate: true
     },
@@ -279,11 +280,35 @@ export default {
   },
   //方法集合
   methods: {
-    handleNodeClick(attributeListData) {
-      this.attributeTableData = attributeListData.data;
-      this.attrColumnArray = attributeListData.children.column;
+    handleNodeClick(xml) {
+      this.extendTableData = xml.xmlEntityMaps;
     },
-
+    parseStrToObj(str) {
+      //替换字符串中的'为" 再转换为对象
+      var reg = new RegExp("'", "g");
+      str = str.replace(reg, '"');
+      return JSON.parse(str);
+    },
+    deleteShmDataRow(index, rows) {
+      //移除一行
+      this.shmComfig.xmlEntityMaps.splice(index, 1);
+      this.setAttrIndex(this.shmComfig.xmlEntityMaps);
+    },
+    addShmDataRow() {
+      //新增一行
+      this.shmComfig.xmlEntityMaps.push(
+        JSON.parse(JSON.stringify(this.shmCopyModel))
+      );
+      this.setAttrIndex(this.shmComfig.xmlEntityMaps);
+    },
+    setAttrIndex(xmlEntityMaps) {
+      for (let index in xmlEntityMaps) {
+        let item = xmlEntityMaps[index];
+        if (item.attributeMap.index != undefined) {
+          item.attributeMap.index = index;
+        }
+      }
+    },
     //20190827   动态修改样式
     changeFixed(clientHeight) {
       var clientHeight1 = parseInt(clientHeight) - 302;
@@ -295,7 +320,15 @@ export default {
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {},
   //生命周期 - 挂载完成（可以访问DOM元素）
-  // mounted() {},
+  mounted() {
+    //20190827  控制高度
+    // 获取浏览器可视区域高度
+    this.clientHeight = `${document.documentElement.clientHeight}`; //document.body.clientWidth;
+    //console.log(self.clientHeight);
+    window.onresize = function temp() {
+      this.clientHeight = `${document.documentElement.clientHeight}`;
+    };
+  }, //20190827  end
   beforeCreate() {}, //生命周期 - 创建之前
   beforeMount() {}, //生命周期 - 挂载之前
   beforeUpdate() {}, //生命周期 - 更新之前

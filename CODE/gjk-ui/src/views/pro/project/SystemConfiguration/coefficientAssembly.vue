@@ -9,6 +9,7 @@
 
       <el-tree
         class="pro_project_systemconfiguration_coe_tree_14s"
+        :props="defaultProps"
         :data="coefficientTreeData"
         @node-click="handleNodeClick"
       />
@@ -20,51 +21,24 @@
           <span>信息配置</span>
         </el-col>
       </el-row>
-      <el-table class="coe_table1_14s" :data="messageConfData" border>
-        <template v-for="(col) in coefColumnArray">
-          <el-table-column :prop="col.prop" :label="col.label" :key="col.prop" fixed>
+      <el-table :data="coeffXmlMaps" border height="250" max-height="250">
+        <template v-for="(col) in coeffColumn">
+          <el-table-column
+            :prop="col.attrName"
+            :label="col.attrMappingName"
+            :key="col.attrName"
+            v-if="col.isShow"
+          >
             <template slot-scope="{row}">
-              <el-input v-model="row[col.prop]" size="mini" />
-              <!-- <span size="mini" v-else>{{row[col.prop]}}</span> -->
+              <form-item-type
+                v-model="row.attributeMap[col.attrName]"
+                :lableType="col.attrConfigType"
+              ></form-item-type>
             </template>
           </el-table-column>
         </template>
-        <!-- <el-table-column label="路径系数" prop="filename_coef">
-          <template slot-scope="{row}">
-            <el-input v-model="row.filename_coef" size="mini" v-if="row.isShow" />
-            <span size="mini" v-else>{{row.filename_coef}}</span>
-          </template>
-        </el-table-column>
 
-        <el-table-column label="数量" prop="count">
-          <template slot-scope="{row}">
-            <el-input v-model="row.count" size="mini" v-if="row.isShow" />
-            <span size="mini" v-else>{{row.count}}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="文件路径" prop="filename">
-          <template slot-scope="{row}">
-            <el-input v-model="row.filename" size="mini" v-if="row.isShow" />
-            <span size="mini" v-else>{{row.filename}}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="路径索引" prop="filename_index">
-          <template slot-scope="{row}">
-            <el-input v-model="row.filename_index" size="mini" v-if="row.isShow" />
-            <span size="mini" v-else>{{row.filename_index}}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="系数长度" prop="coeflen">
-          <template slot-scope="{row}">
-            <el-input v-model="row.coeflen" size="mini" v-if="row.isShow" />
-            <span size="mini" v-else>{{row.coeflen}}</span>
-          </template>
-        </el-table-column>-->
-
-        <el-table-column fixed="right" label="操作" header-align="center">
+        <el-table-column label="操作" v-if="showTable">
           <template slot-scope="{row,$index}">
             <el-button
               type="danger"
@@ -82,56 +56,35 @@
         </el-button>
       </div>
     </el-col>
+
     <div class="coefficientassembly_bottom_14s">
       <el-col :span="24" class="nodeText">
         <span>扩展配置</span>
       </el-col>
-      <el-col :span="24">
-        <el-table :data="extendConfData" border>
-          <template v-for="(col) in userSpaceItem.children.column">
-            <el-table-column :prop="col.prop" :label="col.label" :key="col.prop" fixed>
+      <el-col :span="24" v-if="userSpaceXml!={}">
+        <el-table :data="userSpaceXml.xmlEntityMaps" border height="250" max-height="250">
+          <template v-for="(col) in userSpaceColumn">
+            <el-table-column
+              :prop="col.attrName"
+              :label="col.attrMappingName"
+              :key="col.attrName"
+              v-if="col.isShow"
+            >
               <template slot-scope="{row}">
-                <el-input v-model="row[col.prop]" size="mini" />
-                <!-- <span size="mini" v-else>{{row[col.prop]}}</span> -->
+                <form-item-type
+                  v-model="row.attributeMap[col.attrName]"
+                  :lableType="col.attrConfigType"
+                ></form-item-type>
               </template>
             </el-table-column>
           </template>
-
-          <!-- <el-table-column label="变量名称" prop="varname">
-            <template slot-scope="{row}">
-              <el-input v-model="row.varname" size="mini" v-if="row.isShow" />
-              <span size="mini" v-else>{{row.varname}}</span>
-            </template>
-          </el-table-column>
-
-          <el-table-column label="路径系数" prop="filename_coef">
-            <template slot-scope="{row}">
-              <el-input v-model="row.filename_coef" size="mini" v-if="row.isShow" />
-              <span size="mini" v-else>{{row.filename_coef}}</span>
-            </template>
-          </el-table-column>
-
-          <el-table-column label="数量" prop="count">
-            <template slot-scope="{row}">
-              <el-input v-model="row.count" size="mini" v-if="row.isShow" />
-              <span size="mini" v-else>{{row.count}}</span>
-            </template>
-          </el-table-column>
-
-          <el-table-column label="文件路径" prop="filename">
-            <template slot-scope="{row}">
-              <el-input v-model="row.filename" size="mini" v-if="row.isShow" />
-              <span size="mini" v-else>{{row.filename}}</span>
-            </template>
-          </el-table-column>-->
-
           <el-table-column fixed="right" label="操作" header-align="center">
             <template slot-scope="{row,$index}">
               <el-button
                 type="danger"
                 plain
                 size="mini"
-                @click.native="deleteExtendConfDataRow($index, row,'0')"
+                @click.native="deleteExtendConfDataRow($index, row)"
               >删除</el-button>
             </template>
           </el-table-column>
@@ -149,9 +102,11 @@
   
 <script>
 import { mapGetters } from "vuex";
+import { parseStrToObj } from "@/util/util";
+import formItemType from "@/views/comp/code-editor/comp-params/form-item-type";
 export default {
   //父级页面读取配置模板之后传递给此页面的系数配置的相关值
-  props: ["modelXmlEntityMap", "callBackXml"],
+  props: ["modelXmlMap"],
   data() {
     //这里存放数据
     return {
@@ -160,35 +115,26 @@ export default {
 
       //存放系数配置树结构
       coefficientTreeData: [],
-      //系数配置树节点对应的表格值
-      messageConfData: [],
-      //系数配置表格列项
-      coefColumnArray: [],
-
-      //扩展配置表格值
-      extendConfData: [],
-      //扩展配置表格列项
-      userSpaceItem: {
-        label: "",
-        attrMap: {},
-        children: { label: "", column: [] },
-        messageConfData: []
+      defaultProps: {
+        label: (data, node) => {
+          return parseStrToObj(data.attributeMap.configureType).lableName;
+        }
       },
+      //系数配置树节点数据
+      coeffXmlMaps: [],
+      coeffColumn: [],
+      //系数配置树节点模板数据
+      coefXmlModel: {},
 
-      //系数配置页面组成的xmlEntityMap值,包含coefXmlEntityMaps、userSpaceXmlEntityMap的值
-      coefConfigXmlEntity: {
-        lableName: "coefConfig",
-        xmlEntityMaps: []
-      },
-
-      //存放各项系数配置组成的xmlEntityMap值
-      coefXmlEntityMaps: [],
-      //存放扩展配置组成的xmlEntityMap值
-      userSpaceXmlEntityMap: {
-        lableName: "userSpace",
-        xmlEntityMaps: []
-      }
+      //扩展配置
+      userSpaceXml: {},
+      userSpaceColumn: [],
+      //扩展配置模板数据
+      userSpaceXmlModel: {}
     };
+  },
+  components: {
+    "form-item-type": formItemType
   },
   //监听属性 类似于data概念
   computed: {
@@ -196,34 +142,27 @@ export default {
   },
   //监控data中的数据变化
   watch: {
-    extendConfData: {
+    modelXmlMap: {
       handler: function() {
-        this.saveUserSpaceToXmlEntityMap();
-        this.getAllCoefConfigXmlMapAndGaveTOParentVue();
-      },
-      deep: true
-    },
-    coefficientTreeData: {
-      handler: function() {
-        this.saveCoefTreeToXmlEntityMap();
-        this.getAllCoefConfigXmlMapAndGaveTOParentVue();
-      },
-      deep: true
-    },
-    //当父级页面传值过来时将值进行解析,此方法只会在父级页面解析模板文件向此页面传值时执行一次
-    "modelXmlEntityMap.xmlEntityMaps": function() {
-      if (this.modelXmlEntityMap.xmlEntityMaps != undefined) {
-        for (let item of this.modelXmlEntityMap.xmlEntityMaps) {
-          this.setCoefAndUserSpace(item, "");
-        }
-        this.$emit("xmlEntityMapChange", this.coefConfigXmlEntity);
-      }
-    },
-    callBackXml: {
-      handler: function() {
-        this.coefficientTreeData = [];
-        for (let item of this.callBackXml.xmlEntityMaps) {
-          this.setCoefAndUserSpace(item, "callBack");
+        if (
+          this.modelXmlMap.xmlEntityMaps != undefined &&
+          this.modelXmlMap.xmlEntityMaps != null &&
+          this.modelXmlMap.xmlEntityMaps.length > 0
+        ) {
+          for (let item of this.modelXmlMap.xmlEntityMaps) {
+            let itemConfig = parseStrToObj(item.attributeMap.configureType);
+            if (itemConfig.lableType == "treeTable") {
+              this.coefficientTreeData.push(item);
+            } else if (itemConfig.lableType == "attrTable") {
+              this.userSpaceXml = item;
+              if (item.xmlEntityMaps != null && item.xmlEntityMaps.length > 0) {
+                this.userSpaceXmlModel = item.xmlEntityMaps[0];
+                this.userSpaceColumn = parseStrToObj(
+                  this.userSpaceXmlModel.attributeMap.configureType
+                ).attrs;
+              }
+            }
+          }
         }
       },
       deep: true
@@ -232,127 +171,53 @@ export default {
   //方法集合
   methods: {
     handleNodeClick(coefficientTreeData) {
-      this.showTable = true;
-      this.messageConfData = coefficientTreeData.messageConfData;
-      this.coefColumnArray = coefficientTreeData.children.column;
-      this.messageConfData.index = coefficientTreeData.$treeNodeId;
-    },
-    getAllCoefConfigXmlMapAndGaveTOParentVue() {
-      this.coefConfigXmlEntity.xmlEntityMaps = JSON.parse(
-        JSON.stringify(this.coefXmlEntityMaps)
-      );
-      this.coefConfigXmlEntity.xmlEntityMaps.push(this.userSpaceXmlEntityMap);
-      this.$emit("xmlEntityMapChange", this.coefConfigXmlEntity);
-    },
-    setCoefAndUserSpace(item, str) {
-      let coefItem = {
-        label: item.lableName,
-        attrMap: item.attributeMap,
-        children: { label: "", column: [] },
-        messageConfData: []
-      };
-      if (item.xmlEntityMaps != null && item.xmlEntityMaps.length > 0) {
-        coefItem.children.label = item.xmlEntityMaps[0].lableName;
-        for (let key in item.xmlEntityMaps[0].attributeMap) {
-          coefItem.children.column.push({
-            prop: key,
-            label: key,
-            defaultStr: item.xmlEntityMaps[0].attributeMap[key]
-          });
-        }
-        if (str == "callBack") {
-          for (let dataItem of item.xmlEntityMaps) {
-            coefItem.messageConfData.push(dataItem.attributeMap);
-          }
-        }
-      }
-      if (item.lableName == "userSpace") {
-        this.userSpaceItem = coefItem;
-        this.extendConfData = coefItem.messageConfData;
-      } else {
-        //添加树节点的方法
-        this.addTreeNode(coefItem);
+      if (
+        coefficientTreeData.xmlEntityMaps != null &&
+        coefficientTreeData.xmlEntityMaps.length > 0
+      ) {
+        this.showTable = true;
+        this.coeffXmlMaps = coefficientTreeData.xmlEntityMaps;
+        this.coefXmlModel = coefficientTreeData.xmlEntityMaps[0];
+        this.coeffColumn = parseStrToObj(
+          this.coefXmlModel.attributeMap.configureType
+        ).attrs;
       }
     },
-    saveUserSpaceToXmlEntityMap() {
-      this.userSpaceXmlEntityMap.attributeMap = this.userSpaceItem.attrMap;
-      this.userSpaceXmlEntityMap.xmlEntityMaps = [];
-      for (let item of this.extendConfData) {
-        let xmlEntityMap = {};
-        xmlEntityMap.lableName = "coef";
-        this.$set(item, "index", this.extendConfData.indexOf(item));
-        xmlEntityMap.attributeMap = item;
-        this.userSpaceXmlEntityMap.xmlEntityMaps.push(xmlEntityMap);
-      }
-    },
-    saveCoefTreeToXmlEntityMap() {
-      this.coefXmlEntityMaps = [];
-      for (let item of this.coefficientTreeData) {
-        let xmlEntityMap = {
-          lableName: "",
-          xmlEntityMaps: []
-        };
-        xmlEntityMap.lableName = item.label;
-        xmlEntityMap.attributeMap = item.attrMap;
-        for (let mapItem of item.messageConfData) {
-          let index = item.messageConfData.indexOf(mapItem);
-          let xml = {};
-          xml.lableName = "coef";
-          this.$set(mapItem, "index", index);
-          xml.attributeMap = mapItem;
-          xmlEntityMap.xmlEntityMaps.push(xml);
-        }
-        this.coefXmlEntityMaps.push(xmlEntityMap);
-      }
+    parseStrToObj(str) {
+      //替换字符串中的'为" 再转换为对象
+      var reg = new RegExp("'", "g");
+      str = str.replace(reg, '"');
+      return JSON.parse(str);
     },
     addMessageConfDataRow() {
       //新增一行
-      this.addRow(this.messageConfData, this.coefColumnArray);
+      this.coeffXmlMaps.push(JSON.parse(JSON.stringify(this.coefXmlModel)));
+      this.setAttrIndex(this.coeffXmlMaps);
     },
     addExtendConfDataRow() {
       //新增一行
-      this.addRow(this.extendConfData, this.userSpaceItem.children.column);
-    },
-    addRow(dataArray, columnArray) {
-      if (dataArray.length > 0) {
-        let item = JSON.parse(JSON.stringify(dataArray[dataArray.length - 1]));
-        if (item.index != undefined) {
-          item.index = dataArray.length + "";
-        }
-        dataArray.push(item);
-      } else {
-        if (columnArray.length > 0) {
-          let item = {};
-          for (let attr of columnArray) {
-            if (attr.prop == "index") {
-              this.$set(item, attr.prop, "0");
-            } else {
-              this.$set(item, attr.prop, attr.defaultStr);
-            }
-          }
-          dataArray.push(item);
-        }
-      }
-    },
-    addTreeNode(coefItem) {
-      this.coefficientTreeData.push(coefItem);
+      this.userSpaceXml.xmlEntityMaps.push(
+        JSON.parse(JSON.stringify(this.userSpaceXmlModel))
+      );
+      this.setAttrIndex(this.userSpaceXml.xmlEntityMaps);
     },
     deleteMessageConfDataRow(index, rows) {
       //移除一行
-      this.messageConfData.splice(index, 1);
+      this.coeffXmlMaps.splice(index, 1);
+      this.setAttrIndex(this.coeffXmlMaps);
     },
     deleteExtendConfDataRow(index, rows) {
       //移除一行
-      this.extendConfData.splice(index, 1);
+      this.userSpaceXml.xmlEntityMaps.splice(index, 1);
+      this.setAttrIndex(this.userSpaceXml.xmlEntityMaps);
     },
-    //检查字符串结尾 判断一个字符串(str)是否以指定的字符串(target)结尾
-    confirmEnding(str, target) {
-      var arr = str.replace(/\s+/g, "");
-      var bb = arr.substr(arr.length - target.length, arr.length);
-      if (bb == target) {
-        return true;
+    setAttrIndex(xmlEntityMaps) {
+      for (let index in xmlEntityMaps) {
+        let item = xmlEntityMaps[index];
+        if (item.attributeMap.index != undefined) {
+          item.attributeMap.index = index;
+        }
       }
-      return false;
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
