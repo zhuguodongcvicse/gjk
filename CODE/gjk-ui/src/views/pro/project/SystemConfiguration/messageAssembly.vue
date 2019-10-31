@@ -9,6 +9,7 @@
             v-model="type.attributeMap[col.attrName]"
             :lableType="col.attrConfigType"
             :dictKey="CordIDs"
+            :multiple="col.multiple"
           ></form-item-type>
         </el-form-item>
       </template>
@@ -44,6 +45,7 @@
                 v-model="xml.attributeMap[col.attrName]"
                 :lableType="col.attrConfigType"
                 :dictKey="CordIDs"
+                :multiple="col.multiple"
               ></form-item-type>
             </el-form-item>
           </template>

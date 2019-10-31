@@ -2,7 +2,7 @@
 <sysConfig
 	configureType="{'lableType':'false','lableName':'sysConfig','lableMapping':false,'attrs':[]}">
 	<node
-		configureType="{'lableType':'cpuPage','lableName':'node','lableMapping':false,'attrs':[{'attrName':'ipConfig','attrMapping':true,'attrMappingName':'IP地址','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':80},{'attrName':'id','attrMapping':true,'attrMappingName':'ID','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':81},{'attrName':'osCoreID','attrMapping':true,'attrMappingName':'芯片选择','actionType':'','isShow':true,'attrConfigType':'selectComm','dataKey':[],'attrKeys':82},{'attrName':'osCoreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'inputComm','attrKeys':83}]}"
+		configureType="{'lableType':'cpuPage','lableName':'node','lableMapping':false,'attrs':[{'attrName':'ipConfig','attrMapping':true,'attrMappingName':'IP地址','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':80},{'attrName':'id','attrMapping':true,'attrMappingName':'ID','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':81},{'attrName':'osCoreID','attrMapping':true,'attrMappingName':'芯片选择','actionType':'','isShow':true,'attrConfigType':'selectComm','multiple':true,'dataKey':[],'attrKeys':82},{'attrName':'osCoreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'length','attrKeys':83}]}"
 		osCoreID="1-2" id="0" ipConfig="192.168.0.7" osCoreSum="2">
 		<cmpDeploy
 			configureType="{'lableType':'cmpDeploy','lableName':'cmpDeploy','lableMapping':false,'attrs':[]}">
@@ -12,14 +12,14 @@
 				<coreDeploy
 					configureType="{'lableType':'coreDeployDiv','lableName':'coreDeploy','lableMapping':true,'attrMappingName':'内核部署','attrs':[]}">
 					<CMM_Read
-						configureType="{'lableType':'false','lableName':'CMM_Read','lableMapping':false,'attrs':[{'attrName':'coreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'selectComm','dataKey':'[]','attrKeys':107},{'attrName':'coreID','attrMapping':true,'attrMappingName':'芯片ID','actionType':'','isShow':true,'attrConfigType':'selectComm','dataKey':'[]','attrKeys':108}]}"
+						configureType="{'lableType':'false','lableName':'CMM_Read','lableMapping':false,'attrs':[{'attrName':'coreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'length','dataKey':'[]','attrKeys':107},{'attrName':'coreID','attrMapping':true,'attrMappingName':'芯片ID','actionType':'','isShow':true,'attrConfigType':'selectComm','multiple':true,'dataKey':'[]','attrKeys':108}]}"
 						coreID="1" coreSum="1" />
 					<CMM_Write
-						configureType="{'lableType':'false','lableName':'CMM_Write','lableMapping':false,'attrs':[{'attrName':'coreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'selectComm','dataKey':'[]','attrKeys':107},{'attrName':'coreID','attrMapping':true,'attrMappingName':'芯片ID','actionType':'','isShow':true,'attrConfigType':'selectComm','dataKey':'[]','attrKeys':108}]}"
+						configureType="{'lableType':'false','lableName':'CMM_Write','lableMapping':false,'attrs':[{'attrName':'coreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'length','dataKey':'[]','attrKeys':107},{'attrName':'coreID','attrMapping':true,'attrMappingName':'芯片ID','actionType':'','isShow':true,'attrConfigType':'selectComm','multiple':true,'dataKey':'[]','attrKeys':108}]}"
 						coreID="2" coreSum="1" />
 					<CMM_Compute
-						configureType="{'lableType':'false','lableName':'CMM_Compute','lableMapping':false,'attrs':[{'attrName':'coreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'selectComm','dataKey':'[]','attrKeys':107},{'attrName':'coreID','attrMapping':true,'attrMappingName':'芯片ID','actionType':'','isShow':true,'attrConfigType':'selectComm','dataKey':'[]','attrKeys':108}]}"
-						coreID="3_4_5" coreSum="3" />
+						configureType="{'lableType':'false','lableName':'CMM_Compute','lableMapping':false,'attrs':[{'attrName':'coreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'length','dataKey':'[]','attrKeys':107},{'attrName':'coreID','attrMapping':true,'attrMappingName':'芯片ID','actionType':'','isShow':true,'attrConfigType':'selectComm','multiple':true,'dataKey':'[]','attrKeys':108}]}"
+						coreID="3-4-5" coreSum="3" />
 				</coreDeploy>
 				<tmpBuf
 					configureType="{'lableType':'buf','lableName':'tmpBuf','lableMapping':false,'attrs':[{'attrName':'size','attrMapping':true,'attrMappingName':'长度','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':87},{'attrName':'baseAddr','attrMapping':true,'attrMappingName':'起始地址','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':88}]}"

@@ -216,35 +216,41 @@ export default {
                       }
                     }
                   }
-                  this.$set(
-                    this.tablePane[1],
-                    "modelXmlMap",
-                    JSON.parse(JSON.stringify(coefXmlMap))
-                  );
                 }
               }
-            });
-          }
 
-          if (Response.data.chips) {
-            let chipsData = JSON.parse(Response.data.chips);
-            for (let node of treeData) {
-              for (let chip of chipsData) {
-                if (node.attributeMap.id == chip.nodeID) {
-                  node.attributeMap.ipConfig = chip.IP;
-                  this.$set(node, "coreNum", chip.coreNum);
-                  if (node.children.length > 0) {
-                    for (let cmpItem of node.children) {
-                      this.$set(cmpItem, "coreNum", chip.coreNum);
-                    }
-                  }
+              this.setNodeAttrByChip(coefXmlMap, Response, treeData);
+            });
+          } else {
+            this.setNodeAttrByChip(coefXmlMap, Response, treeData);
+          }
+        });
+      });
+    },
+    setNodeAttrByChip(coefXmlMap, Response, treeData) {
+      this.$set(
+        this.tablePane[1],
+        "modelXmlMap",
+        JSON.parse(JSON.stringify(coefXmlMap))
+      );
+      if (Response.data.chips) {
+        let chipsData = JSON.parse(Response.data.chips);
+        for (let node of treeData) {
+          for (let chip of chipsData) {
+            if (node.attributeMap.id == chip.nodeID) {
+              node.attributeMap.ipConfig = chip.IP;
+              this.$set(node, "coreNum", chip.coreNum);
+              if (node.children.length > 0) {
+                for (let cmpItem of node.children) {
+                  this.$set(cmpItem, "coreNum", chip.coreNum);
                 }
               }
             }
           }
-          this.setTreeCmp(treeData);
-        });
-      });
+          this.setStrToCordId(node, node.coreNum);
+        }
+      }
+      this.setTreeCmp(treeData);
     },
     //4:调用api return获取cmp数据
     setTreeCmp(treeData) {
@@ -263,10 +269,19 @@ export default {
                     "CMM_Compute",
                     null
                   );
-                  this.returnXmlEntityMap.attributeMap.coreID = JSON.parse(
-                    JSON.stringify(this.coreStrToCoreArray(element[4], "_"))
-                  );
-                  this.returnXmlEntityMap.attributeMap.coreSum = this.returnXmlEntityMap.attributeMap.coreID.length;
+                  for (let returnXmlAttr of parseStrToObj(
+                    this.returnXmlEntityMap.attributeMap.configureType
+                  ).attrs) {
+                    if (returnXmlAttr.attrConfigType == "length") {
+                      this.returnXmlEntityMap.attributeMap[
+                        returnXmlAttr.attrName
+                      ] = element[3];
+                    } else if (returnXmlAttr.attrConfigType == "selectComm") {
+                      this.returnXmlEntityMap.attributeMap[
+                        returnXmlAttr.attrName
+                      ] = element[4];
+                    }
+                  }
                   for (let index in element) {
                     let item = element[index];
                     if (index > 4 && item.msg != undefined) {
@@ -283,6 +298,7 @@ export default {
                   }
                 }
               }
+              this.setStrToCordId(cmpItem, cmpItem.coreNum);
             }
           }
         }
@@ -392,13 +408,16 @@ export default {
       let configureType = parseStrToObj(
         xmlEntityMap.attributeMap.configureType
       );
+      let flag = false;
+      let cordIdLength = "";
       for (let attrItem of configureType.attrs) {
-        //待写，填写选择核的数量
         if (
-          attrItem.attrConfigType == "selectComm"
-          // &&
-          // attrItem.multiple == "true"
+          attrItem.attrConfigType == "selectComm" &&
+          attrItem.multiple == true
         ) {
+          flag = true;
+          cordIdLength =
+            xmlEntityMap.attributeMap[attrItem.attrName].length + "";
           xmlEntityMap.attributeMap[
             attrItem.attrName
           ] = this.coreArrayToCoreStr(
@@ -407,12 +426,57 @@ export default {
           );
         }
       }
+      for (let attrItem of configureType.attrs) {
+        if (attrItem.attrConfigType == "length") {
+          if (flag) {
+            xmlEntityMap.attributeMap[attrItem.attrName] = cordIdLength;
+          }
+        }
+      }
       if (
         xmlEntityMap.xmlEntityMaps != null &&
         xmlEntityMap.xmlEntityMaps.length > 0
       ) {
         for (let item of xmlEntityMap.xmlEntityMaps) {
           this.setSelectCordIdToStr(item);
+        }
+      }
+    },
+    setStrToCordId(xmlEntityMap, coreNum) {
+      let configureType = parseStrToObj(
+        xmlEntityMap.attributeMap.configureType
+      );
+      for (let attrItem of configureType.attrs) {
+        if (
+          attrItem.attrConfigType == "selectComm" &&
+          attrItem.multiple == true
+        ) {
+          let array = this.coreStrToCoreArray(
+            xmlEntityMap.attributeMap[attrItem.attrName],
+            "-"
+          );
+          let newArray = [];
+          for (let item of array) {
+            let flag = false;
+            for (let i = 0; i < coreNum; i++) {
+              if (i + "" == item) {
+                flag = true;
+              }
+            }
+            if (flag) {
+              newArray.push(item);
+            }
+          }
+          xmlEntityMap.attributeMap[attrItem.attrName] = [];
+          xmlEntityMap.attributeMap[attrItem.attrName] = newArray;
+        }
+      }
+      if (
+        xmlEntityMap.xmlEntityMaps != null &&
+        xmlEntityMap.xmlEntityMaps.length > 0
+      ) {
+        for (let item of xmlEntityMap.xmlEntityMaps) {
+          this.setStrToCordId(item, coreNum);
         }
       }
     },
