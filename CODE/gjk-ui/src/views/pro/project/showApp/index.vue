@@ -498,11 +498,21 @@ export default {
     playClick(domain, index) {
       returnFilePath({
         }).then(vals => {
+          //console.log("oooo",JSON.parse(domain.partnamePlatform))
           //获取组件名，及平台类型
           for (let key in JSON.parse(domain.partnamePlatform)) {
             let value = JSON.parse(domain.partnamePlatform)[key];
+            if(value === "win_vs2010"){
+              value = "VS2010";
+            }else if(value === "win_sylixos"){
+              value = "Sylixos";
+            }else if(value === "win_workbench"){
+              value = "Workbench";
+            }else if(value === "linux_icc"){
+              value = "Linux";
+            }
             getPath({
-              path: vals.data.data + domain.filePath + "/" + domain.fileName,
+              path: vals.data.data + domain.filePath + "/" + domain.fileName+"/"+key,
               fileName: key,
               platformType: value,
               token: this.$store.getters.access_token

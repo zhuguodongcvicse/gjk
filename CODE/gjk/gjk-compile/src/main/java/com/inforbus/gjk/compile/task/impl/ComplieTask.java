@@ -4,7 +4,6 @@ import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
 import com.inforbus.gjk.common.core.util.FileUtil;
-import com.inforbus.gjk.compile.exception.FileNotFoundException;
 import com.inforbus.gjk.compile.task.Task;
 import com.inforbus.gjk.compile.util.ChannelSftpSingleton;
 import com.inforbus.gjk.compile.util.SftpUtil;
@@ -27,11 +26,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /*
-* 2019年10月30日 11:19:08
-* wang创建
-* 编译任务类,编译功能
-*
-* */
+ * 2019年10月30日 11:19:08
+ * wang创建
+ * 编译任务类,编译功能
+ *
+ * */
 @Component("complieTask")
 @Scope("prototype")
 public class ComplieTask implements Task {
@@ -125,7 +124,7 @@ public class ComplieTask implements Task {
                         str = devenv(childFile.getAbsolutePath(), this.getFileName(), this.getToken());
                     }
                 }
-            }else if (platformType.equals("Sylixos")) {
+            } else if (platformType.equals("Sylixos")) {
                 //判断是否是Sylixos平台
                 isFile = true;
                 str = sylixos(file.getAbsolutePath(), fileName, token);
@@ -144,7 +143,7 @@ public class ComplieTask implements Task {
 
             }
         } else {
-            logger.error("传入路径错误,"+this.getPath1()+"文件路径不存在");
+            logger.error("传入路径错误," + this.getPath1() + "文件路径不存在");
             //throw new FileNotFoundException("传入路径错误,"+file.getName()+"不存在");
         }
 
@@ -158,6 +157,7 @@ public class ComplieTask implements Task {
         }
         return str;
     }
+
     //编译windows平台vs2010
     private String devenv(String slnpath, String fileName, String token) {
         //String strCommand = "";
@@ -172,9 +172,10 @@ public class ComplieTask implements Task {
         Runtime rt = Runtime.getRuntime();
         LineNumberReader input = null;
         Process p = null;
+        InputStreamReader ir = null;
         try {
             p = rt.exec(cmd, null, dir);
-            InputStreamReader ir = new InputStreamReader(p.getInputStream(), "GBK");
+            ir = new InputStreamReader(p.getInputStream(), "GBK");
             input = new LineNumberReader(ir);
             String line = "";
             while ((line = input.readLine()) != null) {
@@ -190,6 +191,23 @@ public class ComplieTask implements Task {
             if (input != null) {
                 try {
                     input.close();
+                } catch (IOException e) {
+                    logger.error("IO关闭失败，请联系管理员。");
+                    e.printStackTrace();
+                }
+            }
+            if (p != null) {
+                try {
+                    p.waitFor();
+                } catch (InterruptedException e) {
+                    logger.error("进程失败，请联系管理员。");
+                    e.printStackTrace();
+                }
+                p.destroy();
+            }
+            if (ir != null) {
+                try {
+                    ir.close();
                 } catch (IOException e) {
                     logger.error("IO关闭失败，请联系管理员。");
                     e.printStackTrace();
@@ -212,8 +230,6 @@ public class ComplieTask implements Task {
         Process p = null;
         try {
             p = rt.exec(cmd, null, dir);
-            //关闭流释放资源
-
             InputStreamReader ir = new InputStreamReader(p.getInputStream(), "GBK");
             input = new LineNumberReader(ir);
             String line = "";
@@ -227,8 +243,8 @@ public class ComplieTask implements Task {
         } catch (IOException e) {
             logger.error("IO读取失败，请检查组件工程文件。");
             e.printStackTrace();
-        }finally {
-            if(input!=null){
+        } finally {
+            if (input != null) {
                 try {
                     input.close();
                 } catch (IOException e) {
@@ -238,11 +254,12 @@ public class ComplieTask implements Task {
             }
             if (p != null) {
                 try {
-                    p.getOutputStream().close();
-                } catch (IOException e) {
-                    logger.error("IO关闭失败，请联系管理员。");
+                    p.waitFor();
+                } catch (InterruptedException e) {
+                    logger.error("进程失败，请联系管理员。");
                     e.printStackTrace();
                 }
+                p.destroy();
             }
         }
         return strCommand;
@@ -275,8 +292,8 @@ public class ComplieTask implements Task {
         } catch (IOException e) {
             logger.error("IO读取失败，请检查组件工程文件。");
             e.printStackTrace();
-        }finally {
-            if (input!=null){
+        } finally {
+            if (input != null) {
                 try {
                     input.close();
                 } catch (IOException e) {
@@ -284,7 +301,7 @@ public class ComplieTask implements Task {
                     e.printStackTrace();
                 }
             }
-            if (ir!=null){
+            if (ir != null) {
                 try {
                     ir.close();
                 } catch (IOException e) {
@@ -292,13 +309,14 @@ public class ComplieTask implements Task {
                     e.printStackTrace();
                 }
             }
-            if (p!=null){
+            if (p != null) {
                 try {
-                    p.getInputStream().close();
-                } catch (IOException e) {
-                    logger.error("IO关闭失败，请联系管理员。");
+                    p.waitFor();
+                } catch (InterruptedException e) {
+                    logger.error("进程失败，请联系管理员。");
                     e.printStackTrace();
                 }
+                p.destroy();
             }
         }
         return strCommand;
@@ -329,7 +347,7 @@ public class ComplieTask implements Task {
         } catch (IOException e) {
             logger.error("Linux服务器连接失败,请检查IP,账号,密码是否正确");
             e.getStackTrace();
-        }finally {
+        } finally {
             if (session != null) {
                 session.close();
             }
@@ -367,7 +385,7 @@ public class ComplieTask implements Task {
         //makefile文件夹路径
         String makeFilePath = "";
         InputStream is = null;
-        BufferedReader brs = null;
+        BufferedReader bufRder = null;
         try {
             Connection connection = new Connection(ip);
             connection.connect();
@@ -379,9 +397,9 @@ public class ComplieTask implements Task {
 
             //获取输出结果 为 makefile 的绝对路径
             is = new StreamGobbler(session.getStdout());
-            brs = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            bufRder = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
             String temp = "";
-            while ((temp = brs.readLine()) != null) {
+            while ((temp = bufRder.readLine()) != null) {
                 makeFilePath = temp.substring(0, temp.lastIndexOf("/"));
             }
 
@@ -391,8 +409,8 @@ public class ComplieTask implements Task {
 
             //成功返回
             is = new StreamGobbler(session.getStdout());
-            brs = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-            while ((temp = brs.readLine()) != null) {
+            bufRder = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            while ((temp = bufRder.readLine()) != null) {
                 //推送消息到rabbitmq中
                 //this.rabbitmqTemplate.convertAndSend(token , token+"===@@@==="+fileName+"===@@@===\n"+temp);
                 this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n" + temp);
@@ -400,8 +418,8 @@ public class ComplieTask implements Task {
 
             //失败返回
             is = new StreamGobbler(session.getStderr());
-            brs = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-            while ((temp = brs.readLine()) != null) {
+            bufRder = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            while ((temp = bufRder.readLine()) != null) {
                 //推送消息到rabbitmq中
                 this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n" + temp);
             }
@@ -412,18 +430,18 @@ public class ComplieTask implements Task {
 
             //成功返回
             is = new StreamGobbler(session.getStdout());
-            brs = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-            while ((temp = brs.readLine()) != null) {
+            bufRder = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            while ((temp = bufRder.readLine()) != null) {
                 //推送消息到rabbitmq中
                 this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n" + temp);
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             if (session != null) {
                 session.close();
             }
-            if (is!=null){
+            if (is != null) {
                 try {
                     is.close();
                 } catch (IOException e) {
@@ -431,9 +449,9 @@ public class ComplieTask implements Task {
                     e.printStackTrace();
                 }
             }
-            if (brs != null){
+            if (bufRder != null) {
                 try {
-                    brs.close();
+                    bufRder.close();
                 } catch (IOException e) {
                     logger.error("IO关闭失败，请联系管理员。");
                     e.printStackTrace();
@@ -495,8 +513,8 @@ public class ComplieTask implements Task {
             session.execCommand("rm -rf " + lPath + "/" + ProcessName);
         } catch (Exception e) {
             e.printStackTrace();
-        }finally {
-            if (session!=null){
+        } finally {
+            if (session != null) {
                 session.close();
             }
         }
@@ -552,14 +570,14 @@ public class ComplieTask implements Task {
 
         } catch (Exception e) {
             throw new IOException(e);
-        }finally {
-            if (in!=null){
+        } finally {
+            if (in != null) {
                 in.close();
             }
-            if (out!=null){
+            if (out != null) {
                 out.close();
             }
-            if (zip!=null){
+            if (zip != null) {
                 zip.close();
             }
         }

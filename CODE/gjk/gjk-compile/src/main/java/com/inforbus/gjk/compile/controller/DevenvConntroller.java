@@ -3,24 +3,17 @@ package com.inforbus.gjk.compile.controller;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import com.inforbus.gjk.compile.config.ExtractApplicationContext;
 import com.inforbus.gjk.compile.task.Task;
 import com.inforbus.gjk.compile.task.impl.ComplieTask;
 import com.inforbus.gjk.compile.taskThread.TaskThread;
-
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.inforbus.gjk.common.core.util.R;
-
-
 import lombok.AllArgsConstructor;
-
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @AllArgsConstructor
