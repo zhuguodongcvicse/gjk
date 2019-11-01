@@ -78,7 +78,7 @@ export default {
           getTreeDefaultExpandIds(response.data.data, defaultExpandIds, 0, 2);
           this.defaultExpandIds = defaultExpandIds;
           this.treeData = response.data.data;
-          console.log("1234567890-=-098723456789098", defaultExpandIds);
+          // console.log("1234567890-=-098723456789098", defaultExpandIds);
         });
       }
     },
