@@ -227,10 +227,11 @@ public class ComplieTask implements Task {
         String[] cmd = new String[]{"cmd", "/c", str};
         Runtime rt = Runtime.getRuntime();
         LineNumberReader input = null;
+        InputStreamReader ir = null;
         Process p = null;
         try {
             p = rt.exec(cmd, null, dir);
-            InputStreamReader ir = new InputStreamReader(p.getInputStream(), "GBK");
+            ir = new InputStreamReader(p.getInputStream(), "GBK");
             input = new LineNumberReader(ir);
             String line = "";
             while ((line = input.readLine()) != null) {
@@ -260,6 +261,14 @@ public class ComplieTask implements Task {
                     e.printStackTrace();
                 }
                 p.destroy();
+            }
+            if (ir != null){
+                try {
+                    ir.close();
+                } catch (IOException e) {
+                    logger.error("IO关闭失败，请联系管理员。");
+                    e.printStackTrace();
+                }
             }
         }
         return strCommand;

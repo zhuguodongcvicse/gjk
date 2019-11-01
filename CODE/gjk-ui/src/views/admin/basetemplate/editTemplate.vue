@@ -156,7 +156,7 @@
         >
           <el-row>
             <!--标签增加的位置选择-->
-            <el-row v-if="position">
+            <el-row v-if="position && dialogType =='新增标签'">
               <el-form-item label="增加的位置">
                 <el-radio v-model="lablePosition" label="up">上</el-radio>
                 <el-radio v-model="lablePosition" label="in">中</el-radio>
@@ -774,7 +774,7 @@ export default {
         this.currentXmlMap.lableName == undefined
       ) {
         this.$message({
-          message: "警告，请选择一个树节点",
+          message: "请选择一个树节点",
           type: "warning"
         });
       } else {
@@ -1033,7 +1033,7 @@ export default {
         this.currentXmlMap.lableName == undefined
       ) {
         this.$message({
-          message: "警告，请选择一个树节点",
+          message: "请选择一个树节点",
           type: "warning"
         });
       } else {
@@ -1246,7 +1246,7 @@ export default {
         this.currentXmlMap.lableName == undefined
       ) {
         this.$message({
-          message: "警告，请选择一个被复制的标签",
+          message: "请选择一个被复制的标签",
           type: "warning"
         });
       } else {
@@ -1334,7 +1334,7 @@ export default {
         Vue.set(this.BaseTemplateBTO, "xmlEntityMap", this.XmlEntityMap);
         console.log(this.BaseTemplateBTO);
         editBaseTemplate(this.BaseTemplateBTO).then(repsonse => {
-          if (repsonse.data.code == 0) {
+          if (repsonse.data.data) {
             this.$message({
               message: "模板保存成功",
               type: "success"
@@ -1342,9 +1342,7 @@ export default {
             this.$router.replace("/admin/basetemplate"); //保存成功后.跳转到首页
             var tag1 = this.tag;
             menuTag(this.$route.path, "remove", this.tagList, tag1);
-          } else {
-            this.$message.error("模板保存失败");
-          }
+          } 
         });
       });
     },

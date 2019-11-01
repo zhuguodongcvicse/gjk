@@ -188,8 +188,8 @@ export default {
   data() {
     var proNameSameNameCheck = (rule, value, callback) => {
       // console.log("11111111111111111111111111", rule, value, callback);
-      if (/^[0-9a-zA-Z\u4e00-\u9fa5]{2,225}$/.test(value) == false) {
-        callback("请输入正确的项目名,项目名最少俩位,可包含汉字、字母、数字");
+      if (/^[0-9a-zA-Z-_()\u4e00-\u9fa5]{1,32}$/.test(value) == false) {
+        callback("请输入正确的项目名,项目名最少1个字符,最多32个字符,可包含汉字、字母、数字、—、_、()");
       } else {
         for (let item of this.proNameList) {
           if (value === item) {
@@ -201,8 +201,8 @@ export default {
       }
     };
     var processNameCheck = (rule, value, callback) => {
-      if (/^[0-9a-zA-Z\u4e00-\u9fa5]{2,225}$/.test(value) == false) {
-        callback("请输入正确的流程名,流程名最少俩位,可包含汉字、字母、数字");
+      if (/^[0-9a-zA-Z-_()\u4e00-\u9fa5]{1,32}$/.test(value) == false) {
+        callback("请输入正确的流程名,流程名最少1个字符,最多32个字符,可包含汉字、字母、数字、—、_、()");
       } else {
         callback();
       }

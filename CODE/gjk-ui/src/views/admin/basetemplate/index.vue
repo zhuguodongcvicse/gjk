@@ -182,8 +182,8 @@ export default {
   data() {
     //验证模板名称是否重复
     var validateTempName = (rule, value, callback) => {
-      if (/^[0-9a-zA-Z\u4e00-\u9fa5_]{2,225}$/.test(value) == false) {
-        callback("请输入正确的模板名,模板名最少俩位,可包含汉字、字母、数字");
+      if (/^[0-9a-zA-Z-_()\u4e00-\u9fa5]{1,32}$/.test(value) == false) {
+        callback("请输入正确的模板名,模板名最少1个字符,最多32个字符,可包含汉字、字母、数字、—、_、()");
       } else {
         checkTempName(value)
           .then(response => {

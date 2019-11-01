@@ -68,12 +68,12 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
      * @return XmlEntityMap
      */
     @Override
-    public XmlEntityMap editParseXml(BaseTemplate baseTemplate) {
+    public XmlEntityMap editParseXml(BaseTemplate baseTemplate) throws FileNotFoundException {
         String path = LOCALPATH + baseTemplate.getTempPath();//获取将要解析的xml文件的路径
         File localPath = new File(path);
         if (!localPath.exists()) {//如果xml文件不存在,返回null
-            logger.error("请检查"+path+"是否存在");
-            return null;
+            logger.error(path+"文件不存在");
+            throw  new FileNotFoundException(path+"文件不存在");
         }
         return XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(localPath);//通过工具类按照路径解析xml文件,返回XmlEntityMap对象
     }
@@ -86,7 +86,7 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
      * @return boolean
      */
     @Override
-    public boolean editBaseTemplate(BaseTemplateDTO baseTemplateDTO) {
+    public boolean editBaseTemplate(BaseTemplateDTO baseTemplateDTO){
         BaseTemplate baseTemplate = baseTemplateDTO.getBaseTemplate();
         XmlEntityMap xmlEntityMap = baseTemplateDTO.getXmlEntityMap();
         String path = LOCALPATH + baseTemplate.getTempPath();//xml文件被保存的位置
@@ -101,6 +101,7 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
         }catch (Exception e){
             logger.error("数据保存失败,请联系管理员");
             e.printStackTrace();
+            return false;
         }
         return XmlFileHandleUtil.createXmlFile(xmlEntityMap, localPath);//保存成功返回true
     }
@@ -113,7 +114,7 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
      * @return boolean
      */
     @Override
-    public boolean saveBaseTemplate(BaseTemplateDTO baseTemplateDTO)  {
+    public boolean saveBaseTemplate(BaseTemplateDTO baseTemplateDTO) throws Exception {
         BaseTemplate baseTemplate = baseTemplateDTO.getBaseTemplate();
         XmlEntityMap xmlEntityMap = baseTemplateDTO.getXmlEntityMap();
         long millis = System.currentTimeMillis();//获取日期毫秒值
@@ -126,12 +127,11 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
                     localPath.createNewFile();
                 }
                 System.out.println("文件已生成");
-            } catch (FileNotFoundException e) {
-                logger.error("文件夹创建失败");
-                e.printStackTrace();
             } catch (IOException e) {
                 logger.error("文件创建失败");
                 e.printStackTrace();
+                return false;
+                //throw new IOException();
             }
         }
         try {
@@ -152,6 +152,7 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
         }catch (Exception e){
             logger.error("模板保存失败,请检查相关配置是否正确");
             e.printStackTrace();
+            throw new Exception();
         }
         return false;
     }
@@ -164,8 +165,11 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
      * @return XmlEntityMap
      */
     @Override
-    public XmlEntityMap parseXml(String baseTemplatePath) {
+    public XmlEntityMap parseXml(String baseTemplatePath) throws FileNotFoundException {
         File localPath = new File(baseTemplatePath);//根据文件路径创建file对象
+        if (!localPath.exists()){
+            throw new FileNotFoundException();
+        }
         return XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(localPath);//根据指定路径解析xml文件
     }
 
@@ -202,12 +206,10 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
                 baseTemplate.setUpdateTime(LocalDateTime.now());
                 baseMapper.updateById(baseTemplate);//把新的数据更细至数据库
                 return true;
-            } catch (FileNotFoundException e) {
-                logger.error("文件未找到");
-                e.printStackTrace();
-            } catch (IOException e) {
+            }catch (IOException e) {
                 logger.error("IO出现错误,请联系管理员");
                 e.printStackTrace();
+
             } finally {
                 if (in != null) {
                     try {
@@ -228,7 +230,6 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
 
             }
         }
-        oldPath.delete();
         return false;
     }
 
