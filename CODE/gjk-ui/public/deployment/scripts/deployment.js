@@ -1181,15 +1181,6 @@ function initEditor(editor) {
 					}
 
 				},
-				{
-					text: '取消所有选中元素', action: function () {
-						/* var data = graph.getElement(evt);
-						var chipId = data.id;
-						chipIds.push(chipId); */
-						graph.selectionModel.clear();
-					}
-
-				},
 				/* {
 					text: '显示选中芯片', action: function () {
 						var data = graph.getElement(evt);
@@ -1250,6 +1241,16 @@ function initEditor(editor) {
 										graph.parseJSON(deploymentsJson, { transform: false }) */
 						//	}
 					}
+				},
+				{
+					text: '取消所有选中元素', action: function () {
+						/* var data = graph.getElement(evt);
+						var chipId = data.id;
+						chipIds.push(chipId); */
+						graph.selectionModel.clear();
+						CHIPdate = [];
+					}
+
 				}
 			];
 
@@ -1400,7 +1401,7 @@ function showchip() {
 			for(var j in deploymentsJsonbak.datas){
 				if(deploymentsJsonbak.datas[j].json.image  == "images/Chip.svg"){
 					if(skipArrays[i].uniqueId  == deploymentsJsonbak.datas[j].json.properties.uniqueId &&deploymentsJsonbak.datas[j]._refId !=  null ){
-						console.log("赋值location坐标",deploymentsJsonbak.datas[j])
+					//	console.log("赋值location坐标",deploymentsJsonbak.datas[j])
 						skipArrays[i].location = deploymentsJsonbak.datas[j].json.location;
 						skipArrays[i]._refId = deploymentsJsonbak.datas[j]._refId;
 					}
@@ -1410,7 +1411,7 @@ function showchip() {
 		}
 
 		//修改跳转前构件坐标数据
-		var variable = 0;
+		var variable = 4;
 		for(var i in skipArrays){
 			for(var j in deploymentsJsonbak.datas){
 				if(deploymentsJsonbak.datas[j]._className == "Q.Text"){
@@ -1418,7 +1419,7 @@ function showchip() {
 						variable+= 3
 						console.log("deploymentsJsonbak.datas[j]",deploymentsJsonbak.datas[j])
 						deploymentsJsonbak.datas[j].json.location.json.x =  skipArrays[i].location.json.x+variable;
-						deploymentsJsonbak.datas[j].json.location.json.y =  skipArrays[i].location.json.y+30;
+						deploymentsJsonbak.datas[j].json.location.json.y =  skipArrays[i].location.json.y+8;
 						deploymentsJsonbak.datas[j].json.host._ref = skipArrays[i]._refId;
 						deploymentsJsonbak.datas[j].json.parent._ref = skipArrays[i]._refId;
 					}
