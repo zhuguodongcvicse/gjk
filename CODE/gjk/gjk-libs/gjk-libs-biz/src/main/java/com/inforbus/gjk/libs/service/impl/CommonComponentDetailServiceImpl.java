@@ -86,6 +86,12 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 			}
 			for (CommonComponentDetail detail : commonComponentDetailList) {
 				String originalFileName = gitFilePath + detail.getFilePath() + File.separator + detail.getFileName();
+				System.out.println("originalFileName---- " + originalFileName);
+				System.out.println("compPath---- " + compPath);
+				System.out.println("detail.getFilePath()---- " + detail.getFilePath());
+				System.out.println("subStr---- " + subStr);
+				System.out.println("subStr.length()---- " + subStr.length());
+				System.out.println("detail.getFilePath().substring(subStr.length())---- " + detail.getFilePath().substring(subStr.length()));
 				detail.setFilePath(compPath + detail.getFilePath().substring(subStr.length()));
 				File originalFile = new File(originalFileName);
 				if (!originalFile.exists()) {

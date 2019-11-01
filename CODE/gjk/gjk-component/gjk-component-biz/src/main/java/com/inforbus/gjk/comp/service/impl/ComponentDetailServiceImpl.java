@@ -171,7 +171,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	private ComponentDetail saveCompDetail(HttpServletRequest request) {
 		ComponentDetail detail = null;
 		InputStream is = null;
-		String compName = null;
+		String compId = null;
 		String version = null;
 		try {
 			Collection<Part> parts = request.getParts();
@@ -196,8 +196,8 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 						detail.setCompId(str);
 						detail.setParaentId(str);
 					}
-					if (partName.equals("compName")) {
-						compName = str;
+					if (partName.equals("compId")) {
+						compId = str;
 					}
 					if (partName.equals("fileType")) {
 						detail.setFileType(str + "file");
@@ -220,7 +220,8 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 					}
 				}
 			}
-			String path = compUserFilePath + File.separator + compName + File.separator + version + File.separator;
+//			String path = compUserFilePath + File.separator + compName + File.separator + version + File.separator;
+			String path = compUserFilePath + File.separator + compId + File.separator + version + File.separator;
 			detail.setFilePath(path);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -634,7 +635,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		detdirs.setCompId(comp.getId());
 		detdirs.setFileName("图标文件");
 		detdirs.setFileType("imgfile");
-		detdirs.setFilePath(compUserFilePath + File.separator + "admin" + File.separator + comp.getCompName() + File.separator + comp.getVersion()
+		detdirs.setFilePath(compUserFilePath + File.separator + "admin" + File.separator + comp.getCompId() + File.separator + comp.getVersion()
 				+ File.separator);
 		detdirs.setParaentId(comp.getId());
 		detdirs.setVersion(comp.getVersion());
@@ -660,6 +661,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		// 删除包含图片的信息
 		compDetailMapper.delete(Wrappers.<ComponentDetail>query().lambda().eq(ComponentDetail::getCompId, comp.getId())
 				.likeRight(ComponentDetail::getFileType, "img%"));
+		System.out.println("detdirs------------>: " + detdirs);
 		baseMapper.saveCompDetail(detdirs);
 		baseMapper.saveCompDetail(detfiles);
 		// 保存包含图片的信息
