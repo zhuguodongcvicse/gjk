@@ -253,7 +253,7 @@ export default {
                 this.cmmXml = childXmlMap;
               } else if (childAttr.lableType == "buf") {
                 this.bufXml.push(childXmlMap);
-              } else if (childAttr.lableType == "shm") {
+              } else if (childAttr.lableType == "attrTable") {
                 this.shmComfig = childXmlMap;
                 if (this.shmComfig.xmlEntityMaps.length > 0) {
                   this.shmColumn = parseStrToObj(

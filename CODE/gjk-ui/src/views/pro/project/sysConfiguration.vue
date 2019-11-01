@@ -102,7 +102,7 @@ export default {
             ) {
               for (let item of modelMap.xmlEntityMaps) {
                 let i = parseStrToObj(item.attributeMap.configureType);
-                if (i.lableType == "cmpDeploy") {
+                if (i.lableName == "cmpDeploy") {
                   if (
                     item.xmlEntityMaps !== null &&
                     item.xmlEntityMaps.length > 0
