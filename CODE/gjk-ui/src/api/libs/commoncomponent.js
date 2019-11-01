@@ -63,9 +63,10 @@ export function saveCommonComp(commonComp) {
   })
 }
 
-export function saveCompDetailList(commonCompDetailList) {
+export function saveCompDetailList(commonCompDetailList, userCurrent) {
+  console.log("userCurrent", userCurrent)
   return request({
-    url: '/libs/commoncomponentdetail/saveCompDetailList',
+    url: '/libs/commoncomponentdetail/saveCompDetailList/' + userCurrent,
     method: 'post',
     data: commonCompDetailList
   })

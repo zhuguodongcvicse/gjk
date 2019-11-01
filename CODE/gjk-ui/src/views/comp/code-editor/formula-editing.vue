@@ -205,7 +205,7 @@ export default {
        */
     structform: {
       handler: function(params) {
-        console.log("params",params)
+        // console.log("params",params)
         let struct;
         let variableSel = JSON.parse(JSON.stringify(this.variableSel));
         // console.log("params",params)
@@ -450,7 +450,6 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    console.log("===================================")
     //console.log("", this.fatherModel);
     this.getStructSel();
   },

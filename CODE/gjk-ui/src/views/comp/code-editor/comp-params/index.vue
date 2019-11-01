@@ -217,7 +217,8 @@ export default {
           this.$refs.saveTestFiles.fetchSavefiles(comp).then(() => {
             this.$refs.savePlatformFiles.fetchSavefiles(comp).then(res => {
               //保存构件文件//保存图标文件
-              // this.$refs.saveCompImg.saveCompImg(comp);
+              // console.log("this.userInfo.username",this.userInfo.username)
+              this.$refs.saveCompImg.saveCompImg(comp);
               let saveComp = deepClone(this.saveDBXmlMaps);
               // console.log("saveDBXmlMapssaveDBXmlMapssaveDBXmlMaps", saveComp);
               // 需要更改函数路径
@@ -268,7 +269,7 @@ export default {
       this.component.id = this.$route.query.compId;
       //查询构件文件
       getCompFiles(this.$route.query.compId).then(res => {
-        // console.log("res",res)
+        console.log("res",res)
         //基本构件
         this.compBackupinfo =  res.data.data.comp.compBackupinfo
         this.component = res.data.data.comp;

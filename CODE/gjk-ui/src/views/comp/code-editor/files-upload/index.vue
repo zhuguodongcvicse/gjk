@@ -76,6 +76,7 @@ export default {
   data() {
     //这里存放数据
     return {
+      existFiles: [],
       uploader_key: new Date().getTime(),
       innerVisible: false,
       outerVisible: false,
@@ -147,13 +148,28 @@ export default {
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["pointHFile"])
+    ...mapGetters(["pointHFile", "fileListOfComponent"])
   },
   //监控data中的数据变化
   watch: {
+    existFiles(params) {
+      console.log("params - watch", params)
+    },
     value(v1) {
-      this.leftData = v1;
+      // console.log("this.value - watch",this.value)
       console.log("v1 - watch",v1)
+      this.leftData = v1;
+      // let fileListFromStore = JSON.parse(JSON.stringify(this.fileListOfComponent))
+      /*if (fileListFromStore.hasOwnProperty("algorithmfile") && fileListFromStore.algorithmfiles.filevo[0] === v1[0]) {
+          this.leftData = fileListFromStore.algorithmfiles.filevo
+      }
+      if (fileListFromStore.hasOwnProperty("platformfile") && fileListFromStore.platformfile.filevo[0] === v1[0]) {
+          this.leftData = fileListFromStore.platformfile.filevo
+      }
+      if (fileListFromStore.hasOwnProperty("testfile") && fileListFromStore.testfile.filevo[0] === v1[0]) {
+          this.leftData = fileListFromStore.testfile.filevo
+      }*/
+      // this.leftData = fileListFromStore.
     },
     leftData(v) {
       this.$emit("retValue", v);
@@ -236,7 +252,8 @@ export default {
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() {
+  },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   beforeCreate() {}, //生命周期 - 创建之前

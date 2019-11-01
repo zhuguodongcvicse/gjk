@@ -122,9 +122,11 @@ export function getCompFiles(compId) {
 // }
 /* 保存图标文件 */
 export function saveCompImg(param) {
+  console.log("saveCompImg - param",param)
   let params = new FormData();
   params.append("file", param.file);
   params.append("compParam",JSON.stringify(param.compParam));
+  // params.append("userCurrent",userCurrent);
   return request({
     method: "post",
     url: "/comp/componentdetail/saveCompImg",
