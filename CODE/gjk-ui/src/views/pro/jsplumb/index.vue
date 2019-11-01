@@ -238,7 +238,7 @@ export default {
             console.log("跨流程复制数据",ctrlXmlParamMap)
            // var ctrlParam = ctrlXmlParamMap.get(newParam.oldTmpId);
           //}
-          //var 
+          //var
           console.log("粘贴Ctrl V:", ctrlParam); //粘贴
           ctrlParam.attributeMap.id = newParam.newTmpId;
           this.$set(
@@ -393,7 +393,7 @@ export default {
         // console.log("// 根据用户编号查询构件及文件列表");
         // 所有文件DTO
         this.dtos = response.data.data.dtos;
-        // console.log("dtos列表", this.dtos);
+        console.log("dtos列表", this.dtos);
         // 设置所有构件XML
         this.xmls = response.data.data.xmls;
         // 设置所有构件XMLMaps
@@ -402,6 +402,7 @@ export default {
       });
     },
     sendMessage(state) {
+        console.log("state",state)
       // 父向子传参方式二
       /* 发送iframe发送消息 */
       if (state === "alignment") {
@@ -487,7 +488,7 @@ export default {
         });
         console.log(
           "this.$route.params.processId",
-          this.$route.params.processId
+            this.dtos
         );
         this.index++;
         if (this.index == 1) {

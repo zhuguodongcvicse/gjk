@@ -278,7 +278,7 @@ export default {
                   commonCompDetail.libsId = item.libsId;
                   compDetail.push(commonCompDetail);
                 }
-                saveCompDetailList(compDetail);
+                saveCompDetailList(compDetail, this.userInfo.username);
               });
 
               //修改构件中审批状态

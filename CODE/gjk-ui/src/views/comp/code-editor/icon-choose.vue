@@ -140,7 +140,9 @@ export default {
       this.imageUrl = URL.createObjectURL(file.raw);
     },
     beforeAvatarUpload(file) {
+      console.log("file",file)
       var testmsg = /^image\/(jpeg|png|jpg)$/.test(file.type);
+      console.log("testmsg",testmsg)
       // const isJPG = file.type === "image/jpeg";
       const isLt2M = file.size / 1024 / 1024 < 1;
       // const isPNG = file.type === "image/png";
@@ -150,7 +152,7 @@ export default {
       if (!isLt2M) {
         this.$message.error("上传头像图片大小不能超过 2MB，请重新选择图片!");
       }
-      return isJPG && isLt2M;
+      return testmsg && isLt2M;
     },
     //组装保存img数据
     submitUpload() {

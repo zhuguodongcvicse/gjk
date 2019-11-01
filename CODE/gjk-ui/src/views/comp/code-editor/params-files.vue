@@ -153,6 +153,7 @@ export default {
     },
     compImg: {
       handler: function(compImg) {
+          console.log("compImg",compImg)
         this.divStyle =
           "height:" +
           compImg.imgHeight +
@@ -186,10 +187,10 @@ export default {
       deep: true
     },
     fileLists: function(param) {
-      // console.log("param - watch",param)
+      console.log("param - watch",param)
       //回显文件列表
       let paramFile = param[this.fileType + "file"];
-      // console.log("paramFile - watch", paramFile)
+      console.log("paramFile - watch", paramFile)
       // console.log("imgimgimgimg", this.fileType, paramFile);
       if (paramFile !== undefined) {
         if (this.fileType === "img") {
@@ -317,7 +318,7 @@ export default {
     },
     imgRetStrFunction(retStr) {
       if (!this.show) {
-        // console.log("00000000000000", retStr);
+        console.log("imgRetStrFunction", retStr);
         this.imgValue.saveCompImgStr.file = retStr;
         // this.imgretStr = retStr;
       }

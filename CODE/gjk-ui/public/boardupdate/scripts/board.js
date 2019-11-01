@@ -188,16 +188,16 @@ function handleMessageFromParent(event) {
 				// console.log("alreadyExistCpuList",JSON.stringify(alreadyExistCpuList))
 				chipList = deepClone(chipList.concat(alreadyExistCpuList))
 				if (chipList.length != 0) {
-					chipIDNum = chipList[0].ID + 1
+					chipIDNum = chipList[0].ID + 2
 				} else {
 					chipIDNum = 0
 				}
-				
-				for (let i = 0; i < chipList.length; i++) {
+				// console.log("chipList",chipList)
+				/*for (let i = 0; i < chipList.length; i++) {
 					if (i < chipList.length - 1 && chipList[i].ID < chipList[i + 1].ID) {
 						chipIDNum = chipList[j].ID + 1
 					}
-				}
+				}*/
 				/* var j
 				for (const i in chipList) {
 					j = parseInt(i) + 1
@@ -234,7 +234,6 @@ function handleMessageFromParent(event) {
 								removeByValue(dragCpuList[i].infOfChipList, dragCpuList[i].infOfChipList[j])
 							}
 						}
-
 					}
 				}
 				// console.log("dragCpuList",JSON.stringify(dragCpuList))
@@ -753,7 +752,7 @@ function initEditor(editor) {
 		window.parent.postMessage(postMessageParentData, "*")
 	}
 	function initToolbar() {
-		//网状画布 
+		//网状画布
 		/* var graph = editor.graph;
 		//不可改变形状大小
 		//	graph.editable = true; */

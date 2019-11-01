@@ -50,7 +50,7 @@ public interface CommonComponentDetailService extends IService<CommonComponentDe
 	 * 
 	 * @param commonComponentDetail
 	 */
-	boolean saveCommonCompDetailList(List<CommonComponentDetail> commonComponentDetail, CommonComponent component);
+	boolean saveCommonCompDetailList(List<CommonComponentDetail> commonComponentDetail, CommonComponent component, String userCurrent);
 
 	/**
 	 * 获取构件集合对应的所有构件详细信息记录

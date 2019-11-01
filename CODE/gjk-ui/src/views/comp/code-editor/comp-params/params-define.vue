@@ -52,6 +52,7 @@ export default {
   data() {
     //这里存放数据
     return {
+      fileLists1: this.fileListForFefine,
       chipsData: [], //流程建模使用的芯片数据
       activeName: "activeName0",
       analysisParamsDefineXmlParams: [],

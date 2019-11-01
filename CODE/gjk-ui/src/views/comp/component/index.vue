@@ -337,6 +337,7 @@ export default {
     getList() {
       this.tableLoading = true;
       fetchList(this.listQuery).then(response => {
+          console.log("response",response)
         this.tableData = response.data.data.records;
         this.page.total = response.data.data.total;
         this.tableLoading = false;

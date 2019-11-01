@@ -85,10 +85,11 @@ public class CommonComponentDetailController {
 	}
 
 	@SysLog("新增公共构件库表")
-	@PostMapping("/saveCompDetailList")
-	public R saveCompDetailList(@RequestBody List<CommonComponentDetail> commonComponentDetail) {
+	@PostMapping("/saveCompDetailList/{userCurrent}")
+	public R saveCompDetailList(@RequestBody List<CommonComponentDetail> commonComponentDetail, @PathVariable String userCurrent) {
+		System.out.println("userCurrent---------------->  " + userCurrent);
 		CommonComponent component = commonComponentService.getById(commonComponentDetail.get(0).getCompId());
-		return new R<>(commonComponentDetailService.saveCommonCompDetailList(commonComponentDetail, component));
+		return new R<>(commonComponentDetailService.saveCommonCompDetailList(commonComponentDetail, component, userCurrent));
 	}
 
 	/**

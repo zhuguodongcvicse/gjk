@@ -166,6 +166,7 @@ import paramsTree from "./params-tree";
 import formItemType from "./form-item-type";
 import { getPerformanceTable } from "@/api/comp/compParams";
 import { getObjType, deepClone } from "@/util/util";
+import { delFilePath } from "@/api/comp/componentdetail";
 import { mapGetters } from "vuex";
 import { Hash } from "crypto";
 export default {
@@ -479,15 +480,32 @@ export default {
   methods: {
     //基本属性解析
     itemTypeChange(baseData, params) {
-      console.log("baseData",baseData)
-      console.log("params",params)
+      // console.log("baseData",baseData)
+      // console.log("params",params)
+      console.log("this.fileListOfComponent",this.fileListOfComponent)
+      /*if (this.fileListOfComponent.algorithmfile != undefined) {
+          let files = [JSON.parse(JSON.stringify(this.fileListOfComponent)).algorithmfile.filevo[0].relativePath]
+          // console.log("files", files);
+          delFilePath(files).then(res => {
+              // this.leftData.splice(index, 1);
+              // console.log("res",res)
+          });
+      }
+      if (this.fileListOfComponent.platformfile != undefined) {
+          let files = [JSON.parse(JSON.stringify(this.fileListOfComponent)).platformfile.filevo[0].relativePath]
+          // console.log("files", files);
+          delFilePath(files).then(res => {
+              // this.leftData.splice(index, 1);
+              // console.log("res",res)
+          });
+      }*/
       let config = this.analysisConfigureType(baseData);
-      console.log("config",config)
+      // console.log("config",config)
       config.attrs.forEach(attr => {
         if (attr.attrConfigType === "uploadComm") {
           let analysisBaseFile = this.analysisBaseFile;
-          console.log("analysisBaseFile",analysisBaseFile)
-          console.log("attr",attr)
+          // console.log("analysisBaseFile",analysisBaseFile)
+          // console.log("attr",attr)
           let str = "";
           //平台
           if (attr.actionType === "analysisPlatformFile") {
