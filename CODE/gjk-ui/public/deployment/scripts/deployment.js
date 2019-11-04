@@ -997,22 +997,11 @@ function initEditor(editor) {
 			}
 			if (evt.kind == Q.InteractionEvent.ELEMENT_MOVE_END) {
 				unhighlight();
-				//console.log('hostELEMENT_MOVE_START',host);
-
-				//var data = dragInfo.data;
 				var oldSlot = data.parent;
-
-				console.log("oldSlot", oldSlot);
 				var slot = findSlot(data, evt);
-				console.log("slot", slot);
-				console.log("移动后的对象", data.parent);
 				//所点击当前构件的所属部件
 				var partname = data._mn3.partname;
-				//	console.log("data",data.id);
-				//	console.log('partname',partname);
 				var host = findCellHost(evt, data);
-				console.log("host", host)
-				console.log("===============data", data)
 				if (startData != null) {
 					for (const i in startData.children.datas) {
 						if (startData.children.datas[i].id != data.id) {
@@ -1131,14 +1120,12 @@ function initEditor(editor) {
 
 	})
 
-	graph.onclick = function (evt) {
+/* 	graph.onclick = function (evt) {
 		var data = graph.getElement(evt);
 		if (data) {
 			var children = data.toChildren();
-			/* 			console.log("children", children); */
-
 		}
-	}
+	} */
 	//按这种方式导出部分json
 	function exportNodeJSON(parent) {
 		return graph.toJSON(false, {
@@ -1155,10 +1142,10 @@ function initEditor(editor) {
 					text: '选中该构件移动', action: function () {
 						graph.select(data);
 						verdict = true;
-						console.log("-------", data)
 						if (data._mn3.partname == null && data.image == "images/Chip.svg" || data.image == "rack" || data.image == "images/BeforeTheBoard.svg") {
-							showMessage('请选择构件', 'success', 2000)
+							showMessage('请选择构件', 'error', 2000)
 							graph.selectionModel.clear();
+							verdict = false;
 						}
 					}
 
@@ -1169,14 +1156,14 @@ function initEditor(editor) {
 						var partname = data._mn3.partname;
 						graph.forEach(function (data) {
 							if (data._mn3.partname == partname) {
-								//	console.log(data);
 								verdict = true;
 								graph.select(data);
 							}
 						})
 						if (data._mn3.partname == null && data.image == "images/Chip.svg" || data.image == "rack" || data.image == "images/BeforeTheBoard.svg") {
-							showMessage('请选择构件', 'success', 2000)
+							showMessage('请选择构件', 'error', 2000)
 							graph.selectionModel.clear();
+							verdict = false;
 						}
 					}
 
@@ -1184,18 +1171,22 @@ function initEditor(editor) {
 				{
 					text: '选中跳转的芯片', action: function () {
 						var data = graph.getElement(evt);
-						//	if( data.image  == "images/芯片.svg"){
 						var deploymentsJson = graph.toJSON();
-						console.log('deploymentsJson', deploymentsJson);
-						console.log("选中芯片数据", data)
-						CHIPdate.push(data);
-						console.log("选中芯片数据数据", CHIPdate)
+						if ( data.image == "images/Chip.svg" ){
+							console.log("选中芯片数据数据", CHIPdate)
+							showMessage('成功选中跳转芯片', 'success', 2000)
+							CHIPdate.push(data);
+						}else{
+							showMessage('请重新选择跳转的芯片', 'error', 2000)
+
+						}
 					}
 				},
 				{
 					text: '取消所有选中元素', action: function () {
 						graph.selectionModel.clear();
 						CHIPdate = [];
+						showMessage('成功取消选择', 'error', 2000)
 					}
 
 				}
@@ -1216,11 +1207,9 @@ var RefIdArrays = [];
 var fromCompidArrays = [];
 var toCompidArrays = [];
 function showchip() {
-		if (falg) {
+		if (falg && CHIPdate.length != 0) {
 			//获取当前画布数据
 			deploymentsJsonbak = graph.toJSON();
-			//var data = JSON.parse(JSON.stringify(deploymentsJsonbak));
-			console.log("5555555555555", deploymentsJsonbak)
 			for(var i in CHIPdate){
 				for(var j in deploymentsJsonbak.datas){
 					if(CHIPdate[i].properties.uniqueId == deploymentsJsonbak.datas[j].json.properties.uniqueId){
@@ -1245,7 +1234,6 @@ function showchip() {
 					RefIdArrays.push(RefIds);
 				}
 			}
-			console.log("所有连线的refid关系refIdArrays", RefIdArrays);
 			for (var i in RefIdArrays) {
 				for (var k in deploymentsJsonbak.datas) {
 					if (deploymentsJsonbak.datas[k]._className == "Q.Text") {
@@ -1264,7 +1252,6 @@ function showchip() {
 				}
 			}
 			graph.clear();
-			console.log("取到选中芯片数据数据", CHIPdate)
 			for (var i = 0; i < CHIPdate.length; i++) {
 				var properties = CHIPdate[i].properties;
 				chip = createCard(properties, i * 85, 0);
@@ -1320,7 +1307,7 @@ function showchip() {
 			CHIPdate = [];
 			fromCompidArrays = [];
 			falg = false;
-		} else {
+		} else if(falg == false && CHIPdate.length == 0){
 			compidArrays = [];
 			var skipdata = graph.toJSON();
 			console.log("skipdata",skipdata);
@@ -1345,8 +1332,6 @@ function showchip() {
 				}
 			}
 			//赋值location坐标
-			console.log("deploymentsJsonbak",deploymentsJsonbak);
-			console.log("skipArrays",skipArrays);
 			for(var i in skipArrays){
 				for(var j in deploymentsJsonbak.datas){
 					if(deploymentsJsonbak.datas[j].json.image  == "images/Chip.svg"){
@@ -1359,7 +1344,6 @@ function showchip() {
 				}
 	
 			}
-	
 			//修改跳转前构件坐标数据
 			var variable = 4;
 			var variable1 = 4;
@@ -1373,8 +1357,6 @@ function showchip() {
 							//判断构件是否备份
 							if(skipArrays[i].group == "A"){
 							variable+= 3
-							console.log("skipArrays[i]",skipArrays[i])
-							console.log("deploymentsJsonbak.datas[j]",deploymentsJsonbak.datas[j])
 							if(skipArrays[i].location.json.x+variable >= skipArrays[i].location.json.x+45){
 								variable = 7;
 								y=13;
@@ -1399,19 +1381,11 @@ function showchip() {
 					}
 				}
 			}
-			
-	
-	
-			console.log("skipArrays",skipArrays);
-	
 			graph.clear();
-			graph.parseJSON(deploymentsJsonbak, { transform: false })
+			graph.parseJSON(deploymentsJsonbak)
 			graph.moveToCenter();
 			falg = true;
 		}
-//	}
-
-
 }
 function createEdge(options) {
 	var edge = graph.createEdge(options.to, options.from);
