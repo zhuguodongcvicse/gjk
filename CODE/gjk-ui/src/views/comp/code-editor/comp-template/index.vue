@@ -120,7 +120,6 @@ export default {
           params
         )
       ).then(response => {
-          console.log("response",response)
         this.tableData = response.data.data.records;
         this.page.total = response.data.data.total;
         this.listLoading = false;

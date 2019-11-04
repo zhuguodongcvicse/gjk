@@ -557,6 +557,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		// 用于临时转换的map
 		Map<String, Object> resMap = Maps.newHashMap();
 		resMap.putAll(JSONUtil.parseObj(map.get("comp")));
+		String userName = (String) map.get("username");
 		// map转成Component
 		Component comp = mapToEntity(resMap, Component.class);
 		resMap.clear();
@@ -566,7 +567,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		// 设置默认图片名称 格式为 '构件名称.png'
 		originalFilename = StringUtils.isEmpty(img.getImgShowName()) ? "" : img.getImgShowName() + ".png";
 		// 远程路径
-		String gitRelativePath = compUserFilePath + File.separator + "admin" + File.separator + comp.getCompId() + File.separator
+		String gitRelativePath = compUserFilePath + File.separator + userName + File.separator + comp.getCompId() + File.separator
 				+ comp.getVersion() + File.separator + "图标文件";
 		// 选择文件后进入的判断
 		if (ObjectUtils.isNotEmpty(file)) {
@@ -635,7 +636,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		detdirs.setCompId(comp.getId());
 		detdirs.setFileName("图标文件");
 		detdirs.setFileType("imgfile");
-		detdirs.setFilePath(compUserFilePath + File.separator + "admin" + File.separator + comp.getCompId() + File.separator + comp.getVersion()
+		detdirs.setFilePath(compUserFilePath + File.separator + userName + File.separator + comp.getCompId() + File.separator + comp.getVersion()
 				+ File.separator);
 		detdirs.setParaentId(comp.getId());
 		detdirs.setVersion(comp.getVersion());

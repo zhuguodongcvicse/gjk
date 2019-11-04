@@ -20,7 +20,7 @@
       <el-col :span="10">
         <el-select v-model="selectBaseTemplateValue" placeholder="请选择" v-if="this.$route.query.type === 'add'">
           <el-option
-            v-for="item in this.allBaseTemplate"
+            v-for="item in structBaseTemplate"
             :key="item.tempPath"
             :label="item.tempName"
             :value="item.tempPath">
@@ -87,7 +87,7 @@
     </el-main>
 
     <el-dialog
-      title="提示"
+      title="请输入备注内容"
       :visible.sync="dialogVisibleOfComBackup"
       width="30%">
       <el-input placeholder="请输入备注内容" v-model="compBackupinfo" clearable>
@@ -106,7 +106,7 @@
 import { mapGetters } from "vuex";
 import paramsDefine from "./params-define";
 import paramsFiles from "../params-files";
-
+import { menuTag } from "@/util/closeRouter";
 import { getObjType, deepClone } from "@/util/util";
 import {
   handleSaveCompMap,
@@ -124,6 +124,7 @@ export default {
   data() {
     //这里存放数据
     return {
+      structBaseTemplate: [],
       compBackupinfo: '',
       dialogVisibleOfComBackup: false,
       selectBaseTemplateValue: '',
@@ -136,7 +137,7 @@ export default {
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["userInfo", "saveXmlMaps", "headerFile", "analysisBaseFile", "allBaseTemplate"])
+    ...mapGetters(["userInfo", "saveXmlMaps", "headerFile", "analysisBaseFile", "allBaseTemplate", "tagWel", "tagList", "tag", "website"])
   },
   //监控data中的数据变化
   watch: {
@@ -170,12 +171,10 @@ export default {
       deep: true
     },
     selectBaseTemplateValue: {
-        handler: function(selectBaseTemplateValue) {
-            let allBaseTemplateTemp = this.allBaseTemplate
-            for (const i in allBaseTemplateTemp) {
-                if (allBaseTemplateTemp[i].tempPath == selectBaseTemplateValue){
-                    this.changeBaseTemplate(allBaseTemplateTemp[i].tempPath);
-                    break
+        handler: function(params) {
+            for (let i in this.structBaseTemplate) {
+                if (this.structBaseTemplate[i].tempPath === params.tempPath || this.structBaseTemplate[i].tempPath === params){
+                    this.changeBaseTemplate( this.structBaseTemplate[i].tempPath);
                 }
             }
             // this.changeBaseTemplate(selectBaseTemplateValue);
@@ -234,11 +233,13 @@ export default {
               }
               let userCurrent = this.userInfo.username
               handleSaveCompMap(saveComp, "Component", comp.id, userCurrent).then(res => {
-                this.$router.push({
+                /*this.$router.push({
                   path: "/comp/showComp/index"
-                });
+                });*/
                 this.reload();
                 loading.close();
+                let tag1 = this.tag
+                menuTag(this.$route.path, "remove", this.tagList, tag1);
               });
             });
           });
@@ -263,7 +264,15 @@ export default {
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
     if (this.$route.query.type === "add") {
-        this.selectBaseTemplateValue = this.$route.query.defauleBaseTemplate[0].tempName
+        // this.selectBaseTemplateValue = this.$route.query.defauleBaseTemplate[0].tempName
+        let allBaseTemplateTemp = JSON.parse(JSON.stringify(this.allBaseTemplate))
+        for (const i in allBaseTemplateTemp) {
+            if (allBaseTemplateTemp[i].tempType === "构件模型"){
+                this.structBaseTemplate.push(allBaseTemplateTemp[i])
+            }
+        }
+        this.structBaseTemplate = JSON.parse(JSON.stringify(this.structBaseTemplate))
+        this.selectBaseTemplateValue = this.structBaseTemplate[this.structBaseTemplate.length - 1]
     }
     if (this.$route.query.compId != undefined) {
       this.component.id = this.$route.query.compId;
