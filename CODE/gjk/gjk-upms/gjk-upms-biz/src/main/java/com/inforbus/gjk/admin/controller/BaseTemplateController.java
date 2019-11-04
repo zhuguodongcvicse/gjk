@@ -95,7 +95,20 @@ public class BaseTemplateController {
 	@PostMapping("addBaseTemplate")
 	@PreAuthorize("@pms.hasPermission('admin_basetemplate_add')")
 	public R save(@RequestBody BaseTemplateDTO baseTemplateDTO) {
-		return new R<>(baseTemplateService.saveBaseTemplate(baseTemplateDTO));
+		boolean b = false;
+		try {
+			b = baseTemplateService.saveBaseTemplate(baseTemplateDTO);
+			if (!b){
+				R<Object> R = new R<>(null,"基础模板保存失败,请检查模板文件是否正确");
+				R.setCode(1);
+				return R;
+			}
+		} catch (Exception e) {
+			R<Object> R = new R<>(null,"基础模板保存失败,请检查模板文件是否正确");
+			R.setCode(1);
+			return R;
+		}
+		return new R<>(b);
 	}
 
 	/**
@@ -108,7 +121,13 @@ public class BaseTemplateController {
 	@PutMapping
 	@PreAuthorize("@pms.hasPermission('admin_basetemplate_edit')")
 	public R update(@RequestBody BaseTemplate baseTemplate) {
-		return new R<>(baseTemplateService.update(baseTemplate));
+		boolean b = baseTemplateService.update(baseTemplate);
+		if (!b){
+			R<Object> R = new R<>(b,"表格修改失败,请检查相关信息");
+			R.setCode(1);
+			return R;
+		}
+		return new R<>(b,"修改成功");
 	}
 
 	/**
@@ -121,7 +140,13 @@ public class BaseTemplateController {
 	@DeleteMapping("/{tempId}")
 	@PreAuthorize("@pms.hasPermission('admin_basetemplate_del')")
 	public R removeById(@PathVariable String tempId) {
-		return new R<>(baseTemplateService.removeById(tempId));
+		boolean b = baseTemplateService.removeById(tempId);
+		if (!b){
+			R<Object> R = new R<>(b,"删除失败,请联系管理员");
+			R.setCode(1);
+			return R;
+		}
+		return new R<>(b,"删除成功");
 	}
 
 	/**
@@ -132,7 +157,15 @@ public class BaseTemplateController {
 	@SysLog("解析xml")
 	@PostMapping("/parseXml")
 	public R parseXml(@RequestBody BaseTemplatePathDTO baseTemplatePathDTO) {
-		return new R<>(baseTemplateService.parseXml(baseTemplatePathDTO.getPath()));
+		XmlEntityMap xmlEntityMap = null;
+		try {
+			xmlEntityMap = baseTemplateService.parseXml(baseTemplatePathDTO.getPath());
+		} catch (FileNotFoundException e) {
+			R<Object> R = new R<>(null, baseTemplatePathDTO.getPath() + "文件不存在");
+			R.setCode(1);
+			return R;
+		}
+		return new R<>(xmlEntityMap);
 	}
 
 	/**
@@ -145,8 +178,16 @@ public class BaseTemplateController {
 	@SysLog("编辑功能解析xml文件")
 	@PreAuthorize("@pms.hasPermission('admin_basetemplate_edit')")
 	@PostMapping("/editParseXml")
-	public R editParseXml(@RequestBody BaseTemplate baseTemplate) {
-		return new R<>(baseTemplateService.editParseXml(baseTemplate));
+	public R editParseXml(@RequestBody BaseTemplate baseTemplate){
+		XmlEntityMap xmlEntityMap = null;
+		try {
+			xmlEntityMap = baseTemplateService.editParseXml(baseTemplate);
+		} catch (FileNotFoundException e) {
+			R<Object> R = new R<>(null, baseTemplate.getTempPath() + "文件不存在");
+			R.setCode(1);
+			return R;
+		}
+		return new R<>(xmlEntityMap);
 	}
 
 	/**
@@ -160,7 +201,13 @@ public class BaseTemplateController {
 	@PreAuthorize("@pms.hasPermission('admin_basetemplate_edit')")
 	@PutMapping("/editBaseTemplate")
 	public R editBaseTemplate(@RequestBody BaseTemplateDTO baseTemplateDTO) {
-		return new R<>(baseTemplateService.editBaseTemplate(baseTemplateDTO));
+		boolean b = baseTemplateService.editBaseTemplate(baseTemplateDTO);
+		if (!b){
+			R<Object> R = new R<>(b,"模板修改失败,请联系管理员");
+			R.setCode(1);
+			return R;
+		}
+		return new R<>(b,"修改成功");
 	}
 
 	/**

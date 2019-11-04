@@ -27,7 +27,18 @@
               @change="itemTypeChange(params,paramsFormXmlParams)"
               @fileChange="fileChange"
             ></form-item-type>
-            <el-input v-model="params.attributeMap.name" :disabled="true" v-else></el-input>
+            <form-item-type
+              v-model="params.attributeMap.name"
+              v-if="moduleType==='jsplumb' && paramType!=='资源属性'"
+              placeholder="请选择文件"
+              :lableType="showParam.attrConfigType"
+              :dictKey="showParam.dataKey"
+              :readonly="readonly"
+              :disabled="showParam.attrMappingName==='数据积累类型'?disabled:true"
+              @change="itemTypeChange(params,paramsFormXmlParams)"
+              @fileChange="fileChange"
+            ></form-item-type>
+<!--            <el-input v-model="params.attributeMap.name" :disabled="true" v-else></el-input>-->
           </el-form-item>
         </el-col>
       </el-form>
@@ -220,7 +231,8 @@ export default {
       "chipsOfHardwarelibs",
       "analysisBaseFile",
       "headerFile",
-      "fileListOfComponent"
+      "fileListOfComponent",
+      "userInfo"
     ])
   },
   //监控data中的数据变化
@@ -482,23 +494,6 @@ export default {
     itemTypeChange(baseData, params) {
       // console.log("baseData",baseData)
       // console.log("params",params)
-      console.log("this.fileListOfComponent",this.fileListOfComponent)
-      /*if (this.fileListOfComponent.algorithmfile != undefined) {
-          let files = [JSON.parse(JSON.stringify(this.fileListOfComponent)).algorithmfile.filevo[0].relativePath]
-          // console.log("files", files);
-          delFilePath(files).then(res => {
-              // this.leftData.splice(index, 1);
-              // console.log("res",res)
-          });
-      }
-      if (this.fileListOfComponent.platformfile != undefined) {
-          let files = [JSON.parse(JSON.stringify(this.fileListOfComponent)).platformfile.filevo[0].relativePath]
-          // console.log("files", files);
-          delFilePath(files).then(res => {
-              // this.leftData.splice(index, 1);
-              // console.log("res",res)
-          });
-      }*/
       let config = this.analysisConfigureType(baseData);
       // console.log("config",config)
       config.attrs.forEach(attr => {
@@ -564,7 +559,8 @@ export default {
               } else {
                   analysisBaseFile.push(obj);
               }
-            // this.$store.dispatch("setAnalysisBaseFile", analysisBaseFile);
+            this.$store.dispatch("setAnalysisBaseFile", analysisBaseFile);
+            console.log("analysisBaseFile - itemTypeChange",analysisBaseFile)
           }
         }
       });
@@ -797,7 +793,30 @@ export default {
       // console.log("tabDatatabDatatabData", tabData);
     },
     fileChange(param) {
+      // console.log("param - fileChange",param)
+      // console.log("this.fileListOfComponent - fileChange",this.fileListOfComponent)
+      let fileListsTemp = JSON.parse(JSON.stringify(this.fileListOfComponent))
       this.files = deepClone(param);
+
+      // console.log("this.files - fileChange",this.files)
+        if (this.fileListOfComponent[0].algorithmfile != undefined && fileListsTemp[0].algorithmfile.filevo.length != 0) {
+            let files = [fileListsTemp[0].algorithmfile.filevo[0].relativePath]
+            // console.log("files - algorithmfile", files);
+            /*delFilePath(files).then(res => {
+                // this.leftData.splice(index, 1);
+                // console.log("res",res)
+            });*/
+        }
+        if (this.fileListOfComponent[0].platformfile != undefined && fileListsTemp[0].platformfile.filevo.length != 0) {
+            let files = [fileListsTemp[0].platformfile.filevo[0].relativePath]
+            // console.log("files - platformfile", files);
+            /*delFilePath(files).then(res => {
+                // this.leftData.splice(index, 1);
+                // console.log("res",res)
+            });*/
+        }
+      fileListsTemp[1] = 0
+      this.$store.dispatch("setFileListOfComponent", fileListsTemp);
     }, //去掉重复的数组Obj
     reduceObject(arrObj, name) {
       let hash = {};

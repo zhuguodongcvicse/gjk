@@ -153,7 +153,6 @@ export default {
     },
     compImg: {
       handler: function(compImg) {
-          console.log("compImg",compImg)
         this.divStyle =
           "height:" +
           compImg.imgHeight +
@@ -187,14 +186,10 @@ export default {
       deep: true
     },
     fileLists: function(param) {
-      console.log("param - watch",param)
       //回显文件列表
       let paramFile = param[this.fileType + "file"];
-      console.log("paramFile - watch", paramFile)
-      // console.log("imgimgimgimg", this.fileType, paramFile);
       if (paramFile !== undefined) {
         if (this.fileType === "img") {
-          // console.log("paramFile.filevo.compImg", paramFile.filevo[0].compImg);
           this.compImg = paramFile.filevo[0].compImg;
         } else {
           if (null !== paramFile && null !== paramFile.filePath) {
@@ -202,7 +197,6 @@ export default {
             this.compValueType.libsID = paramFile.filePath.id;
           }
           this.compValueType.paths = this.filesPath = paramFile.filevo;
-          // console.log("this.compValueType - watch",this.compValueType)
         }
       }
     },

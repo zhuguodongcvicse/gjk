@@ -48,7 +48,7 @@ public interface BaseTemplateService extends IService<BaseTemplate> {
 	 * @param baseTemplate 基础模板
 	 * @return XmlEntityMap
 	 */
-	XmlEntityMap editParseXml(BaseTemplate baseTemplate);
+	XmlEntityMap editParseXml(BaseTemplate baseTemplate) throws FileNotFoundException;
 
 	/**
 	 * 基础模板编辑功能保存数据
@@ -63,14 +63,14 @@ public interface BaseTemplateService extends IService<BaseTemplate> {
 	 * @param baseTemplateDTO 基础模板
 	 * @return boolean
 	 */
-	boolean saveBaseTemplate(BaseTemplateDTO baseTemplateDTO);
+	boolean saveBaseTemplate(BaseTemplateDTO baseTemplateDTO) throws Exception;
 
 	/**
 	 * 基础模板新增功能按指定路径读取xml文件
 	 * @param baseTemplatePath 将要读取的xml文件的路径
 	 * @return XmlEntityMap
 	 */
-	XmlEntityMap parseXml(String baseTemplatePath);
+	XmlEntityMap parseXml(String baseTemplatePath) throws FileNotFoundException;
 
 	/**
 	 * 基础模板修改功能

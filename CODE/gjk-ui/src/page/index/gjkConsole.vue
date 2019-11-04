@@ -210,6 +210,10 @@ export default {
     },
     onFailed: function(frame) {
       console.log("Failed: " + frame);
+      this.$message({
+          message: 'MQ连接失败,请确认是否开启MQ服务或者刷新页面',
+          type: 'warning'
+        });
     },
     responseCallback: function(frame) {
       console.log("responseCallback msg=>" + frame.body);

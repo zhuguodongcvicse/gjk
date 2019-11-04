@@ -275,7 +275,7 @@ export default {
         this.component = res.data.data.comp;
         this.$store.dispatch("setSaveXmlMaps", res.data.data.compBasicMap);
         this.fileList = res.data.data;
-        this.$store.dispatch("setFileListOfComponent", res.data.data);
+        this.$store.dispatch("setFileListOfComponent", [res.data.data, 1]);
       });
     }
     // this.saveXmlMaps = this.$route.params;

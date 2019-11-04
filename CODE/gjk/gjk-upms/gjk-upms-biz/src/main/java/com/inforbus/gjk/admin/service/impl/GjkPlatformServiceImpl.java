@@ -414,23 +414,22 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 		for (ComponentDetail commInfos : commInfo) {
 //			List<ComponentDetail> libsFile = new ArrayList<>();
 			GjkAlgorithm gjkAlgorithm = new GjkAlgorithm();
-			if (commInfos.getFileName().equals("算法文件")) {
+			Component compName = baseMapper.getCompNameById(commInfos.getId());
+			if (compName != null) {
 				firstId = commInfos.getId();
 				String sssId = IdGenerate.uuid();
 				gjkAlgorithm.setAlgorithmId(commInfos.getId());
 				gjkAlgorithm.setParentId(commInfos.getLibsId());
-				gjkAlgorithm.setName(commInfos.getFileName());
+				gjkAlgorithm.setName(compName.getCompName());
 				gjkAlgorithms.add(gjkAlgorithm);
 				// 展示构件名
-				Component compName = baseMapper.getCompNameById(commInfos.getId());
-				if (compName != null) {
-
+				if (commInfos.getFileName().equals("算法文件")) {
 					gjkAlgorithm = new GjkAlgorithm();
 					gjkAlgorithm.setAlgorithmId(sssId);
 					gjkAlgorithm.setParentId(firstId);
 					// 重置parentID
 					parId = gjkAlgorithm.getAlgorithmId();
-					gjkAlgorithm.setName(compName.getCompName());
+					gjkAlgorithm.setName(commInfos.getFileName());
 					gjkAlgorithms.add(gjkAlgorithm);
 
 					// 解析文件夹
@@ -480,22 +479,22 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 		String libsFilePath = "";
 		for (ComponentDetail commInfos : commInfo) {
 			GjkTest gjkTest = new GjkTest();
-			if (commInfos.getFileName().equals("测试文件")) {
+			Component compName = baseMapper.getCompNameById(commInfos.getId());
+			if (compName != null) {
 				firstId = commInfos.getId();
 				String sssId = IdGenerate.uuid();
 				gjkTest.setTestId(commInfos.getId());
 				gjkTest.setParentId(commInfos.getLibsId());
-				gjkTest.setName(commInfos.getFileName());
+				gjkTest.setName(compName.getCompName());
 				gjkTests.add(gjkTest);
 				// 展示构件名
-				Component compName = baseMapper.getCompNameById(commInfos.getId());
-				if (compName != null) {
+				if (commInfos.getFileName().equals("测试文件")) {
 					gjkTest = new GjkTest();
 					gjkTest.setTestId(sssId);
 					gjkTest.setParentId(firstId);
 					// 重置parentID
 					parId = gjkTest.getTestId();
-					gjkTest.setName(compName.getCompName());
+					gjkTest.setName(commInfos.getFileName());
 					gjkTests.add(gjkTest);
 
 					// 解析文件夹
@@ -546,22 +545,22 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 		String libsFilePath = "";
 		for (ComponentDetail commInfos : commInfo) {
 			GjkPlatform gjkPlatform = new GjkPlatform();
-			if (commInfos.getFileName().equals("平台文件")) {
+			Component compName = baseMapper.getCompNameById(commInfos.getId());
+			if (compName != null) {
 				firstId = commInfos.getId();
 				String sssId = IdGenerate.uuid();
 				gjkPlatform.setPlatformId(commInfos.getId());
 				gjkPlatform.setParentId(commInfos.getLibsId());
-				gjkPlatform.setName(commInfos.getFileName());
+				gjkPlatform.setName(compName.getCompName());
 				gjkPlatforms.add(gjkPlatform);
 				// 展示构件名
-				Component compName = baseMapper.getCompNameById(commInfos.getId());
-				if (compName != null) {
+				if (commInfos.getFileName().equals("平台文件")) {
 					gjkPlatform = new GjkPlatform();
 					gjkPlatform.setPlatformId(sssId);
 					gjkPlatform.setParentId(firstId);
 					// 重置parentID
 					parId = gjkPlatform.getPlatformId();
-					gjkPlatform.setName(compName.getCompName());
+					gjkPlatform.setName(commInfos.getFileName());
 					gjkPlatforms.add(gjkPlatform);
 
 					// 解析文件夹

@@ -76,7 +76,7 @@ export default {
   data() {
     //这里存放数据
     return {
-      existFiles: [],
+      allFilesList: '',
       uploader_key: new Date().getTime(),
       innerVisible: false,
       outerVisible: false,
@@ -148,28 +148,40 @@ export default {
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["pointHFile", "fileListOfComponent"])
+    ...mapGetters(["pointHFile", "fileListOfComponent", "analysisBaseFile", "userInfo"])
   },
   //监控data中的数据变化
   watch: {
-    existFiles(params) {
-      console.log("params - watch", params)
+    analysisBaseFile: {
+        handler: function(params) {
+            this.allFilesList = JSON.parse(JSON.stringify(this.analysisBaseFile))
+            console.log("allFilesList - watch", params)
+            console.log("allFilesList - watch", this.analysisBaseFile)
+        },
+        deep: true
     },
     value(v1) {
       // console.log("this.value - watch",this.value)
       console.log("v1 - watch",v1)
+      console.log("this.allFilesList - watch",this.allFilesList)
+      console.log("this.fileListOfComponent - watch",this.fileListOfComponent)
+      if (this.fileListOfComponent[1] === 0 && this.fileListOfComponent[0].algorithmfile != undefined) {
+          for (const i in v1) {
+              if (this.fileListOfComponent[0].algorithmfile.filevo.length != 0 && this.fileListOfComponent[0].algorithmfile.filevo[0].relativePath === v1[i].relativePath){
+                  v1.splice(i, 1)
+              }
+          }
+      }
+      if (this.fileListOfComponent[1] === 0 && this.fileListOfComponent[0].platformfile != undefined) {
+          console.log("++++++++++++++++++++++")
+          for (const i in v1) {
+              if (this.fileListOfComponent[0].platformfile.filevo.length != 0 && this.fileListOfComponent[0].platformfile.filevo[0].relativePath === v1[i].relativePath){
+                  v1.splice(i, 1)
+                  console.log("-------------------------")
+              }
+          }
+      }
       this.leftData = v1;
-      // let fileListFromStore = JSON.parse(JSON.stringify(this.fileListOfComponent))
-      /*if (fileListFromStore.hasOwnProperty("algorithmfile") && fileListFromStore.algorithmfiles.filevo[0] === v1[0]) {
-          this.leftData = fileListFromStore.algorithmfiles.filevo
-      }
-      if (fileListFromStore.hasOwnProperty("platformfile") && fileListFromStore.platformfile.filevo[0] === v1[0]) {
-          this.leftData = fileListFromStore.platformfile.filevo
-      }
-      if (fileListFromStore.hasOwnProperty("testfile") && fileListFromStore.testfile.filevo[0] === v1[0]) {
-          this.leftData = fileListFromStore.testfile.filevo
-      }*/
-      // this.leftData = fileListFromStore.
     },
     leftData(v) {
       this.$emit("retValue", v);

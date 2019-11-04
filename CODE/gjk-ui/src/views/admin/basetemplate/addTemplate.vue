@@ -40,6 +40,8 @@
             <el-col :span="5">{{attribute.attrMappingName}}</el-col>
             <!--不同的配置方式-->
             <el-col :span="6">
+              <el-row v-if="attribute.attrConfigType=='onlyReadComm'">只读方式,不可赋值</el-row>
+              <el-row v-if="attribute.attrConfigType=='length'">联级触发,多选框中值的个数,不可赋值</el-row>
               <!--input输入框配置方式-->
               <el-input
                 v-model="currentXmlMap.attributeMap[attribute.attrName]"
@@ -156,7 +158,7 @@
         >
           <el-row>
             <!--标签增加的位置选择-->
-            <el-row v-if="position">
+            <el-row v-if="position && dialogType =='新增标签'">
               <el-form-item label="增加的位置">
                 <el-radio v-model="lablePosition" label="up">上</el-radio>
                 <el-radio v-model="lablePosition" label="in">中</el-radio>
@@ -586,6 +588,14 @@ export default {
         {
           value: "formulaComm",
           label: "公式编辑器"
+        },
+        {
+          value: "onlyReadComm",
+          label: "只读"
+        },
+        {
+          value: "length",
+          label: "多选个数"
         }
       ],
       sonLableConfigTypes: [
@@ -617,6 +627,22 @@ export default {
         {
           label: "特殊处理",
           value: "specalHandle"
+        },
+        {
+          label: "联级表单",
+          value: "coreDeployDiv"
+        },
+        {
+          label: "属性表格",
+          value: "attrTable"
+        },
+        {
+          label: "表格群",
+          value: "networkTable"
+        },
+        {
+          label: "树节点表格",
+          value: "treeTable"
         }
       ],
       dialogType: "新增标签",
@@ -704,6 +730,7 @@ export default {
       } else {
         this.position = true;
       }
+
       var attributeMap = data.attributeMap;
       var configureType = {};
       if (attributeMap != null) {
@@ -774,7 +801,7 @@ export default {
         this.currentXmlMap.lableName == undefined
       ) {
         this.$message({
-          message: "警告，请选择一个树节点",
+          message: "请选择一个树节点",
           type: "warning"
         });
       } else {
@@ -1031,7 +1058,7 @@ export default {
         this.currentXmlMap.lableName == undefined
       ) {
         this.$message({
-          message: "警告，请选择一个树节点",
+          message: "请选择一个树节点",
           type: "warning"
         });
       } else {
@@ -1244,7 +1271,7 @@ export default {
         this.currentXmlMap.lableName == undefined
       ) {
         this.$message({
-          message: "警告，请选择一个被复制的标签",
+          message: "请选择一个被复制的标签",
           type: "warning"
         });
       } else {
@@ -1331,9 +1358,8 @@ export default {
         this.deleteMappingData(this.XmlEntityMap);
         Vue.set(this.BaseTemplateBTO, "baseTemplate", this.BaseTemplate);
         Vue.set(this.BaseTemplateBTO, "xmlEntityMap", this.XmlEntityMap);
-
         addObj(this.BaseTemplateBTO).then(repsonse => {
-          if (repsonse.data.code == 0) {
+          if (repsonse.data.data) {
             this.$message({
               message: "模板保存成功",
               type: "success"
@@ -1341,8 +1367,6 @@ export default {
             this.$router.replace("/admin/basetemplate"); //保存成功后.跳转到首页
             var tag1 = this.tag;
             menuTag(this.$route.path, "remove", this.tagList, tag1);
-          } else {
-            this.$message.error("模板保存失败");
           }
         });
       });
