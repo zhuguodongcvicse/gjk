@@ -117,7 +117,8 @@ export default {
       coefficientTreeData: [],
       defaultProps: {
         label: (data, node) => {
-          return parseStrToObj(data.attributeMap.configureType).lableName;
+          return parseStrToObj(data.attributeMap.configureType)
+            .lableMappingName;
         }
       },
       //系数配置树节点数据

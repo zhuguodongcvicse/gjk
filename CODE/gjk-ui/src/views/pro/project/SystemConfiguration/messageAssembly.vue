@@ -33,11 +33,11 @@
       </el-row>
 
       <div v-if="cmmXml.xmlEntityMaps.length>0">
-        <el-divider>{{parseStrToObj(cmmXml.attributeMap.configureType).attrMappingName}}</el-divider>
+        <el-divider>{{parseStrToObj(cmmXml.attributeMap.configureType).lableMappingName}}</el-divider>
         <template v-for="(xml) in cmmXml.xmlEntityMaps">
           <template v-for="(col) in parseStrToObj(xml.attributeMap.configureType).attrs">
             <el-form-item
-              :label="parseStrToObj(xml.attributeMap.configureType).lableName"
+              :label="parseStrToObj(xml.attributeMap.configureType).lableMappingName"
               v-if="col.isShow"
               label-width="100px"
             >
@@ -55,7 +55,7 @@
       <el-row :gutter="5" v-if="bufXml.length>0">
         <template v-for="(xml) in bufXml">
           <el-col :span="24">
-            <el-divider>{{parseStrToObj(xml.attributeMap.configureType).lableName}}</el-divider>
+            <el-divider>{{parseStrToObj(xml.attributeMap.configureType).lableMappingName}}</el-divider>
           </el-col>
           <template v-for="(col) in parseStrToObj(xml.attributeMap.configureType).attrs">
             <el-col :span="24">
@@ -72,7 +72,7 @@
 
       <el-row :gutter="5" v-if="shmComfig!={}">
         <el-col :span="24">
-          <el-divider>{{parseStrToObj(shmComfig.attributeMap.configureType).lableName}}</el-divider>
+          <el-divider>{{parseStrToObj(shmComfig.attributeMap.configureType).lableMappingName}}</el-divider>
         </el-col>
         <el-table :data="shmComfig.xmlEntityMaps" border height="250" max-height="250">
           <template v-for="(col) in shmColumn">
@@ -113,7 +113,7 @@
       <el-tabs>
         <el-tab-pane label="网络配置" v-if="networkArray.length>0">
           <template v-for="(network) in networkArray">
-            <el-divider>{{parseStrToObj(network.attributeMap.configureType).lableName}}</el-divider>
+            <el-divider>{{parseStrToObj(network.attributeMap.configureType).lableMappingName}}</el-divider>
             <el-table
               :data="network.xmlEntityMaps"
               border
@@ -212,7 +212,8 @@ export default {
       extendTableData: [],
       defaultProps: {
         label: (data, node) => {
-          return parseStrToObj(data.attributeMap.configureType).lableName;
+          return parseStrToObj(data.attributeMap.configureType)
+            .lableMappingName;
         }
       }
     };

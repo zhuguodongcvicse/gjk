@@ -82,7 +82,6 @@ export default {
     getModelXmlEntityMap() {
       //1:解析基础模板文件，获得cpu和cmp的节点
       getSysConfigModelXml().then(Response => {
-        // console.log("11111111111111111111111111111", Response.data.data);
         this.setCNENMapping(Response.data.data);
         this.xmlEntityMap = JSON.parse(JSON.stringify(Response.data.data));
         this.xmlEntityMap.xmlEntityMaps = [];
@@ -367,8 +366,8 @@ export default {
       let cnName = null;
       if (xmlConfig.lableMapping) {
         cnName = this.compChineseMapping.find(item => {
-          return item.label === xmlConfig.mappingKeys;
-        });
+          return item.id === xmlConfig.mappingKeys;
+        }).label;
       } else {
         cnName = xmlConfig.lableName;
       }
@@ -380,16 +379,24 @@ export default {
       if (xmlConfig.attrs.length > 0) {
         for (let attrItem of xmlConfig.attrs) {
           if (attrItem.attrMapping) {
-            attrItem.attrMappingName = this.compChineseMapping.find(item => {
-              return item.label === attrItem.attrKeys;
+            let getItem = this.compChineseMapping.find(item => {
+              return item.id === attrItem.attrKeys;
             });
+            if (getItem != undefined) {
+              this.$set(attrItem, "attrMappingName", getItem.label);
+            } else {
+              this.$set(attrItem, "attrMappingName", attrItem.attrName);
+            }
           } else {
-            attrItem.attrMappingName = attrItem.attrName;
+            this.$set(attrItem, "attrMappingName", attrItem.attrName);
           }
         }
       }
       xmlentityMap.attributeMap.configureType = parseObjToStr(xmlConfig);
-      if (xmlentityMap.xmlEntityMaps != null && xmlentityMap.length > 0) {
+      if (
+        xmlentityMap.xmlEntityMaps != null &&
+        xmlentityMap.xmlEntityMaps.length > 0
+      ) {
         for (let childXmlMap of xmlentityMap.xmlEntityMaps) {
           this.setCNENMapping(childXmlMap);
         }

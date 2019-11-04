@@ -1,94 +1,91 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <sysConfig
-	configureType="{'lableType':'false','lableName':'sysConfig','lableMapping':false,'attrs':[]}">
+	configureType="{'lableType':'false','lableName':'sysConfig','lableMapping':false,'attrs':[],'lableMappingName':'sysConfig'}">
 	<node
-		configureType="{'lableType':'form','lableName':'node','lableMapping':false,'attrs':[{'attrName':'ipConfig','attrMapping':true,'attrMappingName':'IP地址','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':80},{'attrName':'id','attrMapping':true,'attrMappingName':'ID','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':81},{'attrName':'osCoreID','attrMapping':true,'attrMappingName':'芯片选择','actionType':'','isShow':true,'attrConfigType':'selectComm','multiple':true,'dataKey':[],'attrKeys':82},{'attrName':'osCoreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'length','attrKeys':83}]}"
+		configureType="{'lableType':'form','lableName':'node','lableMapping':false,'attrs':[{'attrName':'ipConfig','attrMapping':true,'attrMappingName':'IP地址','actionType':'','isShow':true,'attrConfigType':'onlyReadComm','attrKeys':154,'dataKey':'[]','multiple':false},{'attrName':'id','attrMapping':true,'attrMappingName':'ID','actionType':'','isShow':true,'attrConfigType':'onlyReadComm','attrKeys':155,'dataKey':'[]','multiple':false},{'attrName':'osCoreID','attrMapping':true,'attrMappingName':'芯片选择','actionType':'','isShow':true,'attrConfigType':'selectComm','multiple':true,'dataKey':'[]','attrKeys':156},{'attrName':'osCoreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'length','attrKeys':157,'dataKey':'[]','multiple':false}],'lableMappingName':'node'}"
 		osCoreID="1-2" id="0" ipConfig="192.168.0.7" osCoreSum="2">
 		<cmpDeploy
-			configureType="{'lableType':'false','lableName':'cmpDeploy','lableMapping':false,'attrs':[]}">
+			configureType="{'lableType':'false','lableName':'cmpDeploy','lableMapping':false,'attrs':[],'lableMappingName':'cmpDeploy'}">
 			<cmp
-				configureType="{'lableType':'form','lableName':'cmp','lableMapping':false,'attrs':[{'attrName':'funcName','attrMapping':true,'attrMappingName':'方法名称','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':84},{'attrName':'cmpName','attrMapping':true,'attrMappingName':'部件名称','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':85},{'attrName':'id','attrMapping':true,'attrMappingName':'部件ID','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':86}]}"
+				configureType="{'lableType':'form','lableName':'cmp','lableMapping':false,'attrs':[{'attrName':'funcName','attrMapping':true,'attrMappingName':'方法名称','actionType':'','isShow':true,'attrConfigType':'onlyReadComm','attrKeys':158,'dataKey':'[]','multiple':false},{'attrName':'cmpName','attrMapping':true,'attrMappingName':'部件名称','actionType':'','isShow':true,'attrConfigType':'onlyReadComm','attrKeys':159,'dataKey':'[]','multiple':false},{'attrName':'id','attrMapping':true,'attrMappingName':'部件ID','actionType':'','isShow':true,'attrConfigType':'onlyReadComm','attrKeys':160,'dataKey':'[]','multiple':false}],'lableMappingName':'cmp'}"
 				id="API Return" funcName="API Return" cmpName="API Return">
 				<coreDeploy
-					configureType="{'lableType':'coreDeployDiv','lableName':'coreDeploy','lableMapping':true,'attrMappingName':'内核部署','attrs':[]}">
+					configureType="{'lableType':'coreDeployDiv','lableName':'coreDeploy','lableMapping':true,'attrs':[],'lableMappingName':'coreDeploy','mappingKeys':161}">
 					<CMM_Read
-						configureType="{'lableType':'false','lableName':'CMM_Read','lableMapping':false,'attrs':[{'attrName':'coreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'length','dataKey':'[]','attrKeys':107},{'attrName':'coreID','attrMapping':true,'attrMappingName':'芯片ID','actionType':'','isShow':true,'attrConfigType':'selectComm','multiple':true,'dataKey':'[]','attrKeys':108}]}"
+						configureType="{'lableType':'false','lableName':'CMM_Read','lableMapping':false,'attrs':[{'attrName':'coreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'length','dataKey':'[]','attrKeys':162,'multiple':false},{'attrName':'coreID','attrMapping':true,'attrMappingName':'芯片ID','actionType':'','isShow':true,'attrConfigType':'selectComm','multiple':true,'dataKey':'[]','attrKeys':163}],'lableMappingName':'CMM_Read'}"
 						coreID="1" coreSum="1" />
 					<CMM_Write
-						configureType="{'lableType':'false','lableName':'CMM_Write','lableMapping':false,'attrs':[{'attrName':'coreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'length','dataKey':'[]','attrKeys':107},{'attrName':'coreID','attrMapping':true,'attrMappingName':'芯片ID','actionType':'','isShow':true,'attrConfigType':'selectComm','multiple':true,'dataKey':'[]','attrKeys':108}]}"
-						coreID="2" coreSum="1" />
+						configureType="{'lableType':'false','lableName':'CMM_Write','lableMapping':false,'attrs':[{'attrName':'coreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'length','dataKey':'[]','attrKeys':162,'multiple':false},{'attrName':'coreID','attrMapping':true,'attrMappingName':'芯片ID','actionType':'','isShow':true,'attrConfigType':'selectComm','multiple':true,'dataKey':'[]','attrKeys':163}],'lableMappingName':'CMM_Write'}"
+						coreID="3-4-5" coreSum="1" />
 					<CMM_Compute
-						configureType="{'lableType':'false','lableName':'CMM_Compute','lableMapping':false,'attrs':[{'attrName':'coreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'length','dataKey':'[]','attrKeys':107},{'attrName':'coreID','attrMapping':true,'attrMappingName':'芯片ID','actionType':'','isShow':true,'attrConfigType':'selectComm','multiple':true,'dataKey':'[]','attrKeys':108}]}"
-						coreID="3-4-5" coreSum="3" />
+						configureType="{'lableType':'false','lableName':'CMM_Compute','lableMapping':false,'attrs':[{'attrName':'coreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'length','dataKey':'[]','attrKeys':162,'multiple':false},{'attrName':'coreID','attrMapping':true,'attrMappingName':'芯片ID','actionType':'','isShow':true,'attrConfigType':'selectComm','multiple':true,'dataKey':'[]','attrKeys':163}],'lableMappingName':'CMM_Compute'}"
+						coreID="API Return" coreSum="API Return" />
 				</coreDeploy>
 				<tmpBuf
-					configureType="{'lableType':'form','lableName':'tmpBuf','lableMapping':false,'attrs':[{'attrName':'size','attrMapping':true,'attrMappingName':'长度','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':87},{'attrName':'baseAddr','attrMapping':true,'attrMappingName':'起始地址','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':88}]}"
+					configureType="{'lableType':'form','lableName':'tmpBuf','lableMapping':false,'attrs':[{'attrName':'size','attrMapping':true,'attrMappingName':'长度','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':164,'dataKey':'[]','multiple':false},{'attrName':'baseAddr','attrMapping':true,'attrMappingName':'起始地址','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':165,'dataKey':'[]','multiple':false}],'lableMappingName':'tmpBuf'}"
 					size="0x40000000" baseAddr="0x300000000" />
 				<moniBuf
-					configureType="{'lableType':'form','lableName':'moniBuf','lableMapping':false,'attrs':[{'attrName':'size','attrMapping':true,'attrMappingName':'长度','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':87},{'attrName':'baseAddr','attrMapping':true,'attrMappingName':'起始地址','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':88}]}"
+					configureType="{'lableType':'form','lableName':'moniBuf','lableMapping':false,'attrs':[{'attrName':'size','attrMapping':true,'attrMappingName':'长度','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':87,'dataKey':'[]','multiple':false},{'attrName':'baseAddr','attrMapping':true,'attrMappingName':'起始地址','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':88,'dataKey':'[]','multiple':false}],'lableMappingName':'moniBuf'}"
 					size="0x40000000" baseAddr="0x300000000" />
 				<shmConfig
-					configureType="{'lableType':'attrTable','lableName':'shmConfig','lableMapping':false,'attrs':[]}">
+					configureType="{'lableType':'attrTable','lableName':'shmConfig','lableMapping':false,'attrs':[],'lableMappingName':'shmConfig'}">
 					<Shm
-						configureType="{'lableType':'false','lableName':'Shm','lableMapping':false,'attrs':[{'attrName':'ShmId','attrMapping':true,'attrMappingName':'ID','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':89},{'attrName':'size','attrMapping':true,'attrMappingName':'长度','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':87},{'attrName':'index','attrMapping':true,'attrMappingName':'索引','actionType':'','isShow':false,'attrConfigType':'inputComm','attrKeys':101},{'attrName':'varname','attrMapping':true,'attrMappingName':'变量名称','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':90}]}"
-						ShmId="1234535" varname="DataProcDot" size="0x10000000" index="0" />
-					<Shm
-						configureType="{'lableType':'false','lableName':'Shm','lableMapping':false,'attrs':[{'attrName':'ShmId','attrMapping':true,'attrMappingName':'ID','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':89},{'attrName':'size','attrMapping':true,'attrMappingName':'长度','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':87},{'attrName':'index','attrMapping':true,'attrMappingName':'索引','actionType':'','isShow':false,'attrConfigType':'inputComm','attrKeys':101},{'attrName':'varname','attrMapping':true,'attrMappingName':'变量名称','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':90}]}"
+						configureType="{'lableType':'false','lableName':'Shm','lableMapping':false,'attrs':[{'attrName':'ShmId','attrMapping':true,'attrMappingName':'ID','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':89,'dataKey':'[]','multiple':false},{'attrName':'size','attrMapping':true,'attrMappingName':'长度','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':87,'dataKey':'[]','multiple':false},{'attrName':'index','attrMapping':true,'attrMappingName':'索引','actionType':'','isShow':false,'attrConfigType':'inputComm','attrKeys':101,'dataKey':'[]','multiple':false},{'attrName':'varname','attrMapping':true,'attrMappingName':'变量名称','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':90,'dataKey':'[]','multiple':false}],'lableMappingName':'Shm'}"
 						ShmId="1234535" varname="DataProcDot" size="0x10000000" index="0" />
 				</shmConfig>
 				<network_in
-					configureType="{'lableType':'networkTable','lableName':'network_in','lableMapping':true,'attrs':[],'mappingKeys':91}">
+					configureType="{'lableType':'networkTable','lableName':'network_in','lableMapping':true,'attrs':[],'mappingKeys':169,'lableMappingName':'网络输入'}">
 					<netconfig
-						configureType="{'lableType':'colTab','lableName':'netconfig','lableMapping':false,'attrs':[{'attrName':'protocol','attrMapping':true,'attrMappingName':'网络传输协议','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':93},{'attrName':'port','attrMapping':true,'attrMappingName':'端口号','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':94},{'attrName':'ip','attrMapping':true,'attrMappingName':'IP地址','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':95}]}"
+						configureType="{'lableType':'colTab','lableName':'netconfig','lableMapping':false,'attrs':[{'attrName':'protocol','attrMapping':true,'attrMappingName':'网络传输协议','actionType':'','isShow':true,'attrConfigType':'onlyReadComm','attrKeys':170,'dataKey':'[]','multiple':false},{'attrName':'port','attrMapping':true,'attrMappingName':'端口号','actionType':'','isShow':true,'attrConfigType':'onlyReadComm','attrKeys':171,'dataKey':'[]','multiple':false},{'attrName':'ip','attrMapping':true,'attrMappingName':'IP地址','actionType':'','isShow':true,'attrConfigType':'onlyReadComm','attrKeys':172,'dataKey':'[]','multiple':false}],'lableMappingName':'netconfig'}"
 						protocol="1" ip="226.0.0.10" port="6666" />
 				</network_in>
 				<network_out
-					configureType="{'lableType':'networkTable','lableName':'network_out','lableMapping':true,'attrs':[],'mappingKeys':92}">
+					configureType="{'lableType':'networkTable','lableName':'network_out','lableMapping':true,'attrs':[],'mappingKeys':177,'lableMappingName':'网络输出'}">
 					<netconfig
-						configureType="{'lableType':'colTab','lableName':'netconfig','lableMapping':false,'attrs':[{'attrName':'protocol','attrMapping':true,'attrMappingName':'网络传输协议','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':93},{'attrName':'port','attrMapping':true,'attrMappingName':'端口号','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':94},{'attrName':'ip','attrMapping':true,'attrMappingName':'IP地址','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':95}]}"
+						configureType="{'lableType':'colTab','lableName':'netconfig','lableMapping':false,'attrs':[{'attrName':'protocol','attrMapping':true,'attrMappingName':'网络传输协议','actionType':'','isShow':true,'attrConfigType':'onlyReadComm','attrKeys':170,'dataKey':'[]','multiple':false},{'attrName':'port','attrMapping':true,'attrMappingName':'端口号','actionType':'','isShow':true,'attrConfigType':'onlyReadComm','attrKeys':171,'dataKey':'[]','multiple':false},{'attrName':'ip','attrMapping':true,'attrMappingName':'IP地址','actionType':'','isShow':true,'attrConfigType':'onlyReadComm','attrKeys':172,'dataKey':'[]','multiple':false}],'lableMappingName':'netconfig'}"
 						protocol="1" ip="226.0.0.10" port="6666" />
 				</network_out>
 				<datasubscribe
-					configureType="{'lableType':'treeTable','lableName':'datasubscribe','lableMapping':false,'attrs':[{'attrName':'recvType','attrMapping':false,'attrMappingName':'recvType','actionType':'','isShow':true,'attrConfigType':'inputComm'}]}"
+					configureType="{'lableType':'treeTable','lableName':'datasubscribe','lableMapping':false,'attrs':[{'attrName':'recvType','attrMapping':false,'attrMappingName':'recvType','actionType':'','isShow':false,'attrConfigType':'onlyReadComm','dataKey':'[]','multiple':false}],'lableMappingName':'datasubscribe'}"
 					recvType="1">
 					<属性
-						configureType="{'lableType':'false','lableName':'属性','lableMapping':false,'attrs':[{'attrName':'cellNum','attrMapping':false,'attrMappingName':'cellNum','actionType':'','isShow':false,'attrConfigType':'inputComm'},{'attrName':'protocol','attrMapping':true,'attrMappingName':'网络传输协议','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':93},{'attrName':'name','attrMapping':true,'attrMappingName':'名称','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':96},{'attrName':'cellSize','attrMapping':true,'attrMappingName':'cell长度','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':97}]}"
+						configureType="{'lableType':'false','lableName':'属性','lableMapping':false,'attrs':[{'attrName':'cellNum','attrMapping':true,'attrMappingName':'cell数量','actionType':'','isShow':true,'attrConfigType':'onlyReadComm','dataKey':'[]','multiple':false,'attrKeys':173},{'attrName':'protocol','attrMapping':true,'attrMappingName':'网络传输协议','actionType':'','isShow':true,'attrConfigType':'onlyReadComm','attrKeys':170,'dataKey':'[]','multiple':false},{'attrName':'name','attrMapping':true,'attrMappingName':'名称','actionType':'','isShow':true,'attrConfigType':'onlyReadComm','attrKeys':174,'dataKey':'[]','multiple':false},{'attrName':'cellSize','attrMapping':true,'attrMappingName':'cell长度','actionType':'','isShow':true,'attrConfigType':'onlyReadComm','attrKeys':175,'dataKey':'[]','multiple':false}],'lableMappingName':'属性'}"
 						cellSize="8192" name="API Return" cellNum="38000" protocol="1" />
 				</datasubscribe>
 				<datapublish
-					configureType="{'lableType':'treeTable','lableName':'datapublish','lableMapping':false,'attrs':[{'attrName':'recvType','attrMapping':false,'attrMappingName':'recvType','actionType':'','isShow':true,'attrConfigType':'inputComm'}]}"
+					configureType="{'lableType':'treeTable','lableName':'datapublish','lableMapping':false,'attrs':[{'attrName':'recvType','attrMapping':false,'attrMappingName':'recvType','actionType':'','isShow':false,'attrConfigType':'onlyReadComm','dataKey':'[]','multiple':false}],'lableMappingName':'datapublish'}"
 					recvType="1">
 					<属性
-						configureType="{'lableType':'false','lableName':'属性','lableMapping':false,'attrs':[{'attrName':'cellNum','attrMapping':false,'attrMappingName':'cellNum','actionType':'','isShow':false,'attrConfigType':'inputComm'},{'attrName':'protocol','attrMapping':true,'attrMappingName':'网络传输协议','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':93},{'attrName':'name','attrMapping':true,'attrMappingName':'名称','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':96},{'attrName':'cellSize','attrMapping':true,'attrMappingName':'cell长度','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':97}]}"
+						configureType="{'lableType':'false','lableName':'属性','lableMapping':false,'attrs':[{'attrName':'cellNum','attrMapping':false,'attrMappingName':'cellNum','actionType':'','isShow':false,'attrConfigType':'inputComm','dataKey':'[]','multiple':false},{'attrName':'protocol','attrMapping':true,'attrMappingName':'网络传输协议','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':93,'dataKey':'[]','multiple':false},{'attrName':'name','attrMapping':true,'attrMappingName':'名称','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':96,'dataKey':'[]','multiple':false},{'attrName':'cellSize','attrMapping':true,'attrMappingName':'cell长度','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':97,'dataKey':'[]','multiple':false}],'lableMappingName':'属性'}"
 						cellSize="8192" name="API Return" cellNum="38000" protocol="1" />
 				</datapublish>
 			</cmp>
 		</cmpDeploy>
 	</node>
 	<coefConfig
-		configureType="{'lableType':'tab','lableName':'coefConfig','lableMapping':true,'attrs':[],'mappingKeys':98}">
+		configureType="{'lableType':'tab','lableName':'coefConfig','lableMapping':true,'attrs':[],'mappingKeys':176,'lableMappingName':'系数配置'}">
 		<fftCoef
-			configureType="{'lableType':'treeTable','lableName':'fftCoef','lableMapping':false,'attrs':[]}">
+			configureType="{'lableType':'treeTable','lableName':'fftCoef','lableMapping':false,'attrs':[],'lableMappingName':'fftCoef'}">
 			<coef coeflen="24503500"
-				configureType="{'lableType':'table','lableName':'coef','lableMapping':false,'attrs':[{'attrName':'filename','attrMapping':true,'attrMappingName':'文件路径','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':99},{'attrName':'count','attrMapping':true,'attrMappingName':'数量','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':100},{'attrName':'index','attrMapping':true,'attrMappingName':'索引','actionType':'','isShow':false,'attrConfigType':'inputComm','attrKeys':101},{'attrName':'coeflen','attrMapping':true,'attrMappingName':'coeflen','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':102},{'attrName':'filename_index','attrMapping':true,'attrMappingName':'文件索引','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':103},{'attrName':'filename_coef','attrMapping':true,'attrMappingName':'文件配置','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':104}]}"
-				filename_index="./CoefFile/In2_FftCoef.dat"
-				filename="./CoefFile/In2_FftCoef.dat" count="1"
-				filename_coef="./CoefFile/In2_FftCoef.dat" index="0" />
+				configureType="{'lableType':'table','lableName':'coef','lableMapping':false,'attrs':[{'attrName':'filename','attrMapping':true,'attrMappingName':'文件路径','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':99,'dataKey':'[]','multiple':false},{'attrName':'count','attrMapping':true,'attrMappingName':'数量','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':100,'dataKey':'[]','multiple':false},{'attrName':'index','attrMapping':true,'attrMappingName':'索引','actionType':'','isShow':false,'attrConfigType':'inputComm','attrKeys':101,'dataKey':'[]','multiple':false},{'attrName':'coeflen','attrMapping':true,'attrMappingName':'coeflen','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':102,'dataKey':'[]','multiple':false},{'attrName':'filename_index','attrMapping':true,'attrMappingName':'文件索引','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':103,'dataKey':'[]','multiple':false},{'attrName':'filename_coef','attrMapping':true,'attrMappingName':'文件配置','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':104,'dataKey':'[]','multiple':false}],'lableMappingName':'coef'}"
+				count="1" filename="./CoefFile/In2_FftCoef.dat"
+				filename_coef="./CoefFile/In2_FftCoef.dat"
+				filename_index="./CoefFile/In2_FftCoef.dat" index="0" />
 		</fftCoef>
 		<aaaCoef
-			configureType="{'lableType':'treeTable','lableName':'aaaCoef','lableMapping':false,'attrs':[]}">
+			configureType="{'lableType':'treeTable','lableName':'aaaCoef','lableMapping':false,'attrs':[],'lableMappingName':'aaaCoef'}">
 			<coef coeflen="24503500"
-				configureType="{'lableType':'table','lableName':'coef','lableMapping':false,'attrs':[{'attrName':'filename','attrMapping':true,'attrMappingName':'文件路径','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':99},{'attrName':'count','attrMapping':true,'attrMappingName':'数量','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':100},{'attrName':'index','attrMapping':true,'attrMappingName':'索引','actionType':'','isShow':false,'attrConfigType':'inputComm','attrKeys':101},{'attrName':'coeflen','attrMapping':true,'attrMappingName':'coeflen','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':102},{'attrName':'filename_index','attrMapping':true,'attrMappingName':'文件索引','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':103}]}"
-				filename_index="./CoefFile/In2_FftCoef.dat"
-				filename="./CoefFile/In2_FftCoef.dat" count="1"
-				filename_coef="./CoefFile/In2_FftCoef.dat" index="0" />
+				configureType="{'lableType':'table','lableName':'coef','lableMapping':false,'attrs':[{'attrName':'filename','attrMapping':true,'attrMappingName':'文件路径','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':99,'dataKey':'[]','multiple':false},{'attrName':'count','attrMapping':true,'attrMappingName':'数量','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':100,'dataKey':'[]','multiple':false},{'attrName':'index','attrMapping':true,'attrMappingName':'索引','actionType':'','isShow':false,'attrConfigType':'inputComm','attrKeys':101,'dataKey':'[]','multiple':false},{'attrName':'coeflen','attrMapping':true,'attrMappingName':'coeflen','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':102,'dataKey':'[]','multiple':false},{'attrName':'filename_index','attrMapping':true,'attrMappingName':'文件索引','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':103,'dataKey':'[]','multiple':false}],'lableMappingName':'coef'}"
+				count="1" filename="./CoefFile/In2_FftCoef.dat"
+				filename_coef="./CoefFile/In2_FftCoef.dat"
+				filename_index="./CoefFile/In2_FftCoef.dat" index="0" />
 		</aaaCoef>
 		<userSpace
-			configureType="{'lableType':'attrTable','lableName':'userSpace','lableMapping':true,'attrs':[],'mappingKeys':106}">
+			configureType="{'lableType':'attrTable','lableName':'userSpace','lableMapping':true,'attrs':[],'mappingKeys':178,'lableMappingName':'扩展配置'}">
 			<coef
-				configureType="{'lableType':'table','lableName':'coef','lableMapping':false,'attrs':[{'attrName':'filename','attrMapping':true,'attrMappingName':'文件路径','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':99},{'attrName':'count','attrMapping':true,'attrMappingName':'数量','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':100},{'attrName':'index','attrMapping':true,'attrMappingName':'索引','actionType':'','isShow':false,'attrConfigType':'inputComm','attrKeys':101},{'attrName':'varname','attrMapping':true,'attrMappingName':'方法名称','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':105},{'attrName':'filename_coef','attrMapping':true,'attrMappingName':'文件配置','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':104}]}"
-				filename="" count="64" varname="CmpMemoryPara" filename_coef=""
-				index="0" />
+				configureType="{'lableType':'table','lableName':'coef','lableMapping':false,'attrs':[{'attrName':'filename','attrMapping':true,'attrMappingName':'文件路径','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':99,'dataKey':'[]','multiple':false},{'attrName':'count','attrMapping':true,'attrMappingName':'数量','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':100,'dataKey':'[]','multiple':false},{'attrName':'index','attrMapping':true,'attrMappingName':'索引','actionType':'','isShow':false,'attrConfigType':'inputComm','attrKeys':101,'dataKey':'[]','multiple':false},{'attrName':'varname','attrMapping':true,'attrMappingName':'方法名称','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':105,'dataKey':'[]','multiple':false},{'attrName':'filename_coef','attrMapping':true,'attrMappingName':'文件配置','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':104,'dataKey':'[]','multiple':false}],'lableMappingName':'coef'}"
+				count="64" filename="" filename_coef="" index="0"
+				varname="CmpMemoryPara" />
 		</userSpace>
 	</coefConfig>
 </sysConfig>
