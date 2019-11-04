@@ -198,8 +198,20 @@ export default {
   methods: {
     goToAddCompPage(){
         getBaseTemplate().then(response => {
-            console.log("response", response)
-            let defauleBaseTemplate = response.data
+            // console.log("response", response)
+            let defauleBaseTemplate = []
+            for (let i in response.data) {
+                if (response.data[i].tempType === "构件模型") {
+                    defauleBaseTemplate.push(response.data[i])
+                }
+            }
+            defauleBaseTemplate = JSON.parse(JSON.stringify(defauleBaseTemplate))
+            if(defauleBaseTemplate.length === 0) {
+                this.$alert('尚未添加构件建模基础模板，请先添加基础模板。', '友情提示', {
+                    confirmButtonText: '确定',
+                });
+                return
+            }
             this.$store.dispatch("setAllBaseTemplate", response.data)
             analysisXmlFile(response.data[0].tempPath).then(response => {
                 console.log("response", response);
@@ -337,7 +349,6 @@ export default {
     getList() {
       this.tableLoading = true;
       fetchList(this.listQuery).then(response => {
-          console.log("response",response)
         this.tableData = response.data.data.records;
         this.page.total = response.data.data.total;
         this.tableLoading = false;

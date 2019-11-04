@@ -289,6 +289,7 @@ export default {
         this.compImg.imgShowName + "-V" + param.version
       );
       imgretStr.compParam.compImg = this.compImg;
+      imgretStr.compParam.username = this.userInfo.username
       saveCompImg(imgretStr);
     },
     //保存对应文件
