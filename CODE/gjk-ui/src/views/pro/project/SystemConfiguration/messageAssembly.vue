@@ -251,7 +251,7 @@ export default {
               );
               if (childAttr.lableType == "coreDeployDiv") {
                 this.cmmXml = childXmlMap;
-              } else if (childAttr.lableType == "buf") {
+              } else if (childAttr.lableType == "form") {
                 this.bufXml.push(childXmlMap);
               } else if (childAttr.lableType == "attrTable") {
                 this.shmComfig = childXmlMap;

@@ -2,12 +2,12 @@
 <sysConfig
 	configureType="{'lableType':'false','lableName':'sysConfig','lableMapping':false,'attrs':[]}">
 	<node
-		configureType="{'lableType':'cpuPage','lableName':'node','lableMapping':false,'attrs':[{'attrName':'ipConfig','attrMapping':true,'attrMappingName':'IP地址','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':80},{'attrName':'id','attrMapping':true,'attrMappingName':'ID','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':81},{'attrName':'osCoreID','attrMapping':true,'attrMappingName':'芯片选择','actionType':'','isShow':true,'attrConfigType':'selectComm','multiple':true,'dataKey':[],'attrKeys':82},{'attrName':'osCoreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'length','attrKeys':83}]}"
+		configureType="{'lableType':'form','lableName':'node','lableMapping':false,'attrs':[{'attrName':'ipConfig','attrMapping':true,'attrMappingName':'IP地址','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':80},{'attrName':'id','attrMapping':true,'attrMappingName':'ID','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':81},{'attrName':'osCoreID','attrMapping':true,'attrMappingName':'芯片选择','actionType':'','isShow':true,'attrConfigType':'selectComm','multiple':true,'dataKey':[],'attrKeys':82},{'attrName':'osCoreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'length','attrKeys':83}]}"
 		osCoreID="1-2" id="0" ipConfig="192.168.0.7" osCoreSum="2">
 		<cmpDeploy
 			configureType="{'lableType':'false','lableName':'cmpDeploy','lableMapping':false,'attrs':[]}">
 			<cmp
-				configureType="{'lableType':'cmpPage','lableName':'cmp','lableMapping':false,'attrs':[{'attrName':'funcName','attrMapping':true,'attrMappingName':'方法名称','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':84},{'attrName':'cmpName','attrMapping':true,'attrMappingName':'部件名称','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':85},{'attrName':'id','attrMapping':true,'attrMappingName':'部件ID','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':86}]}"
+				configureType="{'lableType':'form','lableName':'cmp','lableMapping':false,'attrs':[{'attrName':'funcName','attrMapping':true,'attrMappingName':'方法名称','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':84},{'attrName':'cmpName','attrMapping':true,'attrMappingName':'部件名称','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':85},{'attrName':'id','attrMapping':true,'attrMappingName':'部件ID','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':86}]}"
 				id="API Return" funcName="API Return" cmpName="API Return">
 				<coreDeploy
 					configureType="{'lableType':'coreDeployDiv','lableName':'coreDeploy','lableMapping':true,'attrMappingName':'内核部署','attrs':[]}">
@@ -22,13 +22,16 @@
 						coreID="3-4-5" coreSum="3" />
 				</coreDeploy>
 				<tmpBuf
-					configureType="{'lableType':'buf','lableName':'tmpBuf','lableMapping':false,'attrs':[{'attrName':'size','attrMapping':true,'attrMappingName':'长度','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':87},{'attrName':'baseAddr','attrMapping':true,'attrMappingName':'起始地址','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':88}]}"
+					configureType="{'lableType':'form','lableName':'tmpBuf','lableMapping':false,'attrs':[{'attrName':'size','attrMapping':true,'attrMappingName':'长度','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':87},{'attrName':'baseAddr','attrMapping':true,'attrMappingName':'起始地址','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':88}]}"
 					size="0x40000000" baseAddr="0x300000000" />
 				<moniBuf
-					configureType="{'lableType':'buf','lableName':'moniBuf','lableMapping':false,'attrs':[{'attrName':'size','attrMapping':true,'attrMappingName':'长度','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':87},{'attrName':'baseAddr','attrMapping':true,'attrMappingName':'起始地址','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':88}]}"
+					configureType="{'lableType':'form','lableName':'moniBuf','lableMapping':false,'attrs':[{'attrName':'size','attrMapping':true,'attrMappingName':'长度','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':87},{'attrName':'baseAddr','attrMapping':true,'attrMappingName':'起始地址','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':88}]}"
 					size="0x40000000" baseAddr="0x300000000" />
 				<shmConfig
 					configureType="{'lableType':'attrTable','lableName':'shmConfig','lableMapping':false,'attrs':[]}">
+					<Shm
+						configureType="{'lableType':'false','lableName':'Shm','lableMapping':false,'attrs':[{'attrName':'ShmId','attrMapping':true,'attrMappingName':'ID','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':89},{'attrName':'size','attrMapping':true,'attrMappingName':'长度','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':87},{'attrName':'index','attrMapping':true,'attrMappingName':'索引','actionType':'','isShow':false,'attrConfigType':'inputComm','attrKeys':101},{'attrName':'varname','attrMapping':true,'attrMappingName':'变量名称','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':90}]}"
+						ShmId="1234535" varname="DataProcDot" size="0x10000000" index="0" />
 					<Shm
 						configureType="{'lableType':'false','lableName':'Shm','lableMapping':false,'attrs':[{'attrName':'ShmId','attrMapping':true,'attrMappingName':'ID','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':89},{'attrName':'size','attrMapping':true,'attrMappingName':'长度','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':87},{'attrName':'index','attrMapping':true,'attrMappingName':'索引','actionType':'','isShow':false,'attrConfigType':'inputComm','attrKeys':101},{'attrName':'varname','attrMapping':true,'attrMappingName':'变量名称','actionType':'','isShow':true,'attrConfigType':'inputComm','attrKeys':90}]}"
 						ShmId="1234535" varname="DataProcDot" size="0x10000000" index="0" />
@@ -63,7 +66,7 @@
 		</cmpDeploy>
 	</node>
 	<coefConfig
-		configureType="{'lableType':'coefPage','lableName':'coefConfig','lableMapping':true,'attrs':[],'mappingKeys':98}">
+		configureType="{'lableType':'tab','lableName':'coefConfig','lableMapping':true,'attrs':[],'mappingKeys':98}">
 		<fftCoef
 			configureType="{'lableType':'treeTable','lableName':'fftCoef','lableMapping':false,'attrs':[]}">
 			<coef coeflen="24503500"

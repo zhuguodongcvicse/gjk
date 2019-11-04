@@ -23,7 +23,7 @@
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
 import { mapGetters } from "vuex";
-import { parseStrToObj } from "@/util/util";
+import { parseStrToObj, parseObjToStr } from "@/util/util";
 import {
   handlerSaveSysXml,
   isXmlFileExist,
@@ -66,7 +66,7 @@ export default {
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["userInfo"])
+    ...mapGetters(["userInfo", "compChineseMapping"])
   },
   //监控data中的数据变化
   watch: {
@@ -82,6 +82,8 @@ export default {
     getModelXmlEntityMap() {
       //1:解析基础模板文件，获得cpu和cmp的节点
       getSysConfigModelXml().then(Response => {
+        // console.log("11111111111111111111111111111", Response.data.data);
+        this.setCNENMapping(Response.data.data);
         this.xmlEntityMap = JSON.parse(JSON.stringify(Response.data.data));
         this.xmlEntityMap.xmlEntityMaps = [];
         let coefXmlMap = null;
@@ -90,9 +92,9 @@ export default {
         for (let item of Response.data.data.xmlEntityMaps) {
           let itemData = parseStrToObj(item.attributeMap.configureType);
           //系数配置模板
-          if (itemData.lableType == "coefPage") {
+          if (itemData.lableType == "tab") {
             coefXmlMap = JSON.parse(JSON.stringify(item));
-          } else if (itemData.lableType == "cpuPage") {
+          } else if (itemData.lableType == "form") {
             //节点部件配置
             modelMap = JSON.parse(JSON.stringify(item));
 
@@ -109,7 +111,7 @@ export default {
                   ) {
                     for (let cmp of item.xmlEntityMaps) {
                       i = parseStrToObj(cmp.attributeMap.configureType);
-                      if (i.lableType == "cmpPage") {
+                      if (i.lableType == "form") {
                         cmpXml = JSON.parse(JSON.stringify(cmp));
                         modelMap.xmlEntityMaps[0].xmlEntityMaps = [];
                       }
@@ -162,7 +164,7 @@ export default {
               for (let item of callBackXmlMap.xmlEntityMaps) {
                 if (
                   parseStrToObj(item.attributeMap.configureType).lableType ==
-                  "cpuPage"
+                  "form"
                 ) {
                   for (let node of treeData) {
                     let nodeConfig = parseStrToObj(
@@ -201,7 +203,7 @@ export default {
                   }
                 } else if (
                   parseStrToObj(item.attributeMap.configureType).lableType ==
-                  "coefPage"
+                  "tab"
                 ) {
                   if (coefXmlMap.xmlEntityMaps.length > 0) {
                     for (let coef of coefXmlMap.xmlEntityMaps) {
@@ -360,6 +362,39 @@ export default {
         }
       }
     },
+    setCNENMapping(xmlentityMap) {
+      let xmlConfig = parseStrToObj(xmlentityMap.attributeMap.configureType);
+      let cnName = null;
+      if (xmlConfig.lableMapping) {
+        cnName = this.compChineseMapping.find(item => {
+          return item.label === xmlConfig.mappingKeys;
+        });
+      } else {
+        cnName = xmlConfig.lableName;
+      }
+      if (xmlConfig.lableMappingName != undefined) {
+        this.$set(xmlConfig, "lableMappingName", cnName);
+      } else {
+        xmlConfig.lableMappingName = cnName;
+      }
+      if (xmlConfig.attrs.length > 0) {
+        for (let attrItem of xmlConfig.attrs) {
+          if (attrItem.attrMapping) {
+            attrItem.attrMappingName = this.compChineseMapping.find(item => {
+              return item.label === attrItem.attrKeys;
+            });
+          } else {
+            attrItem.attrMappingName = attrItem.attrName;
+          }
+        }
+      }
+      xmlentityMap.attributeMap.configureType = parseObjToStr(xmlConfig);
+      if (xmlentityMap.xmlEntityMaps != null && xmlentityMap.length > 0) {
+        for (let childXmlMap of xmlentityMap.xmlEntityMaps) {
+          this.setCNENMapping(childXmlMap);
+        }
+      }
+    },
     saveSysConfigXmlFile() {
       this.getXmlEntityMap();
       this.setSelectCordIdToStr(this.xmlEntityMap);
@@ -504,6 +539,7 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
+    this.$store.dispatch("setChineseMapping", "sysconfig_param_type");
     //1:解析基础模板文件，获得cpu和cmp的节点
     //2:调用解析流程模型xml文件，根据数据结构、cpu和cmp生成树结构
     //3:获取硬件数据chipsOfHardwarelibs，修改cpu数据
