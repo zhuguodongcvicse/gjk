@@ -1141,8 +1141,11 @@ function initEditor(editor) {
 				{
 					text: '选中该构件移动', action: function () {
 						graph.select(data);
+						console.log("1111111111111111111111111",data)
 						verdict = true;
-						if (data._mn3.partname == null && data.image == "images/Chip.svg" || data.image == "rack" || data.image == "images/BeforeTheBoard.svg") {
+						if (data._mn3.partname == null && data.image == "images/Chip.svg" || data.image == "rack" || data.image == "images/BeforeTheBoard.svg"
+						|| data.image == "images/OpticalFiberMouth.svg" || data.image == "images/InternetAccess.svg" ||  data.image == "images/RoundMouth.svg"
+						||  data.image == "images/SerialPort.svg"  || data.image =="images/AfterTheBoard.svg" || data.edgeType == "extend.top" ) {
 							showMessage('请选择构件', 'error', 2000)
 							graph.selectionModel.clear();
 							verdict = false;
@@ -1160,7 +1163,9 @@ function initEditor(editor) {
 								graph.select(data);
 							}
 						})
-						if (data._mn3.partname == null && data.image == "images/Chip.svg" || data.image == "rack" || data.image == "images/BeforeTheBoard.svg") {
+						if (data._mn3.partname == null && data.image == "images/Chip.svg" || data.image == "rack" || data.image == "images/BeforeTheBoard.svg"
+						|| data.image == "images/OpticalFiberMouth.svg" || data.image == "images/InternetAccess.svg" ||  data.image == "images/RoundMouth.svg"
+						||  data.image == "images/SerialPort.svg"  || data.image =="images/AfterTheBoard.svg" || data.edgeType == "extend.top") {
 							showMessage('请选择构件', 'error', 2000)
 							graph.selectionModel.clear();
 							verdict = false;
@@ -1173,9 +1178,8 @@ function initEditor(editor) {
 						var data = graph.getElement(evt);
 						var deploymentsJson = graph.toJSON();
 						if ( data.image == "images/Chip.svg" ){
-							console.log("选中芯片数据数据", CHIPdate)
-							showMessage('成功选中跳转芯片', 'success', 2000)
 							CHIPdate.push(data);
+							showMessage('成功选中跳转芯片'+CHIPdate.length+'个', 'success', 2000)
 						}else{
 							showMessage('请重新选择跳转的芯片', 'error', 2000)
 
