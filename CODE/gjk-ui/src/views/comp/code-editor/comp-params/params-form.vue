@@ -543,23 +543,28 @@ export default {
           }
           let obj = {};
           obj[str] = this.files;
+          //数据中添加文件类型，用作判断添加的文件类型
           obj["fileTypeTemp"] = attr.actionType;
+          //文件是否存在标识，默认-1
           let ifExistSameFile = -1;
           if (JSON.stringify(obj) !== "{}") {
               if (analysisBaseFile.length != 0){
                   for (let i in analysisBaseFile) {
+                      //如果添加的文件和存在的相同，则标识改变
                       if (analysisBaseFile[i].fileTypeTemp == attr.actionType) {
                           ifExistSameFile = i;
                           break;
                       }
                   }
+                  //若标识不为默认值-1
                   if (ifExistSameFile != -1) {
+                      //删除相同的老数据，添加新数据
                       analysisBaseFile.splice(ifExistSameFile, 1);
                       analysisBaseFile.push(obj);
-                  } else {
+                  } else {//原先不存在则直接添加
                       analysisBaseFile.push(obj);
                   }
-              } else {
+              } else {//原先不存在则直接添加
                   analysisBaseFile.push(obj);
               }
             this.$store.dispatch("setAnalysisBaseFile", analysisBaseFile);
@@ -799,18 +804,39 @@ export default {
       tabData.splice(index, 1);
       // console.log("tabDatatabDatatabData", tabData);
     },
+    //延时函数
     sleep(time) {
         return new Promise((resolve) => setTimeout(resolve, time));
     },
+    //改变文件时触发
     fileChange(param) {
       //调用父组件方法
       // this.$parent.$parent.$parent.$parent.saveCurrentIODate()
       // console.log("param - fileChange",param)
       // console.log("this.fileListOfComponent - fileChange",this.fileListOfComponent)
+      //如果文件列表 不为空
       if (this.fileListOfComponent.length != 0) {
           let fileListsTemp = JSON.parse(JSON.stringify(this.fileListOfComponent))
+          //改变文件时标识“1”变为0
           fileListsTemp[1] = 0
           this.$store.dispatch("setFileListOfComponent", fileListsTemp);
+          //删除原先存在的文件，重新上传新文件，避免重复
+          if (this.fileListOfComponent[0].algorithmfile != undefined && fileListsTemp[0].algorithmfile.filevo.length != 0) {
+              let files = [fileListsTemp[0].algorithmfile.filevo[0].relativePath]
+              // console.log("files - algorithmfile", files);
+              delFilePath(files).then(res => {
+                  // this.leftData.splice(index, 1);
+                  // console.log("res",res)
+              });
+          }
+          if (this.fileListOfComponent[0].platformfile != undefined && fileListsTemp[0].platformfile.filevo.length != 0) {
+              let files = [fileListsTemp[0].platformfile.filevo[0].relativePath]
+              // console.log("files - platformfile", files);
+              delFilePath(files).then(res => {
+                  // this.leftData.splice(index, 1);
+                  // console.log("res",res)
+              });
+          }
       }
       this.files = deepClone(param);
       /*this.sleep(500).then(() => {
@@ -820,22 +846,6 @@ export default {
           // console.log("paramsFormXmlParamsTemp",JSON.stringify(paramsFormXmlParamsTemp))
           // console.log("currentIODateTemp",JSON.stringify(currentIODateTemp))
       })*/
-      /*if (this.fileListOfComponent[0].algorithmfile != undefined && fileListsTemp[0].algorithmfile.filevo.length != 0) {
-          let files = [fileListsTemp[0].algorithmfile.filevo[0].relativePath]
-          // console.log("files - algorithmfile", files);
-          /!*delFilePath(files).then(res => {
-              // this.leftData.splice(index, 1);
-              // console.log("res",res)
-          });*!/
-      }
-      if (this.fileListOfComponent[0].platformfile != undefined && fileListsTemp[0].platformfile.filevo.length != 0) {
-          let files = [fileListsTemp[0].platformfile.filevo[0].relativePath]
-          // console.log("files - platformfile", files);
-          /!*delFilePath(files).then(res => {
-              // this.leftData.splice(index, 1);
-              // console.log("res",res)
-          });*!/
-      }*/
     }, //去掉重复的数组Obj
     reduceObject(arrObj, name) {
       let hash = {};

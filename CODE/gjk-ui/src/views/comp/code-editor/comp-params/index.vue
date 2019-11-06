@@ -253,6 +253,7 @@ export default {
                 });*/
                 this.reload();
                 loading.close();
+                //保存之后关闭路由
                 let tag1 = this.tag
                 menuTag(this.$route.path, "remove", this.tagList, tag1);
               });
@@ -278,28 +279,33 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
+    //如果是新增构件
     if (this.$route.query.type === "add") {
         // this.selectBaseTemplateValue = this.$route.query.defauleBaseTemplate[0].tempName
         let allBaseTemplateTemp = JSON.parse(JSON.stringify(this.allBaseTemplate))
         for (const i in allBaseTemplateTemp) {
+            //筛选出构件模板
             if (allBaseTemplateTemp[i].tempType === "构件模型"){
                 this.structBaseTemplate.push(allBaseTemplateTemp[i])
             }
         }
         this.structBaseTemplate = JSON.parse(JSON.stringify(this.structBaseTemplate))
+        //默认显示模板的最后一条
         this.selectBaseTemplateValue = this.structBaseTemplate[this.structBaseTemplate.length - 1]
     }
+    //如果是编辑或者复制
     if (this.$route.query.compId != undefined) {
       this.component.id = this.$route.query.compId;
       //查询构件文件
       getCompFiles(this.$route.query.compId).then(res => {
-        console.log("res",res)
+        // console.log("res",res)
         //基本构件
+        //备注信息赋值
         this.compBackupinfo =  res.data.data.comp.compBackupinfo
         this.component = res.data.data.comp;
         this.$store.dispatch("setSaveXmlMaps", res.data.data.compBasicMap);
         this.fileList = res.data.data;
-        this.$store.dispatch("setFileListOfComponent", [res.data.data, 1]);
+        this.$store.dispatch("setFileListOfComponent", [res.data.data, 1]); //“1” 标识是否为第一次进编辑或者复制，刚进时也会触发各种 方法导致数据有问题
       });
     }
     // this.saveXmlMaps = this.$route.params;

@@ -825,7 +825,9 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 							}
 							file.createNewFile();
 						}
-						FileUtil.copyFilesFromDir(uploadFile, file, true);
+						if (!uploadFile.equals(file)) {
+							FileUtil.copyFilesFromDir(uploadFile, file, true);
+						}
 						// 上传文件到 GIT
 						JGitUtil.commitAndPush(file.getPath(), "上传构件xml文件");
 					}
