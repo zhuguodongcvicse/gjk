@@ -11,7 +11,7 @@
           <!-- <el-button type="primary" plain size="small" @click="bottonCheckComp = !bottonCheckComp">{{bottonCheckComp?'检查更新':'还原'}}</el-button>
           <el-button type="primary" plain size="small" @click="sendMessage('completeCheck')">完备性检查</el-button> -->
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('loading')">加载</el-button> -->
-          <el-button type="primary" plain size="small" @click="sendMessage('simulation')">仿真</el-button>
+          <!-- <el-button type="primary" plain size="small" @click="sendMessage('simulation')">仿真</el-button> -->
           <el-button type="primary" plain size="small" @click="sendMessage('exportJSON')">导出</el-button>
 
           <!-- <input type="file" @change="getFile($event)"> -->
@@ -152,7 +152,8 @@ export default {
       isFullscreen: false, //是否全屏
       index: 0,
       compUpdateState : {},//构件更新状态
-      bottonCheckComp : true
+      bottonCheckComp : true,
+      bottonState : ""
     };
   },
   //监听属性 类似于data概念
@@ -488,7 +489,11 @@ export default {
           this.$refs.gjkIframe.sendMessage(this.postMessageData);
         });
       } else if (state === "exportJSON") {
-        exportFile(this.$route.query.processId);
+        this.bottonState = state
+        this.postMessageData.cmd = "clickCompSave";
+        this.postMessageData.params = "save";
+        this.$refs.gjkIframe.sendMessage(this.postMessageData);
+        //exportFile(this.$route.query.processId);
       } else if (state === "completeCheck") {
         this.postMessageData.cmd = "completeCheck";
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
@@ -581,13 +586,20 @@ export default {
           this.$route.query.processId
         ).then(res => {
           // setTimeout(() => {
-          loading.close();
-          this.saveState = false;
-          this.$message({
-            showClose: true,
-            message: "生成成功",
-            type: "success"
-          });
+            if(this.bottonState == "exportJSON"){
+               loading.close();
+              exportFile(this.$route.query.processId)
+            }else{
+              loading.close();
+              this.saveState = false;
+              this.$message({
+                showClose: true,
+                message: "生成成功",
+                type: "success"
+              });
+            }
+            this.bottonState = ""
+          
           // }, 1000);
         });
       });
