@@ -307,20 +307,35 @@ export default {
     },
     // 双击赋值
     handleRowClick(row, event) {
+        console.log("row",row)
       let val = this.tmpLengthVal;
       let strcutObj;
       let strName = "";
       const dbId = JSON.parse(JSON.stringify(this.structform.variable));
-
       let variableSel = JSON.parse(JSON.stringify(this.variableSel));
-      variableSel.find(item => {
-        item.options.find(it => {
-          if (it.dbId === dbId) {
-            strName = it.fparamName;
-            strcutObj = it;
-          }
-        });
-      });
+      let indexNumOfDbId = dbId.indexOf('v')
+      // console.log("indexNumOfParam",indexNumOfParam)
+      if (indexNumOfDbId != -1) {
+          let structTypeTemp = dbId.slice(0, indexNumOfDbId - 2)
+          let structVersionTemp = dbId.slice(indexNumOfDbId + 1)
+          variableSel.find(item => {
+              item.options.find(it => {
+                  if (it.fparamType === structTypeTemp && it.version === structVersionTemp) {
+                      strName = it.fparamName;
+                      strcutObj = it;
+                  }
+              });
+          });
+      } else {
+          variableSel.find(item => {
+              item.options.find(it => {
+                  if (it.dbId === dbId) {
+                      strName = it.fparamName;
+                      strcutObj = it;
+                  }
+              });
+          });
+      }
       if (strcutObj) {
         let headerFile = this.headerFile;
         if (headerFile && headerFile.structParams) {
