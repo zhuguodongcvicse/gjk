@@ -43,7 +43,11 @@ export default {
     },
     moduleType: { type: String, required: true },
     readonly: { type: Boolean, default: false },
-    disabled: { type: Boolean, default: false }
+    disabled: { type: Boolean, default: false },
+    test66: {
+      type: Function,
+      default: null
+    }
   },
   components: { "params-form": paramsForm },
   //监听属性 类似于data概念
@@ -100,6 +104,9 @@ export default {
   },
   //方法集合
   methods: {
+    saveCurrentIODate: function(){
+        this.$parent.$parent.$parent.$parent.$parent.saveCurrentIODate()
+    },
     saveParamsDefineXmlParams: function(dataParam, nameType) {
       // console.log("params-define.vue中。需要保存的数据结构******", dataParam);
       this.$emit("change", dataParam,nameType);

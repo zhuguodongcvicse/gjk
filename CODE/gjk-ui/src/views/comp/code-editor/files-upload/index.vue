@@ -155,16 +155,16 @@ export default {
     analysisBaseFile: {
         handler: function(params) {
             this.allFilesList = JSON.parse(JSON.stringify(this.analysisBaseFile))
-            console.log("allFilesList - watch", params)
-            console.log("allFilesList - watch", this.analysisBaseFile)
+            // console.log("allFilesList - watch", params)
+            // console.log("allFilesList - watch", this.analysisBaseFile)
         },
         deep: true
     },
     value(v1) {
       // console.log("this.value - watch",this.value)
-      console.log("v1 - watch",v1)
-      console.log("this.allFilesList - watch",this.allFilesList)
-      console.log("this.fileListOfComponent - watch",this.fileListOfComponent)
+      // console.log("v1 - watch",v1)
+      // console.log("this.allFilesList - watch",this.allFilesList)
+      // console.log("this.fileListOfComponent - watch",this.fileListOfComponent)
       if (this.fileListOfComponent[1] === 0 && this.fileListOfComponent[0].algorithmfile != undefined) {
           for (const i in v1) {
               if (this.fileListOfComponent[0].algorithmfile.filevo.length != 0 && this.fileListOfComponent[0].algorithmfile.filevo[0].relativePath === v1[i].relativePath){
@@ -173,11 +173,9 @@ export default {
           }
       }
       if (this.fileListOfComponent[1] === 0 && this.fileListOfComponent[0].platformfile != undefined) {
-          console.log("++++++++++++++++++++++")
           for (const i in v1) {
               if (this.fileListOfComponent[0].platformfile.filevo.length != 0 && this.fileListOfComponent[0].platformfile.filevo[0].relativePath === v1[i].relativePath){
                   v1.splice(i, 1)
-                  console.log("-------------------------")
               }
           }
       }

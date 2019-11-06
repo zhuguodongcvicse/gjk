@@ -232,7 +232,9 @@ export default {
       "analysisBaseFile",
       "headerFile",
       "fileListOfComponent",
-      "userInfo"
+      "userInfo",
+      "saveDBXmlMaps",
+      "currentIODate"
     ])
   },
   //监控data中的数据变化
@@ -274,7 +276,7 @@ export default {
         }
         this.paramsFormXmlParams = baseData;
         this.xnTableData = xnShowTable;
-        // console.log("this.paramsFormXmlParams-watch",this.paramsFormXmlParams)
+        // console.log("this.paramsFormXmlParams-watch(formXmlParam)",this.paramsFormXmlParams)
       }
     },
     saveXnTableData: {
@@ -513,6 +515,7 @@ export default {
               this.$store.dispatch("GetParseHeaderObj", path).then(() => {
                 let base = deepClone(this.paramsFormXmlParams);
                 this.paramsFormXmlParams = [];
+                // console.log("Date.parse(new Date()) - itemTypeChange",Date.parse(new Date()))
                 let input = this.headerFile.inputXmlMapParams;
                 let output = this.headerFile.outputXmlMapParams;
                 let paramsFormXml = [];
@@ -560,10 +563,12 @@ export default {
                   analysisBaseFile.push(obj);
               }
             this.$store.dispatch("setAnalysisBaseFile", analysisBaseFile);
-            console.log("analysisBaseFile - itemTypeChange",analysisBaseFile)
+            // console.log("analysisBaseFile - itemTypeChange",analysisBaseFile)
           }
         }
       });
+      // console.log("this.paramsFormXmlParams - itemTypeChange",this.paramsFormXmlParams)
+      // console.log("Date.parse(new Date()) - itemTypeChange",Date.parse(new Date()))
     },
     //将基础模板的配置方式写到解析后的参数中
     itemTypeChangeAssignmenDataParam(toParam, formParam) {
@@ -773,7 +778,9 @@ export default {
     },
     //处理ConfigureType
     analysisConfigureType(config) {
+        // console.log("analysisConfigureType - config",config)
       if (config.attributeMap) {
+        // console.log("eval(----------------)",eval("(" + config.attributeMap.configureType + ")"))
         return eval("(" + config.attributeMap.configureType + ")");
       } else {
         return {};
@@ -792,31 +799,43 @@ export default {
       tabData.splice(index, 1);
       // console.log("tabDatatabDatatabData", tabData);
     },
+    sleep(time) {
+        return new Promise((resolve) => setTimeout(resolve, time));
+    },
     fileChange(param) {
+      //调用父组件方法
+      // this.$parent.$parent.$parent.$parent.saveCurrentIODate()
       // console.log("param - fileChange",param)
       // console.log("this.fileListOfComponent - fileChange",this.fileListOfComponent)
-      let fileListsTemp = JSON.parse(JSON.stringify(this.fileListOfComponent))
+      if (this.fileListOfComponent.length != 0) {
+          let fileListsTemp = JSON.parse(JSON.stringify(this.fileListOfComponent))
+          fileListsTemp[1] = 0
+          this.$store.dispatch("setFileListOfComponent", fileListsTemp);
+      }
       this.files = deepClone(param);
-
-      // console.log("this.files - fileChange",this.files)
-        if (this.fileListOfComponent[0].algorithmfile != undefined && fileListsTemp[0].algorithmfile.filevo.length != 0) {
-            let files = [fileListsTemp[0].algorithmfile.filevo[0].relativePath]
-            // console.log("files - algorithmfile", files);
-            /*delFilePath(files).then(res => {
-                // this.leftData.splice(index, 1);
-                // console.log("res",res)
-            });*/
-        }
-        if (this.fileListOfComponent[0].platformfile != undefined && fileListsTemp[0].platformfile.filevo.length != 0) {
-            let files = [fileListsTemp[0].platformfile.filevo[0].relativePath]
-            // console.log("files - platformfile", files);
-            /*delFilePath(files).then(res => {
-                // this.leftData.splice(index, 1);
-                // console.log("res",res)
-            });*/
-        }
-      fileListsTemp[1] = 0
-      this.$store.dispatch("setFileListOfComponent", fileListsTemp);
+      /*this.sleep(500).then(() => {
+          // console.log("66666666")
+          let paramsFormXmlParamsTemp = JSON.parse(JSON.stringify(this.paramsFormXmlParams))
+          let currentIODateTemp = JSON.parse(JSON.stringify(this.currentIODate))
+          // console.log("paramsFormXmlParamsTemp",JSON.stringify(paramsFormXmlParamsTemp))
+          // console.log("currentIODateTemp",JSON.stringify(currentIODateTemp))
+      })*/
+      /*if (this.fileListOfComponent[0].algorithmfile != undefined && fileListsTemp[0].algorithmfile.filevo.length != 0) {
+          let files = [fileListsTemp[0].algorithmfile.filevo[0].relativePath]
+          // console.log("files - algorithmfile", files);
+          /!*delFilePath(files).then(res => {
+              // this.leftData.splice(index, 1);
+              // console.log("res",res)
+          });*!/
+      }
+      if (this.fileListOfComponent[0].platformfile != undefined && fileListsTemp[0].platformfile.filevo.length != 0) {
+          let files = [fileListsTemp[0].platformfile.filevo[0].relativePath]
+          // console.log("files - platformfile", files);
+          /!*delFilePath(files).then(res => {
+              // this.leftData.splice(index, 1);
+              // console.log("res",res)
+          });*!/
+      }*/
     }, //去掉重复的数组Obj
     reduceObject(arrObj, name) {
       let hash = {};
