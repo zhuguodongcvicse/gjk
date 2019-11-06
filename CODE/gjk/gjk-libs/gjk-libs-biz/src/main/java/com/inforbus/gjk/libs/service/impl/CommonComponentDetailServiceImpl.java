@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.FileUtil;
@@ -91,7 +92,8 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 				System.out.println("detail.getFilePath()---- " + detail.getFilePath());
 				System.out.println("subStr---- " + subStr);
 				System.out.println("subStr.length()---- " + subStr.length());
-				System.out.println("detail.getFilePath().substring(subStr.length())---- " + detail.getFilePath().substring(subStr.length()));
+				System.out.println("detail.getFilePath().substring(subStr.length())---- "
+						+ detail.getFilePath().substring(subStr.length()));
 				detail.setFilePath(compPath + detail.getFilePath().substring(subStr.length()));
 				File originalFile = new File(originalFileName);
 				if (!originalFile.exists()) {
@@ -102,6 +104,16 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 				} else {
 					FileUtil.copyFile(originalFileName, gitFilePath + detail.getFilePath());
 				}
+				if ("xml".equals(detail.getFileType())) {
+					File file = new File(gitFilePath + detail.getFilePath() + detail.getFileName());
+					XmlEntityMap entityMap = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);
+					XmlEntityMap getFunctionName = getXmlMapByLableName(entityMap, "函数路径");
+					if (getFunctionName.getAttributeMap().containsKey("name")) {
+						getFunctionName.getAttributeMap().put("name",
+								compPath + getFunctionName.getAttributeMap().get("name").substring(subStr.length()));
+					}
+					XmlFileHandleUtil.createXmlFile(entityMap, file);
+				}
 				baseMapper.saveCommonCompDetail(detail);
 			}
 			return true;
@@ -109,6 +121,31 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	/**
+	 * 递归查询对应的标签名下属性值对应的value
+	 * 
+	 * @param xmlEntityMap xml结构
+	 * @param lableName    标签名
+	 * @param attributeKey 属性名
+	 * @return
+	 */
+	private XmlEntityMap getXmlMapByLableName(XmlEntityMap xmlEntityMap, String lableName) {
+		XmlEntityMap xmlMap = null;
+		if (xmlEntityMap.getLableName().equals(lableName)) {
+			xmlMap = xmlEntityMap;
+		} else {
+			if (xmlEntityMap.getXmlEntityMaps() != null) {
+				for (XmlEntityMap entityMap : xmlEntityMap.getXmlEntityMaps()) {
+					xmlMap = getXmlMapByLableName(entityMap, lableName);
+					if (xmlMap != null) {
+						break;
+					}
+				}
+			}
+		}
+		return xmlMap;
 	}
 
 	@Override
@@ -174,8 +211,8 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				tree.add(new CommCompDetailVO(parent.getId(), parent.getFileName(), parent.getFileType(), "data:image/png;base64," +base64,
-						parent.getParaentId(), parent.getVersion()));
+				tree.add(new CommCompDetailVO(parent.getId(), parent.getFileName(), parent.getFileType(),
+						"data:image/png;base64," + base64, parent.getParaentId(), parent.getVersion()));
 			} else {
 				tree.add(new CommCompDetailVO(parent.getId(), parent.getFileName(), parent.getFileType(),
 						JGitUtil.getLOCAL_REPO_PATH() + parent.getFilePath(), parent.getParaentId(),

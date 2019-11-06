@@ -31,6 +31,7 @@
 		<result property="updateTime" column="update_time" />
 		<result property="delFlag" column="del_flag" />
 		<result property="storageFlag" column="storage_flag" />
+		<result property="applyDesc" column="apply_desc" />
 	</resultMap>
 
 	<sql id="saveStructlibsSql">
@@ -64,7 +65,8 @@
 		create_time,
 		update_time,
 		del_flag,
-		storage_flag
+		storage_flag,
+		apply_desc
 		FROM gjk_structlibs
 		<where>
 			<if test="structlibs.id != null and structlibs.id.trim() != ''">

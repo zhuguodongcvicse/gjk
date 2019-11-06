@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container pull-auto libs_approval_index_14s ">
+  <div class="app-container pull-auto libs_approval_index_14s">
     <basic-container>
       <avue-crud
         ref="crud"
@@ -26,7 +26,6 @@
           <el-button type="primary" size="mini" plain @click="showAll">显示全部</el-button>
           <el-button type="primary" size="mini" plain @click="showUnprocessed">显示未处理</el-button>
         </template>
-        
 
         <template slot-scope="scope" slot="menu">
           <!-- <el-button
@@ -52,6 +51,7 @@
       :dialog="applyDetailDialog"
       @applyDetailDialogState="applyDetailDialogState"
       :applyItemMsg="applyItemMsg"
+      @refresh="refreshChange"
     />
   </div>
 </template>
@@ -70,6 +70,8 @@ import { mapGetters } from "vuex";
 import applyDetail from "./applyDetail";
 import { userInfo } from "os";
 export default {
+  //注入依赖，调用this.reload();用于刷新页面
+  inject: ["reload"],
   components: {
     "apply-detail": applyDetail
   },
@@ -94,12 +96,15 @@ export default {
 
       applyDetailDialog: false,
       //传给入库页面的构件基本信息
-      applyItemMsg: {}
+      applyItemMsg: {},
+
+      showAllOrUnprocess: true
     };
   },
   created() {
     this.getList();
   },
+  watch: {},
   mounted: function() {},
   methods: {
     applyDetailDialogState() {
@@ -112,6 +117,7 @@ export default {
     },
     showAll() {
       this.getList();
+      this.showAllOrUnprocess = true;
     },
     showUnprocessed() {
       this.tableLoading = true;
@@ -122,6 +128,7 @@ export default {
         this.page.total = response.data.data.total;
         this.tableLoading = false;
       });
+      this.showAllOrUnprocess = false;
     },
     getList() {
       this.tableLoading = true;
@@ -135,12 +142,20 @@ export default {
     currentChange(val) {
       this.page.current = val;
       this.listQuery.current = val;
-      this.getList();
+      if (this.showAllOrUnprocess) {
+        this.getList();
+      } else {
+        this.showUnprocessed();
+      }
     },
     sizeChange(val) {
       this.page.size = val;
       this.listQuery.size = val;
-      this.getList();
+      if (this.showAllOrUnprocess) {
+        this.getList();
+      } else {
+        this.showUnprocessed();
+      }
     },
     /**
      * @title 打开新增窗口
@@ -215,7 +230,11 @@ export default {
      * 刷新回调
      */
     refreshChange() {
-      this.getList();
+      if (this.showAllOrUnprocess) {
+        this.getList();
+      } else {
+        this.showUnprocessed();
+      }
     }
   }
 };

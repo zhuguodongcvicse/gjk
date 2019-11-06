@@ -114,9 +114,9 @@ export function findProJSON(proId) {
   })
 }
 
-export function updateProCompApprovalState(projectId, compIdArray) {
+export function updateProCompApprovalState(projectId, compIdArray, canUse) {
   return request({
-    url: '/pro/project/updateProCompApprovalState/' + projectId,
+    url: '/pro/project/updateProCompApprovalState/' + projectId + "/" + canUse,
     method: 'put',
     data: compIdArray
   })
@@ -170,34 +170,34 @@ export function deleteChipsFromHardwarelibs(id) {
   })
 }
 
-export function simulation () {
+export function simulation() {
   return request({
     url: '/pro/simulation/simulationData',
     method: 'get'
-  })  
+  })
 }
-export function realData () {
-    return request({
-      url: '/pro/simulation/realData',
-      method: 'get'
-    })
+export function realData() {
+  return request({
+    url: '/pro/simulation/realData',
+    method: 'get'
+  })
 }
 
 //流程建模导出
-export function exportFile(id){
+export function exportFile(id) {
   return request({
-    url:'/pro/manager/exportFile/'+id,
-    method:'put',
+    url: '/pro/manager/exportFile/' + id,
+    method: 'put',
     responseType: 'arraybuffer',
-    outCharset:'utf-8',
-    inCharset:'utf-8'
+    outCharset: 'utf-8',
+    inCharset: 'utf-8'
   }).then((response) => { // 处理返回的文件流
-    console.log("返回数据",response.data)
+    console.log("返回数据", response.data)
     let blob = new Blob([response.data], {
       type: 'application/zip'
     })
     let filename = decodeURIComponent(escape(response.headers["filename"]));
-    console.log("压缩包名",response.headers)
+    console.log("压缩包名", response.headers)
     let link = document.createElement('a')
     link.href = URL.createObjectURL(blob)
     link.style.display = "none"
@@ -212,45 +212,45 @@ export function exportFile(id){
 }
 //流程建模导入
 export function importFile(obj) {
-return request({
-  url: '/pro/manager/importFile',
-  method: 'post',
-  data: obj
-})
+  return request({
+    url: '/pro/manager/importFile',
+    method: 'post',
+    data: obj
+  })
 }
 
 //集成代码生成
-export function codeGeneration(proDetailId,username) {
+export function codeGeneration(proDetailId, username) {
   return request({
-    url: '/pro/manager/codeGeneration/'+ proDetailId+'/'+username,
+    url: '/pro/manager/codeGeneration/' + proDetailId + '/' + username,
     method: 'put',
   })
-  }
+}
 
 //项目树增加文件
 export function uploadFile(obj) {
   return request({
     url: '/pro/project/uploadFile',
     method: 'put',
-    data:obj
+    data: obj
   })
-  }
+}
 
 //项目树增加文件夹
 export function uploadFolder(obj) {
   return request({
     url: '/pro/project/uploadFolder',
     method: 'post',
-    data:obj,
+    data: obj,
     headers: { "Content-Type": "multipart/form-data" }
   })
-  }
+}
 
-  //项目树增加文件夹
+//项目树增加文件夹
 export function uploadFiles(obj) {
   return request({
     url: '/pro/project/uploadFiles',
     method: 'put',
-    data:obj,
+    data: obj,
   })
-  }
+}

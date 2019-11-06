@@ -74,6 +74,7 @@ public interface ProjectService extends IService<Project> {
 	 * @return 项目列表
 	 */
 	List<Project> getByUserId(String userId);
+
 	/**
 	 * 获取此用户下所有项目的项目名称集合
 	 * 
@@ -81,6 +82,7 @@ public interface ProjectService extends IService<Project> {
 	 * @return
 	 */
 	List<String> getProNameListByUserId(String userId);
+
 	/**
 	 * @Title: saveProCompList
 	 * @Description: 保存与项目相关的构件列表
@@ -109,27 +111,27 @@ public interface ProjectService extends IService<Project> {
 	 * @param compList
 	 * @return
 	 */
-	List<ProComp> getAllByProIdCompId(String projectId, List<String> compList);
+	List<ProComp> getAllByProIdCompId(String projectId, List<String> compList, String canUse);
 
 	/**
 	 *
-	 *@Title: uploadFile
+	 * @Title: uploadFile
 	 * @Description: 上传文件
 	 * @Author cvics
 	 * @DateTime 2019年10月18日 15:48:36
 	 * @param filePathDTO
 	 * @return boolean
 	 */
-    boolean uploadFile(FilePathDTO filePathDTO);
+	boolean uploadFile(FilePathDTO filePathDTO);
 
 	/**
 	 *
-	 *@Title: uploadFile
+	 * @Title: uploadFile
 	 * @Description: 上传文件夹
 	 * @Author wang
 	 * @DateTime 2019年10月18日 15:49:05
 	 * @param folderPathDTO
 	 * @return String
 	 */
-    String uploadFiles(FolderPathDTO folderPathDTO);
+	String uploadFiles(FolderPathDTO folderPathDTO);
 }

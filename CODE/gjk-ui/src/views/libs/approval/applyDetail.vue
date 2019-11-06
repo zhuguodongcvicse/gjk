@@ -19,12 +19,15 @@
       <span>申请{{libsName}}{{libsNameValue}}</span>
       <br />
       <br />
+      <span v-if="showStruct">{{structData}}</span>
+      <br />
+      <br />
       <span>申请类型：{{applyType}}</span>
       <br />
       <br />
       <span>申请日期：{{applyTime}}</span>
     </el-card>
-    <el-card shadow="always" style="height:100%;overflow-y: auto;">
+    <el-card shadow="always" style="height:100%;overflow-y: auto;" v-if="showMessage">
       <div slot="header">
         <span>{{libsNameValue}}申请详细信息</span>
       </div>
@@ -87,6 +90,10 @@ import {
   getTreeById as getBSPTreeById,
   putObj as modifyBSP
 } from "@/api/libs/bsp";
+import {
+  getObj as getStructById,
+  putObj as modifyStruct
+} from "@/api/libs/structlibs";
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
 export default {
@@ -118,6 +125,12 @@ export default {
       userName: "",
       //库类别
       libsType: "",
+
+      showStruct: false,
+      structData: "",
+
+      showMessage: true,
+
       //申请类别 入库或出库
       applyType: "",
       applyTime: "",
@@ -188,7 +201,14 @@ export default {
           });
           break;
         case "6":
+          this.libsName = "结构体名称：";
           this.libsType = "结构体库";
+          getStructById(this.applyItemMsg.applyId).then(Response => {
+            this.libsNameValue = Response.data.data.name;
+            this.showStruct = true;
+            this.showMessage = false;
+            this.structData = "结构体类型：" + Response.data.data.dataType;
+          });
           break;
         case "7":
           this.libsName = "项目名称：";
@@ -289,7 +309,7 @@ export default {
               modifyComp(modifyComponent).then(Response => {
                 this.dialogStateShow(false);
                 //刷新页面
-                this.reload();
+                this.$emit("refresh");
               });
             });
             break;
@@ -301,7 +321,7 @@ export default {
             modifySoftware(software).then(Response => {
               this.dialogStateShow(false);
               //刷新页面
-              this.reload();
+              this.$emit("refresh");
             });
             break;
           case "5":
@@ -312,7 +332,18 @@ export default {
             modifyBSP(bsp).then(Response => {
               this.dialogStateShow(false);
               //刷新页面
-              this.reload();
+              this.$emit("refresh");
+            });
+            break;
+          case "6":
+            let struct = {};
+            struct.id = this.applyItemMsg.applyId;
+            struct.storageFlag = "2";
+            struct.applyDesc = "已通过";
+            modifyStruct(struct).then(Response => {
+              this.dialogStateShow(false);
+              //刷新页面
+              this.$emit("refresh");
             });
             break;
           case "7":
@@ -331,11 +362,11 @@ export default {
                 proCompIdArray.push(item.id);
               }
               let proId = this.applyItemMsg.applyId;
-              updateProCompApprovalState(proId, proCompIdArray).then(
+              updateProCompApprovalState(proId, proCompIdArray, "0").then(
                 Response => {
                   this.dialogStateShow(false);
                   //刷新页面
-                  this.reload();
+                  this.$emit("refresh");
                 }
               );
             });
@@ -366,7 +397,7 @@ export default {
               this.rejectDialog = false;
               this.dialogStateShow(false);
               //刷新页面
-              this.reload();
+              this.$emit("refresh");
             });
           case "3":
             let software = {};
@@ -377,7 +408,7 @@ export default {
               this.rejectDialog = false;
               this.dialogStateShow(false);
               //刷新页面
-              this.reload();
+              this.$emit("refresh");
             });
             break;
           case "5":
@@ -389,10 +420,45 @@ export default {
               this.rejectDialog = false;
               this.dialogStateShow(false);
               //刷新页面
-              this.reload();
+              this.$emit("refresh");
+            });
+            break;
+          case "6":
+            let struct = {};
+            struct.id = this.applyItemMsg.applyId;
+            struct.storageFlag = "3";
+            struct.applyDesc = this.rejectMassage;
+            modifyStruct(struct).then(Response => {
+              this.rejectDialog = false;
+              this.dialogStateShow(false);
+              //刷新页面
+              this.$emit("refresh");
             });
             break;
           case "7":
+            let updateList = [];
+            console.log("1111111111111111111111", this.proCompIdList);
+            for (let item of this.proCompIdList) {
+              let approvalApply = {};
+              approvalApply.approvalId = this.applyItemMsg.id;
+              approvalApply.applyId = item.id;
+              approvalApply.approvalState = "3";
+              updateList.push(approvalApply);
+            }
+            updateApprovalApplyById(updateList).then(Response => {
+              let proCompIdArray = [];
+              for (let item of this.proCompIdList) {
+                proCompIdArray.push(item.id);
+              }
+              let proId = this.applyItemMsg.applyId;
+              updateProCompApprovalState(proId, proCompIdArray, "1").then(
+                Response => {
+                  this.dialogStateShow(false);
+                  //刷新页面
+                  this.$emit("refresh");
+                }
+              );
+            });
             break;
         }
       });

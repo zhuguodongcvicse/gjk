@@ -34,74 +34,76 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @TableName("gjk_structlibs")
 public class Structlibs extends Model<Structlibs> {
-private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    /**
-   * ID
-   */
-    @TableId
-    private String id ;
-    /**
-   * 父ID
-   */
-    private String parentId ;
-    /**
-   * 结构体类型根节点id
-   */
-    private String rootId;
-    
-    /**
-     * 子结构体id集合
-     */
-    private String childrenIds;
-    /**
-   * 名称
-   */
-    private String name ;
-    /**
-   * 类型（0--基本类型 1--基本指针类型 2--结构体类型 3--结构体指针类型
-   */
-    private String type ;
-    /**
-   * 数据类型
-   */
-    private String dataType;
-    /**
-   * 结构体类型（0--公共结构体 1--组件参数结构体 2--其他结构体）
-   */
-    private String structType ;
-    
-    /**
-     * 版本
-     */
-    private Double version ;
-    /**
-   * 数据长度
-   */
-    private Integer dataLength ;
-    /**
-   * 测试权限标识
-   */
-    private String permission ;
-    /**
-   * 排序值
-   */
-    private Integer sort;
-    /**
-   * 创建时间
-   */
-    private LocalDateTime createTime;
-    /**
-   * 更新时间
-   */
-    private LocalDateTime updateTime;
-    /**
-   * 逻辑删除标记(0--正常 1--删除)
-   */
-    private String delFlag;
-    /**
-     * 逻辑入库标记（0--未入库；1--已入库；2,3--其他）
-     */
-    private String storageFlag;
-  
+	/**
+	 * ID
+	 */
+	@TableId
+	private String id;
+	/**
+	 * 父ID
+	 */
+	private String parentId;
+	/**
+	 * 结构体类型根节点id
+	 */
+	private String rootId;
+	/**
+	 * 子结构体id集合
+	 */
+	private String childrenIds;
+	/**
+	 * 名称
+	 */
+	private String name;
+	/**
+	 * 类型（0--基本类型 1--基本指针类型 2--结构体类型 3--结构体指针类型
+	 */
+	private String type;
+	/**
+	 * 数据类型
+	 */
+	private String dataType;
+	/**
+	 * 结构体类型（0--公共结构体 1--组件参数结构体 2--其他结构体）
+	 */
+	private String structType;
+	/**
+	 * 版本
+	 */
+	private Double version;
+	/**
+	 * 数据长度
+	 */
+	private Integer dataLength;
+	/**
+	 * 测试权限标识
+	 */
+	private String permission;
+	/**
+	 * 排序值
+	 */
+	private Integer sort;
+	/**
+	 * 创建时间
+	 */
+	private LocalDateTime createTime;
+	/**
+	 * 更新时间
+	 */
+	private LocalDateTime updateTime;
+	/**
+	 * 逻辑删除标记(0--正常 1--删除)
+	 */
+	private String delFlag;
+	/**
+	 * 逻辑入库标记（0--未入库；1--已入库；2,3--其他）
+	 */
+	private String storageFlag;
+	/**
+	 * 审批描述
+	 */
+	private String applyDesc;
+
 }

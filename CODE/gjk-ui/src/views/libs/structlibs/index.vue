@@ -31,7 +31,7 @@
           >编辑</el-button>
           <el-button
             type="danger"
-            v-if="permissions.libs_structlibs_del"
+            v-if="scope.row.storageFlag=='1'?false:scope.row.storageFlag=='2'?false:true"
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
@@ -39,19 +39,19 @@
           <!--  @click="handleRku(scope.row,scope.index)"-->
           <el-button
             type="primary"
-            v-if="permissions.libs_structlibs_del&&scope.row.storageFlag=='0'"
+            v-if="scope.row.storageFlag=='1'?false:scope.row.storageFlag=='2'?false:true"
             size="small"
             plain
             @click="storageApplys(scope.row,scope.index)"
           >入库</el-button>
-          <el-button
+          <!-- <el-button
             type="primary"
-            disabled="true"
+            :disabled="true"
             v-if="scope.row.storageFlag=='1'"
             size="small"
             plain
             @click="handleRku(scope.row,scope.index)"
-          >已入库</el-button>
+          >已入库</el-button>-->
         </template>
       </avue-crud>
     </basic-container>
@@ -133,7 +133,7 @@ export default {
       //   }
       //   row.children = datas;
       // });
-        this.$refs.pram.getPram(row);
+      this.$refs.pram.getPram(row);
     },
     storageApplyDialogStates() {
       this.storageApplyDialog = false;

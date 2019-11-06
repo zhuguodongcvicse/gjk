@@ -141,9 +141,6 @@
 			<if test="comp.compId != null and comp.compId.trim() != ''">
 				AND comp_id=#{comp.compId}
 			</if>
-			<if test="comp.compName != null and comp.compName.trim() != ''">
-				AND comp_name=#{comp.compName}
-			</if>
 		</where>
 	</select>
 
