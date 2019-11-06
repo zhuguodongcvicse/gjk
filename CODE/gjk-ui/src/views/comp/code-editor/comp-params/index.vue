@@ -29,7 +29,6 @@
           </el-option>
         </el-select>
       </el-col>
-
     </el-header>
 
     <el-main>
@@ -185,6 +184,8 @@ export default {
   //方法集合
   methods: {
     changeSaveDBXmlMaps(saveComp, nameType) {
+        // console.log("saveComp",saveComp)
+        // console.log("nameType",nameType)
       let dBXmlMaps = this.saveDBXmlMaps;
       if (JSON.stringify(dBXmlMaps) === "{}") {
         dBXmlMaps = deepClone(this.saveXmlMaps);
@@ -196,14 +197,28 @@ export default {
         }
       }
       this.saveDBXmlMaps = dBXmlMaps;
-      // console.log("index.vue中。需要保存的数据结构******", this.saveDBXmlMaps);
+      // console.log("this.saveDBXmlMaps",JSON.stringify(this.saveDBXmlMaps))
+      // console.log("Date.parse(new Date()) - changeSaveDBXmlMaps",Date.parse(new Date()))
     },
     inputCompBackupInfo() {
       this.dialogVisibleOfComBackup = true
     },
+    sleep(time) {
+        return new Promise((resolve) => setTimeout(resolve, time));
+    },
+    saveCurrentIODate(){
+      // console.log("66666666-saveCurrentIODate")
+      let saveDBXmlMapsTemp = JSON.parse(JSON.stringify(this.saveDBXmlMaps))
+      this.$store.dispatch("saveCurrentIODate", saveDBXmlMapsTemp.xmlEntityMaps[0].xmlEntityMaps);
+      /*this.sleep(500).then(() => {
+          console.log("66666666")
+          let saveDBXmlMapsTemp = JSON.parse(JSON.stringify(this.saveDBXmlMaps))
+          this.$store.dispatch("saveCurrentIODate", saveDBXmlMapsTemp);
+      })*/
+    },
     clickHandleSaveComp() {
       //存构件基本信息
-      const loading = this.$loading({
+      /*const loading = this.$loading({
         lock: true,
         text: "构件文件生成中。。。",
         spinner: "el-icon-loading",
@@ -219,7 +234,7 @@ export default {
               // console.log("this.userInfo.username",this.userInfo.username)
               this.$refs.saveCompImg.saveCompImg(comp);
               let saveComp = deepClone(this.saveDBXmlMaps);
-              // console.log("saveDBXmlMapssaveDBXmlMapssaveDBXmlMaps", saveComp);
+              // console.log("saveComp", saveComp);
               // 需要更改函数路径
               saveComp.xmlEntityMaps[0].xmlEntityMaps.forEach(item => {
                 if (item.lableName === "函数路径") {
@@ -233,9 +248,9 @@ export default {
               }
               let userCurrent = this.userInfo.username
               handleSaveCompMap(saveComp, "Component", comp.id, userCurrent).then(res => {
-                /*this.$router.push({
+                /!*this.$router.push({
                   path: "/comp/showComp/index"
-                });*/
+                });*!/
                 this.reload();
                 loading.close();
                 let tag1 = this.tag
@@ -244,7 +259,7 @@ export default {
             });
           });
         });
-      });
+      });*/
     },
     changeBaseTemplate(tempPath) {
         analysisXmlFile(tempPath).then(response => {

@@ -140,9 +140,9 @@ export default {
       this.imageUrl = URL.createObjectURL(file.raw);
     },
     beforeAvatarUpload(file) {
-      console.log("file",file)
+      // console.log("file",file)
       var testmsg = /^image\/(jpeg|png|jpg)$/.test(file.type);
-      console.log("testmsg",testmsg)
+      // console.log("testmsg",testmsg)
       // const isJPG = file.type === "image/jpeg";
       const isLt2M = file.size / 1024 / 1024 < 1;
       // const isPNG = file.type === "image/png";

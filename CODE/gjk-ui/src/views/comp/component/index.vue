@@ -190,7 +190,7 @@ export default {
   watch: {
     importCompFileList: {
       handler: function() {
-        console.log("importCompFileList", this.importCompFileList);
+        // console.log("importCompFileList", this.importCompFileList);
       },
       immediate: true
     }
