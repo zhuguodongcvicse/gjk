@@ -218,7 +218,7 @@ export default {
     },
     clickHandleSaveComp() {
       //存构件基本信息
-      /*const loading = this.$loading({
+      const loading = this.$loading({
         lock: true,
         text: "构件文件生成中。。。",
         spinner: "el-icon-loading",
@@ -248,9 +248,9 @@ export default {
               }
               let userCurrent = this.userInfo.username
               handleSaveCompMap(saveComp, "Component", comp.id, userCurrent).then(res => {
-                /!*this.$router.push({
+                /*this.$router.push({
                   path: "/comp/showComp/index"
-                });*!/
+                });*/
                 this.reload();
                 loading.close();
                 let tag1 = this.tag
@@ -259,7 +259,7 @@ export default {
             });
           });
         });
-      });*/
+      });
     },
     changeBaseTemplate(tempPath) {
         analysisXmlFile(tempPath).then(response => {
