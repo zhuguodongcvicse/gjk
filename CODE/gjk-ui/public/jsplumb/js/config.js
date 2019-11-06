@@ -33,7 +33,7 @@ visoConfig.baseStyle = {
   connectorHoverStyle: visoConfig.connectorHoverStyle,
   paintStyle: {
     strokeStyle: '#4ECB74',
-    //stroke: '#4ECB74',
+    //stroke: 'red',
     fill: 'pink',
     fillStyle: '#4ECB74',
     radius: 5 ,

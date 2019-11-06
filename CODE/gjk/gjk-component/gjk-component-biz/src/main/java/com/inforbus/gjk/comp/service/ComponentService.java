@@ -187,5 +187,5 @@ public interface ComponentService extends IService<Component> {
 	 * 检查更新
 	 * @param obj
 	 */
-	void checkComp(List<Object> obj);
+	Map<String, Object> checkComp(List<Object> obj);
 }

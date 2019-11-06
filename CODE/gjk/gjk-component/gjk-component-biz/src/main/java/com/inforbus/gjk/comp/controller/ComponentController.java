@@ -299,10 +299,9 @@ public class ComponentController {
 	public R<?> appImageUpload(@RequestParam(value = "file", required = false) MultipartFile ufile) {
 		return new R<>(componentService.analysisZipFile(ufile));
 	}
+	@ResponseBody
 	@PostMapping(path = "/checkComp")
 	public R checkComp(@RequestBody List<Object> obj){
-		System.out.println(obj);
-		componentService.checkComp(obj);
-		return new R<>();
+		return new R<>(componentService.checkComp(obj));
 	}
 }
