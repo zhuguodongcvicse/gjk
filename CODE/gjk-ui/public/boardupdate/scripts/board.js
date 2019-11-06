@@ -257,6 +257,7 @@ function handleMessageFromParent(event) {
 							height: 50
 						}
 					},
+					editable: false,
 					clientProperties: {
 						type: 'port',
 						chip_id: chipArr[i].id,

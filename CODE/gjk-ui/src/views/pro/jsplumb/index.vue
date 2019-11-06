@@ -8,9 +8,10 @@
         </el-input>
         <el-button-group>
           <el-button type="primary" plain size="small" @click="sendMessage('save')">保存</el-button>
+          <!-- <el-button type="primary" plain size="small" @click="bottonCheckComp = !bottonCheckComp">{{bottonCheckComp?'检查更新':'还原'}}</el-button>
+          <el-button type="primary" plain size="small" @click="sendMessage('completeCheck')">完备性检查</el-button> -->
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('loading')">加载</el-button> -->
-          <el-button type="primary" plain size="small" @click="sendMessage('simulation')">仿真</el-button>
-          <!-- <el-button type="primary" plain size="small" @click="sendMessage('fullScreen')">全屏</el-button> -->
+          <!-- <el-button type="primary" plain size="small" @click="sendMessage('simulation')">仿真</el-button> -->
           <el-button type="primary" plain size="small" @click="sendMessage('exportJSON')">导出</el-button>
 
           <!-- <input type="file" @change="getFile($event)"> -->
@@ -24,7 +25,6 @@
           >
             <el-button type="primary" plain size="small">导入</el-button>
           </el-upload>
-           <el-button type="primary" plain size="small" @click="sendMessage('checkComp')">检查更新</el-button>
           <!-- <el-button type="primary" plain size="small" @click="submit($event)">导入</el-button> -->
         </el-button-group>
         <el-select
@@ -150,7 +150,10 @@ export default {
       connectionData: [], //保存连线关系
       tmpDataParam: {},
       isFullscreen: false, //是否全屏
-      index: 0
+      index: 0,
+      compUpdateState : {},//构件更新状态
+      bottonCheckComp : true,
+      bottonState : ""
     };
   },
   //监听属性 类似于data概念
@@ -170,13 +173,40 @@ export default {
         this.isShow_14s = param.length > 0 ? true : false;
       }
     },
+    bottonCheckComp:{
+       handler: function() {
+         //console.log(this.bottonCheckComp)
+         if(!this.bottonCheckComp){
+         //  console.log(this.dtos)
+            let checkList = []
+            let compList = {}
+            for(var value of this.dtos){
+              compList = {}
+              compList.id = value.id
+              compList.compId = value.compId
+              compList.compName = value.compName
+              compList.version = value.version
+              compList.token = this.$store.getters.access_token
+              checkList.push(compList)
+            }
+            checkComp(checkList).then(response=>{
+             // console.log("111111111111111111",response.data.data)
+              this.compUpdateState = response.data.data
+            })
+         }
+          this.postMessageData.cmd = "bottonCheckComp";
+          this.postMessageData.params = this.bottonCheckComp;
+          this.postMessageData.compUpdateState =  this.compUpdateState
+          this.$refs.gjkIframe.sendMessage(this.postMessageData);
+      }
+    },
     /* 监听iframeParams数据 */
     iframeParams: {
       handler: function(newParam, oldparam) {
         /* 添加构件 */
         if (newParam.state === 0) {
           /* 增加构件到tmp 新0911*/
-          console.log("接收数据后处理。。。。。添加", this.xmlMaps);
+         // console.log("接收数据后处理。。。。。添加", this.xmlMaps);
           let arrMap = deepClone(this.deleteParamMaps.get(newParam.tmpId)); //从删除的数据中获取
           if (!arrMap) {
             arrMap = deepClone(this.xmlMaps[newParam.gjId]); //从基础的数据中获取
@@ -200,8 +230,8 @@ export default {
           //this.tmp.delete(newParam.tmpId);
           this.saveXmlMaps.xmlEntityMaps = [];
         } else if (newParam.state === 2) {
-          console.log("接收数据后处理。。。。。点击");
-          console.log("加载完成点击构件", this.tmpMaps, newParam.tmpId);
+          // console.log("接收数据后处理。。。。。点击");
+          // console.log("加载完成点击构件", this.tmpMaps, newParam.tmpId);
           let arrMap = this.tmpMaps.get(newParam.tmpId);
           if (arrMap.xmlEntityMaps[0].xmlEntityMaps.uids === undefined) {
             this.tmpMaps.set(newParam.tmpId, arrMap); // 使用map将 数据对应上
@@ -220,10 +250,10 @@ export default {
             this.ctrlXmlParam.set(id, this.tmpMaps.get(id));
           });
           sessionStorage.setItem("vueCopyData", JSON.stringify(this.ctrlXmlParam));
-          console.log("赋值Ctrl C:", tmpId); //复制 c
+         // console.log("赋值Ctrl C:", tmpId); //复制 c
         } else if (newParam.state === 4) {
           //console.log("9999999999999",JSON.parse(sessionStorage.getItem("vueCopyData")))
-          console.log(newParam.oldTmpId)
+        //  console.log(newParam.oldTmpId)
           // if(this.ctrlXmlParam.length > 0){
           //   console.log("没跨流程")
           //   ctrlParam = deepClone(this.ctrlXmlParam.get(newParam.oldTmpId)); //增加构件到tmpMaps
@@ -235,11 +265,11 @@ export default {
                 ctrlParam = deepClone(ctrlXmlParamMap[i][1])
               }
             }
-            console.log("跨流程复制数据",ctrlXmlParamMap)
+           // console.log("跨流程复制数据",ctrlXmlParamMap)
            // var ctrlParam = ctrlXmlParamMap.get(newParam.oldTmpId);
           //}
           //var
-          console.log("粘贴Ctrl V:", ctrlParam); //粘贴
+         // console.log("粘贴Ctrl V:", ctrlParam); //粘贴
           ctrlParam.attributeMap.id = newParam.newTmpId;
           this.$set(
             ctrlParam.xmlEntityMaps[0].xmlEntityMaps,
@@ -331,7 +361,7 @@ export default {
       // let iframeWin = this.$refs.iframe.contentWindow;
       jspDataParam.compId = this.saveXmlMaps.attributeMap.id;
       /* 发送iframe发送消息 */
-      console.log("发送iframe发送消息", this.saveXmlMaps);
+      //console.log("发送iframe发送消息", this.saveXmlMaps);
       this.postMessageData.cmd = "getCompDtosData";
       this.postMessageData.params = jspDataParam;
       // this.$refs.gjkIframe.sendMessage(this.postMessageData);
@@ -345,7 +375,7 @@ export default {
         const item = dBXmlMaps.xmlEntityMaps[key];
         if (item.lableName === nameType) {
           if (item.lableName === "层级属性") {
-            console.log("234567890-09876543", saveComp);
+           // console.log("234567890-09876543", saveComp);
             this.refreshCjParamAll(deepClone(saveComp));
           }
           dBXmlMaps.xmlEntityMaps[key].xmlEntityMaps = saveComp;
@@ -391,9 +421,11 @@ export default {
       // console.log("// 根据用户编号查询构件及文件列表");
       getCompList(this.$route.query.proId).then(response => {
         // console.log("// 根据用户编号查询构件及文件列表");
+        //所有构件已更新未更新状态
+        this.compUpdateState = response.data.data.compUpdate
         // 所有文件DTO
         this.dtos = response.data.data.dtos;
-        console.log("dtos列表", this.dtos);
+       // console.log("dtos列表", this.dtos);
         // 设置所有构件XML
         this.xmls = response.data.data.xmls;
         // 设置所有构件XMLMaps
@@ -402,7 +434,7 @@ export default {
       });
     },
     sendMessage(state) {
-        console.log("state",state)
+       // console.log("state",state)
       // 父向子传参方式二
       /* 发送iframe发送消息 */
       if (state === "alignment") {
@@ -442,7 +474,7 @@ export default {
         //console.log("this.postMessageData.params", this.postMessageData.params);
         findProJSON(this.$route.query.processId).then(res => {
           //循环流程中的构件及"arrow"
-          console.log("加载后的数据", res.data.data.xmlJson.xmlEntityMaps);
+          //console.log("加载后的数据", res.data.data.xmlJson.xmlEntityMaps);
           res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
             if (tmp.lableName !== "arrow") {
               /* 将查询的东西插入到临时 */
@@ -451,50 +483,54 @@ export default {
               this.tmpMaps.set(tmp.attributeMap.id, tmp);
             }
           });
-          console.log("map数据", this.tmpMaps);
+          //console.log("map数据", this.tmpMaps);
           this.postMessageData.cmd = "clickCompLoading";
           this.postMessageData.params = res.data.data.json;
           this.$refs.gjkIframe.sendMessage(this.postMessageData);
         });
       } else if (state === "exportJSON") {
-        exportFile(this.$route.query.processId);
-      } else if (state === "fullScreen") {
-        this.postMessageData.cmd = "fullScreen";
+        this.bottonState = state
+        this.postMessageData.cmd = "clickCompSave";
+        this.postMessageData.params = "save";
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
-        console.log("1111111111111111111111111111", this.$refs.paramsDefine);
-        this.$refs.paramsDefine.screenfull();
-      } else if(state === "checkComp"){
-        console.log(this.dtos)
-        let checkList = []
-        let compList = {}
-        for(var value of this.dtos){
-          compList = {}
-          compList.id = value.id
-          compList.compId = value.compId
-          compList.compName = value.compName
-          compList.version = value.version
-          compList.token = this.$store.getters.access_token
-          checkList.push(compList)
-        }
-        checkComp(checkList)
-      }
+        //exportFile(this.$route.query.processId);
+      } else if (state === "completeCheck") {
+        this.postMessageData.cmd = "completeCheck";
+        this.$refs.gjkIframe.sendMessage(this.postMessageData);
+      } 
+      // else if(state === "checkComp"){
+      //   console.log(this.dtos)
+      //   let checkList = []
+      //   let compList = {}
+      //   for(var value of this.dtos){
+      //     compList = {}
+      //     compList.id = value.id
+      //     compList.compId = value.compId
+      //     compList.compName = value.compName
+      //     compList.version = value.version
+      //     compList.token = this.$store.getters.access_token
+      //     checkList.push(compList)
+      //   }
+      //   checkComp(checkList)
+      // }
        else {
         remote("connectionType").then(val => {
           this.postMessageData.cmd = "getCompDtos";
           this.postMessageData.params = this.dtos;
+          //this.postMessageData.compUpdateState  = this.compUpdateState
           this.postMessageData.connectionData = val.data.data;
-          console.log("连线关系数据", this.postMessageData);
+         // console.log("连线关系数据", this.postMessageData);
           this.$refs.gjkIframe.sendMessage(this.postMessageData);
         });
-        console.log(
-          "this.$route.params.processId",
-            this.dtos
-        );
+        // console.log(
+        //   "this.$route.params.processId",
+        //     this.dtos
+        // );
         this.index++;
         if (this.index == 1) {
           findProJSON(this.$route.query.processId).then(res => {
             //循环流程中的构件及"arrow"
-            console.log("加载后的数据", res.data.data.xmlJson.xmlEntityMaps);
+           // console.log("加载后的数据", res.data.data.xmlJson.xmlEntityMaps);
             res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
               if (tmp.lableName !== "arrow") {
                 /* 将查询的东西插入到临时 */
@@ -503,7 +539,7 @@ export default {
                 this.tmpMaps.set(tmp.attributeMap.id, tmp);
               }
             });
-            console.log("map数据", this.tmpMaps);
+           // console.log("map数据", this.tmpMaps);
             this.postMessageData.cmd = "clickCompLoading";
             this.postMessageData.params = res.data.data.json;
             this.$refs.gjkIframe.sendMessage(this.postMessageData);
@@ -522,7 +558,7 @@ export default {
           this.iframeParams = data.params[0];
           break;
         case "returnSave":
-          console.log("020222222222222222");
+         // console.log("020222222222222222");
           // 处理业务逻辑
           if (data.params.length <= 0) {
             this.saveState = false;
@@ -543,20 +579,27 @@ export default {
         background: "rgba(0, 0, 0, 0.7)"
       });
       handlerSaveSysXml(param, this.$route.query.processId).then(res => {
-        console.log("handlerSaveSysXml", res.data.data);
-        console.log("列表", res.data);
+        // console.log("handlerSaveSysXml", res.data.data);
+        // console.log("列表", res.data);
         editProJSON(
           JSON.parse(this.saveParams.saveflowChartJson),
           this.$route.query.processId
         ).then(res => {
           // setTimeout(() => {
-          loading.close();
-          this.saveState = false;
-          this.$message({
-            showClose: true,
-            message: "生成成功",
-            type: "success"
-          });
+            if(this.bottonState == "exportJSON"){
+               loading.close();
+              exportFile(this.$route.query.processId)
+            }else{
+              loading.close();
+              this.saveState = false;
+              this.$message({
+                showClose: true,
+                message: "生成成功",
+                type: "success"
+              });
+            }
+            this.bottonState = ""
+          
           // }, 1000);
         });
       });
@@ -565,14 +608,14 @@ export default {
      if(confirm("是否清空当前画布构件")){
         this.postMessageData.cmd = "cleanCanvas";
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
-        console.log("el-upload数据", event);
+       // console.log("el-upload数据", event);
         this.file = event.file;
-        console.log("文件", this.file);
+       // console.log("文件", this.file);
         var formData = new FormData();
         formData.append("file", this.file);
-        console.log(formData);
+        //console.log(formData);
         importFile(formData).then(res => {
-          console.log("导入后的数据", res.data.data);
+          //console.log("导入后的数据", res.data.data);
           res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
             if (tmp.lableName !== "arrow") {
               /* 将查询的东西插入到临时 */
@@ -591,9 +634,9 @@ export default {
       event.preventDefault();
       var formData = new FormData();
       formData.append("file", this.file);
-      console.log(formData);
+     // console.log(formData);
       importFile(formData).then(res => {
-        console.log("导入后的数据", res.data.data);
+       // console.log("导入后的数据", res.data.data);
         res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
           if (tmp.lableName !== "arrow") {
             /* 将查询的东西插入到临时 */
@@ -610,7 +653,7 @@ export default {
     screenfull() {
       // console.log("12335549849856546546546456")
       if (!screenfull.enabled) {
-        console.log("12335549849856546546546456");
+        //console.log("12335549849856546546546456");
         this.$message({
           message: "Your browser does not work",
           type: "warning"
@@ -618,7 +661,7 @@ export default {
         return false;
       }
       screenfull.toggle();
-    }
+    },
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {},

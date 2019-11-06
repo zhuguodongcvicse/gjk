@@ -131,7 +131,7 @@ function handleMessageFromParent(event) {
 							width: 52,
 							height: 50
 						},
-						//	editable: false
+							editable: false
 					},
 					clientProperties: {
 						type: 'port',

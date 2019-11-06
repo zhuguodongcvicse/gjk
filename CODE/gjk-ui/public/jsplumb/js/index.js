@@ -71,6 +71,10 @@ var newConnectionY = new Array()
 var nodePosition = {}
 //撤销粘贴操作时所使用的对象
 var addPasteData = {}
+//构件更新状态
+var compUpdateState = {}
+//删除构件列表
+gjkCompId = ""
 // 子向父传参
 function handleMessageToParent(cmd, gjIdAndTemId) {
 	window.parent.postMessage({
@@ -102,7 +106,7 @@ function handleMessageFromParent(event) {
 			iframeData = data
 			dat = eval(JSON.stringify(iframeData.params));
 			// console.log("子接收父参数", iframeData)
-			//console.log("dat数据", dat);
+			//console.log("构件状态", compUpdateState);
 			connectionData = iframeData.connectionData
 			//console.log("connection数据", connectionData)
 			break
@@ -169,6 +173,28 @@ function handleMessageFromParent(event) {
 			case 'cleanCanvas':
 				cleanCanvas();
 				break;
+			case 'bottonCheckComp':
+				if(!data.params){
+					$("#accordion").show()
+					$("#gjk").hide()
+					// $('#update').html("")
+					// $('#notUpdate').html("")
+					compUpdateState = data.compUpdateState;
+					//console.log("检查更新数据",compUpdateState)
+					appendUpdateDiv()
+				}else{
+					$("#accordion").hide()
+					$("#gjk").show()
+				}
+				break;
+			case 'completeCheck':
+				//警告
+				//let styleColor = "#F4A460"
+				//错误
+				let styleColor = "#ff0000"
+				//$('.pa').addClass("warn")
+				//endpointCheck(styleColor);
+				connectionCheck(styleColor);
 	}
 };
 
@@ -189,7 +215,7 @@ function dropNode(template, position) {
 	position.left -= $('#side-buttons').outerWidth()
 	position.left = position.left + $(areaId).scrollLeft()
 	position.top = position.top + $(areaId).scrollTop()
-	console.log("position+++++++++++++++",position)
+	//console.log("position+++++++++++++++",position)
 	position.id = uuid.v1()
 	//position.generateId = uuid.v1
 	gjTemplateId = position.id;
@@ -561,18 +587,39 @@ function checkDat() {
 		//$("#gjk").load();	
 	}
 }
+function appendUpdateDiv(){
+	var strUpdate = ""
+	var notUpdate = ""
+	for (var i = 0; i < dat.length; i++) {
+		for(let key in compUpdateState){
+			if(compUpdateState[key] == "0"){ //已更新
+				if(dat[i].id == key){
+					strUpdate +=  "<div class = 'btn' style = 'margin:5px' data-template='tpl-menu" + i + "'>" + dat[i].compImg + "</div></br>"
+				}
+			}else{
+				if(dat[i].id == key){
+					notUpdate +=  "<div class = 'btn' style = 'margin:5px' data-template='tpl-menu" + i + "'>" + dat[i].compImg + "</div></br>"
+				}
+			}
+		}
+	}
+	$('#update').append(strUpdate)
+	$('#notUpdate').append(notUpdate)
+}
 
 //循环添加构件并生成相应模板
 function appendDiv() {
 	var str = "";
 	var Template = "";
+	var strUpdate = ""
+	var notUpdate = ""
 	for (var i = 0; i < dat.length; i++) {
 
 		//console.log("dat[i].compImg", dat[i].compImg);
-		var s = dat[i].compImg.substr(dat[i].compImg.indexOf("src='") + 5);
-		var img = s.substr(0, s.indexOf("' "));
+		// var s = dat[i].compImg.substr(dat[i].compImg.indexOf("src='") + 5);
+		// var img = s.substr(0, s.indexOf("' "));
 		//str += "<div class = 'btn'  data-template='tpl-menu" + i + "'><img src='"+img+"'><br/>" + dat[i].compName + "</div></br>"
-		str += "<div class = 'btn' style = 'margin:5px' data-template='tpl-menu" + i + "'>" + dat[i].compImg + "</div></br>"
+		str += "<div class = 'btn' id = '"+dat[i].id+"' style = 'margin:5px' data-template='tpl-menu" + i + "'>" + dat[i].compImg + "</div></br>"
 		//str += "<a class='btn btn-success btn-controler'  data-template='tpl-menu" + i + "' role='button'>" + dat[i].compName + "</a></br><br>";
 		Template += "<script id='tpl-menu" + i + "' type='text/html'>" +
 			"<div class='pa' id='{{id}}' style='top:{{top}}px;left:{{left}}px'>" +
@@ -589,8 +636,21 @@ function appendDiv() {
 			"</div>" +
 			"</div>" +
 			"</div></script>";
+			for(let key in compUpdateState){
+				if(compUpdateState[key] == "0"){ //已更新
+					if(dat[i].id == key){
+						strUpdate +=  "<div class = 'btn' style = 'margin:5px' data-template='tpl-menu" + i + "'>" + dat[i].compImg + "</div></br>"
+					}
+				}else{
+					if(dat[i].id == key){
+						notUpdate +=  "<div class = 'btn' style = 'margin:5px' data-template='tpl-menu" + i + "'>" + dat[i].compImg + "</div></br>"
+					}
+				}
+			}
 	}
 	$('#gjk').append(str);
+	// $('#update').append(strUpdate)
+	// $('#notUpdate').append(notUpdate)
 	$('body').append(Template);
 }
 
@@ -627,7 +687,7 @@ function main() {
 	$(areaId).droppable({
 		scope: 'ss',
 		drop: function (event, ui) {
-			console.log("+++++++++", $(areaId).scrollTop())
+			//console.log("+++++++++", $(areaId).scrollTop())
 			dropNode(ui.draggable[0].dataset.template, ui.position)
 			//$('#propertybar').show();
 			var gj = getGj(ui.draggable[0].dataset.template);
@@ -677,7 +737,9 @@ function main() {
 					});
 				}
 				$('#' + a).addClass("nodeStyle")
-				$.each(endpoints, function (n, val) {
+				var points = jsPlumb.getEndpoints(a);
+				//console.log("锚点信息",points)
+				$.each(points, function (n, val) {
 					val.addClass("nodeStyle")
 				});
 				lastTimeId = a
@@ -795,11 +857,6 @@ function main() {
 				eventHandler(event.target.dataset);
 			});
 
-			// $('#' + a).mousedown(function(e){
-			// 	if(3==e.which){
-
-			// 	}
-			// })
 		}
 	})
 	//避免同一构件输出点连接输入点
@@ -811,10 +868,22 @@ function main() {
 		}
 	})
 
-	//鼠标右击
-	jsPlumb.bind('contextmenu', function (component, originalEvent) {
+	//删除构件列表构件
+	//$('.btn').off("click").on("click", function () { });
+	$('.btn').bind('click', function (event) {
+		//console.log(event.currentTarget.id)
+		gjkCompId = event.currentTarget.id
+		$('#' + event.currentTarget.id).attr('tabindex', 0);
+		document.getElementById(event.currentTarget.id).style.outline = "0"
+		$('#' + event.currentTarget.id).focus();
+		document.getElementById(event.currentTarget.id).onkeydown=function (e){
+			if(e.keyCode==46){
+				//alert(event.currentTarget.id)
+				$("#"+event.currentTarget.id).remove()
+			}
+		}
 
-	});
+	})
 }
 
 //折叠面板点击事件
@@ -822,10 +891,10 @@ function main() {
 // 	console.log("折叠面板标题",ui.newHeader.text())
 // } );
 
-// $('.panel').on('show.bs.collapse', function (event, ui) {
-// 	var panel = event.currentTarget.children[0].innerText;
-// 	console.log(panel)
-// })
+$('.panel').on('show.bs.collapse', function (event, ui) {
+	var panel = event.currentTarget.children[0].innerText;
+	//console.log(panel)
+})
 
 //点选Ctrl+C保存单个节点json
 //存储复制数据
@@ -850,7 +919,7 @@ function saveNodeJson(nodeId) {
 			id: nodeId
 		});
 	});
-	console.log("当前画布的数据+++++++++++++++++",canvasData)
+	//console.log("当前画布的数据+++++++++++++++++",canvasData)
 	nodes.push({
 		blockId: nodeId,
 		//nodetype: $elem.attr('data-nodetype'),
@@ -1027,7 +1096,7 @@ function updatePoint(proPream) {
 			// });
 		} else {
 			canvasData.get(proPream.compId).outputList.push(proPream.data)
-			console.log("画布数据", canvasData);
+			//console.log("画布数据", canvasData);
 			var len = outputUuidList.length + 1;
 			var anchorNumber = 1 / len;
 			var differenceValue = anchorNumber / 2;
@@ -1083,7 +1152,7 @@ function updatePoint(proPream) {
 			var points = jsPlumb.getEndpoints(proPream.compId);
 			if (proPream.inOrOut == 'input') {
 				canvasData.get(proPream.compId).inputList.splice(proPream.compId.split("*")[0], 1)
-				console.log("画布数据", canvasData)
+				//console.log("画布数据", canvasData)
 				var len = inputUuidList.length - 1;
 				//console.log(len);
 				var anchorNumber = 1 / len;
@@ -1097,7 +1166,7 @@ function updatePoint(proPream) {
 				});
 			} else {
 				canvasData.get(proPream.compId).outputList.splice(proPream.compId.split("*")[0], 1)
-				console.log("画布数据", canvasData)
+				//console.log("画布数据", canvasData)
 				var len = outputUuidList.length - 1;
 				var anchorNumber = 1 / len;
 				var differenceValue = anchorNumber / 2;
@@ -1304,10 +1373,10 @@ jsPlumb.bind("connectionDragStop", function (info) {
 			var targetGj = $('#' + target + '-heading')[0].dataset.id;
 			targetType = canvasData.get(target).inputList[targetUid.split("*")[0]].dataTypeName 
 			//targetType = dat[targetGj].inputList[targetUid.split("*")[0]].dataTypeName;
-			console.log("目标节点属性else",targetType);
+			//console.log("目标节点属性else",targetType);
 		}
-		console.log("源节点类型",sourceType);
-		console.log("目标节点类型",targetType);
+		// console.log("源节点类型",sourceType);
+		// console.log("目标节点类型",targetType);
 		// console.log("连线关系",connectionData)
 		var isConnect = false
 		if (sourceType == targetType) {
@@ -1346,7 +1415,7 @@ document.onkeydown = function (event) {
 		event.preventDefault();
 	//	alert(11111)
 		var connected = jsPlumb.getConnections();
-		console.log("画布所有连线关系", connected)
+		//console.log("画布所有连线关系", connected)
 		//saveFlowchart();
 		//loadJson();
 		//$(".fz").show();
@@ -1365,7 +1434,7 @@ document.onkeydown = function () {
 		//console.log(11111111111111)
 		if(copyData.length <= 0){
 			copyData = JSON.parse(sessionStorage.getItem("copyData"));
-			console.log("复制数据",copyData)
+			//console.log("复制数据",copyData)
 		}
 		for (var i = 0; i < copyData.length; i++) {
 			pasteJson(copyData[i]);
@@ -1376,7 +1445,7 @@ document.onkeydown = function () {
 		if (connectionMap.size > 1) {
 			connectionMap.forEach(function (value, key) {
 				idList.push(value)
-				console.log("2222222222", value)
+				//console.log("2222222222", value)
 				$("#" + value).addClass("ui-selected")
 			})
 		}
@@ -1548,7 +1617,7 @@ document.onkeydown = function () {
 					sourceAndTarget.connSourceUUid = operationJSON1.connSourceUUid
 					sourceAndTarget.connTargetUUid = operationJSON.connTargetUUid
 				} else {
-					console.log("使用新增连线对象")
+					//console.log("使用新增连线对象")
 					chartOperationStack[rareOperation].pop()
 					var connObj = newConnection.pop()
 					operationJSON = connObj.removeConnection
@@ -1559,7 +1628,7 @@ document.onkeydown = function () {
 					}
 				}
 				//var operationJSON=chartOperationStack[rareOperation].pop();
-				console.log(operationJSON)
+				//console.log(operationJSON)
 				ctrlYStack['addConnection'].push(sourceAndTarget)
 				ctrlYOperationStack.push("addConnection");
 				limitY();
@@ -1569,7 +1638,7 @@ document.onkeydown = function () {
 			case "deleteConnection"://删除连线为新增连线
 				//console.log(chartOperationStack[rareOperation])
 				var operationJSON = chartOperationStack[rareOperation].pop();
-				console.log("删除后回退的对象", operationJSON);
+				//console.log("删除后回退的对象", operationJSON);
 				isConnection = false;
 				isRemoveConn = true;
 				var conn = jsPlumb.connect({ uuids: [operationJSON.connSourceUUid, operationJSON.connTargetUUid] })
@@ -1585,7 +1654,7 @@ document.onkeydown = function () {
 				break;
 			case "dragZ":
 				var operationJSON = chartOperationStack[rareOperation].pop();
-				console.log(operationJSON)
+				//console.log(operationJSON)
 				for (var i = 0; i < operationJSON.oldPosition.length; i++) {
 					var div = document.getElementById(operationJSON.oldPosition[i].id)
 					div.style.top = operationJSON.oldPosition[i].top + "px"
@@ -1603,7 +1672,7 @@ document.onkeydown = function () {
 				//console.log(operationJSON)
 				var idMap = new Map(operationJSON.idMap)
 				var pasteIds = new Array()
-				console.log(idMap)
+				//console.log(idMap)
 				idMap.forEach(function (value, key) {
 					pasteIds.push(value)
 					jsPlumb.remove(value)
@@ -1633,7 +1702,7 @@ document.onkeydown = function () {
 						$("#" + value).addClass("ui-selected")
 					})
 				}
-				console.log("回退后的数据", addDivStyleJson)
+				//console.log("回退后的数据", addDivStyleJson)
 				var prevIdMap = new Map(addDivStyleJson.idMap)
 
 				ctrlYStack['addPaste'].push(operationJSON)
@@ -1641,7 +1710,7 @@ document.onkeydown = function () {
 				limitY()
 				break;
 			case "deletePaste": //删除框选后的节点
-				console.log("删除节点与连线")
+				//console.log("删除节点与连线")
 				var operationJSON = chartOperationStack[rareOperation].pop();
 				loadState = false;
 				for (var i = 0; i < operationJSON.length; i++) {
@@ -1677,7 +1746,7 @@ document.onkeydown = function () {
 				handleMessageToParent("returnFormJson", gjidAndTemid);
 				break;
 			case "addConnection":
-				console.log(ctrlYStack[state].length)
+				//console.log(ctrlYStack[state].length)
 				var deleteJSON = ctrlYStack[state].pop();
 				//console.log(deleteJSON)
 				//isConnection = false
@@ -1708,7 +1777,7 @@ document.onkeydown = function () {
 				break;
 			case "dragY":
 				var deleteJSON = ctrlYStack[state].pop();
-				console.log(deleteJSON)
+				//console.log(deleteJSON)
 				for (var i = 0; i < deleteJSON.newPosition.length; i++) {
 					var div = document.getElementById(deleteJSON.newPosition[i].id)
 					div.style.top = deleteJSON.newPosition[i].top + "px"
@@ -1732,7 +1801,7 @@ document.onkeydown = function () {
 				break;
 			case "deletePaste":
 				var deleteJSON = ctrlYStack[state].pop();
-				console.log(deleteJSON)
+				//console.log(deleteJSON)
 				chartOperationStack['deletePaste'].push(deleteJSON)
 				chartRareOperationStack.push("deletePaste")
 				var tempIds = new Array()
@@ -1750,7 +1819,7 @@ document.onkeydown = function () {
 				break;
 		}
 	} else if (event.keyCode == 46) { //delete
-		console.log(connectionObjClick)
+		//console.log(connectionObjClick)
 		if (Object.keys(connectionObjClick).length > 0) { //删除连线
 			chartOperationStack['deleteConnection'].push(connectionObjClick)
 			chartRareOperationStack.push("deleteConnection");
@@ -1767,7 +1836,7 @@ document.onkeydown = function () {
 			for (var a = 0; a < idList.length; a++) {
 				jsPlumb.remove(idList[a])
 			}
-			console.log("保存ctrlZ数据")
+			//console.log("保存ctrlZ数据")
 			chartOperationStack['deletePaste'].push(copyPream)
 			chartRareOperationStack.push('deletePaste')
 			limitZ();
@@ -1814,14 +1883,6 @@ document.onkeydown = function () {
 			handleMessageToParent("returnFormJson", gjidAndTemids);
 			idList = []
 		}
-		//??需要和vue页面交互
-		// var gjidAndTemid = [];
-		// gjidAndTemid.push({
-		// 	gjId: gjid,
-		// 	tmpId: [idList],
-		// 	state: 1
-		// });
-		// handleMessageToParent("returnFormJson",gjidAndTemid);
 	}
 }
 
@@ -1904,7 +1965,7 @@ function pasteJson(pasteDataJson) {
 			// 	val.addClass("nodeStyle")
 			// });
 			lastTimeId = newId
-			console.log("uuid集合", uuidList);
+			//console.log("uuid集合", uuidList);
 			var TempData = [];
 			TempData.push({
 				//构件ID
@@ -1996,8 +2057,8 @@ function pasteJson(pasteDataJson) {
 					uuid: endpoint.uuid.split("*")[0] + "*" + endpoint.uuid.split("*")[1] + "*" + newId,
 				}, config)
 				inPoint.bind('dblclick', function (endpoint, originalEvent) {
-					console.log("222222222222222",canvasData.get(newId))
-					console.log("进入", canvasData.get(newId).inputList[0].variableName)
+					// console.log("222222222222222",canvasData.get(newId))
+					// console.log("进入", canvasData.get(newId).inputList[0].variableName)
 					addTemDiv(endpoint, canvasData.get(newId).inputList);
 					//var mouse = mousePosition();
 					var endpointId = endpoint.getUuid().split("*")[2]
@@ -2059,7 +2120,7 @@ function pasteJson(pasteDataJson) {
 		});
 		//console.log("参数：",JSON.stringify(gjidAndTemid));
 		//gjIdAndTemId = gjidAndTemid;
-		console.log("粘贴后进行传值", gjidAndTemid)
+		//console.log("粘贴后进行传值", gjidAndTemid)
 		handleMessageToParent("returnFormJson", gjidAndTemid);
 	});
 	var connections = pasteDataJson.connections;
@@ -2084,7 +2145,7 @@ function save() {
 	var map = new Map();
 	if (loadState) {
 		addPointParam = addPointParam.concat(loadAddPointParam)
-		console.log("合并增加数据", addPointParam);
+		//console.log("合并增加数据", addPointParam);
 		loadState = false;
 	}
 	$.each(connected, function (id, connection) {
@@ -2201,7 +2262,9 @@ function save() {
 			start: sourcePrame,
 			end: targetPrame,
 			length: sourLength,
-			id: id
+			id: id,
+			endId:targetid,
+			stateId:sourceuid
 		};
 		conn.push(con3);
 
@@ -2299,10 +2362,10 @@ function saveFlowchart() {
 
 //添加锚点信息(还原)
 function addTemDiv(endpoint, PointsData) {
-	console.log("添加锚点信息(还原)", PointsData);
+	//console.log("添加锚点信息(还原)", PointsData);
 	var templateUuid = endpoint.getUuid().split('*');
 	var tempUuid = templateUuid[0];
-	console.log("信息", tempUuid)
+	//console.log("信息", tempUuid)
 	var str = '';
 	if (PointsData[tempUuid].variableStructType != '') {
 		str += "<div class = 'point' style='background:#F0E6BD'>" +
@@ -2334,11 +2397,11 @@ function addTemDiv(endpoint, PointsData) {
 // }
 //解析json字符串还原流程图
 function loadJson(loadJson) {
-	console.log("粘贴", loadJson);
+	//console.log("粘贴", loadJson);
 	//var loadJson = {"nodes":[{"blockId":"2521ced0-8455-11e9-8180-6b92e201c8cd","positionX":120,"positionY":72,"imageId":"0","outPointsData":[{"variableName":"rr","variableStructType":"","dataTypeName":"int*","orderNumName":"","lengthName":"1","categoryName":"DATA","voluationName":"","selectionVariableName":"","parameterNumName":{}}],"inPointsData":[{"variableName":"asf","variableStructType":"","dataTypeName":"int*","orderNumName":"","lengthName":"4","categoryName":"DATA","voluationName":"","selectionVariableName":"","parameterNumName":{}}],"compImg":"<div style='text-align:center;height:80px;width:160px;border:4px solid ;border-radius:1px;background-color: #E7DC08;display: block;'><img src='./gjk/image/u7.png' style='vertical-align: middle;width: 150px; height:75px;border-radius:5px;'><i style='display: inline-block;height: 100%;vertical-align: middle;'></i><div class='desc' id='\" + i + \"'>构件001</div></div>"},{"blockId":"25cbca70-8455-11e9-8180-6b92e201c8cd","positionX":536,"positionY":69,"imageId":"0","outPointsData":[{"variableName":"rr","variableStructType":"","dataTypeName":"int*","orderNumName":"","lengthName":"1","categoryName":"DATA","voluationName":"","selectionVariableName":"","parameterNumName":{}}],"inPointsData":[{"variableName":"asf","variableStructType":"","dataTypeName":"int*","orderNumName":"","lengthName":"4","categoryName":"DATA","voluationName":"","selectionVariableName":"","parameterNumName":{}}],"compImg":"<div style='text-align:center;height:80px;width:160px;border:4px solid ;border-radius:1px;background-color: #E7DC08;display: block;'><img src='./gjk/image/u7.png' style='vertical-align: middle;width: 150px; height:75px;border-radius:5px;'><i style='display: inline-block;height: 100%;vertical-align: middle;'></i><div class='desc' id='\" + i + \"'>构件001</div></div>"},{"blockId":"268f1a70-8455-11e9-8180-6b92e201c8cd","positionX":486,"positionY":245,"imageId":"0","outPointsData":[{"variableName":"rr","variableStructType":"","dataTypeName":"int*","orderNumName":"","lengthName":"1","categoryName":"DATA","voluationName":"","selectionVariableName":"","parameterNumName":{}}],"inPointsData":[{"variableName":"asf","variableStructType":"","dataTypeName":"int*","orderNumName":"","lengthName":"4","categoryName":"DATA","voluationName":"","selectionVariableName":"","parameterNumName":{}}],"compImg":"<div style='text-align:center;height:80px;width:160px;border:4px solid ;border-radius:1px;background-color: #E7DC08;display: block;'><img src='./gjk/image/u7.png' style='vertical-align: middle;width: 150px; height:75px;border-radius:5px;'><i style='display: inline-block;height: 100%;vertical-align: middle;'></i><div class='desc' id='\" + i + \"'>构件001</div></div>"},{"blockId":"278672c0-8455-11e9-8180-6b92e201c8cd","positionX":188,"positionY":243,"imageId":"0","outPointsData":[{"variableName":"rr","variableStructType":"","dataTypeName":"int*","orderNumName":"","lengthName":"1","categoryName":"DATA","voluationName":"","selectionVariableName":"","parameterNumName":{}}],"inPointsData":[{"variableName":"asf","variableStructType":"","dataTypeName":"int*","orderNumName":"","lengthName":"4","categoryName":"DATA","voluationName":"","selectionVariableName":"","parameterNumName":{}}],"compImg":"<div style='text-align:center;height:80px;width:160px;border:4px solid ;border-radius:1px;background-color: #E7DC08;display: block;'><img src='./gjk/image/u7.png' style='vertical-align: middle;width: 150px; height:75px;border-radius:5px;'><i style='display: inline-block;height: 100%;vertical-align: middle;'></i><div class='desc' id='\" + i + \"'>构件001</div></div>"}],"connections":[{"connectionId":"con_28","pageSourceId":"2521ced0-8455-11e9-8180-6b92e201c8cd","pageTargetId":"25cbca70-8455-11e9-8180-6b92e201c8cd","anchors":[[1,0.5,0,1,0,0],[0,0.5,0,-1,0,0]],"sourceUuid":"0*output*2521ced0-8455-11e9-8180-6b92e201c8cd","targetUuid":"0*input*25cbca70-8455-11e9-8180-6b92e201c8cd"},{"connectionId":"con_33","pageSourceId":"25cbca70-8455-11e9-8180-6b92e201c8cd","pageTargetId":"268f1a70-8455-11e9-8180-6b92e201c8cd","anchors":[[1,0.5,0,1,0,0],[0,0.5,0,-1,0,0]],"sourceUuid":"0*output*25cbca70-8455-11e9-8180-6b92e201c8cd","targetUuid":"0*input*268f1a70-8455-11e9-8180-6b92e201c8cd"},{"connectionId":"con_38","pageSourceId":"2521ced0-8455-11e9-8180-6b92e201c8cd","pageTargetId":"278672c0-8455-11e9-8180-6b92e201c8cd","anchors":[[1,0.5,0,1,0,0],[0,0.5,0,-1,0,0]],"sourceUuid":"0*output*2521ced0-8455-11e9-8180-6b92e201c8cd","targetUuid":"0*input*278672c0-8455-11e9-8180-6b92e201c8cd"}],"jsonendpoints":[{"anchorX":0,"anchorY":0.5,"uuid":"0*input*2521ced0-8455-11e9-8180-6b92e201c8cd","id":"2521ced0-8455-11e9-8180-6b92e201c8cd"},{"anchorX":1,"anchorY":0.5,"uuid":"0*output*2521ced0-8455-11e9-8180-6b92e201c8cd","id":"2521ced0-8455-11e9-8180-6b92e201c8cd"},{"anchorX":0,"anchorY":0.5,"uuid":"0*input*25cbca70-8455-11e9-8180-6b92e201c8cd","id":"25cbca70-8455-11e9-8180-6b92e201c8cd"},{"anchorX":1,"anchorY":0.5,"uuid":"0*output*25cbca70-8455-11e9-8180-6b92e201c8cd","id":"25cbca70-8455-11e9-8180-6b92e201c8cd"},{"anchorX":0,"anchorY":0.5,"uuid":"0*input*268f1a70-8455-11e9-8180-6b92e201c8cd","id":"268f1a70-8455-11e9-8180-6b92e201c8cd"},{"anchorX":1,"anchorY":0.5,"uuid":"0*output*268f1a70-8455-11e9-8180-6b92e201c8cd","id":"268f1a70-8455-11e9-8180-6b92e201c8cd"},{"anchorX":0,"anchorY":0.5,"uuid":"0*input*278672c0-8455-11e9-8180-6b92e201c8cd","id":"278672c0-8455-11e9-8180-6b92e201c8cd"},{"anchorX":1,"anchorY":0.5,"uuid":"0*output*278672c0-8455-11e9-8180-6b92e201c8cd","id":"278672c0-8455-11e9-8180-6b92e201c8cd"}]}
 	var nodes = loadJson.nodes;
 	var endpoints = loadJson.jsonendpoints;
-	console.log("锚点数据", endpoints)
+	//console.log("锚点数据", endpoints)
 	var addPoinrData = loadJson.addPointParam;
 	//console.log(nodes);
 	$.each(nodes, function (index, elem) {
@@ -2379,18 +2442,18 @@ function loadJson(loadJson) {
 				val.addClass("nodeStyle")
 				uuidList.push(val.getUuid());
 			});
+			$('#' + elem.blockId).addClass("nodeStyle")
 			if(lastTimeId != ""){
 				$('#' + lastTimeId).removeClass("nodeStyle")
 				$.each(jsPlumb.getEndpoints(lastTimeId), function (n,v) {
 					v.removeClass("nodeStyle")
 				});
 			}
-			$('#' + elem.blockId).addClass("nodeStyle")
 			// $.each(endpoints, function (n, val) {
 			// 	val.addClass("nodeStyle")
 			// });
 			lastTimeId = elem.blockId
-			console.log("uuid集合", uuidList);
+			//console.log("uuid集合", uuidList);
 			var TempData = [];
 			TempData.push({
 				//构件ID
@@ -2537,7 +2600,7 @@ function loadJson(loadJson) {
 		});
 		//console.log("是否执行加载",loadingState)
 		if(!loadState){
-			console.log("22222222222222",elem.blockId)
+			//console.log("22222222222222",elem.blockId)
 			var gjidAndTemid = [];
 			var b = $('#' + elem.blockId + '-heading')[0].dataset.id;
 			var points = jsPlumb.getEndpoints(elem.blockId);
@@ -2568,7 +2631,7 @@ function loadJson(loadJson) {
 		connectionObj.connSourceUUid = elem.sourceUuid
 		connectionObj.connTargetUUid = elem.targetUuid
 		newConnection.push(connectionObj)
-		console.log("新连接newConnection", newConnection)
+		//console.log("新连接newConnection", newConnection)
 	});
 }
 
@@ -2695,7 +2758,6 @@ $('.div_right').bind({
 		mousedownState = 0;
 		canvasState = true
 		if (mousedownState != 1) {
-			console.log("进入鼠标按下")
 			for (var i = 0; i < idList.length; i++) {
 				//$("#"+idList[i]+"-heading").css({"box-shadow":"none"})
 				$(".pa").removeClass("ui-selected")
@@ -2839,7 +2901,7 @@ function topAlignment(top, id) {
 	chartOperationStack['dragZ'].push(dragNode)
 	chartRareOperationStack.push('dragZ')
 	limitZ()
-	console.log("idList长度",idList)
+	//console.log("idList长度",idList)
 }
 //左对齐
 function leftAlignment(left, id) {
@@ -2994,6 +3056,40 @@ function toggleFullScreen() {
 	}
 }
 
+//完备性检查修改锚点样式
+function endpointCheck(styleColor){
+	$(".pa").each(function (idx, elem) {
+		var $elem = $(elem);
+		//i用于定位使用什么数据
+		//var i = $elem.find("div").find("div")[0].dataset.id;
+		var endpoints = jsPlumb.getEndpoints($elem.attr('id'));
+		//console.log(endpoints);
+		//循环构件上的锚点
+		$.map(endpoints, function (endpoint) {
+			//console.log("锚点",endpoint.getPaintStyle())
+			if(endpoint.anchor.x == 0){
+				endpoint.getPaintStyle().strokeStyle = styleColor
+			}else{
+				endpoint.getPaintStyle().strokeStyle = styleColor
+				endpoint.getPaintStyle().fillStyle = styleColor
+			}
+			
+		});
+	});
+	jsPlumb.setSuspendDrawing(false, true);
+}
 
+//完备性检查修改连线样式
+function connectionCheck(styleColor){
+	$.each(jsPlumb.getConnections(), function (idx, connection) {
+		//console.log(connection.getPaintStyle())
+		//connection.addClass("warn")
+		connection.getPaintStyle().lineWidth = "3"
+		connection.getPaintStyle().stroke = styleColor
+		connection.getPaintStyle().strokeStyle = styleColor
+
+	});
+	jsPlumb.setSuspendDrawing(false, true);
+}
 
 //})();

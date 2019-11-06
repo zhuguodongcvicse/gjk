@@ -289,6 +289,7 @@ export default {
         this.compImg.imgShowName + "-V" + param.version
       );
       imgretStr.compParam.compImg = this.compImg;
+      imgretStr.compParam.username = this.userInfo.username
       saveCompImg(imgretStr);
     },
     //保存对应文件
@@ -312,7 +313,7 @@ export default {
     },
     imgRetStrFunction(retStr) {
       if (!this.show) {
-        console.log("imgRetStrFunction", retStr);
+        // console.log("imgRetStrFunction", retStr);
         this.imgValue.saveCompImgStr.file = retStr;
         // this.imgretStr = retStr;
       }

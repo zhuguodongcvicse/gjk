@@ -11,6 +11,7 @@ const comp = {
         strInPointer: getStore({ name: 'strInPointer' }) || [],
         allBaseTemplate: getStore({ name: 'allBaseTemplate' }) || [],
         fileListOfComponent: getStore({ name: 'fileListOfComponent' }) || [],
+        currentIODate: getStore({ name: 'currentIODate' }) || [],
     },
     actions: {
         //绑定下拉框的值
@@ -53,6 +54,16 @@ const comp = {
           return new Promise((resolve, reject) => {
             try {
               commit('SET_ALLBASETEMPLATE', allBaseTemplate);
+              resolve();
+            } catch (e) {
+              reject(e)
+            }
+          })
+        },
+        saveCurrentIODate({ commit }, currentIODate) {
+          return new Promise((resolve, reject) => {
+            try {
+              commit('SET_CURRENTIODATE', currentIODate);
               resolve();
             } catch (e) {
               reject(e)
@@ -109,6 +120,14 @@ const comp = {
           setStore({
             name: 'allBaseTemplate',
             content: state.allBaseTemplate,
+            type: "session"
+          })
+        },
+        SET_CURRENTIODATE: (state, currentIODate) => {
+          state.currentIODate = currentIODate
+          setStore({
+            name: 'currentIODate',
+            content: state.currentIODate,
             type: "session"
           })
         },

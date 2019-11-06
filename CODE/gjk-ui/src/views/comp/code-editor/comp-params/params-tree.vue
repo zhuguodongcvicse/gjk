@@ -176,6 +176,7 @@ export default {
     tableXmlParams: {
       immediate: true,
       handler: function() {
+        // console.log("tableXmlParams - watch",this.tableXmlParams)
         this.paramType =
           this.tableXmlParams.lableName === "输入"
             ? "input"
@@ -188,6 +189,7 @@ export default {
     treeData: {
       immediate: true,
       handler: function(treeData) {
+        // console.log("treeData - watch",treeData)
         let saveTreeData = [];
         this.analysisByBaseXmlOptionData(deepClone(treeData), saveTreeData);
         this.tableXmlParams.xmlEntityMaps = saveTreeData;
@@ -241,6 +243,7 @@ export default {
     },
     //添加数据
     appendTreeNode(nodeParam, dataParam, storeParam, insertParam) {
+      console.log("appendTreeNode")
       // console.log("insertParaminsertParaminsertParam", insertParam);
       let base = deepClone(this.baseXmlOptionData);
       //组装树形数据
@@ -602,6 +605,7 @@ export default {
     },
     //将查询得到的数据用基础配置转成数组
     getBaseXmlOptionDataTree(nodeData) {
+      console.log("getBaseXmlOptionDataTree - nodeData", nodeData)
       let node = {};
       //组装树形数据
       let treeData = [];
@@ -777,6 +781,7 @@ export default {
     },
     //处理属性是否显示
     analysisAttrConfigType(attr) {
+      // console.log("analysisAttrConfigType",attr)
       let tmpTabOptionData = {}; //处理表格 "variable"
       let tmpXmlEntityMaps = []; //处理表格 "variable".XmlEntityMaps
       var attrObj = eval("(" + attr.attributeMap.configureType + ")");
@@ -936,8 +941,9 @@ export default {
     analysisMapping(from) {
       //标签名是否要中英文映射
       var attrObj = eval("(" + from.attributeMap.configureType + ")");
+      // console.log("attrObj",attrObj)
       let showName;
-      if (attrObj.lableMapping) {
+      if (attrObj && attrObj.lableMapping) {
         //基于标签名
         let val = this.compChineseMapping.find(item => {
           return item.label === con.attrKeys;
@@ -999,6 +1005,7 @@ export default {
     },
     //遍历保存数据根据基础baseXmlOptionData
     analysisByBaseXmlOptionData(treeData, saveTreeData, parentTree) {
+      // console.log("analysisByBaseXmlOptionData", "treeData", treeData, "saveTreeData", saveTreeData, "parentTree", parentTree)
       treeData.forEach(tree => {
         let baseData = deepClone(this.baseXmlOptionData);
         let saveRow = deepClone(this.baseXmlOptionData);
