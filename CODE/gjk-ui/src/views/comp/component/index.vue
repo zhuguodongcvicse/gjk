@@ -198,7 +198,7 @@ export default {
   methods: {
     goToAddCompPage(){
         getBaseTemplate().then(response => {
-            // console.log("response", response)
+            console.log("getBaseTemplate - response", response)
             let defauleBaseTemplate = []
             for (let i in response.data) {
                 if (response.data[i].tempType === "构件模型") {

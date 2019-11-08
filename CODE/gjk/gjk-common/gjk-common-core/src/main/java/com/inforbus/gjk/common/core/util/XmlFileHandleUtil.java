@@ -180,6 +180,9 @@ public class XmlFileHandleUtil {
 			tf.setOutputProperty(OutputKeys.INDENT, "yes");
 			// 设置输出内容缩进 数字设置缩进长度
 			tf.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+			java.util.Properties properties = tf.getOutputProperties();
+			properties.setProperty(OutputKeys.ENCODING,"utf-8");
+			tf.setOutputProperties(properties);
 			// 创建xml文件并写入内容
 			tf.transform(new DOMSource(document), new StreamResult(file));
 
