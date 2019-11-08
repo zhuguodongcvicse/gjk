@@ -189,7 +189,9 @@ export default {
     var proNameSameNameCheck = (rule, value, callback) => {
       // console.log("11111111111111111111111111", rule, value, callback);
       if (/^[0-9a-zA-Z-_()\u4e00-\u9fa5]{1,32}$/.test(value) == false) {
-        callback("请输入正确的项目名,项目名最少1个字符,最多32个字符,可包含汉字、字母、数字、—、_、()");
+        callback(
+          "请输入正确的项目名,项目名最少1个字符,最多32个字符,可包含汉字、字母、数字、—、_、()"
+        );
       } else {
         for (let item of this.proNameList) {
           if (value === item) {
@@ -202,7 +204,9 @@ export default {
     };
     var processNameCheck = (rule, value, callback) => {
       if (/^[0-9a-zA-Z-_()\u4e00-\u9fa5]{1,32}$/.test(value) == false) {
-        callback("请输入正确的流程名,流程名最少1个字符,最多32个字符,可包含汉字、字母、数字、—、_、()");
+        callback(
+          "请输入正确的流程名,流程名最少1个字符,最多32个字符,可包含汉字、字母、数字、—、_、()"
+        );
       } else {
         callback();
       }
@@ -397,13 +401,14 @@ export default {
           saveProject(this.project)
             .then(Response => {
               this.project.id = Response.data.data.id;
-              let projectsTemp = this.$store.state.projectTreeShow.projectTreeShow;
+              let projectsTemp = this.$store.state.projectTreeShow
+                .projectTreeShow;
               if (projectsTemp.length != 0) {
                 for (const i in projectsTemp) {
-                  projectsTemp[i].showFlag = 1
+                  projectsTemp[i].showFlag = 1;
                 }
               }
-              this.project.showFlag = 0
+              this.project.showFlag = 0;
               projectsTemp.push(this.project);
               this.$store.dispatch("setProjectTreeShow", projectsTemp);
               saveProProcess(this.project.id, this.project.processName).then(
@@ -436,15 +441,15 @@ export default {
                       approval.applyId = this.project.id;
                       approval.applyType = "2";
                       approval.libraryType = "7";
-                      console.log(
-                        "2222222222222222222222",
-                        this.formLabelAlign.applyUser
-                      );
+                      // console.log(
+                      //   "2222222222222222222222",
+                      //   this.formLabelAlign.applyUser
+                      // );
                       if (this.formLabelAlign.applyUser != "") {
-                        console.log(
-                          "11111111111111111111111111",
-                          this.formLabelAlign.applyUser
-                        );
+                        // console.log(
+                        //   "11111111111111111111111111",
+                        //   this.formLabelAlign.applyUser
+                        // );
                         approval.applyUserId = this.formLabelAlign.applyUser;
                       }
                       approval.approvalState = "0";
@@ -535,6 +540,16 @@ export default {
             message: "删除成功",
             type: "success"
           });
+          if (this.tableData != null && this.tableData.length > 0) {
+            for (const i in this.tableData) {
+              this.tableData[i].showFlag = 1;
+            }
+            this.tableData[0].showFlag = 0;
+            this.$store.dispatch("setProjectTreeShow", this.tableData);
+          } else {
+            this.$store.dispatch("setProjectTreeShow", []);
+          }
+
           this.reload();
         })
         .catch(function(err) {});

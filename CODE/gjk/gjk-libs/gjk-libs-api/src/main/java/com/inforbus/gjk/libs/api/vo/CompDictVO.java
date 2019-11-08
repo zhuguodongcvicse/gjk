@@ -16,7 +16,7 @@ public class CompDictVO implements Serializable {
 
 	public CompDictVO(CommonComponent comp) {
 		this.id = comp.getId();
-		this.compName = comp.getCompName() + "-" + comp.getVersion();
+		this.compName = comp.getCompId() + "-" + comp.getVersion();
 	}
 
 	/**

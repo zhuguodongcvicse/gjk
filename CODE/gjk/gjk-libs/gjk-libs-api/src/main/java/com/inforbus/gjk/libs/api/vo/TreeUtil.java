@@ -144,9 +144,9 @@ public class TreeUtil {
 		for (CompVO comp : vos) {
 			node = new CompTree();
 			node.setId(comp.getId());
-			node.setNodeName(comp.getCompName());
+			node.setNodeName(comp.getCompId());
 			node.setParentId(comp.getTreeParent());
-			node.setLabel(comp.getCompName());
+			node.setLabel(comp.getCompId());
 			trees.add(node);
 		}
 		System.out.println(JSONUtil.parse(trees));
@@ -177,6 +177,7 @@ public class TreeUtil {
 		}
 		return trees;
 	}
+
 	/**
 	 * @Title: buildCompTree
 	 * @Description: 建comp树形选择器的树
@@ -201,6 +202,7 @@ public class TreeUtil {
 		}
 		return TreeUtil.buildCommTreeByLoop(trees, root);
 	}
+
 	/**
 	 * 两层循环实现建comp树形选择器的树
 	 *

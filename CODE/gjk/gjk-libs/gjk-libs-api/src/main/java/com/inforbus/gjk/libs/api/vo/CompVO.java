@@ -11,10 +11,10 @@ public class CompVO extends Model<CompVO> {
 
 	private static final long serialVersionUID = 1L;
 
-	public CompVO(String id, String compName, String version, String treeParent) {
+	public CompVO(String id, String compId, String version, String treeParent) {
 		super();
 		this.id = id;
-		this.compName = compName;
+		this.compId = compId;
 		this.version = version;
 		this.treeParent = treeParent;
 	}

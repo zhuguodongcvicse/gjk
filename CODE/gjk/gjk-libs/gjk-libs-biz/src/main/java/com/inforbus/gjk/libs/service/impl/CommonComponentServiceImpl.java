@@ -137,9 +137,11 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		// 将目标文件打包成zip导出
 		for (CommonComponent comp : compList) {
 			String compPath = gitFilePath + "gjk" + File.separator + "common" + File.separator + "component"
-					+ File.separator + comp.getCompName() + File.separator + comp.getVersion();
-			zipDirOrFile(zip, new File(compPath),
-					"component" + File.separator + comp.getCompName() + File.separator + comp.getVersion());
+					+ File.separator + comp.getCompId() + File.separator + comp.getVersion();
+			if (new File(compPath).exists()) {
+				zipDirOrFile(zip, new File(compPath),
+						"component" + File.separator + comp.getCompName() + File.separator + comp.getVersion());
+			}
 		}
 
 		createExcelFileToZipIO(compList, details, zip);
@@ -358,7 +360,7 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		// 获取所有构件名,避免重名
 		Set<String> strings = new HashSet<>();
 		for (CommonComponent comp : comps) {
-			strings.add(comp.getCompName());
+			strings.add(comp.getCompId());
 		}
 		// 创建构件选择树的所有父节点
 		for (String s : strings) {
@@ -366,8 +368,8 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		}
 		// 添加构件选择树的所有子节点
 		for (CommonComponent comp : comps) {
-			tree.add(new CompVO(comp.getId(), comp.getCompName() + "-" + comp.getVersion(), comp.getVersion(),
-					comp.getCompName()));
+			tree.add(new CompVO(comp.getId(), comp.getCompId() + "-" + comp.getVersion(), comp.getVersion(),
+					comp.getCompId()));
 		}
 		return tree;
 	}

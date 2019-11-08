@@ -133,8 +133,8 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		List<ComponentDetail> details = compDetailMapper.listCompDetailByCompId(compId);
 		try {
 			Component comp = this.getById(compId);
-			String filePath = compDetailPath + "gjk" + File.separator + "component" + File.separator
-					+ comp.getCompId() + File.separator + comp.getVersion() + File.separator;
+			String filePath = compDetailPath + "gjk" + File.separator + "component" + File.separator + comp.getCompId()
+					+ File.separator + comp.getVersion() + File.separator;
 
 			// 删除构件
 			this.removeById(compId);
@@ -313,16 +313,16 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 
 			}
 		}
-		//构件编号集合
+		// 构件编号集合
 		List<String> compIdList = new ArrayList<String>();
-		//构件id、编号map
-		Map<String, String> compIdMap = new HashMap<String,String>();
-		//构件id、版本map
-		Map<String, String> versionMap = new HashMap<String,String>();
+		// 构件id、编号map
+		Map<String, String> compIdMap = new HashMap<String, String>();
+		// 构件id、版本map
+		Map<String, String> versionMap = new HashMap<String, String>();
 		for (ComponentDTO dto : dtos) {
 			compIdList.add(dto.getCompId());
 			compIdMap.put(dto.getId(), dto.getCompId());
-			versionMap.put(dto.getId(),dto.getVersion());
+			versionMap.put(dto.getId(), dto.getVersion());
 			for (int i = 0; i < dto.getInputList().size(); i++) {
 				ComponentInput input = dto.getInputList().get(i);
 				if (!input.getCategoryName().toUpperCase().equals("DATA")) {
@@ -342,29 +342,32 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			System.out.println("dto.getInputList()=>" + dto.getInputList());
 		}
 		Map<String, String> compUpdate = Maps.newHashMap();
-		//版本集合
+		// 版本集合
 		List<Double> versions = new ArrayList<Double>();
-		//获取所有编号的构件集合
+		// 获取所有编号的构件集合
 		List<Component> compList = baseMapper.checkComp(compIdList);
-		for(Map.Entry<String, String> entry : compIdMap.entrySet()){
-		    for(Component comp : compList) {
-		    	if(entry.getValue().equals(comp.getCompId())) {
-		    		versions.add(Double.parseDouble(comp.getVersion()));
-		    	}
-		    }
-		    Collections.sort(versions);
-	    	versions.get(versions.size()-1);
-	    //strJson += compNameMap.get(entry.getKey())+"：当前版本"+versionMap.get(entry.getKey())+";  最高版本为"+versions.get(versions.size()-1)+"\n";
+		for (Map.Entry<String, String> entry : compIdMap.entrySet()) {
+			for (Component comp : compList) {
+				if (entry.getValue().equals(comp.getCompId())) {
+					versions.add(Double.parseDouble(comp.getVersion()));
+				}
+			}
+			Collections.sort(versions);
+			versions.get(versions.size() - 1);
+			// strJson +=
+			// compNameMap.get(entry.getKey())+"：当前版本"+versionMap.get(entry.getKey())+";
+			// 最高版本为"+versions.get(versions.size()-1)+"\n";
 //	    	Double version = Double.valueOf(versionMap.get(entry.getKey()));
 //	    	Double versionTmp = Double.valueOf(versions.get(versions.size()-1));
-	    	if((Double.valueOf(versionMap.get(entry.getKey()))) < (Double.valueOf(versions.get(versions.size()-1)))) {
-	    		compUpdate.put(entry.getKey(), "0");//已更新
-	    	}else {
-	    		compUpdate.put(entry.getKey(), "1");//未更新
-	    	}
-	    	versions.clear();
+			if ((Double.valueOf(versionMap.get(entry.getKey()))) < (Double
+					.valueOf(versions.get(versions.size() - 1)))) {
+				compUpdate.put(entry.getKey(), "0");// 已更新
+			} else {
+				compUpdate.put(entry.getKey(), "1");// 未更新
+			}
+			versions.clear();
 		}
-		
+
 		maps.put("dtos", dtos);
 		maps.put("xmls", xmlMap);
 		maps.put("xmlMaps", xmlEntityMap);
@@ -434,7 +437,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		// 获取所有构件名,避免重名
 		Set<String> strings = new HashSet<>();
 		for (Component comp : comps) {
-			strings.add(comp.getCompName());
+			strings.add(comp.getCompId());
 		}
 		// 创建构件选择树的所有父节点
 		for (String s : strings) {
@@ -442,8 +445,8 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		}
 		// 添加构件选择树的所有子节点
 		for (Component comp : comps) {
-			tree.add(new CompVO(comp.getId(), comp.getCompName() + "-" + comp.getVersion(), comp.getVersion(),
-					comp.getCompName()));
+			tree.add(new CompVO(comp.getId(), comp.getCompId() + "-" + comp.getVersion(), comp.getVersion(),
+					comp.getCompId()));
 		}
 		return tree;
 	}
@@ -859,6 +862,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			e.printStackTrace();
 		}
 	}
+
 	@Override
 	/**
 	 * 检查更新
@@ -868,49 +872,52 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		int compNumber = 0;
 		String strJson = "";
 		String token = "";
-		Map<String, String> compIdMap = new HashMap<String,String>();
-		Map<String, String> compNameMap = new HashMap<String,String>();
-		Map<String, String> versionMap = new HashMap<String,String>();
+		Map<String, String> compIdMap = new HashMap<String, String>();
+		Map<String, String> compNameMap = new HashMap<String, String>();
+		Map<String, String> versionMap = new HashMap<String, String>();
 		List<String> compIdList = new ArrayList<String>();
-		//List<String> idList = new ArrayList<String>();
+		// List<String> idList = new ArrayList<String>();
 		JSONArray compJson = JSONUtil.parseArray(obj);
-		for(int i = 0;i<compJson.size();i++) {
+		for (int i = 0; i < compJson.size(); i++) {
 			JSONObject job = compJson.getJSONObject(i);
 			compIdList.add((String) job.get("compId"));
-			//idList.add((String) job.get("id"));
-			compIdMap.put((String)job.get("id"), (String)job.get("compId"));
-			compNameMap.put((String)job.get("id"), (String)job.get("compName"));
-			versionMap.put((String)job.get("id"), (String)job.get("version"));
-			token = (String)job.get("token");
-			
+			// idList.add((String) job.get("id"));
+			compIdMap.put((String) job.get("id"), (String) job.get("compId"));
+			compNameMap.put((String) job.get("id"), (String) job.get("compName"));
+			versionMap.put((String) job.get("id"), (String) job.get("version"));
+			token = (String) job.get("token");
+
 		}
 		List<Component> compList = baseMapper.checkComp(compIdList);
 		List<Double> versions = new ArrayList<Double>();
 		Map<String, String> compUpdate = Maps.newHashMap();
-		for(Map.Entry<String, String> entry : compIdMap.entrySet()){
-		    for(Component comp : compList) {
-		    	if(entry.getValue().equals(comp.getCompId())) {
-		    		versions.add(Double.parseDouble(comp.getVersion()));
-		    	}
-		    }
-		    if(versions.size()>1) {
-		    	compNumber +=1;
-		    }
-		    Collections.sort(versions);
-	    	versions.get(versions.size()-1);
-	    	strJson += compNameMap.get(entry.getKey())+"：当前版本"+versionMap.get(entry.getKey())+";  最高版本为"+versions.get(versions.size()-1)+"\n";
-	    	if((Double.valueOf(versionMap.get(entry.getKey()))) < (Double.valueOf(versions.get(versions.size()-1)))) {
-	    		compUpdate.put(entry.getKey(), "0");//已更新
-	    	}else {
-	    		compUpdate.put(entry.getKey(), "1");//未更新
-	    	}
-	    	versions.clear();
+		for (Map.Entry<String, String> entry : compIdMap.entrySet()) {
+			for (Component comp : compList) {
+				if (entry.getValue().equals(comp.getCompId())) {
+					versions.add(Double.parseDouble(comp.getVersion()));
+				}
+			}
+			if (versions.size() > 1) {
+				compNumber += 1;
+			}
+			Collections.sort(versions);
+			versions.get(versions.size() - 1);
+			strJson += compNameMap.get(entry.getKey()) + "：当前版本" + versionMap.get(entry.getKey()) + ";  最高版本为"
+					+ versions.get(versions.size() - 1) + "\n";
+			if ((Double.valueOf(versionMap.get(entry.getKey()))) < (Double
+					.valueOf(versions.get(versions.size() - 1)))) {
+				compUpdate.put(entry.getKey(), "0");// 已更新
+			} else {
+				compUpdate.put(entry.getKey(), "1");// 未更新
+			}
+			versions.clear();
 		}
-		//System.out.println(strJson);
+		// System.out.println(strJson);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-		
-		String consoleStr = "<<"+sdf.format(new Date())+"  total  "+compJson.size()+"  updated  "+compNumber+"  Not updated  "+(compJson.size()-compNumber)+"  >>\n"+strJson;
-		this.rabbitmqTemplate.convertAndSend(token , "lcjm"+"===@@@==="+consoleStr);
+
+		String consoleStr = "<<" + sdf.format(new Date()) + "  total  " + compJson.size() + "  updated  " + compNumber
+				+ "  Not updated  " + (compJson.size() - compNumber) + "  >>\n" + strJson;
+		this.rabbitmqTemplate.convertAndSend(token, "lcjm" + "===@@@===" + consoleStr);
 		maps.put("compUpdate", compUpdate);
 		return maps;
 	}

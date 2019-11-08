@@ -81,9 +81,9 @@ public class CompTreeUtil extends TreeUtil {
 		for (CompVO comp : vos) {
 			node = new CompTree();
 			node.setId(comp.getId());
-			node.setNodeName(comp.getCompName());
+			node.setNodeName(comp.getCompId());
 			node.setParentId(comp.getTreeParent());
-			node.setLabel(comp.getCompName());
+			node.setLabel(comp.getCompId());
 			trees.add(node);
 		}
 		System.out.println(JSONUtil.parse(trees));
