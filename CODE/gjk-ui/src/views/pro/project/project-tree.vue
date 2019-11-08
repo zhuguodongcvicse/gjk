@@ -185,6 +185,7 @@
         :before-upload="beforeAvatarUpload"
         :http-request="appImageUploadFunc"
         :on-change="onchange"
+        accept="image/jpeg, image/jpg, image/png"
       >
         <img v-if="imageUrl" :src="imageUrl" class="avatar" />
         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -1127,10 +1128,10 @@ export default {
       this.imageUrl = URL.createObjectURL(file.raw);
     },
     beforeAvatarUpload(file) {
-      const isJPG = file.type === "image/jpeg";
+      const isJPG = /^image\/(jpeg|png|jpg)$/.test(file.type);
       const isLt2M = file.size / 1024 / 1024 < 2;
       if (!isJPG) {
-        this.$message.error("上传头像图片只能是 JPG 格式!");
+        this.$message.error("上传头像图片格式为 JPG 和 PNG，请重新选择图片!");
       }
       if (!isLt2M) {
         this.$message.error("上传头像图片大小不能超过 2MB!");

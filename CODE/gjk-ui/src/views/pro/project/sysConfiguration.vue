@@ -365,9 +365,14 @@ export default {
       let xmlConfig = parseStrToObj(xmlentityMap.attributeMap.configureType);
       let cnName = null;
       if (xmlConfig.lableMapping) {
-        cnName = this.compChineseMapping.find(item => {
+        let item = this.compChineseMapping.find(item => {
           return item.id === xmlConfig.mappingKeys;
-        }).label;
+        });
+        if (item != undefined && item.label != undefined) {
+          cnName = item.label;
+        } else {
+          cnName = xmlConfig.lableName;
+        }
       } else {
         cnName = xmlConfig.lableName;
       }
@@ -382,7 +387,7 @@ export default {
             let getItem = this.compChineseMapping.find(item => {
               return item.id === attrItem.attrKeys;
             });
-            if (getItem != undefined) {
+            if (getItem != undefined && getItem.label != undefined) {
               this.$set(attrItem, "attrMappingName", getItem.label);
             } else {
               this.$set(attrItem, "attrMappingName", attrItem.attrName);
