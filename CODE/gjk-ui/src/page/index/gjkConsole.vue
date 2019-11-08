@@ -72,7 +72,7 @@ export default {
       inputText: "",
       client: Stomp.client(MQTT_SERVICE),
       token: "",
-      
+
     };
   },
   //监听属性 类似于data概念
@@ -106,7 +106,7 @@ export default {
         if (this.consoleLog == "") {
           //this.client.disconnect(); //断开连接
           return;
-        } else { 
+        } else {
           var isRepeat = false;
           //日志名称
           var consoleLogName = this.consoleLog.split("===@@@===")[0];
@@ -122,7 +122,7 @@ export default {
               }
             });
           if (isRepeat) {
-           
+
             $("#textedits_log")
               .find("div[pid=" + consoleLogName + "]")
               .children()
@@ -171,7 +171,7 @@ export default {
   created() {
     //连接mq
     this.connect();
-    //console.log("token", this.$store.getters.access_token); 
+    //console.log("token", this.$store.getters.access_token);
     this.token = this.$store.getters.access_token;//获取到登录的token
   },
   //方法集合
@@ -209,11 +209,11 @@ export default {
       this.client.subscribe(topic, this.responseCallback, this.onFailed);
     },
     onFailed: function(frame) {
-      console.log("Failed: " + frame);
+     /* console.log("Failed: " + frame);
       this.$message({
           message: 'MQ连接失败,请确认是否开启MQ服务或者刷新页面',
           type: 'warning'
-        });
+        });*/
     },
     responseCallback: function(frame) {
       console.log("responseCallback msg=>" + frame.body);
@@ -262,7 +262,7 @@ export default {
 window.project = function(val) {
   //将所有日志div隐藏
   $("#textedits_log")
-    .find("div")  
+    .find("div")
     .each(function() {
       $(this).hide();
     });

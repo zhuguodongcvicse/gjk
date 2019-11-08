@@ -127,7 +127,7 @@ export default {
     },
     handleUseTemplate(params) {
       analysisXmlFile(params.tempPath).then(response => {
-        console.log("response", response);
+        console.log("analysisXmlFile - response", response);
         this.templateData.templateVisible = false;
         this.$store.dispatch("setFetchStrInPointer");
         //保存加载的数据

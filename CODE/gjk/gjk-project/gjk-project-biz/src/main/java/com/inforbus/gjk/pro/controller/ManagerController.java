@@ -170,7 +170,7 @@ public class ManagerController {
 		} else {
 			filePath = System.getProperty("user.dir") + "\\软硬件映射配置.xml";
 		}
-		return new R<>(XmlFileHandleUtil.analysisXmlFile(new File(filePath)));
+		return new R<>(XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(new File(filePath)));
 	}
 
 	@GetMapping("/getCoeffNodeTree/{proDetailId}")

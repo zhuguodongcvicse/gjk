@@ -229,8 +229,10 @@ export default {
       })
       .then(Response => {
         //map
-        getSysConfigXmlEntityMap(this.$route.query.proId).then(Response => {
+        // getSysConfigXmlEntityMap(this.$route.query.proId).then(Response => {
+          rollbackDispose(this.$route.query.proId).then(Response => {
           this.form = Response.data.data;
+          console.log("lllll",this.form);
           //给方案路径赋值
           for (let item of this.form.xmlEntityMaps) {
             if (item.lableName === this.planFilePaths) {

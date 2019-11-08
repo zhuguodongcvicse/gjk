@@ -30,11 +30,11 @@
     <script src="src/common/DragSupport.js"></script>
     <script src="src/common/FileSupport.js"></script>
     <script src="src/common/JSONSerializer.js"></script>
-    <script src="src/common/ExportPane.js"></script>
+    <script src="src/common/Exportpane.js"></script>
     <script src="src/common/Toolbar.js"></script>
     <script src="src/common/ToolBox.js"></script>
     <script src="src/common/PopupMenu.js"></script>
-    <script src="src/common/PropertyPane.js"></script>
+    <script src="src/common/Propertypane.js"></script>
     <script src="src/common/GridBackground.js"></script>
     <!-- <script src="src/graph.editor.js"></script> -->
     <script src="graph.editor/graph.editor.js"></script>
@@ -58,11 +58,11 @@
                     if (graphList.fJson[m].datas[k].json.properties.caseName != null) {
                         for (const i in graphList.fJson[m].datas[k].json.properties.frontBoardList) {
                             for (const j in graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList) {
-                                //ÕÒµ½Êý×éÖÐµã»÷µÄµ±Ç°Ð¾Æ¬
+                                //ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½Äµï¿½Ç°Ð¾Æ¬
                                 if (graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList[j].uniqueId.indexOf(clickCheckedChip.uniqueId) != -1) {
-                                    //µ±Ç°ÅäÖÃÀ¸ÊäÈëµÄIP¸³¸øÊý×éÖÐÐ¾Æ¬µÄÊôÐÔ
+                                    //ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IPï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¾Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                                     graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList[j].IP = clickCheckedChip.IP
-                                    //½«¸Ã¸³ÖµºóµÄÐ¾Æ¬·Åµ½ÁÙÊ±µÄÐ¾Æ¬Êý×éÖÐ
+                                    //ï¿½ï¿½ï¿½Ã¸ï¿½Öµï¿½ï¿½ï¿½Ð¾Æ¬ï¿½Åµï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ð¾Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                                     chipListTemp.push(graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList[j])
                                 }
                             }
@@ -70,7 +70,7 @@
                     }
                 }
             }
-            //Éî¿½±´
+            //ï¿½î¿½ï¿½ï¿½
 			chipListTemp = JSON.parse(JSON.stringify(chipListTemp))
         }
         function getCaption(obj) {

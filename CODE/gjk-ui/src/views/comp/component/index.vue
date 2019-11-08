@@ -26,9 +26,9 @@
           <!-- <el-button size="small">
             <i class="el-icon-download el-icon--left"></i>导出
           </el-button>-->
-          <el-button size="small" @click="importComp" type="primary">
-            <i class="el-icon-upload el-icon--left"></i>导入
-          </el-button>
+          <!--<el-button size="small" @click="importComp" type="primary">
+            <i class="el-icon-upload el-icon&#45;&#45;left"></i>导入
+          </el-button>-->
         </template>
         <template slot="version" slot-scope="scope">
           <el-tag>V{{parseFloat(scope.row.version).toFixed(1)}}</el-tag>
@@ -198,7 +198,7 @@ export default {
   methods: {
     goToAddCompPage(){
         getBaseTemplate().then(response => {
-            // console.log("response", response)
+            console.log("getBaseTemplate - response", response)
             let defauleBaseTemplate = []
             for (let i in response.data) {
                 if (response.data[i].tempType === "构件模型") {
