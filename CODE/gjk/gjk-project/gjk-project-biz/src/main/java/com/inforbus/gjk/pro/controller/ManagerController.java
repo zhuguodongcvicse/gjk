@@ -178,10 +178,9 @@ public class ManagerController {
 		return new R<>(managerService.getCoeffNodeTree(proDetailId));
 	}
 
-	@GetMapping
-	@RequestMapping("/getcoefficientXmlEntityMap")
-	public R getcoefficientXmlEntityMap() {
-		return new R<>(managerService.getcoefficientXmlEntityMap());
+	@GetMapping("/getcoefficientXmlEntityMap/{proDetailId}")
+	public R getcoefficientXmlEntityMap(@PathVariable String proDetailId) {
+		return new R<>(managerService.getcoefficientXmlEntityMap(proDetailId));
 	}
 
 	@GetMapping

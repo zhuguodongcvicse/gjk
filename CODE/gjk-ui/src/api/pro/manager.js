@@ -71,9 +71,9 @@ export function isXmlFileExist(proDetailId) {
   })
 }
 
-export function getSysConfigModelXml() {
+export function getSysConfigModelXml(proDetailId) {
   return request({
-    url: '/pro/manager/getcoefficientXmlEntityMap',
+    url: '/pro/manager/getcoefficientXmlEntityMap/'+proDetailId,
     method: 'get'
   })
 }

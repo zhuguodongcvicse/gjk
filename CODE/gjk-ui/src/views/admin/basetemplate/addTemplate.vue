@@ -1551,6 +1551,7 @@ export default {
             lableType: "false",
             lableName: XmlEntityMap.lableName,
             lableMapping: false,
+            lableMappingName:XmlEntityMap.lableName,
             mappingKeys: Number,
             actionType: String,
             attrs: []
@@ -1567,7 +1568,7 @@ export default {
               mappingData: []
             });
           }
-
+          Vue.set(XmlEntityMap, "lableMappingName", XmlEntityMap.lableName);
           var str = parseObjToStr(configureType);
           Vue.set(XmlEntityMap.attributeMap, "configureType", str);
         }
@@ -1578,6 +1579,7 @@ export default {
           lableType: "false",
           lableName: XmlEntityMap.lableName,
           lableMapping: false,
+          lableMappingName:XmlEntityMap.lableName, 
           mappingKeys: Number,
           actionType: String,
           attrs: []

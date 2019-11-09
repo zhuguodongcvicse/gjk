@@ -16,6 +16,7 @@
  */
 package com.inforbus.gjk.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -238,4 +239,10 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
         return baseMapper.selectList(null);
     }
 
+    @Override
+    public List<BaseTemplate> getBaseTemplateByTempType(String tempType) {
+        BaseTemplate baseTemplate = new BaseTemplate();
+        baseTemplate.setTempType(tempType);
+        return baseMapper.selectList(new QueryWrapper<>(baseTemplate).orderByDesc("temp_version"));
+    }
 }

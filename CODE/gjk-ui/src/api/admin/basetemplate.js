@@ -100,3 +100,10 @@ export function getBaseTemplate() {
     method: 'get'
   })
 }
+
+export function getBaseTemplates(tempType) {
+  return request({
+    url: '/admin/basetemplate/getBaseTemplates/'+tempType,
+    method: 'get'
+  })
+}
