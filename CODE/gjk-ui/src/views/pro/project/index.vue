@@ -29,9 +29,10 @@
             width="50%"
             class="libs_bsp_dialog_14s pro_project_index_dialog_14s"
             :visible.sync="dialogTableVisible"
+            v-if="dialogTableVisible"
           >
             <div>
-              <el-tabs>
+              <el-tabs v-model="activeName">
                 <el-tab-pane label="基本信息" name="first">
                   <el-form
                     :label-position="labelPosition"
@@ -242,10 +243,7 @@ export default {
       }
     };
     return {
-      // sysDatas: [],
-      // themeDatas: [],
-      // networkDatas: [],
-      // hsmDatas: [],
+      activeName:"first",
       projectsTemp: "",
       project: {},
       compHaveChildArray: [],
