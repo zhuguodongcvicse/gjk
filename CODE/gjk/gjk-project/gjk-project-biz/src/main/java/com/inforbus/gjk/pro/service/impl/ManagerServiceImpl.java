@@ -298,7 +298,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		BaseTemplateIDsDTO baseTemplateIDsDTO = JSON.parseObject(json, BaseTemplateIDsDTO.class);//把json串转成json对象
 		//BaseTemplateIDsDTO baseTemplateIDsDTO = (BaseTemplateIDsDTO)JSON.parse(json);
 		String sysTempId = baseTemplateIDsDTO.getSysTempId();//获取到系统配置模板id
-		return getXmlEntityMap(sysTempId);//解析软硬件映射xml文件返回数据
+		return getXmlEntityMap(sysTempId);//解析系统配置xml文件返回数据
 	}
 
 	/**
@@ -510,19 +510,21 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @return
 	 */
 	public XmlEntityMap getSysConfigXmlEntityMap(String proDetailId) {
-		//File file = new File(gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml");//老耿代码
+		ProjectFile projectFile = getProDetailById(proDetailId);
+		File hsmLocalFile = new File(gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml");//老耿代码
 		//XmlEntityMap xmlEntityMap = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);//老耿代码
 //		if (projectFile.getFileType().equals("14")) {
 //			file = new File(gitDetailPath+projectFile.getFilePath()+ "方案展示.xml");
 //		}
-		// if (projectFile.getFileType().equals("11")) {
-		// file = new File(System.getProperty("user.dir") + "/流程实例.xml");
-		// }
-		ProjectFile projectFile = getProDetailById(proDetailId);
+//		 if (projectFile.getFileType().equals("11")) {
+//		 file = new File(System.getProperty("user.dir") + "/流程实例.xml");
+//		 }
+		if(hsmLocalFile.exists()){
+			return XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(hsmLocalFile);
+		}
 		Project project = projectMapper.getProById(projectFile.getProjectId());
 		String json = project.getBasetemplateIds();//获取到模板idjson串
 		BaseTemplateIDsDTO baseTemplateIDsDTO = JSON.parseObject(json, BaseTemplateIDsDTO.class);//把json串转成json对象
-		//BaseTemplateIDsDTO baseTemplateIDsDTO = (BaseTemplateIDsDTO)JSON.parse(json);
 		String hsmTempId = baseTemplateIDsDTO.getHsmTempId();//获取到软硬件映射模板id
 		return getXmlEntityMap(hsmTempId);//解析软硬件映射xml文件返回数据
 	}

@@ -161,16 +161,16 @@ public class ManagerController {
 
 	@GetMapping(value = "/dispose/{proDetailId}")
 	public R rollBackDisposeXml(@PathVariable("proDetailId") String proDetailId) {
-		String filePath = "";
-		ProjectFile projectFile = managerService.getProDetailById(proDetailId);
-		Boolean bool = managerService.isXmlFileExist(proDetailId);
-		// 如果文件存在
-		if (bool == true) {
-			filePath = proDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml";
-		} else {
-			filePath = System.getProperty("user.dir") + "\\软硬件映射配置.xml";
-		}
-		return new R<>(XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(new File(filePath)));
+//		String filePath = "";
+//		ProjectFile projectFile = managerService.getProDetailById(proDetailId);
+//		Boolean bool = managerService.isXmlFileExist(proDetailId);
+//		// 如果文件存在
+//		if (bool == true) {
+//			filePath = proDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml";
+//		} else {
+//			filePath = System.getProperty("user.dir") + "\\软硬件映射配置.xml";
+//		}
+		return new R<>(managerService.getSysConfigXmlEntityMap(proDetailId));
 	}
 
 	@GetMapping("/getCoeffNodeTree/{proDetailId}")
