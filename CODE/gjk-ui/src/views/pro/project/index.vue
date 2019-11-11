@@ -259,7 +259,7 @@ export default {
         sysTempId: "",
         themeTempId: "",
         networkTempId: "",
-        hsmTempId: "",       
+        hsmTempId: "",
       },
       labelPosition: "right",
       dialogTableVisible: false,
@@ -767,12 +767,12 @@ export default {
       });
     },
   },
-  created() { 
+  created() {
     this.getList();
     this.getCreateData();
     this.getLibsTree();
     this.getSoftwareSelectList();
-    this.getBaseTemplateData();
+    // this.getBaseTemplateData();
   },
   mounted: function() {}
 };
