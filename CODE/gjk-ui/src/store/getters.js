@@ -1,3 +1,5 @@
+import refreshListFlag from "./modules/refreshListFlag";
+
 const getters = {
   tag: state => state.tags.tag,
   website: state => state.common.website,
@@ -49,6 +51,7 @@ const getters = {
   cjUnitParam : state => state.comp.cjUnitParam,
   strInPointer : state => state.comp.strInPointer,
   chipsOfHardwarelibs : state => state.chipsOfHardwarelibs.chipsOfHardwarelibs,
+  refreshListFlag : state => state.refreshListFlag.refreshListFlag,
   closeRouter : state => state.closeRouter,
   projectTreeShow : state => state.projectTreeShow.projectTreeShow,
 }

@@ -13,6 +13,7 @@ import infList from './modules/infList'
 import chipsOfHardwarelibs from './modules/chipsOfHardwarelibs'
 import projectTreeShow from './modules/projectTreeShow'
 import closeRouter from './modules/closeRouter'
+import refreshListFlag from "./modules/refreshListFlag";
 
 Vue.use(Vuex)
 const store = new Vuex.Store({
@@ -27,6 +28,7 @@ const store = new Vuex.Store({
     chipsOfHardwarelibs,
     comp,
     gjkConsole,
+    refreshListFlag,
     projectTreeShow
   },
   getters

@@ -1,11 +1,12 @@
 <template>
   <div class="libs_hardwarelibboard_boarddesign_14s libs_hardwarelibchip_chipdesign_14s">
+    <el-button type="primary" icon="el-icon-edit" @click="test" circle></el-button>
     <el-row>
       <el-col :span="18">
         <!-- 导入iframe页面  -->
         <div class="grid-content bg-purple boarddesign_btn_14s">
-          <!--       <el-button-group> 
-             <el-button type="primary" size="small" @click="sendMessage('save')">加载组件</el-button> 
+          <!--       <el-button-group>
+             <el-button type="primary" size="small" @click="sendMessage('save')">加载组件</el-button>
           </el-button-group>-->
 
           <iframe
@@ -28,15 +29,12 @@
 <script>
 import { menuTag } from "@/util/closeRouter";
 import {
-  fetchList,
   getInfData,
-  willGetChipData,
   saveChip
 } from "@/api/libs/hardwarelibchip";
 import { mapGetters } from "vuex";
 import NProgress from "nprogress"; // progress bar
 import "nprogress/nprogress.css"; // progress bar style
-import { saveProcessModel } from "@/api/pro/project";
 
 export default {
   name: "AvueIframe",
@@ -54,6 +52,7 @@ export default {
 
   data() {
     return {
+      refreshListFlag: 1,
       ifSave: 1,
       formObj: "",
       params: "",
@@ -67,7 +66,6 @@ export default {
     };
   },
   created() {
-    console.log("created");
     NProgress.configure({ showSpinner: false });
     var formObj = this.$route.query;
     // this.$route.chipDataTemp = this.$route.params
@@ -77,7 +75,6 @@ export default {
     console.log("this.params", this.params);
   },
   mounted() {
-    console.log("mounted");
     // window.onbeforeunload = function(e) {
     //   e = e || window.event;
 
@@ -104,6 +101,8 @@ export default {
   },
   computed: { ...mapGetters(["tagWel", "tagList", "tag", "website"]) },
   methods: {
+    test(){
+    },
     sendMessage() {
       // 父向子传参方式二
       let iframeWin = this.$refs.iframe.contentWindow;
@@ -135,6 +134,8 @@ export default {
             // this.params = "";
             var tag1 = this.tag;
             menuTag(this.$route.path, "remove", this.tagList, tag1);
+            this.refreshListFlag = Math.random()
+            this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
           });
           // console.log("this.$route.path", this.$route.path);
           break;

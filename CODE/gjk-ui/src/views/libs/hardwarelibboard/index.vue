@@ -122,7 +122,16 @@ export default {
   },
   mounted: function() {},
   computed: {
-    ...mapGetters(["permissions"])
+    ...mapGetters(["permissions", "refreshListFlag"])
+  },
+  watch: {
+      refreshListFlag: {
+          // immediate: true,
+          handler: function(params) {
+              this.getList();
+          },
+          deep: true
+      }
   },
   methods: {
     getList() {

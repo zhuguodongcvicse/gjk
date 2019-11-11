@@ -109,7 +109,16 @@ export default {
   },
   mounted: function() {},
   computed: {
-    ...mapGetters(["permissions"])
+    ...mapGetters(["permissions", "refreshListFlag"])
+  },
+  watch: {
+      refreshListFlag: {
+          // immediate: true,
+          handler: function(params) {
+              this.getList();
+          },
+          deep: true
+      }
   },
   methods: {
     showdialog() {
@@ -132,7 +141,7 @@ export default {
       // console.log("this.form",this.form)
       getBoardData().then(response => {
         this.queryData = response.data;
-        /* getCaseJson(row.id).then(res => { 
+        /* getCaseJson(row.id).then(res => {
             this.form.boardJson = res.data.boardJson
             //console.log("this.form",this.form)
             this.queryData = [this.infDataParams,this.chipDataParams]
