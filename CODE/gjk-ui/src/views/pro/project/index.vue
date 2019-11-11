@@ -216,6 +216,8 @@ export default {
     ...mapGetters(["permissions", "userInfo"])
   },
   name: "project",
+  //刷新
+  inject: ["reload"],
   data() {
     var proNameSameNameCheck = (rule, value, callback) => {
       // console.log("11111111111111111111111111", rule, value, callback);
@@ -529,6 +531,7 @@ export default {
     handleCancleComp() {
       this.dialogTableVisible = false;
       Object.assign(this.formLabelAlign, this.$options.data().formLabelAlign);
+      this.reload();
     },
     getList() {
       fetchAlgorithmTree(this.listQuery).then(Response => {
