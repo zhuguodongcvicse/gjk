@@ -20,7 +20,7 @@
         <template slot="menuLeft">
           <el-button
             type="primary"
-            @click="dialogTableVisible = true"
+            @click="dialogTableVisible = true, showStructList()"
             size="small"
             icon="el-icon-plus"
             v-if="permissions.pro_project_add"
@@ -344,6 +344,9 @@ export default {
     }
   },
   methods: {
+    showStructList(){
+        this.getTableData()
+    },
     selectAllComp() {
       let selectArray = [];
       this.setId(this.compTreeData, selectArray);
