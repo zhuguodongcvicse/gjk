@@ -11,45 +11,49 @@ import router from '@/router/router.js'
  */
 export function menuTag(value, action, tagList, tag1) {
   let tagUrl = urlStr(tag1.value)
-    if (action === "remove") {
-        let { tag, key } = findTag(value, tagList);
-        store.commit("DEL_TAG", tag);
-        if (tag.value === tagUrl) {
-          tag = tagList[key === 0 ? key : key - 1]; //如果关闭本标签让前推一个src\router\router.js
-          openTag(tag);
-        }
-      }
+  if (action === "remove") {
+    let { tag, key } = findTag(value, tagList);
+    store.commit("DEL_TAG", tag);
+    if (tag.value === tagUrl) {
+      tag = tagList[key === 0 ? key : key - 1]; //如果关闭本标签让前推一个src\router\router.js
+      openTag(tag);
+    }
+  } if (action === "removeOpen") {
+    let { tag } = findTag(value, tagList);
+    store.commit("DEL_TAG", tag);
+    openTag(findTag(tag1.value, tagList).tag);
+  }
 }
 function findTag(value, tagList) {
-    let tag, key;
-    tagList.map((item, index) => {
-      if (item.value.indexOf('?') != -1) {
-        tag = item;
-        key = index;
-        tag.value = urlStr(item.value)
-      } else if (item.value === value) {
-        tag = item;
-        key = index;
-      }
-    });
-    return { tag: tag, key: key };
+  let tag, key;
+  tagList.map((item, index) => {
+    if (item.value.indexOf('?') != -1) {
+      tag = item;
+      key = index;
+      tag.value = urlStr(item.value)
+    } else if (item.value === value) {
+      tag = item;
+      key = index;
+    }
+  });
+  return { tag: tag, key: key };
 }
-function urlStr(oldUrl){
+function urlStr(oldUrl) {
   let newUrl = oldUrl.slice(0, oldUrl.indexOf('?'))
   return newUrl
 }
 function openTag(item) {
-    let tag;
-    if (item.name) {
-      tag = findTag(item.name).tag;
-    } else {
-      tag = item;
-    }
-    router.push({
-      path: router.$avueRouter.getPath({
-        name: tag.label,
-        src: tag.value
-      }),
-      query: tag.query
-    });
+  let tag;
+  if (item.name) {
+    tag = findTag(item.name).tag;
+  } else {
+    tag = item;
+  }
+  router.push({
+    path: router.$avueRouter.getPath({
+      name: tag.label,
+      src: tag.value
+    }),
+    query: tag.query
+  });
 }
