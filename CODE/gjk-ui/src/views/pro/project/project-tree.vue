@@ -185,7 +185,6 @@
         :before-upload="beforeAvatarUpload"
         :http-request="appImageUploadFunc"
         :on-change="onchange"
-        accept="image/jpeg, image/jpg, image/png"
       >
         <img v-if="imageUrl" :src="imageUrl" class="avatar" />
         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -299,19 +298,6 @@
         </el-form-item>
       </el-form>
     </el-dialog>
-
-    <el-dialog
-      title="修改模板"
-      class="libs_bsp_dialog_14s libs_software_dialog_14s"
-      width="40%"
-      :visible.sync="isUpdataTemp"
-    >
-      <choose-temp :formLabelAlign="formLabelAlign"></choose-temp>
-      <div class="control-container bsp_footer_btn_14s text_align_right_14s">
-        <el-button type="primary" @click.native="handleSaveTemp">提交申请</el-button>
-        <el-button type="button" @click.native="isUpdataTemp = false">取消</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 <script>
@@ -324,8 +310,7 @@ import {
   saveProCompList,
   uploadFile,
   uploadFolder,
-  uploadFiles,
-  putObj
+  uploadFiles
 } from "@/api/pro/project";
 
 import {
@@ -357,12 +342,10 @@ import { getPath } from "@/api/compile/devenv";
 import { mapGetters } from "vuex";
 import selectTree from "./selectTree";
 import { codeGeneration } from "@/api/pro/project";
-import chooseTemp from "./chooseTemplate";
 export default {
   // components: { ComponentSave },
   components: {
-    "select-tree": selectTree,
-    "choose-temp": chooseTemp
+    "select-tree": selectTree
   },
   //注入依赖，调用this.reload();用于刷新页面
   inject: ["reload"],
@@ -375,13 +358,6 @@ export default {
       }
     };
     return {
-      formLabelAlign: {
-        sysTempId: "",
-        themeTempId: "",
-        networkTempId: "",
-        hsmTempId: ""
-      },
-      isUpdataTemp: false,
       token: "",
       uploader_key: new Date().getTime(),
       optionsUploader: {
@@ -878,17 +854,6 @@ export default {
         this.isUploadFile = true;
       } else if (item == "增加文件夹") {
         this.isUploadBTN = true;
-      } else if (item == "修改模板") {
-        var baseTempIds = JSON.parse(this.temp_currProject.basetemplateIds);
-        Vue.set(this.formLabelAlign, "sysTempId", baseTempIds.sysTempId);
-        Vue.set(this.formLabelAlign, "themeTempId", baseTempIds.themeTempId);
-        Vue.set(
-          this.formLabelAlign,
-          "networkTempId",
-          baseTempIds.networkTempId
-        );
-        Vue.set(this.formLabelAlign, "hsmTempId", baseTempIds.hsmTempId);
-        this.isUpdataTemp = true;
       }
     },
     findTargetNode(currentNodeObj, targetNodeObj) {
@@ -1084,7 +1049,6 @@ export default {
         this.menus = [
           "集成代码生成",
           "修改软件框架",
-          "修改模板",
           "修改BSP",
           "APP组件工程生成",
           "删除流程"
@@ -1163,10 +1127,10 @@ export default {
       this.imageUrl = URL.createObjectURL(file.raw);
     },
     beforeAvatarUpload(file) {
-      const isJPG = /^image\/(jpeg|png|jpg)$/.test(file.type);
+      const isJPG = file.type === "image/jpeg";
       const isLt2M = file.size / 1024 / 1024 < 2;
       if (!isJPG) {
-        this.$message.error("上传头像图片格式为 JPG 和 PNG，请重新选择图片!");
+        this.$message.error("上传头像图片只能是 JPG 格式!");
       }
       if (!isLt2M) {
         this.$message.error("上传头像图片大小不能超过 2MB!");
@@ -1525,25 +1489,6 @@ export default {
         .catch(error => {
           this.$message.error(error);
         });
-    },
-    //修改模板
-    handleSaveTemp() {
-      var json = JSON.stringify(this.formLabelAlign);
-      var project = {
-        id: this.temp_currProject.id,
-        basetemplateIds: json
-      };
-      putObj(project).then(res => {
-        if (res.data.data) {
-          this.$message({
-            message: "修改模板成功",
-            type: "success"
-          });
-          this.getProjects();
-          this.reload();
-        }
-        this.isUpdataTemp = false;
-      });
     }
   }
 };
