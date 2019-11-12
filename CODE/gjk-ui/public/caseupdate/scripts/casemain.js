@@ -245,7 +245,7 @@ function ondropLoadJSON(evt, graph, center, options) {
 		}
 		for (const i in jsonObj.datas[0].json.properties.chipList) {
 			if (jsonObj.datas[0].json.properties.chipList[i].uniqueId.indexOf(uuidRandom) == -1) {
-				jsonObj.datas[0].json.properties.chipList[i].uniqueId = uuidRandom + '_' + jsonObj.datas[0].json.properties.chipList[i].uniqueId	
+				jsonObj.datas[0].json.properties.chipList[i].uniqueId = uuidRandom + '_' + jsonObj.datas[0].json.properties.chipList[i].uniqueId
 			}
 		}
 	}
@@ -843,7 +843,7 @@ function initEditor(editor) {
 			}
 		}
 		toolbar.appendChild(button)
-		//网状画布 
+		//网状画布
 		var graph = editor.graph;
 		//不可改变形状大小
 		graph.editable = true;
@@ -1274,6 +1274,7 @@ function initEditor(editor) {
 			}
 		}
 		if (image == 'rack') {
+      console.log("666666666666",image)
 			return {
 				group: '机箱属性',
 				properties: [{
@@ -1282,7 +1283,7 @@ function initEditor(editor) {
 				}/* ,
 					{
 						client: 'boardnum',
-						displayName: '主板数量' 
+						displayName: '主板数量'
 					} */
 				]
 			}
@@ -1291,7 +1292,7 @@ function initEditor(editor) {
 	}
 
 
-	//initData(); 
+	//initData();
 	initInteraction();
 
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="libs_hardwarelibboard_boarddesign_14s libs_hardwarelibchip_chipdesign_14s">
-    <el-button type="primary" icon="el-icon-edit" @click="test" circle></el-button>
+<!--    <el-button type="primary" icon="el-icon-edit" @click="test" circle></el-button>-->
     <el-row>
       <el-col :span="18">
         <!-- 导入iframe页面  -->
@@ -71,8 +71,6 @@ export default {
     // this.$route.chipDataTemp = this.$route.params
     // this.$set(this.$route,"chipDataTemp", this.$route.params)
     this.params = formObj;
-    console.log("this.$router", this.$route);
-    console.log("this.params", this.params);
   },
   mounted() {
     // window.onbeforeunload = function(e) {

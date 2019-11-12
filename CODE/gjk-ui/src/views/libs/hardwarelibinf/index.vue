@@ -213,7 +213,7 @@ export default {
             // console.log("this",this)
           });
           this.infTemp = "";
-          this.$refs[formName].resetFields();
+          // this.$refs[formName].resetFields();
         } else {
           // console.log("error submit!!");
           return false;
