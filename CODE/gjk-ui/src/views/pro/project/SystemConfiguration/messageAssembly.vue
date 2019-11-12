@@ -113,7 +113,9 @@
       <el-tabs>
         <el-tab-pane label="网络配置" v-if="networkArray.length>0">
           <template v-for="(network) in networkArray">
-            <el-divider>{{parseStrToObj(network.attributeMap.configureType).lableMappingName}}</el-divider>
+            <el-divider
+              v-if="network.xmlEntityMaps.length>0"
+            >{{parseStrToObj(network.attributeMap.configureType).lableMappingName}}</el-divider>
             <el-table
               :data="network.xmlEntityMaps"
               border
