@@ -50,4 +50,8 @@ public class AppDataDTO {
 	 * 组件划分方案路径
 	 */
 	private String cmpDeployPlanFilePath;
+	/**
+	 * 用户名
+	 */
+	private String userName;
 }

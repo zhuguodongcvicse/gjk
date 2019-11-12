@@ -112,10 +112,11 @@ export function getSoftProcessFilePath(id) {
   })
 }
 
-export function getFilePathListById(id) {
+export function getFilePathListById(id,appDataDTO) {
   return request({
     url: '/pro/manager/getFilePathListById/' + id,
-    method: 'get'
+    method: 'post',
+    data: appDataDTO
   })
 }
 

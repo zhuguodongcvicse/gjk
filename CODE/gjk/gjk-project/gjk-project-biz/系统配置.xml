@@ -18,7 +18,7 @@
 						configureType="{'lableType':'false','lableName':'CMM_Write','lableMapping':false,'attrs':[{'attrName':'coreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'length','dataKey':'[]','attrKeys':162,'multiple':false},{'attrName':'coreID','attrMapping':true,'attrMappingName':'芯片ID','actionType':'','isShow':true,'attrConfigType':'selectComm','multiple':true,'dataKey':'[]','attrKeys':163}],'lableMappingName':'CMM_Write'}"
 						coreID="3-4-5" coreSum="1" />
 					<CMM_Compute
-						configureType="{'lableType':'false','lableName':'CMM_Compute','lableMapping':false,'attrs':[{'attrName':'coreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'length','dataKey':'[]','attrKeys':162,'multiple':false},{'attrName':'coreID','attrMapping':true,'attrMappingName':'芯片ID','actionType':'','isShow':true,'attrConfigType':'selectComm','multiple':true,'dataKey':'[]','attrKeys':163}],'lableMappingName':'CMM_Compute'}"
+						configureType="{'lableType':'false','lableName':'CMM_Compute','lableMapping':false,'attrs':[{'attrName':'coreSum','attrMapping':true,'attrMappingName':'芯片数量','actionType':'','isShow':false,'attrConfigType':'length','dataKey':'[]','attrKeys':162,'multiple':false},{'attrName':'coreID','attrMapping':true,'attrMappingName':'芯片ID','actionType':'','isShow':true,'attrConfigType':'selectComm','multiple':true,'dataKey':'API Return','attrKeys':163}],'lableMappingName':'CMM_Compute'}"
 						coreID="API Return" coreSum="API Return" />
 				</coreDeploy>
 				<tmpBuf
