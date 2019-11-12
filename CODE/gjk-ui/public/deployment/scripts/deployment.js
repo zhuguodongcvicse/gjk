@@ -1218,12 +1218,9 @@ function showchip() {
 				for(var j in deploymentsJsonbak.datas){
 					if(CHIPdate[i].properties.uniqueId == deploymentsJsonbak.datas[j].json.properties.uniqueId){
 						if(deploymentsJsonbak.datas[j]._refId == undefined){
-	
 							deploymentsJsonbak.datas[j]._refId = parseInt(1000000000 * Math.random());
 						}
-						
 					}
-					CHIPdate[i].properties.uniqueId 
 				}
 			}
 	
