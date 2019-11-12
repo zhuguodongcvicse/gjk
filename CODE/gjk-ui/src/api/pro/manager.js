@@ -71,9 +71,9 @@ export function isXmlFileExist(proDetailId) {
   })
 }
 
-export function getSysConfigModelXml() {
+export function getSysConfigModelXml(proDetailId) {
   return request({
-    url: '/pro/manager/getcoefficientXmlEntityMap',
+    url: '/pro/manager/getcoefficientXmlEntityMap/'+proDetailId,
     method: 'get'
   })
 }
@@ -112,10 +112,11 @@ export function getSoftProcessFilePath(id) {
   })
 }
 
-export function getFilePathListById(id) {
+export function getFilePathListById(id,appDataDTO) {
   return request({
     url: '/pro/manager/getFilePathListById/' + id,
-    method: 'get'
+    method: 'post',
+    data: appDataDTO
   })
 }
 

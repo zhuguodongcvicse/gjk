@@ -27,6 +27,7 @@
 		<result property="defaultBspId" column="default_bsp_id" />
 		<result property="description" column="description" />
 		<result property="delFlag" column="del_flag" />
+		<result property="basetemplateIds" column="basetemplate_ids" />
 	</resultMap>
 
 	<resultMap type="com.inforbus.gjk.pro.api.entity.ProComp"
@@ -60,7 +61,8 @@
 		default_software_id,
 		default_bsp_id,
 		description,
-		del_flag
+		del_flag,
+		basetemplate_ids
 	</sql>
 
 	<sql id="saveProSql">
@@ -70,7 +72,8 @@
 		project_img,
 		default_software_id,
 		default_bsp_id,
-		description
+		description,
+		basetemplate_ids
 	</sql>
 
 	<sql id="proComp">
@@ -165,7 +168,8 @@
 		#{pro.projectImg},
 		#{pro.defaultSoftwareId},
 		#{pro.defaultBspId},
-		#{pro.description})
+		#{pro.description},
+		#{pro.basetemplateIds})
 	</insert>
 
 	<select id="getProById" resultMap="projectMap">

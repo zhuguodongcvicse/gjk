@@ -1277,7 +1277,7 @@ function initEditor(editor) {
 			return {
 				group: '机箱属性',
 				properties: [{
-					client: 'rackname',
+					client: 'caseName',
 					displayName: '机箱名称'
 				}/* ,
 					{

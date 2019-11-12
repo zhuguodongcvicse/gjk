@@ -93,7 +93,7 @@ public interface ManagerService extends IService<ProjectFile> {
 	 * @DateTime 2019年5月22日 下午3:36:13
 	 * @return
 	 */
-	XmlEntityMap getcoefficientXmlEntityMap();
+	XmlEntityMap getcoefficientXmlEntityMap(String proDetailId);
 
 	/**
 	 * @Title: getSysConfigByApiReturn

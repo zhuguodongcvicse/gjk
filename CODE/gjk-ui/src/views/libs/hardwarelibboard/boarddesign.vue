@@ -64,6 +64,7 @@ export default {
   },
   data() {
     return {
+      refreshListFlag: 1,
       ifSave: 1,
       chipDataParams: "",
       infDataParams: "",
@@ -121,12 +122,12 @@ export default {
             // console.log("this.infDataParams",this.infDataParams)
             this.postMessageData.cmd = "boarddesign"
             this.postMessageData.params = [this.chipDataParams,this.infDataParams,this.params,calculateBoardLinkType,calculateBoardIoType]
-            
+
             iframeWin.postMessage(this.postMessageData, "*")
            // console.log("postMessageData",this.postMessageData);
           })
       })
-      
+
     },
     // 接受子页面发来的信息
     handleMessage(event) {
@@ -143,12 +144,9 @@ export default {
               showClose: true,
               message: "保存成功",
               type: "success"
-            }).catch(response => {
-              this.$message({
-                type: "error",
-                message: "保存失败"
-              });
-            });
+            })
+            this.refreshListFlag = Math.random()
+            this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
           })
           var tag1 = this.tag
           menuTag(this.$route.path, "remove", this.tagList, tag1);

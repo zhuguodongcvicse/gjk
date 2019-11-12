@@ -323,23 +323,23 @@
                 }
             ],
             editor: [
-                {
+           /*      {
                     name: '创建连线',
                     interactionMode: Q.Consts.INTERACTION_MODE_CREATE_EDGE,
                     iconClass: 'q-icon toolbar-edge'
-                },
+                }, */
                 // {
                 //     name: '创建曲线',
                 //     interactionMode: Q.Consts.INTERACTION_MODE_CREATE_SIMPLE_EDGE,
                 //     iconClass: 'q-icon toolbar-edge_VH',
                 //     edgeType: Q.Consts.EDGE_TYPE_HORIZONTAL_VERTICAL
                 // },
-                {
+               /*  {
                     name: '创建L型连线',
                     interactionMode: Q.Consts.INTERACTION_MODE_CREATE_SIMPLE_EDGE,
                     iconClass: 'q-icon toolbar-edge_VH',
                     edgeType: Q.Consts.EDGE_TYPE_VERTICAL_HORIZONTAL
-                },
+                }, */
             /*     {
                     name: '创建多边形',
                     interactionMode: Q.Consts.INTERACTION_MODE_CREATE_SHAPE,
@@ -386,11 +386,11 @@
                 }
             } */
         }
-        if (customButtons) {
+     /*    if (customButtons) {
             for (var n in customButtons) {
                 buttons[n] = customButtons[n];
             }
-        }
+        } */
         function createButtons(buttons, toolbar, scope, vertical, togglable) {
             for (var n in buttons) {
                 var info = buttons[n];

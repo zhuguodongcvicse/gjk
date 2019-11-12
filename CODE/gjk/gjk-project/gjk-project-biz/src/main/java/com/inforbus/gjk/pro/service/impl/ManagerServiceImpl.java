@@ -25,9 +25,12 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import com.inforbus.gjk.admin.api.entity.BaseTemplate;
+import com.inforbus.gjk.pro.api.dto.BaseTemplateIDsDTO;
 import com.inforbus.gjk.pro.api.entity.*;
 
 import com.inforbus.gjk.pro.mapper.PartPlatformSoftwareMapper;
+import com.inforbus.gjk.pro.service.BaseTemplateService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -99,6 +102,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	protected ProjectMapper projectMapper;
 	@Autowired
 	protected PartPlatformSoftwareMapper partPlatformSoftwareMapper;
+	@Autowired
+	private BaseTemplateService baseTemplateService;
 
 	private static final String proDetailPath = JGitUtil.getLOCAL_REPO_PATH();
 	private static final String integerCodeFileName = JGitUtil.getINTEGER_CODE_FILE_NAME();
@@ -281,14 +286,19 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	public ProjectFile getProDetailById(String id) {
 		return baseMapper.getProDetailById(id);
 	}
-
+	/*
+	* 2019年11月5日 15:22:53 wang修改
+	* 修改为从基础模板表读模板数据
+	* */
 	@Override
-	public XmlEntityMap getcoefficientXmlEntityMap() {
-		// TODO:临时使用，读取基础模板获取基础模板的信息
-		String filePath = System.getProperty("user.dir") + "\\系统配置.xml";
-		File file = new File(filePath);
-		XmlEntityMap xmlEntityMap = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);
-		return xmlEntityMap;
+	public XmlEntityMap getcoefficientXmlEntityMap(String proDetailId) {
+		ProjectFile projectFile = getProDetailById(proDetailId);
+		Project project = projectMapper.getProById(projectFile.getProjectId());
+		String json = project.getBasetemplateIds();//获取到模板idjson串
+		BaseTemplateIDsDTO baseTemplateIDsDTO = JSON.parseObject(json, BaseTemplateIDsDTO.class);//把json串转成json对象
+		//BaseTemplateIDsDTO baseTemplateIDsDTO = (BaseTemplateIDsDTO)JSON.parse(json);
+		String sysTempId = baseTemplateIDsDTO.getSysTempId();//获取到系统配置模板id
+		return getXmlEntityMap(sysTempId);//解析系统配置xml文件返回数据
 	}
 
 	/**
@@ -501,17 +511,22 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 */
 	public XmlEntityMap getSysConfigXmlEntityMap(String proDetailId) {
 		ProjectFile projectFile = getProDetailById(proDetailId);
-		File file = new File(gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml");
-
+		File hsmLocalFile = new File(gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml");//老耿代码
+		//XmlEntityMap xmlEntityMap = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);//老耿代码
 //		if (projectFile.getFileType().equals("14")) {
 //			file = new File(gitDetailPath+projectFile.getFilePath()+ "方案展示.xml");
 //		}
-		// if (projectFile.getFileType().equals("11")) {
-		// file = new File(System.getProperty("user.dir") + "/流程实例.xml");
-		// }
-
-		XmlEntityMap xmlEntityMap = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);
-		return xmlEntityMap;
+//		 if (projectFile.getFileType().equals("11")) {
+//		 file = new File(System.getProperty("user.dir") + "/流程实例.xml");
+//		 }
+		if(hsmLocalFile.exists()){
+			return XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(hsmLocalFile);
+		}
+		Project project = projectMapper.getProById(projectFile.getProjectId());
+		String json = project.getBasetemplateIds();//获取到模板idjson串
+		BaseTemplateIDsDTO baseTemplateIDsDTO = JSON.parseObject(json, BaseTemplateIDsDTO.class);//把json串转成json对象
+		String hsmTempId = baseTemplateIDsDTO.getHsmTempId();//获取到软硬件映射模板id
+		return getXmlEntityMap(hsmTempId);//解析软硬件映射xml文件返回数据
 	}
 
 	/**
@@ -906,18 +921,18 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		FileUtil.getSelectStrFilePathList(linuxCFilePathSet, partIntegerCodeFilePath, selectFileExtensionList);
 
-		try {
-			// 原始需求调用客户接口,apiFileList中存添加的.c .cpp .h文件不带后缀的文件名
-			List<String> apiFileList = new ArrayList<String>();
-			apiFileList.addAll(apiNeedStringSet);
-			ExternalIOTransUtils.modifySpbInclude(apiFileList,
-					new File(appFilePathName).getParentFile().getAbsolutePath());
-		} catch (IOException e) {
-			e.printStackTrace();
-			logger.error("调用客户接口失败，请联系管理员。");
-			r.setAllAttr(CommonConstants.FAIL, "调用客户接口失败，请联系管理员。", null);
-			return;
-		}
+//		try {
+//			// 原始需求调用客户接口,apiFileList中存添加的.c .cpp .h文件不带后缀的文件名
+//			List<String> apiFileList = new ArrayList<String>();
+//			apiFileList.addAll(apiNeedStringSet);
+//			ExternalIOTransUtils.modifySpbInclude(apiFileList,
+//					new File(appFilePathName).getParentFile().getAbsolutePath());
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			logger.error("调用客户接口失败，请联系管理员。");
+//			r.setAllAttr(CommonConstants.FAIL, "调用客户接口失败，请联系管理员。", null);
+//			return;
+//		}
 
 //		try {
 //			// 调用客户接口,list中存添加的构件的函数名
@@ -1649,5 +1664,13 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		} else {
 			file.delete();
 		}
+	}
+	/*
+	* 使用feign获取到基础模板id返回xmlEntityMap对象
+	* */
+	public XmlEntityMap getXmlEntityMap(String tempId){
+		R<BaseTemplate> R = baseTemplateService.getById(tempId);//feign调用upms接口根据id查模板对象
+		File file = new File(gitDetailPath+R.getData().getTempPath());
+		return XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);
 	}
 }

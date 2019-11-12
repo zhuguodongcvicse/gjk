@@ -14,7 +14,7 @@
           </el-input>
           <el-button type="primary" class="showapp_form_btn" plain @click="refreshApp">刷 新</el-button>
         </el-form-item>
-        <br />
+        <br>
       </div>
       <el-form-item
         v-for="(domain, index) in dynamicValidateForm.domains[0]"
@@ -80,7 +80,7 @@
                   v-bind:style="{cursor: banArray[index].wrenchBan }"
                 ></i>
               </el-tooltip>
-              <br />
+              <br>
               <el-tooltip content="启动" placement="bottom" effect="light">
                 <i
                   class="el-icon-caret-right"
@@ -132,10 +132,10 @@
               </el-tooltip>
             </div>
           </div>
-          <img class="appImage" :src="`/pro/app/appImg/${domain.id}`" />
+          <img class="appImage" :src="`/pro/app/appImg/${domain.id}`">
         </div>
       </el-form-item>
-      <br />
+      <br>
     </el-form>
     <!-- 分页的组件 -->
     <div align="center" class="showapp_page_14s">
@@ -179,6 +179,7 @@ import {
   deleteAppByAPPId,
   returnFilePath
 } from "@/api/pro/app";
+import { mapGetters } from "vuex";
 export default {
   //import引入的组件需要注入到对象中才能使用
   components: {
@@ -275,7 +276,9 @@ export default {
     };
   },
   //监听属性 类似于data概念
-  computed: {},
+  computed: {
+    ...mapGetters(["userInfo"])
+  },
   //监控data中的数据变化
   watch: {},
   //生命周期 - 创建完成（可以访问当前this实例）
@@ -475,6 +478,8 @@ export default {
       this.appFilePath = domain.filePath + "/" + domain.fileName + "/";
       //无用
       // this.appFile = "D:/14S_GJK_GIT/gjk/gjk/APPDownload/" + domain.fileName;
+      //用户名
+      this.appDataDTO.userName = this.userInfo.username;
       //当前app对应的流程id(数据库存的字符串，客戶方的是int，先在前台转成了int，后期根据需求改动)
       this.appDataDTO.flowId = domain.flowId;
       //导出路径（如：D:/14S_GJK_GIT/gjk/gjk/APPDownload/admin_123_111流程APP）
@@ -496,36 +501,43 @@ export default {
     },
     //编译图标
     playClick(domain, index) {
-      returnFilePath({
-        }).then(vals => {
-          //console.log("oooo",JSON.parse(domain.partnamePlatform))
-          //获取组件名，及平台类型
-          for (let key in JSON.parse(domain.partnamePlatform)) {
-            let value = JSON.parse(domain.partnamePlatform)[key];
-            if(value === "win_vs2010"){
-              value = "VS2010";
-            }else if(value === "win_sylixos"){
-              value = "Sylixos";
-            }else if(value === "win_workbench"){
-              value = "Workbench";
-            }else if(value === "linux_icc"){
-              value = "Linux";
-            }
-            getPath({
-              path: vals.data.data + domain.filePath + "/" + domain.fileName+"/"+key,
-              fileName: key,
-              platformType: value,
-              token: this.$store.getters.access_token
-            }).then(val => {
-              this.$message({
-                message: val.data.data
-              });
-            });
+      returnFilePath({}).then(vals => {
+        //console.log("oooo",JSON.parse(domain.partnamePlatform))
+        //获取组件名，及平台类型
+        for (let key in JSON.parse(domain.partnamePlatform)) {
+          let value = JSON.parse(domain.partnamePlatform)[key];
+          if (value === "win_vs2010") {
+            value = "VS2010";
+          } else if (value === "win_sylixos") {
+            value = "Sylixos";
+          } else if (value === "win_workbench") {
+            value = "Workbench";
+          } else if (value === "linux_icc") {
+            value = "Linux";
           }
-        })
+          getPath({
+            path:
+              vals.data.data +
+              domain.filePath +
+              "/" +
+              domain.fileName +
+              "/" +
+              key,
+            fileName: key,
+            platformType: value,
+            token: this.$store.getters.access_token
+          }).then(val => {
+            this.$message({
+              message: val.data.data
+            });
+          });
+        }
+      });
     },
     //加载图标
     loadingClick(domain, index) {
+      //用户名
+      this.appDataDTO.userName = this.userInfo.username;
       //APP组件工程生成，<组件名称，对应平台大类属性>
       this.appDataDTO.cmpNameToHwType = domain.partnamePlatform;
       //当前app对应的流程id(数据库存的字符串，客戶方的是int，先在前台转成了int，后期根据需求改动)
@@ -565,6 +577,8 @@ export default {
     },
     //更新加载
     refreshClick(domain, index) {
+      //用户名
+      this.appDataDTO.userName = this.userInfo.username;
       //APP组件工程生成，<组件名称，对应平台大类属性>
       this.appDataDTO.cmpNameToHwType = domain.partnamePlatform;
       //当前app对应的流程id(数据库存的字符串，客戶方的是int，先在前台转成了int，后期根据需求改动)
@@ -604,6 +618,8 @@ export default {
     },
     //启动
     startClick(domain, index) {
+      //用户名
+      this.appDataDTO.userName = this.userInfo.username;
       //APP组件工程生成，<组件名称，对应平台大类属性>
       this.appDataDTO.cmpNameToHwType = domain.partnamePlatform;
       //当前app对应的流程id(数据库存的字符串，客戶方的是int，先在前台转成了int，后期根据需求改动)
@@ -638,6 +654,8 @@ export default {
     //暂停
     pauseClick(domain, index) {
       // domain.appState = "";
+      //用户名
+      this.appDataDTO.userName = this.userInfo.username;
       //APP组件工程生成，<组件名称，对应平台大类属性>
       this.appDataDTO.cmpNameToHwType = domain.partnamePlatform;
       //当前app对应的流程id(数据库存的字符串，客戶方的是int，先在前台转成了int，后期根据需求改动)
@@ -671,6 +689,8 @@ export default {
     },
     //停止
     stopClick(domain, index) {
+      //用户名
+      this.appDataDTO.userName = this.userInfo.username;
       //APP组件工程生成，<组件名称，对应平台大类属性>
       this.appDataDTO.cmpNameToHwType = domain.partnamePlatform;
       //当前app对应的流程id(数据库存的字符串，客戶方的是int，先在前台转成了int，后期根据需求改动)
@@ -704,6 +724,8 @@ export default {
     },
     //卸载
     deleteClick(domain, index) {
+      //用户名
+      this.appDataDTO.userName = this.userInfo.username;
       //APP组件工程生成，<组件名称，对应平台大类属性>
       this.appDataDTO.cmpNameToHwType = domain.partnamePlatform;
       //当前app对应的流程id(数据库存的字符串，客戶方的是int，先在前台转成了int，后期根据需求改动)
@@ -739,6 +761,8 @@ export default {
     //注册
     earthClick(domain, index) {
       console.log("domain:::::---", domain);
+      //用户名
+      this.appDataDTO.userName = this.userInfo.username;
       //调接口传的参数
       this.appDataDTO.cmpNameToHwType = domain.partnamePlatform;
       //当前app对应的流程id(数据库存的字符串，客戶方的是int，先在前台转成了int，后期根据需求改动)
@@ -781,6 +805,8 @@ export default {
     },
     //注销
     removeClick(domain, index) {
+      //用户名
+      this.appDataDTO.userName = this.userInfo.username;
       //调接口传的参数
       this.appDataDTO.cmpNameToHwType = domain.partnamePlatform;
       //当前app对应的流程id(数据库存的字符串，客戶方的是int，先在前台转成了int，后期根据需求改动)

@@ -20,7 +20,7 @@
         <template slot="menuLeft">
           <el-button
             type="primary"
-            @click="dialogTableVisible = true"
+            @click="dialogTableVisible = true, showStructList()"
             size="small"
             icon="el-icon-plus"
             v-if="permissions.pro_project_add"
@@ -29,94 +29,122 @@
             width="50%"
             class="libs_bsp_dialog_14s pro_project_index_dialog_14s"
             :visible.sync="dialogTableVisible"
+            v-if="dialogTableVisible"
           >
-            <el-form
-              :label-position="labelPosition"
-              label-width="120px"
-              :model="formLabelAlign"
-              :rules="projectRules"
-              ref="formLabelAlignRef"
-            >
-              <div class="bsp_tab_14s">
-                <el-form-item label="项目名称" prop="projectName">
-                  <el-input v-model="formLabelAlign.projectName"></el-input>
-                </el-form-item>
-                <!-- <el-form-item label="硬件选择">
-                <select-tree :treeData="hardwareTreeData" multiple :id.sync="hardwareSelectArray"></select-tree>
-                </el-form-item>-->
-                <el-form-item label="构件筛选">
-                  <select-tree :treeData="screenLibsTree" multiple :id.sync="screenLibsIdArray" />
-                </el-form-item>
-                <el-form-item label="构件选择">
-                  <select-tree :treeData="compTreeData" multiple :id.sync="compSelectArray" />
-                  <el-button type="primary" @click="selectAllComp">全选</el-button>
-                </el-form-item>
-                <el-form-item label="软件框架选择">
-                  <span style="color: red;" v-show="platformFlag">{{platformNameTs}}未选择</span>
-                  <el-select
-                    class="text_align_center_14s"
-                    v-model="softwareSelectString"
-                    multiple
-                    placeholder="请选择"
-                    @change="selectSoftwareClk"
+            <div>
+              <el-tabs v-model="activeName">
+                <el-tab-pane label="基本信息" name="first">
+                  <el-form
+                    :label-position="labelPosition"
+                    label-width="120px"
+                    :model="formLabelAlign"
+                    :rules="projectRules"
+                    ref="formLabelAlignRef"
                   >
-                    <el-option
-                      v-for="item in softwareTreeData"
-                      :key="item.id"
-                      :label="item.softwareName"
-                      :value="item.id"
-                    >
-                      <span style="float: left">{{ item.softwareName }}(v{{item.version}}.0)</span>
-                      <span
-                        style="float: right; color: #8492a6; font-size: 13px;margin-right: 30px;"
-                      >{{ item.description }}</span>
-                    </el-option>
-                  </el-select>
-                  <!--<el-select v-model="softwareSelectString" placeholder="请选择">-->
-                  <!--<el-option-->
-                  <!--v-for="item in softwareTreeData"-->
-                  <!--:key="item.id"-->
-                  <!--:label="item.label"-->
-                  <!--:value="item.id"-->
-                  <!--&gt;</el-option>-->
-                  <!--</el-select>-->
-                </el-form-item>
-                <el-form-item label="BSP选择" prop="bspSelectString">
-                  <el-select v-model="formLabelAlign.bspSelectString" placeholder="请选择">
-                    <el-option
-                      v-for="item in bspTreeData"
-                      :key="item.id"
-                      :label="item.label"
-                      :value="item.id"
-                    ></el-option>
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="请选择审批人" prop="applyUser">
-                  <el-select v-model="formLabelAlign.applyUser" placeholder="请选择">
-                    <el-option
-                      v-for="item in applyUserSelect"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                    ></el-option>
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="流程名称" prop="processName">
-                  <el-input v-model="formLabelAlign.processName"></el-input>
-                </el-form-item>
-              </div>
+                    <div class="bsp_tab_14s">
+                      <el-form-item label="项目名称" prop="projectName">
+                        <el-input v-model="formLabelAlign.projectName"></el-input>
+                      </el-form-item>
+                      <el-form-item label="流程名称" prop="processName">
+                        <el-input v-model="formLabelAlign.processName"></el-input>
+                      </el-form-item>
+                      <el-form-item label="请选择审批人" prop="applyUser">
+                        <el-select v-model="formLabelAlign.applyUser" placeholder="请选择">
+                          <el-option
+                            v-for="item in applyUserSelect"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                          ></el-option>
+                        </el-select>
+                      </el-form-item>
+                    </div>
+                  </el-form>
+                </el-tab-pane>
 
-              <div class="control-container bsp_footer_btn_14s text_align_right_14s">
-                <el-form-item>
-                  <el-button
-                    type="primary"
-                    :disabled="platformFlag"
-                    @click.native="handleSaveComp"
-                  >提交申请</el-button>
-                  <el-button type="button" @click.native="handleCancleComp">取消</el-button>
-                </el-form-item>
-              </div>
-            </el-form>
+                <el-tab-pane label="框架信息" name="second">
+                  <el-form
+                    :label-position="labelPosition"
+                    label-width="120px"
+                    :model="formLabelAlign"
+                  >
+                    <div class="bsp_tab_14s">
+                      <el-form-item label="软件框架选择">
+                        <span style="color: red;" v-show="platformFlag">{{platformNameTs}}未选择</span>
+                        <el-select
+                          class="text_align_center_14s"
+                          v-model="softwareSelectString"
+                          multiple
+                          placeholder="请选择"
+                          @change="selectSoftwareClk"
+                        >
+                          <el-option
+                            v-for="item in softwareTreeData"
+                            :key="item.id"
+                            :label="item.softwareName"
+                            :value="item.id"
+                          >
+                            <span style="float: left">{{ item.softwareName }}(v{{item.version}}.0)</span>
+                            <span
+                              style="float: right; color: #8492a6; font-size: 13px;margin-right: 30px;"
+                            >{{ item.description }}</span>
+                          </el-option>
+                        </el-select>
+                        <!--<el-select v-model="softwareSelectString" placeholder="请选择">-->
+                        <!--<el-option-->
+                        <!--v-for="item in softwareTreeData"-->
+                        <!--:key="item.id"-->
+                        <!--:label="item.label"-->
+                        <!--:value="item.id"-->
+                        <!--&gt;</el-option>-->
+                        <!--</el-select>-->
+                      </el-form-item>
+                      <el-form-item label="BSP选择" prop="bspSelectString">
+                        <el-select v-model="formLabelAlign.bspSelectString" placeholder="请选择">
+                          <el-option
+                            v-for="item in bspTreeData"
+                            :key="item.id"
+                            :label="item.label"
+                            :value="item.id"
+                          ></el-option>
+                        </el-select>
+                      </el-form-item>
+                    </div>
+                  </el-form>
+                </el-tab-pane>
+
+                <el-tab-pane label="构件信息" name="third">
+                  <el-form
+                    :label-position="labelPosition"
+                    label-width="120px"
+                    :model="formLabelAlign"
+                  >
+                    <div class="bsp_tab_14s">
+                      <el-form-item label="构件筛选">
+                        <select-tree
+                          :treeData="screenLibsTree"
+                          multiple
+                          :id.sync="screenLibsIdArray"
+                        />
+                      </el-form-item>
+                      <el-form-item label="构件选择">
+                        <select-tree :treeData="compTreeData" multiple :id.sync="compSelectArray" />
+                        <el-button type="primary" @click="selectAllComp">全选</el-button>
+                      </el-form-item>
+                    </div>
+                  </el-form>
+                </el-tab-pane>
+                <!--选择模板-->
+                <el-tab-pane label="模板信息" name="fourth">
+                  <choose-temp :formLabelAlign="formLabelAlign"></choose-temp>
+                </el-tab-pane>
+              </el-tabs>
+            </div>
+
+            <div class="control-container bsp_footer_btn_14s text_align_right_14s">
+              <el-button type="primary" :disabled="platformFlag" @click.native="handleSaveComp">提交申请</el-button>
+              <el-button type="button" @click.native="handleCancleComp">取消</el-button>
+            </div>
           </el-dialog>
           <br />
           <br />
@@ -174,17 +202,22 @@ import {
   updatePartSoftwareAndPlatform
 } from "@/api/pro/manager";
 import { mapGetters } from "vuex";
+
+import chooseTemp  from "./chooseTemplate"
 export default {
   //注入依赖，调用this.reload();用于刷新页面
   inject: ["reload"],
   components: {
     "select-tree": selectTree,
-    "el-addDialog": addDialog
+    "el-addDialog": addDialog,
+    "choose-temp": chooseTemp
   },
   computed: {
     ...mapGetters(["permissions", "userInfo"])
   },
   name: "project",
+  //刷新
+  inject: ["reload"],
   data() {
     var proNameSameNameCheck = (rule, value, callback) => {
       // console.log("11111111111111111111111111", rule, value, callback);
@@ -212,6 +245,7 @@ export default {
       }
     };
     return {
+      activeName:"first",
       projectsTemp: "",
       project: {},
       compHaveChildArray: [],
@@ -221,7 +255,11 @@ export default {
         hardware: "",
         bspSelectString: "",
         applyUser: "",
-        processName: ""
+        processName: "",
+        sysTempId: "",
+        themeTempId: "",
+        networkTempId: "",
+        hsmTempId: "",
       },
       labelPosition: "right",
       dialogTableVisible: false,
@@ -306,6 +344,9 @@ export default {
     }
   },
   methods: {
+    showStructList(){
+        this.getTableData()
+    },
     selectAllComp() {
       let selectArray = [];
       this.setId(this.compTreeData, selectArray);
@@ -396,8 +437,16 @@ export default {
           // this.project.defaultSoftwareId = this.softwareSelectString;
           this.project.defaultBspId = this.formLabelAlign.bspSelectString;
           this.project.userId = this.userInfo.userId;
-          //给工作模式ID赋值
-
+          //模板ID赋值
+          var basetemplate = {
+            sysTempId:this.formLabelAlign.sysTempId,
+            themeTempId:this.formLabelAlign.themeTempId,
+            networkTempId:this.formLabelAlign.networkTempId,
+            hsmTempId:this.formLabelAlign.hsmTempId
+          }
+          //给模板id赋json串值
+          this.project.basetemplateIds = JSON.stringify(basetemplate);
+          console.log("this.project.basetemplateIds",this.project.basetemplateIds)
           saveProject(this.project)
             .then(Response => {
               this.project.id = Response.data.data.id;
@@ -485,6 +534,7 @@ export default {
     handleCancleComp() {
       this.dialogTableVisible = false;
       Object.assign(this.formLabelAlign, this.$options.data().formLabelAlign);
+      this.reload();
     },
     getList() {
       fetchAlgorithmTree(this.listQuery).then(Response => {
@@ -718,14 +768,14 @@ export default {
           this.$message.error("修改软件框架失败");
         }
       });
-    }
+    },
   },
   created() {
-    this.getCompSelectTree();
     this.getList();
     this.getCreateData();
     this.getLibsTree();
     this.getSoftwareSelectList();
+    // this.getBaseTemplateData();
   },
   mounted: function() {}
 };

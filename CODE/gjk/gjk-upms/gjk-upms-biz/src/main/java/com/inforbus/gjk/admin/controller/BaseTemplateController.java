@@ -35,6 +35,7 @@ import com.inforbus.gjk.admin.service.SysDictService;
 
 import lombok.AllArgsConstructor;
 
+import org.simpleframework.xml.core.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -228,5 +229,10 @@ public class BaseTemplateController {
 	@GetMapping("/getBaseTemplate")
 	public List<BaseTemplate> getBaseTemplate() {
 		return baseTemplateService.getBaseTemplate();
+	}
+
+	@GetMapping("/getBaseTemplates/{tempType}")
+	public R getBaseTemplates(@PathVariable String tempType) {
+		return new R<>(baseTemplateService.getBaseTemplateByTempType(tempType));
 	}
 }

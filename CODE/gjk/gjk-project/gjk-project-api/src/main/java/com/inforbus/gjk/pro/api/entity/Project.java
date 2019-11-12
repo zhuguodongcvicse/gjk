@@ -79,5 +79,9 @@ public class Project extends Model<Project> {
 	 */
 	@TableLogic
 	private String delFlag;
+	/*
+	* 基础模板id json串
+	* */
+	private String basetemplateIds;
 
 }

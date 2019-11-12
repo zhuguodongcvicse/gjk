@@ -81,7 +81,7 @@ export default {
   methods: {
     getModelXmlEntityMap() {
       //1:解析基础模板文件，获得cpu和cmp的节点
-      getSysConfigModelXml().then(Response => {
+      getSysConfigModelXml(this.$route.query.sysId).then(Response => {
         this.setCNENMapping(Response.data.data);
         this.xmlEntityMap = JSON.parse(JSON.stringify(Response.data.data));
         this.xmlEntityMap.xmlEntityMaps = [];

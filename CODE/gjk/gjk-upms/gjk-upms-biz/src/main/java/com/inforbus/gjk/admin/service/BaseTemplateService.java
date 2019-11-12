@@ -22,6 +22,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.inforbus.gjk.admin.api.dto.BaseTemplateDTO;
 import com.inforbus.gjk.admin.api.entity.BaseTemplate;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -33,6 +37,7 @@ import java.util.List;
  * @author wang
  * @date 2019-07-16 08:40:33
  */
+
 public interface BaseTemplateService extends IService<BaseTemplate> {
 
 	/**
@@ -80,5 +85,8 @@ public interface BaseTemplateService extends IService<BaseTemplate> {
 	boolean update(BaseTemplate baseTemplate);
 
 	List<BaseTemplate> getBaseTemplate();
+
+	List<BaseTemplate> getBaseTemplateByTempType(String tempType);
+
 
 }
