@@ -48,6 +48,7 @@ import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
+import com.inforbus.gjk.pro.api.dto.AppDataDTO;
 import com.inforbus.gjk.pro.api.dto.ProjectTree;
 import com.inforbus.gjk.pro.api.entity.App;
 import com.inforbus.gjk.pro.api.entity.Arrows;
@@ -333,8 +334,8 @@ public class ManagerController {
 	 * @param id
 	 * @return
 	 */
-	@GetMapping("/getFilePathListById/{id}")
-	public R getworkSpacePathById(@PathVariable("id") String id) {
+	@PostMapping("/getFilePathListById/{id}")
+	public R getworkSpacePathById(@PathVariable("id") String id,@RequestBody AppDataDTO appDataDTO) {
 		String local_REPO_PATH = null;
 		// id：软硬件映射配置的主键id
 		List<ProjectFile> lists = managerService.getFilePathListById(id);
@@ -409,7 +410,8 @@ public class ManagerController {
 		// 客户exe文件全路径
 		String exe = JGitUtil.getSoftToHard();// "D:\\14S_GJK_GIT\\gjk\\gjk\\exe\\exe.exe";
 		// 调用客户接口执行exe
-		String[] strArray = new String[] { exe, hardWareFilePath, mapConfigPath, sysParamFilePath };
+		//appDataDTO.getUserName():当前用户名
+		String[] strArray = new String[] { exe, hardWareFilePath, mapConfigPath, sysParamFilePath, appDataDTO.getUserName() };
 		try {
 			Process process = Runtime.getRuntime().exec(strArray);
 			InputStreamReader reader = new InputStreamReader(process.getInputStream());
