@@ -167,7 +167,9 @@ export default {
       flowId: "",
       //特殊处理多选构件数组
       specalHandleSelect: [],
-      isAble: true
+      isAble: true,
+      //调接口传的参数
+      appDataDTO: {},
     };
   },
 
@@ -313,7 +315,7 @@ export default {
 
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["compChineseMapping"]),
+    ...mapGetters(["compChineseMapping", "userInfo"]),
     copyForm() {
       return JSON.parse(JSON.stringify(this.form));
     }
@@ -426,8 +428,10 @@ export default {
     },
     //软硬件配置
     softwareClick() {
+      //用户名
+      this.appDataDTO.userName = this.userInfo.username;
       //调用接口
-      getFilePathListById(this.$route.query.proId).then(editor => {
+      getFilePathListById(this.$route.query.proId, this.appDataDTO).then(editor => {
         console.log("this.editor::::", editor.data.data);
       });
     },
