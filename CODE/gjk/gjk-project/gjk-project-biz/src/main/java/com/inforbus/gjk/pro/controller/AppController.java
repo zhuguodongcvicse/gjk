@@ -274,7 +274,7 @@ public class AppController {
 		try {
 			// 调用加载、更新加载接口
 			returnVal = ExternalIOTransUtils.appLoad(cmpNameToHwType, appDataDTO.getFlowId(), appDataDTO.getAppName(),
-					existDeployConfig, appDataDTO.getSysconfigPath(), gitFilePath + appDataDTO.getAppProPath());
+					existDeployConfig, gitFilePath + appDataDTO.getSysconfigPath(), gitFilePath + appDataDTO.getAppProPath());
 		} catch (Exception e) {
 			e.printStackTrace();
 			returnVal = false;
@@ -434,7 +434,7 @@ public class AppController {
 		String selfGenerateCodeResult = gitFilePath + aa + File.separator +  softToHardResult + File.separator + "组件划分方案.xml";
 		String appPath = gitFilePath + aa + File.separator + appDataDTO.getAppProPath();
 		// 还未给接口，自己模拟的接口  + File.separator +
-		ExternalIOTransUtils.appTaskExport(appDataDTO.getFlowId(), appDataDTO.getAppName(), appPath, appDataDTO.getSysconfigPath(), selfSoftToHardResult, selfGenerateCodeResult);
+		ExternalIOTransUtils.appTaskExport(appDataDTO.getFlowId(), appDataDTO.getAppName(), appPath, gitFilePath + appDataDTO.getSysconfigPath(), selfSoftToHardResult, selfGenerateCodeResult);
 	}
 
 	/**
