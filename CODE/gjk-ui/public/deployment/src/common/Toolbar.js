@@ -386,11 +386,11 @@
                 }
             } */
         }
-        if (customButtons) {
+      /*   if (customButtons) {
             for (var n in customButtons) {
                 buttons[n] = customButtons[n];
             }
-        }
+        } */
         function createButtons(buttons, toolbar, scope, vertical, togglable) {
             for (var n in buttons) {
                 var info = buttons[n];
