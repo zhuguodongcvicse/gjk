@@ -107,3 +107,10 @@ export function getPassCompByProId(approvalId) {
     method: 'get'
   })
 }
+
+export function removeCompApproval(compId,projectId){
+  return request({
+    url:'/libs/approval/removeCompApproval/' + compId+'/'+projectId,
+    method:'get'
+  })
+}

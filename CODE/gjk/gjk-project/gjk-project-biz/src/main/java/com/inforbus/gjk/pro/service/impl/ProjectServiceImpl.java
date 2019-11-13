@@ -290,4 +290,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 		return infoDTO;
 	}
 
+	@Override
+	public void removeCompProject(String compId, String projectId) {
+		baseMapper.removeCompProject(compId,projectId);
+		
+	}
+
 }

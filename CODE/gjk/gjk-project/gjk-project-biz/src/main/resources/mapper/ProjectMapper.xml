@@ -280,5 +280,12 @@
 		<include refid="hardwarelibs" />
 		FROM gjk_hardwarelibs
 	</select>
+	
+	<update id="removeCompProject">
+		UPDATE gjk_project_comp SET can_use = '1'
+		where comp_id = #{compId}
+		AND
+		project_id = #{projectId}
+	</update>
 
 </mapper>

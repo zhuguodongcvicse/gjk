@@ -254,3 +254,10 @@ export function uploadFiles(obj) {
     data: obj,
   })
 }
+
+export function removeCompProject(compId,projectId){
+  return request({
+    url:'/pro/project/removeCompProject/' + compId+'/'+projectId,
+    method:'get'
+  })
+}

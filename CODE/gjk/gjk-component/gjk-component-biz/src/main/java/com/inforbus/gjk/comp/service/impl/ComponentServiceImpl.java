@@ -345,28 +345,31 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		// 版本集合
 		List<Double> versions = new ArrayList<Double>();
 		// 获取所有编号的构件集合
-		List<Component> compList = baseMapper.checkComp(compIdList);
-		for (Map.Entry<String, String> entry : compIdMap.entrySet()) {
-			for (Component comp : compList) {
-				if (entry.getValue().equals(comp.getCompId())) {
-					versions.add(Double.parseDouble(comp.getVersion()));
+		if(compIdList.size()>0) {
+			List<Component> compList = baseMapper.checkComp(compIdList);
+			for (Map.Entry<String, String> entry : compIdMap.entrySet()) {
+				for (Component comp : compList) {
+					if (entry.getValue().equals(comp.getCompId())) {
+						versions.add(Double.parseDouble(comp.getVersion()));
+					}
 				}
+				Collections.sort(versions);
+				versions.get(versions.size() - 1);
+				// strJson +=
+				// compNameMap.get(entry.getKey())+"：当前版本"+versionMap.get(entry.getKey())+";
+				// 最高版本为"+versions.get(versions.size()-1)+"\n";
+//		    	Double version = Double.valueOf(versionMap.get(entry.getKey()));
+//		    	Double versionTmp = Double.valueOf(versions.get(versions.size()-1));
+				if ((Double.valueOf(versionMap.get(entry.getKey()))) < (Double
+						.valueOf(versions.get(versions.size() - 1)))) {
+					compUpdate.put(entry.getKey(), "0");// 已更新
+				} else {
+					compUpdate.put(entry.getKey(), "1");// 未更新
+				}
+				versions.clear();
 			}
-			Collections.sort(versions);
-			versions.get(versions.size() - 1);
-			// strJson +=
-			// compNameMap.get(entry.getKey())+"：当前版本"+versionMap.get(entry.getKey())+";
-			// 最高版本为"+versions.get(versions.size()-1)+"\n";
-//	    	Double version = Double.valueOf(versionMap.get(entry.getKey()));
-//	    	Double versionTmp = Double.valueOf(versions.get(versions.size()-1));
-			if ((Double.valueOf(versionMap.get(entry.getKey()))) < (Double
-					.valueOf(versions.get(versions.size() - 1)))) {
-				compUpdate.put(entry.getKey(), "0");// 已更新
-			} else {
-				compUpdate.put(entry.getKey(), "1");// 未更新
-			}
-			versions.clear();
 		}
+		
 
 		maps.put("dtos", dtos);
 		maps.put("xmls", xmlMap);
