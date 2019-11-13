@@ -119,4 +119,8 @@ public interface ApprovalMapper extends BaseMapper<Approval> {
 	 */
 	List<ApprovalApply> getPassCompByProId(@Param("proId") String proId);
 
+	void removeCompApproval(@Param("idList") List<String> idList, @Param("compId") String compId);
+
+	List<Approval> getByApplyId(@Param("projectId") String projectId);
+
 }

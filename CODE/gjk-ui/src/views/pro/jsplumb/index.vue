@@ -111,11 +111,13 @@ import {
   editProJSON,
   findProJSON,
   exportFile,
-  importFile
+  importFile,
+  removeCompProject
 } from "@/api/pro/project";
 import { handlerSaveSysXml } from "@/api/pro/manager";
 import { remote } from "@/api/admin/dict";
 import { randomLenNum, randomUuid, deepClone, getObjType } from "@/util/util";
+import {removeCompApproval} from "@/api/libs/approval";
 // import screenfull from 'screenfull'
 //例如：import 《组件名称》 from '《组件路径》';
 export default {
@@ -530,8 +532,9 @@ export default {
         if (this.index == 1) {
           findProJSON(this.$route.query.processId).then(res => {
             //循环流程中的构件及"arrow"
-           // console.log("加载后的数据", res.data.data.xmlJson.xmlEntityMaps);
-            res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
+           console.log("加载后的数据", res.data.data);
+           if(res.data.data != null){
+              res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
               if (tmp.lableName !== "arrow") {
                 /* 将查询的东西插入到临时 */
                 // this.tempParam.push(tmp);
@@ -539,10 +542,11 @@ export default {
                 this.tmpMaps.set(tmp.attributeMap.id, tmp);
               }
             });
+             this.postMessageData.cmd = "clickCompLoading";
+             this.postMessageData.params = res.data.data.json;
+             this.$refs.gjkIframe.sendMessage(this.postMessageData);
+           }
            // console.log("map数据", this.tmpMaps);
-            this.postMessageData.cmd = "clickCompLoading";
-            this.postMessageData.params = res.data.data.json;
-            this.$refs.gjkIframe.sendMessage(this.postMessageData);
           });
         }
       }
@@ -567,6 +571,15 @@ export default {
             this.saveParams = data.params;
           }
           break;
+          case "removeComp":
+            let compId = data.params
+            let projectId = this.$route.query.proId
+            removeCompApproval(compId,projectId).then(res =>{
+              removeCompProject(compId,projectId)
+            }
+              
+            )
+
       }
     },
     //保存流程模型
