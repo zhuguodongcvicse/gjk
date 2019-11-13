@@ -23,7 +23,12 @@
             v-if="permissions.libs_bsp_add"
           >新 增</el-button>
 
-          <el-dialog class="libs_bsp_dialog_14s libs_bsp_index_dialog_14s" title="新增" width="40%" :visible.sync="dialogTableVisible">
+          <el-dialog
+            class="libs_bsp_dialog_14s libs_bsp_index_dialog_14s"
+            title="新增"
+            width="40%"
+            :visible.sync="dialogTableVisible"
+          >
             <el-form :label-position="labelPosition" :model="formLabelAlign">
               <el-form-item>
                 <!-- <el-input v-model="frameFilePath" placeholder="BSP文件夹" ></el-input> -->
@@ -33,28 +38,28 @@
                   ref="uploader"
                   :autoStart="false"
                 >
-                <el-form-item label="文件选择: " label-width="90px">
-                  <uploader-unsupport></uploader-unsupport>
-                  <div>
-                    <!-- <uploader-btn>
+                  <el-form-item label="文件选择: " label-width="90px">
+                    <uploader-unsupport></uploader-unsupport>
+                    <div>
+                      <!-- <uploader-btn>
                       <template slot-scope="scope">
                         <el-tag type="info" size="mini">选择文件</el-tag>
                       </template>
-                    </uploader-btn>-->
-                  </div>
-                  <div>
-                    <uploader-btn :directory="true">
-                      <template slot-scope="scope">
-                        <el-tag type="info" size="mini">选择文件夹</el-tag>
-                      </template>
-                    </uploader-btn>
-                  </div>
-                </el-form-item>
-                <el-form-item>
-                  <uploader-files>
-                    <template slot-scope="filess">
-                      <div class="bsp_tab_14s">
-                        <el-table :data="filess.files">
+                      </uploader-btn>-->
+                    </div>
+                    <div>
+                      <uploader-btn :directory="true">
+                        <template slot-scope="scope">
+                          <el-tag type="info" size="mini">选择文件夹</el-tag>
+                        </template>
+                      </uploader-btn>
+                    </div>
+                  </el-form-item>
+                  <el-form-item>
+                    <uploader-files>
+                      <template slot-scope="filess">
+                        <div class="bsp_tab_14s">
+                          <el-table :data="filess.files">
                             <el-table-column label="名称">
                               <template slot-scope="scope">{{ scope.row.name }}</template>
                             </el-table-column>
@@ -79,63 +84,62 @@
                                 >移除</el-button>
                               </template>
                             </el-table-column>
-                        </el-table>
+                          </el-table>
 
-                        <div class="control-container bsp_tab_btn_14s text_align_center_14s">
+                          <div class="control-container bsp_tab_btn_14s text_align_center_14s">
+                            <el-button
+                              size="small"
+                              type="danger"
+                              plain
+                              @click="removeAll(filess.files)"
+                            >全部取消</el-button>
+                          </div>
+
+                          <el-form-item label="平台选择: " label-width="90px">
+                            <el-select
+                              v-model="values"
+                              multiple
+                              filterable
+                              allow-create
+                              default-first-option
+                              placeholder="请选择平台"
+                            >
+                              <el-option
+                                v-for="item in options"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value"
+                              >
+                                <span class="fl_14s">{{ item.label }}</span>
+                              </el-option>
+                            </el-select>
+
+                            <el-tree
+                              class="filter-tree"
+                              hidden
+                              node-key="id"
+                              highlight-current
+                              :data="treeData"
+                              :props="defaultProps"
+                            ></el-tree>
+                          </el-form-item>
+
+                          <el-form-item label="描述: " label-width="90px">
+                            <!-- <el-input v-model="version" placeholder="请添加描述"></el-input> -->
+                            <textarea v-model="description" rows="2" cols="70" placeholder="请添加描述"></textarea>
+                          </el-form-item>
+                        </div>
+                        <div class="control-container bsp_footer_btn_14s text_align_right_14s">
                           <el-button
                             size="small"
-                            type="danger"
-                            plain
-                            @click="removeAll(filess.files)"
-                          >全部取消</el-button>
+                            type="primary"
+                            @click="resumes(filess.files)"
+                            :disabled="isAble"
+                          >全部上传</el-button>
+                          <el-button type @click="handleCancleBSP">取消</el-button>
                         </div>
-
-                        <el-form-item label="平台选择: " label-width="90px">
-                          <el-select
-                            v-model="values"
-                            multiple
-                            filterable
-                            allow-create
-                            default-first-option
-                            placeholder="请选择平台"
-                          >
-                            <el-option
-                              v-for="item in options"
-                              :key="item.value"
-                              :label="item.label"
-                              :value="item.value"
-                            >
-                              <span class="fl_14s">{{ item.label }}</span>
-                            </el-option>
-                          </el-select>
-
-                          <el-tree
-                            class="filter-tree"
-                            hidden
-                            node-key="id"
-                            highlight-current
-                            :data="treeData"
-                            :props="defaultProps"
-                          ></el-tree>
-                        </el-form-item>
-
-                        <el-form-item label="描述: " label-width="90px">
-                          <!-- <el-input v-model="version" placeholder="请添加描述"></el-input> -->
-                          <textarea v-model="description" rows="2" cols="70" placeholder="请添加描述"></textarea>
-                        </el-form-item>
-
-                      </div>
-                      <div class="control-container bsp_footer_btn_14s text_align_right_14s">
-                        <el-button
-                          size="small"
-                          type="primary"
-                          @click="resumes(filess.files)"
-                          :disabled="isAble"
-                        >全部上传</el-button>
-                        <el-button type @click="handleCancleBSP">取消</el-button>
-                      </div>
-                    </template>
-                  </uploader-files>
+                      </template>
+                    </uploader-files>
                   </el-form-item>
                 </uploader>
               </el-form-item>
@@ -324,97 +328,108 @@ export default {
     //上传
     resumes(files) {
       // console.log("files:", files);
-      this.softwareName1 = files[0].relativePath.split("/")[0];
-      let formData = new FormData();
-      this.filePathList = [];
-      files.forEach((e, index) => {
-        //每个文件的路径
-        // console.log("eeeeee::", e.relativePath);
-        //截取文件夹的第一个"/"前的内容，作为文件夹的名字
-        this.folderName = e.relativePath.split("/")[0];
-        let fileEntity = {};
-        fileEntity.fileName = e.relativePath;
-        this.filePathList.push(fileEntity);
-        console.log("this.filePathList:", this.filePathList);
-        formData.append("file", e.file);
-      });
-
-      //平台的选择的id
-      this.platfoemId = "";
-      let softId = "";
-      //设置版本号
-      setVersionSize()
-        .then(response => {
-          if (response.data.data == null) {
-            this.versionSize = 1.0;
-          } else {
-            this.versionSize = response.data.data.version + 1.0;
-          }
-        })
-        .then(() => {
-          this.software.filePath =
-            "gjk/bsp/" +
-            parseFloat(this.versionSize).toFixed(1) +
-            "/" +
-            this.folderName +
-            "/";
-          //保持软件框架库信息
-          this.software.version = this.versionSize;
-          this.software.description = this.description;
-          //软件框架库名
-          this.software.bspName =
-            "BSP" + "_" + parseFloat(this.versionSize).toFixed(1);
-
-          //保存软件框架库信息
-          saveBSP(this.software).then(response => {
-            softId = response.data.data.id;
-            this.software.id = response.data.data.id;
-            for (let items of this.options) {
-              for (let item of this.values) {
-                if (items.value === item) {
-                  let tmpSoft = JSON.parse(JSON.stringify(this.softwareDetail));
-                  //对象深拷贝，对象存值
-                  // tmpSoft = JSON.parse(JSON.stringify(this.softwareDetail));
-                  let platId = "";
-                  platId = items.id;
-                  tmpSoft.bspId = softId;
-                  //平台id
-                  tmpSoft.platformId = platId;
-                  //保持软件构件库详细信息
-                  saveBSPDetail(tmpSoft).then(response => {});
+      if (files.length == 0) {
+        alert("请选择一个不为空的文件夹！！！");
+      } else {
+        const loading = this.$loading({
+          lock: true,
+          text: "上传文件中。。。",
+          spinner: "el-icon-loading",
+          background: "rgba(0, 0, 0, 0.7)"
+        });
+        this.softwareName1 = files[0].relativePath.split("/")[0];
+        let formData = new FormData();
+        this.filePathList = [];
+        files.forEach((e, index) => {
+          //每个文件的路径
+          //截取文件夹的第一个"/"前的内容，作为文件夹的名字
+          this.folderName = e.relativePath.split("/")[0];
+          let fileEntity = {};
+          fileEntity.fileName = e.relativePath;
+          this.filePathList.push(fileEntity);
+          formData.append("file", e.file);
+        });
+        //平台的选择的id
+        this.platfoemId = "";
+        let softId = "";
+        //设置版本号
+        setVersionSize()
+          .then(response => {
+            if (response.data.data == null) {
+              this.versionSize = 1.0;
+            } else {
+              this.versionSize = response.data.data.version + 1.0;
+            }
+          })
+          .then(() => {
+            this.software.filePath =
+              "gjk/bsp/" +
+              parseFloat(this.versionSize).toFixed(1) +
+              "/" +
+              this.folderName +
+              "/";
+            //保持软件框架库信息
+            this.software.version = this.versionSize;
+            this.software.description = this.description;
+            //软件框架库名
+            this.software.bspName =
+              "BSP" + "_" + parseFloat(this.versionSize).toFixed(1);
+            //保存软件框架库信息
+            saveBSP(this.software).then(response => {
+              softId = response.data.data.id;
+              this.software.id = response.data.data.id;
+              for (let items of this.options) {
+                for (let item of this.values) {
+                  if (items.value === item) {
+                    let tmpSoft = JSON.parse(
+                      JSON.stringify(this.softwareDetail)
+                    );
+                    //对象深拷贝，对象存值
+                    // tmpSoft = JSON.parse(JSON.stringify(this.softwareDetail));
+                    let platId = "";
+                    platId = items.id;
+                    tmpSoft.bspId = softId;
+                    //平台id
+                    tmpSoft.platformId = platId;
+                    //保持软件构件库详细信息
+                    saveBSPDetail(tmpSoft).then(response => {});
+                  }
                 }
               }
-            }
-            this.filePathList.forEach((e, index) => {
-              let tmpSoftFile = JSON.parse(JSON.stringify(this.softwareFile));
-              tmpSoftFile.fileName = e.fileName;
-              tmpSoftFile.bspId = softId;
-              tmpSoftFile.filePath =
-                "gjk/bsp/" +
-                parseFloat(this.versionSize).toFixed(1) +
-                "/" +
-                e.fileName;
-              saveBSPFile(tmpSoftFile).then(response => {});
+              this.filePathList.forEach((e, index) => {
+                let tmpSoftFile = JSON.parse(JSON.stringify(this.softwareFile));
+                tmpSoftFile.fileName = e.fileName;
+                tmpSoftFile.bspId = softId;
+                tmpSoftFile.filePath =
+                  "gjk/bsp/" +
+                  parseFloat(this.versionSize).toFixed(1) +
+                  "/" +
+                  e.fileName;
+                saveBSPFile(tmpSoftFile).then(response => {});
+              });
             });
+          })
+          .then(() => {
+            uploadFiles(formData, Object.assign(this.software.version)).then(
+              response => {
+                let resData = response.data.split(",");
+                setTimeout(() => {
+                  loading.close();
+                  alert(resData[1]);
+                // console.log("response:", resData[1]);
+                // console.log("response:", response);
+                //保存到数据库中的文件路径
+                this.softFilePath = resData[0];
+                //显示在页面上的文件路径
+                this.frameFilePath = resData[0] + this.folderName + "/";
+                this.dialogTableVisible = false;
+                 }, 500);
+                this.reload();
+              }
+            );
+            this.isAble = true;
           });
-        })
-        .then(() => {
-          uploadFiles(formData, Object.assign(this.software.version)).then(
-            response => {
-              let resData = response.data.split(",");
-              alert(resData[1]);
-              // console.log("response:", response);
-              //保存到数据库中的文件路径
-              this.softFilePath = resData[0];
-              //显示在页面上的文件路径
-              this.frameFilePath = resData[0] + this.folderName + "/";
-
-              this.dialogTableVisible = false;
-              this.reload();
-            }
-          );
-          this.isAble = true;
-        });
+      }
     },
 
     getPlatformSelectTree() {
@@ -439,7 +454,7 @@ export default {
       this.tableLoading = true;
       fetchList(this.listQuery).then(response => {
         this.tableData = response.data.data.records;
-        this.page.total = (response.data.data.records).length;
+        this.page.total = response.data.data.records.length;
         this.tableLoading = false;
       });
     },
