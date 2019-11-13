@@ -267,8 +267,9 @@ export default {
                   cmpItem.attributeMap.id = element[2];
                   this.selectXmlMapByLableNameOrLableType(
                     cmpItem,
-                    "CMM_Compute",
-                    null
+                    null,
+                    "dataKey",
+                    "API Return"
                   );
                   for (let returnXmlAttr of parseStrToObj(
                     this.returnXmlEntityMap.attributeMap.configureType
@@ -283,18 +284,34 @@ export default {
                       ] = element[4];
                     }
                   }
-                  for (let index in element) {
-                    let item = element[index];
-                    if (index > 4 && item.msg != undefined) {
-                      this.selectXmlMapByLableNameOrLableType(
-                        cmpItem,
-                        item.msg,
-                        null
+                  if (
+                    cmpItem.xmlEntityMaps != null &&
+                    cmpItem.xmlEntityMaps.length > 0
+                  ) {
+                    for (let cmpXmlMap of cmpItem.xmlEntityMaps) {
+                      let attrConfig = parseStrToObj(
+                        cmpXmlMap.attributeMap.configureType
                       );
-                      this.setXmlentityMapsByApiReturn(
-                        item,
-                        this.returnXmlEntityMap
-                      );
+                      if (
+                        attrConfig.lableType == "networkTable" ||
+                        attrConfig.lableType == "treeTable"
+                      ) {
+                        let flag = false;
+                        for (let index in element) {
+                          let item = element[index];
+                          // console.log(
+                          //   "1111111111111111111111",
+                          //   JSON.parse(JSON.stringify(item))
+                          // );
+                          if (index > 4 && item.msg == cmpXmlMap.lableName) {
+                            flag = true;
+                            this.setXmlentityMapsByApiReturn(item, cmpXmlMap);
+                          }
+                        }
+                        if (!flag) {
+                          cmpXmlMap.xmlEntityMaps = [];
+                        }
+                      }
                     }
                   }
                 }
@@ -309,7 +326,7 @@ export default {
 
     setXmlentityMapsByApiReturn(item, xmlentityMap) {
       let xmlEntityMaps = xmlentityMap.xmlEntityMaps;
-      if ((item.data.length = xmlEntityMaps.length)) {
+      if (item.data.length == xmlEntityMaps.length) {
         this.setAttrByApiReturn(item, xmlEntityMaps);
       } else {
         if (xmlEntityMaps.length > 0) {
@@ -331,11 +348,16 @@ export default {
         }
       }
     },
-    selectXmlMapByLableNameOrLableType(xmlEntityMap, lableName, lableType) {
+    selectXmlMapByLableNameOrLableType(
+      xmlEntityMap,
+      lableName,
+      attrKey,
+      attrValue
+    ) {
       this.returnXmlEntityMap = {};
-      this.selectXmlEntity(xmlEntityMap, lableName, lableType);
+      this.selectXmlEntity(xmlEntityMap, lableName, attrKey, attrValue);
     },
-    selectXmlEntity(xmlEntityMap, lableName, lableType) {
+    selectXmlEntity(xmlEntityMap, lableName, attrKey, attrValue) {
       if (lableName != null) {
         if (xmlEntityMap.lableName == lableName) {
           this.returnXmlEntityMap = xmlEntityMap;
@@ -344,19 +366,28 @@ export default {
           xmlEntityMap.xmlEntityMaps.length > 0
         ) {
           for (let childXmlMap of xmlEntityMap.xmlEntityMaps) {
-            this.selectXmlEntity(childXmlMap, lableName, lableType);
+            this.selectXmlEntity(childXmlMap, lableName, attrKey, attrValue);
           }
         }
-      } else if (lableType != null) {
-        let attr = parseStrToObj(xmlEntityMap.attributeMap.configureType);
-        if (attr.lableType == lableType) {
-          this.returnXmlEntityMap = xmlEntityMap;
-        } else if (
+      } else if (attrKey != null) {
+        let attr = parseStrToObj(xmlEntityMap.attributeMap.configureType).attrs;
+        let flag = false;
+        for (let attrItem of attr) {
+          if (
+            attrItem[attrKey] != undefined &&
+            attrItem[attrKey] == attrValue
+          ) {
+            flag = true;
+            this.returnXmlEntityMap = xmlEntityMap;
+          }
+        }
+        if (
+          !flag &&
           xmlEntityMap.xmlEntityMaps != null &&
-          xmlEntityMap.length > 0
+          xmlEntityMap.xmlEntityMaps.length > 0
         ) {
           for (let childXmlMap of xmlEntityMap.xmlEntityMaps) {
-            this.selectXmlEntity(childXmlMap, lableName, lableType);
+            this.selectXmlEntity(childXmlMap, lableName, attrKey, attrValue);
           }
         }
       }

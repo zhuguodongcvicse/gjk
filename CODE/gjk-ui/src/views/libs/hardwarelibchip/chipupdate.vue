@@ -66,6 +66,7 @@ export default {
   },
   data() {
     return {
+      refreshListFlag: 1,
       ifSave: 1,
       formObj: "",
       params: "",
@@ -131,6 +132,8 @@ export default {
               message: "修改成功",
               type: "success"
             });
+            this.refreshListFlag = Math.random()
+            this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
           });
           var tag1 = this.tag;
           menuTag(this.$route.path, "remove", this.tagList, tag1);

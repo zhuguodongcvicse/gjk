@@ -108,4 +108,6 @@ public interface ApprovalService extends IService<Approval> {
 	 */
 	List<ApprovalApply> getApprovalApplyIdByList(List<ApprovalApply> approvalApplies);
 
+	void removeCompApproval(String compId, String projectId);
+
 }

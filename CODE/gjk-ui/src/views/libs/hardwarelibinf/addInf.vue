@@ -78,7 +78,7 @@ export default {
           { required: true, message: "请选择接口类型", trigger: "change" }
         ],
         opticalNum: [
-          { required: true, message: "不能为空", trigger: "blur" },
+          { required: true, message: "光纤数量不能为空", trigger: "blur" },
           {
             pattern: /^[0-9]*[1-9][0-9]*$/,
             message: "请输入整数",

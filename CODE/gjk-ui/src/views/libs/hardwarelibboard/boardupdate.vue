@@ -27,7 +27,7 @@
 
 <script>
 import { getChipData,  saveBoard, updateBoard } from "@/api/libs/hardwarelibboard";
-import { getInfData, willGetChipData, saveChip } from "@/api/libs/hardwarelibchip"; 
+import { getInfData, willGetChipData, saveChip } from "@/api/libs/hardwarelibchip";
 import { mapGetters } from "vuex";
 import NProgress from "nprogress"; // progress bar
 import "nprogress/nprogress.css"; // progress bar style
@@ -51,6 +51,7 @@ export default {
   },
   data() {
     return {
+      refreshListFlag: 1,
       ifSave: 1,
       params: '',
       jsonObj: [],
@@ -106,12 +107,9 @@ export default {
               showClose: true,
               message: "更新成功",
               type: "success"
-            }).catch(response => {
-              this.$message({
-                type: "error",
-                message: "更新失败"
-              });
-            });
+            })
+            this.refreshListFlag = Math.random()
+            this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
           })
           var tag1 = this.tag;
           menuTag(this.$route.path, "remove", this.tagList, tag1);

@@ -53,6 +53,7 @@ export default {
   },
   data() {
     return {
+      refreshListFlag: 1,
       formObj: '',
       params: '',
       /* 用于iframe参数 */
@@ -109,18 +110,15 @@ export default {
           // console.log("this.params[1]",this.params[1])
           this.ifSave = 0;
           saveCase(this.params[1]).then(response => {
-            return this.$message({
+            this.$message({
               type: "success",
               message: "修改成功!"
-            }).catch(response => {
-              this.$message({ 
-                type: "error",
-                message: "修改失败"
-              });
-            });
+            })
+            this.refreshListFlag = Math.random()
+            this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
           });
-            var tag1 = this.tag;
-            menuTag(this.$route.path, "remove", this.tagList, tag1);
+          var tag1 = this.tag;
+          menuTag(this.$route.path, "remove", this.tagList, tag1);
           break;
       }
     },

@@ -66,10 +66,10 @@ export const tableOption = {
       label: '',
       prop: 'projectImg'
     }, */
-	  {
+	  /*{
       label: '版本',
       prop: 'version'
-    },
+    },*/
 	  /* {
       label: '逻辑删除',
       prop: 'delFlag'

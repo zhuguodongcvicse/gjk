@@ -141,7 +141,11 @@ public class ApprovalController {
 	public R saveApproval(@RequestBody Approval approval) {
 		return new R<>(approvalService.saveApproval(approval));
 	}
-
+	@GetMapping
+	@RequestMapping("/removeCompApproval/{compId}/{projectId}")
+	public void removeCompApproval(@PathVariable String compId,@PathVariable String projectId) {
+		approvalService.removeCompApproval(compId,projectId);
+	}
 	/**
 	 * @Title: getIdByApplyId
 	 * @Description: 获取申请构件的申请记录ID

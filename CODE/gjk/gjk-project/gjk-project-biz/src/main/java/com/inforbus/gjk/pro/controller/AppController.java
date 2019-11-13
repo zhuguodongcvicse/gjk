@@ -238,7 +238,7 @@ public class AppController {
 		boolean returnVal ;
 		try {
 			// 调用注册接口
-			returnVal = ExternalIOTransUtils.appInstall(cmpNameToHwType, appDataDTO.getFlowId(), appDataDTO.getAppName(),
+			returnVal = ExternalIOTransUtils.appInstall(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(), appDataDTO.getAppName(),
 					selfSoftToHardResult, selfGenerateCodeResult, gitFilePath + appDataDTO.getAppProPath());
 		} catch (Exception e) {
 			returnVal = false;
@@ -273,8 +273,8 @@ public class AppController {
 		}
 		try {
 			// 调用加载、更新加载接口
-			returnVal = ExternalIOTransUtils.appLoad(cmpNameToHwType, appDataDTO.getFlowId(), appDataDTO.getAppName(),
-					existDeployConfig, appDataDTO.getSysconfigPath(), gitFilePath + appDataDTO.getAppProPath());
+			returnVal = ExternalIOTransUtils.appLoad(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(), appDataDTO.getAppName(),
+					existDeployConfig, gitFilePath + appDataDTO.getSysconfigPath(), gitFilePath + appDataDTO.getAppProPath());
 		} catch (Exception e) {
 			e.printStackTrace();
 			returnVal = false;
@@ -298,7 +298,7 @@ public class AppController {
 		boolean returnVal;
 		try {
 			// 调用卸载接口
-			returnVal = ExternalIOTransUtils.appUnload(cmpNameToHwType, appDataDTO.getFlowId(), appDataDTO.getAppName());
+			returnVal = ExternalIOTransUtils.appUnload(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(), appDataDTO.getAppName());
 		} catch (Exception e) {
 			e.printStackTrace();
 			returnVal = false;
@@ -322,7 +322,7 @@ public class AppController {
 		boolean returnVal;
 		try {
 			// 调用启动接口
-			returnVal = ExternalIOTransUtils.appRestart(cmpNameToHwType, appDataDTO.getFlowId(),
+			returnVal = ExternalIOTransUtils.appRestart(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(),
 					appDataDTO.getAppName());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -347,7 +347,7 @@ public class AppController {
 		boolean returnVal;
 		try {
 			// 调用停止接口
-			returnVal = ExternalIOTransUtils.appStop(cmpNameToHwType, appDataDTO.getFlowId(), appDataDTO.getAppName());
+			returnVal = ExternalIOTransUtils.appStop(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(), appDataDTO.getAppName());
 		} catch (Exception e) {
 			e.printStackTrace();
 			returnVal = false;
@@ -371,7 +371,7 @@ public class AppController {
 		boolean returnVal;
 		try {
 			// 调用暂停接口
-			returnVal = ExternalIOTransUtils.appPause(cmpNameToHwType, appDataDTO.getFlowId(), appDataDTO.getAppName());
+			returnVal = ExternalIOTransUtils.appPause(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(), appDataDTO.getAppName());
 		} catch (Exception e) {
 			e.printStackTrace();
 			returnVal = false;
@@ -402,7 +402,7 @@ public class AppController {
 		boolean returnVal ;
 		try {
 			// 调用注销接口
-			returnVal = ExternalIOTransUtils.appUnInstall(cmpNameToHwType, appDataDTO.getFlowId(),
+			returnVal = ExternalIOTransUtils.appUnInstall(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(),
 					appDataDTO.getAppName(), selfSoftToHardResult);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -434,7 +434,7 @@ public class AppController {
 		String selfGenerateCodeResult = gitFilePath + aa + File.separator +  softToHardResult + File.separator + "组件划分方案.xml";
 		String appPath = gitFilePath + aa + File.separator + appDataDTO.getAppProPath();
 		// 还未给接口，自己模拟的接口  + File.separator +
-		ExternalIOTransUtils.appTaskExport(appDataDTO.getFlowId(), appDataDTO.getAppName(), appPath, appDataDTO.getSysconfigPath(), selfSoftToHardResult, selfGenerateCodeResult);
+		ExternalIOTransUtils.appTaskExport(appDataDTO.getUserName(), appDataDTO.getFlowId(), appDataDTO.getAppName(), appPath, gitFilePath + appDataDTO.getSysconfigPath(), selfSoftToHardResult, selfGenerateCodeResult);
 	}
 
 	/**
