@@ -307,11 +307,10 @@ export default {
     },
     // 双击赋值
     handleRowClick(row, event) {
-        console.log("row",row)
       let val = this.tmpLengthVal;
       let strcutObj;
       let strName = "";
-      const dbId = JSON.parse(JSON.stringify(this.structform.variable));
+      let dbId = JSON.parse(JSON.stringify(this.structform.variable));
       let variableSel = JSON.parse(JSON.stringify(this.variableSel));
       let indexNumOfDbId = dbId.indexOf('v')
       // console.log("indexNumOfParam",indexNumOfParam)
@@ -336,6 +335,7 @@ export default {
               });
           });
       }
+      dbId = strcutObj.dbId
       if (strcutObj) {
         let headerFile = this.headerFile;
         if (headerFile && headerFile.structParams) {
