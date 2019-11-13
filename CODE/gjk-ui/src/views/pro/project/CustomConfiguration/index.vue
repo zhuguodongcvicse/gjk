@@ -175,7 +175,7 @@ export default {
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["subMapCustomConfig", "pubMapCustomConfig", "themeData","netWorkIn","netWorkOut","partList"])
+    ...mapGetters(["subMapCustomConfig", "pubMapCustomConfig", "themeData","xmlDataMap","netWorkIn","netWorkOut","partList"])
   },
   //方法集合
   methods: {
@@ -453,30 +453,30 @@ export default {
       //      this.netWorkxmlEntityMaps.xmlEntityMaps.push(JSON.parse(JSON.stringify(this.funcConfigEntityMaps))) 
       //  }
       //  this.netWorkXML.xmlEntityMaps.push(JSON.parse(JSON.stringify(this.netWorkxmlEntityMaps)))
-      console.log("网络配置数据",this.netWorkIn)
-      this.netWorkXML.xmlEntityMaps = []
-      if(this.netWorkIn.size > 0){
-        this.netWorkXML.xmlEntityMaps.push(JSON.parse(JSON.stringify(this.createNetWorkXml(this.netWorkIn))))
-      }
-       if(this.netWorkOut.size > 0){
-          this.netWorkXML.xmlEntityMaps.push(JSON.parse(JSON.stringify(this.createNetWorkXml(this.netWorkOut))))
-       }
-       console.log("网络配置xml数据",this.netWorkXML)
+      // console.log("网络配置数据",this.netWorkIn)
+      // this.netWorkXML.xmlEntityMaps = []
+      // if(this.netWorkIn.size > 0){
+      //   this.netWorkXML.xmlEntityMaps.push(JSON.parse(JSON.stringify(this.createNetWorkXml(this.netWorkIn))))
+      // }
+      //  if(this.netWorkOut.size > 0){
+      //     this.netWorkXML.xmlEntityMaps.push(JSON.parse(JSON.stringify(this.createNetWorkXml(this.netWorkOut))))
+      //  }
+      //  console.log("网络配置xml数据",this.netWorkXML)
       //createNetWorkXml(this.netWorkIn)
-      createNetWorkXML(this.netWorkXML,this.$route.query.sysId,this.netWorkName).then(response => {
-              if (response.data.data) {
-              this.$notify({
-                title: "成功",
-                message: "保存成功",
-                type: "success"
-              });
-            } else {
-              this.$notify.error({
-                title: "错误",
-                message: "保存失败"
-              });
-            }
+      createNetWorkXML(this.xmlDataMap[this.$route.query.sysId].netWorkData,this.$route.query.sysId,this.netWorkName).then(response => {
+        if (response.data.data) {
+          this.$notify({
+            title: "成功",
+            message: "保存成功",
+            type: "success"
           });
+        } else {
+          this.$notify.error({
+            title: "错误",
+            message: "保存失败"
+          });
+        }
+      });
     }
 
   },

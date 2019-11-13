@@ -149,10 +149,11 @@ const CustomConfiguration = {
           state.themeData = params.themeData
           state.netWorkData = params.netWorkData
           state.partList = params.partList
-         // state.xmlDataMap.set(id,params)
-          var xmlDataObj = {}
-          xmlDataObj[id] = params
-          state.xmlDataMap.push(xmlDataObj)
+          // state.xmlDataMap.set(id,params)
+          // var xmlDataObj = {}
+          // xmlDataObj[id] = params
+          // state.xmlDataMap.push(xmlDataObj)
+          state.xmlDataMap[id] = params
           setStore({
             name: 'themeData',
             content: state.themeData,

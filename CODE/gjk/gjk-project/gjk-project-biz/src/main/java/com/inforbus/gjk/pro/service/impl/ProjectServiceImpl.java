@@ -19,7 +19,9 @@ package com.inforbus.gjk.pro.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.Maps;
 import com.inforbus.gjk.admin.api.entity.SysUser;
+import com.inforbus.gjk.common.core.constant.CommonConstants;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.pro.api.dto.FilePathDTO;
@@ -28,14 +30,26 @@ import com.inforbus.gjk.pro.api.dto.ProjectInfoDTO;
 import com.inforbus.gjk.pro.api.entity.Hardwarelibs;
 import com.inforbus.gjk.pro.api.entity.ProComp;
 import com.inforbus.gjk.pro.api.entity.Project;
+import com.inforbus.gjk.pro.api.util.HttpClientUtil;
 import com.inforbus.gjk.pro.mapper.ProjectMapper;
 import com.inforbus.gjk.pro.service.ProjectService;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
+import com.inforbus.gjk.pro.thread.StreamManage;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -127,6 +141,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 		return baseMapper.getIdByProIdCompId(proComp);
 	}
 
+	@Override
 	public List<ProComp> getAllByProIdCompId(String projectId, List<String> compList, String canUse) {
 		List<ProComp> proComps = new ArrayList<ProComp>();
 		for (String compId : compList) {
@@ -293,7 +308,48 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 	@Override
 	public void removeCompProject(String compId, String projectId) {
 		baseMapper.removeCompProject(compId,projectId);
-		
+
 	}
 
+    @Override
+    public R staticInspect(String filePath, String fileName) {
+        Map<String, String> params = Maps.newHashMap();
+        params.put("name", fileName);
+        params.put("project",""+fileName.hashCode());
+        String url = "http://127.0.0.1:9000/api/projects/create";
+        HttpResponse httpResponse = HttpClientUtil.toPost(url, params);
+		if(httpResponse==null){
+			return new R<>(CommonConstants.FAIL,"sonar工具未启动", null);
+		}
+        int statusCode = httpResponse.getStatusLine().getStatusCode();
+        try {
+            String s = EntityUtils.toString(httpResponse.getEntity());
+            System.out.println(s);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(statusCode);
+        if(statusCode!=200){
+            return new R<>(CommonConstants.FAIL,"sonar创建项目失败", null);
+        }
+        //执行sonar-scanner命令
+        //文件所在盘符
+        String diskCharacter = filePath.split(":")[0]+":";
+        String execCommand = "cmd.exe /c cd " + filePath + " && "
+                + diskCharacter + " && E:\\soft\\sonar1024\\sonar-scanner-2.8\\bin\\sonar-scanner.bat -D\"sonar.projectKey="
+                + fileName.hashCode() + "\" -D\"sonar.sources=.\" -D\"sonar.host.url=http://localhost:9000\"";
+        try {
+            Process execResult = Runtime.getRuntime().exec(execCommand);
+            //出现error时 单个线程会阻塞
+            StreamManage errorStream = new StreamManage(execResult.getErrorStream(), "Error");
+            StreamManage outputStream  = new StreamManage(execResult.getInputStream(), "Output");
+            errorStream.start();
+            outputStream.start();
+            execResult.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new R<>(CommonConstants.FAIL,"执行sonar-scanner扫描项目失败", null);
+        }
+        return new R<>(CommonConstants.SUCCESS,"静态扫描成功",fileName.hashCode());
+    }
 }

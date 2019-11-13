@@ -136,4 +136,15 @@ public interface ProjectService extends IService<Project> {
 	String uploadFiles(FolderPathDTO folderPathDTO);
 
 	void removeCompProject(String compId, String projectId);
+    String uploadFiles(FolderPathDTO folderPathDTO);
+
+	/**
+	 * @Title staticInspect
+	 * @Description 项目静态检查
+	 * @Author liu_tf
+	 * @DateTime 2019年11月1日 17:08:00
+	 * @param filePath
+	 * @return boolean
+	 */
+	R staticInspect(String filePath, String fileName);
 }

@@ -315,4 +315,9 @@ public class ProjectController {
 		s.add("4444444444444");
 		return new R<>(s, "成功");
 	}
+
+    @PostMapping("/staticInspect")
+    public R staticInspect(String filePath, String fileName){
+        return projectService.staticInspect(filePath, fileName);
+    }
 }

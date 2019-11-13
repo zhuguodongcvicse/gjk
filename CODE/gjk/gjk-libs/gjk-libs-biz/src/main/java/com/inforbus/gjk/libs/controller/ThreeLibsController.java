@@ -27,12 +27,7 @@ import com.inforbus.gjk.libs.service.ThreeLibsService;
 
 import lombok.AllArgsConstructor;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -44,6 +39,9 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 构件明细
@@ -61,7 +59,7 @@ public class ThreeLibsController {
 	private static final String defaultEncoding = JGitUtil.getDefaultEncoding();
 
 	/**
-	 * 
+	 *
 	 * @Title: getAlgorithmByLibsId
 	 * @Description:
 	 * @Author cvicse
@@ -74,7 +72,7 @@ public class ThreeLibsController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @Title: getAlgorithmFile
 	 * @Description:
 	 * @Author cvicse
@@ -87,7 +85,7 @@ public class ThreeLibsController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @Title: getPlatformByLibsId
 	 * @Description:
 	 * @Author cvicse
@@ -100,7 +98,7 @@ public class ThreeLibsController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @Title: getPlatformFile
 	 * @Description:
 	 * @Author cvicse
@@ -113,7 +111,7 @@ public class ThreeLibsController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @Title: getTestByLibsId
 	 * @Description:
 	 * @Author cvicse
@@ -126,7 +124,7 @@ public class ThreeLibsController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @Title: getTestFile
 	 * @Description:
 	 * @Author cvicse
@@ -140,7 +138,7 @@ public class ThreeLibsController {
 
 	/**
 	 * 根据id获取文件路径
-	 * 
+	 *
 	 * @Title: getAlgorithmFile
 	 * @Description:
 	 * @Author cvicse
@@ -154,7 +152,7 @@ public class ThreeLibsController {
 
 	/**
 	 * 根据文件路径取文件内容
-	 * 
+	 *
 	 * @Title: fileRead
 	 * @Description:
 	 * @Author cvicse
@@ -177,8 +175,8 @@ public class ThreeLibsController {
 		}
 		File isFile = new File(fileName);
 		//获取文件编码格式
-		//获得文件编码  
-//		String fileEncode=EncodingDetect.getJavaEncode(filePath);  
+		//获得文件编码
+//		String fileEncode=EncodingDetect.getJavaEncode(filePath);
 //		if(threeLibsFilePathDTO.getEditorCode()!=null) {
 //			code = threeLibsFilePathDTO.getEditorCode();
 //		}else {
@@ -228,7 +226,7 @@ public class ThreeLibsController {
 				// 读取word文件
 			} else if ("doc".equals(prefix) || "docx".equals(prefix)) {
 				try {
-					
+
 					FileInputStream in = new FileInputStream(fileName);
 					WordExtractor extractor = new WordExtractor(in);
 					str = extractor.getText();
@@ -241,7 +239,7 @@ public class ThreeLibsController {
 			// 读取//.h .m .c .o等客户 文件
 			else {
 				// 获得文件编码
-//				String fileEncode=EncodingDetect.getJavaEncode(fileName);   
+//				String fileEncode=EncodingDetect.getJavaEncode(fileName);
 				//String encoding = "utf-8";
 				try {
 					str = FileUtils.readFileToString(new File(fileName), code);
@@ -259,13 +257,13 @@ public class ThreeLibsController {
 		return new R<>(dto);
 
 	}
-	
+
     public String codeString(String fileName) throws Exception {
         BufferedInputStream bin = new BufferedInputStream(new FileInputStream(fileName));
         int p = (bin.read() << 8) + bin.read();
         bin.close();
         String code = null;
- 
+
         switch (p) {
         case 298127:
             code = "UTF-8";
@@ -279,13 +277,13 @@ public class ThreeLibsController {
         default:
             code = "GBK";
         }
- 
+
         return code;
     }
 
 	/**
 	 * 得到平台库的文件夹树
-	 * 
+	 *
 	 * @Title: getAlgorithmFile
 	 * @Description:
 	 * @Author cvicse
@@ -309,6 +307,39 @@ public class ThreeLibsController {
 	public void saveFileContext(@RequestBody ThreeLibsFilePathDTO threeLibsFilePathDTO) {
 		System.out.println("uiuiiuiuiui:::" + threeLibsFilePathDTO.getFilePathName());
 		threeLibsService.saveFileContext(threeLibsFilePathDTO.getFilePath(), threeLibsFilePathDTO.getFilePathName());
+	}
+
+	@PostMapping("/getFileStream")
+	public void getFileStream(HttpServletRequest request, HttpServletResponse response,@RequestBody ThreeLibsFilePathDTO threeLibsFilePathDTO){
+		response.setContentType("application/pdf");
+		FileInputStream in = null;
+		OutputStream out = null;
+	  	try {
+			in = new FileInputStream(new File(threeLibsFilePathDTO.getFilePath()));
+			out = response.getOutputStream();
+			byte[] b = new byte[512];
+			while ((in.read(b)) != -1) {
+				out.write(b);
+			}
+	  	} catch (IOException e) {
+			e.printStackTrace();
+	  	}finally {
+	  		if(out!=null){
+				try {
+					out.flush();
+					out.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if(in!=null){
+				try {
+					in.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 }

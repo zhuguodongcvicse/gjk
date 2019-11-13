@@ -566,54 +566,7 @@ public class ManagerController {
 	@PutMapping
 	@RequestMapping("/analysisThemeXML/{proDetailId}")
 	public R analysisThemeXML(@PathVariable("proDetailId") String proDetailId) {
-		String flowFilePath = "";
-		String path = "";
-		List<Part> partList = new ArrayList<Part>();
-		List<ProjectFile> ProjectFileList = managerService.getFilePathListById(proDetailId);
-		for (ProjectFile proFile : ProjectFileList) {
-			if (proFile.getFileType().equals("11")) {
-				flowFilePath = proDetailPath + proFile.getFilePath() + proFile.getFileName() + ".xml";
-				path = proDetailPath + proFile.getFilePath();
-			}
-		}
-		// flowFilePath =
-		// "D:\\14S_GJK_GIT\\gjk\\gjk\\project\\测试项目\\测试流程流程\\模型\\流程模型.xml";
-		// File file = new File(flowFilePath);
-		// 获取部件及部件及部件下构建
-		File flowFile = new File(flowFilePath);
-		if (flowFile.exists()) {
-			// partList.addAll(ProcedureXmlAnalysis.getPartList(new File(flowFilePath)));
-			List<Part> partList1 = ProcedureXmlAnalysis.getPartList(new File(flowFilePath));
-			partList.addAll(partList1);
-		}
-		// 解析流程模型文件
-		// XmlEntityMap folwModelData
-		// =XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(new File(flowFilePath));
-		String themePath = path + "自定义配置__主题配置.xml";
-		File themeFile = new File(themePath);
-		XmlEntityMap themeData = null;
-		XmlEntityMap netWorkData = null;
-		if (!themeFile.exists()) {
-			String filePath = System.getProperty("user.dir") + "\\主题配置.xml";
-			themeData = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(new File(filePath));
-		} else {
-			themeData = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(themeFile);
-		}
-		String netWorkPath = path + "自定义配置__网络配置.xml";
-		File netWorkFile = new File(netWorkPath);
-		if (!netWorkFile.exists()) {
-			String filePath1 = System.getProperty("user.dir") + "\\网络配置.xml";
-			netWorkData = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(new File(filePath1));
-		} else {
-			netWorkData = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(netWorkFile);
-		}
-
-		JSONObject obj = new JSONObject();
-		obj.put("themeData", themeData);
-		obj.put("netWorkData", netWorkData);
-		obj.put("partList", partList);
-		// obj.put("folwModelData", folwModelData);
-		return new R<>(obj);
+		return managerService.analysisThemeXML(proDetailId);
 	}
 
 	/*
