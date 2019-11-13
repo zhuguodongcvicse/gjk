@@ -152,7 +152,7 @@ public class ProcedureXmlAnalysis {
 
 	private void setParamenter(Paramenter paramenter, XmlEntityMap entityXml) {
 		paramenter.setName(getAttributeValue(entityXml, "variable", "name"));
-		paramenter.setDataType(getAttributeValue(entityXml, "数据类型", "name"));
+		paramenter.setDataType(getAttributeValue(entityXml, "变量类型", "name"));
 		paramenter.setNumber(getAttributeValue(entityXml, "序号", "name"));
 		paramenter.setLength(getAttributeValue(entityXml, "长度", "name"));
 		paramenter.setType(getAttributeValue(entityXml, "类别", "name"));
