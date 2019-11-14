@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+  <方案 name="D:\14S_GJK_GIT\gjk\gjk\test\方案展示1.xml" filepath="GJK_GIT\gjk\gjk\project\gengTest\geng流程\模型\方案评价指标">
+    <属性1 name="0"/>
+    <属性2 name="0.0"/>
+    <属性3 name="1.0"/>
+    <属性4 name="1.0"/>
+    <属性5 name="1.0"/>
+    <属性6 name="1.0"/>
+    <属性7 name="1.0"/>
+    <属性8 name="1.0"/>
+  </方案>
+  <方案 name="D:\14S_GJK_GIT\gjk\gjk\test\方案展示2.xml" filepath="GJK_GIT\gjk\gjk\project\gengTest\geng流程\模型\软硬件映射配置">
+    <属性1 name="1"/>
+    <属性2 name="1.0"/>
+    <属性3 name="2.0"/>
+    <属性4 name="2.0"/>
+    <属性5 name="2.0"/>
+    <属性6 name="2.0"/>
+    <属性7 name="2.0"/>
+    <测试8 name="2.0"/>
+  </方案>
+  <方案 name="D:\14S_GJK_GIT\gjk\gjk\test\方案展示3.xml" filepath="GJK_GIT\gjk\gjk\project\gengTest\geng流程\模型\软硬件映射配置">
+    <属性1 name="1"/>
+    <属性2 name="1.0"/>
+    <属性3 name="2.0"/>
+    <属性4 name="2.0"/>
+    <属性5 name="2.0"/>
+    <属性6 name="2.0"/>
+    <属性7 name="2.0"/>
+  </方案>
+</root>

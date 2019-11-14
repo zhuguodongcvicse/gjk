@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.inforbus.gjk.admin.mapper.GjkPlatformMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap"
+		type="com.inforbus.gjk.admin.api.entity.GjkPlatform">
+		<id column="platform_id" property="platformId" />
+		<result column="name" property="name" />
+		<result column="permission" property="permission" />
+		<result column="parent_id" property="parentId" />
+		<result column="sort" property="sort" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="del_flag" property="delFlag" />
+	</resultMap>
+
+	<resultMap id="PlatformVoResultMap"
+		type="com.inforbus.gjk.admin.api.vo.PlatformVO">
+		<id column="platform_id" property="platformId" />
+		<result column="name" property="name" />
+		<result column="permission" property="permission" />
+		<result column="parent_id" property="parentId" />
+		<result column="sort" property="sort" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="del_flag" property="delFlag" />
+	</resultMap>
+
+
+	<resultMap id="softwareMap"
+		type="com.inforbus.gjk.admin.api.entity.Software">
+		<id property="id" column="id" />
+		<result property="softwareName" column="software_name" />
+		<result property="version" column="version" />
+		<result property="filePath" column="file_path" />
+		<result property="applyState" column="apply_state" />
+		<result property="applyDesc" column="apply_desc" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="description" column="description" />
+		<result property="delFlag" column="del_flag" />
+	</resultMap>
+
+	<resultMap id="softwareDetailMap"
+		type="com.inforbus.gjk.admin.api.entity.SoftwareDetail">
+		<id property="software_id" column="softwareId" />
+		<result property="platform_id" column="platformId" />
+	</resultMap>
+
+	<resultMap id="softwareFileMap"
+		type="com.inforbus.gjk.admin.api.entity.SoftwareFile">
+		<id property="software_id" column="softwareId" />
+		<result property="file_name" column="fileName" />
+		<result property="file_path" column="filePath" />
+	</resultMap>
+
+	<resultMap id="bspMap"
+		type="com.inforbus.gjk.admin.api.entity.BSP">
+		<id property="id" column="id" />
+		<result property="bspName" column="bsp_name" />
+		<result property="version" column="version" />
+		<result property="filePath" column="file_path" />
+		<result property="applyState" column="apply_state" />
+		<result property="applyDesc" column="apply_desc" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="description" column="description" />
+		<result property="delFlag" column="del_flag" />
+	</resultMap>
+
+	<resultMap id="bspDetailMap"
+		type="com.inforbus.gjk.admin.api.entity.BSPDetail">
+		<id property="bsp_id" column="bspId" />
+		<result property="platform_id" column="platformId" />
+	</resultMap>
+
+	<resultMap id="bspFileMap"
+		type="com.inforbus.gjk.admin.api.entity.BSPFile">
+		<id property="bsp_id" column="bspId" />
+		<result property="file_name" column="fileName" />
+		<result property="file_path" column="filePath" />
+	</resultMap>
+	
+	<resultMap id="componentDetailMap"
+		type="com.inforbus.gjk.admin.api.entity.ComponentDetail">
+		<id property="id" column="id" />
+		<result property="compId" column="comp_id" />
+		<result property="fileName" column="file_name" />
+		<result property="fileType" column="file_type" />
+		<result property="filePath" column="file_path" />
+		<result property="version" column="version" />
+		<result property="paraentId" column="paraent_id" />
+		<result property="paraentIds" column="paraent_ids" />
+		<result property="libsId" column="libs_id" />
+	</resultMap>
+	<resultMap id="componentMap"
+		type="com.inforbus.gjk.admin.api.entity.Component">
+		<id property="id" column="id" />
+		<result property="compId" column="comp_id" />
+		<result property="compName" column="comp_name" />
+		<result property="compFuncname" column="comp_funcname" />
+		<result property="userId" column="user_id" />
+		<result property="version" column="version" />
+		<result property="compImg" column="comp_img" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="description" column="description" />
+		<result property="applyState" column="apply_state" />
+		<result property="applyDesc" column="apply_desc" />
+		<result property="delFlag" column="del_flag" />
+	</resultMap>
+
+	<!--通过角色查询平台库信息 -->
+	<select id="listPlatformsByRoleId"
+		resultMap="PlatformVoResultMap">
+		SELECT
+		gjk_platform.*
+		FROM
+		gjk_platform
+		LEFT JOIN sys_role_menu ON gjk_platform.platform_id =
+		sys_role_menu.menu_id
+		WHERE
+		gjk_platform.del_flag = 0
+		<!-- AND sys_role_menu.role_id = #{roleId} -->
+		ORDER BY
+		gjk_platform.sort DESC
+	</select>
+
+	<!--通过角色ID 查询权限 -->
+	<select id="listPermissionsByRoleIds"
+		resultType="java.lang.String">
+		SELECT
+		m.permission
+		FROM
+		gjk_platform m, sys_role_menu rm WHERE m.platform_id = rm.menu_id AND m.del_flag =
+		0 AND rm.role_id IN (#{roleIds})
+	</select>
+
+	<!-- 获取软件框架库的主表信息 -->
+	<select id="getSoftware" resultMap="softwareMap">
+		SELECT * FROM gjk_software
+		<!-- s WHERE s.id IN (SELECT b.software_id FROM gjk_software_detail b) -->
+	</select>
+
+	<!-- 获取软件框架库平台id的副表信息 -->
+	<select id="getSoftwarePlatform" resultMap="softwareDetailMap">
+		SELECT * FROM gjk_software_detail
+		<!-- s WHERE s.software_id IN (SELECT b.id FROM gjk_software b) -->
+	</select>
+
+	<!-- 获取软件框架库文件夹的副表信息 -->
+	<select id="getSoftwareFile" resultMap="softwareFileMap">
+		SELECT * FROM gjk_software_file
+		<!-- s WHERE s.software_id IN (SELECT b.id FROM gjk_software b) -->
+	</select>
+
+	<!-- 获取bsp的主表信息 -->
+	<select id="getBSP" resultMap="bspMap">
+		SELECT * FROM gjk_bsp
+	</select>
+
+	<!-- 获取bsp平台id的副表信息 -->
+	<select id="getBSPPlatform" resultMap="bspDetailMap">
+		SELECT * FROM gjk_bsp_detail
+	</select>
+
+	<!-- 获取bsp文件夹的副表信息 -->
+	<select id="getBSPFile" resultMap="bspFileMap">
+		SELECT * FROM gjk_bsp_file
+	</select>
+	
+	<!-- 获取构件建模模块选择的文件夹的信息 -->
+	<select id="getLibsFile" resultMap="componentDetailMap" >
+		SELECT b.* FROM gjk_component_detail b WHERE b.paraent_id in 
+		(SELECT a.id FROM gjk_component_detail a WHERE a.libs_id = #{libsId})
+	</select>
+	
+	<!-- 获取构件建模模块的信息 -->
+	<select id="getLibsInfo" resultMap="componentDetailMap">
+		SELECT * FROM gjk_component_detail
+	</select>
+	
+	<!-- 根据libs_id获取构件建模模块属于哪个库信息 -->
+	<select id="getLibsFileType" resultMap="componentDetailMap">
+		SELECT * FROM gjk_component_detail WHERE libs_id = #{libsId}
+	</select>
+	
+	<!-- 根据详细表的comp_id找到主表里的comp_name -->
+	<select id="getCompNameById" resultMap="componentMap">
+	SELECT b.* FROM gjk_component b WHERE b.id =
+		(SELECT a.comp_id FROM gjk_component_detail a WHERE a.id = #{id})
+	</select>
+
+</mapper>

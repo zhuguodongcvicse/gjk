@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<network_in>
+		<funcConfig name="func1" cmpName="cmp1">
+			<ip name="192.168.1.1" />
+			<port name="8080" />
+			<protocol name="0" />
+		</funcConfig>
+	</network_in>
+	<network_out>
+		<funcConfig name="func1" cmpName="cmp1">
+			<ip name="192.168.1.2" />
+			<port name="8081" />
+			<protocol name="0" />
+		</funcConfig>
+	</network_out>
+</root>

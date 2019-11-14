@@ -1,0 +1,365 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel=stylesheet href=libs/bootstrap/css/bootstrap.css> <link rel=stylesheet href=libs/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css>
+        <!-- build:css libs/graph.editor/graph.editor.css -->
+    <link rel="stylesheet" href="src/css/graph.editor.css" />
+    <!-- endbuild -->
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body class="layout">
+    <div id="editor" class="graph-editor public_boarddesign_mainboardindex_14s" data-options="region:'center'"></div>
+    <!-- FpgaBoard -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog mainboardindex_modal_14s">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        外部互联
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <!-- <div class="form-group" style="height:10%">
+					<label class="col-sm-5 control-label">交换芯片：</label>					
+				</div> -->
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Cpu：</label>
+                        <div class="col-sm-9">
+                            <select class="form-control" id="selectStartCpu">
+                                <option>请选择Cpu</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Inf：</label>
+                        <div class="col-sm-9">
+                            <select class="form-control" id="selectStartInf">
+                                <option>请选择Inf</option>
+                                <option>1</option>
+                            </select>
+                        </div>
+                    </div>
+                    <p class="fl_14s w100_14s fontsize2 color_14s">linkType</p>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">value：</label>
+                        <div class="col-sm-9">
+                            <select class="form-control" id="selectValue">
+                                <option>0</option>
+                                <option>1</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group caseindex_14s" id="selectedIdDiv">
+                        <label class="col-sm-3 control-label">id：</label>
+                        <div class="col-sm-9">
+                            <select class="form-control" id="selectId">
+                                <option>请选择id</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-primary" onclick="initTableData();">
+                        完成
+                    </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick="cleanTableData();">关闭
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+    <script src="scripts/qunee-min.js"></script>
+    <!-- build:js libs/js.js -->
+    <script src="libs/jquery.min.js"></script>
+    <script src="libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="libs/layout.border.js"></script>
+    <script src="libs/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+    <!-- endbuild -->
+    <!-- build:js libs/graph.editor/graph.editor.js -->
+    <script src="src/common/i18n.js"></script>
+    <script src="src/common/CopyPaste.js"></script>
+    <script src="src/common/DomSupport.js"></script>
+    <script src="src/common/DragSupport.js"></script>
+    <script src="src/common/FileSupport.js"></script>
+    <script src="src/common/JSONSerializer.js"></script>
+    <script src="src/common/Exportpane.js"></script>
+    <script src="src/common/Toolbar.js"></script>
+    <script src="src/common/ToolBox.js"></script>
+    <script src="src/common/PopupMenu.js"></script>
+    <script src="src/common/Propertypane.js"></script>
+    <script src="src/common/GridBackground.js"></script>
+    <!-- <script src="src/graph.editor.js"></script> -->
+    <script src="graph.editor/graph.editor.js"></script>
+    <!-- endbuild -->
+    <script src="scripts/graphs.js"></script>
+    <script src="scripts/casemain.js"></script>
+    <script src="../util/mangUtils.js"></script>
+    <script type="text/javascript">
+        function loadFpgaBoardDatas(evt) {
+            for (const i in clickBoardList) {
+                if (clickBoardList[i].ifClick == 0) {
+                    //将选中的板卡赋给变量currentBoard
+                    currentBoard = clickBoardList[i]
+                }
+            }
+            currentBoard = JSON.parse(JSON.stringify(currentBoard))
+            console.log("currentBoard", currentBoard)
+            if (currentBoard.boardType == 0 || currentBoard.boardType == 1) {
+                //cpu显示
+                $("#selectStartCpu").empty();
+                var selectHtml = '';
+                for (var i = 0; i < currentBoard.chipList.length; i++) {
+                    var sHtml = '<option>' + currentBoard.chipList[i].ID + '</option>';
+                    selectHtml = selectHtml + sHtml;
+                }
+                $("#selectStartCpu").html(selectHtml);
+                //接口显示
+                $("#selectStartInf").empty();
+                var selectHtml = '';
+                if (allInfOfFrontBoard.length != 0) {
+                    let ifExistInf = []
+                    for (const i in currentBoard.chipList) {
+                        if (document.getElementById('selectStartCpu').value == currentBoard.chipList[i].ID) {
+                            if (currentBoard.chipList[i].infOfChipList.length != 0) {
+                                for (const j in currentBoard.chipList[i].infOfChipList) {
+                                    // if (currentBoard.chipList[i].infOfChipList[j].ID == document.getElementById('selectStartInf').value) {
+                                    for (const k in allInfOfFrontBoard) {
+                                        if (currentBoard.chipList[i].infOfChipList[j].uniqueId.indexOf(allInfOfFrontBoard[k].uniqueId) != -1) {
+                                            ifExistInf.push(allInfOfFrontBoard[k])
+                                            let sHtml = '<option>' + allInfOfFrontBoard[k].ID + '</option>';
+                                            selectHtml = selectHtml + sHtml;
+                                        }
+                                    }
+                                    // }
+                                }
+                            }
+                        }
+                    }
+                    if (ifExistInf.length == 0) {
+                        selectHtml = '<option>该芯片无可选接口</option>'
+                    }
+                } else {
+                    var sHtml = '<option>该芯片无可选接口</option>';
+                    selectHtml = selectHtml + sHtml;
+                    //console.log("selectHtml1133",selectHtml)
+                }
+                $("#selectStartInf").html(selectHtml);
+
+                //linktype中英文映射
+                $("#selectValue").empty();
+                var selectHtmlLinkType = '';
+                for (const i in fpgaBoardLinkType) {
+                    var sHtml = '<option value="' + fpgaBoardLinkType[i].value + '">' + fpgaBoardLinkType[i].label + '</option>';
+                    selectHtmlLinkType = selectHtmlLinkType + sHtml;
+                }
+                $("#selectValue").html(selectHtmlLinkType);
+
+                var selectValue = document.getElementById("selectValue");
+                //value 改变显示后板卡接口
+                selectValue.onchange = function () {
+                    selectValueVal = selectValue.value;
+                    switch (selectValueVal) {
+                        case '0':
+                            document.getElementById("selectedIdDiv").style.visibility = "hidden"
+                            document.getElementById("selectId").style.visibility = "hidden"
+                            break;
+                        case '1':
+                            var frontBoardJson
+                            //console.log("graph.name", graph.name)
+                            if (graph.name == '正面视图') {
+                                frontBoardJson = graph.toJSON()
+                            } else if (graph.name == '正面机箱') {
+                                frontBoardJson = graph.toJSON()
+                            }
+                            for (const i in frontBoardJson.datas) {
+                                if (frontBoardJson.datas[i].json.properties.boardType != null && frontBoardJson.datas[i].json.properties.uniqueId == currentBoard.uniqueId) {
+                                    for (const j in frontBoardJson.datas) {
+                                        if (frontBoardJson.datas[j]._refId == frontBoardJson.datas[i].json.host._ref) {
+                                            fSlotNum = frontBoardJson.datas[j].json.properties.slotNum
+                                        }
+                                    }
+                                }
+                            }
+                            // console.log("fSlotNum", fSlotNum)
+                            // console.log("frontBoardJson", frontBoardJson)
+                            // console.log("bJson", bJson)
+                            // console.log("currentBoard", currentBoard)
+                            if (typeof (bJson) != "undefined") {
+                                for (const i in bJson.datas) {
+                                    if (bJson.datas[i].json.properties != null && bJson.datas[i].json.properties.slotNum == fSlotNum + 10) {
+                                        for (const j in bJson.datas) {
+                                            if (bJson.datas[j].json.properties != null && bJson.datas[j].json.properties.boardType != null && bJson.datas[j].json.host._ref == bJson.datas[i]._refId) {
+                                                //console.log("thisboard",bJson.datas[j].json.properties)
+                                                oppositeBoard = bJson.datas[j]
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                alert("背面无板卡，请添加板卡！")
+                                return
+                            }
+                            //console.log("oppositeBoard", oppositeBoard)
+                            $("#selectId").empty();
+                            var selectHtml = '';
+                            var ifExistInfofBackBoard = []
+                            if (typeof (oppositeBoard) != "undefined" && oppositeBoard != '') {
+                                for (const i in oppositeBoard.json.properties.backBoardInfList) {
+                                    for (const j in allInfOfBackBoard) {
+                                        if (allInfOfBackBoard[j].uniqueId == oppositeBoard.json.properties.backBoardInfList[i].uniqueId) {
+                                            ifExistInfofBackBoard.push(allInfOfBackBoard[j])
+                                            var sHtml = '<option>' + allInfOfBackBoard[j].ID + '</option>';
+                                            selectHtml = selectHtml + sHtml;
+                                        }
+                                    }
+                                }
+                                if (ifExistInfofBackBoard.length == 0) {
+                                    selectHtml = '<option>对应卡槽的interfaceBoard无可选接口</option>'
+                                }
+                            } else {
+                                var sHtml = '<option>无对应卡槽的interfaceBoard</option>';
+                                selectHtml = selectHtml + sHtml;
+                            }
+                            $("#selectId").html(selectHtml);
+                            document.getElementById("selectedIdDiv").style.visibility = "visible"
+                            document.getElementById("selectId").style.visibility = "visible"
+                            break;
+                    }
+                };
+            }
+        }
+        function initTableData() {
+            if (document.getElementById('selectStartInf').value == '该芯片无可选接口' || document.getElementById('selectId').value == '该芯片无可选接口') {
+                alert("配置的内部互联中存在无效接口，请重新配置")
+                return false
+            }
+            var selectValueTemp = document.getElementById('selectValue').value
+            if (selectValueTemp == '1') {
+                var html1 = '<tr><td>' + $('#selectStartCpu option:selected').text() + '</td><td>' + $('#selectStartInf option:selected').text() + '</td><td>' + $('#selectValue option:selected').text() + '</td><td>' + $('#selectId option:selected').text() + '</td><td><button type="button" class="btn btn-default" data-toggle="modal" onclick="deleteExternalLink(this);">删除</button></td></tr>';
+            } else if (selectValueTemp == '0') {
+                var html1 = '<tr><td>' + $('#selectStartCpu option:selected').text() + '</td><td>' + $('#selectStartInf option:selected').text() + '</td><td>' + $('#selectValue option:selected').text() + '</td><td> </td><td><button type="button" class="btn btn-default" data-toggle="modal" onclick="deleteExternalLink(this);">删除</button></td></tr>';
+            }
+            $('#tbody1').append(html1);
+            $("#myModal").modal('hide');
+            linkTypeList.push(document.getElementById('selectValue').value)
+            //遍历删除选中的接口，将选中的接口添加到要展示到表格的数组中
+            for (const i in currentBoard.chipList) {
+                if (document.getElementById('selectStartCpu').value == currentBoard.chipList[i].ID) {
+                    for (const j in currentBoard.chipList[i].infOfChipList) {
+                        if (document.getElementById('selectStartInf').value == currentBoard.chipList[i].infOfChipList[j].ID) {
+                            for (const k in allInfOfFrontBoard) {
+                                if (currentBoard.chipList[i].infOfChipList[j].uniqueId.indexOf(allInfOfFrontBoard[k].uniqueId) != -1) {
+                                    showCpuList.push(currentBoard.chipList[i])
+                                    showCpuInfList.push(allInfOfFrontBoard[k])
+                                    showCpuInfList = JSON.parse(JSON.stringify(showCpuInfList))
+                                    replenishCpuInfList = replenishCpuInfList.concat(showCpuInfList)
+                                    replenishCpuInfList = JSON.parse(JSON.stringify(replenishCpuInfList))
+                                    removeByValue(allInfOfFrontBoard, allInfOfFrontBoard[k])
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (selectValueTemp == 1 || selectValueTemp == '1') {
+                if (typeof (oppositeBoard) != "undefined") {
+                    for (const i in oppositeBoard.json.properties.backBoardInfList) {
+                        if (document.getElementById('selectId').value == oppositeBoard.json.properties.backBoardInfList[i].ID && allInfOfBackBoard.length != 0) {
+                            for (const j in allInfOfBackBoard) {
+                                if (allInfOfBackBoard[j].uniqueId.indexOf(oppositeBoard.json.properties.backBoardInfList[i].uniqueId) != -1) {
+                                    showBackBoardInfList.push(allInfOfBackBoard[j])
+                                    showBackBoardInfList = JSON.parse(JSON.stringify(showBackBoardInfList))
+                                    replenishBackBoardInfList = replenishBackBoardInfList.concat(showBackBoardInfList)
+                                    replenishBackBoardInfList = JSON.parse(JSON.stringify(replenishBackBoardInfList))
+                                    removeByValue(allInfOfBackBoard, allInfOfBackBoard[j])
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                showBackBoardInfList.push('无接口')
+                showBackBoardInfList = JSON.parse(JSON.stringify(showBackBoardInfList))
+            }
+            var outLinkArrTemp = []
+            for (const i in showCpuInfList) {
+                outLinkArrTemp.push(showCpuList[i], showCpuInfList[i], linkTypeList[i], showBackBoardInfList[i])
+            }
+            currentBoard.outLinkArr.push(outLinkArrTemp)
+            //深拷贝
+            currentBoard = JSON.parse(JSON.stringify(currentBoard))
+            clickBoardList = JSON.parse(JSON.stringify(clickBoardList))
+            // console.log("currentBoard",currentBoard)
+            //把当前板卡替换数组中原来的板卡
+            for (const i in clickBoardList) {
+                if (clickBoardList[i].uniqueId == currentBoard.uniqueId) {
+                    clickBoardList[i] = currentBoard
+                }
+            }
+            //深拷贝
+            clickBoardList = JSON.parse(JSON.stringify(clickBoardList))
+            // console.log("clickBoardList",clickBoardList)
+            // console.log("allInfOfFrontBoard", allInfOfFrontBoard)
+            //清除数据
+            selectCount++
+            addInfCount++
+            currentBoard = ''
+            linkTypeList.length = 0
+            showCpuList.length = 0
+            showCpuInfList.length = 0
+            showBackBoardInfList.length = 0
+            cleanTableData()
+        }
+        function deleteExternalLink(obj) {
+            // console.log("obj",obj)
+            // console.log("obj.parentNode",obj.parentNode)
+            var tr = this.getRowObj(obj);
+            // console.log("tr.children[0].innerText",tr.children[0].innerText)
+            // console.log("tr.children",tr.children)
+            // console.log("tr",tr)
+            if (tr != null) {
+                tr.parentNode.removeChild(tr);
+                for (const i in clickBoardList) {
+                    if (clickBoardList[i].ifClick == 0) {
+                        for (const j in clickBoardList[i].outLinkArr) {
+                            if (clickBoardList[i].outLinkArr[j][0].ID == tr.children[0].innerText &&
+                                clickBoardList[i].outLinkArr[j][1].ID == tr.children[1].innerText &&
+                                clickBoardList[i].outLinkArr[j][2] == tr.children[2].innerText) {
+                                allInfOfFrontBoard.push(clickBoardList[i].outLinkArr[j][1])
+                                allInfOfFrontBoard = JSON.parse(JSON.stringify(allInfOfFrontBoard))
+                                if (clickBoardList[i].outLinkArr[j][2] == '1') {
+                                    allInfOfBackBoard.push(clickBoardList[i].outLinkArr[j][3])
+                                    allInfOfBackBoard = JSON.parse(JSON.stringify(allInfOfBackBoard))
+                                }
+                                removeByValue(clickBoardList[i].outLinkArr, clickBoardList[i].outLinkArr[j])
+                            }
+                        }
+                    }
+                }
+                // console.log("clickBoardList",clickBoardList)
+            } else {
+                throw new Error("the given object is not contained by the table");
+            }
+        }
+
+        function cleanTableData() {
+            oppositeBoard = ''
+            document.getElementById("selectValue").value = 0
+            document.getElementById("selectedIdDiv").style.visibility = "hidden"
+            document.getElementById("selectId").style.visibility = "hidden"
+        }
+
+    </script>
+</body>
+
+</html>

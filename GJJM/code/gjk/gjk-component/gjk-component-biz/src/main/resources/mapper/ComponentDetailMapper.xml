@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ~ Copyright (c) 2018-2025, inforbus All rights reserved. ~ ~ Redistribution 
+	and use in source and binary forms, with or without ~ modification, are permitted 
+	provided that the following conditions are met: ~ ~ Redistributions of source 
+	code must retain the above copyright notice, ~ this list of conditions and 
+	the following disclaimer. ~ Redistributions in binary form must reproduce 
+	the above copyright ~ notice, this list of conditions and the following disclaimer 
+	in the ~ documentation and/or other materials provided with the distribution. 
+	~ Neither the name of the inforbus.com developer nor the names of its ~ contributors 
+	may be used to endorse or promote products derived from ~ this software without 
+	specific prior written permission. ~ Author: inforbus -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.inforbus.gjk.comp.mapper.ComponentDetailMapper">
+
+	<resultMap id="componentDetailMap"
+		type="com.inforbus.gjk.comp.api.entity.ComponentDetail">
+		<id property="id" column="id" />
+		<result property="compId" column="comp_id" />
+		<result property="fileName" column="file_name" />
+		<result property="fileType" column="file_type" />
+		<result property="filePath" column="file_path" />
+		<result property="version" column="version" />
+		<result property="paraentId" column="paraent_id" />
+		<result property="paraentIds" column="paraent_ids" />
+		<result property="libsId" column="libs_id" />
+	</resultMap>
+
+	<sql id="compDetailSql">
+		id,
+		comp_id,
+		file_name,
+		file_type,
+		file_path,
+		version,
+		paraent_id,
+		paraent_ids,
+		libs_id
+	</sql>
+
+	<!--componentDetail简单分页查询 -->
+	<select id="getComponentDetailPage"
+		resultMap="componentDetailMap">
+		SELECT
+		<include refid="compDetailSql" />
+		FROM gjk_component_detail
+		<where>
+			<if
+				test="componentDetail.id != null and componentDetail.id.trim() != ''">
+				AND id = #{componentDetail.id}
+			</if>
+			<if
+				test="componentDetail.compId != null and componentDetail.compId.trim() != ''">
+				AND comp_id = #{componentDetail.compId}
+			</if>
+			<if
+				test="componentDetail.fileName != null and componentDetail.fileName.trim() != ''">
+				AND file_name = #{componentDetail.fileName}
+			</if>
+			<if
+				test="componentDetail.fileType != null and componentDetail.fileType.trim() != ''">
+				AND file_type = #{componentDetail.fileType}
+			</if>
+			<if
+				test="componentDetail.filePath != null and componentDetail.filePath.trim() != ''">
+				AND file_path = #{componentDetail.filePath}
+			</if>
+			<if
+				test="componentDetail.paraentId != null and componentDetail.paraentId.trim() != ''">
+				AND paraent_id = #{componentDetail.paraentId}
+			</if>
+			<if
+				test="componentDetail.paraentIds != null and componentDetail.paraentIds.trim() != ''">
+				AND paraent_ids = #{componentDetail.paraentIds}
+			</if>
+			<if
+				test="componentDetail.version != null and componentDetail.version.trim() != ''">
+				AND version = #{componentDetail.version}
+			</if>
+			<if
+				test="componentDetail.libsId != null and componentDetail.libsId.trim() != ''">
+				AND libs_id = #{componentDetail.libsId}
+			</if>
+		</where>
+	</select>
+	<!--listCompDetailByCompId 通过构件编号查询构件文件 -->
+	<select id="listCompDetailByCompId"
+		resultMap="componentDetailMap">
+		select * from gjk_component_detail where comp_id=#{compId}
+		<!-- AND file_type != 'xml' -->
+	</select>
+
+	<!-- getCompXMl查询XML -->
+	<select id="getCompXMl" resultMap="componentDetailMap">
+		select
+		<include refid="compDetailSql" />
+		from gjk_common_component_detail
+		<where>
+			<if test="compId != null and compId.trim() != ''">
+				AND comp_id = Cast(#{compId} AS Binary(32))
+			</if>
+			AND file_type = 'xml'
+		</where>
+	</select>
+	<!-- getCompXMl查询XML -->
+	<select id="getCommCompXMl" resultMap="componentDetailMap">
+		select
+		<include refid="compDetailSql" />
+		from gjk_common_component_detail
+		<where>
+			<if test="compId != null and compId.trim() != ''">
+				AND comp_id = Cast(#{compId} AS Binary(32))
+			</if>
+			AND file_type = 'xml'
+		</where>
+	</select>
+	<!-- getCompXMl查询XML -->
+	<select id="getCompFiles" resultMap="componentDetailMap">
+		select
+		<include refid="compDetailSql" />
+		from gjk_component_detail
+		<where>
+			<if test="compId != null and compId.trim() != ''">
+				AND comp_id = #{compId}
+			</if>
+			AND file_type NOT RLIKE 'file'
+		</where>
+	</select>
+
+	<select id="listDetailByCompId" resultMap="componentDetailMap">
+		SELECT
+		<include refid="compDetailSql" />
+		FROM
+		gjk_component_detail
+		<where>
+			<if test="compId != null and compId.trim() != ''">
+				AND comp_id = #{compId}
+			</if>
+		</where>
+	</select>
+
+	<!-- 保存构件详细信息 -->
+	<insert id="saveCompDetail"
+		parameterType="com.inforbus.gjk.comp.api.entity.ComponentDetail">
+		INSERT INTO gjk_component_detail (
+		<include refid="compDetailSql" />
+		) VALUES (#{compDetail.id},
+		#{compDetail.compId},
+		#{compDetail.fileName},
+		#{compDetail.fileType},
+		#{compDetail.filePath},
+		#{compDetail.version},
+		#{compDetail.paraentId},
+		#{compDetail.paraentIds},
+		#{compDetail.libsId})
+	</insert>
+
+	<!-- 用于判断各类文件的父节点是否存在 -->
+	<select id="fileParentCompDetail"
+		parameterType="com.inforbus.gjk.comp.api.entity.ComponentDetail"
+		resultMap="componentDetailMap">
+		SELECT * FROM gjk_component_detail WHERE
+		comp_id=#{compDetail.compId}
+		AND
+		file_name=#{compDetail.fileName}
+		AND
+		paraent_id=#{compDetail.paraentId}
+	</select>
+	<delete id="deleteByCompId" parameterType="string">
+		DELETE FROM
+		`gjk_component_detail` WHERE `com_id` =
+		Cast(#{compId} AS Binary(32))
+	</delete>
+	<select id="findCompXml"
+		parameterType="com.inforbus.gjk.comp.api.entity.ComponentDetail"
+		resultMap="componentDetailMap">
+		SELECT
+		<include refid="compDetailSql" />
+		FROM gjk_component_detail
+		<where>
+			<if test="compId != null and compId.trim() != ''">
+				AND comp_id = #{compId}
+			</if>
+			<if test="fileType != null and fileType.trim() != ''">
+				AND file_type = #{fileType}
+			</if>
+		</where>
+	</select>
+	<update id="editCompDetail"
+		parameterType="com.inforbus.gjk.comp.api.entity.ComponentDetail">
+		UPDATE `gjk_component_detail`
+		<set>
+			<if
+				test="compDetail.fileName != null and compDetail.fileName.trim() != ''">
+				`file_name` = #{compDetail.fileName},
+			</if>
+			<if
+				test="compDetail.fileType != null and compDetail.fileType.trim() != ''">
+				`file_type` = #{compDetail.fileType},
+			</if>
+			<if
+				test="compDetail.filePath != null and compDetail.filePath.trim() != ''">
+				`file_path` = #{compDetail.filePath},
+			</if>
+		</set>
+		<where>
+			`id` =Cast(#{compDetail.id} AS Binary(32))
+		</where>
+	</update>
+
+	<!-- 根据树节点的构件库详细信息的id查找文件路径 -->
+	<select id="getFilePathById" resultMap="componentDetailMap">
+		SELECT
+		*
+		FROM
+		gjk_component_detail
+		where id=#{id}
+
+	</select>
+
+</mapper>

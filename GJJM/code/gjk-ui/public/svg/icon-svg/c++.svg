@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="13px" viewBox="0 0 12 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 57 (83077) - https://sketch.com -->
+    <title>c++</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="-2.1168944e-16 0 13 0 13 13 -2.1168944e-16 13"></polygon>
+    </defs>
+    <g id="14所-信息构建库" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="系统配置1" transform="translate(-361.000000, -626.000000)">
+            <g id="菜单" transform="translate(282.000000, 219.000000)">
+                <g id="分组-8" transform="translate(79.000000, 401.000000)">
+                    <g id="c++" transform="translate(0.000000, 6.000000)">
+                        <mask id="mask-2" fill="white">
+                            <use xlink:href="#path-1"></use>
+                        </mask>
+                        <g id="Clip-2"></g>
+                        <rect id="矩形" fill="#FFCC00" mask="url(#mask-2)" x="0" y="0" width="12" height="13" rx="2"></rect>
+                        <text id="C" mask="url(#mask-2)" font-family="Futura-Medium, Futura" font-size="9" font-weight="400" fill="#FFFFFF">
+                            <tspan x="0.5" y="10">C</tspan>
+                        </text>
+                        <text id="+" mask="url(#mask-2)" font-family="Futura-Bold, Futura" font-size="6" font-weight="bold" fill="#FFFFFF">
+                            <tspan x="6.5" y="8">+</tspan>
+                        </text>
+                        <text id="+-copy" mask="url(#mask-2)" font-family="Futura-Bold, Futura" font-size="6" font-weight="bold" fill="#FFFFFF">
+                            <tspan x="8" y="10.5">+</tspan>
+                        </text>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

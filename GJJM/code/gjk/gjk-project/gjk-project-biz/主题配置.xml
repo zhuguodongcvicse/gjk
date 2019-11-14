@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<root>
+<subscribe>
+<topic name="6">
+<startCmp name="start"/>
+<endCmp name="0"/>
+<dataStream>
+<funcName compId="cc25c960-e32e-11e9-9d74-93030f210e70" compName="qwer789" name="qwer"/>
+<funcInterface name="选项2"/>
+</dataStream>
+</topic>
+<topic name="topic">
+<startCmp name="startCmp"/>
+<endCmp name="qqqq"/>
+<dataStream>
+<funcName compId="cc25c960-e32e-11e9-9d74-93030f210e70" compName="qwer789" name="qwer"/>
+<funcInterface name="rrrr"/>
+</dataStream>
+<dataStream>
+<funcName compId="cc25c960-e32e-11e9-9d74-93030f210e70" compName="qwer789" name="qwer"/>
+<funcInterface name="rrrr"/>
+</dataStream>
+</topic>
+</subscribe>
+
+
+<publish>
+<topic name="pub">
+<startCmp name="end"/>
+<endCmp  name="1"/>
+<dataStream>
+<funcName compId="cc25c960-e32e-11e9-9d74-93030f210e70" compName="asdf456" name="asdf"/>
+<funcInterface name="选项2"/>
+</dataStream>
+</topic>
+<topic name="pub">
+<startCmp name="end"/>
+<endCmp  name="2"/>
+<dataStream>
+<funcName compId="cc25c960-e32e-11e9-9d74-93030f210e70" compName="asdf456" name="asdf"/>
+<funcInterface name="rvj"/>
+</dataStream>
+<dataStream>
+<funcName compId="60719050-e27f-11e9-bcec-a128ff91afba" compName="asdf456" name="asdf"/>
+<funcInterface name="9"/>
+</dataStream>
+</topic>
+</publish>
+</root>

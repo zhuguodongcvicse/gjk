@@ -1,0 +1,85 @@
+//@grant window.close
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+</head>
+
+<body>
+	<input type="button" name="close" value="关闭" onclick="closePageForm()" />
+	<input type="button" name="close" value="testSame" onclick="testSame()" />
+	<input type="text" id="a" oninput="aa(event)" onporpertychange="aa(event)" />
+	<script>
+		function aa(e) { 
+			alert("inputting!!"); 
+		}
+		function closePageForm() {
+			window.opener = null;
+			window.open('', '_self');
+			window.close();
+		}
+		function getCaption(obj) {
+			var index = obj.lastIndexOf("\_");
+			obj = obj.substring(index + 1, obj.length);
+			//  console.log(obj);
+			return obj;
+		}
+		var str = "芯片接口3_NQcicj51BdrHyPp_ySboqehOiPCt7ZF";
+		function jiequ() {
+			var str = "0123456789";
+			console.log("原始字符串：", str);
+
+			console.log("从索引为3的字符起一直到结束：", str.slice(3));  //3456789
+			console.log("从倒数第3个字符起一直到结束：", str.slice(-3));  //789
+
+			console.log("从开始一直到索引为5的前一个字符：", str.slice(0, 5));  //01234
+			console.log("从开始一直到倒数第3个字符的前一个字符：", str.slice(0, -3));  //0123456
+
+			console.log("从索引为3的字符起到索引为5的前一个字符：", str.slice(3, 5));  //34
+			console.log("从索引为3的字符起到倒数第3个字符的前一个字符：", str.slice(3, -3));  //3456
+		}
+		function testMap() {
+			var map = new Map()
+			var a = { 'a': 1, 'b': 2 }
+			map.set(a, 'ccc')
+			map.set('aa', 55)
+			// alert(map.get(a))
+			// alert(map.get('aa'))
+			delete map[a]
+			delete map['aa']
+			map.delete(a)
+			console.log("map", map)
+		}
+		function testSame() {
+			var listA = [{ a: 1, b: 2 }, { c: 3, d: 4 }]
+			var listB = [{ a: 1, b: 2 }]
+			// var val = listA.indexOf(listB[0])
+			/* let bb = listA.find(bb => {
+				return bb.a == 1
+			}); */
+			let a1 = listB[0].a
+			a1 = listA.find(a1 => {
+				return a1.a == 1
+			});
+			console.log("listA", listA)
+			console.log("listB", listB)
+			console.log("a1", a1)
+			let items = [
+				{ id: 1, name: 'something' },
+				{ id: 2, name: 'anything' },
+				{ id: 3, name: 'nothing' },
+				{ id: 4, name: 'anything' }
+			];
+			let item = items.find(item => {
+				return item == { id: 2, name: 'anything' };
+			});
+			console.log("item", item)
+		}
+	</script>
+</body>
+
+</html>

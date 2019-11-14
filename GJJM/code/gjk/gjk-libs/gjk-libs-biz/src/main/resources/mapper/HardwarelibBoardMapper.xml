@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ ~    Copyright (c) 2018-2025, inforbus All rights reserved.
+ ~
+ ~ Redistribution and use in source and binary forms, with or without
+ ~ modification, are permitted provided that the following conditions are met:
+ ~
+ ~ Redistributions of source code must retain the above copyright notice,
+ ~ this list of conditions and the following disclaimer.
+ ~ Redistributions in binary form must reproduce the above copyright
+ ~ notice, this list of conditions and the following disclaimer in the
+ ~ documentation and/or other materials provided with the distribution.
+ ~ Neither the name of the inforbus.com developer nor the names of its
+ ~ contributors may be used to endorse or promote products derived from
+ ~ this software without specific prior written permission.
+ ~ Author: inforbus
+  -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inforbus.gjk.libs.mapper.HardwarelibBoardMapper">
+
+  <resultMap id="hardwarelibBoardMap" type="com.inforbus.gjk.libs.api.entity.HardwarelibBoard">
+                  <id property="id" column="id"/>
+                        <result property="boardName" column="board_name"/>
+                        <result property="sn" column="sn"/>
+                        <result property="boardId" column="board_id"/>
+                        <result property="cpuNum" column="cpu_num"/>
+                        <result property="hrTypeName" column="hr_type_name"/>
+                        <result property="userId" column="user_id"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="version" column="version"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="boardType" column="board_type"/>
+            </resultMap>
+
+  <!--hardwarelibBoard简单分页查询-->
+  <select id="getHardwarelibBoardPage" resultMap="hardwarelibBoardMap">
+    SELECT
+                  id,
+                        board_name,
+                        sn,
+                        board_id,
+                        cpu_num,
+                        hr_type_name,
+                        user_id,
+                        create_time,
+                        update_time,
+                        version,
+                        del_flag,
+                        board_type
+              FROM gjk_hardwarelib_board
+    <where>
+              <if test="hardwarelibBoard.id != null and hardwarelibBoard.id.trim() != ''">
+          AND id = #{hardwarelibBoard.id}
+        </if>
+              <if test="hardwarelibBoard.boardName != null and hardwarelibBoard.boardName.trim() != ''">
+          AND board_name = #{hardwarelibBoard.boardName}
+        </if>
+              <if test="hardwarelibBoard.sn != null and hardwarelibBoard.sn.trim() != ''">
+          AND sn = #{hardwarelibBoard.sn}
+        </if>
+              <if test="hardwarelibBoard.boardId != null and hardwarelibBoard.boardId.trim() != ''">
+          AND board_id = #{hardwarelibBoard.boardId}
+        </if>
+              <if test="hardwarelibBoard.cpuNum != null and hardwarelibBoard.cpuNum.trim() != ''">
+          AND cpu_num = #{hardwarelibBoard.cpuNum}
+        </if>
+              <if test="hardwarelibBoard.hrTypeName != null and hardwarelibBoard.hrTypeName.trim() != ''">
+          AND hr_type_name = #{hardwarelibBoard.hrTypeName}
+        </if>
+              <if test="hardwarelibBoard.userId != null and hardwarelibBoard.userId.trim() != ''">
+          AND user_id = #{hardwarelibBoard.userId}
+        </if>
+              <if test="hardwarelibBoard.createTime != null and hardwarelibBoard.createTime.trim() != ''">
+          AND create_time = #{hardwarelibBoard.createTime}
+        </if>
+              <if test="hardwarelibBoard.updateTime != null and hardwarelibBoard.updateTime.trim() != ''">
+          AND update_time = #{hardwarelibBoard.updateTime}
+        </if>
+              <!--<if test="hardwarelibBoard.description != null and hardwarelibBoard.description.trim() != ''">
+          AND description = #{hardwarelibBoard.description}
+        </if>-->
+              <if test="hardwarelibBoard.delFlag != null and hardwarelibBoard.delFlag.trim() != ''">
+          AND del_flag = #{hardwarelibBoard.delFlag}
+        </if>
+              <if test="hardwarelibBoard.boardType != null and hardwarelibBoard.boardType.trim() != ''">
+          AND type = #{hardwarelibBoard.boardType}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

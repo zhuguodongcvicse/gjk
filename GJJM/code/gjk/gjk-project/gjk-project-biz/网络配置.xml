@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<root>
+    <network_in>
+        <funcConfig compId="61021080-e27f-11e9-bcec-a128ff91afba" compName="qwer789" name="qwer">
+            <ip name="533"/>
+            <port name="dsef"/>
+            <protocol name="666"/>
+        </funcConfig>
+    </network_in>
+    <network_out>
+        <funcConfig compId="60719050-e27f-11e9-bcec-a128ff91afba" compName="asdf456" name="asdf">
+            <ip name="062645"/>
+            <port name="89"/>
+            <protocol name="666"/>
+        </funcConfig>
+    </network_out>
+</root>

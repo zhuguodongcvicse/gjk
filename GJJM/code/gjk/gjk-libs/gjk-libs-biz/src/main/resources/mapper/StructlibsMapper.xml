@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ~ Copyright (c) 2018-2025, inforbus All rights reserved. ~ ~ Redistribution 
+	and use in source and binary forms, with or without ~ modification, are permitted 
+	provided that the following conditions are met: ~ ~ Redistributions of source 
+	code must retain the above copyright notice, ~ this list of conditions and 
+	the following disclaimer. ~ Redistributions in binary form must reproduce 
+	the above copyright ~ notice, this list of conditions and the following disclaimer 
+	in the ~ documentation and/or other materials provided with the distribution. 
+	~ Neither the name of the inforbus.com developer nor the names of its ~ contributors 
+	may be used to endorse or promote products derived from ~ this software without 
+	specific prior written permission. ~ Author: inforbus -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inforbus.gjk.libs.mapper.StructlibsMapper">
+
+	<resultMap id="structlibsMap"
+		type="com.inforbus.gjk.libs.api.entity.Structlibs">
+		<id property="id" column="id" />
+		<result property="parentId" column="parent_id" />
+		<result property="childrenIds" column="children_ids" />
+		<result property="name" column="name" />
+		<result property="version" column="version" />
+		<result property="type" column="type" />
+		<result property="dataType" column="data_type" />
+		<result property="structType" column="struct_type" />
+		<result property="dataLength" column="data_length" />
+		<result property="permission" column="permission" />
+		<result property="sort" column="sort" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="delFlag" column="del_flag" />
+		<result property="storageFlag" column="storage_flag" />
+		<result property="applyDesc" column="apply_desc" />
+	</resultMap>
+
+	<sql id="saveStructlibsSql">
+		id,
+		parent_id,
+		children_ids,
+		name,
+		sort,
+		version,
+		type,
+		data_type,
+		struct_type,
+		data_length,
+		permission
+	</sql>
+
+	<!--structlibs简单分页查询 -->
+	<select id="getStructlibsPage" resultMap="structlibsMap">
+		SELECT
+		id,
+		parent_id,
+		children_ids,
+		name,
+		version,
+		type,
+		data_type,
+		struct_type,
+		data_length,
+		permission,
+		sort,
+		create_time,
+		update_time,
+		del_flag,
+		storage_flag,
+		apply_desc
+		FROM gjk_structlibs
+		<where>
+			<if test="structlibs.id != null and structlibs.id.trim() != ''">
+				AND id = #{structlibs.id}
+			</if>
+
+			<if
+				test="structlibs.childrenIds != null and structlibs.childrenIds.trim() != ''">
+				AND children_ids = #{structlibs.childrenIds}
+			</if>
+			<if
+				test="structlibs.name != null and structlibs.name.trim() != ''">
+				AND name LIKE CONCAT('%',#{structlibs.name},'%')
+			</if>
+			<if test="structlibs.version != null">
+				AND version = #{structlibs.version}
+			</if>
+			<if
+				test="structlibs.type != null and structlibs.type.trim() != ''">
+				AND type = #{structlibs.type}
+			</if>
+			<if
+				test="structlibs.dataType != null and structlibs.dataType.trim() != ''">
+				AND data_type = #{structlibs.dataType}
+			</if>
+			<if
+				test="structlibs.structType != null and structlibs.structType.trim() != ''">
+				AND struct_type = #{structlibs.structType}
+			</if>
+			<if test="structlibs.dataLength != null">
+				AND data_length = #{structlibs.dataLength}
+			</if>
+			<if
+				test="structlibs.permission != null and structlibs.permission.trim() != ''">
+				AND permission = #{structlibs.permission}
+			</if>
+			<if test="structlibs.sort != null">
+				AND sort = #{structlibs.sort}
+			</if>
+			<if
+				test="structlibs.createTime != null and structlibs.createTime.trim() != ''">
+				AND create_time = #{structlibs.createTime}
+			</if>
+			<if
+				test="structlibs.updateTime != null and structlibs.updateTime.trim() != ''">
+				AND update_time = #{structlibs.updateTime}
+			</if>
+			AND parent_id = '0'
+			and del_flag = '0'
+		</where>
+	</select>
+
+	<!-- 保存构件 -->
+	<insert id="saveStruct"
+		parameterType="com.inforbus.gjk.libs.api.entity.Structlibs">
+		INSERT INTO gjk_structlibs (
+		<include refid="saveStructlibsSql" />
+		) VALUES (
+		#{structlibs.id},
+		#{structlibs.parentId},
+		#{structlibs.childrenIds},
+		#{structlibs.name},
+		#{structlibs.sort},
+		#{structlibs.version},
+		#{structlibs.type},
+		#{structlibs.dataType},
+		#{structlibs.structType},
+		#{structlibs.dataLength},
+		#{structlibs.permission})
+	</insert>
+
+	<select id="getVersionByStruct" resultMap="structlibsMap">
+		SELECT * FROM
+		(SELECT *
+		FROM gjk_structlibs sl WHERE parent_id='0' AND
+		data_type=#{dataType}
+		AND
+		del_flag!='1'
+		ORDER BY sl.version desc LIMIT 10000) t GROUP BY
+		t.data_type
+	</select>
+
+	<select id="getLatestStructByType" resultMap="structlibsMap">
+		SELECT * From
+		`gjk_structlibs`
+		where root_id in (SELECT id FROM (SELECT * FROM
+		gjk_structlibs sl WHERE
+		data_type=#{dataType} ORDER BY sl.version desc
+		LIMIT 10000) t GROUP BY
+		t.data_type)
+	</select>
+	<select id="findAllStructs" resultMap="structlibsMap">
+		SELECT * FROM
+		gjk_structlibs
+		WHERE parent_id='0' AND del_flag!='1'
+	</select>
+	<update id="deleteStructByParentId">
+		update gjk_structlibs set del_flag='1' where
+		parent_id=#{id}
+	</update>
+	<update id="deleteStructById">
+		update gjk_structlibs set del_flag='1' where id=#{id}
+	</update>
+
+	<select id="getStructByParentId" resultMap="structlibsMap">
+		SELECT * From
+		`gjk_structlibs`
+		where parent_id=#{id}
+	</select>
+	<update id="rKuStructById">
+		update gjk_structlibs set storage_flag ='1' where
+		id=#{id}
+	</update>
+	<update id="rKuStructByParentId">
+		update gjk_structlibs set storage_flag ='1' where
+		parent_id=#{id}
+	</update>
+	<update id="updateStruct"
+		parameterType="com.inforbus.gjk.libs.api.entity.Structlibs">
+		update gjk_structlibs set
+		parent_id=#{structlibs.parentId},
+		children_ids=#{structlibs.childrenIds},
+		name=#{structlibs.name},
+		sort=#{structlibs.sort},
+		version=#{structlibs.version},
+		type=#{structlibs.type},
+		data_type=#{structlibs.dataType},
+		data_length=#{structlibs.dataLength},
+		permission=#{structlibs.permission}
+		where id=#{structlibs.id}
+	</update>
+	<update id="delStructByIds">
+		update gjk_structlibs set del_flag='1' where
+		parent_id=#{id} and id not in
+		(${ids})
+	</update>
+</mapper>

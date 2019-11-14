@@ -1,0 +1,1213 @@
+/* new class */
+html,body,#app {
+    height: 100%;
+    width:100%;
+    min-width:1200px;
+    /* min-height:768px; */
+    // width:expression_r(document.body.clientWidth < 1200 ? "1200px": "auto" );
+    overflow: auto;
+    font-size:14px;
+  }
+  /* 滚动条 */
+  ::-webkit-scrollbar {width:10px;height:10px;background:#D2DAE5;}
+  ::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    background: #999;
+  }
+  ::-webkit-scrollbar-track {
+    border-radius: 3px;
+    -moz-box-shadow:0px 0px 5px #D2DAE5; 
+    -webkit-box-shadow:0px 0px 5px #D2DAE5; 
+    box-shadow:0px 0px 5px #D2DAE5;
+    background:#D2DAE5;
+  }
+  body::-webkit-scrollbar {width:10px;height:10px;background:#bbb;}
+  body::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    background: #333;
+  }
+  body::-webkit-scrollbar-track {
+    border-radius: 3px;
+    -moz-box-shadow:0px 0px 5px #bbb; 
+    -webkit-box-shadow:0px 0px 5px #bbb; 
+    box-shadow:0px 0px 5px #bbb;
+    background:#bbb;
+  }
+
+  .fl_14s{float:left;}
+  .fr_14s{float:right;}
+  .w100_14s{width:100%;}
+  .h100_14s{height:100%;}
+  .text_align_right_14s{text-align:right;}
+  .text_align_center_14s{text-align:center;}
+  .text_align_left_14s{text-align:left;}
+  .fontsize0{font-size:12px;}
+  .fontsize1{font-size:14px;}
+  .fontsize2{font-size:16px;}
+  .fontsize3{font-size:18px;}
+
+  .avue-contail{
+    min-width:1100px;
+    // width:expression_r(document.body.clientWidth < 1100 ? "1100px": "auto" );
+  }
+  
+  // 系统所需要的按钮统一修改样式
+  .el-button--primary{background:#436D9F;border-color:#436D9F;}
+  .el-button--primary:hover,
+  .el-button--primary:active,
+  .el-button--primary:focus{background:rgba(67,109,159,0.8);border-color:rgba(67,109,159,0.8);}
+  .el-button--small, .el-button--small.is-round{padding:8px 10px;}
+  .el-button{padding:6px 15px;}
+  .el-button--text{color:#436D9F;}
+
+  .el-button--primary.is-plain{background:rgba(67, 109, 159, 0);border-color:rgba(67, 109, 159, 0.8);color:rgba(67, 109, 159, 1);}
+  .el-button--primary.is-plain:focus, .el-button--primary.is-plain:hover{
+    background:rgba(67, 109, 159, 0.1);border-color:rgba(67, 109, 159, 1);color:rgba(67, 109, 159, 1);
+  }
+  
+  // 选项卡“更多”样式修改
+  .btn_more_14{background:transparent;color:#436D9F;border-color:transparent;}
+  .btn_more_14 .el-icon--right{margin-left:0px;}
+  .btn_more_14:hover,
+  .btn_more_14:active,
+  .btn_more_14:focus{background:transparent;color:#2E3E63;border-color:transparent;}
+  // -------------end
+
+  //头部全屏样式
+  .icon-quanping:before {
+      content: "\e85a"!important;
+      color:#409EFF;
+      font-weight:bold;
+    }
+  .icon-tuichuquanping:before{color:#409EFF;font-weight:bold;}
+  // -------------end
+
+  
+  .el-tree{padding-bottom:30px;}
+  .avue-crud__menu{height:20px!important;}
+  .el-card__body{padding:15px 20px}
+  .avue-view{padding-bottom:18px!important;}
+  
+  .avue-main{background:#f0f2f5;}
+  .el-input__inner,
+  .el-input--medium .el-input__inner,
+  .el-input--medium .el-input__icon{height:30px;line-height:30px;}
+  .el-select{width:100%;}
+  .el-input-number .el-input__inner{text-align:left;}
+
+  
+  // 首页样式修改
+  .wel-contailer {
+    position: relative;
+  }
+  
+  .banner-text {
+    position: relative;
+    padding: 0 20px;
+    font-size: 20px;
+    text-align: center;
+    color: #333;
+  }
+  
+  .banner-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.8;
+    display: none;
+  }
+  
+  .actor {
+    height: 250px;
+    overflow: hidden;
+    font-size: 18px;
+    color: #333;
+  }
+  
+  .actor:after {
+    content: "";
+    width: 3px;
+    height: 25px;
+    vertical-align: -5px;
+    margin-left: 5px;
+    background-color: #333;
+    display: inline-block;
+    animation: blink 0.4s infinite alternate;
+  }
+  
+  .typeing:after {
+    animation: none;
+  }
+  
+  @keyframes blink {
+    to {
+      opacity: 0;
+    }
+  }
+  .page_wel_14s .avue-data-panel .item{background:#436D9F;}
+  .page_wel_14s .avue-data-panel .item-title,
+  .page_wel_14s .avue-data-panel .item-count{color:#fff!important;}
+
+// ************end
+
+/* 系统表格统用样式 */
+.el-table__body td .el-button--primary.is-plain{color:#436D9F;}
+.el-table__body td .el-button--primary.is-plain,
+.el-table__body td .el-button--danger.is-plain,
+.el-table__body td .el-button--success.is-plain,
+.el-table__body td .el-button--warning.is-plain{padding:5px 5px!important;background:none;border:none;}
+
+.el-table__body td .el-button--primary.is-plain:active,
+.el-table__body td .el-button--primary.is-plain:focus,
+.el-table__body td .el-button--primary.is-plain:hover{color:#436D9F;}
+.el-table__body td .el-button--danger.is-plain:active,
+.el-table__body td .el-button--danger.is-plain:focus,
+.el-table__body td .el-button--danger.is-plain:hover{color:#F2637B;}
+.el-table__body td .el-button--success.is-plain:active,
+.el-table__body td .el-button--success.is-plain:focus,
+.el-table__body td .el-button--success.is-plain:hover{color:#4ECB74;}
+.el-table__body td .el-button--warning.is-plain:active,
+.el-table__body td .el-button--warning.is-plain:focus,
+.el-table__body td .el-button--warning.is-plain:hover{color:#E6A23C;}
+
+.el-pagination.is-background .el-pager li:not(.disabled).active{background:#436D9F;}
+
+
+.app-container.calendar-list-container .el-button.el-button--primary.is-plain{padding:3px 15px;}
+.app-container.calendar-list-container .el-button.el-button--primary.is-plain:hover,
+.app-container.calendar-list-container .el-button.el-button--primary.is-plain:active,
+.app-container.calendar-list-container .el-button.el-button--primary.is-plain:focus{background:none;}
+
+.el-table--medium td, .el-table--medium th,
+.el-table td, .el-table th
+{padding:5px 0;}
+// ************end
+
+/* 系统弹出框统一样式 */
+.el-dialog__header,
+.el-message-box__header{background:#F7F7F7;padding:8px 15px;min-height:14px;}
+.el-dialog__title,
+.el-message-box__title{font-size:14px;}
+.el-dialog__headerbtn{top:10px;}
+.el-dialog__headerbtn .el-dialog__close,
+.el-message-box__headerbtn .el-message-box__close{font-weight:bold;color:#4A4A4A;}
+.el-message-box__headerbtn{top:4px;}
+
+// .el-dialog__body{padding:20px;overflow-x:hidden;overflow-y:auto;max-height:300px;}
+.el-dialog__body > div{height:100%!important;}
+.el-dialog__body .el-button.el-button--primary.el-button--mini{margin-bottom:15px;}
+// .el-dialog__body .el-form-item{margin-bottom:22px;}
+.uploaderbtn {
+  border: 1px solid rgb(0, 0, 0);
+  border-radius: 3px;
+}
+.uploaderbtn{margin-bottom:15px;font-size:12px!important;color:#fff!important;font-weight:400!important;margin-right:15px;}
+.uploaderbtn1{background:#436D9F!important;border:1px solid #436D9F!important;}
+.uploaderbtn2{background:#E4B94E!important;border:1px solid #E4B94E!important;}
+.comp_upload_btn_14s{text-align:right;margin-top:15px;}
+.el-dialog .el-transfer__button{padding:7px!important;}
+// ************end
+
+/* 用户管理 */
+.user {
+  height: 100%;
+
+  &__tree {
+    padding-top: 3px;
+    padding-right: 20px;
+  }
+
+  &__main {
+    .el-card__body {
+      padding-top: 0;
+    }
+  }
+}
+// ************end
+
+// src\page\index\logo.vue页面提取出样式
+.fade-leave-active {
+transition: opacity 0.2s;
+}
+.fade-enter-active {
+transition: opacity 2.5s;
+}
+.fade-enter,
+.fade-leave-to {
+opacity: 0;
+}
+.avue-logo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 64px;
+  line-height: 64px;
+  background-color: #20222a;
+  font-size: 20px;
+  overflow: hidden;
+  box-sizing: border-box;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+  z-index: 1024;
+  &_title {
+    display: block;
+    text-align: center;
+    font-weight: 300;
+    font-size: 16px;
+  }
+  &_subtitle {
+    display: block;
+    text-align: center;
+    font-size: 25px;
+    font-weight: bold;
+    color: #fff;
+  }
+}
+// ************end
+
+  /* 构件建模样式 */
+        /* 请选择图标 */
+        .comp_code-editor_icon-choose_14s .el-form-item{margin-bottom:10px;}
+        .comp_code-editor_icon-choose_14s .el-form-item__label,
+        .comp_code-editor_icon-choose_14s .el-form-item__content{line-height:40px;}
+        .comp_code-editor_icon-choose_14s .el-form-item__content .el-col{margin-bottom:0px;}
+        .comp_code-editor_icon-choose_14s .el-input__inner{height:40px;line-height:40px;}
+        .comp_code-editor_icon-choose_14s .el-color-picker--small .el-color-picker__trigger{border:none;}
+
+        .icon_choose_w1_14s{width:96%;}
+        .icon_choose_w2_14s{width:88%;}
+        .icon_choose_w3_14s{width:95%;}
+        .icon_choose_imgdiv_14s{text-align:center;border:1px dashed #ddd;width:150px;}
+        .icon_choose_img_14s{vertical-align: middle;width: 100px; height:80px;border-radius:5px;}
+        .icon_choose_i_14s{display: inline-block;height: 100%;vertical-align: middle;}
+        .avatar-uploader .el-upload {
+          border: 1px dashed #d9d9d9;
+          border-radius: 6px;
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+        }
+        .avatar-uploader .el-upload:hover {
+          border-color: #409eff;
+        }
+        .avatar-uploader-icon {
+          font-size: 28px;
+          color: #8c939d;
+          width: 150px;
+          height: 75px;
+          line-height: 75px;
+          text-align: center;
+        }
+        .el-input-group__append {
+          margin: 0;
+          padding: 0;
+        }
+        /* 选择文件 */
+        .params_files_14s .el-col {
+          border-radius: 4px;
+        }
+        .params_files_14s .bg-purple-dark {
+          background: #99a9bf;
+        }
+        .params_files_14s .bg-purple {
+          background: #d3dce6;
+        }
+        .params_files_14s .bg-purple-light {
+          background: #e5e9f2;
+        }
+        .params_files_14s .grid-content {
+          border-radius: 4px;
+          min-height: 36px;
+        }
+  
+        .table_add_div_14s{height:35px;line-height:35px;padding-left:10px;border:1px solid #EBEEF5;border-top:0px;}
+        .table_add_div_14s .addtabrow_btn_14s{font-size:14px!important;font-weight:400!important; color:#436D9F;}
+  
+        /* 建模添加*/
+        .params_14s .params_tit_14s{line-height:40px;padding-left:0px;font-size:16px;font-weight:bold;cursor:pointer}
+        .params_table_14s .tit_14s font{line-height:40px;}
+        .el-row label,.el-card__header span{font-weight:bold;font-size:16px;}
+        .grid-content.bg-purple-dark font{font-weight:bold;font-size:16px;}
+        .el-card__header{border-bottom:none;padding:18px 20px 10px 20px;}
+        .el-card.is-hover-shadow .el-card__body{padding:0px 20px 20px 20px;}
+        .el-tabs__item.is-active{color:#436D9F;}
+        .el-tabs__active-bar{background-color:#436D9F;}
+        .el-tabs__item{padding:0px 12px;}
+        .el-scrollbar__view .el-card{border:none;}
+        .el-scrollbar__view .el-card.box-card.is-never-shadow{border-bottom:2px solid #EBEEF5; }
+        .el-tab-pane .el-card{border:none;}
+        .el-form .el-form-item__label{font-size:14px;font-weight:400;}
+        .nt_main{background:#fff;left:10px!important;overflow-x: hidden;overflow-y: auto;padding:10px;}
+        .nt_main_14s_1008{padding-right:0px;}  //项目管理器
+
+        .el-row{background:#fff;}
+        .el-card.is-always-shadow, 
+        .el-card.is-hover-shadow:focus, 
+        .el-card.is-hover-shadow:hover{box-shadow:none!important;}
+        .el-form-item--mini.el-form-item, .el-form-item--small.el-form-item{margin-bottom:10px;}
+        .el-.el-input--mini .el-input__inner{padding:0px 5px;text-align:center;}
+        .el-form-item__content .el-button{padding:7px 5px;}
+        .avue-crud{width:100%!important;}
+        .el-dialog .el-button{padding:7px 15px;}
+        .el-dialog .el-button.el-button--small.is-circle{padding:9px!important;}
+  
+        .el-table__body-wrapper .el-table__empty-block{height:100px;}
+
+        .comp_sxpz_14s .el-tabs__content{}
+        .comp_sxpz_14s,.component_add_right_14s{height:74vh;overflow-y: scroll;overflow-x: hidden;}
+        .comp_sxpz_14s{height:72vh;overflow-y: scroll;overflow-x: hidden;border-right:1px solid #EBEEF5;}
+        .component_add_right_14s{border-left:1px solid #EBEEF5;padding-top:15px;}
+        .component_add_right_14s .el-card__header{padding:0px;padding-left:15px;padding-top:5px;padding-bottom:5px;}
+        .component_add_right_14s .component_add_padd_14s{padding:0px;}
+        .component_add_right_14s .component_add_padd_14s .el-card__body{padding:0px;padding-left:8px;}
+        // .component_add_right_14s .avatar-uploader.icon_choose_imgdiv_14s i{border:1px dashed #ddd;}
+        .component_add_right_14s .el-button--info.is-plain{border-radius:0px 3px 3px 0px;}
+        .component_add_right_14s .el-input__inner{border-radius:3px 0px 0px 3px;}
+        // .params_table_scroll_14s .el-table--border .el-table__fixed-body-wrapper{height:200px;overflow:auto!important;border:1px solid red;}
+        // .params_table_scroll_14s .el-table--border .el-table__body-wrapper.is-scrolling-none{height:200px;overflow:auto!important;border:1px solid red;}
+  
+        /* 性能属性 */
+        .comp_component_showcomp_14s{height:100%;padding:0px 10px 0px  10px;}
+        .comp_component_showcomp_14s .comp_component_showcomp_tree_14s,
+        .comp_component_showcomp_tree_14s .el-tree{height:100%;padding-bottom:0px;}
+        .comp_component_showcomp_main_14s{height:100%;overflow: hidden;}   //overflow-x:hidden;overflow-y:auto;
+        .el-table_3_column_6  .el-input__inner{height:29px;line-height:29px;}
+        .el-table_3_column_6 .el-input__icon{line-height:29px;}
+        .el-table--border th, .el-table__fixed-right-patch{background:#fafafa;color:rgba(0,0,0,.85);}
+        // .el-table .cell{text-align:center;}
+        .demo-dynamic .el-button--info{margin-left:10px;}
+        .comp_sxpz_14s .el-button i{padding:9px 25px;}
+        /* .el-form-item__content{text-align:right;} */
+  
+        /* 添加组件 */
+        .component_add_padd_14s{padding:10px;}
+        .component_add_padd_14s .clearfix{padding:0px;}
+  
+        /* 构件入库 */
+        .storageapply_header_14s{font-size:14px;text-align:center;color:#436D9F;height:auto!important;padding-bottom:20px;}
+        .storageapply_main_form .el-select{width:100%;}
+  
+        /* textEdit文件 */
+        .textdeit_form_14s{
+            .form_inp_14s{width:600px;}
+            .form_btn_14s{margin-bottom:10px;}
+            .editor {
+                width: 1500px;
+                height: 1000px;
+              }
+        } 
+  
+  /* 项目开发 */
+        
+        // 项目列表
+        .libs_bsp_dialog_14s.pro_project_index_dialog_14s .bsp_tab_14s{height:292px;overflow:auto;padding-right:10px;}
+        .libs_bsp_dialog_14s.pro_project_index_dialog_14s .bsp_footer_btn_14s{padding-top:15px;padding-bottom:15px;}
+
+        /* 加载组件 */
+        .pro_deployment_14s {padding:20px;}
+        .pro_deployment_14s .pro_deployment_btn{margin-left:15px;}
+        .pro_deployment_14s .el-upload__tip{margin-top:0.01px;}
+        .pro_deployment_14s .iframe{position:absolute;top:10px;left: 0px;}
+        
+        /* 参数配置 */
+        .pro_hardware_property_14s .hardware_property_tit{height:50px;line-height:50px;text-align:center; background:#909399}
+  
+        /* src\views\pro\project\CustomConfiguration\文件  network与networkout样式相同*/
+        
+        .pro_project_custom_index_14s{padding: 0 1rem ;overflow-x:hidden;overflow-y:auto;height:100%;}
+  
+        .pro_project_custom_networkconfig_14s .divlable{
+          font-size:16px;
+          font-weight:bold;
+          color:#436D9F;
+          text-align:left;
+        }
+        
+        .pro_project_custom_pubtopicparam_14s .pubtopicparam_row1{padding: 0.5rem 2.5rem 0}
+        .pro_project_custom_pubtopicparam_14s .pubtopicparam_row2{padding: 0 0.5rem}
+        .pro_project_custom_pubtopicparam_14s .pubtopicparam_row2 .pubtopicparam_row2_div1{height:9rem;overflow: auto;}
+        .pro_project_custom_pubtopicparam_14s .pubtopicparam_row2 .pubtopicparam_row2_div1 .el-tree{ margin:10px;}
+        .pro_project_custom_pubtopicparam_14s .pubtopicparam_col1{padding: 0 2.5rem}
+        .pro_project_custom_pubtopicparam_14s .nodeText { }
+  
+        /* 自定义配置 */
+        .pro_project_custom_themeconfig_14s .divlable {
+          font-size:16px;
+          font-weight:bold;
+          color:#436D9F;
+          text-align:center;
+          margin-top:10px;
+          padding:10px 0px;
+          background:#F7F7F7;
+        
+        }
+        .pro_project_custom_networkout_14s{margin:0px!important;margin-top:10px!important;}
+        .pro_project_custom_networkout_14s .el-col-6,.topicparam_row2 .el-col-7{border:1px solid #E8E8E8;padding:0px!important;}
+        .pro_project_custom_networkout_14s .divlable {
+          background:#F7F7F7;
+          font-size:14px;
+          font-weight:400;
+          color:#436D9F;
+          text-align:left;
+          margin:0px;
+          padding:5px 10px;
+        }
+  
+        .pro_project_custom_networkout_14s .el-tree{margin:0px;}
+        .pro_project_custom_networkout_14s .el-col-18{padding:0px!important;padding-left:20px!important;}
+  
+        .pro_project_custom_network3_14s,
+        .pro_project_custom_topicparam_14s .topicparam_row1 ,
+        .pro_project_custom_topicparam_14s .topicparam_row2
+        {padding:0px!important;}
+        .pro_project_custom_topicparam_14s .el-form-item{width:50%;margin:0px!important;padding:5px 0;}
+        .pro_project_custom_topicparam_14s .el-input__inner{height:30px;line-height:30px;}
+        .topicparam_row2 .divlable{color:#333;font-weight:bold;}
+        .topicparam_row2_col2_dataStream{font-size:14px;color:#436D9F;}
+        .pro_project_custom_topicparam_14s .topicparam_row2_div {height:9rem;overflow: auto;}
+        .pro_project_custom_topicparam_14s .topicparam_row2 .topicparam_row2_col2{padding-left:14%;}
+        .pro_project_custom_topicparam_14s .topicparam_row2 .topicparam_row2_col2 .el-form-item{width:100%;}
+        .pro_project_custom_networkoutparam_14s{margin-top:10px;padding-right:20px;}
+        .pro_project_custom_networkoutparam_14s  .el-select{width:100%;}
+        .pro_project_custom_network1_14s {height:15.2rem!important;overflow: auto;}
+  
+        /* 项目管理器-左侧tree */
+        .project_tree_14s{width:100%;padding:20px 0;text-align:center}
+        /*
+        .pro_project_tree_14s .el-tree-node__label{background:url(../../public/img/new_img14s/wj_14s.png) left center no-repeat;padding-left:20px;}
+        .pro_project_tree_14s .el-tree-node__children .el-tree-node__children .el-tree-node__label{background:url(../../public/img/new_img14s/JPG_14s.png) left center no-repeat;}
+        */
+        .project_tree_14s img{border-radius: 50%;display:block;width:90px;margin:auto}
+        .project_tree_14s .project_tree_dropdown{margin-bottom:-5px;color:#303133}
+        .pro_project_tree_14s .tree-container .el-tree{margin:10px;}
+        .pro_project_tree_span1_14s{padding:0px 10px;}
+        .pro_project_tree_14s .nodeMenu {
+          position: absolute;
+          display: none;
+          text-align: center;
+          width: 100px;
+          cursor: pointer;
+          color: #000;
+          /* z-index: 3000; */
+        }
+        
+        .pro_project_tree_14s .nodeMenu-member:hover {
+          cursor: pointer;
+          background:rgba(176, 224, 230, 0.5);
+        }
+        
+        .pro_project_tree_14s .nodeMenu-member:hover font {
+          font-weight: 700;
+          font-size: 30;
+        }
+        
+        .pro_project_tree_14s .el-dropdown-link {
+          cursor: pointer;
+          color: #436D9F;
+          font-size:14px;
+          font-weight:bold;
+        }
+        
+        .pro_project_tree_14s  .rightmenu {
+          position: absolute;
+          text-align: center;
+          border-radius: 5px;
+          margin: 0px;
+          width: 8rem;
+          background: white;
+          box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25);
+          color: #000;
+          font-size: 12px;
+          left: 120px;
+          display: none;
+        }
+       
+        
+        .pro_project_tree_14s  .rightmenu .disable {
+          color: rgba(0, 0, 0, 0.25);
+        }
+        
+        .pro_project_tree_14s .rightmenu .command {
+          height: 14px;
+          padding: 10px;
+          box-sizing: content-box;
+        }
+        
+        .pro_project_tree_14s  .rightmenu .command:hover {
+          cursor: pointer;
+          border-radius: 5px;
+          background: #e6f7ff;
+        }
+        
+        .pro_project_tree_14s  .rightmenu .command.disable:hover {
+          cursor: default;
+          background: none;
+        }
+        
+        .pro_project_tree_14s  .tree-container {
+          height: 500px;
+          overflow-y: auto;
+        }
+        
+        .pro_project_tree_14s  .avatar-uploader .el-upload {
+          border: 1px dashed #d9d9d9;
+          border-radius: 6px;
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+        }
+        .pro_project_tree_14s .avatar-uploader .el-upload:hover {
+          border-color: #409eff;
+        }
+        .pro_project_tree_14s .avatar-uploader-icon {
+          font-size: 28px;
+          color: #8c939d;
+          width: 178px;
+          height: 178px;
+          line-height: 178px;
+          text-align: center;
+        }
+        .pro_project_tree_14s .avatar {
+          width: 178px;
+          height: 178px;
+          display: block;
+        }
+        .pro_project_tree_14s .el-select{width:100%;}
+        .pro_project_tree_14s .el-checkbox{margin-top:10px;}
+
+        .pro_project_tree_14s .tree-container{position: relative;}
+
+  
+        /* src\views\pro\project\selectTree.vue */
+        .selecttree_14s{height:300px;overflow-y: scroll;}
+  
+        /* 项目开发——流程模型 */
+        // .mb_main{border:1px solid yellow;}
+        .pro_jsplumb_14s{height:calc(100%);}
+        .pro_jsplumb_index_14s{height: calc(92%);}
+        .pro_jsplumb_14s .jsplumb_group1{padding:0 0 0 10px;}
+        .jsplumb_group1 .el-button i{font-size:14px;}
+        .pro_jsplumb_14s .iframe {
+          width: 100%;
+          border:0;
+          overflow: hidden!important;
+          box-sizing: border-box;
+          pointer-events: all;
+          z-index: 10px;
+        }
+        .pro_jsplumb_14s .main {
+          position: relative;
+          width: 100%;
+        }
+        .pro_jsplumb_14s .float_div {
+          float:left;
+          width: 100%;
+          height: 100%;
+          
+        }
+        .pro_jsplumb_14s  .slider {
+          width: 30%;
+          height: 98%;
+          padding-left:5px;
+          position: absolute;
+          top: 0;
+          cursor: w-resize;
+          right: 0;
+          background: #fff;
+          z-index: 25;
+        }
+        .pro_jsplumb_14s .popContainer {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.3);
+          z-index: 100;
+        }
+        .pro_jsplumb_14s .el-form.el-form--inline .el-input-group__append{padding:0px 12px;background:#436D9F;color:#fff;}
+        .pro_jsplumb_14s .el-input-group{margin-right:40px;}
+        .pro_jsplumb_14s .el-form.el-form--inline .el-button{padding:5px 20px;}
+        .pro_jsplumb_14s .el-form.el-form--inline{border-bottom:2px solid #F0F2F5;padding-bottom:15px;padding:15px 20px;}
+        .pro_jsplumb_14s .float_div > .el-card{
+          overflow-x:hidden;
+          overflow-y:scroll;
+          height: 97%;
+        }
+        .pro_jsplumb_14s .pro_jsplumb_comp_14s {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          background:#000;
+          right: 0px;
+          opacity: 0.2;
+          z-index: 24;
+          display:none;
+        }
+        .pro_jsplumb_14s .pro_jsplumb_select{margin-left:10px;width:auto;}
+        .pro_jsplumb_index_14s .compdiv_btn {
+          position: absolute;
+          top:5px;
+          padding:3px 8px;
+          right:15px;background:#fff;
+          z-index:9999;
+        }
+        .pro_jsplumb_index_14s .compdiv_btn:hover,
+        .pro_jsplumb_index_14s .compdiv_btn:active,
+        .pro_jsplumb_index_14s .compdiv_btn:focus{background:#fff;}
+  
+        .pro_jsplumb_compdiv_14s .params_14s .el-button i{padding:9px 25px!important;}
+        .pro_jsplumb_compdiv_14s .params_14s .el-col{width:100%;}
+        .pro_jsplumb_compdiv_14s .el-table__fixed, .pro_jsplumb_compdiv_14s .el-table__fixed-right{
+          box-shadow:none;
+        }
+        .pro_jsplumb_compdiv_14s .el-form-item{margin-bottom:10px;}
+
+        
+        /* 方案展示 */
+        .showplan_btn_14s{padding:10px 20px 10px 5px;margin-left:10px;}
+        .pro_project_showplan_14s .showplay_table_14s{overflow-x:hidden;overflow-y:scroll;height:92%;padding:0px 15px;}
+        .pro_project_showplan_14s {padding:0px 10px;height:84vh;}
+  
+        /* 流程模型——请您选择一张将要生成的App组件工程的图片弹框 */
+        .dialog_selectPhotoDialogVisible_14s .el-upload.el-upload--text{border:1px solid #dcdcdc;}
+  
+        /* 项目开发—— App运行与控制模块 */
+        .pro_project_showapp_14s .showapp_form{margin-left: 60px; }
+        .pro_project_showapp_14s .showapp_input_14s{margin-right:20px; width: 570px;}
+        .showapp_input_14s .el-input-group__append{padding:0px 35px;background:#436D9F;color:#fff;}
+        .pro_project_showapp_14s .showapp_form_btn{height:28px;padding:0px 20px;vertical-align:top;}
+        .pro_project_showapp_14s{
+          -moz-box-shadow:0px 0px 3px #ccc; 
+          -webkit-box-shadow:0px 0px 3px #ccc; 
+          box-shadow:0px 0px 3px #ccc;
+          width:98.5%!important;
+          background:#fff;
+          margin:0 10px;
+          padding:15px;
+          border-radius: 3px;
+          height:100%;
+          /* overflow-x:hidden;
+          overflow-y:auto; */
+        }
+        .showapp_tc_14s{
+          border-radius: 0 0 6px;
+          background-color: rgba(255, 255, 255, 0.8); 
+          position: absolute; bottom:0px;text-align: center; width:270px
+        }
+        .showapp_tc_14s .el-tooltip{
+          background:#436D9F;
+          width:25px;
+          height:25px;
+          color:#fff;
+          text-align:center;
+          line-height:25px;
+          margin:0px 3px;
+        }
+        .pro_project_showapp_14s .father{position:relative;-moz-box-shadow:0px 0px 5px #ccc; -webkit-box-shadow:0px 0px 5px #ccc; box-shadow:0px 0px 5px #ccc;width:270px; height:236px; margin-left: 40px; border-radius:6px;}
+        .pro_project_showapp_14s .child{width:100%; height:236px; text-align: right; position: absolute;z-index:999;}
+        .pro_project_showapp_14s .appImage{width:270px; height:236px; border-radius:6px;position: absolute;z-index:99;top:0;}
+        .showapp_child_14s .showapp_child_tit_14s{width:100%;position:absolute;bottom:80px;padding:0px;}
+        .pro_project_showapp_14s .showapp_child_14s span{font-size:13px; color: #333333;padding-right:10px;}
+        .pro_project_showapp_14s .showapp_child_14s strong span{font-size:14px; color: #333333}
+        .showapp_child_tit_14s{line-height:25px;background:rgba(255, 255, 255, 0.8);}
+        .pro_project_showapp_14s .showapp_child_14s strong,
+        .showapp_child_14s .child_line_14s{display:list-item;list-style:none;line-height:25px;margin:0px;padding:0px;}
+        .showapp_page_14s {margin-bottom:20px}
+        .showapp_form2 .showapp_form2_btn{width:280px; height:240px; margin-left: 60px}
+        .showapp_dialog_14s .showapp_dialog_inp1{width:550px}
+        .showapp_dialog_14s .showapp_dialog_inp2{width:410px}
+        .showapp_dialog_14s .showapp_dialog_btn{height:40px;}
+        /* //控制鼠标悬停事件 */
+         .pro_project_showapp_14s .father .child {
+            display: none; /*  //上层的div的内容一开始设置为不可见 */
+          }
+         .pro_project_showapp_14s .father:hover .child {
+            display: block;/*  //鼠标移入后，上层的div的内容为可见 */
+          }
+         .pro_project_showapp_14s .father:hover .appImage {
+            display: block; /*  //鼠标移入后，底层div的图片不可见 */
+          }
+            // App运行与控制模块
+          .showApp_indexBar_div1{margin-left: 60px; margin-top: 40px; margin-bottom: 20px}
+          .showApp_indexBar_inp1{margin-top: 10px; margin-right:20px; width: 570px; height: 33px;}
+          .pro_project_showApp_indexBar_14s .father{border: 1px solid #DAA520; width:280px; height:230px; margin-left: 60px; border-radius:6px;}
+          .pro_project_showApp_indexBar_14s .child{width:280px; height:230px; text-align: center;}
+          
+        
+        /* 项目开发——系统配置 */
+        .pro_project_systemconfiguration_14s .systemconfiguration__btn_14s{padding:20px;}
+        .pro_project_systemconfiguration_14s{background:transparent!important;overflow-x:hidden;overflow-y:auto;}
+        .sysConfig_tab_14s{padding:0px 20px 20px 20px;width:97%;}
+        .sysConfig_tab_14s .el-card__body{padding:0px;}
+        .sysConfig_tab_14s .el-form-item__content{text-align:left;border:1px solid #f5f5f5;}
+        .pro_project_systemconfiguration_coe_14s .nodeText {
+          font-size: 16px;
+          border-radius: 3px;
+          padding:5px 0;
+          text-align: left;
+          font-weight: bold;
+          color: #436D9F;
+        }
+        .el-tree.pro_project_systemconfiguration_coe_tree_14s {
+          height:10rem;overflow: auto;
+          background:#E6F0FC!important;
+        }
+        .pro_project_systemconfiguration_coe_14s .el-form-item{margin-bottom:10px;}
+        .pro_project_systemconfiguration_coe_14s .el-select{width:100%;}
+        .pro_project_systemconfiguration_message_14s{border:1px solid transparent; border-radius:3px; padding:0;}
+        .pro_project_systemconfiguration_message_14s .el-form-item__content{border:none;}
+        .pro_project_systemconfiguration_message_div{border:1px solid transparent; border-radius:6px; padding:0}
+        .pro_project_systemconfiguration_message_div span{color:#436D9F;padding:3px 22px;}
+        .coe_table1_14s .el-table__body-wrapper{height:9.7rem;overflow: auto;}
+  
+        .pro_project_systemconfiguration_14s .nodeAndAssemblyCard {
+          text-align: left;
+        }
+        .pro_project_systemconfiguration_14s .coefficientConfigurationCard {
+          text-align: left;
+        }
+        .pro_project_systemconfiguration_14s .headTextSize {
+          font-size: 20px;
+        }
+  
+        /* src\views\pro\project\textEdits.vue */
+        .pro_project_textedits_14s .textedits_div1_14s{position: relative}
+        .pro_project_textedits_14s .textedits_btn_14s{margin-bottom:10px}
+        .pro_project_textedits_14s .textedits_inp_14s{width:99%;border:2px solid #ccc; bottom:20px}
+        .pro_project_textedits_14s .editor {
+          width: 1500px;
+          height: 1000px;
+        }
+
+  /* admin/dispose 文件 软硬件映射配置 */
+        /*软硬件映射配置 */
+          .admin_dispose_14s{height:97%;}
+          .admin_dispose_14s .admin_dispose_row{height:92%;}
+          .admin_dispose_14s .dispose_btn{padding:20px;border-bottom:5px solid #F0F2F5;}
+          .dispose_inp1_hidden{width: 60%;}
+          .admin_dispose_14s .div1{padding:0px 20px;padding-bottom:20px;}
+          .admin_dispose_row .admin_dispose_left{width:40%;}
+          .admin_dispose_row .admin_dispose_right{width:59.5%;padding-right:15px;}
+          .admin_dispose_row .el-col{height:100%;padding:0px;margin:0px;padding-bottom:15px;overflow-x:hidden;overflow-y:auto;}
+          .admin_dispose_14s .dispose_tit,
+          .dispose_grid_14s .dispose_grid_tit{text-align:left;color:#436D9F;font-weight:bold;}
+          .admin_dispose_14s .dispose_form1{margin-right:30px; margin-top:10px}
+          .dispose_form1 .el-form .el-form-item{margin-bottom:0px;width:100%;position: relative;}
+          .admin_dispose_14s .dispose_form1 .el-select
+  
+          .admin_dispose_14s .dispose_grid_14s .dispose_grid_form{border:1px solid #F0F2F5;padding:0px 20px;}
+          .admin_dispose_14s .dispose_grid_hr_14s{float:left;height:100vh;border:none;margin:0px;width:5px;background:#F0F2F5;}
+          .dispose_grid_14s{padding-left:20px;padding-right:15px;}
+          .dispose_grid_14s .dispose_grid_tit{padding:0px;padding-top:20px;padding-bottom:15px;}
+          .dispose_grid_14s .div2 .dispose_grid_tit{color:#444;}
+          .dispose_form1 .el-form .el-select{width:100%!important;}
+          .dispose_grid_form .el-form .el-form-item{margin-bottom:0px;width:100%;position: relative;}
+          
+          .dispose_grid_form .el-upload{float:left;position: absolute;top:0px; right:0px;}
+          .dispose_grid_form .el-upload .el-button{border:none;background:transparent;color:#555;}
+          
+          .dispose_grid_14s .div2 .dispose_grid_tit .el-button{margin-left:10px;padding:6px 10px;}
+          .dispose_grid_tscl .dispose_grid_del{border:none;background:transparent;color:#888;}
+          .dispose_grid_radio .el-radio__label{font-weight:400;}
+          // .admin_dispose_14s .el-form--inline .el-form-item__content{position: absolute;top:0px;width:90%;}
+          .dispose_grid_14s .el-select{width:100%;}
+          // .dispose_grid_radio .el-form--inline .el-form-item__content{left:155px;}
+          .dispose_grid_tscl .dispose_grid_select .el-select{width:90%;}
+          .dispose_grid_tscl .dispose_grid_select .dispose_grid_del span{color:#F56C6C;}
+          .dispose_grid_form .el-input .el-input__inner,.dispose_form1 .el-input .el-input__inner{height:30px;line-height:30px;}
+  
+          .admin_dispose_showhandle_14s .showhandle_div1{margin-left:40px;}
+          .admin_dispose_showhandle_14s .showhandle_div2{margin-left:30px;}
+  
+          .admin_dispose_showinput_14s{}
+          .admin_dispose_showselect_14s{}
+          .admin_dispose_showselectsingle_14s{}
+
+          .admin_basetemplate_addtemplate_14s .custom-tree-node {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            padding-right: 8px;
+          }
+          
+          .admin_basetemplate_addtemplate_14s .uploader-example {
+            width: 90%;
+            padding: 15px;
+            margin: 40px auto 0;
+            font-size: 12px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+          }
+          
+          .admin_basetemplate_addtemplate_14s  .uploader-example .uploader-btn {
+            margin-right: 4px;
+          }
+          
+          .admin_basetemplate_addtemplate_14s .uploader-example .uploader-list {
+            max-height: 440px;
+            overflow: auto;
+            overflow-x: hidden;
+            overflow-y: auto;
+          }
+          
+          .admin_basetemplate_addtemplate_14s .attributeClass {
+            margin-top: 9px;
+          }
+          .admin_basetemplate_addtemplate_14s .addtemplate_table_14s span.addtemplate_title_14s{font-size:14px;padding:10px 0px;}
+          .addtemplate_dialog_14s .el-col{line-height:30px;}
+          .addtemplate_dialog_14s .el-input__icon{height:auto;line-height:30px;}
+          .addtemplate_dialog_border_14s{border:1px solid #eee;padding:15px;}
+          // .addtemplate_dialog_row_14s {margin-bottom:15px;}
+          .addtemplate_dialog_14s .el-form-item{margin-bottom:0px;width:100%;}
+          .addtemplate_dialog_14s .addtemplate_dialogbtn_14s{margin-top:15px;}
+  
+  // 用户管理
+          /* 信息管理-密码管理 */
+          .admin_user_info_14s .avatar-uploader .el-upload {
+            border: 1px dashed #d9d9d9;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+          }
+  
+          .admin_user_info_14s .avatar-uploader .el-upload:hover {
+            border-color: #409EFF;
+          }
+  
+          .admin_user_info_14s .avatar-uploader-icon {
+            font-size: 28px!important;
+            color: #8c939d!important;
+            width: 178px!important;
+            height: 178px!important;
+            line-height: 178px!important;
+            text-align: center!important;
+          }
+  
+          .admin_user_info_14s.avatar {
+            width: 178px;
+            height: 178px;
+            display: block;
+          }
+  
+          /* 菜单管理 */
+          .admin_menu_index_14s,
+          .admin_menu_index_14s > .basic-container,
+          .admin_menu_index_14s > .basic-container > .el-card.is-always-shadow,
+          .admin_menu_index_14s > .basic-container > .el-card.is-always-shadow > .el-card__body{height:100%;}
+          
+          .admin_menu_index_main_14s .el-card__body{padding-top:0px;}
+          .admin_menu_index_main_14s .el-form-item{margin-bottom:10px;}
+          .admin_menu_index_main_14s{height:100%;padding-top:15px;}
+          .menu_main_left_14s,
+          .menu_main_right_14s{height:100%;overflow-x:hidden;overflow-y:auto;padding-bottom:15px;}
+  
+          /* 字典管理 用户管理 */
+          .admin_dict_14s,
+          .admin_dict_14s .basic-container,
+          .admin_dict_14s .el-card.is-always-shadow{height:100%;}
+          .admin_dict_14s .el-card__body{height:92%;overflow-x:hidden;overflow-y:auto;}
+
+          .admin_basetemplate_shmapping_14s,
+          .admin_basetemplate_tablecomm_14s,
+          .admin_basetemplate_testfather_14s,
+          .admin_basetemplate_test_configtyetest_14s,
+          .admin_basetemplate_updatabasetemplate_updatamapping_14s{
+            width: 100%;
+            height: 100% ;
+            overflow:auto;
+          }
+          
+          .shmapping_isaddlable2,
+          .updatamapping_isaddlable2{ overflow:auto;}
+  
+          .admin_basetemplate_testrecursive_14s{}
+          .admin_basetemplate_components_inputcomm_14s{}
+          .admin_basetemplate_components_selectcomm_14s{}
+          .admin_basetemplate_components_uploadcomm_14s{}
+          .admin_basetemplate_test_treecomm_14s{}
+  
+          .admin_ceshi_14s .editor {
+            width: 1500px;
+            height: 1000px;
+          }
+  
+          .admin_client_14s{}
+          
+          .admin_log_index_14s .el-form{width:50%;float:left;}
+          .admin_log_index_14s .avue-crud__menu{width:50%;float:right;}
+
+          .admin_role_index_14s{}
+          .admin_token_14s{}
+  
+          .admin_uploaders_index_14s .btn_10_14s{margin-left:10px;}
+  
+  /* 库管理 */
+  .libs_algorithmlib_showchild_14s textarea{width:700px; height: 600px;}
+  .libs_hardwarelibboard_boarddesign_14s .boarddesign_iframe_14s
+  {
+    position:absolute;
+    top:10px;
+    left: 10px;
+    width: 98.5%;
+    height: 91.5%!important;
+    border: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+  
+  .libs_hardwarelibcase_index_14s{}
+  .libs_hardwarelibcase_casedesign_14s .casedesign_iframe_14s{}
+  .libs_structlibs_configstruct_14s .table1{
+    width: 100%;margin-bottom: 15px;
+    margin-top:5px;
+  }
+  .libs_structlibs_configstruct_14s  .el-table__body-wrapper .el-table__empty-block{height:58px;}
+
+
+  // 库管理弹出窗样式
+  .libs_bsp_dialog_14s .uploader-btn{border:1px solid #e9e9eb;background:#f4f4f5;}
+  .libs_bsp_dialog_14s .el-tag.el-tag--info{border:none;background:transparent;}
+  .bsp_tab_14s .el-table{border:1px solid #EBEEF5;border-bottom:0px;}
+  .bsp_tab_btn_14s {border:1px solid #EBEEF5;border-top:0px;}
+  .libs_bsp_dialog_14s textarea{border:1px solid #DCDFE6;width:94%;padding:0px 15px;}
+  .bsp_tab_14s .el-form-item{margin:10px 0;}
+  .libs_bsp_dialog_14s .el-form-item{margin-bottom:22px;}
+  .libs_bsp_dialog_14s .el-form-item__content,
+  .libs_bsp_dialog_14s .el-form-item__label{line-height:30px;}
+  .libs_bsp_dialog_14s .bsp_tab_btn_14s button.el-button{margin:3px 0;}
+  .libs_bsp_dialog_14s .el-table__body-wrapper .el-table__empty-block{height:65px;}
+  .libs_bsp_dialog_14s .el-dialog__body{overflow: hidden;height:auto;max-height:400px;padding:15px 15px 5px 15px;}
+  .libs_bsp_dialog_14s .bsp_tab_14s{height:250px;overflow:auto;padding-right:10px;}
+  .libs_bsp_dialog_14s .bsp_footer_btn_14s{padding-top:20px;}
+
+  .libs_bsp_index_dialog_14s .el-form-item,
+  .libs_software_dialog_14s .el-form-item{margin-bottom:10px;}
+
+  // ----------end
+
+  
+
+  .libs_algorithmlib_index_14s .admin_menu_index_main_14s,
+  .libs_testlib_index_14s .admin_menu_index_main_14s,
+  .libs_platformlib_index_14s .admin_menu_index_main_14s{padding-top:0px;}
+
+  .libs_algorithmlib_index_14s .el-input,
+  .libs_testlib_index_14s .el-input,
+  .libs_platformlib_index_14s .el-input{width:90%;margin-bottom:10px;}
+
+  .libs_algorithmlib_index_14s .ivu-split-trigger-vertical,
+  .libs_testlib_index_14s .ivu-split-trigger-vertical,
+  .libs_platformlib_index_14s .ivu-split-trigger-vertical{box-shadow:none;background:#eee;}
+
+  .libs_hardwarelibchip_index_14s .el-input,
+  .libs_hardwarelibboard_index_14s .el-input,
+  .libs_hardwarelibcase_index_14s .el-input{width:90%;}
+  .libs_hardwarelibchip_addchip_14s .el-input,
+  .libs_hardwarelibboard_boarddesign_14s .el-input,
+  .libs_hardwarelibcase_addcase_14s .el-input{width:90%;}
+  
+
+  // 板子设计
+  .libs_hardwarelibboard_boarddesign_14s ,
+  .libs_hardwarelibboard_boarddesign_14s .el-row{height:100%;}
+  .libs_hardwarelibboard_boarddesign_14s{padding:0 10px;}
+  // .libs_hardwarelibboard_boarddesign_14s .boarddesign_btn_14s{padding:15px;}
+  // .libs_hardwarelibboard_boarddesign_14s .boarddesign_btn_14s .el-button{margin-right:10px;}
+  
+  
+  .tree_left_14s{background:#E6F0FC;height:100%;overflow-x:hidden;overflow-y:auto;padding-top:5px;}
+  .tree_left_14s .el-tree{background:transparent!important;}
+  .pro_project_systemconfiguration_message_14s{border:1px solid #ddd;padding:5px 15px 10px 15px;margin-right:5px;overflow-x:hidden;overflow-y:auto;}
+  .coefficientassembly_14s,.coefficientassembly_bottom_14s{padding-right:20px!important;}
+  .coe_table1_14s{}
+  
+  /* 结构体库管理 */
+  .libs_structlibs_configstruct_14s .grid-content.bg-purple-light{margin-top:15px;}
+  // .libs_structlibs_configstruct_14s .el-form-item{margin-bottom:10px;}
+  .libs_structlibs_configstruct_14s .el-input-group__append{padding:0px 20px;}
+  .libs_structlibs_configstruct_14s .el-dialog__body .el-button.el-button--primary.el-button--mini{margin-bottom:0px;}
+  .libs_structlibs_configstruct_14s .el-form-item__label,
+  .libs_structlibs_configstruct_14s .el-form-item__content,
+  .libs_structlibs_configstruct_14s .el-input__icon
+  {line-height:30px;}
+  .libs_structlibs_configstruct_14s .el-select{width:100%;}
+/*结构体库管理新增样式*/
+.libs_structlibs_configstruct_14s_25s .grid-content.bg-purple-light{margin-top:15px;}
+.libs_structlibs_configstruct_14s_25s .grid-content.bg-purple-light_25s{margin-top:-30px;}
+// .libs_structlibs_configstruct_14s_25s .el-form-item{margin-bottom:10px;}
+.libs_structlibs_configstruct_14s_25s .el-input-group__append{padding:0px 20px;}
+.libs_structlibs_configstruct_14s_25s .el-dialog__body{overflow-y: hidden;min-height: 100px;max-height: 500px}
+.libs_structlibs_configstruct_14s_25s .el-dialog__body .el-button.el-button--primary.el-button--mini{margin-bottom:0px;}
+.libs_structlibs_configstruct_14s_25s .el-form-item__label,
+.libs_structlibs_configstruct_14s_25s .el-form-item__content,
+.libs_structlibs_configstruct_14s_25s .el-input__icon
+{line-height:30px;}
+.libs_structlibs_configstruct_14s_25s .el-select{width:100%;}
+.libs_structlibs_configstruct_14s_25s_table{overflow-y: auto;max-height: 300px}
+
+  
+  /* 系统页面设置高度与加滚动条 */
+  .user,
+  .user .basic-container,
+  .user .el-card.is-always-shadow,
+  .admin_role_index_14s,
+  .admin_role_index_14s .basic-container,
+  .admin_role_index_14s .el-card.is-always-shadow,
+  .admin_basetemplate_index_14s,
+  .admin_basetemplate_index_14s .basic-container,
+  .admin_basetemplate_index_14s .el-card.is-always-shadow,
+  .admin_log_index_14s,
+  .admin_log_index_14s .basic-container,
+  .admin_log_index_14s .el-card.is-always-shadow,
+  .comp_component_index_14s,
+  .comp_component_index_14s .basic-container,
+  .comp_component_index_14s .el-card.is-always-shadow,
+  .pro_project_height_14s,
+  .pro_project_height_14s .basic-container,
+  .pro_project_height_14s .el-card.is-always-shadow,
+  .libs_algorithmlib_index_14s,
+  .libs_algorithmlib_index_14s .basic-container,
+  .libs_algorithmlib_index_14s .el-card.is-always-shadow,
+  .libs_approval_index_14s,
+  .libs_approval_index_14s .basic-container,
+  .libs_approval_index_14s .el-card.is-always-shadow,
+  .libs_bsp_index_14s,
+  .libs_bsp_index_14s .basic-container,
+  .libs_bsp_index_14s .el-card.is-always-shadow,
+  .libs_commoncomponent_index_14s,
+  .libs_commoncomponent_index_14s .basic-container,
+  .libs_commoncomponent_index_14s .el-card.is-always-shadow,
+  .libs_compmanage_index_14s,
+  .libs_compmanage_index_14s .basic-container,
+  .libs_compmanage_index_14s .el-card.is-always-shadow,
+  .libs_hardwarelibboard_index_14s,
+  .libs_hardwarelibboard_index_14s .basic-container,
+  .libs_hardwarelibboard_index_14s .el-card.is-always-shadow,
+  .libs_software_index_14s,
+  .libs_software_index_14s .basic-container,
+  .libs_software_index_14s .el-card.is-always-shadow,
+  .libs_hardwarelibcase_index_14s,
+  .libs_hardwarelibcase_index_14s .basic-container,
+  .libs_hardwarelibcase_index_14s .el-card.is-always-shadow,
+  .libs_hardwarelibchip_index_14s,
+  .libs_hardwarelibchip_index_14s .basic-container,
+  .libs_hardwarelibchip_index_14s .el-card.is-always-shadow,
+  .libs_hardwarelibinf_index_14s,
+  .libs_hardwarelibinf_index_14s .basic-container,
+  .libs_hardwarelibinf_index_14s .el-card.is-always-shadow,
+  .libs_platformlib_index_14s,
+  .libs_platformlib_index_14s .basic-container,
+  .libs_platformlib_index_14s .el-card.is-always-shadow,
+  .libs_project_index_14s,
+  .libs_project_index_14s .basic-container,
+  .libs_project_index_14s .el-card.is-always-shadow,
+  .libs_approval_index_14s,
+  .libs_approval_index_14s .basic-container,
+  .libs_approval_index_14s .el-card.is-always-shadow,
+  .libs_softwarelibs_index_14s,
+  .libs_softwarelibs_index_14s .basic-container,
+  .libs_softwarelibs_index_14s .el-card.is-always-shadow,
+  .libs_structlibs_14s,
+  .libs_structlibs_14s .basic-container,
+  .libs_structlibs_14s .el-card.is-always-shadow,
+  .libs_testlib_index_14s,
+  .libs_testlib_index_14s .basic-container,
+  .libs_testlib_index_14s .el-card.is-always-shadow,
+  .page_wel_14s,
+  .page_wel_14s .basic-container,
+  .page_wel_14s .el-card.is-always-shadow,
+  .admin_basetemplate_addtemplate_14s,
+  .admin_basetemplate_addtemplate_14s .basic-container,
+  .admin_basetemplate_addtemplate_14s .el-card.is-always-shadow
+  {height:100%;}
+  .user .el-card__body,
+  .admin_role_index_14s .el-card__body,
+  .admin_basetemplate_index_14s .el-card__body,
+  .admin_log_index_14s .el-card__body,
+  .comp_component_index_14s .el-card__body,
+  .pro_project_height_14s .el-card__body,
+  .libs_algorithmlib_index_14s .el-card__body,
+  .libs_approval_index_14s .el-card__body,
+  .libs_bsp_index_14s .el-card__body,
+  .libs_commoncomponent_index_14s .el-card__body,
+  .libs_compmanage_index_14s .el-card__body,
+  .libs_hardwarelibboard_index_14s .el-card__body,
+  .libs_software_index_14s .el-card__body,
+  .libs_hardwarelibcase_index_14s .el-card__body,
+  .libs_hardwarelibchip_index_14s .el-card__body,
+  .libs_hardwarelibinf_index_14s .el-card__body,
+  .libs_platformlib_index_14s .el-card__body,
+  .libs_project_index_14s .el-card__body,
+  .libs_approval_index_14s .el-card__body,
+  .libs_softwarelibs_index_14s .el-card__body,
+  .libs_structlibs_14s .el-card__body,
+  .libs_testlib_index_14s .el-card__body,
+  .admin_basetemplate_addtemplate_14s .el-card__body,
+  .page_wel_14s .el-card__body
+  {height:95%;overflow-x:hidden;overflow-y:auto;}
+  // ************end
+  
+
+/* 页面护眼色 */
+.avue-header,.avue-tags,.el-row,.el-collapse-item__header,.el-collapse-item__wrap,.nt_main,.mb_main,.pro_jsplumb_14s .slider,.el-card,.el-tree,
+.user .el-card__body,
+.admin_role_index_14s .el-card__body,
+.admin_basetemplate_index_14s .el-card__body,
+.admin_log_index_14s .el-card__body,
+.comp_component_index_14s .el-card__body,
+.pro_project_height_14s .el-card__body,
+.libs_algorithmlib_index_14s .el-card__body,
+.libs_approval_index_14s .el-card__body,
+.libs_bsp_index_14s .el-card__body,
+.libs_commoncomponent_index_14s .el-card__body,
+.libs_compmanage_index_14s .el-card__body,
+.libs_hardwarelibboard_index_14s .el-card__body,
+.libs_software_index_14s .el-card__body,
+.libs_hardwarelibcase_index_14s .el-card__body,
+.libs_hardwarelibchip_index_14s .el-card__body,
+.libs_hardwarelibinf_index_14s .el-card__body,
+.libs_platformlib_index_14s .el-card__body,
+.libs_project_index_14s .el-card__body,
+.libs_approval_index_14s .el-card__body,
+.libs_softwarelibs_index_14s .el-card__body,
+.libs_structlibs_14s .el-card__body,
+.libs_testlib_index_14s .el-card__body,
+.page_wel_14s .el-card__body,.comp_component_showcomp_main_14s{
+  background-color: #FFFFFA!important;
+}
+
+  @media screen and (max-width: 1440px) {
+    .admin_dispose_row .admin_dispose_right{width:59.3%;}
+  }
+  @media screen and (max-width: 1280px) {
+    .avue-view{padding-bottom:18px!important;}
+    .pro_jsplumb_14s  .slider {
+      width: 35%;
+    }
+    .admin_dispose_row .admin_dispose_right{width:59.3%;}
+    .pro_project_custom_index_14s{height:97%;}
+    .sysConfig_tab_14s{padding:0px 20px 20px 20px;width:67.6%;}
+    .coefficientassembly_14s,.coefficientassembly_bottom_14s{padding-right:10px!important;}
+  }
+  @media screen and (max-width: 1230px) {
+    .admin_dispose_row .admin_dispose_right{width:59%;}
+  }
+
+  
+  //项目列表表格加鼠标样式
+  .table_cursor_14s_1008 tr:hover td{cursor:pointer;}
+  
+  .fullbg_14s {
+    display: none; 
+    position: absolute; 
+    z-index:1002; 
+    overflow: auto; 
+    opacity:-99.0;
+}
