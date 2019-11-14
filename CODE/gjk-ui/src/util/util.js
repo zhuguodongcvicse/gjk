@@ -21,7 +21,8 @@ export const getObjType = obj => {
     '[object RegExp]': 'regExp',
     '[object Undefined]': 'undefined',
     '[object Null]': 'null',
-    '[object Object]': 'object'
+    '[object Object]': 'object',
+    '[object Map]': 'map'
   }
   if (obj instanceof Element) {
     return 'element'
@@ -38,6 +39,8 @@ export const deepClone = data => {
     obj = []
   } else if (type === 'object') {
     obj = {}
+  } else if (type === 'map') {
+    obj = new Map()
   } else {
     // 不再具有下一层次
     return data
@@ -49,6 +52,10 @@ export const deepClone = data => {
   } else if (type === 'object') {
     for (var key in data) {
       obj[key] = deepClone(data[key])
+    }
+  } else if (type === 'map') {
+    for (var [key, value] of data) {
+      obj.set(key, deepClone(value))
     }
   }
   return obj

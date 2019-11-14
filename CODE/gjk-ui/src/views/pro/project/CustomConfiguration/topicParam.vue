@@ -3,40 +3,39 @@
   <div class="pro_project_custom_topicparam_14s">
     <el-row class="topicparam_row1">
       <el-col :span="24" class="nodeText">
-        <el-form :inline="true" :model="formInline" class="demo-form-inline">
-          <el-form-item label="startCmp">
-            <el-input v-model="formInline.user" placeholder=""></el-input>
-          </el-form-item>
-          <el-form-item label="endCmp" >
-            <el-select v-model="formInline.region" placeholder="">
-              <el-option 
-                v-for="item in part"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-                @click.native="getPart"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-          <!--<el-form-item>
-             <el-button type="primary" @click="select">查询</el-button> 
-          </el-form-item>-->
+        <el-form :inline="true" class="demo-form-inline">
+          <template v-for=" (item, index) in paramData">
+            <el-form-item
+              v-if="item.lableType == 'form'"
+              :label="item.attrMappingName"
+              :key="index"
+              style="margin-bottom: 0px;"
+            >
+              <form-item-type
+                v-model="item.attributeMap.name"
+                :lableType="item.attrConfigType"
+                :dictKey="partData"
+                :multiple="item.multiple"
+                @change="getFuncNamePart"
+              ></form-item-type>
+            </el-form-item>
+          </template>
         </el-form>
       </el-col>
     </el-row>
     <el-row class="topicparam_row2" >
       <el-col :span="7">
         <el-row class="divlable">
-          <span >dataStream列表</span>
+          <span >{{ dataStreamTagName }}列表</span>
           <i class="el-icon-remove-outline fr_14s" @click="removeNode"></i>
-        <span class="fr_14s">&nbsp;&nbsp;&nbsp;</span>
-        <i class="el-icon-circle-plus-outline fr_14s" @click="addNode"></i>
+          <span class="fr_14s">&nbsp;&nbsp;&nbsp;</span>
+          <i class="el-icon-circle-plus-outline fr_14s" @click="addNode"></i>
         </el-row>
         <div class="topicparam_row2_div">
           <el-tree
             ref="tree"
             node-key="id"
-            :data="data"
+            :data="dataStreamData"
             :default-expand-all="true"
             :highlight-current="true"
             :expand-on-click-node="false"
@@ -46,422 +45,613 @@
       </el-col>
       <el-col :span="17" class="topicparam_row2_col2">
         <el-row class="topicparam_row2_col2_dataStream">
-          <span>dataStream属性配置</span>
+          <span>{{ dataStreamTagName }}属性配置</span>
         </el-row>
-        <el-form :label-position="'right'" label-width="120px" :model="formLabelAlign">
-          <el-form-item label="funcName">
-            <el-select v-model="formLabelAlign.name" placeholder="请选择">
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-                @click.native="getInPreames"
-              >
-                <span style="float: left">{{ item.label }}</span>
-                <span style="float: right; color: #8492a6; font-size: 13px">{{ item.value }}</span>
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="funcInterface">
-            <el-select v-model="formLabelAlign.region" placeholder="请选择">
-              <el-option
-                v-for="item in inPreames"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              ></el-option>
-            </el-select>
-          </el-form-item>
+        <el-form :label-position="'right'" label-width="120px">
+          <template v-for=" (item, index) in dataStreamParamData">
+            <el-form-item
+              v-if="item.lableType == 'form'"
+              :label="item.attrMappingName"
+              :key="index"
+              style="margin-bottom: 0px;"
+            >
+              <form-item-type
+                v-if="item.lableNameTag == 'funcName'"
+                v-model="item.attributeMap.name"
+                :lableType="item.attrConfigType"
+                :multiple="item.multiple"
+                :dictKey="funcNameOptions"
+                @change="getFuncInterfacePart"
+              ></form-item-type>
+              <form-item-type
+                v-else
+                v-model="item.attributeMap.name"
+                :lableType="item.attrConfigType"
+                :multiple="item.multiple"
+                :dictKey="funcInterfaceOptions"
+              ></form-item-type>
+            </el-form-item>
+          </template>
         </el-form>
       </el-col>
     </el-row>
   </div>
-  <!-- <el-row :gutter="5">
-    
-    
-  </el-row>-->
 </template>
 
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
 import { mapGetters } from "vuex";
+import formItemType from "@/views/comp/code-editor/comp-params/form-item-type";
+import { deepClone } from "@/util/util"
 
 export default {
   //import引入的组件需要注入到对象中才能使用
-  components: {},
+  components: {
+      "form-item-type": formItemType,
+  },
   //props用于接收父级传值
-  props: [],
+  props: {
+      topicKey: { type: String, default: "" },
+      paramMaps: [Array],
+      partList: [Array],
+      titleType: { type: String, default: "" }
+  },
   //监控data中的数据变化
   watch: {
-    formLabelAlign:{
-      handler:function(newValue, oldValue){
-      this.init();
-       console.log("this.subMapCustomConfig+++++++",this.subMapCustomConfig)
-        if(new Map(this.mapFuncConfig.dataStream).size > 0 && this.clickState=="1"){
-         // console.log("返回后的数据",new Map(this.mapFuncConfig.dataStream));
-         console.log("进入监听1")
-          this.topicData.dataStream = new Map(this.mapFuncConfig.dataStream)
-          this.clickState = ""
-        }
-       // console.log("输出一下topicKey",this.topicKey)
-        if(this.topicKey != "" && this.cleanState != "1"){
-          console.log("进入监听2")
-          this.$store.dispatch('getSubMapCustomConfig', {key:"subscribe*"+this.topicKey,value:this.topicData})
-        }
-      
+      topicKey: {
+          handler: function(data) {
+              console.log('watch-topicKey:::',this.titleType, data)
+              this.cleanDataStreamParamDataTag = false
+              this.changeTopicTagPD = true
+              this.changeTopicTagDSPD = true
+              this.handleTopicParams()
+          },
+          deep: true
       },
-      deep:true
-    },
-    formInline:{
-      handler:function(newValue, oldValue){
-        this.init();
-        console.log("this.subMapCustomConfig+++++++",this.subMapCustomConfig)
-        if(new Map(this.mapFuncConfig.dataStream).size > 0 && this.clickState=="1"){
-          console.log("11111111111111111111111111111")
-          console.log("返回后的数据user",new Map(this.mapFuncConfig.dataStream));
-          this.topicData.dataStream = new Map(this.mapFuncConfig.dataStream)
-          this.clickState = ""
-        }
-         if(this.topicKey != "" && this.cleanState != "1"){
-           console.log("00000000000000000000")
-            this.$store.dispatch('getSubMapCustomConfig', {key:"subscribe*"+this.topicKey,value:this.topicData})
-        }
+      paramMaps: {
+          handler: function(data) {
+              console.log('watch-paramMaps:::', this.titleType,data)
+
+
+              // this.topicArr[this.topicKey] = this.topicData
+              // this.titleArr[this.titleType] = this.topicArr
+              // this.$store.dispatch('setThemeCustomConfigData', {key:this.$route.query.sysId, value:this.titleArr})
+              // this.initAnalysis()
+          },
+          deep: true
       },
-      deep:true
-    }
+      paramData: {
+          handler: function(data) {
+              console.log('watch-paramData:::', this.titleType, data)
+
+              // 点击切换topic时不处理
+              if(this.changeTopicTagPD){
+                  this.changeTopicTagPD = false
+                  return;
+              }
+              // 删除topic不处理
+              if(this.topicRemoveTagBool2){
+                  this.topicRemoveTagBool2 = false
+                  return;
+              }
+
+              // 取出缓存中当前的 topicData
+              let topicDataTmp = deepClone(this.getStoreTopicDataByTopicKey())
+              if(JSON.stringify(topicDataTmp) != '{}'){
+                  this.topicData = topicDataTmp
+              }
+
+              // 提取选择的值
+              for(let item of data){
+                  this.topicData[item.lableNameTag] = item.attributeMap.name
+                  // endCmp/startCmp 下拉框选的值如有改变 则清空dataStream值
+                  if(JSON.stringify(topicDataTmp) != '{}' &&
+                      topicDataTmp[item.lableNameTag] != item.attributeMap.name &&
+                      ((this.titleType == 'subscribe' && item.lableNameTag == 'endCmp' ) ||
+                          (this.titleType == 'publish' && item.lableNameTag == 'startCmp'))){
+                      this.topicData.dataStream = new Map()
+                  }
+              }
+              this.savaData2Store()
+              console.log('themeCustomConfigData1:::',this.titleType, this.themeCustomConfigData)
+          },
+          deep: true
+      },
+      dataStreamParamData: {
+          handler: function (data, oldData) {
+              console.log('watch-dataStreamParamData:::', this.titleType,data)
+
+              // 点击切换topic时不处理
+              if(this.changeTopicTagDSPD){
+                  this.changeTopicTagDSPD = false
+                  return;
+              }
+              // 初始化时不做处理
+              if(this.currDataStreamId === ''){
+                  return
+              }
+              // 删除datastream操作，不进行处理
+              if(this.dataStreamRemoveTag || this.topicRemoveTagBool1){
+                  this.dataStreamRemoveTag = false
+                  this.topicRemoveTagBool1 = false
+                  return;
+              }
+
+              let dsObj = {}
+              for(let item of data){
+                  if(item.lableNameTag == 'funcName'){
+                      let partObj = this.funcNamePartMap.get(item.attributeMap.name)
+
+                      // 切换topic时为了现在正常，该name存的是compName，所以这里再从缓存中取到compId从而获取到正确的数据
+                      if(!partObj){
+                          let funcConfig = this.getStoreDataStreamByKey(this.currDataStreamId)
+                          if(funcConfig){
+                              partObj = this.funcNamePartMap.get(funcConfig.funcName.compId)
+                          }
+                      }
+
+                      let partTmp = {
+                          compId: item.attributeMap.name,
+                          compName: partObj ? partObj.compName : '',
+                          name: partObj ? partObj.funName : ''
+                      }
+                      dsObj[item.lableNameTag] = partTmp
+                  }else {
+                      dsObj[item.lableNameTag] = item.attributeMap.name
+                  }
+              }
+              if(JSON.stringify(dsObj) != '{}'){
+                  this.topicData.dataStream.set(this.currDataStreamId, dsObj)
+                  this.savaData2Store()
+              }
+              console.log('themeCustomConfigData2:::', this.titleType,this.themeCustomConfigData)
+          },
+          deep: true
+      }
   },
   data() {
     //这里存放数据
     return {
-      funcNameMap : new Map(), //存放funcName相应数据
-      topicFuncNameMap :new Map(), //点击topic收存放funcName相应数据
-      compId : "",
-      state:"",
-      cleanState:"", //删除状态
-      part :[],
-      formLabelAlign: {
-        name: "",
-        region: "",
-        type: ""
-      },
-      index:"",
-      options: [],
-      inPreames:[],
-      formInline: {
-        user: "",
-        region: ""
-      },
-      data: [
-        // {
-        //   id:2,
-        //   label: "dataStream"
-        // },
-        // {
-        //    id:3,
-        //   label: "dataStream"
-        // },
-        // {
-        //    id:4,
-        //   label: "dataStream"
-        // }
-      ],
-      defaultProps: {
-        children: "children",
-        label: "label"
-      },
-      //组装topic数据
-      topicData : {
-         startCmp: "",
-         endCmp: "",
-         dataStream: new Map()
-      },
-      //funcConfigData : new Map()
-      //funcConfig列表值
-      funcConfigLabel : "",   
-      //父组件中的topickey
-      topicKey : "",
-      //父组件点击后的数据
-      mapFuncConfig : new Map(),
-      //父组件点击后的状态
-      clickState:"",
-      //xml数据
-      themeData:{},
-      //解析流程建模数据
-      partList:{}
+        changeTopicTagPD: false,
+        changeTopicTagDSPD: false,
+        cleanDataStreamParamDataTag: true,
+        topicRemoveTagBool1: false,
+        topicRemoveTagBool2: false,
+        dataStreamRemoveTag: false, // 标识是否进行了删除操作
+        funcNamePartMap : new Map(), //存放funcName相应数据
+        dataStreamTitle: '',
+        dataStreamTagName: '',
+        paramData: [],
+        partData: [],
+        dataStreamData: [],
+        index: 0,
+        currDataStreamId: '',
+        formLabelAlign: {
+            cmpPartName: "",
+            funcNameCompId: "",
+            type: ""
+        },
+        dataStreamParamData: [],
+        funcNameOptions: [],
+        funcInterfaceOptions: [],
+        titleArr: [],
+        topicArr: new Map(),
+        topicData: {
+            dataStream: new Map()
+        }
     };
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["subMapCustomConfig","xmlDataMap"])
+    ...mapGetters(["themeCustomConfigData", "themeChineseMapping"])
   },
   //方法集合
   methods: {
-    getInPreames(e){
-      console.log("labellabellabellabellabel",e)
-      this.formLabelAlign.region = ""
-      this.inPreames = []
-      for(var p in this.partList){
-         if(this.formInline.region == this.partList[p].partName){
-            for(var i in this.partList[p].components){
-              if(this.formLabelAlign.name == this.partList[p].components[i].compId){
-                for(var a in this.partList[p].components[i].inParamenter){
-                  if(this.partList[p].components[i].inParamenter[a].type == "DATA"){
-                        this.inPreames.push({
-                          label:this.partList[p].components[i].inParamenter[a].name,
-                          value:this.partList[p].components[i].inParamenter[a].name
-                     });
+      // 点击topic 进行数据渲染处理
+      handleTopicParams(){
+          let titleTmp = this.themeCustomConfigData.get(this.$route.query.sysId)
+          let bool = true
+          if(titleTmp){
+              let topicTmp = titleTmp[this.titleType]
+              if(topicTmp){
+                  let topicDataTmp = topicTmp.get(this.topicKey)
+                  if(topicDataTmp){
+                      bool = false
+                      this.topicData = topicDataTmp
+                      for(let i in this.paramData){
+                          if(((this.titleType == 'subscribe' && this.paramData[i].lableNameTag == 'endCmp' ) ||
+                              (this.titleType == 'publish' && this.paramData[i].lableNameTag == 'startCmp')) &&
+                              this.paramData[i].attributeMap.name == topicDataTmp[this.paramData[i].lableNameTag]){
+                              this.cleanDataStreamParamDataTag = true
+                          }
+                          this.paramData[i].attributeMap.name = topicDataTmp[this.paramData[i].lableNameTag]
+                      }
+
+                      this.dataStreamData = []
+                      for(let item of this.dataStreamParamData){
+                          item.attributeMap.name = ''
+                      }
+                      for(let [key, value] of topicDataTmp.dataStream){
+                          this.dataStreamData.push({
+                              id: key,
+                              label: this.dataStreamTitle
+                          })
+                      }
+                      if(this.dataStreamData.length > 0){
+                          this.$refs.tree.setCurrentKey(this.dataStreamData['0'].id);
+                          this.currDataStreamId = this.dataStreamData['0'].id
+
+                          for(let item of this.dataStreamParamData){
+                              let dsObj = topicDataTmp.dataStream.get(this.currDataStreamId)
+                              if(item.lableNameTag == 'funcName'){
+                                  item.attributeMap.name = dsObj[item.lableNameTag].compName //compId
+                              }else{
+                                  item.attributeMap.name = dsObj[item.lableNameTag]
+                              }
+                          }
+                      }
+                      if(this.dataStreamData.length == 0){
+                          this.addNode()
+                      }
                   }
-                }
               }
-            }
-         }
-      }
-    },
-    getPart(){
-      console.log("this.part",this.partList);
-      this.formLabelAlign.name = ""
-      this.options = []
-       for(var p in this.partList){
-         if(this.formInline.region == this.partList[p].partName){
-           for(var i in this.partList[p].components){
-             console.log(this.partList[p].components[i].functionName)
-              this.state = "1"
-             this.funcNameMap.set(this.partList[p].components[i].compId,{compName:this.partList[p].components[i].compName,funName:this.partList[p].components[i].functionName})
-             this.options.push({
-               label:this.partList[p].components[i].compName,
-               value:this.partList[p].components[i].compId
-             });
-            
-           }
-         }
-       }
-    },
-    addNode(){
-        this.data.push({
-          label: "dataStream",
-          id:this.index++
-        });
-        console.log("增加dataStream",this.subMapCustomConfig)
-    },
-    removeNode(){
-      console.log("当前topic中的值",this.topicKey)
-      console.log("当前dataStream",this.funcConfigLabel)
-       for(var i in this.data){
-        if(this.data[i].id == this.funcConfigLabel.split("*")[0]){
-          this.$store.dispatch('delSubDataStream', {topicKey:"subscribe*"+this.topicKey,DataStreamKey:this.funcConfigLabel})
-          this.data.splice(i,1);
-          this.cleanState = "1"
-          this.formLabelAlign.name = ""
-          this.formLabelAlign.region = ""
-          console.log("this.data数据",this.data)
-        }
-      }
-    },
-    clean(){
-      this.clickState = "1"
-      this.formInline.user = ""
-      this.formInline.region = ""
-      this.formLabelAlign.name = ""
-      this.formLabelAlign.region = ""
-      this.data = []
-    },
+          }
+          if(bool){
+              this.clean(false)
+          }
+      },
+      clean(tag){
+          this.topicRemoveTagBool1 = tag
+          this.topicRemoveTagBool2 = tag
+          this.topicData = this.$options.data().topicData
+          this.funcNamePartMap = this.$options.data().funcNamePartMap
+          this.dataStreamData = this.$options.data().dataStreamData
+          this.funcNameOptions = this.$options.data().funcNameOptions
+          this.dataStreamData.push({
+              id: this.index ++,
+              label: this.dataStreamTitle
+          })
+          this.currDataStreamId = this.dataStreamData['0'].id
+          for(let i in this.dataStreamParamData){
+              this.dataStreamParamData[i].attributeMap.name = ''
+          }
+          for(let i in this.paramData){
+              this.paramData[i].attributeMap.name = ''
+          }
+      },
+      // 数据存储到缓存vuex
+      savaData2Store() {
+          let titleTmp = this.themeCustomConfigData.get(this.$route.query.sysId)
+          if (titleTmp) {
+              this.titleArr = titleTmp
+              let topicTmp = this.titleArr[this.titleType]
+              if (topicTmp) {
+                  this.topicArr = topicTmp
+              }
+          }
 
-    handleNodeClick(e) {
-       this.cleanState = "0"
-      this.funcConfigLabel = e.id+"*"+e.label;
-      console.log(this.funcConfigLabel)
-      console.log("商店中取出数据",this.subMapCustomConfig)
-      var topicData = this.subMapCustomConfig.get("subscribe*"+this.topicKey);
-     // console.log("商店中key取值",this.topicKey);
-      console.log("商店中取出数据topicData",topicData);
-      if(topicData != undefined){
-         var funcConfig =new Map( this.subMapCustomConfig.get("subscribe*"+this.topicKey).dataStream).get(this.funcConfigLabel);
-        console.log("商店中取出数据funcConfig",funcConfig);
-        console.log("55555",this.funcConfigLabel, "subscribe*"+this.topicKey)
-        if(funcConfig == undefined){
-          this.state = "2"
-          this.compId = ""
-          this.formLabelAlign.name = ""
-          this.formLabelAlign.region = ""
-        }else{
-          this.state = "2"
-          this.compId = funcConfig.funcName.split("*")[1]
-          console.log("5863526",funcConfig.funcName)
-          this.formLabelAlign.name = funcConfig.funcName.split("*")[3]
-          this.formLabelAlign.region = funcConfig.funcInterface.split("*")[1]
-        }
-      }
+          let topicDataTmp = deepClone(this.topicData)
+          this.topicArr.set(this.topicKey, topicDataTmp)
+          this.titleArr[this.titleType] = this.topicArr
+          this.$store.dispatch('setThemeCustomConfigData', {key: this.$route.query.sysId, value: this.titleArr})
+      },
+      // 从缓存获取当前topicData数据对象
+      getStoreTopicDataByTopicKey() {
+          let titleTmp = this.themeCustomConfigData.get(this.$route.query.sysId)
+          let topicDataTmp = {}
+          if(titleTmp){
+              let topicTmp = titleTmp[this.titleType]
+              if(topicTmp){
+                  topicDataTmp = topicTmp.get(this.topicKey)
+              }
+          }
+          return topicDataTmp ? topicDataTmp : {}
+      },
+      // 从缓存中获取一个dataStream数据
+      getStoreDataStreamByKey(key) {
+          let topicDataTmp = this.getStoreTopicDataByTopicKey()
+          if(JSON.stringify(topicDataTmp) == '{}'){
+              return undefined
+          }
+          return topicDataTmp.dataStream.get(key)
+      },
+      // 处理页面要显示的元素
+      initAnalysis(){
+          let dataStreamLableName = ''
+          for (let key in this.paramMaps) {
+              let entity = this.paramMaps[key]
+              let attrObj = this.analysisAttrConfigType(entity)
+              let configType = this.analysisConfigureType(entity)
+              // dataStram数据汇总到一个集合用于显示树列表，其他按form元素类型显示
+              if(configType.lableType == 'topicTree'){
+                  // this.dataStreamData.push({
+                  //     id: this.index++,
+                  //     label: configType.lableName
+                  // })
+                  dataStreamLableName = configType.lableName
+              }else{
+                  this.paramData = this.paramData.concat(
+                      attrObj
+                  );
+              }
+          }
 
-    },
-    echo(topic,state){
-      this.cleanState = "0"
-      this.data = []
-      if(topic!=undefined){
-        console.log("获取数据",topic);
-        console.log("dataStreamkey",this.funcConfigLabel)
-        this.mapFuncConfig = topic
-        this.clickState = state
-        this.funcConfigLabel = topic.dataStream[0][0]
-        for(var i = 0;i<topic.dataStream.length;i++){
-          this.data.push({
-            id: topic.dataStream[i][0].split("*")[0],
-            label: topic.dataStream[i][0].split("*")[1]
+          for(let item of this.paramData){
+              if((this.titleType == 'subscribe' && item.lableNameTag == 'endCmp') ||
+                      (this.titleType == 'publish' && item.lableNameTag == 'startCmp')){
+                  this.getFuncNamePart(item.attributeMap.name)
+              }
+          }
+
+          let topicDataTmp = this.getStoreTopicDataByTopicKey()
+          for(let [key, value] of topicDataTmp.dataStream){
+              this.dataStreamData.push({
+                  id: key,
+                  label: dataStreamLableName
+              })
+              this.index = key + 1
+          }
+
+          // 获取dataStream子标签属性项
+          for (let key in this.paramMaps) {
+              let entity = this.paramMaps[key]
+              let configType = this.analysisConfigureType(entity)
+              if(configType.lableType == 'topicTree'){
+                  this.dataStreamTitle = entity.lableName
+                  this.dataStreamTagName = this.getTagChineseName(configType)
+                  for (let i in entity.xmlEntityMaps) {
+                      let attrObj = this.analysisAttrConfigType(entity.xmlEntityMaps[i])
+                      if(attrObj[0].lableNameTag == 'funcName'){
+                          attrObj[0].attributeMap.name = attrObj[0].attributeMap.compId
+                      }
+                      this.dataStreamParamData = this.dataStreamParamData.concat(
+                          attrObj
+                      );
+                  }
+                  break
+              }
+          }
+      },
+      // startCmp/endCmp 选择后获取 funcName 下拉框数据
+      getFuncNamePart(data){
+          if(!data){
+              return
+          }
+          this.formLabelAlign.cmpPartName = data
+
+          // 切换topic时 不清空
+          if(this.cleanDataStreamParamDataTag){
+              for(let i in this.dataStreamParamData){
+                  this.dataStreamParamData[i].attributeMap.name = ''
+              }
+              for(var i in this.dataStreamData){
+                  this.$store.dispatch(
+                      'delThemeCustomConfigDataDataStream',
+                      {
+                          sysId:this.$route.query.sysId,
+                          titleType:this.titleType,
+                          topicKey:this.topicKey,
+                          dskey:this.dataStreamData[i].id
+                      }
+                  )
+                  this.formLabelAlign.funcNameCompId = ""
+              }
+          }else{
+              this.cleanDataStreamParamDataTag = true
+          }
+
+          this.funcNameOptions = []
+          for(var p in this.partList){
+              if(data == this.partList[p].partName){
+                  for(var i in this.partList[p].components){
+                      // console.log(this.partList[p].components[i].functionName)
+                      // this.state = "1"
+                      this.funcNamePartMap.set(
+                          this.partList[p].components[i].compId,
+                          {compName:this.partList[p].components[i].compName, funName:this.partList[p].components[i].functionName}
+                      )
+                      this.funcNameOptions.push({
+                          label: this.partList[p].components[i].compName,
+                          value: this.partList[p].components[i].compId,
+                          rightName: this.partList[p].components[i].compId
+                      });
+                  }
+              }
+          }
+      },
+      // funcName 选择后获取 FuncInterface 下拉框数据
+      getFuncInterfacePart(data){
+          console.log('jjjjjjjjjjj', data)
+          this.formLabelAlign.funcNameCompId = data
+          this.funcInterfaceOptions = []
+          for(var p in this.partList){
+              if(this.formLabelAlign.cmpPartName == this.partList[p].partName){
+                  for(var i in this.partList[p].components){
+                      if(data == this.partList[p].components[i].compId){
+                          let paramenter = []
+                          if(this.titleType == 'subscribe'){
+                              paramenter = this.partList[p].components[i].inParamenter
+                          }else if(this.titleType = 'publish'){
+                              paramenter = this.partList[p].components[i].outParamenter
+                          }
+                          for(var a in paramenter){
+                              if(paramenter[a].type == "DATA"){
+                                  this.funcInterfaceOptions.push({
+                                      label:paramenter[a].dataType + ' ' + paramenter[a].name,
+                                      value:paramenter[a].dataType + ' ' + paramenter[a].name
+                                  });
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      },
+      handleNodeClick(e) {
+          this.currDataStreamId = e.id;
+          // var topicData = this.subMapCustomConfig.get("subscribe*"+this.topicKey);
+          let topicDataTmp = this.getStoreTopicDataByTopicKey()
+          if(topicDataTmp != undefined){
+              // var funcConfig =new Map( this.subMapCustomConfig.get("subscribe*"+this.topicKey).dataStream).get(this.currDataStreamId);
+              let funcConfig = this.getStoreDataStreamByKey(e.id)
+              if(funcConfig){
+                  this.formLabelAlign.funcNameCompId = funcConfig.funcName.compId
+                  for(let item of this.dataStreamParamData){
+                      if(item.lableNameTag == 'funcName'){
+                          item.attributeMap.name = funcConfig.funcName.compId
+                      }else {
+                          item.attributeMap.name = funcConfig[item.lableNameTag]
+                      }
+                  }
+
+              }else{
+                  this.formLabelAlign.funcNameCompId = ""
+                  for(let item of this.dataStreamParamData){
+                      item.attributeMap.name = ''
+                  }
+              }
+          }
+      },
+      removeNode(){
+          for(var i in this.dataStreamData){
+              if(this.dataStreamData[i].id == this.currDataStreamId){
+                  this.dataStreamRemoveTag = true
+                  this.$store.dispatch(
+                      'delThemeCustomConfigDataDataStream',
+                      {
+                          sysId:this.$route.query.sysId,
+                          titleType:this.titleType,
+                          topicKey:this.topicKey,
+                          dskey:this.dataStreamData[i].id
+                      }
+                  )
+                  this.topicData.dataStream.delete(this.dataStreamData[i].id)
+                  this.dataStreamData.splice(i,1);
+                  this.formLabelAlign.funcNameCompId = ""
+                  for(let item of this.dataStreamParamData){
+                      item.attributeMap.name = ''
+                  }
+                  this.currDataStreamId = ''
+              }
+          }
+          console.log('themeCustomConfigData3:::', this.themeCustomConfigData)
+      },
+      addNode(){
+          let id = this.index++
+          this.dataStreamData.push({
+              id: id,
+              label: this.dataStreamTitle
+          })
+          if(this.currDataStreamId == ''){
+              this.currDataStreamId = id
+          }
+      },
+      getTagChineseName(attrObj){
+          //基于标签名
+          let val = this.themeChineseMapping.find(item => {
+              return item.label === attrObj.attrKeys;
           });
-        }
-        this.index = this.data[this.data.length-1].id+1
-        this.$nextTick(function(){
-          this.$refs.tree.setCurrentKey(this.data[0].id);
-        })
-        var funcConfig = new Map(topic.dataStream).get(this.funcConfigLabel);
-         this.formInline.user = topic.startCmp.split("*")[1]
-        this.formInline.region = topic.endCmp.split("*")[1]
-        if(new Map(topic.dataStream).size>0 && funcConfig!=undefined){
-          this.state = "2"
-          this.compId = funcConfig.funcName.split("*")[1]
-          console.log("compId88888",funcConfig.funcName)
-          this.topicFuncNameMap.set(funcConfig.funcName.split("*")[1],{compName:funcConfig.funcName.split("*")[3],funName:funcConfig.funcName.split("*")[2]})
-          this.formLabelAlign.name = funcConfig.funcName.split("*")[3]
-          this.formLabelAlign.region = funcConfig.funcInterface.split("*")[1]
-        }
-      }else{
-        this.state = "2"
-        this.compId = ""
-        this.formInline.user = ""
-        this.formInline.region = ""
-         this.formLabelAlign.name = ""
-          this.formLabelAlign.region = ""
-          this.topicData.startCmp = ""
-          this.topicData.endCmp = ""
-          this.topicData.dataStream.clear()
-      }
-    },
-    getTopicKey(key){
-      this.topicKey = key
-    },
-
-    init(){
-       this.topicData.startCmp = "startCmp*"+this.formInline.user;
-       this.topicData.endCmp = "endCmp*"+this.formInline.region;
-       var strFuncName = ""
-       var strcompName = ""
-       var strcompId = ""
-       console.log("this.funcNameMap111111111",this.funcNameMap)
-       if(this.funcNameMap.size>0 && this.state == "1"){
-         console.log("状态为1")
-         console.log(this.funcNameMap.get(this.formLabelAlign.name))
-         console.log("this.formLabelAlign.name",this.formLabelAlign.name)
-         if(this.formLabelAlign.name != ""){
-          strFuncName = this.funcNameMap.get(this.formLabelAlign.name).funName
-          strcompName = this.funcNameMap.get(this.formLabelAlign.name).compName
-          strcompId = this.formLabelAlign.name
-         }
-       }else if(this.funcNameMap.size>0 && this.state == "0"){
-         console.log("状态为0")
-        strFuncName = this.funcNameMap.get(this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compId).funName
-        strcompName = this.funcNameMap.get(this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compId).compName
-        strcompId = this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compId
-       }else{
-         if(this.compId != "" && this.compId != undefined){
-           console.log("状态为2")
-           strFuncName = this.funcNameMap.get(this.compId).funName
-           strcompName = this.funcNameMap.get(this.compId).compName
-           strcompId = this.compId
-         }
-       }
-       console.log("this.formLabelAlign.name",this.formLabelAlign.name)
-       this.topicData.dataStream.set(this.funcConfigLabel,JSON.parse(JSON.stringify({funcName:"funcName*"+strcompId+"*"+strFuncName+"*"+strcompName,funcInterface:"funcInterface*"+this.formLabelAlign.region})));
-    }
-
+          let param = this.themeChineseMapping.find(item => {
+              return item.id === attrObj.mappingKeys;
+          });
+          return param === undefined
+                  ? val === undefined
+                    ? attrObj.lableName
+                    : val.value
+                  : param.label;
+      },
+      //处理属性是否显示及中英文映射
+      analysisAttrConfigType(attr) {
+          let attrObj = eval("(" + attr.attributeMap.configureType + ")");
+          //标签名是否要中英文映射
+          let showName;
+          if (attrObj.lableMapping) {
+              //基于标签名
+              showName = this.getTagChineseName(attrObj)
+          } else {
+              showName = attr.lableName;
+          }
+          let attrs = [];
+          if (attr.hasOwnProperty("attributeMap") && attr.attributeMap !== null && attrObj.hasOwnProperty("attrs") && attrObj.attrs.length > 0) {
+              attrObj.attrs.forEach(conn => {
+                  let con = JSON.parse(JSON.stringify(conn))
+                  //排除不显示的属性
+                  if (con.isShow) {
+                      // con.lableName = attr.attributeMap[con.attrName];
+                      con.lableNameTag = attr.lableName;
+                      if (con.hasOwnProperty("attrMapping") && con.attrMapping) {
+                          //基于标签名
+                          let val = this.themeChineseMapping.find(item => {
+                              return item.label === con.attrKeys;
+                          });
+                          let valParam = this.themeChineseMapping.find(item => {
+                              return item.id === con.attrKeys;
+                          });
+                          con.attrMappingName =
+                              valParam === undefined
+                                  ? val === undefined
+                                    ? con.attrName
+                                    : val.value
+                                  : valParam.label;
+                      // } else if (attrObj.attrs.length == 1) {
+                      //     con.attrMappingName = showName;
+                      } else {
+                          // con.attrMappingName = con.attrName;
+                          con.attrMappingName = showName;
+                      }
+                      //将原有的属性及配置都给附带上
+                      con.attributeMap = attr.attributeMap;
+                      con.lableType = attrObj.lableType
+                      attrs.push(con);
+                  }
+              });
+          } else {
+              //处理没有属性标签
+              attrs.push({
+                  lableType: attrObj.lableType,
+                  attrMappingName: showName,
+                  isShow: false,
+                  attributeMap: attr.attributeMap,
+                  xmlEntityMaps: attr.xmlEntityMaps
+              });
+          }
+          return attrs;
+      },
+      //处理ConfigureType
+      analysisConfigureType(config) {
+          if (config.attributeMap) {
+              return eval("(" + config.attributeMap.configureType + ")");
+          } else {
+              return {};
+          }
+      },
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    this.$store.dispatch("cleanSubMapCustomConfig")
-    for(var x = 0;x<this.xmlDataMap.length;x++){
-      for(var i in this.xmlDataMap[x]) {
-        if(i==this.$route.query.sysId){
-           this.themeData = this.xmlDataMap[x][i].themeData
-           this.partList = this.xmlDataMap[x][i].partList
-        }
-      }
-    }
-    //this.themeData = this.xmlDataMap[this.$route.query.sysId].themeData
-    //console.log("解析xml所得数据+++++++++",this.themeData)
-    //this.partList = this.xmlDataMap[this.$route.query.sysId].partList
-   //console.log("topicParam",this.themeData.xmlEntityMaps[0].xmlEntityMaps)
-    // console.log("topic中的数据",this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps)
-    if(this.themeData.xmlEntityMaps != null){
-      for(var i = 0;i<this.themeData.xmlEntityMaps[0].xmlEntityMaps.length;i++){
-      this.topicData.dataStream.clear()
-      for(var j = 0;j<this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps.length;j++){
-        if(this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].lableName == "startCmp"){
-           //this.topicData.startCmp =this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].lableName+"*"+ this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[0].attributeMap.name
-           for(var p in this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[0].attributeMap){
-              if(p == "name"){
-                //this.topicData.startCmp =this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].lableName+"*"+ p+"*"+this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[0].attributeMap[p]
-                this.topicData.startCmp =this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].lableName+"*"+this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[0].attributeMap[p]
-              }
-              
-           }
-        }else if(this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].lableName == "endCmp"){
-           this.topicData.endCmp =this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].lableName+"*"+ this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[1].attributeMap.name
-        }else{
-         var dataStream = {
-           funcName:this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[0].lableName+"*"+this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[0].attributeMap.compId+"*"+this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[0].attributeMap.name+"*"+this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[0].attributeMap.compName,
-           funcInterface:this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[1].lableName+"*"+this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].xmlEntityMaps[1].attributeMap.name,
-         }; 
-        // console.log("解析xmldataStream",dataStream)
-         this.topicData.dataStream.set(j+"*"+this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].xmlEntityMaps[j].lableName,dataStream);
-        }
-      }
-     
-        this.$store.dispatch('getSubMapCustomConfig', {key:this.themeData.xmlEntityMaps[0].lableName+"*"+i+"*"+this.themeData.xmlEntityMaps[0].xmlEntityMaps[i].lableName,value:this.topicData})
-        console.log("走了几次",this.subMapCustomConfig)
-      }
-        var key = this.themeData.xmlEntityMaps[0].lableName+"*0*"+this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].lableName
-        this.mapFuncConfig = this.subMapCustomConfig.get(key)
-        this.clickState = "1"
-        this.state = "0"
-        this.funcNameMap.set(this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compId,{compName:this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compName,funName:this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.name})
-        console.log("this.funcNameMap11111111",this.funcNameMap)
-        this.formInline.user = this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[0].attributeMap.name
-        this.formInline.region = this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[1].attributeMap.name
-        for(var a = 0;a < this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps.length-2;a++){
-          this.data.push(
-            {
-              id:a+2,
-              label: this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[a+2].lableName
-            }
-          );
-        }
-        this.funcConfigLabel = this.data[0].id+"*"+this.data[0].label
-        this.formLabelAlign.name = this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[0].attributeMap.compName
-        
-        this.formLabelAlign.region = this.themeData.xmlEntityMaps[0].xmlEntityMaps[0].xmlEntityMaps[2].xmlEntityMaps[1].attributeMap.name 
+    console.log('tp1topicKey------', this.topicKey)
+    console.log('tp2paramMaps-----', this.paramMaps)
+    console.log('tp3titleType-----', this.titleType)
+    console.log('tp4sysId---------', this.$route.query.sysId)
+    console.log("tp5所有的部件-----",this.partList)
+    console.log("-----------------------------------------")
+    this.initAnalysis()
 
+    for(let k =0;k<this.partList.length;k++){
+        this.partData.push({
+            label:this.partList[k].partName,
+            value:this.partList[k].partName
+        });
     }
-   
-    
-    console.log("所有的部件",this.partList)
-    for(var k =0;k<this.partList.length;k++){
-      this.part.push(
-        {
-        label:this.partList[k].partName,
-        value:this.partList[k].partName
-        }
-      );
-    }
-
-     console.log("this.subMapCustomConfig--------",this.subMapCustomConfig)
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
-    if(this.data.length>0){
-      this.$nextTick(function(){
-        this.$refs.tree.setCurrentKey(this.data[0].id);
-      })
-    }
+      if(this.dataStreamData.length>0){
+          this.$nextTick(function(){
+              this.$refs.tree.setCurrentKey(this.dataStreamData['0'].id);
+              this.currDataStreamId = this.dataStreamData['0'].id
+          })
+      }
   },
   beforeCreate() {}, //生命周期 - 创建之前
   beforeMount() {}, //生命周期 - 挂载之前
