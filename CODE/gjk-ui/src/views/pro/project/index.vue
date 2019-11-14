@@ -720,7 +720,7 @@ export default {
         }
       }
       this.softwareSelectNameString = valNameArr;
-      this.checkoutPlatform();
+      // this.checkoutPlatform();
     },
     checkoutPlatform() {
       var disabledPlatformName = "";
