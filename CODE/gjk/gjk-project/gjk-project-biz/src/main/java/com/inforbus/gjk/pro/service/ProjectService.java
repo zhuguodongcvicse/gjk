@@ -136,7 +136,6 @@ public interface ProjectService extends IService<Project> {
 	String uploadFiles(FolderPathDTO folderPathDTO);
 
 	void removeCompProject(String compId, String projectId);
-    String uploadFiles(FolderPathDTO folderPathDTO);
 
 	/**
 	 * @Title staticInspect
