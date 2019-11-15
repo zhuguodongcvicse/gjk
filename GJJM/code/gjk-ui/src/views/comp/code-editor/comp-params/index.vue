@@ -255,7 +255,9 @@ export default {
                 loading.close();
                 //保存之后关闭路由
                 let tag1 = this.tag
-                menuTag(this.$route.path, "remove", this.tagList, tag1);
+                menuTag(this.$route.path, "removeOpen", this.tagList, {
+                  value: "/comp/component"
+                });
               });
             });
           });
