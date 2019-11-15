@@ -31,6 +31,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.inforbus.gjk.common.core.entity.XmlEntity;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
+import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.comp.api.entity.CompImg;
 import com.inforbus.gjk.comp.api.entity.ComponentDetail;
 import com.inforbus.gjk.comp.api.vo.CompFilesVO;
@@ -175,5 +176,16 @@ public interface ComponentDetailService extends IService<ComponentDetail> {
 	String saveCompfiles(Map<String, String> maps, List<CompFilesVO> paths);
 
 	CompImg getCompDefaultImg();
+
+	/**
+	 * @Title: createSpbFrameFile
+	 * @Description: 生成构件框架
+	 * @Author xiaohe
+	 * @DateTime 2019年11月13日 下午4:05:24
+	 * @param spbModelXmlFile
+	 * @param saveDir 
+	 * @throws Exception 
+	 */
+	public R createSpbFrameFile(String spbModelXmlFile, String saveDir);
 
 }

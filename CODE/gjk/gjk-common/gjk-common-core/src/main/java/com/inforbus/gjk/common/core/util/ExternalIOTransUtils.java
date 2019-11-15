@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.google.common.collect.Maps;
@@ -241,7 +242,7 @@ public class ExternalIOTransUtils {
 	 * 导出
 	 * 
 	 * @param appId                 APP对应的流程ID
-	 * @param appName          APP名称
+	 * @param appName               APP名称
 	 * @param appPath               APP工程文件夹路径
 	 * @param sysconfigPath         系统配置模块XML路径
 	 * @param packinfoPath          客户自存自取路径
@@ -265,5 +266,22 @@ public class ExternalIOTransUtils {
 
 	public static void modifySpbInclude(List<String> compFuncNameList, String cmpAppFilePath) throws IOException {
 		cmpProCreate.modifySpbInclude(compFuncNameList, cmpAppFilePath);
+	}
+
+
+	/**
+	 * @Title: createSpbFrameFile
+	 * @Description: 生成构件框架
+	 * @Author xiaohe
+	 * @DateTime 2019年11月13日 下午2:53:28
+	 * @param spbModelXmlFile    构件模型XML文件
+	 * @param headerTemplateFile 头文件模板文件
+	 * @param srcTemplateFile    源文件模板文件
+	 * @param saveDir            保存路径(可以是平台文件路径)
+	 * @throws NullPointerException 
+	 */
+	public static void createSpbFrameFile(String spbModelXmlFile, String headerTemplateFile, String srcTemplateFile,
+			String saveDir){
+		
 	}
 }
