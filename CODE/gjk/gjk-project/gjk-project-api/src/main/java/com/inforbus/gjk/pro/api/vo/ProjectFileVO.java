@@ -111,6 +111,7 @@ public class ProjectFileVO extends Model<ProjectFileVO> {
 		this.parentId = file.getParentId();
 		this.softwareId = file.getSoftwareId();
 		this.bspId = file.getBspId();
+		this.filePath = file.getFilePath();
 	}
 
 	public ProjectFileVO() {

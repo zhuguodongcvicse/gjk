@@ -309,13 +309,14 @@ public class ThreeLibsController {
 		threeLibsService.saveFileContext(threeLibsFilePathDTO.getFilePath(), threeLibsFilePathDTO.getFilePathName());
 	}
 
-	@PostMapping("/getFileStream")
-	public void getFileStream(HttpServletRequest request, HttpServletResponse response,@RequestBody ThreeLibsFilePathDTO threeLibsFilePathDTO){
+	@GetMapping("/getFileStream/{filePath}")
+	public void getFileStream(HttpServletRequest request, HttpServletResponse response,@PathVariable("filePath") String filePath){
+		String replace = filePath.replace("!", "\\");
 		response.setContentType("application/pdf");
 		FileInputStream in = null;
 		OutputStream out = null;
 	  	try {
-			in = new FileInputStream(new File(threeLibsFilePathDTO.getFilePath()));
+			in = new FileInputStream(new File(replace));
 			out = response.getOutputStream();
 			byte[] b = new byte[512];
 			while ((in.read(b)) != -1) {

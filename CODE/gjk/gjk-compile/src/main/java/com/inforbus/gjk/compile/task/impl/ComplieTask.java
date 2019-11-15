@@ -48,7 +48,7 @@ public class ComplieTask implements Task {
 
 
     @Value("${Linux.path}")
-    private String lPath;
+    private String linuxPath;
 
     //读取配置信息
     @Value("${Linux.ip}")
@@ -62,7 +62,8 @@ public class ComplieTask implements Task {
 
     @Value("${downPath.path}")
     private String dPath;
-
+    //linux 连接对象
+    private Connection connection;
     @Autowired
     private AmqpTemplate rabbitmqTemplate;
 
@@ -338,23 +339,22 @@ public class ComplieTask implements Task {
         ProcessName = ProcessName.substring(ProcessName.lastIndexOf(File.separator) + 1, ProcessName.length());
         System.out.println("流程名称====" + ProcessName);
 
+        boolean login = linuxLogin();
         Session session = null;
         //执行linux命令编译 项目
         try {
-            Connection connection = new Connection(ip);
-            connection.connect();
-            connection.authenticateWithPassword(username, password);
-            session = connection.openSession();
-
-            //先创建流程文件夹
-            session.execCommand("mkdir " + lPath + "/" + ProcessName);
-
-            //再创建工程文件夹
-            session = connection.openSession();
-            session.execCommand("mkdir " + lPath + "/" + ProcessName + "/" + fileName);
-
+            if (login){
+                session = connection.openSession();
+                //先创建流程文件夹
+                session.execCommand("mkdir " + linuxPath + "/" + ProcessName);
+                //再创建工程文件夹
+                session = connection.openSession();
+                session.execCommand("mkdir " + linuxPath + "/" + ProcessName + "/" + fileName);
+            }else {
+                return "连接失败";
+            }
         } catch (IOException e) {
-            logger.error("Linux服务器连接失败,请检查IP,账号,密码是否正确");
+            logger.error("IO异常请联系管理员");
             e.getStackTrace();
         } finally {
             if (session != null) {
@@ -365,7 +365,7 @@ public class ComplieTask implements Task {
 
         //将Windows 项目文件上传到linux服务器中
         try {
-            SftpUtil.uploadFilesToServer(filePath, lPath + "/" + ProcessName + "/" + fileName, ip, username, password, new SftpProgressMonitor() {
+            SftpUtil.uploadFilesToServer(filePath, linuxPath + "/" + ProcessName + "/" + fileName, ip, username, password, new SftpProgressMonitor() {
 
                 @Override
                 public void init(int op, String src, String dest, long max) {
@@ -396,53 +396,49 @@ public class ComplieTask implements Task {
         InputStream is = null;
         BufferedReader bufRder = null;
         try {
-            Connection connection = new Connection(ip);
-            connection.connect();
-            connection.authenticateWithPassword(username, password);
-            session = connection.openSession();
+            if (login){
+                session = connection.openSession();
+                //先执行查找makefile命令
+                session.execCommand("find " + linuxPath + "/" + ProcessName + "/" + fileName + " -name makefile");
+                //获取输出结果 为 makefile 的绝对路径
+                is = new StreamGobbler(session.getStdout());
+                bufRder = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+                String temp = "";
+                while ((temp = bufRder.readLine()) != null) {
+                    makeFilePath = temp.substring(0, temp.lastIndexOf("/"));
+                }
+                //找到路径后  执行make命令
+                session = connection.openSession();
+                session.execCommand("cd " + makeFilePath + " ; make clean ; make");
 
-            //先执行查找makefile命令
-            session.execCommand("find " + lPath + "/" + ProcessName + "/" + fileName + " -name makefile");
+                //成功返回
+                is = new StreamGobbler(session.getStdout());
+                bufRder = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+                while ((temp = bufRder.readLine()) != null) {
+                    //推送消息到rabbitmq中
+                    //this.rabbitmqTemplate.convertAndSend(token , token+"===@@@==="+fileName+"===@@@===\n"+temp);
+                    this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n" + temp);
+                }
 
-            //获取输出结果 为 makefile 的绝对路径
-            is = new StreamGobbler(session.getStdout());
-            bufRder = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-            String temp = "";
-            while ((temp = bufRder.readLine()) != null) {
-                makeFilePath = temp.substring(0, temp.lastIndexOf("/"));
-            }
+                //失败返回
+                is = new StreamGobbler(session.getStderr());
+                bufRder = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+                while ((temp = bufRder.readLine()) != null) {
+                    //推送消息到rabbitmq中
+                    this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n" + temp);
+                }
 
-            //找到路径后  执行make命令
-            session = connection.openSession();
-            session.execCommand("cd " + makeFilePath + " ; make clean ; make");
+                //执行打包命令
+                session = connection.openSession();
+                session.execCommand("cd " + makeFilePath + " ; zip -r " + fileName + ".zip " + "*");
 
-            //成功返回
-            is = new StreamGobbler(session.getStdout());
-            bufRder = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-            while ((temp = bufRder.readLine()) != null) {
-                //推送消息到rabbitmq中
-                //this.rabbitmqTemplate.convertAndSend(token , token+"===@@@==="+fileName+"===@@@===\n"+temp);
-                this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n" + temp);
-            }
-
-            //失败返回
-            is = new StreamGobbler(session.getStderr());
-            bufRder = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-            while ((temp = bufRder.readLine()) != null) {
-                //推送消息到rabbitmq中
-                this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n" + temp);
-            }
-
-            //执行打包命令
-            session = connection.openSession();
-            session.execCommand("cd " + makeFilePath + " ; zip -r " + fileName + ".zip " + "*");
-
-            //成功返回
-            is = new StreamGobbler(session.getStdout());
-            bufRder = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-            while ((temp = bufRder.readLine()) != null) {
-                //推送消息到rabbitmq中
-                this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n" + temp);
+                //成功返回
+                is = new StreamGobbler(session.getStdout());
+                bufRder = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+                while ((temp = bufRder.readLine()) != null) {
+                    //推送消息到rabbitmq中
+                    this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n" + temp);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -470,7 +466,6 @@ public class ComplieTask implements Task {
 
         //将连接状态设置成null
         ChannelSftpSingleton.channelSftpNull();
-
         //下载压缩包
         ChannelSftp chSftp = null;
         try {
@@ -480,26 +475,27 @@ public class ComplieTask implements Task {
             e.printStackTrace();
         }
         try {
-            SftpUtil.download(makeFilePath + "/" + fileName + ".zip", makeFilePath + "/" + fileName + ".zip", dPath, chSftp);
-
-            //todo,需取得一个下载成功或失败的标志
-            //推送消息到rabbitmq中
-            this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n下载完毕");
-
-            //解压到工程Debug目录下
-            try {
-                unZipFiles(dPath + "\\" + fileName + ".zip", filePath + "\\Debug");
-                //todo ,解压成功或失败的判断以及处理
-            } catch (IOException e) {
-                logger.error("解压失败");
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            File downFile = new File(dPath);
+            if (!downFile.exists()){
+                downFile.mkdirs();
             }
-            //解压完删除压缩包
+            SftpUtil.download(makeFilePath + "/" + fileName + ".zip", makeFilePath + "/" + fileName + ".zip", dPath, chSftp);
             File rmFile = new File(dPath + "\\" + fileName + ".zip");
+            if (!rmFile.exists()){
+                this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n压缩包文件下载失败");
+                return "下载失败";
+            }
+            //推送消息到rabbitmq中
+            this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n压缩包文件下载完毕");
+            //解压到工程Debug目录下
+            unZipFiles(dPath + "\\" + fileName + ".zip", filePath + "\\Debug");
+            //解压完删除压缩包
             rmFile.delete();
         } catch (UnsupportedEncodingException e) {
             logger.error("下载失败");
+            e.printStackTrace();
+        } catch (IOException e) {
+            logger.error("解压失败");
             e.printStackTrace();
         }
         try {
@@ -513,13 +509,11 @@ public class ComplieTask implements Task {
 
         //执行完毕 删除 linux数据
         try {
-            Connection connection = new Connection(ip);
-            connection.connect();
-            connection.authenticateWithPassword(username, password);
-            session = connection.openSession();
-
-            //执行删除文件夹命令
-            session.execCommand("rm -rf " + lPath + "/" + ProcessName);
+            if (login){
+                session = connection.openSession();
+                //执行删除文件夹命令
+                session.execCommand("rm -rf " + linuxPath + "/" + ProcessName);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -591,5 +585,20 @@ public class ComplieTask implements Task {
             }
         }
     }
+
+    //linux系统连接方法
+    public boolean linuxLogin(){
+        boolean flag = false;
+        try {
+            connection = new Connection(ip);
+            connection.connect();
+            flag = connection.authenticateWithPassword(username, password);
+        } catch (IOException e) {
+            logger.error("连接linux失败,请检查ip,账户,密码是否正确");
+            e.printStackTrace();
+        }
+        return flag;
+    }
+
 
 }

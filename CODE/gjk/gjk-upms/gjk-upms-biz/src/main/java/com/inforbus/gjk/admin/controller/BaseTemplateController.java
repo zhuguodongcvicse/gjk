@@ -231,8 +231,25 @@ public class BaseTemplateController {
 		return baseTemplateService.getBaseTemplate();
 	}
 
+	/**
+	 * 根据模板类型获取模板数据
+	 *创建: 2019年11月7日 15:36:58
+	 * @param tempType
+	 * @return R
+	 */
 	@GetMapping("/getBaseTemplates/{tempType}")
 	public R getBaseTemplates(@PathVariable String tempType) {
 		return new R<>(baseTemplateService.getBaseTemplateByTempType(tempType));
+	}
+
+	/**
+	 * 根据模板类型获取模板数据
+	 *创建: 2019年11月7日 15:36:58
+	 * @param
+	 * @return R
+	 */
+	@GetMapping("/getLocalPath")
+	public R getLocalPath(){
+		return new R<>(baseTemplateService.getLocalPath());
 	}
 }

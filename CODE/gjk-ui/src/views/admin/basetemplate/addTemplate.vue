@@ -48,7 +48,7 @@
                 placeholder="请输入值"
                 v-if="attribute.attrConfigType=='inputComm'"
               ></el-input>
-              <!--单选框配置方式-->
+              <!--开关配置方式-->
               <el-row v-if="attribute.attrConfigType=='switchComm'">
                 <el-switch
                   v-model="currentXmlMap.attributeMap[attribute.attrName]"
@@ -57,8 +57,11 @@
                   active-value="true"
                   inactive-value="false"
                 ></el-switch>
-                <!-- <el-radio v-model="currentXmlMap.attributeMap[attribute.attrName]" label="Y">是</el-radio>
-                <el-radio v-model="currentXmlMap.attributeMap[attribute.attrName]" label="N">否</el-radio>-->
+              </el-row>
+              <!--单选框配置方式-->
+              <el-row v-if="attribute.attrConfigType=='radioComm'">
+                <el-radio v-model="currentXmlMap.attributeMap[attribute.attrName]" label="Y">是</el-radio>
+                <el-radio v-model="currentXmlMap.attributeMap[attribute.attrName]" label="N">否</el-radio>
               </el-row>
               <!--select下拉框配置方式-->
               <el-select
@@ -158,7 +161,7 @@
         >
           <el-row>
             <!--标签增加的位置选择-->
-            <el-row v-if="position && dialogType =='新增标签'">
+            <el-row v-if="position && dialogType =='添加标签'">
               <el-form-item label="增加的位置">
                 <el-radio v-model="lablePosition" label="up">上</el-radio>
                 <el-radio v-model="lablePosition" label="in">中</el-radio>
@@ -353,7 +356,7 @@
         <el-row class="addtemplate_dialogbtn_14s text_align_right_14s">
           <el-button @click="dialogVisible = false">取 消</el-button>
           <el-button v-show="dialogType == '编辑标签'" type="primary" @click="eidtLable()">确 定</el-button>
-          <el-button v-show="dialogType == '新增标签'" type="primary" @click="AddLable()">确 定</el-button>
+          <el-button v-show="dialogType == '添加标签'" type="primary" @click="AddLable()">确 定</el-button>
         </el-row>
       </el-dialog>
 
@@ -575,6 +578,10 @@ export default {
         // },
         {
           value: "switchComm",
+          label: "开关"
+        },
+        {
+          value: "radioComm",
           label: "单选框"
         },
         // {
@@ -645,7 +652,7 @@ export default {
           value: "treeTable"
         }
       ],
-      dialogType: "新增标签",
+      dialogType: "添加标签",
       dialogVisible: false,
       template: "", //模板
       lableName: "",
@@ -805,7 +812,7 @@ export default {
           type: "warning"
         });
       } else {
-        this.dialogType = "新增标签";
+        this.dialogType = "添加标签";
         this.dialogVisible = true;
         this.lableName = "";
         this.configureType = {
@@ -1551,7 +1558,7 @@ export default {
             lableType: "false",
             lableName: XmlEntityMap.lableName,
             lableMapping: false,
-            lableMappingName:XmlEntityMap.lableName,
+            lableMappingName: XmlEntityMap.lableName,
             mappingKeys: Number,
             actionType: String,
             attrs: []
@@ -1579,7 +1586,7 @@ export default {
           lableType: "false",
           lableName: XmlEntityMap.lableName,
           lableMapping: false,
-          lableMappingName:XmlEntityMap.lableName, 
+          lableMappingName: XmlEntityMap.lableName,
           mappingKeys: Number,
           actionType: String,
           attrs: []
@@ -1610,6 +1617,10 @@ export default {
         {
           value: "[]",
           label: "无"
+        },
+        {
+          value: "API Return",
+          label: "API Return"
         }
       ];
       other = other.concat(res.data.data.dictDb);

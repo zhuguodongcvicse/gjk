@@ -16,6 +16,7 @@
  */
 package com.inforbus.gjk.pro.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -23,15 +24,20 @@ import com.google.common.collect.Maps;
 import com.inforbus.gjk.admin.api.entity.SysUser;
 import com.inforbus.gjk.common.core.constant.CommonConstants;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
+import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.R;
+import com.inforbus.gjk.pro.api.dto.BaseTemplateIDsDTO;
 import com.inforbus.gjk.pro.api.dto.FilePathDTO;
 import com.inforbus.gjk.pro.api.dto.FolderPathDTO;
 import com.inforbus.gjk.pro.api.dto.ProjectInfoDTO;
 import com.inforbus.gjk.pro.api.entity.Hardwarelibs;
 import com.inforbus.gjk.pro.api.entity.ProComp;
 import com.inforbus.gjk.pro.api.entity.Project;
+import com.inforbus.gjk.pro.api.entity.ProjectFile;
 import com.inforbus.gjk.pro.api.util.HttpClientUtil;
+import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
 import com.inforbus.gjk.pro.mapper.ProjectMapper;
+import com.inforbus.gjk.pro.service.ManagerService;
 import com.inforbus.gjk.pro.service.ProjectService;
 
 import java.io.*;
@@ -50,6 +56,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -65,6 +72,11 @@ import javax.xml.transform.OutputKeys;
  */
 @Service("projectService")
 public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> implements ProjectService {
+
+	@Autowired
+	private ManagerService managerService;
+
+	private static final String proDetailPath = JGitUtil.getLOCAL_REPO_PATH();
 
 	/**
 	 * 资源管理简单分页查询
@@ -347,9 +359,45 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             outputStream.start();
             execResult.waitFor();
         } catch (Exception e) {
-            e.printStackTrace();
-            return new R<>(CommonConstants.FAIL,"执行sonar-scanner扫描项目失败", null);
-        }
-        return new R<>(CommonConstants.SUCCESS,"静态扫描成功",fileName.hashCode());
+			e.printStackTrace();
+			return new R<>(CommonConstants.FAIL, "执行sonar-scanner扫描项目失败", null);
+		}
+		File file = new File(filePath + "/.sonar/" + fileName.hashCode() + ".pdf");
+		if(file.exists()){
+        	file.renameTo(new File(filePath + "/.sonar/" + fileName + "检查报告.pdf"));
+		}
+        return new R<>(CommonConstants.SUCCESS,"filePath + \"/.sonar/\" + fileName + \".pdf\"",fileName.hashCode());
     }
+
+	@Override
+	public boolean updateBaseTemplate(Project project) {
+		List<ProjectFileVO> treeByProjectId = managerService.getTreeByProjectId(project.getId());
+		Project oldProject = baseMapper.getProById(project.getId());
+		String path = "";
+		for (ProjectFileVO proFile : treeByProjectId) {
+			if (proFile.getFileType().equals("11")) {
+				path = proDetailPath + proFile.getFilePath();
+			}
+		}
+		BaseTemplateIDsDTO oldBaseTemplateIDsDTO = JSON.parseObject(oldProject.getBasetemplateIds(), BaseTemplateIDsDTO.class);
+		BaseTemplateIDsDTO newBaseTemplateIDsDTO = JSON.parseObject(project.getBasetemplateIds(), BaseTemplateIDsDTO.class);
+
+		if(newBaseTemplateIDsDTO != null){
+			if(newBaseTemplateIDsDTO.getNetworkTempId()!=null && newBaseTemplateIDsDTO.getNetworkTempId().equals("") && oldBaseTemplateIDsDTO.getNetworkTempId().equals(newBaseTemplateIDsDTO.getNetworkTempId())){
+				//把项目路径下的模板删除
+				File file = new File(path + "自定义配置__网络配置.xml");
+				if(file.exists()){
+					file.delete();
+				}
+			}
+			if(newBaseTemplateIDsDTO.getThemeTempId()!=null && newBaseTemplateIDsDTO.getThemeTempId().equals("") && oldBaseTemplateIDsDTO.getThemeTempId().equals(newBaseTemplateIDsDTO.getThemeTempId())){
+				//把项目路径下的模板删除
+				File file = new File(path + "自定义配置__主题配置.xml");
+				if(file.exists()){
+					file.delete();
+				}
+			}
+		}
+		return this.updateById(project);
+	}
 }
