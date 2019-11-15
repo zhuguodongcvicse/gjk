@@ -101,7 +101,7 @@ export default {
   data() {
     //这里存放数据
     return {
-      stuctShowFlagChild: '',
+      stuctShowFlagChild: "",
       options: {
         header: false,
         height: 250,
@@ -160,27 +160,46 @@ export default {
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["headerFile", "structType", "tmpStructLength", "defaultShowStruct"]),
+    ...mapGetters([
+      "headerFile",
+      "structType",
+      "tmpStructLength",
+      "defaultShowStruct"
+    ])
   },
   watch: {
-      /**
-       * 监听父页面传来的输入框标识
-       */
-      stuctShowFlag: {
+    /**
+     * 监听父页面传来的输入框标识
+     */
+    stuctShowFlag: {
       handler: function(stuctShowFlag) {
-          //赋值给子组件声明的值
-          this.stuctShowFlagChild = stuctShowFlag
-          //判断store中有没有值
-          if (Object.keys(this.defaultShowStruct).length != 0) {
-              //判断点击的输入框在store中是否有值，如果有则显示该值
-              if (typeof this.defaultShowStruct[this.stuctShowFlagChild.stuctShowFlagTemp] != "undefined") {
-                  this.structform = this.defaultShowStruct[this.stuctShowFlagChild.stuctShowFlagTemp]
-              } else { //如果没有则显示store中最后一条新加的数据
-                  let defaultShowStructTemp = JSON.parse(JSON.stringify(this.defaultShowStruct))
-                  this.structform = defaultShowStructTemp[Object.keys(this.defaultShowStruct)[Object.keys(this.defaultShowStruct).length - 1]]
-              }
-              // console.log("this.structform-watch",this.structform)
+        //赋值给子组件声明的值
+        this.stuctShowFlagChild = stuctShowFlag;
+        //判断store中有没有值
+        if (Object.keys(this.defaultShowStruct).length != 0) {
+          //判断点击的输入框在store中是否有值，如果有则显示该值
+          if (
+            typeof this.defaultShowStruct[
+              this.stuctShowFlagChild.stuctShowFlagTemp
+            ] != "undefined"
+          ) {
+            this.structform = this.defaultShowStruct[
+              this.stuctShowFlagChild.stuctShowFlagTemp
+            ];
+          } else {
+            //如果没有则显示store中最后一条新加的数据
+            let defaultShowStructTemp = JSON.parse(
+              JSON.stringify(this.defaultShowStruct)
+            );
+            this.structform =
+              defaultShowStructTemp[
+                Object.keys(this.defaultShowStruct)[
+                  Object.keys(this.defaultShowStruct).length - 1
+                ]
+              ];
           }
+          // console.log("this.structform-watch",this.structform)
+        }
       },
       deep: true
     },
@@ -200,9 +219,9 @@ export default {
       },
       deep: true
     },
-      /**
-       * 监听变量类型下拉框值的变化
-       */
+    /**
+     * 监听变量类型下拉框值的变化
+     */
     structform: {
       handler: function(params) {
         // console.log("params",params)
@@ -210,53 +229,56 @@ export default {
         let variableSel = JSON.parse(JSON.stringify(this.variableSel));
         // console.log("params",params)
         // console.log("variableSel",variableSel)
-        let indexNumOfParam
-        if (params.variable){
+        let indexNumOfParam;
+        if (params.variable) {
           //判断显示的是id还是类型名称
-          indexNumOfParam = params.variable.indexOf('v')
-            // console.log("indexNumOfParam",indexNumOfParam)
-            if (indexNumOfParam != -1){
-                let structTypeTemp = params.variable.slice(0,indexNumOfParam-2)
-                let structVersionTemp = params.variable.slice(indexNumOfParam + 1)
-                variableSel.find(item => {
-                    // console.log("item",item)
-                    item.options.find(it => {
-                        if (it.fparamType === structTypeTemp && it.version === structVersionTemp) {
-                            struct = it;
-                        }
-                    });
-                });
-            } else {
-                variableSel.find(item => {
-                    item.options.find(it => {
-                        if (it.dbId === params.variable) {
-                            struct = it;
-                        }
-                    });
-                });
-            }
+          indexNumOfParam = params.variable.indexOf("v");
+          // console.log("indexNumOfParam",indexNumOfParam)
+          if (indexNumOfParam != -1) {
+            let structTypeTemp = params.variable.slice(0, indexNumOfParam - 2);
+            let structVersionTemp = params.variable.slice(indexNumOfParam + 1);
+            variableSel.find(item => {
+              // console.log("item",item)
+              item.options.find(it => {
+                if (
+                  it.fparamType === structTypeTemp &&
+                  it.version === structVersionTemp
+                ) {
+                  struct = it;
+                }
+              });
+            });
+          } else {
+            variableSel.find(item => {
+              item.options.find(it => {
+                if (it.dbId === params.variable) {
+                  struct = it;
+                }
+              });
+            });
+          }
         }
-      // console.log("struct", struct)
-      //找出struct后显示 该struct的数据
-      if (struct) {
+        // console.log("struct", struct)
+        //找出struct后显示 该struct的数据
+        if (struct) {
           struct.dbId = struct.dbId.replace("_*", "");
           this.$set(struct, "queryParam", params.fparamName);
           let childrenParam;
           getStructTree(struct).then(res => {
-              // console.log("res",res)
-              childrenParam = JSON.parse(JSON.stringify(res.data.data));
-              // console.log("childrenParam",childrenParam)
-              if (res.data.data.length === 0) {
-                  let headerFile = this.headerFile;
-                  if (headerFile) {
-                      childrenParam = this.headerFile.structParams[
-                          struct.fparamType.replace("*", "")
-                          ].children;
-                  }
+            // console.log("res",res)
+            childrenParam = JSON.parse(JSON.stringify(res.data.data));
+            // console.log("childrenParam",childrenParam)
+            if (res.data.data.length === 0) {
+              let headerFile = this.headerFile;
+              if (headerFile) {
+                childrenParam = this.headerFile.structParams[
+                  struct.fparamType.replace("*", "")
+                ].children;
               }
-              this.treeStructParam = childrenParam;
+            }
+            this.treeStructParam = childrenParam;
           });
-      }
+        }
         // console.log("structform",this.structform)
       },
       deep: true
@@ -307,36 +329,40 @@ export default {
     },
     // 双击赋值
     handleRowClick(row, event) {
-        console.log("row",row)
+      console.log("row", row);
       let val = this.tmpLengthVal;
       let strcutObj;
       let strName = "";
-      const dbId = JSON.parse(JSON.stringify(this.structform.variable));
+      let dbId = JSON.parse(JSON.stringify(this.structform.variable));
       let variableSel = JSON.parse(JSON.stringify(this.variableSel));
-      let indexNumOfDbId = dbId.indexOf('v')
+      let indexNumOfDbId = dbId.indexOf("v");
       // console.log("indexNumOfParam",indexNumOfParam)
       if (indexNumOfDbId != -1) {
-          let structTypeTemp = dbId.slice(0, indexNumOfDbId - 2)
-          let structVersionTemp = dbId.slice(indexNumOfDbId + 1)
-          variableSel.find(item => {
-              item.options.find(it => {
-                  if (it.fparamType === structTypeTemp && it.version === structVersionTemp) {
-                      strName = it.fparamName;
-                      strcutObj = it;
-                  }
-              });
+        let structTypeTemp = dbId.slice(0, indexNumOfDbId - 2);
+        let structVersionTemp = dbId.slice(indexNumOfDbId + 1);
+        variableSel.find(item => {
+          item.options.find(it => {
+            if (
+              it.fparamType === structTypeTemp &&
+              it.version === structVersionTemp
+            ) {
+              strName = it.fparamName;
+              strcutObj = it;
+            }
           });
+        });
       } else {
-          variableSel.find(item => {
-              item.options.find(it => {
-                  if (it.dbId === dbId) {
-                      strName = it.fparamName;
-                      strcutObj = it;
-                  }
-              });
+        variableSel.find(item => {
+          item.options.find(it => {
+            if (it.dbId === dbId) {
+              strName = it.fparamName;
+              strcutObj = it;
+            }
           });
+        });
       }
       if (strcutObj) {
+        dbId = strcutObj.dbId;
         let headerFile = this.headerFile;
         if (headerFile && headerFile.structParams) {
           let param = this.headerFile.structParams[
@@ -356,7 +382,6 @@ export default {
       }
     },
     getStructSel() {
-
       this.storeLengthVal = this.storeLengthVal;
       const sels = JSON.parse(JSON.stringify(this.structType));
       for (let i = 0; i < sels.length; i++) {
@@ -371,11 +396,17 @@ export default {
       }
       //判断store中是否有值，若有则显示第一条
       if (Object.keys(this.defaultShowStruct).length != 0) {
-          // console.log("Object.keys(this.defaultShowStruct)",Object.keys(this.defaultShowStruct))
-          this.stuctShowFlagChild = Object.keys(this.defaultShowStruct)[0]
-          this.structform.variable = this.defaultShowStruct[this.stuctShowFlagChild].variable
-      } else { //若没有则从数据库中取数据显示第一条
-          this.structform.variable = this.variableSel[1].options[0].fparamType + '__v' + this.variableSel[1].options[0].version;
+        // console.log("Object.keys(this.defaultShowStruct)",Object.keys(this.defaultShowStruct))
+        this.stuctShowFlagChild = Object.keys(this.defaultShowStruct)[0];
+        this.structform.variable = this.defaultShowStruct[
+          this.stuctShowFlagChild
+        ].variable;
+      } else {
+        //若没有则从数据库中取数据显示第一条
+        this.structform.variable =
+          this.variableSel[1].options[0].fparamType +
+          "__v" +
+          this.variableSel[1].options[0].version;
       }
     },
     getStructTrees() {
@@ -399,51 +430,69 @@ export default {
       this.fatherModel.dialogFormVisible = false;
     },
     addColParam() {
-      let struct
+      let struct;
       let variableSel = JSON.parse(JSON.stringify(this.variableSel));
-        let indexNumOfParam
-        if (this.structform.variable){
-            indexNumOfParam = this.structform.variable.indexOf('v')
-            if (indexNumOfParam != -1){
-                let structTypeTemp = this.structform.variable.slice(0,indexNumOfParam-2)
-                let structVersionTemp = this.structform.variable.slice(indexNumOfParam + 1)
-                variableSel.find(item => {
-                    item.options.find(it => {
-                        if (it.fparamType === structTypeTemp && it.version === structVersionTemp) {
-                            struct = it;
-                        }
-                    });
-                });
-            } else {
-                variableSel.find(item => {
-                    item.options.find(it => {
-                        if (it.dbId === this.structform.variable) {
-                            struct = it;
-                        }
-                    });
-                });
-            }
-        }
-        //找出该struct拼接名称并赋值
-      this.structform.variable = struct.fparamType + '__v' + struct.version;
-      let showKeys = Object.keys(this.defaultShowStruct)
-      let defaultShowStructList = JSON.parse(JSON.stringify(this.defaultShowStruct))
-      let showKeyTemp
-      if(showKeys.length != 0){
-          //找出store中和要保存的struct相同的那个
-          showKeys.find(item => {
-              if (item == this.stuctShowFlagChild.stuctShowFlagTemp){
-                  showKeyTemp = item
+      let indexNumOfParam;
+      if (this.structform.variable) {
+        indexNumOfParam = this.structform.variable.indexOf("v");
+        if (indexNumOfParam != -1) {
+          let structTypeTemp = this.structform.variable.slice(
+            0,
+            indexNumOfParam - 2
+          );
+          let structVersionTemp = this.structform.variable.slice(
+            indexNumOfParam + 1
+          );
+          variableSel.find(item => {
+            item.options.find(it => {
+              if (
+                it.fparamType === structTypeTemp &&
+                it.version === structVersionTemp
+              ) {
+                struct = it;
               }
-          })
-          //若找到则把store中的值重新刷一下
-          if (showKeyTemp != undefined){
-              defaultShowStructList[showKeyTemp].variable = this.structform.variable
-          } else { //否则新添加一条数据
-              defaultShowStructList[this.stuctShowFlagChild.stuctShowFlagTemp] = this.structform
+            });
+          });
+        } else {
+          variableSel.find(item => {
+            item.options.find(it => {
+              if (it.dbId === this.structform.variable) {
+                struct = it;
+              }
+            });
+          });
+        }
+      }
+      //找出该struct拼接名称并赋值
+      this.structform.variable = struct.fparamType + "__v" + struct.version;
+      let showKeys = Object.keys(this.defaultShowStruct);
+      let defaultShowStructList = JSON.parse(
+        JSON.stringify(this.defaultShowStruct)
+      );
+      let showKeyTemp;
+      if (showKeys.length != 0) {
+        //找出store中和要保存的struct相同的那个
+        showKeys.find(item => {
+          if (item == this.stuctShowFlagChild.stuctShowFlagTemp) {
+            showKeyTemp = item;
           }
-      } else { //若store为空则新加一条
-          defaultShowStructList[this.stuctShowFlagChild.stuctShowFlagTemp] = this.structform
+        });
+        //若找到则把store中的值重新刷一下
+        if (showKeyTemp != undefined) {
+          defaultShowStructList[
+            showKeyTemp
+          ].variable = this.structform.variable;
+        } else {
+          //否则新添加一条数据
+          defaultShowStructList[
+            this.stuctShowFlagChild.stuctShowFlagTemp
+          ] = this.structform;
+        }
+      } else {
+        //若store为空则新加一条
+        defaultShowStructList[
+          this.stuctShowFlagChild.stuctShowFlagTemp
+        ] = this.structform;
       }
       //存到store
       this.$store.dispatch("setDefaultShowStruct", defaultShowStructList);
@@ -475,8 +524,7 @@ export default {
   beforeUpdate() {}, //生命周期 - 更新之前
   updated() {}, //生命周期 - 更新之后
   beforeDestroy() {}, //生命周期 - 销毁之前
-  destroyed() {
-  }, //生命周期 - 销毁完成
+  destroyed() {}, //生命周期 - 销毁完成
   activated() {} //如果页面有keep-alive缓存功能，这个函数会触发
 };
 </script>
