@@ -797,6 +797,7 @@ export default {
           let treeParam = [];
           let variable = this.analysisMapping(xml);
           this.nameParam = variable[0].attrMappingName;
+          console.log("修改数据")
           treeParam.push(variable);
           //给树赋值显示值
           node["id"] = randomUuid(); //new Number(randomLenNum(5, false));
