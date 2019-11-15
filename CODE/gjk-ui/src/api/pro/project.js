@@ -63,6 +63,14 @@ export function putObj(obj) {
   })
 }
 
+export function updateBaseTemplateIDs(obj) {
+  return request({
+    url: '/pro/project/updateBaseTemplateIDs',
+    method: 'put',
+    data: obj
+  })
+}
+
 export function getProNameListByUserId(userId) {
   return request({
     url: '/pro/project/getProNameListByUserId/' + userId,
