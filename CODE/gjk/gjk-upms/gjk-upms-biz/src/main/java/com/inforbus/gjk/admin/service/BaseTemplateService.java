@@ -89,4 +89,11 @@ public interface BaseTemplateService extends IService<BaseTemplate> {
 	List<BaseTemplate> getBaseTemplateByTempType(String tempType);
 
 
+	/**
+	 * 获取本地路径
+	 * @param
+	 * @return String
+	 */
+    String getLocalPath();
+
 }

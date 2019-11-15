@@ -56,6 +56,7 @@ import lombok.AllArgsConstructor;
  * @author xiaohe
  * @date 2019-04-20 09:26:14
  */
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/component")
