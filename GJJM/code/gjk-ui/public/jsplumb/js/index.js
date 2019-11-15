@@ -286,11 +286,11 @@ function setEnterPoint(id, gj) {
 		inPoint.bind('dblclick', function (endpoint, originalEvent) {
 			addDiv(endpoint);
 			var endpointId = endpoint.getUuid().split("*")[2]
-			var y = $("#" + endpointId).offset().top;
-			var x = $("#" + endpointId).offset().left;
+			var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
+			var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 			// var mouse = mousePosition();
 			$('.point').css("position", "absolute");
-			$('.point').css("left", x - 150);
+			$('.point').css("left", x - 290);
 			$('.point').css("top", y);
 		});
 		// inPoint.bind('mouseout', function (endpoint, originalEvent) {
@@ -336,8 +336,8 @@ function addDiv(endpoint) {
 		// 	"<h6>结构体：" + dat[b].inputList[tempUuid].variableStructType + "</h6>" +
 		// 	"</div>";
 	}
-	//$('#drop-bg').append(str);
-	$('body').append(str);
+	$('#drop-bg').append(str);
+	//$('body').append(str);
 	$(".point").bind('click',function(event){
 	//	console.log("+++++++++++++++",event)
 		event.stopPropagation();
@@ -404,10 +404,10 @@ function setExitPoint(id, gj) {
 		outPoint.bind('dblclick', function (endpoint, originalEvent) {
 			addDiv(endpoint);
 			var endpointId = endpoint.getUuid().split("*")[2]
-			var y = $("#" + endpointId).offset().top;
-			var x = $("#" + endpointId).offset().left;
+			var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
+			var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 			$('.point').css("position", "absolute");
-			$('.point').css("left", x+120);
+			$('.point').css("left", x - 15);
 			$('.point').css("top", y);
 		});
 		//端点绑定鼠标移出事件
@@ -1026,8 +1026,8 @@ function addPointDiv(proPream) {
 			"<p>参数长度：" + proPream.data.lengthName + "</p>" +
 			"</div>";
 	}
-	//$('#drop-bg').append(str);
-	$('body').append(str);
+	$('#drop-bg').append(str);
+	//$('body').append(str);
 	$(".point").bind('click',function(event){
 		//	console.log("+++++++++++++++",event)
 			event.stopPropagation();
@@ -1089,10 +1089,10 @@ function updatePoint(proPream) {
 				addPointDiv(proPream);
 				//var mouse = mousePosition();
 				var endpointId = endpoint.getUuid().split("*")[2]
-				var y = $("#" + endpointId).offset().top;
-				var x = $("#" + endpointId).offset().left;
+				var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
+				var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 				$('.point').css("position", "absolute");
-				$('.point').css("left", x - 150);
+				$('.point').css("left", x - 290);
 				$('.point').css("top", y);
 				//$('.point').css("border", "1px solid red");
 			});
@@ -1125,10 +1125,10 @@ function updatePoint(proPream) {
 				addPointDiv(proPream);
 				//var mouse = mousePosition();
 				var endpointId = endpoint.getUuid().split("*")[2]
-				var y = $("#" + endpointId).offset().top;
-				var x = $("#" + endpointId).offset().left;
+				var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
+				var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 				$('.point').css("position", "absolute");
-				$('.point').css("left", x +120);
+				$('.point').css("left", x -15);
 				$('.point').css("top", y);
 			});
 			// addOutPoint.bind('mouseout', function () {
@@ -2077,10 +2077,10 @@ function pasteJson(pasteDataJson) {
 					addTemDiv(endpoint, canvasData.get(newId).inputList);
 					//var mouse = mousePosition();
 					var endpointId = endpoint.getUuid().split("*")[2]
-					var y = $("#" + endpointId).offset().top;
-					var x = $("#" + endpointId).offset().left;
+					var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
+					var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 					$('.point').css("position", "absolute");
-					$('.point').css("left", x - 150);
+					$('.point').css("left", x - 290);
 					$('.point').css("top", y);
 				});
 				// inPoint.bind('mouseout', function (endpoint, originalEvent) {
@@ -2104,10 +2104,10 @@ function pasteJson(pasteDataJson) {
 				outPoint.bind('dblclick', function (endpoint, originalEvent) {
 					addTemDiv(endpoint, canvasData.get(newId).outputList);
 					var endpointId = endpoint.getUuid().split("*")[2]
-					var y = $("#" + endpointId).offset().top;
-					var x = $("#" + endpointId).offset().left;
+					var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
+					var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 					$('.point').css("position", "absolute");
-					$('.point').css("left", x + 120);
+					$('.point').css("left", x -15);
 					$('.point').css("top", y);
 				});
 				// outPoint.bind('mouseout', function (endpoint, originalEvent) {
@@ -2400,8 +2400,8 @@ function addTemDiv(endpoint, PointsData) {
 			"<p>参数长度：" + PointsData[tempUuid].lengthName + "</p>" +
 			"</div>";
 	}
-	//$('#drop-bg').append(str);
-	$('body').append(str);
+	$('#drop-bg').append(str);
+	//$('body').append(str);
 	$(".point").bind('click',function(event){
 	//	console.log("+++++++++++++++",event)
 		event.stopPropagation();
@@ -2569,10 +2569,10 @@ function loadJson(loadJson) {
 						// var mouse = mousePosition();
 						// console.log(mouse)
 						var endpointId = endpoint.getUuid().split("*")[2]
-						var y = $("#" + endpointId).offset().top;
-						var x = $("#" + endpointId).offset().left;
+						var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
+						var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 						$('.point').css("position", "absolute");
-						$('.point').css("left", x - 150);
+						$('.point').css("left", x - 290);
 						$('.point').css("top", y);
 					});
 					// inPoint.bind('mouseout', function (endpoint, originalEvent) {
@@ -2610,10 +2610,10 @@ function loadJson(loadJson) {
 						}
 						//var mouse = mousePosition();
 						var endpointId = endpoint.getUuid().split("*")[2]
-						var y = $("#" + endpointId).offset().top;
-						var x = $("#" + endpointId).offset().left;
+						var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
+						var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 						$('.point').css("position", "absolute");
-						$('.point').css("left", x +120 );
+						$('.point').css("left", x -15);
 						$('.point').css("top", y);
 					});
 					// outPoint.bind('mouseout', function (endpoint, originalEvent) {
