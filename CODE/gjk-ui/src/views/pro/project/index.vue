@@ -470,7 +470,7 @@ export default {
                   }
                   // console.log("this.procedureId" + this.procedureId);
                   //保存软件框架
-                  this.changeProcedureSoftwareId();
+                  // this.changeProcedureSoftwareId();
                   // this.softwareSelectString = []
                   // showPartSoftwareAndPlatform(this.procedureId).then(Response => {
                   //   for (var k = 0; k < Response.data.data.length; k++) {
