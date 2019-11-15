@@ -363,13 +363,13 @@ export default {
       }
       if (strcutObj) {
         dbId = strcutObj.dbId;
-        let headerFile = this.headerFile;
-        if (headerFile && headerFile.structParams) {
-          let param = this.headerFile.structParams[
-            strcutObj.fparamType.replace("*", "")
-          ];
-          strName = param === undefined ? strName : param.fparamName;
-        }
+        // let headerFile = this.headerFile;
+        // if (headerFile && headerFile.structParams) {
+        //   let param = this.headerFile.structParams[
+        //     strcutObj.fparamType.replace("*", "")
+        //   ];
+        //   strName = param === undefined ? strName : param.fparamName;
+        // }
         let separator = dbId.includes("_*") ? "->" : ".";
         if (this.fileParamType === "formulaComm") {
           this.tmpLengthVal += strName + separator + row.assigParamName;
