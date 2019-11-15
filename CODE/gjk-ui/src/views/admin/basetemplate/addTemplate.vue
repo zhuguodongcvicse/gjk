@@ -650,7 +650,15 @@ export default {
         {
           label: "树节点表格",
           value: "treeTable"
-        }
+        },
+        {
+          label: "页面块标题",
+          value: "title"
+        },
+        {
+          label: "topic列表及dataStream列表",
+          value: "topicTree"
+        },
       ],
       dialogType: "添加标签",
       dialogVisible: false,
