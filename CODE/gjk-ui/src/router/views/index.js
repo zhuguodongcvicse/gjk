@@ -86,6 +86,10 @@ export default [{
             name: '文本编辑',
             component: () => import('@/views/pro/project/textEdits')
         }, {
+            path: 'fileProview',
+            name: '文件预览',
+            component: () => import('@/views/pro/project/fileProview')
+        }, {
             path: 'showindex',
             name: '项目信息',
             component: () =>
