@@ -22,7 +22,7 @@
             icon="el-icon-edit el-icon--left"
             size="small"
             @click="goToAddCompPage()"
-          >新增</el-button><!-- @click="templateData.templateVisible = true" -->
+          >新增</el-button><!-- @click="templateData.templateVisible = true" --> <!-- @click="goToAddCompPage()" -->
           <!-- <el-button size="small">
             <i class="el-icon-download el-icon--left"></i>导出
           </el-button>-->

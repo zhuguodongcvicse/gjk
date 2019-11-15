@@ -31,7 +31,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="名称" :label-width="formLabelWidth" prop="fparamName">
-        <el-input v-model="mappedModel.fparamName" autocomplete="off" placeholder="请输入结构体名称"></el-input>
+        <el-input  v-model="mappedModel.fparamName" autocomplete="off" placeholder="请输入结构体名称"></el-input>
       </el-form-item>
       <!-- <el-form-item label="类别" :label-width="formLabelWidth" prop="structClassify">
         <el-select
@@ -71,7 +71,7 @@
           <el-table-column prop="fparamName" label="名称" type="scoped solt">
             <template slot-scope="{row}" v-if="row.delFlag!='1'">
               <el-input
-                :disabled="mappedModel.dbId==row.parentId?false:true"
+                :disabled="mappedModel.dbId===row.parentId?false:true"
                 v-model="row.fparamName"
                 size="mini"
               ></el-input>
@@ -82,7 +82,7 @@
           <el-table-column prop="fparamType" label="类型">
             <template slot-scope="{row}" v-if="row.delFlag!='1'">
               <el-select
-                :disabled="mappedModel.dbId==row.parentId?false:true"
+                :disabled="mappedModel.dbId===row.parentId?false:true"
                 filterable
                 allow-create
                 aria-disabled="true"
