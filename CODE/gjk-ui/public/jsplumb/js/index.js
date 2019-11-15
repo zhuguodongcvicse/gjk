@@ -290,7 +290,7 @@ function setEnterPoint(id, gj) {
 			var x = $("#" + endpointId).offset().left;
 			// var mouse = mousePosition();
 			$('.point').css("position", "absolute");
-			$('.point').css("left", x - 310);
+			$('.point').css("left", x - 150);
 			$('.point').css("top", y);
 		});
 		// inPoint.bind('mouseout', function (endpoint, originalEvent) {
@@ -336,7 +336,8 @@ function addDiv(endpoint) {
 		// 	"<h6>结构体：" + dat[b].inputList[tempUuid].variableStructType + "</h6>" +
 		// 	"</div>";
 	}
-	$('#drop-bg').append(str);
+	//$('#drop-bg').append(str);
+	$('body').append(str);
 	$(".point").bind('click',function(event){
 	//	console.log("+++++++++++++++",event)
 		event.stopPropagation();
@@ -406,7 +407,7 @@ function setExitPoint(id, gj) {
 			var y = $("#" + endpointId).offset().top;
 			var x = $("#" + endpointId).offset().left;
 			$('.point').css("position", "absolute");
-			$('.point').css("left", x-15);
+			$('.point').css("left", x+120);
 			$('.point').css("top", y);
 		});
 		//端点绑定鼠标移出事件
@@ -1856,7 +1857,6 @@ document.onkeydown = function () {
 			handleMessageToParent("returnFormJson", gjidAndTemid);
 			idList = []
 		}
-		//？？需要与vu额页面做交互
 	} else if (event.ctrlKey == true && event.keyCode == 88) { //剪切功能
 		if (idList.length > 0) { //删除框选的节点
 			var copyPream = new Array()
@@ -2046,10 +2046,14 @@ function pasteJson(pasteDataJson) {
 			jsPlumb.remove(event.target.dataset.id)
 			handleMessageToParent("returnFormJson", removeTemp);
 		});
-		var midpoints = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+		var midpoints1 = [ 0.2, 0.4, 0.6, 0.8]
+		var midpoints = [ 30, 40, 50, 60]
+		var inputIndex = -1;
+		var outIndex = -1
 		$.each(endpoints, function (index, endpoint) {
 			var config = JSON.parse(JSON.stringify(getBaseNodeConfig()))
 			if (endpoint.anchorX == 0) {
+				inputIndex++
 				config.isSource = false
 				config.maxConnections = 1
 				config.paintStyle = {
@@ -2058,9 +2062,10 @@ function pasteJson(pasteDataJson) {
 					radius: 5,
 					lineWidth: 2
 				}
-				config.connector[1].midpoint = midpoints[index]
+				config.connector[1].midpoint =midpoints1[inputIndex]
+				config.connector[1].stub = midpoints[inputIndex]
 				var inPoint = jsPlumb.addEndpoint(newId, {
-					anchors: [0, endpoint.anchorY, 0, 0],
+					anchors: [0, endpoint.anchorY, -1, 0],
 					uuid: endpoint.uuid.split("*")[0] + "*" + endpoint.uuid.split("*")[1] + "*" + newId,
 				}, config)
 				inPoint.bind('dblclick', function (endpoint, originalEvent) {
@@ -2082,11 +2087,13 @@ function pasteJson(pasteDataJson) {
 					mousedownState = 1;
 				});
 			} else {
+				outIndex++
 				config.isTarget = true
 				config.maxConnections = -1
-				config.connector[1].midpoint = midpoints[index]
+				config.connector[1].midpoint =midpoints1[outIndex]
+				config.connector[1].stub = midpoints[outIndex]
 				var outPoint = jsPlumb.addEndpoint(newId, {
-					anchors: [1, endpoint.anchorY, 0, 0],
+					anchors: [1, endpoint.anchorY, 1, 0],
 					uuid: endpoint.uuid.split("*")[0] + "*" + endpoint.uuid.split("*")[1] + "*" + newId,
 				}, config)
 				outPoint.bind('dblclick', function (endpoint, originalEvent) {
@@ -2516,13 +2523,15 @@ function loadJson(loadJson) {
 		var addoutPointState = false;
 		//设置当前锚点显示参数下标
 		var addPoinrIndex = 0;
-		var midpoints = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+		var midpoints1 = [ 0.2, 0.4, 0.6, 0.8]
+		var midpoints = [ 30, 40, 50, 60]
+		var inputIndex = -1
+		var outIndex = -1
 		$.each(endpoints, function (index, endpoint) {
-			//console.log("idsss", endpoint.id);
-			//console.log("elem.blockId", elem.blockId)
 			if (endpoint.id == elem.blockId) {
 				var config = JSON.parse(JSON.stringify(getBaseNodeConfig()))
 				if (endpoint.anchorX == 0) {
+					inputIndex++
 					config.isSource = false
 					config.maxConnections = 1
 					config.paintStyle = {
@@ -2531,9 +2540,10 @@ function loadJson(loadJson) {
 						radius: 5,
 						lineWidth: 2
 					}
-					config.connector[1].midpoint = midpoints[index]
+					config.connector[1].midpoint =midpoints1[inputIndex]
+					config.connector[1].stub = midpoints[inputIndex]
 					var inPoint = jsPlumb.addEndpoint(elem.blockId, {
-						anchors: [0, endpoint.anchorY, 0, 0],
+						anchors: [0, endpoint.anchorY, -1, 0],
 						uuid: endpoint.uuid,
 					}, config)
 					inPoint.bind('dblclick', function (endpoint, originalEvent) {
@@ -2566,9 +2576,11 @@ function loadJson(loadJson) {
 						mousedownState = 1;
 					});
 				} else {
+					outIndex++
 					config.isTarget = true
 					config.maxConnections = -1
-					config.connector[1].midpoint = midpoints[index]
+					config.connector[1].midpoint =midpoints1[outIndex]
+					config.connector[1].stub = midpoints[outtIndex]
 					var outPoint = jsPlumb.addEndpoint(elem.blockId, {
 						anchors: [1, endpoint.anchorY, 0, 0],
 						uuid: endpoint.uuid,

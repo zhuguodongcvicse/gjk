@@ -320,4 +320,9 @@ public class ProjectController {
     public R staticInspect(String filePath, String fileName){
         return projectService.staticInspect(filePath, fileName);
     }
+
+    @PutMapping("/updateBaseTemplateIDs")
+	public R updateBaseTemplateIDs(@RequestBody Project project){
+		return new R<>(projectService.updateBaseTemplate(project));
+	}
 }

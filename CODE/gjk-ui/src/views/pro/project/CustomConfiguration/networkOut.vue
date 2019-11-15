@@ -103,15 +103,15 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-     for(var x = 0;x<this.xmlDataMap.length;x++){
-      for(var i in this.xmlDataMap[x]) {
-        if(i==this.$route.query.sysId){
-          this.netWorkData = this.xmlDataMap[x][i].netWorkData
-          //this.partList = this.xmlDataMap[x][i].partList
-        }
-      }
-    }
-    //this.netWorkData = this.xmlDataMap[this.$route.query.sysId].netWorkData
+    //  for(var x = 0;x<this.xmlDataMap.length;x++){
+    //   for(var i in this.xmlDataMap[x]) {
+    //     if(i==this.$route.query.sysId){
+    //       this.netWorkData = this.xmlDataMap[x][i].netWorkData
+    //       //this.partList = this.xmlDataMap[x][i].partList
+    //     }
+    //   }
+    // }
+    this.netWorkData = this.xmlDataMap[this.$route.query.sysId].netWorkData
     if(this.netWorkData.xmlEntityMaps != null){
       for(var i = 0;i<this.netWorkData.xmlEntityMaps[1].xmlEntityMaps.length;i++){
       this.data.push(

@@ -146,4 +146,11 @@ public interface ProjectService extends IService<Project> {
 	 * @return boolean
 	 */
 	R staticInspect(String filePath, String fileName);
+
+	/**
+	 * 更新项目基础模板
+	 * @param project
+	 * @return
+	 */
+	boolean updateBaseTemplate(Project project);
 }
