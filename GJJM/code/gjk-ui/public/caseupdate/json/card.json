@@ -1,0 +1,343 @@
+{
+  "version": "2.0",
+  "refs": {
+    "1": {
+      "_classPath": "Q.Position.CENTER_TOP"
+    },
+    "12": {
+      "_classPath": "Q.Position.CENTER_MIDDLE"
+    }
+  },
+  "datas": [
+    {
+      "_className": "Q.RectElement",
+      "json": {
+        "width": 62,
+        "height": 380,
+        "styles": {
+          "shape.fill.color": "#EEE",
+          "shape.stroke": 1,
+          "shape.stroke.style": "#555",
+          "label.padding": 5,
+          "label.position": {
+            "$ref": 1
+          },
+          "label.anchor.position": {
+            "$ref": 1
+          }
+        },
+        "properties": {
+          "type": "card"
+        },
+        "location": {
+          "_className": "Q.Point",
+          "json": {
+            "x": -142,
+            "y": 36,
+            "rotate": 0
+          }
+        },
+        "size": {
+          "width": 62,
+          "height": 380
+        },
+        "image": "card"
+      },
+      "_refId": "407"
+    },
+    {
+      "_className": "Q.RectElement",
+      "json": {
+        "movable": false,
+        "selectable": false,
+        "parent": {
+          "_ref": 407
+        },
+        "host": {
+          "_ref": 407
+        },
+        "width": 52,
+        "height": 50,
+        "styles": {
+          "shape.fill.color": null,
+          "shape.stroke": 1,
+          "shape.stroke.style": "#555",
+          "label.padding": 5
+        },
+        "properties": {
+          "type": "slot",
+          "childType": "port"
+        },
+        "location": {
+          "_className": "Q.Point",
+          "json": {
+            "x": -137,
+            "y": 76,
+            "rotate": 0
+          }
+        },
+        "image": {
+          "_className": "Q.Path",
+          "json": [
+            {
+              "type": "m",
+              "points": [
+                0,
+                0
+              ]
+            },
+            {
+              "type": "l",
+              "points": [
+                52,
+                0
+              ]
+            },
+            {
+              "type": "l",
+              "points": [
+                52,
+                50
+              ]
+            },
+            {
+              "type": "l",
+              "points": [
+                0,
+                50
+              ]
+            },
+            {
+              "type": "z",
+              "points": [
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      },
+      "_refId": "408"
+    },
+    {
+      "_className": "Q.RectElement",
+      "json": {
+        "movable": false,
+        "selectable": false,
+        "parent": {
+          "_ref": 407
+        },
+        "host": {
+          "_ref": 407
+        },
+        "width": 52,
+        "height": 50,
+        "styles": {
+          "shape.fill.color": null,
+          "shape.stroke": 1,
+          "shape.stroke.style": "#555",
+          "label.padding": 5
+        },
+        "properties": {
+          "type": "slot",
+          "childType": "port"
+        },
+        "location": {
+          "_className": "Q.Point",
+          "json": {
+            "x": -137,
+            "y": 136,
+            "rotate": 0
+          }
+        },
+        "image": {
+          "_className": "Q.Path",
+          "json": [
+            {
+              "type": "m",
+              "points": [
+                0,
+                0
+              ]
+            },
+            {
+              "type": "l",
+              "points": [
+                52,
+                0
+              ]
+            },
+            {
+              "type": "l",
+              "points": [
+                52,
+                50
+              ]
+            },
+            {
+              "type": "l",
+              "points": [
+                0,
+                50
+              ]
+            },
+            {
+              "type": "z",
+              "points": [
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      },
+      "_refId": "414"
+    },
+    {
+      "_className": "Q.RectElement",
+      "json": {
+        "movable": false,
+        "selectable": false,
+        "parent": {
+          "_ref": 407
+        },
+        "host": {
+          "_ref": 407
+        },
+        "width": 52,
+        "height": 50,
+        "styles": {
+          "shape.fill.color": null,
+          "shape.stroke": 1,
+          "shape.stroke.style": "#555",
+          "label.padding": 5
+        },
+        "properties": {
+          "type": "slot",
+          "childType": "port"
+        },
+        "location": {
+          "_className": "Q.Point",
+          "json": {
+            "x": -137,
+            "y": 196,
+            "rotate": 0
+          }
+        },
+        "image": {
+          "_className": "Q.Path",
+          "json": [
+            {
+              "type": "m",
+              "points": [
+                0,
+                0
+              ]
+            },
+            {
+              "type": "l",
+              "points": [
+                52,
+                0
+              ]
+            },
+            {
+              "type": "l",
+              "points": [
+                52,
+                50
+              ]
+            },
+            {
+              "type": "l",
+              "points": [
+                0,
+                50
+              ]
+            },
+            {
+              "type": "z",
+              "points": [
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "_className": "Q.RectElement",
+      "json": {
+        "movable": false,
+        "selectable": false,
+        "parent": {
+          "_ref": 407
+        },
+        "host": {
+          "_ref": 407
+        },
+        "width": 52,
+        "height": 50,
+        "styles": {
+          "shape.fill.color": null,
+          "shape.stroke": 1,
+          "shape.stroke.style": "#555",
+          "label.padding": 5
+        },
+        "properties": {
+          "type": "slot",
+          "childType": "port"
+        },
+        "location": {
+          "_className": "Q.Point",
+          "json": {
+            "x": -137,
+            "y": 256,
+            "rotate": 0
+          }
+        },
+        "image": {
+          "_className": "Q.Path",
+          "json": [
+            {
+              "type": "m",
+              "points": [
+                0,
+                0
+              ]
+            },
+            {
+              "type": "l",
+              "points": [
+                52,
+                0
+              ]
+            },
+            {
+              "type": "l",
+              "points": [
+                52,
+                50
+              ]
+            },
+            {
+              "type": "l",
+              "points": [
+                0,
+                50
+              ]
+            },
+            {
+              "type": "z",
+              "points": [
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
