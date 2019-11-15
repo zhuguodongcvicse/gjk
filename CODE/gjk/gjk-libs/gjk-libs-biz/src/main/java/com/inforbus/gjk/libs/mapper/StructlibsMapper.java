@@ -19,7 +19,7 @@ package com.inforbus.gjk.libs.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.inforbus.gjk.libs.api.entity.Structlibs;
+import com.inforbus.gjk.common.core.entity.Structlibs;
 
 import java.util.List;
 
@@ -118,4 +118,18 @@ public interface StructlibsMapper extends BaseMapper<Structlibs> {
 	 * @return
 	 */
 	List<Structlibs> findAllStructs();
+
+	/**
+	 * 得到结构体数据，根据id集合
+	 * @param idList
+	 * @return
+	 */
+	List<Structlibs> getStructlibsByIdList(@Param("idList") List<String> idList);
+
+	/**
+	 * 得到子结构体数据，根据id集合
+	 * @param parentIdList
+	 * @return
+	 */
+	List<Structlibs> getStructlibsByParentIdList(@Param("parentIdList") List<String> parentIdList);
 }

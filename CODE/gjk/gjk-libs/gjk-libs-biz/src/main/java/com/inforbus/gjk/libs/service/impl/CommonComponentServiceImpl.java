@@ -21,6 +21,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
+import com.inforbus.gjk.common.core.entity.CompStruct;
+import com.inforbus.gjk.common.core.entity.Structlibs;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.libs.api.dto.CompTree;
 import com.inforbus.gjk.libs.api.entity.CommonComponent;
@@ -29,6 +31,7 @@ import com.inforbus.gjk.libs.api.vo.CompDictVO;
 import com.inforbus.gjk.libs.api.vo.CompVO;
 import com.inforbus.gjk.libs.api.vo.TreeUtil;
 import com.inforbus.gjk.libs.mapper.CommonComponentMapper;
+import com.inforbus.gjk.libs.mapper.StructlibsMapper;
 import com.inforbus.gjk.libs.service.CommonComponentService;
 
 import java.io.BufferedInputStream;
@@ -45,6 +48,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -59,6 +63,7 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -72,6 +77,9 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		implements CommonComponentService {
 
 	private static final String gitFilePath = JGitUtil.getLOCAL_REPO_PATH();
+
+	@Autowired
+	private StructlibsMapper structlibsMapper;
 
 	/**
 	 * 公共构件库详细表简单分页查询
@@ -234,21 +242,38 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		XSSFWorkbook workbook = new XSSFWorkbook();
 
 		// 创建一个新表格
-		XSSFSheet compXssfSheet = workbook.createSheet("gjk_common_component");
-		// set Sheet页头部
-		List<String> compColumnList = setSheetHeader(workbook, compXssfSheet, "gjk_common_component");
-		// set Sheet页内容
-		List<Object> list = new ArrayList<Object>();
-		list.addAll(compList);
-		setSheetContent(workbook, compXssfSheet, list, compColumnList);
+//		XSSFSheet compXssfSheet = workbook.createSheet("gjk_common_component");
+//		// set Sheet页头部
+//		List<String> compColumnList = setSheetHeader(workbook, compXssfSheet, "gjk_common_component");
+//		// set Sheet页内容
+//		List<Object> list = new ArrayList<Object>();
+//		list.addAll(compList);
+//		setSheetContent(workbook, compXssfSheet, list, compColumnList);
+		// 构件库页
+		createSheet(workbook, compList, "gjk_common_component");
 
-		XSSFSheet compDetailSheet = workbook.createSheet("gjk_common_component_detail");
-		// set Sheet页头部
-		List<String> compDetailColumnList = setSheetHeader(workbook, compDetailSheet, "gjk_common_component_detail");
-		// set Sheet页内容
-		list = new ArrayList<Object>();
-		list.addAll(details);
-		setSheetContent(workbook, compDetailSheet, list, compDetailColumnList);
+//		XSSFSheet compDetailSheet = workbook.createSheet("gjk_common_component_detail");
+//		// set Sheet页头部
+//		List<String> compDetailColumnList = setSheetHeader(workbook, compDetailSheet, "gjk_common_component_detail");
+//		// set Sheet页内容
+//		list = new ArrayList<Object>();
+//		list.addAll(details);
+//		setSheetContent(workbook, compDetailSheet, list, compDetailColumnList);
+		// 构件库详情页
+		createSheet(workbook, details, "gjk_common_component_detail");
+
+		// 构件库和结构体表关系页
+		List<String> compIdList = compList.stream().map(CommonComponent::getId).collect(Collectors.toList());
+		List<CompStruct> compStructList = baseMapper.getCompStructByCompIdList(compIdList);
+		createSheet(workbook, compStructList, "gjk_comp_struct");
+
+		// 结构体页
+		List<Structlibs> structlibsList = new ArrayList<>();
+		List<String> structIdList = compStructList.stream().map(CompStruct::getStructId).collect(Collectors.toList());
+		List<Structlibs> structlibsListSub = structlibsMapper.getStructlibsByIdList(structIdList);
+		structlibsList.addAll(structlibsListSub);
+		findStructlibsRecursion(structlibsListSub, structlibsList);
+		createSheet(workbook, structlibsList, "gjk_structlibs");
 
 		// 创建Excel文件保存的临时地址
 		File file = new File(gitFilePath + "gjk" + File.separator + "testExcel" + File.separator + "MySQL.xls");
@@ -268,6 +293,37 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		file.delete();
 		zip.flush();
 		zip.closeEntry();
+	}
+
+	/**
+	 * 创建一个sheep标签 并处理数据
+	 * @param workbook
+	 * @param dataList
+	 * @param tableName
+	 * @throws Exception
+	 */
+	private void createSheet(XSSFWorkbook workbook, List<?> dataList, String tableName) throws Exception {
+		XSSFSheet compDetailSheet = workbook.createSheet(tableName);
+		// set Sheet页头部
+		List<String> compDetailColumnList = setSheetHeader(workbook, compDetailSheet, tableName);
+		// set Sheet页内容
+		List<Object> list = new ArrayList<Object>();
+		list.addAll(dataList);
+		setSheetContent(workbook, compDetailSheet, list, compDetailColumnList);
+	}
+
+	/**
+	 * 递归获取结构体数据
+	 * @param structlibsList
+	 * @param resList
+	 */
+	private void findStructlibsRecursion(List<Structlibs> structlibsList, List<Structlibs> resList){
+		List<String> structIdList = structlibsList.stream().map(Structlibs::getId).collect(Collectors.toList());
+		List<Structlibs> list = structlibsMapper.getStructlibsByParentIdList(structIdList);
+		if(list.size() > 0){
+			resList.addAll(list);
+			findStructlibsRecursion(list, resList);
+		}
 	}
 
 	/**

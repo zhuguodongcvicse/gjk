@@ -19,9 +19,6 @@ package com.inforbus.gjk.libs.service;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.Valid;
-
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -31,7 +28,7 @@ import com.inforbus.gjk.admin.api.vo.DictVO;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.vo.ParamTreeVO;
 import com.inforbus.gjk.libs.api.dto.StructDTO;
-import com.inforbus.gjk.libs.api.entity.Structlibs;
+import com.inforbus.gjk.common.core.entity.Structlibs;
 
 /**
  * 结构体库

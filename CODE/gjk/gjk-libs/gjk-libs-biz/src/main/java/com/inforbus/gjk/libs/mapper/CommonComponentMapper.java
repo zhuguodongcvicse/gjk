@@ -19,6 +19,7 @@ package com.inforbus.gjk.libs.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.inforbus.gjk.common.core.entity.CompStruct;
 import com.inforbus.gjk.libs.api.entity.CommonComponent;
 
 import java.util.List;
@@ -111,4 +112,18 @@ public interface CommonComponentMapper extends BaseMapper<CommonComponent> {
 	 */
 	IPage<CommonComponent> getCompListByStringAndLibsId(Page page, @Param("libsList") List<String> libsList,
 			@Param("selectStringList") List<String> selectStringList);
+
+	/**
+	 * 根据构件库id，获取构件库和结构体关系数据
+	 * @param compId
+	 * @return
+	 */
+	List<CompStruct> getCompStructByCompId(@Param("compId") String compId);
+
+	/**
+	 * 根据构件库id集合，获取构件库和结构体关系数据
+	 * @param compIdList
+	 * @return
+	 */
+	List<CompStruct> getCompStructByCompIdList(@Param("compIdList") List<String> compIdList);
 }

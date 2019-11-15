@@ -203,10 +203,41 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
                 while ((len = in.read(bytes)) != -1) {//循环解读写数据,复制文件
                     out.write(bytes, 0, len);
                 }
+
+                BaseTemplate oldBT = baseMapper.selectById(baseTemplate.getTempId());
+                if (oldBT!=null){
+                    if (!oldBT.getTempType().equals(baseTemplate.getTempType())){
+                        Integer version = baseMapper.getMaxVersion(baseTemplate.getTempType());//获取最新版本
+                        if (version == null){
+                            baseTemplate.setTempVersion(1);
+                        }else {
+                            baseTemplate.setTempVersion(version+1);
+                        }
+                    }
+                }
                 baseTemplate.setTempPath(path);//更改新的路径
                 baseTemplate.setUpdateTime(LocalDateTime.now());
-                baseMapper.updateById(baseTemplate);//把新的数据更细至数据库
-                return true;
+                int i = baseMapper.updateById(baseTemplate);//把新的数据更细至数据库
+                if (i>0){
+                    if (in != null) {
+                        try {
+                            in.close();//关闭输入流
+                        } catch (IOException e) {
+                            logger.error("IO流关闭失败,请联系管理员");
+                            e.printStackTrace();
+                        }
+                    }
+                    if(out!=null){
+                        try {
+                            out.close();//关闭输出流
+                        } catch (IOException e) {
+                            logger.error("IO流关闭失败,请联系管理员");
+                            e.printStackTrace();
+                        }
+                    }
+                    oldPath.delete();
+                    return true;
+                }
             }catch (IOException e) {
                 logger.error("IO出现错误,请联系管理员");
                 e.printStackTrace();
@@ -228,7 +259,6 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
                         e.printStackTrace();
                     }
                 }
-
             }
         }
         return false;
@@ -239,10 +269,25 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
         return baseMapper.selectList(null);
     }
 
+    /**
+     * 根据模板类型获取基础模板数据
+     * @param tempType
+     * @return List<BaseTemplate>
+     */
     @Override
     public List<BaseTemplate> getBaseTemplateByTempType(String tempType) {
         BaseTemplate baseTemplate = new BaseTemplate();
         baseTemplate.setTempType(tempType);
         return baseMapper.selectList(new QueryWrapper<>(baseTemplate).orderByDesc("temp_version"));
+    }
+
+    /**
+     * 基础模板获取本地地址
+     * @param
+     * @return String
+     */
+    @Override
+    public String getLocalPath() {
+        return LOCALPATH;
     }
 }

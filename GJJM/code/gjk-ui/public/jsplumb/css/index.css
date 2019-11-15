@@ -144,7 +144,7 @@ div.desc {
 
 .border {
   padding: 0 10px;
-  z-index: 100;
+  z-index: 10;
   position: absolute;
   top: 0;
   bottom: 0;
@@ -262,12 +262,12 @@ div.desc {
   z-index: 2;
 }
 .point {
-  width: 150px;
+  width: 135px;
   height: 80px;
   word-wrap: break-word;
   word-break: break-all;
   overflow-y:auto;
-  
+  z-index: 150;
 }
 .warn{
   box-shadow:0px 0px 15px 8px #ff0000

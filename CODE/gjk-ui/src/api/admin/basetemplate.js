@@ -107,3 +107,10 @@ export function getBaseTemplates(tempType) {
     method: 'get'
   })
 }
+
+export function getLocalPath() {
+  return request({
+    url: '/admin/basetemplate/getLocalPath',
+    method: 'get'
+  })
+}
