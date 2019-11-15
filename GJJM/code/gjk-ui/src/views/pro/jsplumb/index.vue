@@ -531,7 +531,8 @@ export default {
           findProJSON(this.$route.query.processId).then(res => {
             //循环流程中的构件及"arrow"
            // console.log("加载后的数据", res.data.data.xmlJson.xmlEntityMaps);
-            res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
+           if( res.data.data != null){
+              res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
               if (tmp.lableName !== "arrow") {
                 /* 将查询的东西插入到临时 */
                 // this.tempParam.push(tmp);
@@ -543,6 +544,8 @@ export default {
             this.postMessageData.cmd = "clickCompLoading";
             this.postMessageData.params = res.data.data.json;
             this.$refs.gjkIframe.sendMessage(this.postMessageData);
+           }
+           
           });
         }
       }
