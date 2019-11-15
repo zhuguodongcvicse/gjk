@@ -1,3 +1,5 @@
+import refreshListFlag from "./modules/refreshListFlag";
+
 const getters = {
   tag: state => state.tags.tag,
   website: state => state.common.website,
@@ -30,6 +32,8 @@ const getters = {
   pointHFile: state => state.struct.pointHFile,
   subMapCustomConfig : state => state.CustomConfiguration.subMapCustomConfig,
   pubMapCustomConfig : state => state.CustomConfiguration.pubMapCustomConfig,
+  themeCustomConfigData : state => state.CustomConfiguration.themeCustomConfigData,
+  themeChineseMapping : state => state.CustomConfiguration.themeChineseMapping,
   themeData : state => state.CustomConfiguration.themeData,
   netWorkIn : state => state.CustomConfiguration.netWorkIn,
   netWorkData : state => state.CustomConfiguration.netWorkData,
@@ -49,6 +53,7 @@ const getters = {
   cjUnitParam : state => state.comp.cjUnitParam,
   strInPointer : state => state.comp.strInPointer,
   chipsOfHardwarelibs : state => state.chipsOfHardwarelibs.chipsOfHardwarelibs,
+  refreshListFlag : state => state.refreshListFlag.refreshListFlag,
   closeRouter : state => state.closeRouter,
   projectTreeShow : state => state.projectTreeShow.projectTreeShow,
 }

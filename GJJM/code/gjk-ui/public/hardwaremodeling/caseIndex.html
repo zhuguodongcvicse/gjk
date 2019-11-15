@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel=stylesheet href=libs/bootstrap/css/bootstrap.css> <link rel=stylesheet href=libs/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css>
+        <!-- build:css libs/graph.editor/graph.editor.css -->
+    <link rel="stylesheet" href="src/css/graph.editor.css" />
+    <!-- endbuild -->
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body class="layout">
+    <div id="editor" class="graph-editor public_boarddesign_mainboardindex_14s" data-options="region:'center'"></div>
+
+    <script src="scripts/qunee-min.js"></script>
+    <!-- build:js libs/js.js -->
+    <script src="libs/jquery.min.js"></script>
+    <script src="libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="libs/layout.border.js"></script>
+    <script src="libs/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+    <!-- endbuild -->
+    <!-- build:js libs/graph.editor/graph.editor.js -->
+    <script src="src/common/i18n.js"></script>
+    <script src="src/common/CopyPaste.js"></script>
+    <script src="src/common/DomSupport.js"></script>
+    <script src="src/common/DragSupport.js"></script>
+    <script src="src/common/FileSupport.js"></script>
+    <script src="src/common/JSONSerializer.js"></script>
+    <script src="src/common/Exportpane.js"></script>
+    <script src="src/common/Toolbar.js"></script>
+    <script src="src/common/ToolBox.js"></script>
+    <script src="src/common/PopupMenu.js"></script>
+    <script src="src/common/Propertypane.js"></script>
+    <script src="src/common/GridBackground.js"></script>
+    <!-- <script src="src/graph.editor.js"></script> -->
+    <script src="graph.editor/graph.editor.js"></script>
+    <!-- endbuild -->
+    <script src="scripts/graphs.js"></script>
+    <script src="scripts/casemain.js"></script>
+    <script src="../util/mangUtils.js"></script>
+    <script type="text/javascript">
+        /* function submitSetting() {
+            var aa = document.getElementsByTagName("input").value(); 
+            console.log("chipValueList",chipValueList)
+            console.log("aa",aa)
+        } */
+        function upperCase() {
+            var x = document.getElementById("IP").childNodes.item(0).value
+            // console.log("x", x)
+            // console.log("clickchip",clickCheckedChip)
+            // document.getElementById("fname").value = x.toUpperCase()
+            for (const m in graphList.fJson) {
+                for (const k in graphList.fJson[m].datas) {
+                    if (graphList.fJson[m].datas[k].json.properties.caseName != null) {
+                        for (const i in graphList.fJson[m].datas[k].json.properties.frontBoardList) {
+                            for (const j in graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList) {
+                                //找到数组中点击的当前芯片
+                                if (graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList[j].uniqueId.indexOf(clickCheckedChip.uniqueId) != -1) {
+                                    //当前配置栏输入的IP赋给数组中芯片的属性
+                                    graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList[j].IP = clickCheckedChip.IP
+                                    //将该赋值后的芯片放到临时的芯片数组中
+                                    chipListTemp.push(graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList[j])
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            //深拷贝
+			chipListTemp = JSON.parse(JSON.stringify(chipListTemp))
+        }
+        function getCaption(obj) {
+            var index = obj.lastIndexOf("\+");
+            obj = obj.substring(index + 1, obj.length);
+            //  console.log(obj);
+            return obj;
+        }
+        function removeByValue(arr, val) {
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i] == val) {
+                    arr.splice(i, 1);
+                    break;
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

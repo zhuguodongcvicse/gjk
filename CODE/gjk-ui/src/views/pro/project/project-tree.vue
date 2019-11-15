@@ -889,6 +889,14 @@ export default {
         );
         Vue.set(this.formLabelAlign, "hsmTempId", baseTempIds.hsmTempId);
         this.isUpdataTemp = true;
+      } else if (item == "静态检查"){
+        let filePath = { filePath: "" , fileName: ""};
+        filePath.filePath = this.fileData.filePath + "\\" + this.fileData.fileName;
+        filePath.fileName = this.fileData.fileName;
+        staticInspect(filePath).then(response => {
+          alert(JSON.stringify(response.data))
+            window.open("http://localhost:9000/dashboard?id="+response.data.data, "_blank");  
+        })
       }
     },
     findTargetNode(currentNodeObj, targetNodeObj) {
@@ -1101,6 +1109,15 @@ export default {
       } else if (
         data.type == "app" &&
         data.isComplie &&
+        data.isDirectory == "0" && 
+        data.label == "App组件工程"
+      ) {
+         this.procedureId = data.processId;
+        this.menus = ["编译", "删除", "静态检查", "增加文件", "增加文件夹"];
+        this.fileData = data;
+      } else if (
+        data.type == "app" &&
+        data.isComplie &&
         data.isDirectory == "0"
       ) {
         this.procedureId = data.processId;
@@ -1129,12 +1146,35 @@ export default {
     handleNodeClick(data) {
       //根据 . 判断是否是文件 待确认
       if (data.label.indexOf(".") >= 0) {
-        this.filePathName = data.filePath + "\\" + data.fileName;
-        if (
+        var d=data.label.length-".pdf".length;
+        if(d>=0&&data.label.lastIndexOf(".pdf")==d){
+          this.filePathName = data.filePath + "\\" + data.fileName;
+          if (
+            data.filePath != null &&
+            data.filePath != "" &&
+            data.filePath != undefineds
+          ) {
+            this.$router.push({
+              path: "/comp/manager/fileProview",
+              query: {
+                filePath: this.filePathName,
+                appFileName: data.fileName,
+                proFloName:
+                  this.treeData[0].fileName +
+                  "_" +
+                  this.treeData[0].children[0].fileName +
+                  "_" +
+                  data.label
+              }
+            });
+          }
+        } else {
+          this.filePathName = data.filePath + "\\" + data.fileName;
+          if (
           data.filePath != null &&
           data.filePath != "" &&
           data.filePath != undefined
-        ) {
+          ) {
           this.$router.push({
             path: "/comp/manager/textEditors",
             query: {
@@ -1146,10 +1186,10 @@ export default {
                 this.treeData[0].children[0].fileName +
                 "_" +
                 data.label
-            }
-          });
+              }
+            });
+          }
         }
-
         $(".rightmenu").hide();
         // this.showProjects = false
       }

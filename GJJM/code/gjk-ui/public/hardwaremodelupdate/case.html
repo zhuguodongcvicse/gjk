@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hello Qunee</title>
+    <link rel=stylesheet href=http://demo.qunee.com/editor/libs/bootstrap/css/bootstrap.css>
+    <link rel=stylesheet href=http://demo.qunee.com/editor/libs/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css>
+    <link rel=stylesheet href=http://demo.qunee.com/editor/libs/graph.editor/graph.editor.css>
+</head>
+<body class="layout">
+<div id="editor" class="graph-editor public_boarddesign_mainboardindex_14s" data-options="region:'center'"></div>
+<script src="http://demo.qunee.com/editor/libs/js.js"></script>
+<script src="http://demo.qunee.com/lib/qunee-min.js?v=1.8"></script>
+<script src="http://demo.qunee.com/editor/libs/graph.editor/graph.editor.js"></script>
+<script>
+    Q.registerImage('rack', 'images/rack.png');//这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
+    Q.registerImage('card', 'images/前板卡.svg');
+    Q.registerImage('cell', 'images/芯片.svg');
+    Q.registerImage('ePort', 'images/网口.svg');
+
+    function RectElement() {
+        Q.doSuperConstructor(this, RectElement, arguments);
+        this.resizable = false;
+        this.rotatable = false;
+        this.addOutProperty('width');
+        this.addOutProperty('height');
+        this.addOutProperty('radius');
+        this.anchorPosition = Q.Position.LEFT_TOP;
+        this.setStyle(Q.Styles.SHAPE_FILL_COLOR, "#EEE");
+        this.setStyle(Q.Styles.SHAPE_STROKE, 1);
+        this.setStyle(Q.Styles.SHAPE_STROKE_STYLE, '#555');
+        this.setStyle(Q.Styles.LABEL_PADDING, 5);
+        this.image = null;
+    }
+
+    RectElement.prototype = {
+        setBounds: function (x, y, width, height, relativeParent) {
+            x = x || 0, y = y || 0;
+            if (relativeParent && this.parent) {
+                x += this.parent.x, y += this.parent.y;
+            }
+            this.width = width, this.height = height;
+            this.x = x, this.y = y;
+            if (!this.image || this.image instanceof Q.Path) {
+                this.image = Q.Shapes.getRect(0, 0, width, height, this.radius || 0);
+            } else {
+                this.size = {width: width, height: height}
+            }
+        },
+        getBounds: function () {
+            return {
+                x: this.x, y: this.y, width: this.width, height: this.height
+            }
+        }
+    }
+
+    Q.extend(RectElement, Q.Node);
+    Q.RectElement = RectElement;
+    Q.loadClassPath(RectElement, 'Q.RectElement')
+
+    $('#editor').graphEditor({
+        images: [{
+            name: '端口',
+            images: [{
+                properties: {
+                    size: {width: 52, height: 50}
+                },
+                clientProperties: {
+                    type: 'port'
+                },
+                type: 'Q.RectElement',
+                image: 'cell',
+            },{
+                properties: {
+                    size: {width: 52, height: 50}
+                },
+                clientProperties: {
+                    type: 'port'
+                },
+                type: 'Q.RectElement',
+                image: 'ePort',
+            }
+            ]
+        }, {
+            name: '接口模板',
+            images: [{
+                image: 'images/card.png',
+                url: './json/card.json',
+                ondrop: 'ondropLoadJSON'//do any thing by your self when drop into the graph
+            }, {
+                image: 'images/card_with_cell.png',
+                url: './json/card_with_cell.json',
+                ondrop: 'ondropLoadJSON'//do any thing by your self when drop into the graph
+            }
+            ]
+        }],
+        callback: initEditor
+    });
+
+    var EVENT_CREATE_ELEMENT_BY_JSON = 'create.element.by.json';
+    function ondropLoadJSON(evt, graph, center, options) {
+        var url = options.url;
+        if (!url) {
+            return;
+        }
+        Q.loadJSON(url, function (json) {
+            var result = loadJSONInParent(graph, json, center);
+            if(!result || !result.length){
+                return;
+            }
+            var roots = [];
+            result.forEach(function(e){
+                if(e.parent === graph.currentSubnetwork){
+                    roots.push(e);
+                }
+            })
+            graph.interactionDispatcher.onEvent({kind: EVENT_CREATE_ELEMENT_BY_JSON, datas: result, roots: roots, event: evt})
+        })
+    }
+
+    function loadJSONInParent(graph, json, center, parent) {
+        parent = parent || graph.currentSubnetwork;
+        var result = graph.parseJSON(json);
+        if (!result) {
+            return
+        }
+        var bounds = new Q.Rect();
+        result.forEach(function (e) {
+            if (e instanceof Q.Node) {
+                bounds.add(e.x, e.y);
+            }
+            if (parent && !e.parent) {
+                e.parent = parent;
+            }
+        })
+        if (!bounds.isEmpty()) {
+            var xOffset = center.x - bounds.cx;
+            var yOffset = center.y - bounds.cy;
+
+            result.forEach(function (e) {
+                if (e.location) {
+                    e.x += xOffset;
+                    e.y += yOffset;
+                }
+            })
+        }
+
+        return result;
+    }
+
+    var graph;
+
+    function createNode(options, parent) {
+        var item = new RectElement();
+        if (options.image) {
+            item.image = options.image;
+        } else {
+            options.radius = options.radius || 5;
+            item.setStyle(Q.Styles.SHAPE_FILL_COLOR, options.fillColor || '#EEE');
+        }
+        item.setBounds(options.x || 0, options.y || 0, options.width || 40, options.height || 40);
+        graph.addElement(item);
+        if (parent) {
+            item.parent = item.host = parent;
+        }
+        return item;
+    }
+
+    function getSlot(parent, id) {
+        if (parent._slots) {
+            return parent._slots[id];
+        }
+    }
+
+    function addSlot(parent, id, x, y, width, height, childType) {
+        var slot = createNode({
+            x: parent.x + x, y: parent.y + y, width: width, height: height
+        }, parent);
+        slot.setStyle(Q.Styles.SHAPE_FILL_COLOR, null);
+        slot.set('type', 'slot');
+        slot.set('childType', childType);
+        slot.movable = false;
+        slot.selectable = false;
+        // slot.setStyle(Q.Styles.SHAPE_STROKE_STYLE, Q.toColor(0x01000000));
+        // slot.setStyle(Q.Styles.LABEL_ANCHOR_POSITION, Q.Position.CENTER_MIDDLE);
+        // slot.setStyle(Q.Styles.LABEL_POSITION, Q.Position.CENTER_MIDDLE);
+        if (!parent._slots) {
+            parent._slots = {};
+        }
+        return parent._slots[id] = slot;
+    }
+
+    function createRack() {
+        var width = 700, height = 500;
+        // 468,295
+        var rack = createNode({
+            image: 'rack',
+            width: width, height: height
+        });
+        var startX = 32, startY = 23, gap = 1.8, itemWidth = 62, itemHeight = 380, count = 10;
+        var i = 0;
+        while (i++ < count) {
+            addSlot(rack, i, startX, startY, itemWidth, itemHeight, 'card');
+            startX += itemWidth + gap;
+        }
+        return rack;
+    }
+
+    function createCard(slot) {
+        var bounds = slot.getBounds();
+        var card = createNode({
+            image: 'card',
+            x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height, radius: 8, fillColor: '#CDF'
+        }, slot);
+        card.set('type', 'card');
+        card.name = '00-007';
+        card.setStyle(Q.Styles.LABEL_POSITION, Q.Position.CENTER_TOP);
+        card.setStyle(Q.Styles.LABEL_ANCHOR_POSITION, Q.Position.CENTER_TOP);
+
+        var startX = 5, startY = 40, gap = 10, itemWidth = bounds.width - 10, itemHeight = 50, count = 4;
+        var i = 0;
+        while (i++ < count) {
+            addSlot(card, i, startX, startY, itemWidth, itemHeight, 'port');
+            startY += itemHeight + gap;
+        }
+        return card;
+    }
+
+    function createPort(slot) {
+        var bounds = slot.getBounds();
+        var port = createNode({
+            image: 'cell',
+            x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height
+        }, slot);
+        port.set('type', 'port');
+        port.name = '001';
+        port.setStyle(Q.Styles.LABEL_ANCHOR_POSITION, Q.Position.CENTER_MIDDLE);
+        port.setStyle(Q.Styles.LABEL_POSITION, Q.Position.CENTER_MIDDLE);
+        return port;
+    }
+
+    function initEditor(editor) {
+        graph = editor.graph;
+        editor.toolbox.hideDefaultGroups();
+
+        graph.styles = {
+            'selection.type': Q.Consts.SELECTION_TYPE_BORDER_RECT
+        }
+
+        initToolbar();
+
+        function initToolbar(){
+            var toolbar = editor.toolbar;
+            var button = document.createElement('button');
+            button.textContent = '切换视图';
+            button.className='boarddesign_board_14s';
+            button.onclick = function () {
+                if(graph.name == '背部视图'){
+                    graph.name = '正面视图'
+                    graph.clear();
+                    initData();
+                    return;
+                }
+                Q.loadJSON('./json/topo.json', function(json){
+                    graph.name = '背部视图'
+                    graph.clear();
+                    graph.parseJSON(json)
+                    graph.moveToCenter();
+                })
+            }
+            toolbar.appendChild(button)
+        }
+
+        initPropertyPane();
+        function initPropertyPane(){
+            var propertySheet = editor.propertyPane;
+            propertySheet.showDefaultProperties = false;
+
+            propertySheet.register({
+                class: Q.RectElement,
+                properties: [
+                    {client: 'type', displayName: 'Type'},
+                    {name: 'name', displayName: 'Name'}
+                ]
+            })
+        }
+
+        function initData() {
+            var rack = createRack();
+            var card = createCard(getSlot(rack, 1))
+            var port1 = createPort(getSlot(card, 1))
+            var port2 = createPort(getSlot(card, 2))
+            graph.moveToCenter();
+        }
+
+
+        function initInteraction() {
+            var currentElement;
+            var oldFillColor;
+            var highlightColor = "#FF0";
+
+            function unhighlight() {
+                if (currentElement) {
+                    currentElement.setStyle(Q.Styles.SHAPE_FILL_COLOR, oldFillColor);
+                }
+            }
+
+            function highlight(element) {
+                if (currentElement == element) {
+                    return;
+                }
+                unhighlight(currentElement);
+                currentElement = element;
+                if (!currentElement) {
+                    return;
+                }
+                oldFillColor = currentElement.getStyle(Q.Styles.SHAPE_FILL_COLOR);
+                currentElement.setStyle(Q.Styles.SHAPE_FILL_COLOR, highlightColor);
+            }
+
+            function findSlot(element, evt) {
+                var xy = graph.toLogical(evt.event);
+                var type = element.get('type');
+
+                function canDrop(data) {
+                    return data.get('type') == 'slot' && data.get('childType') == type;
+                }
+
+                var slot;
+                graph.forEachReverseVisibleUI(function (ui) {
+                    if (ui.data == element || ui.data.isDescendantOf(element)) {
+                        return;
+                    }
+                    var bounds = graph.getUIBounds(ui);
+                    if (bounds.intersects(xy.x, xy.y)) {
+                        if (canDrop(ui.data)) {
+                            slot = ui.data;
+                        }
+                        return false;
+                    }
+                });
+                return slot;
+            }
+
+            function adaptBounds(element, slot) {
+                element.parent = element.host = slot;
+                var bounds = slot.getBounds();
+                graph.moveElements([element], bounds.x - element.x, bounds.y - element.y)
+            }
+
+            var dragInfo = {};
+            graph.interactionDispatcher.addListener(function (evt) {
+                if(evt.kind === EVENT_CREATE_ELEMENT_BY_JSON){
+                    if (evt.roots.length === 1) {
+                        var element = evt.roots[0];
+                        var slot = findSlot(element, evt);
+                        if (slot) {
+                            adaptBounds(element, slot);
+                        }
+                    }
+                    return;
+                }
+                var data = evt.data;
+                if (evt.kind == Q.InteractionEvent.ELEMENT_CREATED && evt.data instanceof Q.Node) {
+                    var slot = findSlot(data, evt);
+                    if (slot) {
+                        adaptBounds(data, slot);
+                    }
+                    return;
+                }
+                if (evt.kind == Q.InteractionEvent.ELEMENT_MOVE_START) {
+                    var type = data.get('type');
+                    if (type && (type == 'card' || type == 'port')) {
+                        dragInfo = {data: data, x: data.x, y: data.y};
+                        graph.sendToTop(data);
+                    } else {
+                        dragInfo = null;
+                    }
+                    return;
+                }
+                if (!dragInfo) {
+                    return
+                }
+                if (evt.kind == Q.InteractionEvent.ELEMENT_MOVING) {
+                    var slot = findSlot(data, evt);
+                    if (!slot) {
+                        unhighlight();
+                    } else {
+                        highlight(slot);
+                    }
+                    return;
+                }
+                if (evt.kind == Q.InteractionEvent.ELEMENT_MOVE_END) {
+                    unhighlight();
+                    var data = dragInfo.data;
+                    var oldSlot = data.parent;
+                    var slot = findSlot(data, evt);
+                    if (!slot || slot == oldSlot) {
+                        graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+                    } else {
+                        adaptBounds(data, slot);
+                    }
+                    dragInfo = null;
+                }
+            })
+        }
+
+        initData();
+        initInteraction();
+    }
+</script>
+</body>
+</html>

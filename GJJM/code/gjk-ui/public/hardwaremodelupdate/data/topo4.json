@@ -1,0 +1,54 @@
+{
+  "version": "2.0",
+  "datas": [
+    {
+      "_className": "Q.Node",
+      "json": {
+        "name": "Node",
+        "styles": {
+          "label.color": "#333333"
+        },
+        "location": {
+          "x": -196,
+          "y": -20
+        }
+      },
+      "_refId": "176"
+    },
+    {
+      "_className": "Q.Text",
+      "json": {
+        "name": "Text",
+        "location": {
+          "x": 100,
+          "y": 100
+        }
+      },
+      "_refId": "177"
+    },
+    {
+      "_className": "Q.Edge",
+      "json": {
+        "from": {
+          "_ref": 176
+        },
+        "to": {
+          "_ref": 177
+        }
+      }
+    },
+    {
+      "_className": "Q.Node",
+      "json": {
+        "location": {
+          "x": -18.68598522061893,
+          "y": -7.110226006734564
+        },
+        "image": "Q-server"
+      }
+    }
+  ],
+  "scale": 1,
+  "tx": 449.68598522061893,
+  "ty": 152.11022600673456
+}

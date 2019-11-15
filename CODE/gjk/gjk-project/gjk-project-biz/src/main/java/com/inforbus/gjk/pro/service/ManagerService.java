@@ -283,4 +283,6 @@ public interface ManagerService extends IService<ProjectFile> {
 	public boolean deleteProcedureById(String procedureId);
 
     boolean deleteFilesFromLocal(Map filePath);
+
+    R analysisThemeXML(String proDetailId);
 }

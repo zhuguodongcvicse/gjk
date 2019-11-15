@@ -1138,6 +1138,19 @@ function initEditor(editor) {
 				]
 			}
 		}
+		if (type == 'case') {
+			return {
+				group: '机箱',
+				properties: [{
+					client: 'boardName',
+					displayName: '主板名称'
+				}, {
+					client: 'showBoardType',
+					displayName: '主板类型'
+				}
+				]
+			}
+		}
 	}
 	initInteraction();
 }

@@ -167,7 +167,9 @@ export default {
       flowId: "",
       //特殊处理多选构件数组
       specalHandleSelect: [],
-      isAble: true
+      isAble: true,
+      //调接口传的参数
+      appDataDTO: {},
     };
   },
 
@@ -271,17 +273,9 @@ export default {
                   this.baseSpecalHandles.push(items);
 
                   getProcessFilePathById(this.$route.query.proId).then(val => {
-                    //处理处理属性是否显示及中英文映射
-                    let vals = this.analysisAttrConfigType(items.xmlEntityMaps);
-                    //处理多个属性名的值
-                    let a = [];
-                    for (let val of vals) {
-                      tmpVal = JSON.parse(JSON.stringify(val));
-                      a.push(val.lableName);
-                    }
                     let selectComponent = [];
                     if (val.data.data != null) {
-                      for (let item of val.data.data) {
+                    for (let item of val.data.data) {
                         let selectComp = {};
                         selectComp.label = item.compName;
                         selectComp.value = item.functionName;
@@ -290,7 +284,17 @@ export default {
                         selectComp.functionName = item.functionName;
                         selectComp.compId = item.compId;
                         selectComponent.push(selectComp);
+                        //给起始构件下拉选赋值
+                        this.selectComponent = selectComponent;
                       }
+                    //处理处理属性是否显示及中英文映射
+                    let vals = this.analysisAttrConfigType(items.xmlEntityMaps);
+                    //处理多个属性名的值
+                    let a = [];
+                    for (let val of vals) {
+                      tmpVal = JSON.parse(JSON.stringify(val));
+                      a.push(val.lableName);
+                    }
                       //设置下拉框的值
                       tmpVal.dataKey = selectComponent;
                       tmpVal.lableName = a;
@@ -311,7 +315,7 @@ export default {
 
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["compChineseMapping"]),
+    ...mapGetters(["compChineseMapping", "userInfo"]),
     copyForm() {
       return JSON.parse(JSON.stringify(this.form));
     }
@@ -343,6 +347,7 @@ export default {
             key === attr.attrName
           ) {
             tabParam.attributeMap[key] = lableName;
+            console.log("11111111111111",lableName)
           }
         });
       }
@@ -423,8 +428,10 @@ export default {
     },
     //软硬件配置
     softwareClick() {
+      //用户名
+      this.appDataDTO.userName = this.userInfo.username;
       //调用接口
-      getFilePathListById(this.$route.query.proId).then(editor => {
+      getFilePathListById(this.$route.query.proId, this.appDataDTO).then(editor => {
         console.log("this.editor::::", editor.data.data);
       });
     },
@@ -441,12 +448,15 @@ export default {
         if (item.lableName === this.workModel) {
           if (item.xmlEntityMaps != null) {
             for (let items of item.xmlEntityMaps) {
-              //给流程文件赋值
-              if (
-                items.lableName === this.yesORno &&
-                items.attributeMap.name === "true"
-              ) {
-                this.isAble = false;
+              //判断软硬件映射配置按钮是否可用
+              if ( items.lableName === this.yesORno ) {
+                if(items.attributeMap.name){
+                  this.isAble = false;
+                  console.log("ooooo",this.isAble);
+                }else{
+                  this.isAble = true;
+                  console.log("assssss",this.isAble);
+                }
               }
             }
           }

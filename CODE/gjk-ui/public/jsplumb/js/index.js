@@ -105,7 +105,7 @@ function handleMessageFromParent(event) {
 			// 处理业务逻辑
 			iframeData = data
 			dat = eval(JSON.stringify(iframeData.params));
-			// console.log("子接收父参数", iframeData)
+			//console.log("子接收父参数", JSON.stringify(dat))
 			//console.log("构件状态", compUpdateState);
 			connectionData = iframeData.connectionData
 			//console.log("connection数据", connectionData)
@@ -264,7 +264,8 @@ function setEnterPoint(id, gj) {
 	var differenceValue = anchorNumber / 2;
 	var x = differenceValue;
 	var inPoint;
-	var midpoints = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+	var midpoints = [ 0.2, 0.4, 0.6, 0.8]
+	var stub = [ 60, 50, 40, 30]
 	for (var i = 0; i < len; i++) {
 		var config = JSON.parse(JSON.stringify(getBaseNodeConfig()))
 		config.isSource = false
@@ -276,8 +277,9 @@ function setEnterPoint(id, gj) {
 			lineWidth: 2
 		}
 		config.connector[1].midpoint = midpoints[i]
+		config.connector[1].stub = stub[i]
 		inPoint = jsPlumb.addEndpoint(id, {
-			anchors: [0, differenceValue, 0, 0],
+			anchors: [0, differenceValue, -1, 0],
 			uuid: i + '*input*' + id,
 			deleteEndpointsOnEmpty: true
 		}, config);
@@ -384,14 +386,16 @@ function setExitPoint(id, gj) {
 	var differenceValue = anchorNumber / 2;
 	var x = differenceValue;
 	var outPoint
-	var midpoints = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+	var midpoints = [ 0.8, 0.6, 0.4,0.2]
+	var stub = [60, 50, 40, 30]
 	for (var i = 0; i < len; i++) {
 		var config = JSON.parse(JSON.stringify(getBaseNodeConfig()))
 		config.isTarget = false
 		config.maxConnections = -1
 		config.connector[1].midpoint = midpoints[i]
+		config.connector[1].stub = stub[i]
 		outPoint = jsPlumb.addEndpoint(id, {
-			anchors: [1, differenceValue, 0, 0],
+			anchors: [1, differenceValue, 1, 0],
 			uuid: i + '*output*' + id,
 			deleteEndpointsOnEmpty: true
 		}, config);
@@ -878,8 +882,10 @@ function main() {
 		$('#' + event.currentTarget.id).focus();
 		document.getElementById(event.currentTarget.id).onkeydown=function (e){
 			if(e.keyCode==46){
-				//alert(event.currentTarget.id)
 				$("#"+event.currentTarget.id).remove()
+				//console.log("参数：",JSON.stringify(gjidAndTemid));
+				//gjIdAndTemId = gjidAndTemid;
+				handleMessageToParent("removeComp", event.currentTarget.id);
 			}
 		}
 
@@ -1228,6 +1234,7 @@ function emptyNode(id) {
 //需保存到ctrlZ数组中的对象
 var connInfoObj = {}
 jsPlumb.bind("connection", function (connInfo, originalEvent) {
+	console.log("1111111111111",connInfo)
 	if (isConnection) {
 		connInfoObj = {}
 		//console.log(connInfo)

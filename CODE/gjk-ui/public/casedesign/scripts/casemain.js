@@ -184,7 +184,7 @@ function ondropLoadJSON(evt, graph, center, options) {
 		}
 		for (const i in jsonObj.datas[0].json.properties.chipList) {
 			if (jsonObj.datas[0].json.properties.chipList[i].uniqueId.indexOf(uuidRandom) == -1) {
-				jsonObj.datas[0].json.properties.chipList[i].uniqueId = uuidRandom + '_' + jsonObj.datas[0].json.properties.chipList[i].uniqueId	
+				jsonObj.datas[0].json.properties.chipList[i].uniqueId = uuidRandom + '_' + jsonObj.datas[0].json.properties.chipList[i].uniqueId
 			}
 		}
 	}
@@ -590,7 +590,7 @@ function initEditor(editor) {
 			}
 			for (const i in fJson.datas[0].json.properties.frontBoardList) {
 				for (const j in fJson.datas) {
-					if (fJson.datas[j].json.properties != null && fJson.datas[j].json.properties.boardType != null 
+					if (fJson.datas[j].json.properties != null && fJson.datas[j].json.properties.boardType != null
 						&& fJson.datas[0].json.properties.frontBoardList[i].uniqueId.indexOf(fJson.datas[j].json.properties.uniqueId) != -1) {
 							fJson.datas[0].json.properties.frontBoardList[i].ID = fJson.datas[j].json.properties.ID
 					}
@@ -614,7 +614,7 @@ function initEditor(editor) {
 			}
 			for (const i in bJson.datas[0].json.properties.backBoardList) {
 				for (const j in bJson.datas) {
-					if (bJson.datas[j].json.properties != null && bJson.datas[j].json.properties.boardType != null 
+					if (bJson.datas[j].json.properties != null && bJson.datas[j].json.properties.boardType != null
 						&& bJson.datas[0].json.properties.backBoardList[i].uniqueId.indexOf(bJson.datas[j].json.properties.uniqueId) != -1) {
 							bJson.datas[0].json.properties.backBoardList[i].ID = bJson.datas[j].json.properties.ID
 					}
@@ -686,7 +686,7 @@ function initEditor(editor) {
 			}
 			for (const i in fJson.datas[0].json.properties.frontBoardList) {
 				for (const j in fJson.datas) {
-					if (fJson.datas[j].json.properties != null && fJson.datas[j].json.properties.boardType != null 
+					if (fJson.datas[j].json.properties != null && fJson.datas[j].json.properties.boardType != null
 						&& fJson.datas[0].json.properties.frontBoardList[i].uniqueId.indexOf(fJson.datas[j].json.properties.uniqueId) != -1) {
 							fJson.datas[0].json.properties.frontBoardList[i].ID = fJson.datas[j].json.properties.ID
 					}
@@ -710,7 +710,7 @@ function initEditor(editor) {
 			}
 			for (const i in bJson.datas[0].json.properties.backBoardList) {
 				for (const j in bJson.datas) {
-					if (bJson.datas[j].json.properties != null && bJson.datas[j].json.properties.boardType != null 
+					if (bJson.datas[j].json.properties != null && bJson.datas[j].json.properties.boardType != null
 						&& bJson.datas[0].json.properties.backBoardList[i].uniqueId.indexOf(bJson.datas[j].json.properties.uniqueId) != -1) {
 							bJson.datas[0].json.properties.backBoardList[i].ID = bJson.datas[j].json.properties.ID
 					}
@@ -784,7 +784,7 @@ function initEditor(editor) {
 			}
 		}
 		toolbar.appendChild(button)
-		//网状画布 
+		//网状画布
 		var graph = editor.graph;
 		//不可改变形状大小
 		graph.editable = true;
@@ -1128,7 +1128,7 @@ function initEditor(editor) {
 					console.log("clickBoardList", JSON.parse(JSON.stringify(clickBoardList)))
 				}
 				// console.log("点击",data.properties)
-			
+
 				data.set('chipName', data._mn3.chipName);
 				data.set('coreNum', data._mn3.coreNum);
 				data.set('memSize', data._mn3.memSize);
@@ -1232,12 +1232,12 @@ function initEditor(editor) {
 			return {
 				group: '机箱属性',
 				properties: [{
-					client: 'rackname',
-					displayName: '机箱名称'
+					client: 'caseName',
+					displayName: '机箱名称66'
 				}/* ,
 					{
 						client: 'boardnum',
-						displayName: '主板数量' 
+						displayName: '主板数量'
 					} */
 				]
 			}
@@ -1246,7 +1246,7 @@ function initEditor(editor) {
 	}
 
 
-	//initData(); 
+	//initData();
 	initInteraction();
 
 }

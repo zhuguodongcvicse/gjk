@@ -92,7 +92,7 @@
 				</div>
 				<div class="modal-body">
 					<!-- <div class="form-group" style="height:10%">
-					<label class="col-sm-5 control-label">交换芯片：</label>					
+					<label class="col-sm-5 control-label">交换芯片：</label>
 				</div> -->
 					<div class="form-group">
 						<label class="col-sm-3 control-label">StartCpu：</label>
@@ -217,58 +217,59 @@
 		}
 
 		function loadFpgaBoardDatas() {
-
 			//显示下拉的cpu
-			$("#selectStartCpu").empty();
-			var selectStartCpuHtml = '';
-			for (var i = 0; i < dragCpuList.length; i++) {
-				var sHtml = '<option value=' + dragCpuList[i].ID + '>' + dragCpuList[i].ID + '</option>';
-				selectStartCpuHtml = selectStartCpuHtml + sHtml;
-			}
-			$("#selectStartCpu").html(selectStartCpuHtml);
+      if (dragCpuList.length !== 0) {
+          $("#selectStartCpu").empty();
+          var selectStartCpuHtml = '';
+          for (var i = 0; i < dragCpuList.length; i++) {
+              var sHtml = '<option value=' + dragCpuList[i].ID + '>' + dragCpuList[i].ID + '</option>';
+              selectStartCpuHtml = selectStartCpuHtml + sHtml;
+          }
+          $("#selectStartCpu").html(selectStartCpuHtml);
 
-			$("#selectEndCpu").empty();
-			var selectEndCpuHtml = '';
-			for (var i = 0; i < dragCpuList.length; i++) {
-				var sHtml = '<option value=' + dragCpuList[i].ID + '>' + dragCpuList[i].ID + '</option>';
-				selectEndCpuHtml = selectEndCpuHtml + sHtml;
-			}
-			$("#selectEndCpu").html(selectEndCpuHtml);
-
+          $("#selectEndCpu").empty();
+          var selectEndCpuHtml = '';
+          for (var i = 0; i < dragCpuList.length; i++) {
+              var sHtml = '<option value=' + dragCpuList[i].ID + '>' + dragCpuList[i].ID + '</option>';
+              selectEndCpuHtml = selectEndCpuHtml + sHtml;
+          }
+          $("#selectEndCpu").html(selectEndCpuHtml);
+      }
 			//显示下拉的接口
 			// if (selectInfCount != 0) {
-			if (dragCpuList[0].infOfChipList.length != 0) {
-				$("#selectStartInf").empty();
-				var selectStartInfHtml = '';
-				for (var j = 0; j < dragCpuList[0].infOfChipList.length; j++) {
-					if (dragCpuList[0].infOfChipList[j].ioType != 0) {
-						var sHtml = '<option>' + dragCpuList[0].infOfChipList[j].ID + '</option>';
-						selectStartInfHtml = selectStartInfHtml + sHtml;
-					}
-				}
-				$("#selectStartInf").html(selectStartInfHtml);
+      if (dragCpuList.length !== 0) {
+          if (dragCpuList[0].infOfChipList.length != 0) {
+              $("#selectStartInf").empty();
+              var selectStartInfHtml = '';
+              for (var j = 0; j < dragCpuList[0].infOfChipList.length; j++) {
+                  if (dragCpuList[0].infOfChipList[j].ioType != 0) {
+                      var sHtml = '<option>' + dragCpuList[0].infOfChipList[j].ID + '</option>';
+                      selectStartInfHtml = selectStartInfHtml + sHtml;
+                  }
+              }
+              $("#selectStartInf").html(selectStartInfHtml);
 
-				$("#selectEndInf").empty();
-				var selectEndInfHtml = '';
-				for (var j = 0; j < dragCpuList[0].infOfChipList.length; j++) {
-					if (dragCpuList[0].infOfChipList[j].ioType != 1) {
-						var sHtml = '<option>' + dragCpuList[0].infOfChipList[j].ID + '</option>';
-						selectEndInfHtml = selectEndInfHtml + sHtml;
-					}
-				}
-				$("#selectEndInf").html(selectEndInfHtml);
-			} else {
-				$("#selectStartInf").empty();
-				var sHtml = '<option>该芯片已无可选接口</option>';
-				var selectStartInfHtml = selectStartInfHtml + sHtml;
-				$("#selectStartInf").html(selectStartInfHtml);
+              $("#selectEndInf").empty();
+              var selectEndInfHtml = '';
+              for (var j = 0; j < dragCpuList[0].infOfChipList.length; j++) {
+                  if (dragCpuList[0].infOfChipList[j].ioType != 1) {
+                      var sHtml = '<option>' + dragCpuList[0].infOfChipList[j].ID + '</option>';
+                      selectEndInfHtml = selectEndInfHtml + sHtml;
+                  }
+              }
+              $("#selectEndInf").html(selectEndInfHtml);
+          } else {
+              $("#selectStartInf").empty();
+              var sHtml = '<option>该芯片已无可选接口</option>';
+              var selectStartInfHtml = selectStartInfHtml + sHtml;
+              $("#selectStartInf").html(selectStartInfHtml);
 
-				$("#selectEndInf").empty();
-				var sHtml = '<option>该芯片已无可选接口</option>';
-				var selectEndInfHtml = selectEndInfHtml + sHtml;
-				$("#selectEndInf").html(selectEndInfHtml);
-			}
-
+              $("#selectEndInf").empty();
+              var sHtml = '<option>该芯片已无可选接口</option>';
+              var selectEndInfHtml = selectEndInfHtml + sHtml;
+              $("#selectEndInf").html(selectEndInfHtml);
+          }
+      }
 			// }
 			//console.log("dragCpuList",JSON.parse(JSON.stringify(dragCpuList)))
 		}

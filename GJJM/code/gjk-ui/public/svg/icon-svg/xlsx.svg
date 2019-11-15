@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="15px" viewBox="0 0 12 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 57 (83077) - https://sketch.com -->
+    <title>xlsx</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="0 0.0431390977 11.9588812 0.0431390977 11.9588812 15 0 15"></polygon>
+    </defs>
+    <g id="14所-信息构建库" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="菜单栏左侧切图" transform="translate(-320.000000, -598.000000)">
+            <g id="菜单" transform="translate(286.000000, 135.000000)">
+                <g id="分组-15-copy-2备份" transform="translate(18.000000, 432.000000)">
+                    <g id="xlsx" transform="translate(16.000000, 31.000000)">
+                        <g id="分组">
+                            <mask id="mask-2" fill="white">
+                                <use xlink:href="#path-1"></use>
+                            </mask>
+                            <g id="Clip-2"></g>
+                            <path d="M7.68804058,0.0431390977 L7.68804058,3.36710526 C7.68804058,3.8656015 8.02931594,4.19768797 8.54189565,4.19768797 L11.9588812,4.19768797 L11.9588812,14.1689662 C11.9588812,14.6674624 11.6170261,15 11.1045043,15 L0.853837681,15 C0.341373913,15 -1.73913043e-05,14.6674624 -1.73913043e-05,14.1689662 L-1.73913043e-05,0.874229323 C-1.73913043e-05,0.375676692 0.341373913,0.0431390977 0.853837681,0.0431390977 L7.68804058,0.0431390977 Z" id="Fill-1" fill="#7FB85A" mask="url(#mask-2)"></path>
+                        </g>
+                        <text id="X" font-family="PingFang-SC-Bold, PingFang SC" font-size="9" font-weight="bold" fill="#FFFFFF">
+                            <tspan x="3.3" y="11">X</tspan>
+                        </text>
+                        <path d="M12,4.24216023 L8.58787214,4.21294496 C7.98784771,4.21294496 7.58823863,3.81627764 7.58823863,3.33632541 L7.65980222,0 L12,4.24216023 Z" id="Fill-5" fill="#7FB85A" opacity="0.552199591"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

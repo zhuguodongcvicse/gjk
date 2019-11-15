@@ -288,7 +288,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	}
 	/*
 	* 2019年11月5日 15:22:53 wang修改
-	* 修改为从基础模板表读模板数据
+	*
+	*
 	* */
 	@Override
 	public XmlEntityMap getcoefficientXmlEntityMap(String proDetailId) {
@@ -928,6 +929,18 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 //			ExternalIOTransUtils.modifySpbInclude(apiFileList,
 //					new File(appFilePathName).getParentFile().getAbsolutePath());
 //		} catch (IOException e) {
+//			e.printStackTrace();
+//			logger.error("调用客户接口失败，请联系管理员。");
+//			r.setAllAttr(CommonConstants.FAIL, "调用客户接口失败，请联系管理员。", null);
+//			return;
+//		}
+//		try {
+//			// 原始需求调用客户接口,apiFileList中存添加的.c .cpp .h文件不带后缀的文件名
+//			List<String> apiFileList = new ArrayList<String>();
+//			apiFileList.addAll(apiNeedStringSet);
+//			ExternalIOTransUtils.modifySpbInclude(apiFileList,
+//					new File(appFilePathName).getParentFile().getAbsolutePath());
+//		} catch (IOException e) {e
 //			e.printStackTrace();
 //			logger.error("调用客户接口失败，请联系管理员。");
 //			r.setAllAttr(CommonConstants.FAIL, "调用客户接口失败，请联系管理员。", null);
@@ -1672,5 +1685,59 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		R<BaseTemplate> R = baseTemplateService.getById(tempId);//feign调用upms接口根据id查模板对象
 		File file = new File(gitDetailPath+R.getData().getTempPath());
 		return XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);
+	}
+
+	@Override
+	public R analysisThemeXML(String proDetailId) {
+		ProjectFile projectFile = getProDetailById(proDetailId);
+		Project project = projectMapper.getProById(projectFile.getProjectId());
+		String json = project.getBasetemplateIds();//获取到模板idjson串
+		BaseTemplateIDsDTO baseTemplateIDsDTO = JSON.parseObject(json, BaseTemplateIDsDTO.class);
+		String flowFilePath = "";
+		String path = "";
+		List<Part> partList = new ArrayList<Part>();
+		List<ProjectFile> ProjectFileList = this.getFilePathListById(proDetailId);
+		for (ProjectFile proFile : ProjectFileList) {
+			if (proFile.getFileType().equals("11")) {
+				flowFilePath = proDetailPath + proFile.getFilePath() + proFile.getFileName() + ".xml";
+				path = proDetailPath + proFile.getFilePath();
+			}
+		}
+
+		// flowFilePath =
+		// "D:\\14S_GJK_GIT\\gjk\\gjk\\project\\测试项目\\测试流程流程\\模型\\流程模型.xml";
+		// File file = new File(flowFilePath);
+		// 获取部件及部件及部件下构建
+		File flowFile = new File(flowFilePath);
+		if (flowFile.exists()) {
+			// partList.addAll(ProcedureXmlAnalysis.getPartList(new File(flowFilePath)));
+			List<Part> partList1 = ProcedureXmlAnalysis.getPartList(new File(flowFilePath));
+			partList.addAll(partList1);
+		}
+		// 解析流程模型文件
+		// XmlEntityMap folwModelData
+		// =XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(new File(flowFilePath));
+		String themePath = path + "自定义配置__主题配置.xml";
+		File themeFile = new File(themePath);
+		XmlEntityMap themeData = null;
+		XmlEntityMap netWorkData = null;
+		if (!themeFile.exists()) {
+			themeData = this.getXmlEntityMap(baseTemplateIDsDTO.getThemeTempId());
+		} else {
+			themeData = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(themeFile);
+		}
+		String netWorkPath = path + "自定义配置__网络配置.xml";
+		File netWorkFile = new File(netWorkPath);
+		if (!netWorkFile.exists()) {
+			netWorkData = this.getXmlEntityMap(baseTemplateIDsDTO.getNetworkTempId());
+		} else {
+			netWorkData = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(netWorkFile);
+		}
+		JSONObject obj = new JSONObject();
+		obj.put("themeData", themeData);
+		obj.put("netWorkData", netWorkData);
+		obj.put("partList", partList);
+		// obj.put("folwModelData", folwModelData);
+		return new R<>(obj);
 	}
 }

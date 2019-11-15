@@ -234,7 +234,17 @@ public class ProjectController {
 	public R uploadFiles(@RequestBody FolderPathDTO folderPathDTO) {
 		return new R<>(projectService.uploadFiles(folderPathDTO));
 	}
-
+	/**
+	 * 流程建模删除构件
+	 * @param compId
+	 * @param projectId
+	 */
+	@GetMapping
+	@RequestMapping("/removeCompProject/{compId}/{projectId}")
+	public void removeCompProject(@PathVariable("compId") String compId,@PathVariable("projectId") String projectId) {
+		System.out.println("444444444444");
+		projectService.removeCompProject(compId,projectId);
+	}
 	@GetMapping("/logs")
 	public R getlogs() {
 		List<String> s = new ArrayList<String>();
@@ -305,4 +315,9 @@ public class ProjectController {
 		s.add("4444444444444");
 		return new R<>(s, "成功");
 	}
+
+    @PostMapping("/staticInspect")
+    public R staticInspect(String filePath, String fileName){
+        return projectService.staticInspect(filePath, fileName);
+    }
 }

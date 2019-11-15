@@ -212,6 +212,19 @@
 			</if>
 		</where>
 	</select>
+	
+	<select id="getByApplyId"
+		parameterType="com.inforbus.gjk.libs.api.entity.Approval"
+		resultMap="approvalMap">
+		SELECT
+		<include refid="approvalSql" />
+		FROM gjk_approval
+		<where>
+			<if test="projectId != null and projectId.trim() != ''">
+				AND apply_id = #{projectId}
+			</if>
+		</where>
+	</select>
 
 	<select id="getIdByApplyId"
 		parameterType="com.inforbus.gjk.libs.api.entity.Approval"
@@ -255,5 +268,15 @@
 			AND approval_state in ('0','1','2','4')
 		</where>
 	</select>
+	
+	<update id="removeCompApproval">
+		UPDATE gjk_approval_apply SET approval_state = '3'
+		where approval_id IN
+		<foreach collection="idList" item="approvalId" index="index"
+			open="(" close=")" separator=",">
+			#{approvalId}
+		</foreach>
+		AND apply_id = #{compId}
+	</update>
 
 </mapper>

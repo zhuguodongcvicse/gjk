@@ -62,10 +62,10 @@ export const tableOption = {
       label: '更新时间',
       prop: 'updateTime'
     }, */
-	  {
+	  /*{
       label: '版本',
       prop: 'version'
-    },
+    },*/
 	  /* {
       label: '逻辑删除',
       prop: 'delFlag'

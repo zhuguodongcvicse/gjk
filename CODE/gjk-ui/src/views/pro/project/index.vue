@@ -20,7 +20,7 @@
         <template slot="menuLeft">
           <el-button
             type="primary"
-            @click="dialogTableVisible = true"
+            @click="dialogTableVisible = true, showStructList()"
             size="small"
             icon="el-icon-plus"
             v-if="permissions.pro_project_add"
@@ -216,6 +216,8 @@ export default {
     ...mapGetters(["permissions", "userInfo"])
   },
   name: "project",
+  //刷新
+  inject: ["reload"],
   data() {
     var proNameSameNameCheck = (rule, value, callback) => {
       // console.log("11111111111111111111111111", rule, value, callback);
@@ -257,7 +259,7 @@ export default {
         sysTempId: "",
         themeTempId: "",
         networkTempId: "",
-        hsmTempId: "",       
+        hsmTempId: "",
       },
       labelPosition: "right",
       dialogTableVisible: false,
@@ -342,6 +344,9 @@ export default {
     }
   },
   methods: {
+    showStructList(){
+        this.getTableData()
+    },
     selectAllComp() {
       let selectArray = [];
       this.setId(this.compTreeData, selectArray);
@@ -529,6 +534,7 @@ export default {
     handleCancleComp() {
       this.dialogTableVisible = false;
       Object.assign(this.formLabelAlign, this.$options.data().formLabelAlign);
+      this.reload();
     },
     getList() {
       fetchAlgorithmTree(this.listQuery).then(Response => {
@@ -714,7 +720,7 @@ export default {
         }
       }
       this.softwareSelectNameString = valNameArr;
-      this.checkoutPlatform();
+      // this.checkoutPlatform();
     },
     checkoutPlatform() {
       var disabledPlatformName = "";
@@ -764,12 +770,12 @@ export default {
       });
     },
   },
-  created() { 
+  created() {
     this.getList();
     this.getCreateData();
     this.getLibsTree();
     this.getSoftwareSelectList();
-    this.getBaseTemplateData();
+    // this.getBaseTemplateData();
   },
   mounted: function() {}
 };

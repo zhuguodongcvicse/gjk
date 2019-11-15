@@ -226,23 +226,29 @@ export default {
       this.formStatus = "create";
     },
     handleDelete() {
-      this.$confirm("此操作将永久删除, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
-        delObj(this.currentId).then(() => {
-          this.getList();
-          this.resetForm();
-          this.onCancel();
-          this.$notify({
-            title: "成功",
-            message: "删除成功",
-            type: "success",
-            duration: 2000
+      if (this.currentId === -1) {
+        alert("请选择一个节点进行删除！！！");
+        this.reload();
+      } else {
+        this.$confirm("此操作将永久删除, 是否继续?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(() => {
+          delObj(this.currentId).then(() => {
+            this.getList();
+            this.resetForm();
+            this.onCancel();
+            this.$notify({
+              title: "成功",
+              message: "删除成功",
+              type: "success",
+              duration: 2000
+            });
+            this.reload();
           });
         });
-      });
+      }
     },
     update() {
       putObj(this.form).then(() => {

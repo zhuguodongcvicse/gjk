@@ -1,4 +1,5 @@
 import { getStore, removeStore, setStore } from '@/util/store'
+import { remote } from "@/api/admin/dict";
 
 const CustomConfiguration = {
     state : {
@@ -10,8 +11,49 @@ const CustomConfiguration = {
       netWorkOut : new Map(),
       partList : getStore({name: 'partList'}) || new Array(),
       xmlDataMap : getStore({name: 'xmlDataMap'}) || new Array(),
+      themeCustomConfigData: new Map(),
+      themeChineseMapping: getStore({ name: 'themeChineseMapping' }) || [],
     },
     actions: {
+        setThemeCustomConfigData({ commit }, params){
+          return new Promise(resolve =>{
+            var key = params.key;
+            var value = params.value
+            commit("SET_ThemeData",{key, value})
+            resolve()
+          })
+        },
+        // 删除主题配置中的topic
+        delThemeCustomConfigDataTopic({ commit }, params){
+          return new Promise(resolve =>{
+            var sysId = params.sysId
+            var titleType = params.titleType
+            var topicKey = params.topicKey
+            commit("DEL_ThemeTopic",{sysId, titleType, topicKey})
+            resolve()
+          })
+        },
+        // 删除主题配置中的dataStream
+        delThemeCustomConfigDataDataStream({ commit }, params){
+          return new Promise(resolve =>{
+            var sysId = params.sysId
+            var titleType = params.titleType
+            var topicKey = params.topicKey
+            var dskey = params.dskey
+            commit("DEL_ThemeDataStream",{sysId, titleType, topicKey, dskey})
+            resolve()
+          })
+        },
+        setThemeChineseMapping({ commit }, param) {
+          return new Promise((resolve, reject) => {
+            remote(param).then(res => {
+              commit('SET_THEMECHINESEMAPPING', res.data.data);
+              resolve()
+            }).catch((e) => {
+              reject(e)
+            })
+          })
+        },
         //存储subscribe整体数据
         getSubMapCustomConfig({
           commit
@@ -126,6 +168,34 @@ const CustomConfiguration = {
         },
     },
     mutations: {
+      SET_ThemeData: (state, {key,value}) => {
+        // state.themeCustomConfigData[key] = value;
+        state.themeCustomConfigData.set(key, value)
+        setStore({
+          name: 'themeCustomConfigData',
+          content: state.themeCustomConfigData,
+          type:"session"
+        })
+      },
+      DEL_ThemeTopic: (state,{sysId, titleType, topicKey}) =>{
+        let projectData = state.themeCustomConfigData.get(sysId)
+        let titleData = projectData[titleType]
+        titleData.delete(topicKey)
+      },
+      DEL_ThemeDataStream: (state,{sysId, titleType, topicKey, dskey}) =>{
+        let projectData = state.themeCustomConfigData.get(sysId)
+        let titleData = projectData[titleType]
+        let topicData = titleData.get(topicKey)
+        topicData.dataStream.delete(dskey)
+      },
+      SET_THEMECHINESEMAPPING: (state, param) => {
+        state.themeChineseMapping = param
+        setStore({
+          name: 'themeChineseMapping',
+          content: state.themeChineseMapping,
+          type: "session"
+        })
+      },
       SET_SubMapCustomConfig: (state, {key,value}) => {
           state.subMapCustomConfig.set(key, JSON.parse(JSON.stringify(value)));
           //console.log("商店SUB", JSON.stringify(state.subMapCustomConfig));
@@ -149,10 +219,11 @@ const CustomConfiguration = {
           state.themeData = params.themeData
           state.netWorkData = params.netWorkData
           state.partList = params.partList
-         // state.xmlDataMap.set(id,params)
-          var xmlDataObj = {}
-          xmlDataObj[id] = params
-          state.xmlDataMap.push(xmlDataObj)
+          // state.xmlDataMap.set(id,params)
+          // var xmlDataObj = {}
+          // xmlDataObj[id] = params
+          // state.xmlDataMap.push(xmlDataObj)
+          state.xmlDataMap[id] = params
           setStore({
             name: 'themeData',
             content: state.themeData,
@@ -193,7 +264,7 @@ const CustomConfiguration = {
             type : "session"
           })
         },
-        
+
         DELETE_SUBTopicData :(state,params) =>{
           for(var [key, value] of  state.subMapCustomConfig){
             if(key == params){
@@ -203,7 +274,7 @@ const CustomConfiguration = {
         },
         DELETE_SUBTopicDataStream :(state,{subTopicKey,DataStreamKey}) =>{
           console.log("商店中输出",subTopicKey,DataStreamKey)
-          
+
         //  for(var [key, value] of  state.subMapCustomConfig){
         //   if(key == subTopicKey){
         //     for(var i = 0;i<value.dataStream.length;i++){
@@ -266,7 +337,7 @@ const CustomConfiguration = {
             name: 'subMapCustomConfig'
           })
         }
-    
+
       }
 }
 export default CustomConfiguration

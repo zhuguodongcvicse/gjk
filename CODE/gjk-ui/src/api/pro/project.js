@@ -254,3 +254,20 @@ export function uploadFiles(obj) {
     data: obj,
   })
 }
+
+
+export function removeCompProject(compId,projectId){
+  return request({
+    url:'/pro/project/removeCompProject/' + compId+'/'+projectId,
+    method:'get'
+  })
+}
+
+//静态检查
+export function staticInspect(obj) {
+  return request({
+    url: '/pro/project/staticInspect',
+    method: 'post',
+    params:obj,
+  })
+}

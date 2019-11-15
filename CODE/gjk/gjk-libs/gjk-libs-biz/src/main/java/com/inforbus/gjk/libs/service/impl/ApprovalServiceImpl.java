@@ -155,4 +155,16 @@ public class ApprovalServiceImpl extends ServiceImpl<ApprovalMapper, Approval> i
 		return list;
 	}
 
+	@Override
+	public void removeCompApproval(String compId, String projectId) {
+		System.out.println(compId);
+		System.out.println(projectId);
+		List<Approval> approvalApp = baseMapper.getByApplyId(projectId);
+		List<String> idList = new ArrayList<String>();
+		for(Approval approval:approvalApp) {
+			idList.add(approval.getId());
+		}
+		baseMapper.removeCompApproval(idList,compId);	
+	}
+
 }

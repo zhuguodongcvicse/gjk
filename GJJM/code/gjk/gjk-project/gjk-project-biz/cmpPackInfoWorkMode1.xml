@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+	<cmp cmpName="cmp1" cmpID="cmpid_0" cmpPoll="0"
+		cmpType="sigProcess">
+		<publish>
+			<topic name="cmp1tocmp3" pubPoll="0" ToCmpName="cmp3">
+				<dataStream start="UINT32* puiDstData_func3"
+					end="unsigned int* puiCoef1_func4" 
+					length="pst_para->uiNum3" />
+			</topic>
+		</publish>
+		<subscribe>
+			<topic name="cmp2tocmp1" FromID="cmp2">
+				<dataStream start="float* pfDstData_func1"
+					end="float* pfSrcData_func2"
+					length="pst_para->uiNum1*pst_para->uiNum2*pst_para->uiNum3*2" />
+			</topic>
+		</subscribe>
+	</cmp>
+	<cmp cmpName="cmp2" cmpID="cmpid_1" cmpPoll="0"
+		cmpType="sigProcess">
+		<publish>
+			<topic name="cmp2tocmp1" pubPoll="0" ToCmpName="cmp1">
+				<dataStream start="float* pfDstData_func1"
+					end="float* pfSrcData_func2"
+					length="pst_para->uiNum1*pst_para->uiNum2*pst_para->uiNum3*2" />
+			</topic>
+			<topic name="cmp2tocmp3" pubPoll="0" ToCmpName="cmp3">
+				<dataStream start="float* pfDstData_func5"
+					end="float* pfCoef2_func4"
+					length="pst_para->uiNum1*pst_para->uiNum2*pst_para->uiNum3*2" />
+				<dataStream start="float* pfDstData_func1"
+					end="float* pfCoef1_func4"
+					length="pst_para->uiNum1*pst_para->uiNum2*pst_para->uiNum3*2" />
+			</topic>
+		</publish>
+		<subscribe />
+		<firstCmp name="1" />
+	</cmp>
+	<cmp cmpName="cmp3" cmpID="cmpid_2" cmpPoll="0"
+		cmpType="sigProcess">
+		<publish />
+		<subscribe>
+			<topic name="cmp2tocmp3" FromID="cmp2">
+				<dataStream start="float* pfDstData_func5"
+					end="float* pfCoef2_func4"
+					length="pst_para->uiNum1*pst_para->uiNum2*pst_para->uiNum3*2" />
+				<dataStream start="float* pfDstData_func1"
+					end="float* pfCoef1_func4"
+					length="pst_para->uiNum1*pst_para->uiNum2*pst_para->uiNum3*2" />
+			</topic>
+			<topic name="cmp1tocmp3" FromID="cmp1">
+				<dataStream start="UINT32* puiDstData_func3"
+					end="unsigned int* puiCoef1_func4" length="pst_para->uiNum3" />
+			</topic>
+		</subscribe>
+	</cmp>
+</root>
