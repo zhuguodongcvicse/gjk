@@ -17,19 +17,17 @@
 package com.inforbus.gjk.libs.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 //import com.inforbus.gjk.admin.api.vo.TreeUtil;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.vo.ParamTreeVO;
 import com.inforbus.gjk.common.log.annotation.SysLog;
 import com.inforbus.gjk.libs.api.dto.StructDTO;
-import com.inforbus.gjk.libs.api.entity.Structlibs;
+import com.inforbus.gjk.common.core.entity.Structlibs;
 import com.inforbus.gjk.libs.api.vo.TreeUtil;
 import com.inforbus.gjk.libs.service.StructlibsService;
 import lombok.AllArgsConstructor;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;

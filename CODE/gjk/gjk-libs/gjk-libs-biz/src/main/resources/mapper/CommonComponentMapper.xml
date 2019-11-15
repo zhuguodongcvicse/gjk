@@ -30,6 +30,13 @@
 		<result property="delFlag" column="del_flag" />
 	</resultMap>
 
+	<resultMap id="compStructMap"
+			   type="com.inforbus.gjk.common.core.entity.CompStruct">
+		<id property="id" column="id" />
+		<result property="compId" column="comp_id" />
+		<result property="structId" column="struct_id" />
+	</resultMap>
+
 	<sql id="commonComponentSql">
 		id,
 		comp_id,
@@ -159,6 +166,22 @@
 			</foreach>
 			)
 		</where>
+	</select>
+
+	<select id="getCompStructByCompId" resultMap="compStructMap">
+		select id, comp_id, struct_id
+		from gjk_comp_struct
+		where comp_id = #{compId}
+	</select>
+
+	<select id="getCompStructByCompIdList" resultMap="compStructMap">
+		select id, comp_id, struct_id
+		from gjk_comp_struct
+		where comp_id in
+		<foreach collection="compIdList" item="item" index="index"
+				 open="(" separator="," close=")">
+			#{item}
+		</foreach>
 	</select>
 
 	<select id="queryTable" resultType="map">

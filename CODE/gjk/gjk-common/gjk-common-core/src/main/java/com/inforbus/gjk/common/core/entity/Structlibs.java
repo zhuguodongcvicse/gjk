@@ -14,14 +14,14 @@
  * this software without specific prior written permission.
  * Author: inforbus
  */
-package com.inforbus.gjk.libs.api.entity;
+package com.inforbus.gjk.common.core.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import java.io.Serializable;
+
 import java.time.LocalDateTime;
 
 /**
