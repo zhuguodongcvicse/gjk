@@ -325,7 +325,9 @@ import {
   uploadFile,
   uploadFolder,
   uploadFiles,
-  putObj
+  putObj,
+  updateBaseTemplateIDs,
+  staticInspect
 } from "@/api/pro/project";
 
 import {
@@ -894,8 +896,21 @@ export default {
         filePath.filePath = this.fileData.filePath + "\\" + this.fileData.fileName;
         filePath.fileName = this.fileData.fileName;
         staticInspect(filePath).then(response => {
-          alert(JSON.stringify(response.data))
-            window.open("http://localhost:9000/dashboard?id="+response.data.data, "_blank");  
+            if (response.data.data) {
+              this.$router.push({
+                path: "/comp/manager/fileProview",
+                query: {
+                  filePath: this.filePathName,
+                  appFileName: data.fileName,
+                  proFloName:
+                    this.treeData[0].fileName +
+                    "_" +
+                    this.treeData[0].children[0].fileName +
+                    "_" +
+                    data.label
+                }
+              });
+            }
         })
       }
     },
@@ -1145,6 +1160,7 @@ export default {
     },
     handleNodeClick(data) {
       //根据 . 判断是否是文件 待确认
+      console.log(data)
       if (data.label.indexOf(".") >= 0) {
         var d=data.label.length-".pdf".length;
         if(d>=0&&data.label.lastIndexOf(".pdf")==d){
@@ -1152,7 +1168,7 @@ export default {
           if (
             data.filePath != null &&
             data.filePath != "" &&
-            data.filePath != undefineds
+            data.filePath != undefined
           ) {
             this.$router.push({
               path: "/comp/manager/fileProview",
@@ -1573,7 +1589,7 @@ export default {
         id: this.temp_currProject.id,
         basetemplateIds: json
       };
-      putObj(project).then(res => {
+      updateBaseTemplateIDs(project).then(res => {
         if (res.data.data) {
           this.$message({
             message: "修改模板成功",

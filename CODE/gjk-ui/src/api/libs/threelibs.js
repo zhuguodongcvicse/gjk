@@ -15,6 +15,7 @@
  * Author: inforbus
  */
 import request from '@/router/axios'
+import { all } from 'q'
 
 export function algorithmLib (query) {
   return request({
@@ -84,6 +85,14 @@ export function getSoftwarePlatformTree(query) {
 export function saveFileContext (query) {
   return request({
     url: '/libs/threelibs/saveFileContext' ,
+    method: 'post',
+    data: query
+  })
+}
+
+export function getFileStream (query) {
+  return request({
+    url: '/libs/threelibs/getFileStream' ,
     method: 'post',
     data: query
   })
