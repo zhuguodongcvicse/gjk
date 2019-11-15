@@ -78,6 +78,7 @@
       >
         <div>
           <avue-crud
+            ref="versionCrud"
             :data="allVersionTableData"
             :option="tableOption"
             @selection-change="versionSelectionChange"
@@ -156,8 +157,11 @@ export default {
       isShowHistoricVersion: true,
 
       exportCompList: [],
+      selectCompList: [],
+      selectVersionCompMap: new Map(),
+      currDialogId: '',
 
-      selectString: ""
+        selectString: ""
 
       // form: {},
 
@@ -195,7 +199,7 @@ export default {
       this.getTableData();
     },
     exportCompList() {
-      console.log("1111111111111111", this.exportCompList);
+      console.log("exportCompList::", this.exportCompList);
     }
   },
   methods: {
@@ -205,13 +209,31 @@ export default {
       }
     },
     selectionChange(list) {
-      console.log("selectionChange", list);
-      this.exportCompList = list;
+      // console.log("selectionChange", list);
+      this.selectCompList = list;
+      this.handleExportCompList()
     },
     versionSelectionChange(list) {
-      // for (let item of list) {
-      //   this.exportCompList.push(item);
-      // }
+        this.selectVersionCompMap.set(this.currDialogId, list)
+        this.handleExportCompList()
+    },
+      // 将勾选的数据放到一块
+    handleExportCompList(){
+        this.exportCompList = []
+        this.exportCompList = this.exportCompList.concat(
+            this.selectCompList
+        );
+        for(let [key, value] of this.selectVersionCompMap){
+            this.exportCompList = this.exportCompList.concat(
+                value
+            );
+        }
+        // 去重
+        let tmpArr = []
+        this.exportCompList = this.exportCompList.reduce(function(item, next) {
+            tmpArr[next.id] ? '' : tmpArr[next.id] = true && item.push(next);
+            return item;
+        }, []);
     },
     getLibsTree() {
       fetchAlgorithmTree(this.listQuery).then(response => {
@@ -230,10 +252,27 @@ export default {
       done();
     },
     showAllVersion(row) {
+      this.currDialogId = row.id
       this.showAllVersionDia = true;
       getAllVersionByCompId({ compId: row.compId }).then(Response => {
         // console.log(Response.data.data);
         this.allVersionTableData = Response.data.data;
+
+        // 默认勾选之前选择的行
+        let selectData = JSON.parse(JSON.stringify(this.exportCompList))
+        let selecctRow = []
+        for(let item of this.allVersionTableData){
+            for(let obj of selectData){
+                if(item.id == obj.id){
+                    selecctRow.push(item)
+                }
+            }
+        }
+        let thiz = this
+        setTimeout(function(){
+            thiz.$refs.versionCrud.toggleSelection(selecctRow);
+        }, 400)
+
       });
     },
     getTableData() {
