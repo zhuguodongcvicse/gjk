@@ -32,37 +32,7 @@
                 <el-button @click="resetForm('ruleForm2')">重置</el-button>
               </el-form-item>
             </el-form>
-            <el-form :model="ruleForm2"
-                     :rules="rules2"
-                     ref="ruleForm2"
-                     label-width="100px"
-                     v-if="switchStatus==='passwordManager'"
-                     class="demo-ruleForm">
-              <el-form-item label="原密码"
-                            prop="password">
-                <el-input type="password"
-                          v-model="ruleForm2.password"
-                          auto-complete="off"></el-input>
-              </el-form-item>
-              <el-form-item label="密码"
-                            prop="newpassword1">
-                <el-input type="password"
-                          v-model="ruleForm2.newpassword1"
-                          auto-complete="off"></el-input>
-              </el-form-item>
-              <el-form-item label="确认密码"
-                            prop="newpassword2">
-                <el-input type="password"
-                          v-model="ruleForm2.newpassword2"
-                          auto-complete="off"></el-input>
-              </el-form-item>
-              <el-form-item>
-                <el-button type="primary"
-                           @click="submitForm('ruleForm2')">提交
-                </el-button>
-                <el-button @click="resetForm('ruleForm2')">重置</el-button>
-              </el-form-item>
-            </el-form>
+            <updatePassword v-if="switchStatus==='passwordManager'" :username="ruleForm2.username"></updatePassword>
           </div>
         </el-col>
       </el-row>
@@ -76,20 +46,13 @@
   import {mapState} from 'vuex'
   import store from "@/store";
   import request from '@/router/axios'
-
+  import updatePassword from "./updatePassword"
+  import { validatePhone } from "@/util/rules"
   export default {
+    components: {
+      updatePassword
+    },
     data() {
-      var validatePass = (rule, value, callback) => {
-        if (this.ruleForm2.password !== '') {
-          if (value !== this.ruleForm2.newpassword1) {
-            callback(new Error('两次输入密码不一致!'))
-          } else {
-            callback()
-          }
-        } else {
-          callback()
-        }
-      }
       return {
         switchStatus: '',
         avatarUrl: '',
@@ -99,16 +62,14 @@
         },
         ruleForm2: {
           username: '',
-          password: '',
-          newpassword1: '',
-          newpassword2: '',
           avatar: '',
           phone: ''
         },
         rules2: {
-          password: [{required: true, min: 6, message: '原密码不能为空且不少于6位', trigger: 'change'}],
-          newpassword1: [{required: false, min: 6, message: '不少于6位', trigger: 'change'}],
-          newpassword2: [{required: false, validator: validatePass, trigger: 'blur'}]
+          phone: [
+            {required: true, message: "手机号不能为空 ", trigger:'blur'},
+            {required: true, validator: validatePhone, trigger:'blur'}
+            ]
         }
       }
     },
@@ -141,12 +102,6 @@
                   type: 'success',
                   duration: 2000
                 })
-                // 修改密码之后强制重新登录
-                if (this.switchStatus === 'passwordManager') {
-                  this.$store.dispatch('LogOut').then(() => {
-                    location.reload() // 为了重新实例化vue-router对象 避免bug
-                  })
-                }
               } else {
                 this.$notify({
                   title: '失败',

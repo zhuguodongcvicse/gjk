@@ -52,6 +52,7 @@
     },
     methods: {
       getList(page, params) {
+        console.log(params)
         this.tableLoading = true
         fetchList(Object.assign({
           descs: 'create_time',

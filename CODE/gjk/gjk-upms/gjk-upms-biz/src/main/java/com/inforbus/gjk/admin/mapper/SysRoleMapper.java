@@ -61,4 +61,11 @@ public interface SysRoleMapper extends BaseMapper<SysRole> {
 	 * @return list
 	 */
 	IPage<List<RoleVO>> getRoleVosPage(Page page, @Param("query") RoleDTO roleDTO);
+
+	/**
+	 * 根据roleCode查询role
+	 * @param sysRole
+	 * @return
+	 */
+	SysRole getRoleByRoleCode(@Param("query") SysRole sysRole);
 }

@@ -73,10 +73,10 @@
       <!-- <add-comm :rowParam="rowParam"></add-comm> -->
     </basic-container>
     <!--新增基础模板的弹窗-->
-    <el-dialog title="新增模板" :visible.sync="isAddTemplate" width="40%" v-if="isAddTemplate">
+    <el-dialog title="新增模板" :visible.sync="isAddTemplate" width="40%" v-if="isAddTemplate" :before-close="cancelAdd">
       <el-form label-width="80px" :model="BaseTemplate" :rules="rules" ref="BaseTemplate">
         <!--新增模板的名称,不可重复-->
-        <el-form-item label="模板名称">
+        <el-form-item label="模板名称" prop="tempName">
           <el-input v-model="BaseTemplate.tempName" placeholder="请输入模板名称"></el-input>
         </el-form-item>
         <!--模板的类型-->
@@ -120,19 +120,19 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="isAddTemplate = false">取 消</el-button>
+        <el-button @click="cancelAdd">取 消</el-button>
         <el-button type="primary" @click="handleAdd(BaseTemplate.tempType)">确 定</el-button>
       </span>
     </el-dialog>
     <!--编辑表格对话框-->
-    <el-dialog title="编辑" :visible.sync="isEidtTemplate" width="50%" v-if="isEidtTemplate">
+    <el-dialog title="编辑" :visible.sync="isEidtTemplate" width="50%" v-if="isEidtTemplate" :before-close="cancelEidt">
       <el-form label-width="80px" :model="baseTemplateVO" :rules="eidtRules" ref="baseTemplateRef">
         <!--新增模板的名称,不可重复-->
-        <el-form-item label="模板名称">
+        <el-form-item label="模板名称" prop="tempName">
           <el-input v-model="baseTemplateVO.tempName" placeholder="请输入模板名称"></el-input>
         </el-form-item>
         <!--模板的类型-->
-        <el-form-item label="模板类型">
+        <el-form-item label="模板类型" prop="tempType">
           <el-select
             v-model="baseTemplateVO.tempType"
             filterable
@@ -155,7 +155,7 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="isEidtTemplate = false">取 消</el-button>
+        <el-button @click="cancelEidt">取 消</el-button>
         <el-button type="primary" @click="handleUpdate">确 定</el-button>
       </span>
     </el-dialog>
@@ -168,7 +168,8 @@ import {
   addObj,
   putObj,
   delObj,
-  checkTempName
+  checkTempName,
+  getLocalPath
 } from "@/api/admin/basetemplate";
 import { tableOption } from "@/const/crud/admin/basetemplate";
 import { getUploadFilesUrl } from "@/api/comp/componentdetail"; //文件上传接口
@@ -179,29 +180,44 @@ import { parse } from "path";
 export default {
   name: "basetemplate",
   components: {},
+  inject: ["reload"],
   data() {
     //验证模板名称是否重复
     var validateTempName = (rule, value, callback) => {
       if (/^[0-9a-zA-Z-_()\u4e00-\u9fa5]{1,32}$/.test(value) == false) {
-        callback("请输入正确的模板名,模板名最少1个字符,最多32个字符,可包含汉字、字母、数字、—、_、()");
+        callback(
+          "请输入正确的模板名,模板名1-32个字符,可包含汉字、字母、数字、—、_、()"
+        );
+        // } else {
+        //   checkTempName(value)
+        //     .then(response => {
+        //       if (window.boxType === "edit") callback();
+        //       let result = response.data.data;
+        //       if (result !== null) {
+        //         callback(new Error("模板名已经存在"));
+        //       } else {
+        //         callback();
+        //       }
+        //     })
+        //     .catch(error => {
+        //       callback(new Error("模板名已经存在"));
+        //     });
       } else {
-        checkTempName(value)
-          .then(response => {
-            if (window.boxType === "edit") callback();
-            let result = response.data.data;
-            if (result !== null) {
-              callback(new Error("模板名已经存在"));
-            } else {
-              callback();
-            }
-          })
-          .catch(error => {
-            callback(new Error("模板名已经存在"));
-          });
+        callback();
+      }
+    };
+    var validateTempType = (rule, value, callback) => {
+      if (/^[0-9a-zA-Z-_()\u4e00-\u9fa5]{1,32}$/.test(value) == false) {
+        callback(
+          "模板类型错误,模板类型1-32个字符,可包含汉字、字母、数字、—、_、()"
+        );
+       
+      } else {
         callback();
       }
     };
     return {
+      localPath:"",
       baseTemplateVO: {
         //模板对象
         tempName: "",
@@ -217,10 +233,10 @@ export default {
           value: "构件模型",
           label: "构件模型"
         },
-        {
-          value: "硬件模型",
-          label: "硬件模型"
-        },
+        // {
+        //   value: "硬件模型",
+        //   label: "硬件模型"
+        // },
         {
           value: "软硬件映射配置模型",
           label: "软硬件映射配置模型"
@@ -250,12 +266,13 @@ export default {
       },
       //新增表单验证规则
       rules: {
-        // tempName: [
-        //   { required: true, message: "请输入模板名称", trigger: "blur" },
-        //   { validator: validateTempName, trigger: "blur" }
-        // ],
+        tempName: [
+          { required: true, message: "请输入模板名称", trigger: "blur" },
+          { validator: validateTempName, trigger: "blur" }
+        ],
         tempType: [
-          { required: true, message: "请选择或输入模板类型", trigger: "change" }
+          { required: true, message: "请选择或输入模板类型", trigger: "change" },
+          { validator: validateTempType, trigger: "change" }
         ],
         fileName: [
           { required: true, message: "请选择模板文件", trigger: "blur" }
@@ -268,7 +285,11 @@ export default {
         tempName: [
           { required: true, message: "请输入模板名称", trigger: "blur" },
           { validator: validateTempName, trigger: "blur" }
-        ]
+        ],
+        tempType: [
+          { required: true, message: "请选择或输入模板类型", trigger: "change" },
+          { validator: validateTempType, trigger: "change" }
+        ],
       },
       rowParam: {
         commVisible: false
@@ -289,6 +310,9 @@ export default {
   },
   created() {
     this.getList();
+    getLocalPath().then(res=>{
+      this.localPath = res.data.data;
+    })
   },
   mounted: function() {},
   computed: {
@@ -433,39 +457,46 @@ export default {
      *
      **/
     handleUpdate() {
-      checkTempName(this.baseTemplateVO.tempName).then(res => {
-        if (res.data.data == null) {
-          putObj(this.baseTemplateVO).then(data => {
+      //checkTempName(this.baseTemplateVO.tempName).then(res => {
+      this.$refs.baseTemplateRef.validate(valid => {
+        if (valid) {
+          putObj(this.baseTemplateVO).then(res => {
             //this.tableData.splice(index, 1, Object.assign({}, row)); //删除数组中指定索引的数据
-            this.$message({
-              showClose: true,
-              message: "修改成功",
-              type: "success"
-            });
-            this.isEidtTemplate = false;
-            this.baseTemplateVO = {};
-            this.getList();
-          });
-        } else {
-          this.$confirm("此模板名称已存在,是否保存修改", "提示", {
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            type: "warning"
-          }).then(() => {
-            putObj(this.baseTemplateVO).then(data => {
-              //this.tableData.splice(index, 1, Object.assign({}, row)); //删除数组中指定索引的数据
+            if (res.data.data) {
               this.$message({
                 showClose: true,
-                message: "修改成功",
+                message: res.data.msg,
                 type: "success"
               });
-              this.isEidtTemplate = false;
-              this.baseTemplateVO = {};
-              this.getList();
-            });
+            } else {
+              this.$message.error(res.data.msg);
+            }
+            this.isEidtTemplate = false;
+            this.baseTemplateVO = {};
+            this.refreshChange();
           });
         }
       });
+
+      // this.$confirm("此模板名称已存在,是否保存修改", "提示", {
+      //   confirmButtonText: "确定",
+      //   cancelButtonText: "取消",
+      //   type: "warning"
+      // }).then(() => {
+      //   putObj(this.baseTemplateVO).then(data => {
+      //     //this.tableData.splice(index, 1, Object.assign({}, row)); //删除数组中指定索引的数据
+      //     this.$message({
+      //       showClose: true,
+      //       message: "修改成功",
+      //       type: "success"
+      //     });
+      //     this.isEidtTemplate = false;
+      //     this.baseTemplateVO = {};
+      //     this.getList();
+      //   });
+      // });
+
+      //});
     },
     /**
      * @title 数据添加
@@ -502,14 +533,14 @@ export default {
     },
     //复制模板功能
     copyTemplate(row, index) {
-      console.log("row",row.tempPath);
+      console.log("row", row.tempPath);
       this.$confirm("是否确认复制" + row.tempName + "模板", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       }).then(() => {
         var BaseTemplatePathDTO = {
-          path: "D:\\14S_GJK_GIT\\gjk\\"+row.tempPath
+          path: this.localPath + row.tempPath
         };
         parseXml(BaseTemplatePathDTO).then(res => {
           var XmlEntityMap = res.data.data;
@@ -517,7 +548,6 @@ export default {
             var BaseTemplateBTO = {};
             Vue.set(BaseTemplateBTO, "baseTemplate", row);
             Vue.set(BaseTemplateBTO, "xmlEntityMap", XmlEntityMap);
-
             addObj(BaseTemplateBTO).then(repsonse => {
               this.refreshChange();
             });
@@ -525,7 +555,16 @@ export default {
         });
       });
     },
-
+    cancelAdd(){
+      this.BaseTemplate = {};
+      this.isAddTemplate = false;
+      this.refreshChange();
+    },
+    cancelEidt(){
+      this.isEidtTemplate = false;
+      //this.reload();
+      this.refreshChange();
+    },
     /**
      * 刷新回调
      */

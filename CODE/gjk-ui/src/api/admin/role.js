@@ -62,3 +62,11 @@ export function fetchRoleTree (roleName) {
     method: 'get'
   })
 }
+
+export function getRole (sysRole) {
+  return request({
+    url: '/admin/role/getRole',
+    method: 'post',
+    data:  sysRole
+  })
+}

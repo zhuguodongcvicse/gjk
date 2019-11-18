@@ -25,7 +25,7 @@ import com.inforbus.gjk.common.core.entity.TreeNode;
 import com.inforbus.gjk.libs.api.dto.CompTree;
 import com.inforbus.gjk.libs.api.dto.StructDTO;
 import com.inforbus.gjk.libs.api.dto.StructTreeNode;
-import com.inforbus.gjk.libs.api.entity.Structlibs;
+import com.inforbus.gjk.common.core.entity.Structlibs;
 
 import cn.hutool.json.JSONUtil;
 

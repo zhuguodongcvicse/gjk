@@ -56,6 +56,10 @@ public class JGitUtil {
 	private static String generatecode;
 	@Getter
 	private static String defaultEncoding;
+	@Getter
+	private static String headerTemplateFile;
+	@Getter
+	private static String srcTemplateFile;
 	
 	private static String INIT_LOCAL_CODE_DIR;
 	private static String LOCAL_CODE_CT_SQL_DIR;
@@ -103,6 +107,8 @@ public class JGitUtil {
 			generatecode = father.get("git.local.generateCodePath").toString();
 			softToHard = father.get("git.local.mapSoftToHardPath").toString();
 			defaultEncoding = father.get("gjk.code.encodeing").toString();
+			headerTemplateFile = father.get("gjk.pro.templateFile.header").toString();
+			srcTemplateFile = father.get("gjk.pro.templateFile.src").toString();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

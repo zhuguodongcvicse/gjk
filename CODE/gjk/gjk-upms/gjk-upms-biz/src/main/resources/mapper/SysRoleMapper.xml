@@ -51,5 +51,19 @@
 		</where>
 		ORDER BY r.create_time DESC
 	</select>
-    
+    <select id="getRoleByRoleCode" resultMap="BaseResultMap">
+		SELECT
+		r.*
+		FROM
+		sys_role AS r
+		<where>
+			<if test="query.roleCode != null and query.roleCode != ''">
+				and r.role_code = #{query.roleCode}
+			</if>
+			<if test="query.roleName != null and query.roleName != ''">
+				and r.role_name = #{query.roleName}
+			</if>
+			and r.del_flag = '0'
+		</where>
+	</select>
 </mapper>

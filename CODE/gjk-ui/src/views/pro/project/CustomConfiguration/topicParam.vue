@@ -418,6 +418,8 @@ export default {
           if(!data){
               return
           }
+          this.changeTopicTagPD = false
+          this.changeTopicTagDSPD = false
           this.formLabelAlign.cmpPartName = data
 
           // 切换topic时 不清空
@@ -462,7 +464,6 @@ export default {
       },
       // funcName 选择后获取 FuncInterface 下拉框数据
       getFuncInterfacePart(data){
-          console.log('jjjjjjjjjjj', data)
           this.formLabelAlign.funcNameCompId = data
           this.funcInterfaceOptions = []
           for(var p in this.partList){

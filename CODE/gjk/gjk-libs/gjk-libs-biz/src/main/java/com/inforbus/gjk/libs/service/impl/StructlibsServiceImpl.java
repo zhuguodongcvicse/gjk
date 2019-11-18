@@ -28,7 +28,7 @@ import com.inforbus.gjk.common.core.util.HeaderFileAndStructUtils;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.vo.ParamTreeVO;
 import com.inforbus.gjk.libs.api.dto.StructDTO;
-import com.inforbus.gjk.libs.api.entity.Structlibs;
+import com.inforbus.gjk.common.core.entity.Structlibs;
 import com.inforbus.gjk.libs.mapper.StructlibsMapper;
 import com.inforbus.gjk.libs.service.StructlibsService;
 
@@ -265,7 +265,7 @@ public class StructlibsServiceImpl extends ServiceImpl<StructlibsMapper, Structl
      * @Description:根据根结构体查询树形结构体
      * @Author xiaohe
      * @DateTime 2019年7月6日 上午8:15:42
-     * @see com.inforbus.gjk.libs.service.StructlibsService#getStructTreeDto(com.inforbus.gjk.libs.api.entity.Structlibs)
+     * @see com.inforbus.gjk.libs.service.StructlibsService#getStructTreeDto(Structlibs)
      */
     @Override
     public List<StructDTO> getStructTreeDto(StructDTO structlibs) {

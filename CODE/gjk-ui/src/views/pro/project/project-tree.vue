@@ -31,7 +31,7 @@
         @node-collapse="handleNodeCollapse"
       ></el-tree>
       <!-- 右键菜单 -->
-      <div class="rightmenu" @mouseleave="changeCount()" style="width: 130px">
+      <div class="rightmenu" id="projectRightMenu" @mouseleave="changeCount()" style="width: 130px">
         <div class="menu">
           <a v-for="item in menus" :key="item" @click="nodeContextmenuClick(item)">
             <div class="command">
@@ -84,7 +84,7 @@
       width="35%"
       :before-close="dialogBeforeClose"
     >
-      <el-form ref="form" label-width="80px">
+      <el-form ref="addProCompForm" label-width="110px" :model="addProCompForm" :rules="addProCompFormRules">
         <el-form-item label="构件筛选">
           <select-tree :treeData="screenLibsTree" multiple :id.sync="screenLibsIdArray" />
         </el-form-item>
@@ -97,8 +97,8 @@
           />
           <el-button type="primary" @click="selectAllComp">全选</el-button>
         </el-form-item>
-        <el-form-item label="请选择审批人">
-          <el-select v-model="applyUser" placeholder="请选择">
+        <el-form-item label="请选择审批人" prop="applyUser">
+          <el-select v-model="addProCompForm.applyUser" placeholder="请选择">
             <el-option
               v-for="item in applyUserSelect"
               :key="item.value"
@@ -427,7 +427,9 @@ export default {
       defaultExpandedNodeArray: [],
       compSelectArray: [],
 
-      applyUser: "",
+      addProCompForm: {
+          applyUser: "",
+      },
       applyUserSelect: [],
 
       softwareDialogVisible: false,
@@ -457,7 +459,10 @@ export default {
         procedureName: [
           { required: true, message: "请输入", trigger: "blur" },
           { validator: proNameSameNameCheck, trigger: "blur" }
-        ]
+        ],
+      },
+      addProCompFormRules: {
+          applyUser: [{ required: true, message: "请选择", trigger: "change" }],
       }
     };
   },
@@ -528,7 +533,7 @@ export default {
   methods: {
     changeCount() {
       setTimeout(() => {
-        $(".rightmenu").hide();
+        $("#projectRightMenu").hide();
       }, 500);
     },
 
@@ -726,7 +731,7 @@ export default {
         setTimeout(() => {
           loading.close();
         }, 2000);
-        $(".rightmenu").hide();
+        $("#projectRightMenu").hide();
       } else if (item == "修改软件框架") {
         this.platformFlag = false;
         //得到平台大类
@@ -759,7 +764,7 @@ export default {
           // this.softwareSelectString.push(this.softwareTreeData[0].id)
         });
         this.softwareDialogVisible = true;
-        $(".rightmenu").hide();
+        $("#projectRightMenu").hide();
       } else if (item == "修改BSP") {
         this.bspDialogVisible = true;
       } else if (item == "APP组件工程生成") {
@@ -831,7 +836,7 @@ export default {
             });
           });
         }
-        $(".rightmenu").hide();
+        $("#projectRightMenu").hide();
       } else if (item == "添加流程") {
         this.addProcedureDialogVisible = true;
       } else if (item == "申请构件") {
@@ -1033,28 +1038,32 @@ export default {
       });
     },
     addProComp() {
-      saveProCompList(this.temp_currProject.id, this.compSelectArray).then(
-        response => {
-          let approval = {};
-          approval.userId = this.userInfo.userId;
-          approval.applyId = this.temp_currProject.id;
-          approval.applyType = "2";
-          approval.libraryType = "7";
-          if (this.applyUser != "") {
-            approval.applyUserId = this.applyUser;
-          }
-          approval.approvalState = "0";
-          //提交记录到审批管理库
-          saveApproval(approval).then(Response => {
-            saveApprovalApply(Response.data.data.id, this.compSelectArray);
-            this.closeAddProCompDialog();
-            this.$message({
-              message: "申请成功，请等候审批。",
-              type: "success"
-            });
-          });
-        }
-      );
+        this.$refs.addProCompForm.validate((valid, object) => {
+            if (valid) {
+                saveProCompList(this.temp_currProject.id, this.compSelectArray).then(
+                    response => {
+                        let approval = {};
+                        approval.userId = this.userInfo.userId;
+                        approval.applyId = this.temp_currProject.id;
+                        approval.applyType = "2";
+                        approval.libraryType = "7";
+                        if (this.addProCompForm.applyUser != "") {
+                            approval.applyUserId = this.addProCompForm.applyUser;
+                        }
+                        approval.approvalState = "0";
+                        //提交记录到审批管理库
+                        saveApproval(approval).then(Response => {
+                            saveApprovalApply(Response.data.data.id, this.compSelectArray);
+                            this.closeAddProCompDialog();
+                            this.$message({
+                                message: "申请成功，请等候审批。",
+                                type: "success"
+                            });
+                        });
+                    }
+                )
+            }
+        })
     },
     changeProcedureSoftwareId() {
       if (this.softwareSelectString.length == 0) {
@@ -1124,7 +1133,7 @@ export default {
       } else if (
         data.type == "app" &&
         data.isComplie &&
-        data.isDirectory == "0" && 
+        data.isDirectory == "0" &&
         data.label == "App组件工程"
       ) {
          this.procedureId = data.processId;
@@ -1151,7 +1160,7 @@ export default {
       } else {
         this.menus = [];
       }
-      $(".rightmenu")
+      $("#projectRightMenu")
         .css({
           top: event.y - 248
         })
@@ -1206,7 +1215,7 @@ export default {
             });
           }
         }
-        $(".rightmenu").hide();
+        $("#projectRightMenu").hide();
         // this.showProjects = false
       }
       this.$emit(

@@ -1,8 +1,6 @@
 package com.inforbus.gjk.libs.api.dto;
 
-import java.time.LocalDateTime;
-
-import com.inforbus.gjk.libs.api.entity.Structlibs;
+import com.inforbus.gjk.common.core.entity.Structlibs;
 
 import lombok.Data;
 

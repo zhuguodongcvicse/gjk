@@ -147,7 +147,7 @@ export default {
   data() {
     //这里存放数据
     return {
-      tmpModelSel: [],
+      tmpModelSel: "",
       structList: [],
       isUpdate: false,
       isImport: false,
@@ -271,26 +271,27 @@ export default {
     },
     //TODO初始化方法，清空data
     initialize() {
-      this.tmpModelSel = [];
-      this.isImport = false;
-      this.importMap = new Map();
-      this.typeSelectData = [];
-      this.formLabelWidth = "80px";
-      this.filePath = "";
-      this.mappedModel = {
-        id: randomLenNum(6, true),
-        dbId: randomLenNum(6, true),
-        parentId: "0",
-        childrenIds: "",
-        fparamName: "",
-        fparamType: "",
-        structClassify: "",
-        children: []
-      };
-      //表当前选中行
-      this.fTableCurrentRow = "";
-      //形参表显示对应实体数据
-      this.fTableShowData = [];
+      Object.assign(this.$data, this.$options.data());
+      // this.tmpModelSel = "";
+      // this.isImport = false;
+      // this.importMap = new Map();
+      // this.typeSelectData = [];
+      // this.formLabelWidth = "80px";
+      // this.filePath = "";
+      // this.mappedModel = {
+      //   id: randomLenNum(6, true),
+      //   dbId: randomLenNum(6, true),
+      //   parentId: "0",
+      //   childrenIds: "",
+      //   fparamName: "",
+      //   fparamType: "",
+      //   structClassify: "",
+      //   children: []
+      // };
+      // //表当前选中行
+      // this.fTableCurrentRow = "";
+      // //形参表显示对应实体数据
+      // this.fTableShowData = [];
     },
     addNode() {
       // return;

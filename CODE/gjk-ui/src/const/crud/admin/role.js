@@ -1,3 +1,34 @@
+import { getRole } from "@/api/admin/role"
+
+var validateRoleCodeOrRoleName = (rule, value, callback) => {
+  console.log(rule)
+  var parmsName;
+  var sysRole;
+  if(rule.field == 'roleName'){
+    sysRole = {
+      roleName: value,
+      roleCode: ''
+    }
+    parmsName = '名称'
+  }else{
+    sysRole = {
+      roleCode: value,
+      roleName: ''
+    }
+    parmsName = '标识'
+  }
+  console.log(sysRole)
+  getRole(sysRole).then(response => {
+    if (window.boxType === 'edit') callback()
+    let result = response.data.data
+    if (result) {
+      callback(new Error('角色'+parmsName+'已经存在'))
+    } else {
+      callback()
+    }
+  })
+}
+
 export const tableOption = {
   border: true,
   index: true,
@@ -25,6 +56,10 @@ export const tableOption = {
       max: 20,
       message: '长度在 3 到 20 个字符',
       trigger: 'blur'
+    },
+    {
+      validator:validateRoleCodeOrRoleName,
+      trigger: 'blur'
     }]
   }, {
     width: 120,
@@ -42,6 +77,10 @@ export const tableOption = {
       max: 20,
       message: '长度在 3 到 20 个字符',
       trigger: 'blur'
+    },
+    {
+      validator:validateRoleCodeOrRoleName,
+      trigger: 'blur'
     }
     ]
   }, {
@@ -49,7 +88,12 @@ export const tableOption = {
     label: '角色描述',
     prop: 'roleDesc',
     overHidden: true,
-    span: 24
+    span: 24,
+    rules: [{      
+        required: true,
+        message: '角色描述不能为空',
+        trigger: 'blur'
+    }]
   }, {
     label: '创建时间',
     prop: 'createTime',

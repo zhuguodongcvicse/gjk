@@ -113,6 +113,13 @@ export default {
   computed: {
     ...mapGetters(["permissions"])
   },
+  watch: {
+    "showStruct.dialogFormVisible": function(isVisible) {
+      if (!isVisible) {
+        this.getList(this.page);
+      }
+    }
+  },
   methods: {
     showdialog() {
       this.showStruct.dialogFormVisible = true;

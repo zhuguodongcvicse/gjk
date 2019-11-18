@@ -28,7 +28,9 @@ import com.inforbus.gjk.admin.mapper.SysRoleMapper;
 import com.inforbus.gjk.admin.mapper.SysRoleMenuMapper;
 import com.inforbus.gjk.admin.service.SysRoleService;
 
+import com.inforbus.gjk.common.core.util.R;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +49,8 @@ import java.util.List;
 @AllArgsConstructor
 public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> implements SysRoleService {
 	private SysRoleMenuMapper sysRoleMenuMapper;
+	@Autowired
+	private SysRoleMapper sysRoleMapper;
 
 	/**
 	 * 通过用户ID，查询角色信息
@@ -63,7 +67,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 	 * 分页查询角色信息
 	 *
 	 * @param page    分页对象
-	 * @param userDTO 参数列表
+	 * @param roleDTO 参数列表
 	 * @return
 	 */
 	@Override
@@ -88,5 +92,14 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 			.<SysRoleMenu>update().lambda()
 			.eq(SysRoleMenu::getRoleId, id));
 		return this.removeById(id);
+	}
+
+	@Override
+	public R getRoleByRoleCode(SysRole sysRole) {
+		SysRole roleByRoleCode = sysRoleMapper.getRoleByRoleCode(sysRole);
+		if(roleByRoleCode!=null){
+			return new R<>(true);
+		}
+		return new R<>(false);
 	}
 }

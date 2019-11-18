@@ -45,7 +45,7 @@ visoConfig.baseStyle = {
   //hoverPaintStyle: { stroke: 'blue' },
   isSource: true, // 是否可以拖动（作为连线起点）
  // connector: ['Flowchart', { gap: 0, cornerRadius: 5,stub:10 }],  // 连接线的样式种类有[Bezier],[Flowchart],[StateMachine ],[Straight ]
-  connector: ["Flowchart", { stub: [-5,-5], gap: 8,midpoint:5, cornerRadius: 5, alwaysRespectStubs: true }],
+  connector: ["Flowchart", { stub: [30,30], gap: 5,midpoint:0.5, cornerRadius: 5, alwaysRespectStubs: true }],
   //connector:["Flowchart", { curviness:50 }],
   isTarget: true, // 是否可以放置（连线终点）
   maxConnections: -1, // 设置连接点最多可以连接几条线

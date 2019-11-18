@@ -40,13 +40,15 @@
             <el-col :span="5">{{attribute.attrMappingName}}</el-col>
             <!--不同的配置方式-->
             <el-col :span="6">
+              <el-row v-if="attribute.attrConfigType=='onlyReadComm'">只读方式,不可赋值</el-row>
+              <el-row v-if="attribute.attrConfigType=='length'">联级触发,多选框中值的个数,不可赋值</el-row>
               <!--input输入框配置方式-->
               <el-input
                 v-model="currentXmlMap.attributeMap[attribute.attrName]"
                 placeholder="请输入值"
                 v-if="attribute.attrConfigType=='inputComm'"
               ></el-input>
-              <!--单选框配置方式-->
+              <!--开关配置方式-->
               <el-row v-if="attribute.attrConfigType=='switchComm'">
                 <el-switch
                   v-model="currentXmlMap.attributeMap[attribute.attrName]"
@@ -55,8 +57,11 @@
                   active-value="true"
                   inactive-value="false"
                 ></el-switch>
-                <!-- <el-radio v-model="currentXmlMap.attributeMap[attribute.attrName]" label="Y">是</el-radio>
-                <el-radio v-model="currentXmlMap.attributeMap[attribute.attrName]" label="N">否</el-radio>-->
+              </el-row>
+              <!--单选框配置方式-->
+              <el-row v-if="attribute.attrConfigType=='radioComm'">
+                <el-radio v-model="currentXmlMap.attributeMap[attribute.attrName]" label="Y">是</el-radio>
+                <el-radio v-model="currentXmlMap.attributeMap[attribute.attrName]" label="N">否</el-radio>
               </el-row>
               <!--select下拉框配置方式-->
               <el-select
@@ -156,7 +161,7 @@
         >
           <el-row>
             <!--标签增加的位置选择-->
-            <el-row v-if="position && dialogType =='新增标签'">
+            <el-row v-if="position && dialogType =='添加标签'">
               <el-form-item label="增加的位置">
                 <el-radio v-model="lablePosition" label="up">上</el-radio>
                 <el-radio v-model="lablePosition" label="in">中</el-radio>
@@ -351,7 +356,7 @@
         <el-row class="addtemplate_dialogbtn_14s text_align_right_14s">
           <el-button @click="dialogVisible = false">取 消</el-button>
           <el-button v-show="dialogType == '编辑标签'" type="primary" @click="eidtLable()">确 定</el-button>
-          <el-button v-show="dialogType == '新增标签'" type="primary" @click="AddLable()">确 定</el-button>
+          <el-button v-show="dialogType == '添加标签'" type="primary" @click="AddLable()">确 定</el-button>
         </el-row>
       </el-dialog>
 
@@ -580,6 +585,10 @@ export default {
           value: "switchComm",
           label: "单选框"
         },
+        {
+          value: "radioComm",
+          label: "单选框"
+        },
         // {
         //   value: "checkBoxComm",
         //   label: "复选框"
@@ -591,6 +600,14 @@ export default {
         {
           value: "formulaComm",
           label: "公式编辑器"
+        },
+         {
+          value: "onlyReadComm",
+          label: "只读"
+        },
+        {
+          value: "length",
+          label: "多选个数"
         }
       ],
       sonLableConfigTypes: [
@@ -622,9 +639,33 @@ export default {
         {
           label: "特殊处理",
           value: "specalHandle"
-        }
+        },
+         {
+          label: "联级表单",
+          value: "coreDeployDiv"
+        },
+        {
+          label: "属性表格",
+          value: "attrTable"
+        },
+        {
+          label: "表格群",
+          value: "networkTable"
+        },
+        {
+          label: "树节点表格",
+          value: "treeTable"
+        },
+        {
+          label: "页面块标题",
+          value: "title"
+        },
+        {
+          label: "topic列表及dataStream列表",
+          value: "topicTree"
+        },
       ],
-      dialogType: "新增标签",
+      dialogType: "添加标签",
       dialogVisible: false,
       template: "", //模板
       lableName: "",
@@ -713,7 +754,6 @@ export default {
       var configureType = {};
       if (attributeMap != null) {
         //获取标签上属性的配置方式
-
         var str = attributeMap["configureType"];
         configureType = parseStrToObj(str);
         this.configureType = configureType;
@@ -778,7 +818,7 @@ export default {
           type: "warning"
         });
       } else {
-        this.dialogType = "新增标签";
+        this.dialogType = "添加标签";
         this.dialogVisible = true;
         this.lableName = "";
         this.configureType = {
@@ -1585,6 +1625,10 @@ export default {
         {
           value: "[]",
           label: "无"
+        },
+        {
+          value: "API Return",
+          label: "API Return"
         }
       ];
       other = other.concat(res.data.data.dictDb);

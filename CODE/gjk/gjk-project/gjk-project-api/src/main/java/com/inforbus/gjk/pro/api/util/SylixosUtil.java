@@ -8,13 +8,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.util.FileUtil;
 
+import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -33,11 +32,13 @@ public class SylixosUtil {
 		for (File childFile : childFiles) {
 			//判断是否是.project
 			if (childFile.getName().endsWith(".project")) {
-				replaceFileStr(childFile.getAbsolutePath(), historyName,sylixosFile.getName());
+				//replaceFileStr(childFile.getAbsolutePath(), historyName,sylixosFile.getName());
+				modifyXMLFile2(childFile.getAbsolutePath(),sylixosFile.getName(),historyName);//修改.project文件
 				//判断是否是.reproject
 			}else if(childFile.getName().endsWith(".reproject")) {
-				replaceFileStr(childFile.getAbsolutePath(), historyName,sylixosFile.getName());
-				//判断是否是 Makefile
+				//replaceFileStr(childFile.getAbsolutePath(), historyName,sylixosFile.getName());
+				//判断是否是 .reproject
+				modifyXMLFile(childFile.getAbsolutePath(),sylixosFile.getName());//
 			}else if(childFile.getName().equals("Makefile")) {
 				replaceFileStr(childFile.getAbsolutePath(), historyName,sylixosFile.getName());
 				//判断是否是716.mk
@@ -154,6 +155,7 @@ public class SylixosUtil {
 						//由于list内容为绝对路径 则进行截取 目前是写死的 src路径 后续 看情况修改
 						paths += list.get(i).substring(list.get(i).indexOf("src"),list.get(i).length()).replace("\\", "/") + " \r\r";
 					}else {
+						//todo 有bug需要解决,当路径中没有src时就报错了.
 						paths += list.get(i).substring(list.get(i).indexOf("src"),list.get(i).length()).replace("\\", "/") + " \\ \r";
 					}
 				}
@@ -253,8 +255,75 @@ public class SylixosUtil {
 			return false;
 		}
 	}
-	
+	/*
+	*修改.reproject文件的方法
+	 *  */
+	public  boolean modifyXMLFile(String XMLFilePath,String projectName){
+		File file = new File(XMLFilePath);
+		XmlEntityMap xmlEntityMap = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);
+		XmlEntityMap xmlEntity = modifyData(xmlEntityMap, projectName);
+		return XmlFileHandleUtil.createXmlFile(xmlEntity,file);
+	}
+	/*
+	 *修改.reproject文件的方法
+	 *  */
+	public XmlEntityMap modifyData (XmlEntityMap xmlEntityMap,String projectName){
+		if (xmlEntityMap.getLableName().equals("DeviceSetting")){
+			Map<String, String> map = xmlEntityMap.getAttributeMap();
+			map.put("WorkDir","/apps/"+projectName);
+		}else if (xmlEntityMap.getLableName().equals("PairItem")){
+			Map<String, String> attributeMap = xmlEntityMap.getAttributeMap();
+			attributeMap.put("key","$(WORKSPACE_"+projectName+")/$(Output)/strip/"+projectName);
+			attributeMap.put("value","/apps/"+projectName+"/"+projectName);
+		}else {
+			for (XmlEntityMap entityMap : xmlEntityMap.getXmlEntityMaps()) {
+				if (entityMap.getLableName().equals("DeviceSetting")){
+					Map<String, String> map = entityMap.getAttributeMap();
+					map.put("WorkDir","/apps/"+projectName);
+				}
+				if (entityMap.getLableName().equals("PairItem")){
+					Map<String, String> attributeMap = entityMap.getAttributeMap();
+					attributeMap.put("key","$(WORKSPACE_"+projectName+")/$(Output)/strip/"+projectName);
+					attributeMap.put("value","/apps/"+projectName+"/"+projectName);
+				}
+				if (entityMap.getXmlEntityMaps() != null && entityMap.getXmlEntityMaps().size()>0){
+					modifyData(entityMap,projectName);
+				}
+			}
+		}
+		return xmlEntityMap;
+	}
+
+
+	/*
+	 *修改.project文件的方法
+	 *  */
+	public boolean modifyXMLFile2(String XMLFilePath,String projectName,String oldProjectName){
+		File file = new File(XMLFilePath);
+		XmlEntityMap xmlEntityMap = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);
+		XmlEntityMap xmlEntity = modifyData2(xmlEntityMap, projectName,oldProjectName);
+		return XmlFileHandleUtil.createXmlFile(xmlEntity,file);
+	}
+
+	public XmlEntityMap modifyData2(XmlEntityMap xmlEntityMap,String projectName,String oldProjectName){
+		if (xmlEntityMap.getLableName().equals("name") && xmlEntityMap.getTextContent().equals(oldProjectName)){
+			xmlEntityMap.setTextContent(projectName);
+		}else {
+			List<XmlEntityMap> xmlEntityMaps = xmlEntityMap.getXmlEntityMaps();
+			if (xmlEntityMaps!=null && xmlEntityMaps.size()>0){
+				for (XmlEntityMap entityMap : xmlEntityMaps) {
+					if (entityMap.getLableName().equals("name") && entityMap.getTextContent().equals(oldProjectName)){
+						entityMap.setTextContent(projectName);
+					}
+					if (entityMap.getXmlEntityMaps()!=null && entityMap.getXmlEntityMaps().size()>0){
+						modifyData2(entityMap,projectName,oldProjectName);
+					}
+				}
+			}
+		}
+		return xmlEntityMap;
+	}
 	public static void main(String[] args) {
-		updateSylixos("D:\\doudou\\compile\\compile\\syliox\\716_tq","716");
+		updateSylixos("D:\\doudou\\716test4","716test3");
 	}
 }

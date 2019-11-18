@@ -243,7 +243,7 @@ export default {
     },
     //添加数据
     appendTreeNode(nodeParam, dataParam, storeParam, insertParam) {
-      console.log("appendTreeNode")
+      console.log("appendTreeNode");
       // console.log("insertParaminsertParaminsertParam", insertParam);
       let base = deepClone(this.baseXmlOptionData);
       //组装树形数据
@@ -605,7 +605,7 @@ export default {
     },
     //将查询得到的数据用基础配置转成数组
     getBaseXmlOptionDataTree(nodeData) {
-      console.log("getBaseXmlOptionDataTree - nodeData", nodeData)
+      console.log("getBaseXmlOptionDataTree - nodeData", nodeData);
       let node = {};
       //组装树形数据
       let treeData = [];
@@ -795,7 +795,10 @@ export default {
           let node = {};
           //处理父级数据
           let treeParam = [];
-          treeParam.push(this.analysisMapping(xml));
+          let variable = this.analysisMapping(xml);
+          this.nameParam = variable[0].attrMappingName;
+          console.log("修改数据")
+          treeParam.push(variable);
           //给树赋值显示值
           node["id"] = randomUuid(); //new Number(randomLenNum(5, false));
           node["lableName"] = xml.attributeMap.name;
@@ -1100,8 +1103,7 @@ export default {
   },
 
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {
-  },
+  created() {},
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   beforeCreate() {}, //生命周期 - 创建之前

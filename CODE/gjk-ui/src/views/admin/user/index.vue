@@ -233,6 +233,7 @@ export default {
         delObj(row.userId)
           .then(() => {
             this.list.splice(index, 1);
+            this.getList(this.page)
             this.$notify({
               title: "成功",
               message: "删除成功",
@@ -248,6 +249,7 @@ export default {
               duration: 2000
             });
           });
+          
       });
     }
   }

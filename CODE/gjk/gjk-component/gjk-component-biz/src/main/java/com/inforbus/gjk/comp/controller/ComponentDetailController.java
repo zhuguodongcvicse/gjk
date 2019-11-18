@@ -144,6 +144,7 @@ public class ComponentDetailController {
 			@PathVariable("compId") String compId) {
 		return new R<>(componentDetailService.createXmlFile(entity, token, compId));
 	}
+
 	@PutMapping
 	@RequestMapping("/createXmlFileMap/{token}/{compId}/{userCurrent}")
 	public R createXmlFileMap(@RequestBody XmlEntityMap entity, @PathVariable("token") String token,
@@ -199,10 +200,10 @@ public class ComponentDetailController {
 
 	/**
 	 * @Title: getDefaultImg
-	 * @Description: 
+	 * @Description:
 	 * @Author xiaohe
 	 * @DateTime 2019年8月3日 下午2:09:39
-	 * @return 
+	 * @return
 	 */
 	@GetMapping("/getDefaultImg")
 	public R<?> getCompDefaultImg() {
@@ -263,4 +264,8 @@ public class ComponentDetailController {
 		return new R<>(componentDetailService.saveCompfiles(map, paths));
 	}
 
+	@PostMapping("/createSpbFrameFile")
+	public R getCreateSpbFrameFile(@RequestBody Map<String, String> pathMaps) {
+		return componentDetailService.createSpbFrameFile(pathMaps.get("spbModelXmlFile"), pathMaps.get("saveDir"));
+	}
 }

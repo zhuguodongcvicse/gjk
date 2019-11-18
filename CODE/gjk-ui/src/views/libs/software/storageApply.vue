@@ -5,9 +5,9 @@
         <span>是否将以下软件框架入库及相关文件提交入库？</span>
       </el-header>
       <el-main>
-        <el-form size="mini" label-position="right" label-width="120px">
-          <el-form-item label="请选择审批人">
-            <el-select v-model="applyUser" placeholder="请选择">
+        <el-form size="mini" label-position="right" label-width="120px" :model="form" :rules="projectRules">
+          <el-form-item label="请选择审批人" prop="applyUser">
+            <el-select v-model="form.applyUser" placeholder="请选择">
               <el-option
                 v-for="item in applyUserSelect"
                 :key="item.value"
@@ -70,8 +70,13 @@ export default {
 
       //具有审批权限的用户，用于选择审批人
       applyUserSelect: [],
-      //所选择的的审批人
-      applyUser: ""
+      form: {
+          //所选择的的审批人
+          applyUser: "",
+      },
+      projectRules: {
+          applyUser: [{ required: true, message: "请选择", trigger: "change" }],
+      }
     };
   },
   //监控data中的数据变化
@@ -115,72 +120,76 @@ export default {
     },
     //提交入库的方法
     storageApplySoftware() {
-      let approval = {};
-      approval.userId = this.userInfo.userId;
-      approval.applyId = this.softwareItemMsg.id;
-      approval.applyType = "1";
-      approval.libraryType = "3";
-      approval.approvalState = "0";
-      if (this.applyUser != "") {
-        approval.applyUserId = this.applyUser;
-      }
-      //如果审批状态是未提交或为空，提交审批记录
-      if (
-        this.softwareItemMsg.applyState == "0" ||
-        this.softwareItemMsg.applyState == null
-      ) {
-        //提交记录到审批管理库
-        saveApproval(approval).then(Response => {
-          let software = {};
-          software.id = this.softwareItemMsg.id;
-          software.applyState = "1";
-          software.applyDesc = "已提交申请，请等待库管理员审批";
-          //修改软件框架审批状态成已提交申请
-          putObj(software).then(Response => {
-            this.$message({
-              message: "已提交申请，请等待库管理员审批",
-              type: "success"
-            });
-          });
-        });
-        //如果申请状态为被驳回，可以再次提交审批
-      } else if (this.softwareItemMsg.applyState == "3") {
-        let software = {};
-        software.id = this.softwareItemMsg.id;
-        software.applyState = "4";
-        software.applyDesc = "已提交申请，请等待库管理员审批";
-        //修改状态成被驳回后提交申请
-        putObj(software).then(Response => {
-          getIdByApplyId(this.softwareItemMsg.id).then(Response => {
-            let modifyApply = {};
-            modifyApply.id = Response.data.data.id;
-            modifyApply.approvalState = "4";
-            modifyApply.description =
-              "前次申请被驳回理由：" + this.softwareItemMsg.applyDesc;
-            //将前次被驳回理由当做审批备注，修改审批记录
-            approvalPutObj(modifyApply).then(Response => {
-              this.$message({
-                message: "已提交申请，请等待库管理员审批",
-                type: "success"
-              });
-            });
-          });
-        });
-        //如果申请状态为已提交，不可以提交审批
-      } else if (this.softwareItemMsg.applyState == "1") {
-        this.$message({
-          message: "该软件框架已提交审批，请勿重复提交！",
-          type: "warning"
-        });
-        //如果申请状态为审批已通过，不可以提交审批
-      } else if (this.softwareItemMsg.applyState == "2") {
-        this.$message({
-          message: "该软件框架已通过审批！",
-          type: "warning"
-        });
-      }
-      this.reload();
-      this.dialogStateShow(false);
+        this.$refs.form.validate((valid, object) => {
+            if (valid) {
+                let approval = {};
+                approval.userId = this.userInfo.userId;
+                approval.applyId = this.softwareItemMsg.id;
+                approval.applyType = "1";
+                approval.libraryType = "3";
+                approval.approvalState = "0";
+                if (this.form.applyUser != "") {
+                    approval.applyUserId = this.form.applyUser;
+                }
+                //如果审批状态是未提交或为空，提交审批记录
+                if (
+                    this.softwareItemMsg.applyState == "0" ||
+                    this.softwareItemMsg.applyState == null
+                ) {
+                    //提交记录到审批管理库
+                    saveApproval(approval).then(Response => {
+                        let software = {};
+                        software.id = this.softwareItemMsg.id;
+                        software.applyState = "1";
+                        software.applyDesc = "已提交申请，请等待库管理员审批";
+                        //修改软件框架审批状态成已提交申请
+                        putObj(software).then(Response => {
+                            this.$message({
+                                message: "已提交申请，请等待库管理员审批",
+                                type: "success"
+                            });
+                        });
+                    });
+                    //如果申请状态为被驳回，可以再次提交审批
+                } else if (this.softwareItemMsg.applyState == "3") {
+                    let software = {};
+                    software.id = this.softwareItemMsg.id;
+                    software.applyState = "4";
+                    software.applyDesc = "已提交申请，请等待库管理员审批";
+                    //修改状态成被驳回后提交申请
+                    putObj(software).then(Response => {
+                        getIdByApplyId(this.softwareItemMsg.id).then(Response => {
+                            let modifyApply = {};
+                            modifyApply.id = Response.data.data.id;
+                            modifyApply.approvalState = "4";
+                            modifyApply.description =
+                                "前次申请被驳回理由：" + this.softwareItemMsg.applyDesc;
+                            //将前次被驳回理由当做审批备注，修改审批记录
+                            approvalPutObj(modifyApply).then(Response => {
+                                this.$message({
+                                    message: "已提交申请，请等待库管理员审批",
+                                    type: "success"
+                                });
+                            });
+                        });
+                    });
+                    //如果申请状态为已提交，不可以提交审批
+                } else if (this.softwareItemMsg.applyState == "1") {
+                    this.$message({
+                        message: "该软件框架已提交审批，请勿重复提交！",
+                        type: "warning"
+                    });
+                    //如果申请状态为审批已通过，不可以提交审批
+                } else if (this.softwareItemMsg.applyState == "2") {
+                    this.$message({
+                        message: "该软件框架已通过审批！",
+                        type: "warning"
+                    });
+                }
+                this.reload();
+                this.dialogStateShow(false);
+            }
+        })
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）

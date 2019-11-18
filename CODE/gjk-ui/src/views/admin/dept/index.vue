@@ -193,6 +193,7 @@
         }).then(() => {
           delObj(this.currentId).then(() => {
             this.getList()
+            this.currentId = undefined
             this.resetForm()
             this.onCancel()
             this.$notify({
@@ -222,8 +223,12 @@
       create() {
         this.$refs.form.validate((valid) => {
           if (!valid) return
+          if(this.form.parentId == undefined || this.form.parentId == ''){
+            this.form.parentId = 0
+          }
           addObj(this.form).then(() => {
             this.getList()
+            this.resetForm()
             this.$notify({
               title: '成功',
               message: '创建成功',

@@ -105,7 +105,7 @@ function handleMessageFromParent(event) {
 			// 处理业务逻辑
 			iframeData = data
 			dat = eval(JSON.stringify(iframeData.params));
-			// console.log("子接收父参数", iframeData)
+			//console.log("子接收父参数", JSON.stringify(dat))
 			//console.log("构件状态", compUpdateState);
 			connectionData = iframeData.connectionData
 			//console.log("connection数据", connectionData)
@@ -264,7 +264,8 @@ function setEnterPoint(id, gj) {
 	var differenceValue = anchorNumber / 2;
 	var x = differenceValue;
 	var inPoint;
-	var midpoints = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+	var midpoints = [ 0.2, 0.4, 0.6, 0.8]
+	var stub = [ 20, 30, 40, 50]
 	for (var i = 0; i < len; i++) {
 		var config = JSON.parse(JSON.stringify(getBaseNodeConfig()))
 		config.isSource = false
@@ -276,19 +277,20 @@ function setEnterPoint(id, gj) {
 			lineWidth: 2
 		}
 		config.connector[1].midpoint = midpoints[i]
+		config.connector[1].stub = stub[i]
 		inPoint = jsPlumb.addEndpoint(id, {
-			anchors: [0, differenceValue, 0, 0],
+			anchors: [0, differenceValue, -1, 0],
 			uuid: i + '*input*' + id,
 			deleteEndpointsOnEmpty: true
 		}, config);
 		inPoint.bind('dblclick', function (endpoint, originalEvent) {
 			addDiv(endpoint);
 			var endpointId = endpoint.getUuid().split("*")[2]
-			var y = $("#" + endpointId).offset().top;
-			var x = $("#" + endpointId).offset().left;
+			var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
+			var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 			// var mouse = mousePosition();
 			$('.point').css("position", "absolute");
-			$('.point').css("left", x - 310);
+			$('.point').css("left", x - 290);
 			$('.point').css("top", y);
 		});
 		// inPoint.bind('mouseout', function (endpoint, originalEvent) {
@@ -335,6 +337,7 @@ function addDiv(endpoint) {
 		// 	"</div>";
 	}
 	$('#drop-bg').append(str);
+	//$('body').append(str);
 	$(".point").bind('click',function(event){
 	//	console.log("+++++++++++++++",event)
 		event.stopPropagation();
@@ -384,14 +387,16 @@ function setExitPoint(id, gj) {
 	var differenceValue = anchorNumber / 2;
 	var x = differenceValue;
 	var outPoint
-	var midpoints = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+	var midpoints = [ 0.7, 0.5, 0.3,0.1]
+	var stub = [40, 30, 20, 10]
 	for (var i = 0; i < len; i++) {
 		var config = JSON.parse(JSON.stringify(getBaseNodeConfig()))
 		config.isTarget = false
 		config.maxConnections = -1
 		config.connector[1].midpoint = midpoints[i]
+		config.connector[1].stub = stub[i]
 		outPoint = jsPlumb.addEndpoint(id, {
-			anchors: [1, differenceValue, 0, 0],
+			anchors: [1, differenceValue, 1, 0],
 			uuid: i + '*output*' + id,
 			deleteEndpointsOnEmpty: true
 		}, config);
@@ -399,10 +404,10 @@ function setExitPoint(id, gj) {
 		outPoint.bind('dblclick', function (endpoint, originalEvent) {
 			addDiv(endpoint);
 			var endpointId = endpoint.getUuid().split("*")[2]
-			var y = $("#" + endpointId).offset().top;
-			var x = $("#" + endpointId).offset().left;
+			var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
+			var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 			$('.point').css("position", "absolute");
-			$('.point').css("left", x-15);
+			$('.point').css("left", x - 15);
 			$('.point').css("top", y);
 		});
 		//端点绑定鼠标移出事件
@@ -878,8 +883,10 @@ function main() {
 		$('#' + event.currentTarget.id).focus();
 		document.getElementById(event.currentTarget.id).onkeydown=function (e){
 			if(e.keyCode==46){
-				//alert(event.currentTarget.id)
 				$("#"+event.currentTarget.id).remove()
+				//console.log("参数：",JSON.stringify(gjidAndTemid));
+				//gjIdAndTemId = gjidAndTemid;
+				handleMessageToParent("removeComp", event.currentTarget.id);
 			}
 		}
 
@@ -1020,6 +1027,7 @@ function addPointDiv(proPream) {
 			"</div>";
 	}
 	$('#drop-bg').append(str);
+	//$('body').append(str);
 	$(".point").bind('click',function(event){
 		//	console.log("+++++++++++++++",event)
 			event.stopPropagation();
@@ -1073,7 +1081,7 @@ function updatePoint(proPream) {
 				lineWidth: 2
 			}
 			var addInPoint = jsPlumb.addEndpoint(proPream.compId, {
-				anchors: [0, differenceValue, 0, 0],
+				anchors: [0, differenceValue, -1, 0],
 				uuid: proPream.uid,
 				deleteEndpointsOnEmpty: true
 			}, config);
@@ -1081,10 +1089,10 @@ function updatePoint(proPream) {
 				addPointDiv(proPream);
 				//var mouse = mousePosition();
 				var endpointId = endpoint.getUuid().split("*")[2]
-				var y = $("#" + endpointId).offset().top;
-				var x = $("#" + endpointId).offset().left;
+				var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
+				var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 				$('.point').css("position", "absolute");
-				$('.point').css("left", x - 310);
+				$('.point').css("left", x - 290);
 				$('.point').css("top", y);
 				//$('.point').css("border", "1px solid red");
 			});
@@ -1109,7 +1117,7 @@ function updatePoint(proPream) {
 			config.isSource = true
 			config.maxConnections = -1
 			var addOutPoint = jsPlumb.addEndpoint(proPream.compId, {
-				anchors: [1, differenceValue, 0, 0],
+				anchors: [1, differenceValue, 1, 0],
 				uuid: proPream.uid,
 				deleteEndpointsOnEmpty: true
 			}, config);
@@ -1117,10 +1125,10 @@ function updatePoint(proPream) {
 				addPointDiv(proPream);
 				//var mouse = mousePosition();
 				var endpointId = endpoint.getUuid().split("*")[2]
-				var y = $("#" + endpointId).offset().top;
-				var x = $("#" + endpointId).offset().left;
+				var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
+				var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 				$('.point').css("position", "absolute");
-				$('.point').css("left", x - 15);
+				$('.point').css("left", x -15);
 				$('.point').css("top", y);
 			});
 			// addOutPoint.bind('mouseout', function () {
@@ -1228,6 +1236,7 @@ function emptyNode(id) {
 //需保存到ctrlZ数组中的对象
 var connInfoObj = {}
 jsPlumb.bind("connection", function (connInfo, originalEvent) {
+	console.log("1111111111111",connInfo)
 	if (isConnection) {
 		connInfoObj = {}
 		//console.log(connInfo)
@@ -1849,10 +1858,11 @@ document.onkeydown = function () {
 			handleMessageToParent("returnFormJson", gjidAndTemid);
 			idList = []
 		}
-		//？？需要与vu额页面做交互
 	} else if (event.ctrlKey == true && event.keyCode == 88) { //剪切功能
 		if (idList.length > 0) { //删除框选的节点
 			var copyPream = new Array()
+			copyTop = 0;
+			copyLeft = 0
 			for (var i = 0; i < idList.length; i++) {
 				var copyJson = saveNodeJson(idList[i])
 				copyPream.push(copyJson)
@@ -2039,10 +2049,14 @@ function pasteJson(pasteDataJson) {
 			jsPlumb.remove(event.target.dataset.id)
 			handleMessageToParent("returnFormJson", removeTemp);
 		});
-		var midpoints = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+		var inputIndex = -1;
+		var outIndex = -1
 		$.each(endpoints, function (index, endpoint) {
 			var config = JSON.parse(JSON.stringify(getBaseNodeConfig()))
 			if (endpoint.anchorX == 0) {
+				var midpoints1 = [ 0.2, 0.4, 0.6, 0.8]
+				var midpoints = [ 30, 40, 50, 60]
+				inputIndex++
 				config.isSource = false
 				config.maxConnections = 1
 				config.paintStyle = {
@@ -2051,9 +2065,10 @@ function pasteJson(pasteDataJson) {
 					radius: 5,
 					lineWidth: 2
 				}
-				config.connector[1].midpoint = midpoints[index]
+				config.connector[1].midpoint =midpoints1[inputIndex]
+				config.connector[1].stub = midpoints[inputIndex]
 				var inPoint = jsPlumb.addEndpoint(newId, {
-					anchors: [0, endpoint.anchorY, 0, 0],
+					anchors: [0, endpoint.anchorY, -1, 0],
 					uuid: endpoint.uuid.split("*")[0] + "*" + endpoint.uuid.split("*")[1] + "*" + newId,
 				}, config)
 				inPoint.bind('dblclick', function (endpoint, originalEvent) {
@@ -2062,10 +2077,10 @@ function pasteJson(pasteDataJson) {
 					addTemDiv(endpoint, canvasData.get(newId).inputList);
 					//var mouse = mousePosition();
 					var endpointId = endpoint.getUuid().split("*")[2]
-					var y = $("#" + endpointId).offset().top;
-					var x = $("#" + endpointId).offset().left;
+					var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
+					var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 					$('.point').css("position", "absolute");
-					$('.point').css("left", x - 310);
+					$('.point').css("left", x - 290);
 					$('.point').css("top", y);
 				});
 				// inPoint.bind('mouseout', function (endpoint, originalEvent) {
@@ -2075,20 +2090,24 @@ function pasteJson(pasteDataJson) {
 					mousedownState = 1;
 				});
 			} else {
+				var midpoints = [ 0.7, 0.5, 0.3,0.1]
+				var stub = [40, 30, 20, 10]
+				outIndex++
 				config.isTarget = true
 				config.maxConnections = -1
-				config.connector[1].midpoint = midpoints[index]
+				config.connector[1].midpoint =midpoints[outIndex]
+				config.connector[1].stub = stub[outIndex]
 				var outPoint = jsPlumb.addEndpoint(newId, {
-					anchors: [1, endpoint.anchorY, 0, 0],
+					anchors: [1, endpoint.anchorY, 1, 0],
 					uuid: endpoint.uuid.split("*")[0] + "*" + endpoint.uuid.split("*")[1] + "*" + newId,
 				}, config)
 				outPoint.bind('dblclick', function (endpoint, originalEvent) {
 					addTemDiv(endpoint, canvasData.get(newId).outputList);
 					var endpointId = endpoint.getUuid().split("*")[2]
-					var y = $("#" + endpointId).offset().top;
-					var x = $("#" + endpointId).offset().left;
+					var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
+					var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 					$('.point').css("position", "absolute");
-					$('.point').css("left", x - 15);
+					$('.point').css("left", x -15);
 					$('.point').css("top", y);
 				});
 				// outPoint.bind('mouseout', function (endpoint, originalEvent) {
@@ -2382,6 +2401,7 @@ function addTemDiv(endpoint, PointsData) {
 			"</div>";
 	}
 	$('#drop-bg').append(str);
+	//$('body').append(str);
 	$(".point").bind('click',function(event){
 	//	console.log("+++++++++++++++",event)
 		event.stopPropagation();
@@ -2509,13 +2529,15 @@ function loadJson(loadJson) {
 		var addoutPointState = false;
 		//设置当前锚点显示参数下标
 		var addPoinrIndex = 0;
-		var midpoints = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+		var inputIndex = -1
+		var outIndex = -1
 		$.each(endpoints, function (index, endpoint) {
-			//console.log("idsss", endpoint.id);
-			//console.log("elem.blockId", elem.blockId)
 			if (endpoint.id == elem.blockId) {
 				var config = JSON.parse(JSON.stringify(getBaseNodeConfig()))
 				if (endpoint.anchorX == 0) {
+					var midpoints1 = [ 0.2, 0.4, 0.6, 0.8]
+					var midpoints = [ 30, 40, 50, 60]
+					inputIndex++
 					config.isSource = false
 					config.maxConnections = 1
 					config.paintStyle = {
@@ -2524,9 +2546,10 @@ function loadJson(loadJson) {
 						radius: 5,
 						lineWidth: 2
 					}
-					config.connector[1].midpoint = midpoints[index]
+					config.connector[1].midpoint =midpoints1[inputIndex]
+					config.connector[1].stub = midpoints[inputIndex]
 					var inPoint = jsPlumb.addEndpoint(elem.blockId, {
-						anchors: [0, endpoint.anchorY, 0, 0],
+						anchors: [0, endpoint.anchorY, -1, 0],
 						uuid: endpoint.uuid,
 					}, config)
 					inPoint.bind('dblclick', function (endpoint, originalEvent) {
@@ -2546,10 +2569,10 @@ function loadJson(loadJson) {
 						// var mouse = mousePosition();
 						// console.log(mouse)
 						var endpointId = endpoint.getUuid().split("*")[2]
-						var y = $("#" + endpointId).offset().top;
-						var x = $("#" + endpointId).offset().left;
+						var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
+						var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 						$('.point').css("position", "absolute");
-						$('.point').css("left", x - 310);
+						$('.point').css("left", x - 290);
 						$('.point').css("top", y);
 					});
 					// inPoint.bind('mouseout', function (endpoint, originalEvent) {
@@ -2559,11 +2582,16 @@ function loadJson(loadJson) {
 						mousedownState = 1;
 					});
 				} else {
+					var midpoints = [ 0.7, 0.5, 0.3,0.1]
+					var stub = [40, 30, 20, 10]
+					outIndex++
 					config.isTarget = true
 					config.maxConnections = -1
-					config.connector[1].midpoint = midpoints[index]
+					config.connector[1].midpoint =midpoints[outIndex]
+					console.log("11111111",stub[outIndex])
+					config.connector[1].stub = stub[outIndex]
 					var outPoint = jsPlumb.addEndpoint(elem.blockId, {
-						anchors: [1, endpoint.anchorY, 0, 0],
+						anchors: [1, endpoint.anchorY, 1, 0],
 						uuid: endpoint.uuid,
 					}, config)
 					outPoint.bind('dblclick', function (endpoint, originalEvent) {
@@ -2582,10 +2610,10 @@ function loadJson(loadJson) {
 						}
 						//var mouse = mousePosition();
 						var endpointId = endpoint.getUuid().split("*")[2]
-						var y = $("#" + endpointId).offset().top;
-						var x = $("#" + endpointId).offset().left;
+						var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
+						var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 						$('.point').css("position", "absolute");
-						$('.point').css("left", x - 15);
+						$('.point').css("left", x -15);
 						$('.point').css("top", y);
 					});
 					// outPoint.bind('mouseout', function (endpoint, originalEvent) {

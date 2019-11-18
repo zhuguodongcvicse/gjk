@@ -15,7 +15,7 @@
 <mapper namespace="com.inforbus.gjk.libs.mapper.StructlibsMapper">
 
 	<resultMap id="structlibsMap"
-		type="com.inforbus.gjk.libs.api.entity.Structlibs">
+		type="com.inforbus.gjk.common.core.entity.Structlibs">
 		<id property="id" column="id" />
 		<result property="parentId" column="parent_id" />
 		<result property="childrenIds" column="children_ids" />
@@ -121,7 +121,7 @@
 
 	<!-- 保存构件 -->
 	<insert id="saveStruct"
-		parameterType="com.inforbus.gjk.libs.api.entity.Structlibs">
+		parameterType="com.inforbus.gjk.common.core.entity.Structlibs">
 		INSERT INTO gjk_structlibs (
 		<include refid="saveStructlibsSql" />
 		) VALUES (
@@ -185,7 +185,7 @@
 		parent_id=#{id}
 	</update>
 	<update id="updateStruct"
-		parameterType="com.inforbus.gjk.libs.api.entity.Structlibs">
+		parameterType="com.inforbus.gjk.common.core.entity.Structlibs">
 		update gjk_structlibs set
 		parent_id=#{structlibs.parentId},
 		children_ids=#{structlibs.childrenIds},
@@ -203,4 +203,24 @@
 		parent_id=#{id} and id not in
 		(${ids})
 	</update>
+
+	<select id="getStructlibsByIdList" resultMap="structlibsMap">
+		select *
+		from gjk_structlibs
+		where id in
+		<foreach collection="idList" item="item" index="index"
+				 open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="getStructlibsByParentIdList" resultMap="structlibsMap">
+		select *
+		from gjk_structlibs
+		where parent_id in
+		<foreach collection="parentIdList" item="item" index="index"
+				 open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
 </mapper>

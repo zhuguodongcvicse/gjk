@@ -835,6 +835,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String platformName = libsType;
 		String softwareFilePath = "";
 		String softwareName = "";
+		String sylixosProjectName = "";
 		for (PartPlatformSoftware software : partPlatformSoftwares) {
 			if (software.getPlatformName().contains(";")) {
 				String[] platforms = software.getPlatformName().split(";");
@@ -842,6 +843,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 					if (s.trim() != "" && s.equals(libsType)) {
 						softwareFilePath = software.getSoftwareFilePath();
 						softwareName = software.getSoftwareName();
+						if("win_sylixos".equals(libsType)){
+							sylixosProjectName = new File(softwareFilePath).getName();
+						}
 					}
 				}
 			}
@@ -967,7 +971,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			} else if (makefileType.trim().toLowerCase().equals("Workbench".toLowerCase())) {
 				WorkbenchUtil.updateWorkbench(assemblyName);
 			} else if (makefileType.trim().toLowerCase().equals("Sylixos".toLowerCase())) {
-				SylixosUtil.updateSylixos(assemblyName, softwareName);
+				SylixosUtil.updateSylixos(assemblyName, sylixosProjectName);
 			} else if (makefileType.trim().toLowerCase().startsWith("Linux".toLowerCase())) {
 				LinuxUtil.updateLinux(cFilePathList, assemblyName, ".c");
 				// LinuxUtil.updateLinux(linuxCFilePath, assemblyName, ".c");
