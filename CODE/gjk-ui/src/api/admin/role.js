@@ -70,3 +70,10 @@ export function getRole (sysRole) {
     data:  sysRole
   })
 }
+
+export function roleCheck (roleId) {
+  return request({
+    url: '/admin/role/roleCheck/' + roleId,
+    method: 'get'
+  })
+}

@@ -102,4 +102,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 		}
 		return new R<>(false);
 	}
+
+	@Override
+	public R getSysUserRoleByRoleId(String roleId) {
+		return new R<>(baseMapper.getSysUserRoleByRoleId(roleId)>0);
+	}
 }

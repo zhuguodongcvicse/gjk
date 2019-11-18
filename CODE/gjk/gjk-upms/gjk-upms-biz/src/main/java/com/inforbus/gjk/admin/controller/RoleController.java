@@ -145,4 +145,8 @@ public class RoleController {
 		return this.sysRoleService.getRoleByRoleCode(sysRole);
 	}
 
+	@GetMapping("/roleCheck/{roleId}")
+	public R roleCheck(@PathVariable("roleId") String roleId) {
+		return this.sysRoleService.getSysUserRoleByRoleId(roleId);
+	}
 }

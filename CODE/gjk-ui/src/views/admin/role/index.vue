@@ -72,7 +72,7 @@
 </template>
 
 <script>
-  import {addObj, delObj, fetchList, fetchRoleTree, getObj, permissionUpd, putObj} from '@/api/admin/role'
+  import {addObj, delObj, fetchList, fetchRoleTree, getObj, permissionUpd, putObj, roleCheck} from '@/api/admin/role'
   import {tableOption} from '@/const/crud/admin/role'
   import {fetchMenuTree} from '@/api/admin/menu'
   import {mapGetters} from 'vuex'
@@ -189,23 +189,33 @@
       },
       handleDelete(row, index) {
         var _this = this
-        this.$confirm('是否确认删除名称为"' + row.roleName + '"'+ '"的数据项?', '警告', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(function () {
-          // 删除之前判断角色是否被引用
-          
-          return delObj(row.roleId)
-        }).then(() => {
-          this.getList(this.page)
-          this.list.splice(index, 1);
-          _this.$message({
-            showClose: true,
-            message: '删除成功',
-            type: 'success'
-          })
-        }).catch(function () {
+        roleCheck(row.roleId).then((res) =>{
+          if(!res.data){
+            this.$confirm('是否确认删除名称为"' + row.roleName + '"'+ '"的数据项?', '警告', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(function () {
+              // 删除之前判断角色是否被引用
+                  return delObj(row.roleId)  
+            }).then(() => {
+              this.getList(this.page)
+              this.list.splice(index, 1);
+              _this.$message({
+                showClose: true,
+                message: '删除成功',
+                type: 'success'
+              })
+            }).catch(function () {
+
+            })
+          }else{
+            _this.$message({
+              showClose: true,
+              message: '角色被用户引用不能删除',
+              type: 'warning'
+            })
+          }
         })
       },
       create(row, done, loading) {

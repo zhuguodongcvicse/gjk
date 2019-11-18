@@ -66,4 +66,8 @@
 			and r.del_flag = '0'
 		</where>
 	</select>
+
+	<select id="getSysUserRoleByRoleId" resultType="int">
+		select count(*) from sys_user_role where role_id=#{roleId}
+	</select>
 </mapper>

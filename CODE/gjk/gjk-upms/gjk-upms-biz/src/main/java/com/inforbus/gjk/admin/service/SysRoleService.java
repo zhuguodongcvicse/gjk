@@ -68,4 +68,11 @@ public interface SysRoleService extends IService<SysRole> {
 	 * @return
 	 */
 	R getRoleByRoleCode(SysRole sysRole);
+
+	/**
+	 * 校验角色是否有用户引用
+	 * @param roleId
+	 * @return
+	 */
+	R getSysUserRoleByRoleId(String roleId);
 }
