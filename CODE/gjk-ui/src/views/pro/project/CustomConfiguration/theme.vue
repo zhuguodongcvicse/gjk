@@ -1,6 +1,6 @@
 <!--  -->
 <template>
-  <div>
+  <div class="pro_project_tree_14s">
     <el-row :gutter="5" class="pro_project_custom_networkout_14s">
       <el-col :span="6">
         <div class="divlable">
@@ -18,7 +18,19 @@
             :highlight-current="true"
             :expand-on-click-node="false"
             @node-click="handleNodeClick"
-          ></el-tree>
+            @node-contextmenu="handleNodeContextMenu"
+          >
+          </el-tree>
+          <!-- 右键菜单 -->
+          <div class="rightmenu" v-bind:id="titleType" @mouseleave="changeCount()" style="width: 130px">
+            <div class="menu">
+              <a v-for="item in menus" :key="item" @click="nodeContextmenuClick(item)">
+                <div class="command">
+                  <span>{{item}}</span>
+                </div>
+              </a>
+            </div>
+          </div>
         </div>
       </el-col>
       <el-col :span="18">
@@ -40,6 +52,16 @@
           <el-button type="primary" @click="handleInputTopicName">确 定</el-button>
       </span>
     </el-dialog>
+    <el-dialog
+      title="修改名称"
+      :visible.sync="dialogVisibleTopicNameUpdate"
+      width="30%">
+      <el-input placeholder="请输入名称" v-model="rightMenuTopicName" clearable></el-input>
+      <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisibleTopicNameUpdate = false">取 消</el-button>
+          <el-button type="primary" @click="handleUpdateTopicName">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -49,6 +71,7 @@
 import topicParam from "./topicParam";
 import { mapGetters } from "vuex";
 import { deepClone } from "@/util/util"
+import $ from "jquery";
 
 export default {
   //import引入的组件需要注入到对象中才能使用
@@ -66,6 +89,10 @@ export default {
   data() {
     //这里存放数据
     return {
+      dialogVisibleTopicNameUpdate: false,
+      rightMenuTopicName: '',
+      rightMenuTopicId: '',
+      menus: ['修改名称'],
       dialogTopicName: '',
       dialogVisibleTopicName: false,
       topicLableName: '',
@@ -118,6 +145,62 @@ export default {
   },
   //方法集合
   methods: {
+      // 鼠标滑过右键菜单事件
+      changeCount() {
+          setTimeout(() => {
+              $("#" + this.titleType).hide();
+          }, 500);
+      },
+      // 点击右键菜单事件
+      nodeContextmenuClick(item){
+        if(item == '修改名称'){
+            this.dialogVisibleTopicNameUpdate = true
+        }
+        $("#" + this.titleType).hide();
+      },
+      // 修改topic名称处理
+      handleUpdateTopicName(){
+          let oldName = ''
+          // 新名称赋值给tree
+          for(let item of this.treeData){
+              if(item.id == this.rightMenuTopicId){
+                  oldName = item.label
+                  item.label = this.rightMenuTopicName
+              }
+          }
+
+          let oldTopicKey = this.rightMenuTopicId + "*" + oldName + "*" + this.topicLableName;
+          let newTopicKey = this.rightMenuTopicId + "*" + this.rightMenuTopicName + "*" + this.topicLableName;
+
+          let oldTopicData = this.getStoreTopicDataByTopicKey(oldTopicKey)
+          if(JSON.stringify(oldTopicData) == '{}'){
+              return
+          }
+
+          let titleTmp = this.themeCustomConfigData.get(this.$route.query.sysId)
+          if(titleTmp){
+              let topicTmp = titleTmp[this.titleType]
+              if(topicTmp){
+                  topicTmp.set(newTopicKey, oldTopicData)
+                  topicTmp.delete(oldTopicKey)
+              }
+          }
+          this.$store.dispatch('setThemeCustomConfigData', {key: this.$route.query.sysId, value: titleTmp})
+          this.dialogVisibleTopicNameUpdate = false
+          console.log('themeCustomConfigData5:::',  this.themeCustomConfigData)
+      },
+      // 从缓存获取当前topicData数据对象
+      getStoreTopicDataByTopicKey(topickey) {
+          let titleTmp = this.themeCustomConfigData.get(this.$route.query.sysId)
+          let topicDataTmp = {}
+          if(titleTmp){
+              let topicTmp = titleTmp[this.titleType]
+              if(topicTmp){
+                  topicDataTmp = topicTmp.get(topickey)
+              }
+          }
+          return topicDataTmp ? topicDataTmp : {}
+      },
       // 保存xml数据到vuex
       initXmlData2StoreHandle(){
           let titleArr = []
@@ -190,7 +273,19 @@ export default {
           // var topicData = this.subMapCustomConfig.get("subscribe*"+node.id+"*"+node.label);
           // this.$refs.topicParam.echo(topicData,"1");
       },
+      handleNodeContextMenu(event, data){
+          this.rightMenuTopicName = data.label
+          this.rightMenuTopicId = data.id
+          let topY = 248
+          if(this.titleType == 'publish'){
+              topY = 570
+          }
+          $("#" + this.titleType)
+              .css({ top: event.y - topY })
+              .show();
+      },
       addNode(){
+          this.dialogTopicName = ''
           this.dialogVisibleTopicName = true
       },
       removeNode(){
@@ -207,7 +302,7 @@ export default {
                   // this.$store.dispatch('delSubTopicData',"subscribe*"+this.treeData[i].id+"*"+this.treeData[i].label)
                   this.treeData.splice(i,1);
                   // this.$refs.topicParam.getTopicKey("");
-                  this.$refs.topicParam.clean(1);
+                  this.$refs.topicParam.clean(true);
                   this.topicKey = ''
               }
           }

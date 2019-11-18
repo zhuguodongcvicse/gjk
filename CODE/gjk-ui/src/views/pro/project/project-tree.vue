@@ -31,7 +31,7 @@
         @node-collapse="handleNodeCollapse"
       ></el-tree>
       <!-- 右键菜单 -->
-      <div class="rightmenu" @mouseleave="changeCount()" style="width: 130px">
+      <div class="rightmenu" id="projectRightMenu" @mouseleave="changeCount()" style="width: 130px">
         <div class="menu">
           <a v-for="item in menus" :key="item" @click="nodeContextmenuClick(item)">
             <div class="command">
@@ -533,7 +533,7 @@ export default {
   methods: {
     changeCount() {
       setTimeout(() => {
-        $(".rightmenu").hide();
+        $("#projectRightMenu").hide();
       }, 500);
     },
 
@@ -731,7 +731,7 @@ export default {
         setTimeout(() => {
           loading.close();
         }, 2000);
-        $(".rightmenu").hide();
+        $("#projectRightMenu").hide();
       } else if (item == "修改软件框架") {
         this.platformFlag = false;
         //得到平台大类
@@ -764,7 +764,7 @@ export default {
           // this.softwareSelectString.push(this.softwareTreeData[0].id)
         });
         this.softwareDialogVisible = true;
-        $(".rightmenu").hide();
+        $("#projectRightMenu").hide();
       } else if (item == "修改BSP") {
         this.bspDialogVisible = true;
       } else if (item == "APP组件工程生成") {
@@ -836,7 +836,7 @@ export default {
             });
           });
         }
-        $(".rightmenu").hide();
+        $("#projectRightMenu").hide();
       } else if (item == "添加流程") {
         this.addProcedureDialogVisible = true;
       } else if (item == "申请构件") {
@@ -1160,7 +1160,7 @@ export default {
       } else {
         this.menus = [];
       }
-      $(".rightmenu")
+      $("#projectRightMenu")
         .css({
           top: event.y - 248
         })
@@ -1215,7 +1215,7 @@ export default {
             });
           }
         }
-        $(".rightmenu").hide();
+        $("#projectRightMenu").hide();
         // this.showProjects = false
       }
       this.$emit(
