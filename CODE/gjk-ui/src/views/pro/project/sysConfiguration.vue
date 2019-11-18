@@ -58,7 +58,7 @@ export default {
       ],
 
       //递归查询节点返回值
-      returnXmlEntityMap: {},
+      returnXmlEntityMap: null,
 
       //最终生成的xmlEntityMap的值
       xmlEntityMap: {}
@@ -271,17 +271,19 @@ export default {
                     "dataKey",
                     "API Return"
                   );
-                  for (let returnXmlAttr of parseStrToObj(
-                    this.returnXmlEntityMap.attributeMap.configureType
-                  ).attrs) {
-                    if (returnXmlAttr.attrConfigType == "length") {
-                      this.returnXmlEntityMap.attributeMap[
-                        returnXmlAttr.attrName
-                      ] = element[3];
-                    } else if (returnXmlAttr.attrConfigType == "selectComm") {
-                      this.returnXmlEntityMap.attributeMap[
-                        returnXmlAttr.attrName
-                      ] = element[4];
+                  if (this.returnXmlEntityMap != null) {
+                    for (let returnXmlAttr of parseStrToObj(
+                      this.returnXmlEntityMap.attributeMap.configureType
+                    ).attrs) {
+                      if (returnXmlAttr.attrConfigType == "length") {
+                        this.returnXmlEntityMap.attributeMap[
+                          returnXmlAttr.attrName
+                        ] = element[3];
+                      } else if (returnXmlAttr.attrConfigType == "selectComm") {
+                        this.returnXmlEntityMap.attributeMap[
+                          returnXmlAttr.attrName
+                        ] = element[4];
+                      }
                     }
                   }
                   if (
@@ -354,7 +356,7 @@ export default {
       attrKey,
       attrValue
     ) {
-      this.returnXmlEntityMap = {};
+      this.returnXmlEntityMap = null;
       this.selectXmlEntity(xmlEntityMap, lableName, attrKey, attrValue);
     },
     selectXmlEntity(xmlEntityMap, lableName, attrKey, attrValue) {
