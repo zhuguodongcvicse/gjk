@@ -313,3 +313,19 @@ export function validatAlphabets(str) {
   const reg = /^[A-Za-z]+$/;
   return reg.test(str);
 }
+/* 是否包含特殊字符 */
+export function checkSpecificKey(rule, value, callback) {
+  var specialKey = "[`~!#$^&*()=|{}':;',\\[\\].<>/?~！#￥……&*（）——|{}【】‘；：”“'。，、？]‘'"; 
+  var flag = false;
+  for (var i = 0; i < value.length; i++) {
+    if (specialKey.indexOf(value.substr(i, 1)) != -1) {
+      flag = true;
+      break;
+    }
+  }
+  if (flag) {
+    callback(new Error("不能输入特殊字符"));
+  } else {
+    callback();
+  }
+}

@@ -1,4 +1,5 @@
 import { getDetails } from '@/api/admin/user'
+import { validatePhone,checkSpecificKey } from '@/util/rules'
 
 var validateUsername = (rule, value, callback) => {
   getDetails(value).then(response => {
@@ -21,12 +22,14 @@ export const tableOption = {
   delBtn: false,
   align: 'center',
   addBtn: false,
+  
   column: [{
     fixed: true,
     label: 'id',
     prop: 'userId',
     span: 24,
     hide: true,
+    editDisplay: false,
     editDisabled: true,
     addDisplay: false
   }, {
@@ -34,6 +37,7 @@ export const tableOption = {
     label: '工号',
     prop: 'username',
     editDisabled: true,
+    editDisplay: false,
     slot: true,
     search: true,
     span: 12,
@@ -47,7 +51,12 @@ export const tableOption = {
       message: '长度在 为 6 个字符',
       trigger: 'blur'
     },
+    {
+      validator: checkSpecificKey, 
+      trigger: 'blur'
+    },
     { validator: validateUsername, trigger: 'blur' }
+    
     ]
   }, {
     fixed: true,
@@ -57,7 +66,11 @@ export const tableOption = {
     value: '',
     hide: true,
     span: 12,
+    editDisplay: false,
     rules: [{
+        required: true,
+        message: '请输入密码'
+      },{
       min: 6,
       max: 20,
       message: '长度在 6 到 20 个字符',
@@ -84,7 +97,7 @@ export const tableOption = {
     rules: [{
       required: true,
       message: '请选择部门',
-      trigger: 'blur'
+      trigger: ['blur','change']
     }]
   }, {
     fixed: true,
@@ -94,9 +107,11 @@ export const tableOption = {
     value: '',
     span: 12,
     rules: [{
-      min: 6,
-      max: 20,
-      message: '长度在 11 个字符',
+      min: 11,
+      max: 11,
+      message: '长度在 11 个字符'
+    },{
+      validator: validatePhone,
       trigger: 'blur'
     }]
   }, {

@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.inforbus.gjk.admin.api.dto.RoleDTO;
 import com.inforbus.gjk.admin.api.dto.UserDTO;
 import com.inforbus.gjk.admin.api.entity.SysRole;
+import com.inforbus.gjk.common.core.util.R;
 
 import java.util.List;
 
@@ -60,4 +61,11 @@ public interface SysRoleService extends IService<SysRole> {
 	 * @return
 	 */
 	Boolean removeRoleById(Integer id);
+
+	/**
+	 * 判断角色标识是否存在
+	 * @param sysRole
+	 * @return
+	 */
+	R getRoleByRoleCode(SysRole sysRole);
 }

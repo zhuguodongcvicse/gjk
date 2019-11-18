@@ -139,4 +139,10 @@ public class RoleController {
 		SysRole sysRole = sysRoleService.getById(roleId);
 		return new R<>(sysRoleMenuService.saveRoleMenus(sysRole.getRoleCode(), roleId, menuIds));
 	}
+
+	@PostMapping("/getRole")
+	public R getRolePage(@RequestBody SysRole sysRole) {
+		return this.sysRoleService.getRoleByRoleCode(sysRole);
+	}
+
 }

@@ -278,6 +278,7 @@
           type: 'warning'
         }).then(() => {
           delObj(this.currentId).then(() => {
+            this.currentId=undefined
             this.getList()
             this.resetForm()
             this.onCancel()
@@ -304,6 +305,7 @@
       create() {
         addObj(this.form).then(() => {
           this.getList()
+          this.resetForm()
           this.$notify({
             title: '成功',
             message: '创建成功',

@@ -34,7 +34,8 @@
                 :itemValue="formLabelAlign[item.attrName]" 
                 :lableType="item.attrConfigType" 
                 :dictKey="item.dataKey"
-                @change="updateData" >
+                @change="updateData" 
+                @selectChangeData="selectChangeData">
                 </form-item-type>
               </el-form-item>
                 <el-form-item v-for="(item,index) in entityParams" :key=index :label="item.attrMapping?item.upNode+'_'+item.attrMappingName:item.upNode+'_'+item.attrName">
@@ -43,7 +44,8 @@
                 :itemValue="formLabelAlign[item.upNode+'_'+item.attrName]" 
                 :lableType="item.attrConfigType" 
                 :dictKey="item.dataKey"
-                @change="updateData" >
+                @change="updateData"
+                @selectChangeData="selectChangeData" >
                 </form-item-type>
               </el-form-item>
             </el-form>
@@ -81,7 +83,6 @@ export default {
                 const element1 = this.xmlEntityMaps[k];
                 entityMaps.push(element1.data)
               }
-
               element.xmlEntityMaps = entityMaps
               this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps[i] = element
             }
@@ -107,7 +108,8 @@ export default {
       xmlEntityMap: {},
       //当前被选中的节点
       node: {},
-      index: ""
+      index: "",
+      nameSelectOptions: undefined
     };
   },
   //监听属性 类似于data概念
@@ -132,7 +134,12 @@ export default {
     handleClick(node){
       for (let key in node.data.attributeMap) {
         if('configureType'!==key){
-         this.formLabelAlign[key] = node.data.attributeMap[key]
+          if(key == 'name'){
+            console.log(node.data.attributeMap['compId'])
+            this.formLabelAlign[key] = node.data.attributeMap['compId']
+          }else{
+            this.formLabelAlign[key] = node.data.attributeMap[key]
+          }
         }
       }
       for (let i = 0; i < node.data.xmlEntityMaps.length; i++) {
@@ -160,9 +167,10 @@ export default {
            const element = paramRule[i];
            if(element.isShow){
             if(element.lableName = 'name'){
-              element.dataKey = this.nameOptions
+              console.log(element)
+              element.dataKey = this.nameOptions       
             }
-            this.funcConfigParams.push(element)
+              this.funcConfigParams.push(element)
            }
          }
     },
@@ -207,9 +215,29 @@ export default {
             }
           }
         }else{
-          entity.attributeMap[key] = this.formLabelAlign[key]
+          if(key != 'name'){
+            entity.attributeMap[key] = this.formLabelAlign[key]
+          }else{
+            if(this.nameSelectOptions != undefined){
+              console.log(data)
+              entity.attributeMap.compId = data
+              var params
+              for (let i = 0; i < this.nameOptions.length; i++) {
+                const element = this.nameOptions[i];
+                if(element.value==data){
+                  entity.attributeMap['compName'] = element['label']
+                  params = element.data
+                }
+              }
+              for(let key in params){
+                entity.attributeMap[key] = params[key]
+              }
+              this.nameSelectOptions = undefined
+              break
+            }
+          }
         }
-      }
+      }    
       this.xmlEntityMaps[index].data = entity
       let xmlEntityMaps = this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps
       for (let i = 0; i < xmlEntityMaps.length; i++) {
@@ -254,6 +282,11 @@ export default {
       //     this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps[i] = element
       //   }
       // }
+    },
+    selectChangeData(options){
+      if(options[0].data!=undefined){
+        this.nameSelectOptions = options
+      }
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
@@ -269,11 +302,18 @@ export default {
       const element = this.partList[i];
       for (let k = 0; k < element.components.length; k++) {
         const element1 = element.components[k];
-        this.nameOptions.push({ label : element1.compName , value: element1.compId})
+        console.log(this.partList)
+        var data = {
+          cmpName: element.partName,
+          name: element1.functionName,   
+          compName: element1.compName
+        }
+        this.nameOptions.push({ label : element1.compName , value: element1.compId, data: data})
       }
     }
     remote("netWork_protocolName").then(res => {
-      this.protocolNameOptions = res.data.data
+      // this.protocolNameOptions = res.data.data
+      this.protocolNameOptions = [{label: '1', value: '1'}]
     })
     let xmlEntityMaps = this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps
     let index = 0;

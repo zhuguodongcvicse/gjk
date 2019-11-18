@@ -194,6 +194,8 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(function () {
+          // 删除之前判断角色是否被引用
+          
           return delObj(row.roleId)
         }).then(() => {
           this.getList(this.page)
