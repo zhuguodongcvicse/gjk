@@ -418,6 +418,8 @@ export default {
           if(!data){
               return
           }
+          this.changeTopicTagPD = false
+          this.changeTopicTagDSPD = false
           this.formLabelAlign.cmpPartName = data
 
           // 切换topic时 不清空
