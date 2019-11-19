@@ -897,25 +897,12 @@ export default {
         Vue.set(this.formLabelAlign, "hsmTempId", baseTempIds.hsmTempId);
         this.isUpdataTemp = true;
       } else if (item == "静态检查"){
+        
         let filePath = { filePath: "" , fileName: ""};
         filePath.filePath = this.fileData.filePath + "\\" + this.fileData.fileName;
         filePath.fileName = this.fileData.fileName;
         staticInspect(filePath).then(response => {
-            if (response.data.data) {
-              this.$router.push({
-                path: "/comp/manager/fileProview",
-                query: {
-                  filePath: this.filePathName,
-                  appFileName: data.fileName,
-                  proFloName:
-                    this.treeData[0].fileName +
-                    "_" +
-                    this.treeData[0].children[0].fileName +
-                    "_" +
-                    data.label
-                }
-              });
-            }
+          window.open("http://localhost:9000/dashboard?id="+response.data.data, "_blank");  
         })
       }
     },
