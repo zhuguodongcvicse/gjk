@@ -80,7 +80,7 @@
           <avue-crud
             ref="versionCrud"
             :data="allVersionTableData"
-            :option="tableOption"
+            :option="tableHisOption"
             @selection-change="versionSelectionChange"
           >
             <template slot="version" slot-scope="scope">
@@ -146,6 +146,7 @@ export default {
       },
       tableLoading: false,
       tableOption: tableOption,
+      tableHisOption: {},
 
       showAllVersionDia: false,
       allVersionTableData: [],
@@ -188,6 +189,8 @@ export default {
     this.getList();
     this.getLibsTree();
     this.loading = false;
+    this.tableHisOption = JSON.parse(JSON.stringify(this.tableOption))
+    this.tableHisOption. menu = false
   },
   mounted: function() {},
   watch: {

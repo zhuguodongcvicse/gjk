@@ -60,11 +60,13 @@ export const tableOption = {
     },
     {
       label: '描述',
+      hide: true,
       prop: 'description'
     },
     {
       width: 150,
       label: '默认软件框架库',
+      hide: true,
       prop: 'defaultSoftwareId'
     },
     {
@@ -75,6 +77,7 @@ export const tableOption = {
     {
       label: '修改时间',
       prop: 'updateTime',
+      hide: true,
       editDisabled: true
     },
   ]

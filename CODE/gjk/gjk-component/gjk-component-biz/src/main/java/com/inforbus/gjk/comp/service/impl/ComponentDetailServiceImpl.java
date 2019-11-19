@@ -382,9 +382,14 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	}
 
 	@Override
-	public boolean createXmlFile(XmlEntity entity, String token, String compId) {
+	public String createXmlFile(XmlEntity entity, String token, String compId) {
 		File file = this.createFile(token, compId, null);
-		return XmlFileHandleUtil.createXmlFile(entity, file);
+		if (XmlFileHandleUtil.createXmlFile(entity, file)) {
+			return file.getAbsolutePath();
+		} else {
+			return "";
+		}
+		
 //		Component component = compMapper.getCompById(compId);
 //
 //		String absolutePath = compDetailPath + compUserFilePath + File.separator + component.getCompName()
@@ -470,7 +475,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	 *      java.lang.String, java.lang.String)
 	 */
 	@Override
-	public boolean createXmlFile(XmlEntityMap entity, String token, String compId, String userCurrent) {
+	public String createXmlFile(XmlEntityMap entity, String token, String compId, String userCurrent) {
 		File file = this.createFile(token, compId, userCurrent);
 		Set<String> Ids = Sets.newHashSet();
 		this.getStructIds(entity, Ids);
@@ -480,7 +485,12 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 			compMapper.saveCompAndStruct(IdGenerate.uuid(), compId, structId);
 		}
 		// 创建文件
-		return XmlFileHandleUtil.createXmlFile(entity, file);
+//		return XmlFileHandleUtil.createXmlFile(entity, file);
+		if (XmlFileHandleUtil.createXmlFile(entity, file)) {
+			return file.getAbsolutePath();
+		} else {
+			return "";
+		}
 //		Component component = compMapper.getCompById(compId);
 //
 //		String absolutePath = compDetailPath + compUserFilePath + File.separator + component.getCompName()
@@ -976,47 +986,66 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	 * @Description: 生成构件框架
 	 * @Author xiaohe
 	 * @DateTime 2019年11月13日 下午4:05:24
-	 * @param spbModelXmlFile
-	 * @param saveDir
+	 * @param spbModelXmlFile 构件模型XML文件
+	 * @param headerTemplateFile 头文件模板文件
+	 * @param srcTemplateFile 源文件模板文件
+	 * @param saveDir 保存路径(可以是平台文件路径)
 	 */
 	@Override
-	public R createSpbFrameFile(String spbModelXmlFile, String saveDir) {
+	public R createSpbFrameFile(String spbModelXmlFile, String headerTemplateFile, String srcTemplateFile,
+			String saveDir) {
 		R retR = new R<>();
-		String headerTemplateFile = compDetailPath + JGitUtil.getHeaderTemplateFile();
-		String srcTemplateFile = compDetailPath + JGitUtil.getSrcTemplateFile();
+		//查找headerTemplateFile是否存在 不存在使用默認的headerTemplateFile
+		headerTemplateFile = StringUtils.isEmpty(headerTemplateFile) ? compDetailPath + JGitUtil.getHeaderTemplateFile()
+				: headerTemplateFile;
+		//查找srcTemplateFile是否存在 不存在使用默認的srcTemplateFile
+		srcTemplateFile = StringUtils.isEmpty(srcTemplateFile) ? compDetailPath + JGitUtil.getSrcTemplateFile()
+				: srcTemplateFile;
+		saveDir=compDetailPath+saveDir;
 		File file = null;
 		try {
 			if (StringUtils.isEmpty(spbModelXmlFile)) {
-				logger.error("spbModelXmlFile is null");
-				return new R<>(new NullPointerException("spbModelXmlFile is null"));
+				spbModelXmlFile = compDetailPath + JGitUtil.getHeaderTemplateFile();
+				logger.error("构件模型XML文件 is null");
+				return new R<>(new NullPointerException("构件模型XML文件 is null"));
 			} else {
 				file = new File(spbModelXmlFile);
 				if (!file.exists() || !file.isFile()) {
-					logger.error("spbModelXmlFile does not exist");
-					return new R<>(new NullPointerException("spbModelXmlFile does not exist"));
+					logger.error("构件模型XML文件 does not exist");
+					return new R<>(new NullPointerException("构件模型XML文件 does not exist"));
 				}
 			}
 			if (StringUtils.isEmpty(headerTemplateFile)) {
-				logger.error("headerTemplateFile is null");
-				return new R<>(new NullPointerException("headerTemplateFile is null"));
+				logger.error("头文件模板 is null");
+				return new R<>(new NullPointerException("头文件模板 is null"));
 			} else {
 				file = new File(headerTemplateFile);
 				if (!file.getParentFile().exists()) {
 					file.getParentFile().mkdirs();
 				}
-//				file.createNewFile();
-				logger.info("The " + file.getName() + " file was created successfully.");
+				if (!file.exists() || !file.isFile()) {
+					logger.error("头文件模板  does not exist");
+					return new R<>(new NullPointerException("头文件模板 does not exist"));
+				}else {
+//					file.createNewFile();
+					logger.info("The " + file.getName() + " file was created successfully.");
+				}
 			}
 			if (StringUtils.isEmpty(srcTemplateFile)) {
-				logger.error("srcTemplateFile is null");
-				return new R<>(new NullPointerException("srcTemplateFile is null"));
+				logger.error("源文件模板  is null");
+				return new R<>(new NullPointerException("源文件模板 is null"));
 			} else {
 				file = new File(srcTemplateFile);
 				if (!file.getParentFile().exists()) {
 					file.getParentFile().mkdirs();
 				}
 //				file.createNewFile();
-				logger.info("The " + file.getName() + " file was created successfully.");
+				if (!file.exists() || !file.isFile()) {
+					logger.error("源文件模板 does not exist");
+					return new R<>(new NullPointerException("源文件模板  does not exist"));
+				} else {
+					logger.info("The " + file.getName() + " file was created successfully.");
+				}
 			}
 			if (StringUtils.isEmpty(saveDir)) {
 				logger.error("saveDir is null");
@@ -1027,11 +1056,12 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 					file.getParentFile().mkdirs();
 				}
 			}
+			ExternalIOTransUtils.createSpbFrameFile(spbModelXmlFile, headerTemplateFile, srcTemplateFile, saveDir);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new R<>(e);
 		}
-		ExternalIOTransUtils.createSpbFrameFile(spbModelXmlFile, headerTemplateFile, srcTemplateFile, saveDir);
+
 		return retR;
 
 	}

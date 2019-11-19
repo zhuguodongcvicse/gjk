@@ -58,7 +58,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/componentdetail")
-public class ComponentDetailController {
+public class ComponentDetailController {	
 
 	private final ComponentDetailService componentDetailService;
 
@@ -264,8 +264,8 @@ public class ComponentDetailController {
 		return new R<>(componentDetailService.saveCompfiles(map, paths));
 	}
 
-	@PostMapping("/createSpbFrameFile")
-	public R getCreateSpbFrameFile(@RequestBody Map<String, String> pathMaps) {
-		return componentDetailService.createSpbFrameFile(pathMaps.get("spbModelXmlFile"), pathMaps.get("saveDir"));
+	@PostMapping(path = "/createSpbFrameFile")
+	public R getCreateSpbFrameFile(@RequestBody Map<String, String> filesPath) {
+		return componentDetailService.createSpbFrameFile(filesPath.get("spbModelXmlFile"),filesPath.get("headerTemplateFile"),filesPath.get("srcTemplateFile"), filesPath.get("saveDir"));
 	}
 }

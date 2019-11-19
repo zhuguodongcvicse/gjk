@@ -357,7 +357,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             StreamManage outputStream  = new StreamManage(execResult.getInputStream(), "Output");
             errorStream.start();
             outputStream.start();
-            execResult.waitFor();
+//            execResult.waitFor();
         } catch (Exception e) {
 			e.printStackTrace();
 			return new R<>(CommonConstants.FAIL, "执行sonar-scanner扫描项目失败", null);

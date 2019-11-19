@@ -90,7 +90,7 @@ public interface ComponentDetailService extends IService<ComponentDetail> {
 	 * @param entity
 	 * @param token
 	 */
-	boolean createXmlFile(XmlEntity entity, String token, String compId);
+	String createXmlFile(XmlEntity entity, String token, String compId);
 	/**
 	 * @Title: createXmlFile
 	 * @Description: 创建xml文件
@@ -99,7 +99,7 @@ public interface ComponentDetailService extends IService<ComponentDetail> {
 	 * @param entity
 	 * @param token
 	 */
-	boolean createXmlFile(XmlEntityMap entMap, String token, String compId, String userCurrent);
+	String createXmlFile(XmlEntityMap entMap, String token, String compId, String userCurrent);
 
 	/**
 	 * @param ufile
@@ -186,6 +186,6 @@ public interface ComponentDetailService extends IService<ComponentDetail> {
 	 * @param saveDir 
 	 * @throws Exception 
 	 */
-	public R createSpbFrameFile(String spbModelXmlFile, String saveDir);
+	public R createSpbFrameFile(String spbModelXmlFile,String headerTemplateFile,String srcTemplateFile, String saveDir);
 
 }

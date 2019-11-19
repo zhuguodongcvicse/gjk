@@ -16,6 +16,7 @@ import com.google.common.collect.Maps;
 import com.inforbus.gjk.common.core.appinter.appInterface;
 import com.inforbus.gjk.common.core.util.vo.*;
 
+import SpbModelDesign.SpbFrameAutoGen;
 import appProCreate.cmpProCreate;
 import appcontrol.AppControl;
 import customtoconfig.TopicConfig;
@@ -135,7 +136,8 @@ public class ExternalIOTransUtils {
 	public static boolean appInstall(Map<String, String> cmpNameToHwType, String userName, int appID, String appName,
 			String packinfoPath, String cmpResFilePath, String appProPath) {
 		AppControl appControl = new AppControl();
-		return appControl.appInstall(cmpNameToHwType, appID, appName, packinfoPath, cmpResFilePath, appProPath);
+//		appControl.appInstall(cmpNameToHwType, userName, appID, appName, packinfoPath, cmpResFilePath, appProPath);
+		return appControl.appInstall(cmpNameToHwType, userName, appID, appName, packinfoPath, cmpResFilePath, appProPath);
 	}
 
 	/**
@@ -153,7 +155,7 @@ public class ExternalIOTransUtils {
 	public static boolean appLoad(Map<String, String> cmpNameToHwType, String userName,  int appID, String appName,
 			boolean existDeployConfig, String sysconfigPath, String appProPath) {
 		AppControl appControl = new AppControl();
-		return appControl.appLoad(cmpNameToHwType, appID, appName, existDeployConfig, sysconfigPath, appProPath);
+		return appControl.appLoad(cmpNameToHwType, userName, appID, appName, existDeployConfig, sysconfigPath, appProPath);
 
 	}
 
@@ -167,7 +169,7 @@ public class ExternalIOTransUtils {
 	 */
 	public static boolean appUnload(Map<String, String> cmpNameToHwType, String userName,  int appID, String appName) {
 		AppControl appControl = new AppControl();
-		return appControl.appUnload(cmpNameToHwType, appID, appName);
+		return appControl.appUnload(cmpNameToHwType, userName, appID, appName);
 	}
 
 	/**
@@ -180,7 +182,7 @@ public class ExternalIOTransUtils {
 	 */
 	public static boolean appRestart(Map<String, String> cmpNameToHwType, String userName,  int appID, String appName) {
 		AppControl appControl = new AppControl();
-		return appControl.appRestart(cmpNameToHwType, appID, appName);
+		return appControl.appRestart(cmpNameToHwType, userName, appID, appName);
 	}
 
 	/**
@@ -193,7 +195,7 @@ public class ExternalIOTransUtils {
 	 */
 	public static boolean appStop(Map<String, String> cmpNameToHwType, String userName,  int appID, String appName) {
 		AppControl appControl = new AppControl();
-		return appControl.appStop(cmpNameToHwType, appID, appName);
+		return appControl.appStop(cmpNameToHwType, userName, appID, appName);
 	}
 
 	/**
@@ -206,7 +208,7 @@ public class ExternalIOTransUtils {
 	 */
 	public static boolean appPause(Map<String, String> cmpNameToHwType, String userName,  int appID, String appName) {
 		AppControl appControl = new AppControl();
-		return appControl.appPause(cmpNameToHwType, appID, appName);
+		return appControl.appPause(cmpNameToHwType, userName, appID, appName);
 	}
 
 	/**
@@ -221,7 +223,7 @@ public class ExternalIOTransUtils {
 	public static boolean appUnInstall(Map<String, String> cmpNameToHwType, String userName,  int appID, String appName,
 			String packinfoPath) {
 		AppControl appControl = new AppControl();
-		return appControl.appUnInstall(cmpNameToHwType, appID, appName, packinfoPath);
+		return appControl.appUnInstall(cmpNameToHwType, userName,appID, appName, packinfoPath);
 	}
 
 	/**
@@ -278,10 +280,9 @@ public class ExternalIOTransUtils {
 	 * @param headerTemplateFile 头文件模板文件
 	 * @param srcTemplateFile    源文件模板文件
 	 * @param saveDir            保存路径(可以是平台文件路径)
-	 * @throws NullPointerException 
 	 */
 	public static void createSpbFrameFile(String spbModelXmlFile, String headerTemplateFile, String srcTemplateFile,
 			String saveDir){
-		
+		new SpbFrameAutoGen().createSpbFrameFile(spbModelXmlFile, headerTemplateFile, srcTemplateFile, saveDir);
 	}
 }

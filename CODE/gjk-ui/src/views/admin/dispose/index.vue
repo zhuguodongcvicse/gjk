@@ -438,6 +438,18 @@ export default {
 
     //存软硬件映射信息
     handleSavePro() {
+        // 判断页面上是否有显示的内容 没有的话结束保存处理
+        let bool = true
+        for(let item of this.form.xmlEntityMaps){
+            if(this.analysisConfigureType(item).lableType === 'form'){
+                bool = false
+            }
+        }
+        if(bool){
+            return
+        }
+
+        // 保存处理中...
       const loading = this.$loading({
         lock: true,
         text: "保存软硬件映射信息中。。。",

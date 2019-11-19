@@ -47,7 +47,7 @@
           pageSize: 20 // 每页显示多少条
         },
         tableLoading: false,
-        tableOption: tableOption
+        tableOption: tableOption,
       }
     },
     created() {
