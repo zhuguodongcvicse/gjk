@@ -49,6 +49,7 @@ export const tableOption = {
     },
 	  {
       label:'图标',
+      hide: true,
       prop :'projectImg'
     }
   ]

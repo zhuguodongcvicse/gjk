@@ -22,6 +22,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.inforbus.gjk.common.core.entity.CompStruct;
+import com.inforbus.gjk.common.core.entity.Structlibs;
 import com.inforbus.gjk.common.core.entity.XmlEntity;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
@@ -199,7 +201,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	 * @DateTime 2019年4月29日 上午11:37:04
 	 * @param compId 用户编号
 	 * @return
-	 * @see com.inforbus.gjk.comp.service.ComponentService#getCompByCompId(java.lang.String)
+	 * @see com.inforbus.gjk.comp.service.ComponentService#getCompByCompId(java.lang.String, boolean)
 	 */
 	@Override
 	public List<CompDetailVO> getCompByCompId(String compId, boolean isShowCompXml) {
@@ -692,6 +694,8 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 
 		List<Component> comps = new ArrayList<Component>();
 		List<ComponentDetail> compDetails = new ArrayList<ComponentDetail>();
+		List<Structlibs> structlibsList = new ArrayList<>();
+		List<CompStruct> compStructList = new ArrayList<>();
 
 		// 获取所有sheet对象
 		Iterator<Sheet> sheetIterator = workbook.sheetIterator();
@@ -709,6 +713,16 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 				for (Object obj : parseSheet(sheet, className)) {
 					compDetails.add((ComponentDetail) obj);
 				}
+			} else if ("gjk_structlibs".equals(tableName)) {
+                className = "com.inforbus.gjk.common.core.entity.Structlibs";
+                for (Object obj : parseSheet(sheet, className)) {
+                    structlibsList.add((Structlibs) obj);
+                }
+            } else if ("gjk_comp_struct".equals(tableName)) {
+                className = "com.inforbus.gjk.common.core.entity.CompStruct";
+                for (Object obj : parseSheet(sheet, className)) {
+                    compStructList.add((CompStruct) obj);
+                }
 			}
 		}
 		workbook.close();
@@ -749,12 +763,33 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 				compDetailMapper.saveCompDetail(detail);
 			}
 
+			// 保存构件和结构体关系
+			List<CompStruct> compStructSubList = new ArrayList<>();
+			for (CompStruct item : compStructList) {
+				if(item.getCompId().equals(comp.getId())){
+					compStructSubList.add(item);
+				}
+			}
+			for (CompStruct compStruct : compStructSubList) {
+				baseMapper.saveCompAndStruct(compStruct.getId(), compStruct.getCompId(), compStruct.getStructId());
+			}
+
 			String newFilePath = compDetailPath + "gjk" + File.separator + "component" + File.separator
 					+ comp.getCompName() + File.separator + comp.getVersion() + File.separator;
 
 			FileUtil.copyDir(beforeFilePath, newFilePath);
 			compList.add(this.getById(comp.getId()));
 		}
+
+		// 遍历结构体structlibs
+		for (Structlibs item : structlibsList) {
+			// 判断是否存在
+			if(baseMapper.getStructlibsById(item.getId()) != null){
+				continue;
+			}
+			baseMapper.saveStructlibs(item);
+		}
+
 		return compList;
 	}
 
@@ -860,7 +895,15 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			fieldName = firstLetter + fieldName.substring(1); // 获取方法名
 			PropertyDescriptor pd = new PropertyDescriptor(fieldName, clazz);
 			Method wM = pd.getWriteMethod();// 获得写方法
-			wM.invoke(o, value);
+
+            // 判断字段类型 转换类型
+            if(pd.getPropertyType().getName().indexOf("Double") > -1){
+                value = Double.valueOf((String)value);
+            }else if(pd.getPropertyType().getName().indexOf("Integer") > -1){
+                value = Integer.valueOf((String)value);
+            }
+
+            wM.invoke(o, value);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
