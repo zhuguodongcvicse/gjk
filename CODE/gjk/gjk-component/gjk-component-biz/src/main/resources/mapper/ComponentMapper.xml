@@ -53,6 +53,26 @@
 		</collection>
 	</resultMap>
 
+	<resultMap id="structlibsMap"
+			   type="com.inforbus.gjk.common.core.entity.Structlibs">
+		<id property="id" column="id" />
+		<result property="parentId" column="parent_id" />
+		<result property="childrenIds" column="children_ids" />
+		<result property="name" column="name" />
+		<result property="version" column="version" />
+		<result property="type" column="type" />
+		<result property="dataType" column="data_type" />
+		<result property="structType" column="struct_type" />
+		<result property="dataLength" column="data_length" />
+		<result property="permission" column="permission" />
+		<result property="sort" column="sort" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="delFlag" column="del_flag" />
+		<result property="storageFlag" column="storage_flag" />
+		<result property="applyDesc" column="apply_desc" />
+	</resultMap>
+
 	<sql id="componentSql">
 		id,
 		comp_id,
@@ -363,5 +383,39 @@
 			open="(" close=")" separator=",">
 			#{compId}
 		</foreach>
+	</select>
+	<!-- 保存结构体 -->
+	<insert id="saveStructlibs"
+			parameterType="com.inforbus.gjk.common.core.entity.Structlibs">
+		INSERT INTO gjk_structlibs (
+			id,
+			parent_id,
+			children_ids,
+			name,
+			sort,
+			version,
+			type,
+			data_type,
+			struct_type,
+			data_length,
+			permission
+		) VALUES (
+		#{structlibs.id},
+		#{structlibs.parentId},
+		#{structlibs.childrenIds},
+		#{structlibs.name},
+		#{structlibs.sort},
+		#{structlibs.version},
+		#{structlibs.type},
+		#{structlibs.dataType},
+		#{structlibs.structType},
+		#{structlibs.dataLength},
+		#{structlibs.permission})
+	</insert>
+	<!-- 根据id查询一条结构体数据 -->
+	<select id="getStructlibsById" resultMap="structlibsMap">
+		SELECT *
+		FROM gjk_structlibs
+		WHERE id=#{id}
 	</select>
 </mapper>

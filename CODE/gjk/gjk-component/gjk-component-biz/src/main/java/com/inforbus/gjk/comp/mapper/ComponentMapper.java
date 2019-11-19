@@ -19,6 +19,7 @@ package com.inforbus.gjk.comp.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.inforbus.gjk.common.core.entity.Structlibs;
 import com.inforbus.gjk.comp.api.entity.Component;
 import com.inforbus.gjk.comp.api.entity.ComponentDetail;
 
@@ -202,4 +203,17 @@ public interface ComponentMapper extends BaseMapper<Component> {
 	 * 检查更新
 	 */
 	List<Component> checkComp(@Param("compIdList") List<String> compIdList);
+
+	/**
+	 * 保存结构体
+	 * @param structlibs
+	 */
+	void saveStructlibs(@Param("structlibs") Structlibs structlibs);
+
+	/**
+	 * 根据id 查询结构体数据
+	 * @param id
+	 * @return
+	 */
+	Structlibs getStructlibsById(@Param("id") String id);
 }

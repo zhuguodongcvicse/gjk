@@ -14,12 +14,12 @@
         @current-change="handleCurrentChange"
         class="w100_14s"
         :header-cell-style="{
-          /* 样式名称 ： 属性 */ 
+          /* 样式名称 ： 属性 */
           'text-align':'center',
-        }" 
-        :cell-style="{ 
-          /* 样式名称 ： 属性 */ 
-          'text-align': 'center', 
+        }"
+        :cell-style="{
+          /* 样式名称 ： 属性 */
+          'text-align': 'center',
         }"
       >
         <el-table-column label="请选择" width="65" align="center">
@@ -180,6 +180,10 @@ export default {
 
     //保存
     handleSavePro() {
+      if(this.tableDate || this.tableDate.length == 0){
+          console.log('没有数据结束保存操作')
+          return
+      }
       //存方案信息
       const loading = this.$loading({
         lock: true,
@@ -202,12 +206,12 @@ export default {
           type: "success"
         });
         }, 500)
-        
-        
+
+
       });
     },
 
-    
+
   }
 };
 </script>
