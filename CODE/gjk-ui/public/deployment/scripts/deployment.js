@@ -1223,8 +1223,6 @@ function showchip() {
 					}
 				}
 			}
-	
-		
 			//获取所有连线关系的refid数据
 			for (var k in deploymentsJsonbak.datas) {
 				if (deploymentsJsonbak.datas[k]._className == "Q.Edge") {
