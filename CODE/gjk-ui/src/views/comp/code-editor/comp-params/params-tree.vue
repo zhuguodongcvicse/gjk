@@ -140,7 +140,8 @@ export default {
       inputTmpuid: new Map(),
       inputCmpuid: "",
       outputTmpuid: new Map(),
-      outputCmpuid: ""
+      outputCmpuid: "",
+      findArrayTmpMap: new Map() //用于转换参数中有数组
     };
   },
   //监听属性 类似于data概念
@@ -149,7 +150,8 @@ export default {
       "compChineseMapping",
       "headerFile",
       "structType",
-      "strInPointer"
+      "strInPointer",
+      "cacheHeaderValueParams"
     ])
   },
   //监控data中的数据变化
@@ -176,23 +178,37 @@ export default {
     tableXmlParams: {
       immediate: true,
       handler: function() {
-        // console.log("tableXmlParams - watch",this.tableXmlParams)
         this.paramType =
           this.tableXmlParams.lableName === "输入"
             ? "input"
             : this.tableXmlParams.lableName === "输出"
             ? "output"
             : "";
+        // this.treeData = [];
+        // console.warn("初始化输入输出数据000000000000000000000");
         this.analysisAttrConfigType(this.tableXmlParams);
       }
     },
     treeData: {
       immediate: true,
       handler: function(treeData) {
-        // console.log("treeData - watch",treeData)
         let saveTreeData = [];
         this.analysisByBaseXmlOptionData(deepClone(treeData), saveTreeData);
         this.tableXmlParams.xmlEntityMaps = saveTreeData;
+        console.log(
+          "saveTreeDatasaveTreeDatasaveTreeDatasaveTreeData",
+          saveTreeData
+        );
+        let { headerKey, headerValue } = this.cacheHeaderValueParams;
+        for (let key in headerValue) {
+          if (key === this.tableXmlParams.lableName) {
+            headerValue[key] = this.tableXmlParams;
+          }
+        }
+        this.$store.dispatch("setCacheHeaderValueParams", {
+          headerKey,
+          headerValue
+        });
       },
       deep: true
     },
@@ -243,7 +259,6 @@ export default {
     },
     //添加数据
     appendTreeNode(nodeParam, dataParam, storeParam, insertParam) {
-      console.log("appendTreeNode")
       // console.log("insertParaminsertParaminsertParam", insertParam);
       let base = deepClone(this.baseXmlOptionData);
       //组装树形数据
@@ -605,11 +620,16 @@ export default {
     },
     //将查询得到的数据用基础配置转成数组
     getBaseXmlOptionDataTree(nodeData) {
-      console.log("getBaseXmlOptionDataTree - nodeData", nodeData)
       let node = {};
       //组装树形数据
       let treeData = [];
       let attr = deepClone(this.baseXmlOptionData);
+      if (attr.xmlEntityMaps.length === 0) {
+        console.warn(
+          "储存基础模板数据tmpTabOptionDatay异常 ,analysisAttrConfigType()->baseXmlOptionData"
+        );
+        return;
+      }
       attr.attributeMap.name = nodeData.fparamName;
       attr.attributeMap.structId = nodeData.fparamType.includes("*")
         ? nodeData.dbId + "_*"
@@ -636,6 +656,7 @@ export default {
         treeData.push(this.analysisMapping(xml));
       });
       node["nodeData"] = deepClone(treeData);
+      // console.log("测试node值", node);
       return node;
     },
     //得到将结构体名称得到结构体
@@ -698,50 +719,77 @@ export default {
     //查询数据库返回表单元素 给当前节点追加children
     getStructTreeParamData(params) {
       //根据表单上的参数得到对应结构体
-      let typeParam = this.getStructType(params);
-      if (typeParam.isok === "shStruct") {
+      let regExp = /\w+\[[0-9]+\]/i;
+      let paramName = params[0][0].lableName;
+      if (regExp.test(paramName)) {
+        // console.log("查询数据库返回表单元素", params[0][0].lableName);
+        let key = this.$refs.tree.getCurrentNode().id;
         let dataVal = [];
-        //①父级结构体，
-        //设置序号
-        this.xmlTreeShowTabValues(
-          typeParam.struct.children,
-          dataVal,
-          typeParam.numIndex
-        );
-        // //设置当前选中节点的子节点
-        this.$refs.tree.getCurrentNode().assigParamName = this.$refs.tree.getCurrentNode().lableName;
-        this.$refs.tree.getCurrentNode().assigStructType =
-          typeParam.struct.fparamType;
+        let arrData = deepClone(this.findArrayTmpMap.get(key));
+        for (let key in arrData) {
+          arrData[key].id = randomUuid();
+          arrData[key].nodeData[0][0].lableName = arrData[key].lableName =
+            "[" + key + "]";
+          //保存需要赋值的数据
+          arrData[key].assigParamName = paramName.replace(
+            /\[[0-9]+\]/i,
+            "[" + key + "]"
+          );
+          dataVal.push(deepClone(arrData[key]));
+        }
+        // console.log("查询数据库返回表单元素", dataVal);
         if (!this.$refs.tree.getCurrentNode().children) {
           this.$set(this.$refs.tree.getCurrentNode(), "children", []);
         }
         this.$refs.tree.updateKeyChildren(this.aCheckedKeys[0], dataVal);
-      } else if (typeParam.isok === "dbStruct") {
-        typeParam.struct.dbId = typeParam.struct.dbId.replace("_*", "");
-        this.$set(typeParam.struct, "queryParam", "");
-        getStructTree(typeParam.struct).then(r => {
-          let nodes = {};
-          nodes = this.getBaseXmlOptionDataTree(typeParam.struct);
-          this.$set(nodes, "children", []);
+      } else {
+        let typeParam = this.getStructType(params);
+        // console.log("typeParamtypeParam", typeParam);
+        if (typeParam.isok === "shStruct") {
+          let dataVal = [];
+          //①父级结构体，
           //设置序号
           this.xmlTreeShowTabValues(
-            r.data.data,
-            nodes.children,
+            typeParam.struct.children,
+            dataVal,
             typeParam.numIndex
           );
+          // //设置当前选中节点的子节点
           this.$refs.tree.getCurrentNode().assigParamName = this.$refs.tree.getCurrentNode().lableName;
           this.$refs.tree.getCurrentNode().assigStructType =
             typeParam.struct.fparamType;
-
-          //设置当前选中节点的子节点
           if (!this.$refs.tree.getCurrentNode().children) {
             this.$set(this.$refs.tree.getCurrentNode(), "children", []);
           }
-          this.$refs.tree.updateKeyChildren(
-            this.aCheckedKeys[0],
-            nodes.children
-          );
-        });
+          this.$refs.tree.updateKeyChildren(this.aCheckedKeys[0], dataVal);
+        } else if (typeParam.isok === "dbStruct") {
+          typeParam.struct.dbId = typeParam.struct.dbId.replace("_*", "");
+          this.$set(typeParam.struct, "queryParam", "");
+          getStructTree(typeParam.struct).then(r => {
+            let nodes = {};
+            nodes = this.getBaseXmlOptionDataTree(typeParam.struct);
+            // console.log("测试数据0111", nodes);
+            this.$set(nodes, "children", []);
+            //设置序号
+            this.xmlTreeShowTabValues(
+              r.data.data,
+              nodes.children,
+              typeParam.numIndex
+            );
+            this.$refs.tree.getCurrentNode().assigParamName = this.$refs.tree.getCurrentNode().lableName;
+            this.$refs.tree.getCurrentNode().assigStructType =
+              typeParam.struct.fparamType;
+
+            //设置当前选中节点的子节点
+            if (!this.$refs.tree.getCurrentNode().children) {
+              this.$set(this.$refs.tree.getCurrentNode(), "children", []);
+            }
+            this.$refs.tree.updateKeyChildren(
+              this.aCheckedKeys[0],
+              nodes.children
+            );
+          });
+        }
       }
     },
     //根据变量类型结构体类型更改值
@@ -781,76 +829,27 @@ export default {
     },
     //处理属性是否显示
     analysisAttrConfigType(attr) {
-      // console.log("analysisAttrConfigType",attr)
-      let tmpTabOptionData = {}; //处理表格 "variable"
-      let tmpXmlEntityMaps = []; //处理表格 "variable".XmlEntityMaps
       var attrObj = eval("(" + attr.attributeMap.configureType + ")");
       //非层级的树
-      let treeDataAll = [];
+      let retDataAll = [];
       if (attrObj.lableType === "table") {
         let inIndex = -1;
         let outIndex = -1;
-        attr.xmlEntityMaps.forEach(xml => {
-          //组装树形数据
-          let node = {};
-          //处理父级数据
-          let treeParam = [];
-          treeParam.push(this.analysisMapping(xml));
-          //给树赋值显示值
-          node["id"] = randomUuid(); //new Number(randomLenNum(5, false));
-          node["lableName"] = xml.attributeMap.name;
-          node["assigParamName"] = "";
-          node["assigStructType"] = xml.attributeMap.structType;
-          let xmlChild = xml.xmlEntityMaps;
-          tmpTabOptionData = xml; //添加基础配置
-
-          xmlChild.forEach(child => {
-            let childArr = this.analysisMapping(child);
-            tmpXmlEntityMaps = tmpXmlEntityMaps.concat(child);
-            if (child.lableName === this.lbParam) {
-              if (this.moduleType === "comp" && !this.$route.query.compId) {
-                for (let key in childArr) {
-                  //清空类别数据
-                  childArr[key].lableName = "";
-                }
-              } else if (this.moduleType === "jsplumb") {
-                for (let key in childArr) {
-                  if (childArr[key].lableName === "DATA") {
-                    if (this.paramType === "input") {
-                      inIndex++;
-                      this.$set(
-                        childArr[key],
-                        "uid",
-                        this.inputTmpuid.get(String(inIndex))
-                      );
-                    } else if (this.paramType === "output") {
-                      outIndex++;
-                      this.$set(
-                        childArr[key],
-                        "uid",
-                        this.outputTmpuid.get(String(outIndex))
-                      );
-                    }
-                  }
-                }
-              }
-            }
-            // //处理合并子数据
-            treeParam.push(childArr);
-          });
-          node["nodeData"] = deepClone(treeParam);
-          // console.log("treeParamtreeParamtreeParam", xmlChild, treeParam);
-          treeDataAll.push(node);
-        });
+        // console.log("attrattrattrattrattr",attr)
+        let { retDataAll, tmpData, tmpMaps } = this.convertXmlToRootArraysXml(
+          attr
+        );
         //去掉重复的tmpXmlEntityMaps
-        tmpXmlEntityMaps = this.reduceObject(tmpXmlEntityMaps, "lableName");
+        tmpMaps = this.reduceObject(tmpMaps, "lableName");
         //组装基础
-        tmpTabOptionData.xmlEntityMaps = tmpXmlEntityMaps;
-        this.baseXmlOptionData = tmpTabOptionData;
+        tmpData.xmlEntityMaps = tmpMaps;
+        // console.log("储存基础模板数据tmpTabOptionData", tmpData, tmpMaps);
+        this.baseXmlOptionData = tmpData;
         let dataTree = [];
         //处理返回树形结构,此处没有问题
-        this.convertXmlToRootXml(treeDataAll, dataTree);
-        // console.log("1234567890-0987654321", dataTree);
+        console.log("处理返回树形结构,", retDataAll);
+        this.convertXmlToRootXml(retDataAll, dataTree);
+        console.log("处理返回树形结构,", dataTree);
         this.treeData = dataTree;
         if (this.treeData !== undefined && this.treeData.length > 0) {
           // 当前表单
@@ -867,12 +866,107 @@ export default {
       }
     },
     //循环所有节点
-    convertXmlToRootXml(treeDataAll, data) {
-      treeDataAll.forEach(tree => {
+    convertXmlToRootXml(retDataAll, data) {
+      // console.log("循环所有节点---前", retDataAll, data);
+      retDataAll.forEach(tree => {
         this.handleDialogParam(tree, data, "");
       });
+      // console.log("循环所有节点---后", retDataAll, data);
     },
-
+    convertXmlToRootArraysXml(attr) {
+      let arrayTmpMap = new Map();
+      let retDataAll = [];
+      let tmpData = {}; //处理表格 "variable"
+      let tmpMaps = []; //处理表格 "variable".XmlEntityMaps
+      if (attr.hasOwnProperty("xmlEntityMaps")) {
+        attr.xmlEntityMaps.forEach(xml => {
+          //组装树形数据
+          let node = {};
+          let lableName = xml.attributeMap.name;
+          //处理父级数据
+          let treeParam = [];
+          let variable = this.analysisMapping(deepClone(xml));
+          this.nameParam = variable[0].attrMappingName;
+          treeParam.push(variable);
+          // console.log("lableName", lableName,treeParam,xml);
+          let regExp = /\w+\[[0-9]+\]/i;
+          let xmlChild = xml.xmlEntityMaps;
+          tmpData = xml; //添加基础配置
+          xmlChild.forEach(child => {
+            if (child.attributeMap.configureType !== undefined) {
+              let childArr = this.analysisMapping(child);
+              tmpMaps = tmpMaps.concat(child);
+              //处理合并子数据
+              treeParam.push(childArr);
+            }
+          });
+          //判断是不是有‘[数字]’
+          if (regExp.test(lableName)) {
+            let arrKey = lableName.replace(/\[[0-9]+\]/i, "");
+            let length = lableName.slice(
+              lableName.indexOf("[") + 1,
+              lableName.indexOf("]")
+            );
+            let obj = {};
+            if (arrayTmpMap.has(arrKey)) {
+              obj = arrayTmpMap.get(arrKey);
+              this.$set(obj, length, obj[Object.keys(obj)[0]]);
+              arrayTmpMap.set(arrKey, obj);
+            } else {
+              let tmpObj = {};
+              tmpObj["id"] = randomUuid();
+              console.log("111111111111111111111111111111111",arrKey,deepClone(treeParam))
+              tmpObj["lableName"] = arrKey;
+              tmpObj["nodeData"] = deepClone(treeParam);
+              tmpObj["assigParamName"] = "";
+              tmpObj["assigStructType"] = xml.attributeMap.structType;
+              this.$set(obj, length, tmpObj);
+              arrayTmpMap.set(arrKey, obj);
+            }
+          } else {
+            //给树赋值显示值
+            node["id"] = randomUuid();
+            node["lableName"] = lableName;
+            node["nodeData"] = deepClone(treeParam);
+            node["assigParamName"] = "";
+            node["assigStructType"] = xml.attributeMap.structType;
+          }
+          if (JSON.stringify(node) !== "{}") {
+            retDataAll.push(node);
+          }
+        });
+        //设置当前选中节点的子节点
+        if (arrayTmpMap.size > 0) {
+          let nodes = [];
+          //循环map
+          arrayTmpMap.forEach((mapValue, key) => {
+            //组装树形数据
+            let node = {};
+            let attrKeys = Object.keys(mapValue);
+            if (attrKeys.length > 1) {
+              node = mapValue[attrKeys[0]];
+              node.lableName =node.nodeData[0][0].lableName= key + "[" + attrKeys.length + "]";
+              console.log("大于1个节点", "node", node, mapValue);
+              this.findArrayTmpMap.set(mapValue[attrKeys[0]].id, mapValue);
+            } else {
+              node = mapValue[attrKeys[0]];
+              node.lableName = key + "[" + attrKeys[0] + "]";
+              // console.log("0000000000000000000", "等于1个节点", attrKeys[0]);
+              let saveMapValue = {};
+              for (let index = 0; index < Number(attrKeys[0]); index++) {
+                this.$set(saveMapValue, index, node);
+              }
+              this.findArrayTmpMap.set(mapValue[attrKeys[0]].id, saveMapValue);
+            }
+            nodes.push(node);
+          });
+          retDataAll = deepClone(retDataAll.concat(nodes));
+          // console.log("findArrayTmpMap", this.findArrayTmpMap);
+        }
+      }
+      // console.log("新处理后的到的表格中的数据", retDataAll);
+      return { retDataAll, tmpData, tmpMaps };
+    },
     //递归返回树形数据
     handleDialogParam(params, retArray, parentKey) {
       ///预处理部分参数
@@ -885,6 +979,10 @@ export default {
         });
         let child = deepClone(params);
         child.assigParamName = parentKey === "" ? params.lableName : parentKey;
+        console.log(
+          "//递归返回树形数据child.assigParamName",
+          child.assigParamName
+        );
         child.lableName = endKey;
         //处理树上所带参数
         child.nodeData.forEach(nodes => {
@@ -940,25 +1038,29 @@ export default {
     //处理中英文映射
     analysisMapping(from) {
       //标签名是否要中英文映射
-      var attrObj = eval("(" + from.attributeMap.configureType + ")");
-      // console.log("attrObj",attrObj)
+      var attrObj = {};
       let showName;
-      if (attrObj && attrObj.lableMapping) {
-        //基于标签名
-        let val = this.compChineseMapping.find(item => {
-          return item.label === con.attrKeys;
-        });
-        let param = this.compChineseMapping.find(item => {
-          return item.id === attrObj.mappingKeys;
-        });
-        showName =
-          param === undefined
-            ? val === undefined
-              ? from.attrName
-              : val.value
-            : param.label;
-      } else {
-        showName = from.lableName;
+      if (from.attributeMap !== undefined) {
+        if (from.attributeMap.configureType !== undefined) {
+          attrObj = eval("(" + from.attributeMap.configureType + ")");
+          if (attrObj !== undefined && attrObj.lableMapping) {
+            //基于标签名
+            let val = this.compChineseMapping.find(item => {
+              return item.label === con.attrKeys;
+            });
+            let param = this.compChineseMapping.find(item => {
+              return item.id === attrObj.mappingKeys;
+            });
+            showName =
+              param === undefined
+                ? val === undefined
+                  ? from.attrName
+                  : val.value
+                : param.label;
+          } else {
+            showName = from.lableName;
+          }
+        }
       }
       // var showName = from.lableName;
       var attrs = [];
@@ -1005,7 +1107,7 @@ export default {
     },
     //遍历保存数据根据基础baseXmlOptionData
     analysisByBaseXmlOptionData(treeData, saveTreeData, parentTree) {
-      // console.log("analysisByBaseXmlOptionData", "treeData", treeData, "saveTreeData", saveTreeData, "parentTree", parentTree)
+      console.log("treeDatatreeDatatreeData", treeData);
       treeData.forEach(tree => {
         let baseData = deepClone(this.baseXmlOptionData);
         let saveRow = deepClone(this.baseXmlOptionData);
@@ -1033,8 +1135,13 @@ export default {
               .split(".")[0];
             let assigStructType = getStrType(tree.assigStructType);
             if (!assigStructType.isType) {
+              let regExp = /\w+\[[0-9]+\]/i;
+              //如果有数组就单独处理
+              if (regExp.test(tmpName)) {
+                tree.assigParamName = tree.lableName.replace(/\[[0-9]+\]/i, "");
+              }
               //是指针
-              if (assigStructType.isPoint) {
+              else if (assigStructType.isPoint) {
                 tree.assigParamName =
                   tmpName === "" ? tree.lableName + "->" : tmpName + "->";
               } else {
@@ -1046,6 +1153,7 @@ export default {
           //递归调用
           this.analysisByBaseXmlOptionData(tree.children, saveTreeData, tree);
         } else {
+          // console.log("1111111111111", tree);
           //保存处理子数据
           if (parentTree) {
             // 给结构体赋值 structId structName
@@ -1100,8 +1208,7 @@ export default {
   },
 
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {
-  },
+  created() {},
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   beforeCreate() {}, //生命周期 - 创建之前

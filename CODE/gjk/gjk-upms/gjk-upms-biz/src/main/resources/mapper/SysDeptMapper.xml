@@ -41,4 +41,8 @@
 		LEFT JOIN sys_dept_relation dr ON t.dept_id = dr.descendant
 		WHERE dr.ancestor = 0
 	</select>
+
+	<select id="getUserCountByDeptId" resultType="int">
+		select count(*) from sys_user where dept_id = #{deptId}
+	</select>
 </mapper>

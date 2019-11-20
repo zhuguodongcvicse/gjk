@@ -26,6 +26,7 @@ import com.inforbus.gjk.admin.api.vo.TreeUtil;
 import com.inforbus.gjk.admin.mapper.SysDeptMapper;
 import com.inforbus.gjk.admin.service.SysDeptRelationService;
 import com.inforbus.gjk.admin.service.SysDeptService;
+import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.security.util.SecurityUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -155,5 +156,10 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
 				return node;
 			}).collect(Collectors.toList());
 		return TreeUtil.buildByLoop(treeList, 0);
+	}
+
+	@Override
+	public R deptCheck(String deptId) {
+		return new R<>(baseMapper.getUserCountByDeptId(deptId)>0);
 	}
 }

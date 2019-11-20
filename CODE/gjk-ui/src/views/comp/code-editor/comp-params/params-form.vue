@@ -24,21 +24,21 @@
               :dictKey="showParam.dataKey"
               :readonly="readonly"
               :disabled="disabled"
-              @change="itemTypeChange(params,paramsFormXmlParams)"
+              @change="itemTypeChange(params)"
               @fileChange="fileChange"
             ></form-item-type>
             <form-item-type
-              v-model="params.attributeMap.name"
-              v-if="moduleType==='jsplumb' && paramType!=='资源属性'"
-              placeholder="请选择文件"
-              :lableType="showParam.attrConfigType"
-              :dictKey="showParam.dataKey"
-              :readonly="readonly"
-              :disabled="showParam.attrMappingName==='数据积累类型'?disabled:true"
-              @change="itemTypeChange(params,paramsFormXmlParams)"
-              @fileChange="fileChange"
-            ></form-item-type>
-<!--            <el-input v-model="params.attributeMap.name" :disabled="true" v-else></el-input>-->
+              v-model="params.attributeMap.name"
+              v-if="moduleType==='jsplumb' && paramType!=='资源属性'"
+              placeholder="请选择文件"
+              :lableType="showParam.attrConfigType"
+              :dictKey="showParam.dataKey"
+              :readonly="readonly"
+              :disabled="showParam.attrMappingName==='数据积累类型'?disabled:true"
+              @change="itemTypeChange(params)"
+              @fileChange="fileChange"
+            ></form-item-type>
+            <!--            <el-input v-model="params.attributeMap.name" :disabled="true" v-else></el-input>-->
           </el-form-item>
         </el-col>
       </el-form>
@@ -176,7 +176,7 @@ import paramsTable from "./params-table";
 import paramsTree from "./params-tree";
 import formItemType from "./form-item-type";
 import { getPerformanceTable } from "@/api/comp/compParams";
-import { getObjType, deepClone } from "@/util/util";
+import { getObjType, deepClone, isObjectEquals } from "@/util/util";
 import { delFilePath } from "@/api/comp/componentdetail";
 import { mapGetters } from "vuex";
 import { Hash } from "crypto";
@@ -210,6 +210,7 @@ export default {
       //用于上传文件返回文件
       files: {},
       paramsFormXmlParams: [],
+      baseXmlParamsData: [],
       xnTableOption: [], //性能表格配置
       xnTableData: [], //性能表格数据
       isShowXnTableData: false,
@@ -234,7 +235,8 @@ export default {
       "fileListOfComponent",
       "userInfo",
       "saveDBXmlMaps",
-      "currentIODate"
+      "currentIODate",
+      "cacheHeaderValueParams"
     ])
   },
   //监控data中的数据变化
@@ -243,7 +245,6 @@ export default {
     formXmlParam: {
       immediate: true,
       handler: function(paramsFormXmlParams) {
-        // console.log("paramsFormXmlParams-watch",paramsFormXmlParams)
         this.paramsFormXmlParams = [];
         let xnShowTable = [];
         this.saveXnTableData = {};
@@ -275,8 +276,8 @@ export default {
           }
         }
         this.paramsFormXmlParams = baseData;
+        this.baseXmlParamsData = deepClone(baseData);
         this.xnTableData = xnShowTable;
-        // console.log("this.paramsFormXmlParams-watch(formXmlParam)",this.paramsFormXmlParams)
       }
     },
     saveXnTableData: {
@@ -493,9 +494,9 @@ export default {
   //方法集合
   methods: {
     //基本属性解析
-    itemTypeChange(baseData, params) {
+    itemTypeChange(baseData) {
+      let paramsValue = deepClone(this.paramsFormXmlParams);
       // console.log("baseData",baseData)
-      // console.log("params",params)
       let config = this.analysisConfigureType(baseData);
       // console.log("config",config)
       config.attrs.forEach(attr => {
@@ -513,23 +514,51 @@ export default {
             //判断是不是需要解析文件 D:/14S_GJK_GIT/gjk/gjk/upload/func1.h 有盘符
             if (path.includes(":")) {
               this.$store.dispatch("GetParseHeaderObj", path).then(() => {
-                let base = deepClone(this.paramsFormXmlParams);
+                // let base = deepClone(this.paramsFormXmlParams);
+                let headerKey = path.slice(path.lastIndexOf("/") + 1);
+                let headerValue = {};
                 this.paramsFormXmlParams = [];
-                // console.log("Date.parse(new Date()) - itemTypeChange",Date.parse(new Date()))
                 let input = this.headerFile.inputXmlMapParams;
                 let output = this.headerFile.outputXmlMapParams;
                 let paramsFormXml = [];
-                params.forEach(param => {
-                  let fromParam = deepClone(param);
-                  if (param.lableName === "输入") {
-                    this.itemTypeChangeAssignmenDataParam(input, fromParam);
-                    param = input;
-                  }
-                  if (param.lableName === "输出") {
-                    this.itemTypeChangeAssignmenDataParam(output, fromParam);
-                    param = output;
+                paramsValue.forEach(param => {
+                  let tmpIfArr = ["输入", "输出"];
+                  if (tmpIfArr.includes(param.lableName)) {
+                    //使用"输入"还是 "输出"
+                    let tmpParam = param.lableName === "输入" ? input : output;
+                    //获取基础模板的配置
+                    let fromParam = this.baseXmlParamsData.find(item => {
+                      return item.lableName === param.lableName;
+                    });
+                    //文件名字是否箱相同，决定是否需要获取数据
+                    if (headerKey === this.cacheHeaderValueParams.headerKey) {
+                      let tmpParams = deepClone(tmpParam);
+                      //合并数据
+
+                      let cacheParams = this.cacheHeaderValueParams.headerValue[
+                        param.lableName
+                      ];
+                      console.log(
+                        "文件名字是否箱相同",
+                        isObjectEquals(fromParam, cacheParams)
+                      );
+                      //判断cacheParams中的数据是不是跟模板一样，一样就不赋值
+                      if (!isObjectEquals(fromParam, cacheParams)) {
+                        this.itemTypeChangeHeaderValueParams(
+                          tmpParam,
+                          cacheParams
+                        );
+                      }
+                    }
+                    this.itemTypeChangeAssignmenDataParam(tmpParam, fromParam);
+                    param = tmpParam;
+                    headerValue[param.lableName] = param;
                   }
                   paramsFormXml.push(param);
+                });
+                this.$store.dispatch("setCacheHeaderValueParams", {
+                  headerKey,
+                  headerValue
                 });
                 this.paramsFormXmlParams = paramsFormXml;
               });
@@ -548,32 +577,76 @@ export default {
           //文件是否存在标识，默认-1
           let ifExistSameFile = -1;
           if (JSON.stringify(obj) !== "{}") {
-              if (analysisBaseFile.length != 0){
-                  for (let i in analysisBaseFile) {
-                      //如果添加的文件和存在的相同，则标识改变
-                      if (analysisBaseFile[i].fileTypeTemp == attr.actionType) {
-                          ifExistSameFile = i;
-                          break;
-                      }
-                  }
-                  //若标识不为默认值-1
-                  if (ifExistSameFile != -1) {
-                      //删除相同的老数据，添加新数据
-                      analysisBaseFile.splice(ifExistSameFile, 1);
-                      analysisBaseFile.push(obj);
-                  } else {//原先不存在则直接添加
-                      analysisBaseFile.push(obj);
-                  }
-              } else {//原先不存在则直接添加
-                  analysisBaseFile.push(obj);
+            if (analysisBaseFile.length != 0) {
+              for (let i in analysisBaseFile) {
+                //如果添加的文件和存在的相同，则标识改变
+                if (analysisBaseFile[i].fileTypeTemp == attr.actionType) {
+                  ifExistSameFile = i;
+                  break;
+                }
               }
+              //若标识不为默认值-1
+              if (ifExistSameFile != -1) {
+                //删除相同的老数据，添加新数据
+                analysisBaseFile.splice(ifExistSameFile, 1);
+                analysisBaseFile.push(obj);
+              } else {
+                //原先不存在则直接添加
+                analysisBaseFile.push(obj);
+              }
+            } else {
+              //原先不存在则直接添加
+              analysisBaseFile.push(obj);
+            }
             this.$store.dispatch("setAnalysisBaseFile", analysisBaseFile);
-            // console.log("analysisBaseFile - itemTypeChange",analysisBaseFile)
           }
         }
       });
-      // console.log("this.paramsFormXmlParams - itemTypeChange",this.paramsFormXmlParams)
-      // console.log("Date.parse(new Date()) - itemTypeChange",Date.parse(new Date()))
+    },
+    //将缓存头文件中的配置方式写到解析后的参数中数据
+    itemTypeChangeHeaderValueParams(toParam, formParam) {
+      // console.log(
+      //   "将缓存头文件中的配置方式写到解析后的参数中数据000000",
+      //   toParam,
+      //   formParam
+      // );
+      if (toParam.lableName === formParam.lableName) {
+        if (toParam.attributeMap === null) {
+          toParam.attributeMap = formParam.attributeMap;
+        } else {
+          // console.log( "将缓存头文件中的配置方式写到解析后的参数中数据000000",toParam.lableName,formParam.attributeMap)
+          toParam.attributeMap = formParam.attributeMap;
+        }
+        console.log(
+          "将缓存头文件中的配置方式写到解析后的参数中数据22222",
+          toParam
+        );
+        if (toParam.xmlEntityMaps.length > 0) {
+          if (formParam.xmlEntityMaps.length === 1) {
+            toParam.xmlEntityMaps.forEach(topm => {
+              this.itemTypeChangeHeaderValueParams(
+                topm,
+                formParam.xmlEntityMaps[0]
+              );
+            });
+          } else {
+            formParam.xmlEntityMaps.forEach((form, index) => {
+              if (toParam.xmlEntityMaps[index] !== undefined) {
+                if (form.lableName === toParam.xmlEntityMaps[index].lableName) {
+                  this.itemTypeChangeHeaderValueParams(
+                    toParam.xmlEntityMaps[index],
+                    form
+                  );
+                }
+              } else {
+                //设置默认值
+                // let data = deepClone(form);
+                // this.$set(toParam.xmlEntityMaps, index, data);
+              }
+            });
+          }
+        }
+      }
     },
     //将基础模板的配置方式写到解析后的参数中
     itemTypeChangeAssignmenDataParam(toParam, formParam) {
@@ -594,6 +667,7 @@ export default {
             });
           } else {
             formParam.xmlEntityMaps.forEach((form, index) => {
+              // console.log("itemTypeChangeAssignmenDataParam*******************formParam.xmlEntityMaps.forEach",form)
               if (toParam.xmlEntityMaps[index] !== undefined) {
                 if (form.lableName === toParam.xmlEntityMaps[index].lableName) {
                   this.itemTypeChangeAssignmenDataParam(
@@ -783,7 +857,7 @@ export default {
     },
     //处理ConfigureType
     analysisConfigureType(config) {
-        // console.log("analysisConfigureType - config",config)
+      // console.log("analysisConfigureType - config",config)
       if (config.attributeMap) {
         // console.log("eval(----------------)",eval("(" + config.attributeMap.configureType + ")"))
         return eval("(" + config.attributeMap.configureType + ")");
@@ -806,7 +880,7 @@ export default {
     },
     //延时函数
     sleep(time) {
-        return new Promise((resolve) => setTimeout(resolve, time));
+      return new Promise(resolve => setTimeout(resolve, time));
     },
     //改变文件时触发
     fileChange(param) {
@@ -816,27 +890,35 @@ export default {
       // console.log("this.fileListOfComponent - fileChange",this.fileListOfComponent)
       //如果文件列表 不为空
       if (this.fileListOfComponent.length != 0) {
-          let fileListsTemp = JSON.parse(JSON.stringify(this.fileListOfComponent))
-          //改变文件时标识“1”变为0
-          fileListsTemp[1] = 0
-          this.$store.dispatch("setFileListOfComponent", fileListsTemp);
-          //删除原先存在的文件，重新上传新文件，避免重复
-          if (this.fileListOfComponent[0].algorithmfile != undefined && fileListsTemp[0].algorithmfile.filevo.length != 0) {
-              let files = [fileListsTemp[0].algorithmfile.filevo[0].relativePath]
-              // console.log("files - algorithmfile", files);
-              delFilePath(files).then(res => {
-                  // this.leftData.splice(index, 1);
-                  // console.log("res",res)
-              });
-          }
-          if (this.fileListOfComponent[0].platformfile != undefined && fileListsTemp[0].platformfile.filevo.length != 0) {
-              let files = [fileListsTemp[0].platformfile.filevo[0].relativePath]
-              // console.log("files - platformfile", files);
-              delFilePath(files).then(res => {
-                  // this.leftData.splice(index, 1);
-                  // console.log("res",res)
-              });
-          }
+        let fileListsTemp = JSON.parse(
+          JSON.stringify(this.fileListOfComponent)
+        );
+        //改变文件时标识“1”变为0
+        fileListsTemp[1] = 0;
+        this.$store.dispatch("setFileListOfComponent", fileListsTemp);
+        //删除原先存在的文件，重新上传新文件，避免重复
+        if (
+          this.fileListOfComponent[0].algorithmfile != undefined &&
+          fileListsTemp[0].algorithmfile.filevo.length != 0
+        ) {
+          let files = [fileListsTemp[0].algorithmfile.filevo[0].relativePath];
+          // console.log("files - algorithmfile", files);
+          delFilePath(files).then(res => {
+            // this.leftData.splice(index, 1);
+            // console.log("res",res)
+          });
+        }
+        if (
+          this.fileListOfComponent[0].platformfile != undefined &&
+          fileListsTemp[0].platformfile.filevo.length != 0
+        ) {
+          let files = [fileListsTemp[0].platformfile.filevo[0].relativePath];
+          // console.log("files - platformfile", files);
+          delFilePath(files).then(res => {
+            // this.leftData.splice(index, 1);
+            // console.log("res",res)
+          });
+        }
       }
       this.files = deepClone(param);
       /*this.sleep(500).then(() => {

@@ -110,3 +110,10 @@ export function getDefaultImg() {
   })
 }
 
+export function createSpbFrameFile(param) {
+  return request({
+    method: "post",
+    url: "/comp/componentdetail/createSpbFrameFile",
+    data: param
+  })
+}

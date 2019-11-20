@@ -232,7 +232,7 @@ export default {
       if (this.lableType === "selectComm") {
         this.$emit("selectChangeData", this.selectOptions);
         this.$emit("change", itemParam);
-      } else {
+      } else if (this.lableType !== "uploadComm") {
         this.$emit("change", itemParam);
       }
     },
@@ -276,6 +276,7 @@ export default {
           size: param.file.size
         };
         this.itemParam = res.data.data;
+        this.$emit("change", res.data.data);
         this.$emit("fileChange", file, param);
       });
     }

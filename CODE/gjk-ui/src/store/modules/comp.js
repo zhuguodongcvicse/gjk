@@ -12,8 +12,16 @@ const comp = {
         allBaseTemplate: getStore({ name: 'allBaseTemplate' }) || [],
         fileListOfComponent: getStore({ name: 'fileListOfComponent' }) || [],
         currentIODate: getStore({ name: 'currentIODate' }) || [],
+        cacheHeaderValueParams:getStore({ name: 'cacheHeaderValueParams' }) || {},
     },
     actions: {
+        //保存头文件值
+        setCacheHeaderValueParams({ commit }, headerValue) {
+            return new Promise((resolve, reject) => {
+                commit('SET_CACHEHEADERVALUEPARAMS', headerValue);
+                resolve();
+            })
+        },
         //绑定下拉框的值
         setAnalysisCjUnitParam({ commit }, { key, value }) {
             return new Promise((resolve, reject) => {
@@ -107,6 +115,14 @@ const comp = {
         },
     },
     mutations: {
+        SET_CACHEHEADERVALUEPARAMS:(state,headerValue)=>{
+            state.cacheHeaderValueParams = headerValue
+            setStore({
+                name: 'cacheHeaderValueParams',
+                content: state.cacheHeaderValueParams,
+                type: "session"
+            })
+        },
         SET_SAVEXMLMAPS: (state, xmlMaps) => {
             state.saveXmlMaps = xmlMaps
             setStore({

@@ -13,17 +13,28 @@
           <span v-else-if="this.$route.query.type ==='edit'">修改</span>
           <span v-else-if="this.$route.query.type ==='copy'">另存为</span>
         </el-button>
+        <el-button
+          type="primary"
+          size="mini"
+          icon="el-icon-edit"
+          @click.native="compSpbShowDialog=true"
+        >生成构件框架</el-button>
       </el-col>
       <el-col :span="4">
         <label class="showlabel">构件建模</label>
       </el-col>
       <el-col :span="10">
-        <el-select v-model="selectBaseTemplateValue" placeholder="请选择" v-if="this.$route.query.type === 'add'">
+        <el-select
+          v-model="selectBaseTemplateValue"
+          placeholder="请选择"
+          v-if="this.$route.query.type === 'add'"
+        >
           <el-option
             v-for="item in structBaseTemplate"
             :key="item.tempPath"
             :label="item.tempName"
-            :value="item.tempPath">
+            :value="item.tempPath"
+          >
             <span style="float: left">{{ item.tempName }}</span>
             <span style="float: right; color: #8492a6; font-size: 13px">{{ item.tempPath }}</span>
           </el-option>
@@ -85,18 +96,26 @@
       </el-row>
     </el-main>
 
-    <el-dialog
-      title="请输入备注内容"
-      :visible.sync="dialogVisibleOfComBackup"
-      width="30%">
-      <el-input placeholder="请输入备注内容" v-model="compBackupinfo" clearable>
-      </el-input>
+    <el-dialog title="请输入备注内容" :visible.sync="dialogVisibleOfComBackup" width="30%">
+      <el-input placeholder="请输入备注内容" v-model="compBackupinfo" clearable></el-input>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisibleOfComBackup = false">取 消</el-button>
-        <el-button type="primary" @click="clickHandleSaveComp">确 定</el-button>
+        <el-button type="primary" @click="clickHandleSaveComp(false)">确 定</el-button>
       </span>
     </el-dialog>
-
+    <el-dialog title="生成构件框架" :visible.sync="compSpbShowDialog" width="30%">
+      <el-form ref="ruleForm" v-model="compSpbForm" label-position="right" label-width="90px">
+        <el-form-item label="头文件模板" prop="headerTemplateFile">
+          <form-item-type v-model="compSpbForm.headerTemplateFile" lableType="uploadComm"></form-item-type>
+        </el-form-item>
+        <el-form-item label="源文件模板" prop="srcTemplateFile">
+          <form-item-type v-model="compSpbForm.srcTemplateFile" lableType="uploadComm"></form-item-type>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="clickHandleSaveComp(true)">生 成</el-button>
+      </div>
+    </el-dialog>
   </el-container>
 </template>
 <script>
@@ -106,37 +125,61 @@ import { mapGetters } from "vuex";
 import paramsDefine from "./params-define";
 import paramsFiles from "../params-files";
 import { menuTag } from "@/util/closeRouter";
+import { createSpbFrameFile } from "@/api/comp/componentdetail";
+import formItemType from "@/views/comp/code-editor/comp-params/form-item-type";
 import { getObjType, deepClone } from "@/util/util";
 import {
   handleSaveCompMap,
   saveComp,
   getCompFiles,
-    analysisXmlFile,
-    analysisBaseTemplateXmlFile
+  analysisXmlFile,
+  analysisBaseTemplateXmlFile
 } from "@/api/comp/component";
 import { saveStructMap } from "@/api/libs/structlibs";
 export default {
   //注入依赖，调用this.reload();用于刷新页面
   inject: ["reload"],
   //import引入的组件需要注入到对象中才能使用
-  components: { "params-define": paramsDefine, "params-files": paramsFiles },
+  components: {
+    "params-define": paramsDefine,
+    "params-files": paramsFiles,
+    "form-item-type": formItemType
+  },
   data() {
     //这里存放数据
     return {
       structBaseTemplate: [],
-      compBackupinfo: '',
+      compBackupinfo: "",
       dialogVisibleOfComBackup: false,
-      selectBaseTemplateValue: '',
+      selectBaseTemplateValue: "",
       //构件基本信息
       component: {},
       // 文件列表
       fileList: {},
-      saveDBXmlMaps: {}
+      saveDBXmlMaps: {},
+      //生成构件框架
+      compSpbShowDialog: false,
+      compSpbForm: {
+        spbModelXmlFile: "",
+        headerTemplateFile: "",
+        srcTemplateFile: "",
+        saveDir: ""
+      }
     };
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["userInfo", "saveXmlMaps", "headerFile", "analysisBaseFile", "allBaseTemplate", "tagWel", "tagList", "tag", "website"])
+    ...mapGetters([
+      "userInfo",
+      "saveXmlMaps",
+      "headerFile",
+      "analysisBaseFile",
+      "allBaseTemplate",
+      "tagWel",
+      "tagList",
+      "tag",
+      "website"
+    ])
   },
   //监控data中的数据变化
   watch: {
@@ -170,22 +213,25 @@ export default {
       deep: true
     },
     selectBaseTemplateValue: {
-        handler: function(params) {
-            for (let i in this.structBaseTemplate) {
-                if (this.structBaseTemplate[i].tempPath === params.tempPath || this.structBaseTemplate[i].tempPath === params){
-                    this.changeBaseTemplate( this.structBaseTemplate[i].tempPath);
-                }
-            }
-            // this.changeBaseTemplate(selectBaseTemplateValue);
-        },
-        deep: true
+      handler: function(params) {
+        for (let i in this.structBaseTemplate) {
+          if (
+            this.structBaseTemplate[i].tempPath === params.tempPath ||
+            this.structBaseTemplate[i].tempPath === params
+          ) {
+            this.changeBaseTemplate(this.structBaseTemplate[i].tempPath);
+          }
+        }
+        // this.changeBaseTemplate(selectBaseTemplateValue);
+      },
+      deep: true
     }
   },
   //方法集合
   methods: {
     changeSaveDBXmlMaps(saveComp, nameType) {
-        // console.log("saveComp",saveComp)
-        // console.log("nameType",nameType)
+      // console.log("saveComp",saveComp)
+      // console.log("nameType",nameType)
       let dBXmlMaps = this.saveDBXmlMaps;
       if (JSON.stringify(dBXmlMaps) === "{}") {
         dBXmlMaps = deepClone(this.saveXmlMaps);
@@ -201,22 +247,25 @@ export default {
       // console.log("Date.parse(new Date()) - changeSaveDBXmlMaps",Date.parse(new Date()))
     },
     inputCompBackupInfo() {
-      this.dialogVisibleOfComBackup = true
+      this.dialogVisibleOfComBackup = true;
     },
     sleep(time) {
-        return new Promise((resolve) => setTimeout(resolve, time));
+      return new Promise(resolve => setTimeout(resolve, time));
     },
-    saveCurrentIODate(){
+    saveCurrentIODate() {
       // console.log("66666666-saveCurrentIODate")
-      let saveDBXmlMapsTemp = JSON.parse(JSON.stringify(this.saveDBXmlMaps))
-      this.$store.dispatch("saveCurrentIODate", saveDBXmlMapsTemp.xmlEntityMaps[0].xmlEntityMaps);
+      let saveDBXmlMapsTemp = JSON.parse(JSON.stringify(this.saveDBXmlMaps));
+      this.$store.dispatch(
+        "saveCurrentIODate",
+        saveDBXmlMapsTemp.xmlEntityMaps[0].xmlEntityMaps
+      );
       /*this.sleep(500).then(() => {
           console.log("66666666")
           let saveDBXmlMapsTemp = JSON.parse(JSON.stringify(this.saveDBXmlMaps))
           this.$store.dispatch("saveCurrentIODate", saveDBXmlMapsTemp);
       })*/
     },
-    clickHandleSaveComp() {
+    clickHandleSaveComp(compSpb) {
       //存构件基本信息
       const loading = this.$loading({
         lock: true,
@@ -224,12 +273,12 @@ export default {
         spinner: "el-icon-loading",
         background: "rgba(0, 0, 0, 0.7)"
       });
-      this.component.compBackupinfo = this.compBackupinfo
+      this.component.compBackupinfo = this.compBackupinfo;
       saveComp(this.component).then(res => {
         let comp = res.data.data;
         this.$refs.saveAlgorithmFiles.fetchSavefiles(comp).then(() => {
           this.$refs.saveTestFiles.fetchSavefiles(comp).then(() => {
-            this.$refs.savePlatformFiles.fetchSavefiles(comp).then(res => {
+            this.$refs.savePlatformFiles.fetchSavefiles(comp).then(resFiles => {
               //保存构件文件//保存图标文件
               // console.log("this.userInfo.username",this.userInfo.username)
               this.$refs.saveCompImg.saveCompImg(comp);
@@ -238,7 +287,7 @@ export default {
               // 需要更改函数路径
               saveComp.xmlEntityMaps[0].xmlEntityMaps.forEach(item => {
                 if (item.lableName === "函数路径") {
-                  item.attributeMap.name = res.data.data;
+                  item.attributeMap.name = resFiles.data.data;
                 }
               });
               if (this.headerFile.structParams) {
@@ -246,16 +295,35 @@ export default {
                   this.$store.dispatch("clearParseHeaderObj");
                 });
               }
-              let userCurrent = this.userInfo.username
-              handleSaveCompMap(saveComp, "Component", comp.id, userCurrent).then(res => {
-                /*this.$router.push({
-                  path: "/comp/showComp/index"
-                });*/
-                this.reload();
-                loading.close();
-                //保存之后关闭路由
-                let tag1 = this.tag
-                menuTag(this.$route.path, "remove", this.tagList, tag1);
+              let userCurrent = this.userInfo.username;
+              handleSaveCompMap(
+                saveComp,
+                "Component",
+                comp.id,
+                userCurrent
+              ).then(resComp => {
+                //需不需要生成构件框架
+                if (compSpb) {
+                  this.compSpbForm.spbModelXmlFile = resComp.data.data;
+                  this.compSpbForm.saveDir = resFiles.data.data;
+                  createSpbFrameFile(this.compSpbForm)
+                    .then(res => {
+                      this.reload();
+                      loading.close();
+                      menuTag(this.$route.path, "removeOpen", this.tagList, {
+                        value: "/comp/component"
+                      });
+                    })
+                    .catch(cat => {
+                      loading.close();
+                    });
+                } else {
+                  this.reload();
+                  loading.close();
+                  menuTag(this.$route.path, "removeOpen", this.tagList, {
+                    value: "/comp/component"
+                  });
+                }
               });
             });
           });
@@ -263,35 +331,40 @@ export default {
       });
     },
     changeBaseTemplate(tempPath) {
-        analysisXmlFile(tempPath).then(response => {
-            // console.log("response", response);
-            this.$store.dispatch("setFetchStrInPointer");
-            //保存加载的数据
-            this.$store.dispatch("setSaveXmlMaps", response.data.data)
-                .catch(() => {
-                    this.$message({
-                        message: "保存加载的数据出错",
-                        type: "error"
-                    });
-                });
+      analysisXmlFile(tempPath).then(response => {
+        // console.log("response", response);
+        this.$store.dispatch("setFetchStrInPointer");
+        //保存加载的数据
+        this.$store.dispatch("setSaveXmlMaps", response.data.data).catch(() => {
+          this.$message({
+            message: "保存加载的数据出错",
+            type: "error"
+          });
         });
+      });
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
     //如果是新增构件
     if (this.$route.query.type === "add") {
-        // this.selectBaseTemplateValue = this.$route.query.defauleBaseTemplate[0].tempName
-        let allBaseTemplateTemp = JSON.parse(JSON.stringify(this.allBaseTemplate))
-        for (const i in allBaseTemplateTemp) {
-            //筛选出构件模板
-            if (allBaseTemplateTemp[i].tempType === "构件模型"){
-                this.structBaseTemplate.push(allBaseTemplateTemp[i])
-            }
+      // this.selectBaseTemplateValue = this.$route.query.defauleBaseTemplate[0].tempName
+      let allBaseTemplateTemp = JSON.parse(
+        JSON.stringify(this.allBaseTemplate)
+      );
+      for (const i in allBaseTemplateTemp) {
+        //筛选出构件模板
+        if (allBaseTemplateTemp[i].tempType === "构件模型") {
+          this.structBaseTemplate.push(allBaseTemplateTemp[i]);
         }
-        this.structBaseTemplate = JSON.parse(JSON.stringify(this.structBaseTemplate))
-        //默认显示模板的最后一条
-        this.selectBaseTemplateValue = this.structBaseTemplate[this.structBaseTemplate.length - 1]
+      }
+      this.structBaseTemplate = JSON.parse(
+        JSON.stringify(this.structBaseTemplate)
+      );
+      //默认显示模板的最后一条
+      this.selectBaseTemplateValue = this.structBaseTemplate[
+        this.structBaseTemplate.length - 1
+      ];
     }
     //如果是编辑或者复制
     if (this.$route.query.compId != undefined) {
@@ -301,7 +374,7 @@ export default {
         // console.log("res",res)
         //基本构件
         //备注信息赋值
-        this.compBackupinfo =  res.data.data.comp.compBackupinfo
+        this.compBackupinfo = res.data.data.comp.compBackupinfo;
         this.component = res.data.data.comp;
         this.$store.dispatch("setSaveXmlMaps", res.data.data.compBasicMap);
         this.fileList = res.data.data;
