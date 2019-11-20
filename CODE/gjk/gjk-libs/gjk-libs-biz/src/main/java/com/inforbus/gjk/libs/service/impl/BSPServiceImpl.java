@@ -109,7 +109,8 @@ public class BSPServiceImpl extends ServiceImpl<BSPMapper, BSP> implements BSPSe
 
 	@Override
 	public IPage<BSPDTO> getBSPDTOPage(Page<BSP> bspPage, BSP bsp) {
-		List<BSP> bsps = getBSPPage(bspPage, bsp).getRecords();
+		IPage<BSP> iPage = getBSPPage(bspPage, bsp);
+		List<BSP> bsps = iPage.getRecords();
 
 		List<BSPDTO> bspDTOs = new ArrayList<>();
 		for (BSP soft : bsps) {
@@ -118,6 +119,8 @@ public class BSPServiceImpl extends ServiceImpl<BSPMapper, BSP> implements BSPSe
 		}
 		Page<BSPDTO> bspDTOPage = new Page<BSPDTO>(bspPage.getCurrent(), bspPage.getSize());
 		bspDTOPage.setRecords(bspDTOs);
+		bspDTOPage.setPages(iPage.getPages());
+		bspDTOPage.setTotal(iPage.getTotal());
 		return bspDTOPage;
 	}
 

@@ -454,7 +454,8 @@ export default {
       this.tableLoading = true;
       fetchList(this.listQuery).then(response => {
         this.tableData = response.data.data.records;
-        this.page.total = response.data.data.records.length;
+        // this.page.total = response.data.data.records.length;
+        this.page.total = response.data.data.total;
         this.tableLoading = false;
       });
     },
