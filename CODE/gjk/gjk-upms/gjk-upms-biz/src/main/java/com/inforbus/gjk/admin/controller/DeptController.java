@@ -111,4 +111,9 @@ public class DeptController {
 		sysDept.setUpdateTime(LocalDateTime.now());
 		return new R<>(sysDeptService.updateDeptById(sysDept));
 	}
+
+	@GetMapping("/deptCheck/{deptId}")
+	public R deptCheck(@PathVariable("deptId")String deptId){
+		return sysDeptService.deptCheck(deptId);
+	}
 }

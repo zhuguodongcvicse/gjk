@@ -19,6 +19,7 @@ package com.inforbus.gjk.admin.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.inforbus.gjk.admin.api.dto.DeptTree;
 import com.inforbus.gjk.admin.api.entity.SysDept;
+import com.inforbus.gjk.common.core.util.R;
 
 import java.util.List;
 
@@ -69,5 +70,7 @@ public interface SysDeptService extends IService<SysDept> {
 	 * @return 成功、失败
 	 */
 	Boolean updateDeptById(SysDept sysDept);
+
+	R deptCheck(String deptId);
 
 }

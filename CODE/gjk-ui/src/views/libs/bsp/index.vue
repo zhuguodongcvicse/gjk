@@ -459,11 +459,13 @@ export default {
       });
     },
     currentChange(val) {
+      console.log(val)
       this.page.current = val;
       this.listQuery.current = val;
       this.getList();
     },
     sizeChange(val) {
+       console.log(val)
       this.page.size = val;
       this.listQuery.size = val;
       this.getList();

@@ -11,6 +11,10 @@ export const tableOption = {
   editBtn: false,
   delBtn: false,
   dialogWidth: '50%',
+  props: {
+    label: 'label',
+    value: 'value'
+  },
   column: [{
     width: 150,
     label: '数据值',
