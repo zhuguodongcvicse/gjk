@@ -37,4 +37,6 @@ public interface SysDeptMapper extends BaseMapper<SysDept> {
 	 * @return 数据列表
 	 */
 	List<SysDept> listDepts();
+
+	int getUserCountByDeptId(String deptId);
 }

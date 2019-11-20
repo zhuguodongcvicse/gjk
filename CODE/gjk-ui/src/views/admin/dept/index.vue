@@ -70,7 +70,7 @@
 </template>
 
 <script>
-  import {addObj, delObj, fetchTree, getObj, putObj} from '@/api/admin/dept'
+  import {addObj, delObj, fetchTree, getObj, putObj, deptCheck} from '@/api/admin/dept'
   import {mapGetters} from 'vuex'
 
   export default {
@@ -186,23 +186,34 @@
         this.formStatus = 'create'
       },
       handleDelete() {
-        this.$confirm('此操作将永久删除, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          delObj(this.currentId).then(() => {
-            this.getList()
-            this.currentId = undefined
-            this.resetForm()
-            this.onCancel()
+        deptCheck(this.currentId).then((req) => {
+          if(!req.data.data){
+            this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+              delObj(this.currentId).then(() => {
+                this.getList()
+                this.currentId = undefined
+                this.resetForm()
+                this.onCancel()
+                this.$notify({
+                  title: '成功',
+                  message: '删除成功',
+                  type: 'success',
+                  duration: 2000
+                })
+              })
+            })
+          }else{
             this.$notify({
-              title: '成功',
-              message: '删除成功',
-              type: 'success',
+              title: '警告',
+              message: '请先移除部门下的用户',
+              type: 'warning',
               duration: 2000
             })
-          })
+          }
         })
       },
       update() {

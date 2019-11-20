@@ -45,3 +45,11 @@ export function putObj (obj) {
     data: obj
   })
 }
+
+export function deptCheck (deptId) {
+  return request({
+    url: '/admin/dept/deptCheck/'+deptId,
+    method: 'get'
+  })
+}
+

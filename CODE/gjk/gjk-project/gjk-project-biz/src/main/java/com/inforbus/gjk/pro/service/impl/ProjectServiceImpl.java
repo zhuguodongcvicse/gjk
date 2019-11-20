@@ -340,10 +340,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(statusCode);
-        if(statusCode!=200){
-            return new R<>(CommonConstants.FAIL,"sonar创建项目失败", null);
-        }
+//        System.out.println(statusCode);
+//        if(statusCode!=200){
+//            return new R<>(CommonConstants.FAIL,"sonar创建项目失败", null);
+//        }
         //执行sonar-scanner命令
         //文件所在盘符
         String diskCharacter = filePath.split(":")[0]+":";
