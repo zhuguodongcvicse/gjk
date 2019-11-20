@@ -144,6 +144,7 @@ export default {
     },
     storageApplyDialogStates() {
       this.storageApplyDialog = false;
+      this.getList(this.page);
     },
     getList(page, params) {
       this.tableLoading = true;

@@ -386,7 +386,7 @@
                 }
             } */
         }
-    /*     if (customButtons) {
+      /*   if (customButtons) {
             for (var n in customButtons) {
                 buttons[n] = customButtons[n];
             }

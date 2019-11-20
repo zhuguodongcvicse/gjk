@@ -2,6 +2,13 @@
 	var createElement = function(options) {
 		options = options || {};
 		var element = document.createElement(options.tagName || 'div');
+		/* if (options.class == 'input-group input-group-sm col-sm-7') {
+			element.setAttribute("readonly","readonly")
+		} */
+		if (options.parent.innerText == 'IP') {
+			element.setAttribute("id","IP")
+			element.removeAttribute("readonly")
+		}
 		if(options.class) {
 			$(element).addClass(options.class);
 		}
@@ -53,7 +60,7 @@
 				parent: parent
 			});
 			this.input = input;
-
+			// console.log("input",input.parentNode)
 			if(property.readonly) {
 				input.setAttribute('readonly', 'readonly');
 			}
@@ -617,19 +624,23 @@
 			var label = Q.createElement({
 				parent: formItem,
 				tagName: 'label',
-				class: 'col-sm-4 control-label font-small',
+				class: 'col-sm-5 control-label font-small',
 				html: getI18NString(property.displayName || property.name)
 			});
 			var inputDIV = Q.createElement({
 				parent: formItem,
-				class: "input-group input-group-sm col-sm-8"
+				class: "input-group input-group-sm col-sm-7"
 			});
-
+			
+			// var aa = $("#form-control")
+            // console.log("aa",aa.document)
 			var cellEditor = createCellEditor(property, inputDIV, function() {
+				// console.log("this.getValue(property)",this.getValue(property))
 				return this.getValue(property);
 			}.bind(this), function(editor) {
 				this.onValueChange(editor.value, property);
 			}.bind(this));
+			// console.log("cellEditor",cellEditor)
 
 			var key = getPropertyKey(property.name, property.propertyType);
 			if(!this._cellEditors) {
@@ -701,7 +712,7 @@
 		 * @param name
 		 * @param properties
 		 */
-		createItemGroup: function(name, properties, boardType) {
+		createItemGroup: function(name, properties) {
 			var group = Q.createElement({
 				class: 'class-group',
 				parent: this.dom
@@ -712,89 +723,23 @@
 				html: name
 			});
 			for(var name in properties) {
+				// console.log("properties",name,properties)
 				this.createItem(group, properties[name]);
 			}
-			//console.log("面板",currentBoard)
-			//if(typeof(currentBoard) != 'undefined' && currentBoard.boardType == 1){
-			if(boardType == 1){
-				Q.createElement({
-					tagName: 'h4',
-					parent: group,
-					html: '外部互联'
-				});
-				//表格内容 
-				//var arr0=['输入','双路','输入','双路','输入',];
-				var item0='';
-				// console.log("currentBoard", currentBoard)
-				//console.log("currentBoard.outLinkArr.length",currentBoard.outLinkArr.length)
-				for (const i in clickBoardList) {
-					// console.log("clickBoardList[i]", clickBoardList[i])
-					if(clickBoardList[i].boardType == 1 && clickBoardList[i].ifClick == 0 && clickBoardList[i].outLinkArr != null && clickBoardList[i].outLinkArr.length != 0){
-						//var j=i+1;
-						//var item1='<tr><td>'+backBoardInfs[i]+'</td><td>'+ioTypeBySelect[i]+'</td></tr>';
-						// console.log("clickBoardList[i].outLinkArr", clickBoardList[i].outLinkArr)
-						for (const j in clickBoardList[i].outLinkArr) {
-							var showLinkType
-							for (const k in fpgaBoardLinkType) {
-								if (fpgaBoardLinkType[i].value == clickBoardList[i].outLinkArr[j][2]) {
-									showLinkType = fpgaBoardLinkType[i].label
-								}
-							}
-							if(clickBoardList[i].outLinkArr[j][2] == '1'){
-								var item1='<tr><td>'+clickBoardList[i].outLinkArr[j][0].ID+'</td><td>'+clickBoardList[i].outLinkArr[j][1].ID+'</td><td>'+ showLinkType +'</td><td>'+clickBoardList[i].outLinkArr[j][3].ID+'</td><td><button type="button" class="btn btn-default" data-toggle="modal" onclick="deleteExternalLink(this);">删除</button></td></tr>'
-								item0=item0+item1;
-							} else {
-								var item1='<tr><td>'+clickBoardList[i].outLinkArr[j][0].ID+'</td><td>'+clickBoardList[i].outLinkArr[j][1].ID+'</td><td>'+ showLinkType +'</td><td>'+clickBoardList[i].outLinkArr[j][3]+'</td><td><button type="button" class="btn btn-default" data-toggle="modal" onclick="deleteExternalLink(this);">删除</button></td></tr>'
-								item0=item0+item1;
-							}
-						}
-					}
+			// var html1='<button type="button" class="btn btn-default propertypane_tablebtn_14s"  onclick="submitSetting();">保存</button>';
+			/* Q.createElement({
+				tagName: 'button1',
+				parent: group,
+				html: html1
+			}); */
+			/* console.log("properties",properties)
+			for (const i in properties) {
+				for (const j in properties[i]) {
+					console.log("properties[i]",properties[i][j])
 				}
-				
-				//var html1='<br/><div style="height:200px;overflow-y:auto;"><table class="table table-bordered"><tr><th>接口名称</th><th>接口类型</th></tr><tbody> <tr> <td>接口1</td> <td>输入</td> </tr> <tr> <td>接口2</td> <td>双路</td> </tr> <tr><td>接口2</td> <td>双路</td></tr><tr><td>接口3</td> <td>双路</td></tr><tr><td>接口4</td> <td>双路</td></tr></tbody></table></div>';
-				var html1='<div class="propertypane_table_14s"><table class="table table-bordered table_14s"><tr><th>CPU</th><th>CPU接口</th><th>LinkType</th><th>后板卡接口</th><th>操作</th></tr><tbody class="tbody1_14s" id="tbody1"> '+item0+'</tbody></table></div>';
-				
-				Q.createElement({
-					tagName: 'button1',
-					parent: group,
-					html: '<button type="button" class="btn btn-defaul propertypane_tablebtn_14s" data-toggle="modal" data-target="#myModal"  onclick="loadFpgaBoardDatas();">新增</button>'
-				});
-				Q.createElement({
-					tagName: 'table1',
-					parent: group,
-					html: html1
-				});
-				
-
-				//切换CPU时更改接口内容
-				var selectStartCpu = document.getElementById("selectStartCpu");
-			
-				selectStartCpu.onchange=function(){
-					selectStartCpuValue = selectStartCpu.value;
-					for (const i in currentBoard.chipList) {
-						switch(selectStartCpuValue){
-							case currentBoard.chipList[i].ID.toString() : 
-								$("#selectStartInf").empty();
-								var selectHtml = '';
-								var ifExistInf = []
-								for (const j in allInfOfFrontBoard) {
-									if (allInfOfFrontBoard[j].uniqueId.indexOf(currentBoard.chipList[i].uniqueId) != -1){
-										ifExistInf.push(allInfOfFrontBoard[j])
-										var sHtml = '<option>' + allInfOfFrontBoard[j].ID + '</option>';
-										selectHtml = selectHtml + sHtml;
-									}
-								}
-								if(ifExistInf.length == 0){
-									selectHtml = '<option>该芯片无可选接口</option>'
-								}
-								$("#selectStartInf").html(selectHtml);
-							break;
-						}
-					}
-				};
-				
-				
+			//console.log("properties[i]",properties[i])
 			}
+			console.log("name",name) */
 		},
 		register: function(options) {
 			registerProperties(this._propertyMap, options);
@@ -824,7 +769,6 @@
 		},
 		_getProperties: function(data) {
 			var properties = this.getProperties(data);
-			//console.log("properties",properties)
 			return new PropertyGroup(properties);
 		},
 		isEditable: function(element) {
@@ -837,7 +781,6 @@
 				return this._datas;
 			},
 			set: function(datas) {
-				//console.log("datas",datas)
 				if(this._datas == datas) {
 					return;
 				}
@@ -850,23 +793,18 @@
 					return;
 				}
 				this._datas = datas;
+				// console.log("datas",datas)
 				if(datas.length == 1) {
 					this.setVisible(true);
 
 					this.propertyGroup = this._getProperties(datas[0]);
-					//console.log("this",this)
-					//console.log("datas[0]",datas[0])
-					//console.log("this._getProperties(datas[0])",this._getProperties(datas[0]))
 
+					// console.log("this.propertyGroup",this.propertyGroup)
 					var group = this.propertyGroup.group;
-					var temp = this
-					setTimeout(function () {
-						for(var groupName in group) {
-							temp.createItemGroup(groupName, group[groupName], datas[0].properties.boardType);
-						}
-						//window.location.reload();
-					}, 350);
-					
+					// console.log("group",group)
+					for(var groupName in group) {
+						this.createItemGroup(groupName, group[groupName]);
+					}
 				}
 			}
 		}

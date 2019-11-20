@@ -11,7 +11,7 @@
         <span>是否将以下结构体提交入库？</span>
       </el-header>
       <el-main class="storageapply_main_form">
-        <el-form size="mini" label-position="right" label-width="100px" :model="form" :rules="projectRules">
+        <el-form size="mini" label-position="right" label-width="100px" ref="applyForm" :model="form" :rules="projectRules">
           <el-form-item label="审批人" prop="applyUser">
             <el-select v-model="form.applyUser" placeholder="请选择">
               <el-option
@@ -46,7 +46,7 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="dialogStateShow(false)">取 消</el-button>
-      <el-button type="primary" @click="storageApplyComp">入库</el-button>
+      <el-button type="primary" @click="storageApplyComp('applyForm')">入库</el-button>
     </span>
   </el-dialog>
 </template>
@@ -129,8 +129,8 @@ export default {
       });
     },
     //提交入库的方法
-    storageApplyComp() {
-        this.$refs.form.validate((valid, object) => {
+    storageApplyComp(vali) {
+        this.$refs[vali].validate((valid, object) => {
             if (valid) {
                 let approval = {};
                 approval.userId = this.userInfo.userId;

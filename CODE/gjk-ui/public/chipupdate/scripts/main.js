@@ -540,11 +540,11 @@ function initEditor(editor) {
 			// console.log("graph.toJSON()", graph.toJSON())
 			var data = graph.getElement(evt);
 			console.log("data",data)
-			var infName = data._mn3.infName;
-			// var infRate = data._mn3.infRate;
-			var id = data._mn3.id;
-			// var infType = data._mn3.infType;
-			var ioType = data._mn3.ioType;
+			var infName = data.properties.infName;
+			// var infRate = data.properties.infRate;
+			var id = data.properties.id;
+			// var infType = data.properties.infType;
+			var ioType = data.properties.ioType;
 			data.set('infname', infName);
 			// data.set('infRate', infRate);
 			data.set('id', id);

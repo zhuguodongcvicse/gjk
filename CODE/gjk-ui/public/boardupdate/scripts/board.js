@@ -1028,32 +1028,32 @@ function initEditor(editor) {
 			// console.log("data",data);
 			// console.log("typeof(data)",typeof(data));
 			if (typeof (data) != 'undefined') {
-				if (data._mn3.chipName != null) {
-					data.set('chipName', data._mn3.chipName);
-					data.set('coreNum', data._mn3.coreNum);
-					data.set('memSize', data._mn3.memSize);
-					data.set('recvRate', data._mn3.recvRate);
-					data.set('hrTypeName', data._mn3.hrTypeName);
+				if (data.properties.chipName != null) {
+					data.set('chipName', data.properties.chipName);
+					data.set('coreNum', data.properties.coreNum);
+					data.set('memSize', data.properties.memSize);
+					data.set('recvRate', data.properties.recvRate);
+					data.set('hrTypeName', data.properties.hrTypeName);
 				}
 
-				// data.set('boardname', data._mn3.boardName);
-				if (data._mn3.boardType == 0) {
+				// data.set('boardname', data.properties.boardName);
+				if (data.properties.boardType == 0) {
 					data.set('showBoardType', 'calculateBoard');
 				}
-				if (data._mn3.boardType == 1) {
+				if (data.properties.boardType == 1) {
 					data.set('showBoardType', 'FpgaBoard');
 				}
-				if (data._mn3.boardType == 2) {
+				if (data.properties.boardType == 2) {
 					data.set('showBoardType', 'exchangeBoard');
 				}
-				if (data._mn3.showBoardType == 3) {
+				if (data.properties.showBoardType == 3) {
 					data.set('showBoardType', 'interfaceBoard');
 				}
-				if (data._mn3.infName != null) {
-					data.set('infName', data._mn3.infName);
-					data.set('infRate', data._mn3.infRate);
-					data.set('opticalNum', data._mn3.opticalNum);
-					data.set('ioType', data._mn3.ioType);
+				if (data.properties.infName != null) {
+					data.set('infName', data.properties.infName);
+					data.set('infRate', data.properties.infRate);
+					data.set('opticalNum', data.properties.opticalNum);
+					data.set('ioType', data.properties.ioType);
 				}
 
 				console.log("data", data);

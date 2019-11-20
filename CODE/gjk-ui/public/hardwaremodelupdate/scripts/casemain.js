@@ -1387,11 +1387,11 @@ function initEditor(editor) {
 				} */
 			}
 			if (data.properties.chipName != null) {
-				data.set('chipName', data._mn3.chipName);
-				data.set('coreNum', data._mn3.coreNum);
-				data.set('memSize', data._mn3.memSize);
-				data.set('hrTypeName', data._mn3.hrTypeName);
-				data.set('recvRate', data._mn3.recvRate);
+				data.set('chipName', data.properties.chipName);
+				data.set('coreNum', data.properties.coreNum);
+				data.set('memSize', data.properties.memSize);
+				data.set('hrTypeName', data.properties.hrTypeName);
+				data.set('recvRate', data.properties.recvRate);
 			}
 			if (data.properties.infName != null) {
 				var infPropertyList = document.getElementsByClassName('form-control')
@@ -1399,28 +1399,28 @@ function initEditor(editor) {
 				infPropertyList.item(1).setAttribute("readonly","readonly")
 				infPropertyList.item(2).setAttribute("readonly","readonly")
 				// console.log("infPropertyList",infPropertyList)
-				data.set('infName', data._mn3.infName);
-				data.set('infRate', data._mn3.infRate);
-				data.set('opticalNum', data._mn3.opticalNum);
+				data.set('infName', data.properties.infName);
+				data.set('infRate', data.properties.infRate);
+				data.set('opticalNum', data.properties.opticalNum);
 			}
 			if (data.properties.boardType != null) {
 				var boardPropertyList = document.getElementsByClassName('form-control')
 				boardPropertyList.item(0).setAttribute("readonly","readonly")
 				boardPropertyList.item(1).setAttribute("readonly","readonly")
 				// console.log("boardPropertyList",boardPropertyList)
-				if (data._mn3.boardType == 0) {
+				if (data.properties.boardType == 0) {
 					data.set('showBoardType', 'calculateBoard');
 				}
-				if (data._mn3.boardType == 1) {
+				if (data.properties.boardType == 1) {
 					data.set('showBoardType', 'FpgaBoard');
 				}
-				if (data._mn3.boardType == 2) {
+				if (data.properties.boardType == 2) {
 					data.set('showBoardType', 'exchangeBoard');
 				}
-				if (data._mn3.boardType == 3) {
+				if (data.properties.boardType == 3) {
 					data.set('showBoardType', 'interfaceBoard');
 				}
-				data.set('boardName', data._mn3.boardName);
+				data.set('boardName', data.properties.boardName);
 			}
 			if (data.properties.caseName != null) {
 				var casePropertyList = document.getElementsByClassName('form-control')
@@ -1428,8 +1428,8 @@ function initEditor(editor) {
 				casePropertyList.item(1).setAttribute("readonly","readonly")
 				// console.log("casePropertyList",casePropertyList)
 			}
-			// data.set('rackname', data._mn3.caseName);
-			// data.set('boardnum', data._mn3.bdnum);
+			// data.set('rackname', data.properties.caseName);
+			// data.set('boardnum', data.properties.bdnum);
 		}
 		if (image == 'images/Chip.svg') {
 			return {

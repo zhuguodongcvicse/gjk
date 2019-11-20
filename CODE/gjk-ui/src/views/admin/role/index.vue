@@ -190,7 +190,7 @@
       handleDelete(row, index) {
         var _this = this
         roleCheck(row.roleId).then((res) =>{
-          if(!res.data){
+          if(!res.data.data){
             this.$confirm('是否确认删除名称为"' + row.roleName + '"'+ '"的数据项?', '警告', {
               confirmButtonText: '确定',
               cancelButtonText: '取消',
