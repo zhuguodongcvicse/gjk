@@ -211,7 +211,7 @@ public class StructlibsServiceImpl extends ServiceImpl<StructlibsMapper, Structl
     public List<StructDTO> getStructTypeAll() {
         List<StructDTO> dto = Lists.newArrayList();
         for (Structlibs list : baseMapper
-                .selectList(Wrappers.<Structlibs>query().lambda().eq(Structlibs::getParentId, "0"))) {
+        		.selectList(Wrappers.<Structlibs>query().lambda().eq(Structlibs::getParentId, "0").eq(Structlibs::getStorageFlag, "2"))) {
             dto.add(new StructDTO(list));
         }
         return dto;
