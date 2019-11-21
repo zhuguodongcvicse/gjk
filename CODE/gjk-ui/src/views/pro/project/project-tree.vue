@@ -897,12 +897,12 @@ export default {
         Vue.set(this.formLabelAlign, "hsmTempId", baseTempIds.hsmTempId);
         this.isUpdataTemp = true;
       } else if (item == "静态检查"){
-        
+
         let filePath = { filePath: "" , fileName: ""};
         filePath.filePath = this.fileData.filePath + "\\" + this.fileData.fileName;
         filePath.fileName = this.fileData.fileName;
         staticInspect(filePath).then(response => {
-          window.open("http://localhost:9000/dashboard?id="+response.data.data, "_blank");  
+          window.open("http://localhost:9000/dashboard?id="+response.data.data, "_blank");
         })
       }
     },
@@ -977,10 +977,10 @@ export default {
         }
       }
       this.platformFlag = false;
-      if (disabledPlatformName != "") {
-        this.platformFlag = true;
-        this.platformNameTs = disabledPlatformName;
-      }
+      // if (disabledPlatformName != "") {
+      //   this.platformFlag = true;
+      //   this.platformNameTs = disabledPlatformName;
+      // }
     },
     dialogBeforeClose(done) {
       done();
@@ -1053,13 +1053,13 @@ export default {
         })
     },
     changeProcedureSoftwareId() {
-      if (this.softwareSelectString.length == 0) {
-        this.$message({
-          message: "请至少选择一个软件框架",
-          type: "error"
-        });
-        return;
-      }
+      // if (this.softwareSelectString.length == 0) {
+        // this.$message({
+        //   message: "请至少选择一个软件框架",
+        //   type: "error"
+        // });
+        // return;
+      // }
       // console.log("修改软件构件库保存：", this.softwareSelectString);
       let prodetail = {};
       prodetail.id = this.procedureId;
