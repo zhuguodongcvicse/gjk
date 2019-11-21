@@ -1,18 +1,6 @@
 package com.inforbus.gjk.pro.service.impl;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
+import java.io.*;
 import java.net.URLDecoder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
+import org.apache.commons.io.FileUtils;
 import com.inforbus.gjk.admin.api.entity.BaseTemplate;
 import com.inforbus.gjk.pro.api.dto.BaseTemplateIDsDTO;
 import com.inforbus.gjk.pro.api.entity.*;
@@ -38,6 +26,7 @@ import org.ho.yaml.Yaml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -83,7 +72,7 @@ import com.inforbus.gjk.pro.mapper.ManagerMapper;
 import com.inforbus.gjk.pro.mapper.PartPlatformSoftwareMapper;
 import com.inforbus.gjk.pro.mapper.ProjectMapper;
 import com.inforbus.gjk.pro.service.ManagerService;
-
+import org.springframework.core.io.ClassPathResource;
 import lombok.AllArgsConstructor;
 
 /**
@@ -1022,7 +1011,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	private R getMakefileTypeByProperties(String platformName) {
 		String makefileType = null;
 		// 获取当前类的路径
-		String filePath = ManagerServiceImpl.class.getResource("").getPath();
+/*		String filePath = ManagerServiceImpl.class.getResource("").getPath();
 		try {
 			// 中文乱码问题
 			filePath = URLDecoder.decode(filePath, "utf-8");
@@ -1034,13 +1023,27 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// 找到bootstrap.properties的地址
 		filePath = filePath.substring(0, filePath.indexOf("target/classes/") + "target/classes/".length())
 				+ "platformType.yml";
-		File dumpFile = new File(filePath);
+		File dumpFile = new File(filePath);*/
 
+
+		File file = null;
 		Map father;
 		try {
-			father = Yaml.loadType(dumpFile, HashMap.class);
+			// 通过流的方式来读取配置文件，解决打成jar包后无法读取配置文件的问题
+			ClassPathResource classPathResource = new ClassPathResource("platformType.yml");
+			InputStream inputStream = classPathResource.getInputStream();
+			// 建立临时文件
+			file = File.createTempFile("bootstrap", ".properties");
+			// 将信息写入临时文件
+			FileUtils.copyInputStreamToFile(inputStream, file);
+
+
+
+
+
+			father = Yaml.loadType(file, HashMap.class);
 			makefileType = father.get(platformName).toString();
-		} catch (FileNotFoundException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("读取配置文件失败，请检查配置文件中" + platformName + "配置是否正确");
 			return new R<>(CommonConstants.FAIL, "读取配置文件失败，请检查配置文件中" + platformName + "配置是否正确", null);

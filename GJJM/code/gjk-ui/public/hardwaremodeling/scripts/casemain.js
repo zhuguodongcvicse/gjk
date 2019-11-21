@@ -22,6 +22,7 @@ var backAllCaseJsonTemp
 var linkList = []
 var linkGraphList = { datas: [] }
 var clickCheckedChip
+var ChipsWithIPs = []
 
 Q.registerImage('rack', 'images/Crate.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
 Q.registerImage('card', 'images/BeforeTheBoard.svg');
@@ -623,11 +624,16 @@ function initEditor(editor) {
 						if (graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList != null) {
 							for (const k in graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList) {
 								//带有IP的临时数据赋给数据
-								for (const m in chipListTemp) {
+                for (const m in ChipsWithIPs) {
+                  if (graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].uniqueId.indexOf(ChipsWithIPs[m].uniqueId) != -1) {
+                    graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k] = ChipsWithIPs[m]
+                  }
+                }
+								/*for (const m in chipListTemp) {
 									if (graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].uniqueId.indexOf(chipListTemp[m].uniqueId) != -1) {
 										graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k] = chipListTemp[m]
 									}
-								}
+								}*/
 								graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].nodeID = cpuNodeID++
 								//给部署图所需数据赋nodeid
 								for (const p in frontCaseForDeployment.datas) {
