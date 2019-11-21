@@ -470,7 +470,7 @@ export default {
                   }
                   // console.log("this.procedureId" + this.procedureId);
                   //保存软件框架
-                  // this.changeProcedureSoftwareId();
+                  this.changeProcedureSoftwareId();
                   // this.softwareSelectString = []
                   // showPartSoftwareAndPlatform(this.procedureId).then(Response => {
                   //   for (var k = 0; k < Response.data.data.length; k++) {
@@ -748,10 +748,10 @@ export default {
     },
     changeProcedureSoftwareId() {
       if (this.softwareSelectString.length == 0) {
-        this.$message({
-          message: "请至少选择一个软件框架",
-          type: "error"
-        });
+        // this.$message({
+        //   message: "请至少选择一个软件框架",
+        //   type: "error"
+        // });
         return;
       }
       // console.log("修改软件构件库保存：", this.softwareSelectString);
