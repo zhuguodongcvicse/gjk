@@ -47,10 +47,10 @@ export const tableOption = {
       label: '创建时间',
       prop: 'createTime'
     },
-	  {
-      label:'图标',
-      hide: true,
-      prop :'projectImg'
-    }
+	  // {
+    //   label:'图标',
+    //   hide: true,
+    //   prop :'projectImg'
+    // }
   ]
 }

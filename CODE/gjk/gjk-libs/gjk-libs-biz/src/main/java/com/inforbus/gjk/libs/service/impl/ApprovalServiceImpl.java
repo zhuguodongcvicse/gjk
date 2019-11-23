@@ -26,6 +26,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
+import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.libs.api.entity.Approval;
 import com.inforbus.gjk.libs.api.entity.ApprovalApply;
 import com.inforbus.gjk.libs.mapper.ApprovalMapper;
@@ -157,14 +158,25 @@ public class ApprovalServiceImpl extends ServiceImpl<ApprovalMapper, Approval> i
 
 	@Override
 	public void removeCompApproval(String compId, String projectId) {
-		System.out.println(compId);
-		System.out.println(projectId);
 		List<Approval> approvalApp = baseMapper.getByApplyId(projectId);
 		List<String> idList = new ArrayList<String>();
 		for(Approval approval:approvalApp) {
 			idList.add(approval.getId());
 		}
 		baseMapper.removeCompApproval(idList,compId);	
+	}
+
+	@Override
+	public String checkApproval(String projectId) {
+		System.out.println(projectId);
+		String checkApprovalState = "0";
+		List<Approval> approvalApp = baseMapper.getByApplyId(projectId);
+		for(Approval approval : approvalApp) {
+			if("0".equals(approval.getApprovalState())) {
+				checkApprovalState = "1";
+			}
+		}
+		return checkApprovalState;
 	}
 
 }
