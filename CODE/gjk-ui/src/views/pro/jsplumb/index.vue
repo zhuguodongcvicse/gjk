@@ -8,8 +8,13 @@
         </el-input>
         <el-button-group>
           <el-button type="primary" plain size="small" @click="sendMessage('save')">保存</el-button>
-          <!-- <el-button type="primary" plain size="small" @click="bottonCheckComp = !bottonCheckComp">{{bottonCheckComp?'检查更新':'还原'}}</el-button>
-          <el-button type="primary" plain size="small" @click="sendMessage('completeCheck')">完备性检查</el-button> -->
+          <el-button
+            type="primary"
+            plain
+            size="small"
+            @click="bottonCheckComp = !bottonCheckComp"
+          >{{bottonCheckComp?'检查更新':'还原'}}</el-button>
+          <!-- <el-button type="primary" plain size="small" @click="sendMessage('completeCheck')">完备性检查</el-button> -->
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('loading')">加载</el-button> -->
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('simulation')">仿真</el-button> -->
           <el-button type="primary" plain size="small" @click="sendMessage('exportJSON')">导出</el-button>
@@ -88,7 +93,7 @@
             alt="收缩"
             v-bind:style="{cursor:'pointer','vertical-align':'middle','position': 'absolute','top': '50%','left': '50%','transform': 'translate(-50%, -50%)'}"
           />
-        </div> -->
+        </div>-->
         <params-define
           ref="paramsDefine"
           v-show="isShow_14s"
@@ -106,7 +111,7 @@
 import { mapGetters } from "vuex";
 import gjkIframe from "@/components/iframe/main";
 import paramsDefine from "@/views/comp/code-editor/comp-params/params-define";
-import { getCompList,checkComp } from "@/api/comp/component";
+import { getCompList, checkComp } from "@/api/comp/component";
 import {
   editProJSON,
   findProJSON,
@@ -117,7 +122,7 @@ import {
 import { handlerSaveSysXml } from "@/api/pro/manager";
 import { remote } from "@/api/admin/dict";
 import { randomLenNum, randomUuid, deepClone, getObjType } from "@/util/util";
-import {removeCompApproval} from "@/api/libs/approval";
+import { removeCompApproval, checkApproval } from "@/api/libs/approval";
 // import screenfull from 'screenfull'
 //例如：import 《组件名称》 from '《组件路径》';
 export default {
@@ -142,7 +147,7 @@ export default {
       iframeParams: "", //iframe返回的信息及状态
       tmp: new Map(), //tmp xmlEntity临时值
       tmpMaps: new Map(), //tmpMaps xmlEntityMaps临时值
-      deleteParamMaps:new Map(),//删除时保存的临时数据
+      deleteParamMaps: new Map(), //删除时保存的临时数据
       postMessageData: {
         //传值
         cmd: "", //用于switch 判断
@@ -153,9 +158,9 @@ export default {
       tmpDataParam: {},
       isFullscreen: false, //是否全屏
       index: 0,
-      compUpdateState : {},//构件更新状态
-      bottonCheckComp : true,
-      bottonState : ""
+      compUpdateState: {}, //构件更新状态
+      bottonCheckComp: true,
+      bottonState: ""
     };
   },
   //监听属性 类似于data概念
@@ -175,31 +180,31 @@ export default {
         this.isShow_14s = param.length > 0 ? true : false;
       }
     },
-    bottonCheckComp:{
-       handler: function() {
-         //console.log(this.bottonCheckComp)
-         if(!this.bottonCheckComp){
-         //  console.log(this.dtos)
-            let checkList = []
-            let compList = {}
-            for(var value of this.dtos){
-              compList = {}
-              compList.id = value.id
-              compList.compId = value.compId
-              compList.compName = value.compName
-              compList.version = value.version
-              compList.token = this.$store.getters.access_token
-              checkList.push(compList)
-            }
-            checkComp(checkList).then(response=>{
-             // console.log("111111111111111111",response.data.data)
-              this.compUpdateState = response.data.data
-            })
-         }
-          this.postMessageData.cmd = "bottonCheckComp";
-          this.postMessageData.params = this.bottonCheckComp;
-          this.postMessageData.compUpdateState =  this.compUpdateState
-          this.$refs.gjkIframe.sendMessage(this.postMessageData);
+    bottonCheckComp: {
+      handler: function() {
+        //console.log(this.bottonCheckComp)
+        if (!this.bottonCheckComp) {
+          //  console.log(this.dtos)
+          let checkList = [];
+          let compList = {};
+          for (var value of this.dtos) {
+            compList = {};
+            compList.id = value.id;
+            compList.compId = value.compId;
+            compList.compName = value.compName;
+            compList.version = value.version;
+            compList.token = this.$store.getters.access_token;
+            checkList.push(compList);
+          }
+          checkComp(checkList).then(response => {
+            // console.log("111111111111111111",response.data.data)
+            this.compUpdateState = response.data.data;
+          });
+        }
+        this.postMessageData.cmd = "bottonCheckComp";
+        this.postMessageData.params = this.bottonCheckComp;
+        this.postMessageData.compUpdateState = this.compUpdateState;
+        this.$refs.gjkIframe.sendMessage(this.postMessageData);
       }
     },
     /* 监听iframeParams数据 */
@@ -208,7 +213,7 @@ export default {
         /* 添加构件 */
         if (newParam.state === 0) {
           /* 增加构件到tmp 新0911*/
-         // console.log("接收数据后处理。。。。。添加", this.xmlMaps);
+          // console.log("接收数据后处理。。。。。添加", this.xmlMaps);
           let arrMap = deepClone(this.deleteParamMaps.get(newParam.tmpId)); //从删除的数据中获取
           if (!arrMap) {
             arrMap = deepClone(this.xmlMaps[newParam.gjId]); //从基础的数据中获取
@@ -225,7 +230,10 @@ export default {
           //this.tmpMaps.delete(newParam.tmpId); //删除临时的tmp
           //console.log("临时数据",newParam.tmpId)
           for (var i = 0; i < newParam.tmpId.length; i++) {
-            this.deleteParamMaps.set(newParam.tmpId[i],this.tmpMaps.get(newParam.tmpId[i]))
+            this.deleteParamMaps.set(
+              newParam.tmpId[i],
+              this.tmpMaps.get(newParam.tmpId[i])
+            );
             this.tmpMaps.delete(newParam.tmpId[i]);
           }
           //删除临时的tmp
@@ -251,27 +259,32 @@ export default {
             //从保存的临时数据中找到复制的数据并存储在ctrlXmlParam中
             this.ctrlXmlParam.set(id, this.tmpMaps.get(id));
           });
-          sessionStorage.setItem("vueCopyData", JSON.stringify(this.ctrlXmlParam));
-         // console.log("赋值Ctrl C:", tmpId); //复制 c
+          sessionStorage.setItem(
+            "vueCopyData",
+            JSON.stringify(this.ctrlXmlParam)
+          );
+          // console.log("赋值Ctrl C:", tmpId); //复制 c
         } else if (newParam.state === 4) {
           //console.log("9999999999999",JSON.parse(sessionStorage.getItem("vueCopyData")))
-        //  console.log(newParam.oldTmpId)
+          //  console.log(newParam.oldTmpId)
           // if(this.ctrlXmlParam.length > 0){
           //   console.log("没跨流程")
           //   ctrlParam = deepClone(this.ctrlXmlParam.get(newParam.oldTmpId)); //增加构件到tmpMaps
           // }else{
-            var ctrlParam;
-            var ctrlXmlParamMap = JSON.parse(sessionStorage.getItem("vueCopyData"));
-            for(let i = 0;i<ctrlXmlParamMap.length;i++){
-              if(ctrlXmlParamMap[i][0] == newParam.oldTmpId){
-                ctrlParam = deepClone(ctrlXmlParamMap[i][1])
-              }
+          var ctrlParam;
+          var ctrlXmlParamMap = JSON.parse(
+            sessionStorage.getItem("vueCopyData")
+          );
+          for (let i = 0; i < ctrlXmlParamMap.length; i++) {
+            if (ctrlXmlParamMap[i][0] == newParam.oldTmpId) {
+              ctrlParam = deepClone(ctrlXmlParamMap[i][1]);
             }
-           // console.log("跨流程复制数据",ctrlXmlParamMap)
-           // var ctrlParam = ctrlXmlParamMap.get(newParam.oldTmpId);
+          }
+          // console.log("跨流程复制数据",ctrlXmlParamMap)
+          // var ctrlParam = ctrlXmlParamMap.get(newParam.oldTmpId);
           //}
           //var
-         // console.log("粘贴Ctrl V:", ctrlParam); //粘贴
+          // console.log("粘贴Ctrl V:", ctrlParam); //粘贴
           ctrlParam.attributeMap.id = newParam.newTmpId;
           this.$set(
             ctrlParam.xmlEntityMaps[0].xmlEntityMaps,
@@ -327,8 +340,8 @@ export default {
                   start: e.start,
                   end: e.end,
                   length: e.length,
-                  endId :e.endId,
-                  stateId:e.stateId
+                  endId: e.endId,
+                  stateId: e.stateId
                 }
               });
             });
@@ -377,7 +390,7 @@ export default {
         const item = dBXmlMaps.xmlEntityMaps[key];
         if (item.lableName === nameType) {
           if (item.lableName === "层级属性") {
-           // console.log("234567890-09876543", saveComp);
+            // console.log("234567890-09876543", saveComp);
             this.refreshCjParamAll(deepClone(saveComp));
           }
           dBXmlMaps.xmlEntityMaps[key].xmlEntityMaps = saveComp;
@@ -424,10 +437,10 @@ export default {
       getCompList(this.$route.query.proId).then(response => {
         // console.log("// 根据用户编号查询构件及文件列表");
         //所有构件已更新未更新状态
-        this.compUpdateState = response.data.data.compUpdate
+        this.compUpdateState = response.data.data.compUpdate;
         // 所有文件DTO
         this.dtos = response.data.data.dtos;
-       // console.log("dtos列表", this.dtos);
+        // console.log("dtos列表", this.dtos);
         // 设置所有构件XML
         this.xmls = response.data.data.xmls;
         // 设置所有构件XMLMaps
@@ -436,7 +449,7 @@ export default {
       });
     },
     sendMessage(state) {
-       // console.log("state",state)
+      // console.log("state",state)
       // 父向子传参方式二
       /* 发送iframe发送消息 */
       if (state === "alignment") {
@@ -491,7 +504,7 @@ export default {
           this.$refs.gjkIframe.sendMessage(this.postMessageData);
         });
       } else if (state === "exportJSON") {
-        this.bottonState = state
+        this.bottonState = state;
         this.postMessageData.cmd = "clickCompSave";
         this.postMessageData.params = "save";
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
@@ -499,7 +512,7 @@ export default {
       } else if (state === "completeCheck") {
         this.postMessageData.cmd = "completeCheck";
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
-      } 
+      }
       // else if(state === "checkComp"){
       //   console.log(this.dtos)
       //   let checkList = []
@@ -515,13 +528,13 @@ export default {
       //   }
       //   checkComp(checkList)
       // }
-       else {
+      else {
         remote("connectionType").then(val => {
           this.postMessageData.cmd = "getCompDtos";
           this.postMessageData.params = this.dtos;
           //this.postMessageData.compUpdateState  = this.compUpdateState
           this.postMessageData.connectionData = val.data.data;
-         // console.log("连线关系数据", this.postMessageData);
+          // console.log("连线关系数据", this.postMessageData);
           this.$refs.gjkIframe.sendMessage(this.postMessageData);
         });
         // console.log(
@@ -532,21 +545,23 @@ export default {
         if (this.index == 1) {
           findProJSON(this.$route.query.processId).then(res => {
             //循环流程中的构件及"arrow"
-           console.log("加载后的数据", res.data.data);
-           if(res.data.data != null){
-              res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
-              if (tmp.lableName !== "arrow") {
-                /* 将查询的东西插入到临时 */
-                // this.tempParam.push(tmp);
-                // 使用map将 数据对应上
-                this.tmpMaps.set(tmp.attributeMap.id, tmp);
+            console.log("加载后的数据", res.data.data);
+            if (res.data.data != null) {
+              if (res.data.data.xmlJson.xmlEntityMaps != null) {
+                res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
+                  if (tmp.lableName !== "arrow") {
+                    /* 将查询的东西插入到临时 */
+                    // this.tempParam.push(tmp);
+                    // 使用map将 数据对应上
+                    this.tmpMaps.set(tmp.attributeMap.id, tmp);
+                  }
+                });
+                this.postMessageData.cmd = "clickCompLoading";
+                this.postMessageData.params = res.data.data.json;
+                this.$refs.gjkIframe.sendMessage(this.postMessageData);
               }
-            });
-             this.postMessageData.cmd = "clickCompLoading";
-             this.postMessageData.params = res.data.data.json;
-             this.$refs.gjkIframe.sendMessage(this.postMessageData);
-           }
-           // console.log("map数据", this.tmpMaps);
+            }
+            // console.log("map数据", this.tmpMaps);
           });
         }
       }
@@ -562,7 +577,6 @@ export default {
           this.iframeParams = data.params[0];
           break;
         case "returnSave":
-         // console.log("020222222222222222");
           // 处理业务逻辑
           if (data.params.length <= 0) {
             this.saveState = false;
@@ -571,14 +585,19 @@ export default {
             this.saveParams = data.params;
           }
           break;
-          case "removeComp":
-            let compId = data.params
-            let projectId = this.$route.query.proId
-            removeCompApproval(compId,projectId).then(res =>{
-              removeCompProject(compId,projectId)
-            }
-              
-            )
+        case "removeComp":
+          let compId = data.params;
+          let projectId = this.$route.query.proId;
+          removeCompApproval(compId, projectId).then(res => {
+            removeCompProject(compId, projectId);
+          });
+          break;
+         case "nodeTypeNotMatch" :
+             this.$message({
+              showClose: true,
+              message: "节点类型不匹配",
+              type: "success"
+            });
 
       }
     },
@@ -599,31 +618,36 @@ export default {
           this.$route.query.processId
         ).then(res => {
           // setTimeout(() => {
-            if(this.bottonState == "exportJSON"){
-               loading.close();
-              exportFile(this.$route.query.processId)
-            }else{
-              loading.close();
-              this.saveState = false;
-              this.$message({
-                showClose: true,
-                message: "生成成功",
-                type: "success"
-              });
-            }
-            this.bottonState = ""
-          
+          if (this.bottonState == "exportJSON") {
+            loading.close();
+            exportFile(this.$route.query.processId);
+          } else {
+            loading.close();
+            this.saveState = false;
+            this.$message({
+              showClose: true,
+              message: "生成成功",
+              type: "success"
+            });
+          }
+          this.bottonState = "";
+
           // }, 1000);
         });
       });
     },
     customFileUpload(event) {
-     if(confirm("是否清空当前画布构件")){
-        this.postMessageData.cmd = "cleanCanvas";
+       this.$confirm("是否清空当前画布流程模型?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        })
+      .then(data => {
+         this.postMessageData.cmd = "cleanCanvas";
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
-       // console.log("el-upload数据", event);
+        // console.log("el-upload数据", event);
         this.file = event.file;
-       // console.log("文件", this.file);
+        // console.log("文件", this.file);
         var formData = new FormData();
         formData.append("file", this.file);
         //console.log(formData);
@@ -641,15 +665,42 @@ export default {
           this.postMessageData.params = res.data.data.json;
           this.$refs.gjkIframe.sendMessage(this.postMessageData);
         });
-      }
+      })
+      .catch(function(err) {
+        next();
+      });
+      // if (confirm("是否清空当前画布构件")) {
+      //   this.postMessageData.cmd = "cleanCanvas";
+      //   this.$refs.gjkIframe.sendMessage(this.postMessageData);
+      //   // console.log("el-upload数据", event);
+      //   this.file = event.file;
+      //   // console.log("文件", this.file);
+      //   var formData = new FormData();
+      //   formData.append("file", this.file);
+      //   //console.log(formData);
+      //   importFile(formData).then(res => {
+      //     //console.log("导入后的数据", res.data.data);
+      //     res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
+      //       if (tmp.lableName !== "arrow") {
+      //         /* 将查询的东西插入到临时 */
+      //         // this.tempParam.push(tmp);
+      //         // 使用map将 数据对应上
+      //         this.tmpMaps.set(tmp.attributeMap.id, tmp);
+      //       }
+      //     });
+      //     this.postMessageData.cmd = "clickCompLoading";
+      //     this.postMessageData.params = res.data.data.json;
+      //     this.$refs.gjkIframe.sendMessage(this.postMessageData);
+      //   });
+      // }
     },
     submit(event) {
       event.preventDefault();
       var formData = new FormData();
       formData.append("file", this.file);
-     // console.log(formData);
+      // console.log(formData);
       importFile(formData).then(res => {
-       // console.log("导入后的数据", res.data.data);
+        // console.log("导入后的数据", res.data.data);
         res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
           if (tmp.lableName !== "arrow") {
             /* 将查询的东西插入到临时 */
@@ -674,16 +725,75 @@ export default {
         return false;
       }
       screenfull.toggle();
-    },
+    }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() {
+    checkApproval(this.$route.query.proId).then(res => {
+      console.log("待审批状态", res.data);
+      if (res.data == 1) {
+        this.$message({
+          showClose: true,
+          message: "有待审批构件",
+          type: "success"
+        });
+      }
+    });
+  },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
     this.getCompAndDetail();
   },
   beforeCreate() {}, //生命周期 - 创建之前
   beforeMount() {}, //生命周期 - 挂载之前
+  // beforeRouteEnter(to, from, next) {
+  //   next(vm => {
+  //     // if (JSON.stringify(vm.xmlEntityVal) != "{}") {
+  //     //   vm.tmpShow = vm.xmlEntityVal;
+  //     //   vm.showComp = vm.xmlEntityVal;
+  //     //   console.log("beforeRouteEnter", vm.showComp, vm.tmpShow);
+  //     //   vm.fileList = "";
+  //     // }
+  //   });
+  // },
+  beforeRouteUpdate(to, from, next) {
+    var _this = this;
+    this.$confirm("是否保存当前流程模型?", "提示", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning"
+    })
+      .then(data => {
+        _this.postMessageData.cmd = "clickCompSave";
+        _this.postMessageData.params = "save";
+        _this.$refs.gjkIframe.sendMessage(_this.postMessageData);
+        setTimeout(() => {
+          next();
+        }, 1000);
+      })
+      .catch(function(err) {
+        next();
+      });
+  },
+  beforeRouteLeave(to, from, next) {
+    var _this = this;
+    this.$confirm("是否保存当前流程模型?", "提示", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning"
+    })
+      .then(data => {
+        _this.postMessageData.cmd = "clickCompSave";
+        _this.postMessageData.params = "save";
+        _this.$refs.gjkIframe.sendMessage(_this.postMessageData);
+        setTimeout(() => {
+          next();
+        }, 1000);
+      })
+      .catch(function(err) {
+        next();
+      });
+  },
   beforeUpdate() {}, //生命周期 - 更新之前
   updated() {}, //生命周期 - 更新之后
   beforeDestroy() {}, //生命周期 - 销毁之前

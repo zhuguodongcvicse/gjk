@@ -114,3 +114,10 @@ export function removeCompApproval(compId,projectId){
     method:'get'
   })
 }
+
+export function checkApproval(projectId){
+  return request({
+    url:'/libs/approval/checkApproval/'+ projectId,
+    method:'get'
+  })
+}

@@ -146,6 +146,11 @@ public class ApprovalController {
 	public void removeCompApproval(@PathVariable String compId,@PathVariable String projectId) {
 		approvalService.removeCompApproval(compId,projectId);
 	}
+	@GetMapping
+	@RequestMapping("/checkApproval/{projectId}")
+	public String checkApproval(@PathVariable String projectId) {
+		return approvalService.checkApproval(projectId);
+	}
 	/**
 	 * @Title: getIdByApplyId
 	 * @Description: 获取申请构件的申请记录ID
