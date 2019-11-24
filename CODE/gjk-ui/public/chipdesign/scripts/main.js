@@ -456,6 +456,8 @@ function initEditor(editor) {
 		if (!selection || selection.length == 0) {
 			return false;
 		}
+		for (var i in selection) {
+			if (selection[i].properties.type == "inf") {
 		Q.confirm("是否 确认删除", function () {
 			var selection = this.removeSelection();
 			// console.log("selection",selection)
@@ -469,6 +471,7 @@ function initEditor(editor) {
 				this.onInteractionEvent(event);
 			} */
 		}, this);
+	}}
 	}
 
 	var propertySheet = editor.propertyPane;

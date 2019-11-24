@@ -19,14 +19,16 @@ var baknum1 = 0.5;
 var baknum2 = 0.5;
 var baknum3 = 0.5;
 var baknum4 = 0.5;
-var num1 = 0.5;
-var num2 = 0.5;
-var num3 = 0.5;
-var num4 = 0.5;
-var numbak1 = 0.5;
-var numbak2 = 0.5;
-var numbak3 = 0.5;
-var numbak4 = 0.5;
+var num  = 0.4;
+var num1 = 0.4;
+var num2 = 0.4;
+var num3 = 0.4;
+var num4 = 0.4;
+var numbak = 0.4;
+var numbak1 = 0.4;
+var numbak2 = 0.4;
+var numbak3 = 0.4;
+var numbak4 = 0.4;
 var components;
 var verdict = false;
 var movedate;
@@ -35,6 +37,7 @@ var deploymentsJsonbak;
 var bakstartIds = [];
 var bakendIds = [];
 var GAT;
+
 // 子接收父参数
 function handleMessageFromParent(event) {
 	deployment = event.data.params[0].frontCaseForDeployment;
@@ -264,6 +267,10 @@ function creatbakgj(compName, cpux, cpuy, refid, compid, parttype, components, G
 					gjjsony = cpuy + 46;
 					var k = 4.5 * (baknum4++);
 					gjjsonx = cpux + 5 + k;
+					if (gjjsonx >= cpux + 42) {
+						gjjsony = cpuy + 46;
+						gjjsonx = cpux + 40;
+					}
 				}
 			}
 		}
@@ -303,7 +310,8 @@ function creatbakgj(compName, cpux, cpuy, refid, compid, parttype, components, G
 				"parttype": parttype,
 				"components": components,
 				"cpuid": 11,
-				'GAT': GAT
+				'GAT': GAT,
+				'Direction':"from"
 			},
 			"location": {
 				"_className": "Q.Point",
@@ -340,6 +348,10 @@ function creatgj(compName, cpux, cpuy, refid, compid, parttype, components, GAT)
 					gjjsony = cpuy + 26;
 					var k = 4.5 * (rootnum4++);
 					gjjsonx = cpux + 5 + k;
+					if (gjjsonx >= cpux + 42) {
+						gjjsony = cpuy + 26;
+						gjjsonx = cpux + 40 ;		
+					}
 				}
 			}
 		}
@@ -379,7 +391,8 @@ function creatgj(compName, cpux, cpuy, refid, compid, parttype, components, GAT)
 				"parttype": parttype,
 				"components": components,
 				"cpuid": 11,
-				'GAT': GAT
+				'GAT': GAT,
+				'Direction':"from"
 			},
 			"location": {
 				"_className": "Q.Point",
@@ -458,8 +471,16 @@ function initEditor(editor) {
 			}
 		}
 		//变量恢复初始值
-		rootnum = -0.5;
-		baknum = -0.5;
+		 rootnum = -0.5;
+		 rootnum1 = 0.5;
+		 rootnum2 = 0.5;
+		 rootnum3 = 0.5;
+		 rootnum4 = 0.5;
+		 baknum = -0.5;
+		 baknum1 = 0.5;
+		 baknum2 = 0.5;
+		 baknum3 = 0.5;
+		 baknum4 = 0.5;
 	}
 	//遍历arrow绘画连线
 	for (var k in arrows) {
@@ -742,28 +763,29 @@ function initEditor(editor) {
 		//这里可以获得当前点击的图元对象
 		graph.onclick = function (evt) {
 			var data = graph.getElement(evt);
+			console.log("这个图元的信息",data)
 			if (data != null) {
 				if (data.from == null) {
 					//console.log("data", data);
-					data.set('chipname', data._mn3.chipName);
-					data.set('corenum', data._mn3.coreNum);
-					data.set('memsize', data._mn3.memSize);
-					data.set('boardname', data._mn3.boardName);
-					data.set('infname', data._mn3.infName);
-					data.set('ifrate', data._mn3.ifRate);
-					data.set('opticalnum', data._mn3.opticalNum);
+					data.set('chipname', data.properties.chipName);
+					data.set('corenum', data.properties.coreNum);
+					data.set('memsize', data.properties.memSize);
+					data.set('boardname', data.properties.boardName);
+					data.set('infname', data.properties.infName);
+					data.set('ifrate', data.properties.ifRate);
+					data.set('opticalnum', data.properties.opticalNum);
 					data.set('compname', data.name);
-					data.set('rackname', data._mn3.caseName);
-					data.set('bdNum', data._mn3.bdNum);
-					data.set('IP', data._mn3.IP);
-					data.set('hrTypeName', data._mn3.hrTypeName);
+					data.set('rackname', data.properties.caseName);
+					data.set('bdNum', data.properties.bdNum);
+					data.set('IP', data.properties.IP);
+					data.set('hrTypeName', data.properties.hrTypeName);
 				} else {
 					data.set('startcomp', data.from.name);
 					data.set('endcomp', data.to.name);
 				}
 			}
 		}
-		if (image == "images/Chip.svg") {
+		if (image == "images/Chip.svg"  || type=='chip') {
 			return {
 				group: '芯片属性',
 				properties: [{
@@ -956,7 +978,7 @@ function initEditor(editor) {
 			}
 			if (evt.kind == Q.InteractionEvent.ELEMENT_MOVE_START) {
 				var type = data.get('type');
-				if (type && (type == 'card' || type == 'port' || type == 'item' || type == null)) {
+				if (type && (type == 'card' || type == 'port' || type == 'item' || type == null || type == 'chip')) {
 					dragInfo = {
 						data: data,
 						x: data.x,
@@ -968,7 +990,7 @@ function initEditor(editor) {
 					if (startData != null) {
 						for (const i in startData.children.datas) {
 							if (startData.children.datas[i].id != data.id) {
-								if (startData.children.datas[i]._mn3.partname == data._mn3.partname) {
+								if (startData.children.datas[i].properties.partname == data.properties.partname) {
 									if (startData != data.parent) {
 										verdict = false;
 									}
@@ -999,44 +1021,71 @@ function initEditor(editor) {
 				unhighlight();
 				var oldSlot = data.parent;
 				var slot = findSlot(data, evt);
+				console.log("鼠标移动后的对象",data)
 				//所点击当前构件的所属部件
-				var partname = data._mn3.partname;
+				var partname = data.properties.partname;
 				var host = findCellHost(evt, data);
 				if (startData != null) {
 					for (const i in startData.children.datas) {
 						if (startData.children.datas[i].id != data.id) {
-							if (startData.children.datas[i]._mn3.partname == data._mn3.partname) {
-								if (startData != data.parent) {
-									showMessage('该芯片上还有其他同部件构件请一起移动', 'error', 2000)
-									graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-									data.parent = startData;
-									data.host = startData;
+							if (startData.children.datas[i].properties.partname == data.properties.partname) {
+								if( data.parent != null){
+
+									if (startData.id != data.parent.id  ) {
+										showMessage('该芯片上还有其他同部件构件请一起移动', 'error', 2000)
+										graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+										data.parent = startData;
+										data.host = startData;
+									}
 								}
 							}
 						}
 					}
+					//校验芯片上构件位置
+					if(data.properties.Direction == 'from'){
+						if (data.x > startData.x + 45 && verdict == false) {
+							graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+							data.parent = startData;
+							data.host = startData;
+						}
+						if (data.x < startData.x + 7.5 && verdict == false) {
+							graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+							data.parent = startData;
+							data.host = startData;
+						}
+						if (data.y > startData.y + 45 && verdict == false) {
+							graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+							data.parent = startData;
+							data.host = startData;
+						}
+						if (data.y < startData.y + 7.5 && verdict == false) {
+							graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+							data.parent = startData;
+							data.host = startData;
+						}
+					}else if (data.properties.Direction == 'back'){
+						if (data.x > startData.x + 80 && verdict == false) {
+							graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+							data.parent = startData;
+							data.host = startData;
+						}
+						if (data.x < startData.x  && verdict == false) {
+							graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+							data.parent = startData;
+							data.host = startData;
+						}
+						if (data.y > startData.y + 80 && verdict == false) {
+							graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+							data.parent = startData;
+							data.host = startData;
+						}
+						if (data.y < startData.y  && verdict == false) {
+							graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+							data.parent = startData;
+							data.host = startData;
+						}
+					}
 
-
-					if (data.x > startData.x + 45 && verdict == false) {
-						graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-						data.parent = startData;
-						data.host = startData;
-					}
-					if (data.x < startData.x + 7.5 && verdict == false) {
-						graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-						data.parent = startData;
-						data.host = startData;
-					}
-					if (data.y > startData.y + 45 && verdict == false) {
-						graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-						data.parent = startData;
-						data.host = startData;
-					}
-					if (data.y < startData.y + 7.5 && verdict == false) {
-						graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-						data.parent = startData;
-						data.host = startData;
-					}
 				}
 				console.log("++++++++++++", data)
 				console.log("++++++++++++", data.host)
@@ -1044,6 +1093,7 @@ function initEditor(editor) {
 				/* if(data.host != null){ */
 				if (data.host == null && verdict == true) {
 					showMessage('请将构件移动到芯片上', 'error', 5000);
+					if(data.properties.Direction == 'from'){
 					if (data.x > data.host.x + 45 || data.x < data.host.x + 7.5 ||
 						data.y > data.host.y + 45 || data.y < data.host.y + 7.5) {
 						for (var i = 0; i < movedate.length; i++) {
@@ -1051,15 +1101,34 @@ function initEditor(editor) {
 							movedate[i].host = startData;
 							graph.moveElements([movedate[i]], dragInfo.x - movedate[i].x, dragInfo.y - movedate[i].y + i * 3)
 						}
+					}}else if(data.properties.Direction == 'back'){
+						if (data.x > data.host.x + 80 || data.x < data.host.x  ||
+							data.y > data.host.y + 80 || data.y < data.host.y ) {
+							for (var i = 0; i < movedate.length; i++) {
+								movedate[i].parent = startData;
+								movedate[i].host = startData;
+								graph.moveElements([movedate[i]], dragInfo.x - movedate[i].x, dragInfo.y - movedate[i].y + i * 3)
+							}
+						}
 					}
 				} else if (verdict == true) {
 					//showMessage('已成功移动到IP为'+data.parent.properties.IP+'芯片上', 'success', 5000);
-					if (data.x > data.host.x + 45 || data.x < data.host.x + 7.5 ||
-						data.y > data.host.y + 45 || data.y < data.host.y + 7.5) {
+					if(data.properties.Direction == 'from'){
+					if (data.x > data.host.x + 45 || data.x < data.host.x+ 7.5   ||
+						data.y > data.host.y + 45 || data.y < data.host.y  + 7.5) {
 						for (var i = 0; i < movedate.length; i++) {
 							movedate[i].parent = startData;
 							movedate[i].host = startData;
 							graph.moveElements([movedate[i]], dragInfo.x - movedate[i].x, dragInfo.y - movedate[i].y + i * 3)
+						}
+					}}else if(data.properties.Direction == 'back'){
+						if (data.x > data.host.x + 80 || data.x < data.host.x ||
+							data.y > data.host.y + 80 || data.y < data.host.y) {
+							for (var i = 0; i < movedate.length; i++) {
+								movedate[i].parent = startData;
+								movedate[i].host = startData;
+								graph.moveElements([movedate[i]], dragInfo.x - movedate[i].x, dragInfo.y - movedate[i].y + i * 3)
+							}
 						}
 					}
 				}
@@ -1072,7 +1141,8 @@ function initEditor(editor) {
 		var xy = graph.toLogical(evt.event);
 		var cell;
 		function canDrop(data) {
-			return data.image == 'images/Chip.svg';
+			console.log("666666666666",data)
+			return data.image == 'images/Chip.svg' || data.properties.type == "chip";
 		}
 
 		function isItem(data) {
@@ -1108,13 +1178,13 @@ function initEditor(editor) {
 		data.host = data.parent = host;
 		evt.datas.forEach(function (data) { data.host = data.parent = host; })
 		if (host != null) {
-			data._mn3.cpuid = host.properties.nodeID;
+			data.properties.cpuid = host.properties.nodeID;
 		}
 
 		/* 	for(var i in data){
 			
-				console.log('CPUid',	data._mn3.cpuid);
-				data._mn3.cpuid  = host.properties.nodeID;
+				console.log('CPUid',	data.properties.cpuid);
+				data.properties.cpuid  = host.properties.nodeID;
 			} */
 		//	console.log('22222EVT',evt.datas)
 
@@ -1141,9 +1211,8 @@ function initEditor(editor) {
 				{
 					text: '选中该构件移动', action: function () {
 						graph.select(data);
-						console.log("1111111111111111111111111",data)
 						verdict = true;
-						if (data._mn3.partname == null && data.image == "images/Chip.svg" || data.image == "rack" || data.image == "images/BeforeTheBoard.svg"
+						if (data.properties.partname == null && data.image == "images/Chip.svg" || data.image == "rack" || data.image == "images/BeforeTheBoard.svg"
 						|| data.image == "images/OpticalFiberMouth.svg" || data.image == "images/InternetAccess.svg" ||  data.image == "images/RoundMouth.svg"
 						||  data.image == "images/SerialPort.svg"  || data.image =="images/AfterTheBoard.svg" || data.edgeType == "extend.top" ) {
 							showMessage('请选择构件', 'error', 2000)
@@ -1156,14 +1225,14 @@ function initEditor(editor) {
 				{
 					text: '选中同一部件下构件移动', action: function () {
 						var data = graph.getElement(evt);
-						var partname = data._mn3.partname;
+						var partname = data.properties.partname;
 						graph.forEach(function (data) {
-							if (data._mn3.partname == partname) {
+							if (data.properties.partname == partname) {
 								verdict = true;
 								graph.select(data);
 							}
 						})
-						if (data._mn3.partname == null && data.image == "images/Chip.svg" || data.image == "rack" || data.image == "images/BeforeTheBoard.svg"
+						if (data.properties.partname == null && data.image == "images/Chip.svg" || data.image == "rack" || data.image == "images/BeforeTheBoard.svg"
 						|| data.image == "images/OpticalFiberMouth.svg" || data.image == "images/InternetAccess.svg" ||  data.image == "images/RoundMouth.svg"
 						||  data.image == "images/SerialPort.svg"  || data.image =="images/AfterTheBoard.svg" || data.edgeType == "extend.top") {
 							showMessage('请选择构件', 'error', 2000)
@@ -1251,28 +1320,37 @@ function showchip() {
 				}
 			}
 			graph.clear();
+			//遍历组装数据绘画芯片
 			for (var i = 0; i < CHIPdate.length; i++) {
 				var properties = CHIPdate[i].properties;
 				chip = createCard(properties, i * 85, 0);
 				graph.moveToCenter();
+			//遍历数据绘画构件
 				for (var index = 0; index < CHIPdate[i].children.datas.length; index++) {
 					//	console.log("----------",CHIPdate[i])
 					var name = CHIPdate[i].children.datas[index].name;
 					var properties = CHIPdate[i].children.datas[index].properties;
 					var refid = CHIPdate[i].children.datas[index].id;
 					if (CHIPdate[i].children.datas[index].properties.group == 'A') {
-						rootnum++;
+						//num++;
 						var gj = createItem({ parent: chip, x: chip.x, y: chip.y, name: name, group: 'A', properties: properties, refid: refid })
 						gjdata.push(gj);
-						//	console.log("绘画构件数据++++", gj)
 					} else {
-						baknum++;
+					//	numbak++;
 						var gjbak = createBakItem({ parent: chip, x: chip.x, y: chip.y+20, name: name, group: 'B', properties: properties, refid: refid })
 						gjdata.push(gjbak);
 					}
 				}
-				rootnum = -0.5;
-				baknum = -0.5;
+				num = 0.4;
+				numbak = 0.4;
+				num1 = 0.4;
+				num2 = 0.4;
+				num3 = 0.4;
+				num4 = 0.4;
+				numbak1 = 0.4;
+				numbak2 = 0.4;
+				numbak3 = 0.4;
+				numbak4 = 0.4;
 			}
 			for (var i in fromCompidArrays) {
 				if(toCompidArrays[i].GAT != null){
@@ -1309,7 +1387,7 @@ function showchip() {
 		} else if(falg == false && CHIPdate.length == 0){
 			compidArrays = [];
 			var skipdata = graph.toJSON();
-			console.log("skipdata",skipdata);
+			//console.log("skipdata",skipdata);
 			var skipArrays = [];
 			for(var i in skipdata.datas){
 				if(skipdata.datas[i]._className == "Q.Text"){
@@ -1318,12 +1396,13 @@ function showchip() {
 					skipgjdata._ref = skipdata.datas[i].json.host._ref;
 					skipgjdata.group = skipdata.datas[i].json.properties.group;
 					skipArrays.push(skipgjdata);
+					console.log("skipdata",skipdata.datas[i])
 				}
 			}
 	//赋值chip_id
 			for(var i in skipArrays){
 				for(var j in skipdata.datas){
-					if(skipdata.datas[j].json.image  == "images/Chip.svg"){
+					if(skipdata.datas[j]._className  == "Q.RectElement"){
 						if(skipArrays[i]._ref == skipdata.datas[j]._refId){
 							skipArrays[i].uniqueId = skipdata.datas[j].json.properties.uniqueId;
 						}
@@ -1333,53 +1412,73 @@ function showchip() {
 			//赋值location坐标
 			for(var i in skipArrays){
 				for(var j in deploymentsJsonbak.datas){
-					if(deploymentsJsonbak.datas[j].json.image  == "images/Chip.svg"){
+					if(deploymentsJsonbak.datas[j]._className  == "Q.RectElement"){
 						if(skipArrays[i].uniqueId  == deploymentsJsonbak.datas[j].json.properties.uniqueId &&deploymentsJsonbak.datas[j]._refId !=  null ){
 						//	console.log("赋值location坐标",deploymentsJsonbak.datas[j])
 							skipArrays[i].location = deploymentsJsonbak.datas[j].json.location;
 							skipArrays[i]._refId = deploymentsJsonbak.datas[j]._refId;
 						}
 					}
+
+
+
+					
 				}
-	
+				variable = 4;
 			}
 			//修改跳转前构件坐标数据
 			var variable = 4;
 			var variable1 = 4;
 			var y = 8;
 			var baky = 30
-			for(var i in skipArrays){
+			for(var i in skipArrays){	
 				for(var j in deploymentsJsonbak.datas){
-					if(deploymentsJsonbak.datas[j]._className == "Q.Text"){
-						if(skipArrays[i].GAT  == deploymentsJsonbak.datas[j].json.properties.GAT ){
-	
+					//判断是哪个构件
+					if(deploymentsJsonbak.datas[j]._className == "Q.Text" && skipArrays[i].GAT  == deploymentsJsonbak.datas[j].json.properties.GAT){
 							//判断构件是否备份
-							if(skipArrays[i].group == "A"){
-							variable+= 3
-							if(skipArrays[i].location.json.x+variable >= skipArrays[i].location.json.x+45){
-								variable = 7;
-								y=13;
-							}
-							deploymentsJsonbak.datas[j].json.location.json.x =  skipArrays[i].location.json.x+variable;
-							deploymentsJsonbak.datas[j].json.location.json.y =  skipArrays[i].location.json.y+y;
+						if(skipArrays[i].group == "A"){
+						variable+= 3
+						var x = skipArrays[i].location.x
+						console.log("variable = 4;",variable)
+					/* 	console.log("skipArrays[i].location.x+variable",skipArrays[i].location.x + variable)
+						console.log("skipArrays[i].location.json.x+45",skipArrays[i].location.json.x+45) */
+					/* 	if(skipArrays[i].location.x + variable >= skipArrays[i].location.json.x+45){
+							variable = 7;
+							y=13;
+							alert(666)
+						} */
+						if( variable >= 43){
+							variable = 7;
+							y=13;
+						}
+						deploymentsJsonbak.datas[j].json.location.json.x =  skipArrays[i].location.json.x+variable;
+						deploymentsJsonbak.datas[j].json.location.json.y =  skipArrays[i].location.json.y+y;
+						//	console.log("skipArrays",skipArrays)
+					
+
 							deploymentsJsonbak.datas[j].json.host._ref = skipArrays[i]._refId;
 							deploymentsJsonbak.datas[j].json.parent._ref = skipArrays[i]._refId;
 							}else{
 								variable1+= 3
-								if(skipArrays[i].location.json.x+variable1 >= skipArrays[i].location.json.x+45){
+							/* 	if(skipArrays[i].location.x+variable1 >= skipArrays[i].location.json.x+45){
+									variable1 = 7;
+									baky= 35;
+								} */
+								if( variable1 >= 43){
 									variable1 = 7;
 									baky= 35;
 								}
 								deploymentsJsonbak.datas[j].json.location.json.x =  skipArrays[i].location.json.x+variable1;
 								deploymentsJsonbak.datas[j].json.location.json.y =  skipArrays[i].location.json.y+baky;
 								deploymentsJsonbak.datas[j].json.host._ref = skipArrays[i]._refId;
-								deploymentsJsonbak.datas[j].json.parent._ref = skipArrays[i]._refId;
-							}
-							
+								deploymentsJsonbak.datas[j].json.parent._ref = skipArrays[i]._refId;					
 						}
+						
 					}
 				}
 			}
+		
+		
 			graph.clear();
 			graph.parseJSON(deploymentsJsonbak)
 			graph.moveToCenter();
@@ -1388,12 +1487,12 @@ function showchip() {
 }
 function createEdge(options) {
 	var edge = graph.createEdge(options.to, options.from);
-    edge.setStyle(Q.Styles.EDGE_COLOR, '#F88');
+    edge.setStyle(Q.Styles.EDGE_COLOR, '#999999');
 	edge.setStyle(Q.Styles.ARROW_TO, true); 
 	 edge.setStyle(Q.Styles.ARROW_TO_SIZE,1.8);
-	
+	edge.properties.type = 'edge';
 	 var arrow = new Q.ImageUI(Q.Shapes.getShape(Q.Consts.SHAPE_ARROW_2, 5, 2.5));
-    arrow.fillColor = '#F88';
+    arrow.fillColor = '#99CCCC';
     arrow.position = Q.Position.CENTER_MIDDLE;
     arrow.anchorPosition = Q.Position.CENTER_MIDDLE;
     edge.addUI(arrow)
@@ -1408,50 +1507,58 @@ function createEdge(options) {
 	} else if (options.edgeType) {
 		edge.edgeType = options.edgeType;
 	}
+
 	return edge;
 }
 
 //绘画构件
 function createItem(options) {
-	var cpux = options.x, cpuy = options.y;
-	var j = 2.4 * (rootnum++);
-	var gjjsonx = cpux + 7 + j;
-	var gjjsony = cpuy + 8;
+	var cpux = options.x;
+	var cpuy = options.y;
+	var j = num += 8;
+	var gjjsonx = cpux + j;
+	var gjjsony = cpuy + 6;
 	//判断坐标到芯片边界	
-	if (gjjsonx >= cpux + 45) {
-		var k = 4.8 * (num1++);
-		gjjsonx = cpux + 7 + k;
-		gjjsony = cpuy + 13;
-		if (gjjsonx >= cpux + 45) {
-			var k = 4.8 * (num2++);
-			gjjsonx = cpux + 7 + k;
-			gjjsony = cpuy + 18;
-			if (gjjsonx >= cpux + 45) {
-				var k = 4.8 * (num3++);
-				gjjsonx = cpux + 7 + k;
-				gjjsony = cpuy + 23;
-				if (gjjsonx >= cpux + 45) {
-					var k = 4.8 * (num4++);
-					gjjsonx = cpux + 7 + k;
-					gjjsony = cpuy + 28;
+	if (gjjsonx >= cpux + 78) {
+		var k = num1 += 8;
+		gjjsonx = cpux + k;
+		gjjsony = cpuy + 11;
+		if (gjjsonx >= cpux + 78) {
+			var k = num2 += 8;
+			gjjsonx = cpux + k;
+			gjjsony = cpuy + 16;
+			if (gjjsonx >= cpux + 78) {
+				var k = num3 += 8;
+				gjjsonx = cpux + k;
+				gjjsony = cpuy + 21;
+				if (gjjsonx >= cpux + 78) {
+					var k = num4 += 8;
+					gjjsonx = cpux + k;
+					gjjsony = cpuy + 26;
+					if (gjjsonx >= cpux + 78) {
+						gjjsonx = cpux +8;
+						gjjsony = cpuy + 31;
+						
+					}
+					
 				}
+			}
 		}
 	}
-}
 	var item = graph.createText(options.name);
 	item.set('type', 'item');
-	
-	if (options.parent) {
+//	if (options.parent) {
 		//	x = options.parent.x + options.parent.width * x;
 		//	y = options.parent.y + options.parent.height * y;
 		item.parent = item.host = options.parent;
-	}
+	//}
 	item.x = gjjsonx, item.y = gjjsony;
 	item.zIndex = 200;
 	item.properties = options.properties;
+	item.properties.Direction = 'back';
 	item.set('group', options.group);
 	item.properties.RefId = options.refid;
-	var color = options.group == 'A' ? '#88FF88' : '#8888FF';
+	var color = options.group == 'A' ? '#FFFF99' : '#99CCFF';
 	item.setStyle(Q.Styles.LABEL_BACKGROUND_COLOR, color);
 	var scale = 0.27;
 	item.setStyle(Q.Styles.LABEL_FONT_SIZE, 7 * scale);
@@ -1463,44 +1570,49 @@ function createItem(options) {
 //绘画备份构件
 function createBakItem(options) {
 	var cpux = options.x, cpuy = options.y;
-	var j = 2.4 * (baknum++);
-	var gjjsonx = cpux + 7 + j;
-	var gjjsony = cpuy + 8;
+	var j = numbak += 8;
+	var gjjsonx = cpux + j;
+	var gjjsony = cpuy + 20;
 	//判断坐标到芯片边界	
-	if (gjjsonx >= cpux + 45) {
-		var k = 4.8 * (numbak1++);
-		gjjsonx = cpux + 7 + k;
-		gjjsony = cpuy + 13;
-		if (gjjsonx >= cpux + 45) {
-			var k = 4.8 * (numbak2++);
-			gjjsonx = cpux + 7 + k;
-			gjjsony = cpuy + 18;
-			if (gjjsonx >= cpux + 45) {
-				var k = 4.8 * (numbak3++);
-				gjjsonx = cpux + 7 + k;
-				gjjsony = cpuy + 23;
-				if (gjjsonx >= cpux + 45) {
-					var k = 4.8 * (numbak4++);
-					gjjsonx = cpux + 7 + k;
-					gjjsony = cpuy + 28;
+	if (gjjsonx >= cpux + 78) {
+		var k = numbak1 += 8;
+		gjjsonx = cpux + k;
+		gjjsony = cpuy + 25;
+		if (gjjsonx >= cpux + 78) {
+			var k = numbak2 += 8;
+			gjjsonx = cpux + k;
+			gjjsony = cpuy + 30;
+			if (gjjsonx >= cpux + 78) {
+				var k = numbak3 += 8;
+				gjjsonx = cpux + k;
+				gjjsony = cpuy + 35;
+				if (gjjsonx >= cpux + 78) {
+					var k = numbak4 += 8;
+					gjjsonx = cpux + k;
+					gjjsony = cpuy + 40;
+					if (gjjsonx >= cpux + 78) {
+						gjjsonx = cpux +8;
+						gjjsony = cpuy + 45;
+					}
 				}
+			}
 		}
 	}
-}
 	var item = graph.createText(options.name);
 	item.set('type', 'item');
 	
-	if (options.parent) {
+	//if (options.parent) {
 		//	x = options.parent.x + options.parent.width * x;
 		//	y = options.parent.y + options.parent.height * y;
 		item.parent = item.host = options.parent;
-	}
+	//}
 	item.x = gjjsonx, item.y = gjjsony;
 	item.zIndex = 200;
 	item.properties = options.properties;
+	item.properties.Direction = 'back';
 	item.set('group', options.group);
 	item.properties.RefId = options.refid;
-	var color = options.group == 'A' ? '#88FF88' : '#8888FF';
+	var color = options.group == 'A' ? '#FFFF99' : '#99CCFF';
 	item.setStyle(Q.Styles.LABEL_BACKGROUND_COLOR, color);
 	var scale = 0.27;
 	item.setStyle(Q.Styles.LABEL_FONT_SIZE, 7 * scale);
@@ -1508,15 +1620,26 @@ function createBakItem(options) {
 	item.setStyle(Q.Styles.LABEL_RADIUS, 2 * scale);
 	return item;
 }
+Q.registerImage('group_cloud', {
+	cacheable: true,
+	width: 100, height: 100,
+	draw: function(g){
+		g.fillStyle = '#FFD';
+		g.fillRect(0, 0, 100, 100);
+		g.strokeStyle = '#CCC';
+		g.strokeRect(0, 0, 100, 100);
+	}
+});
 //跳转画布绘画芯片
 function createCard(properties, x, y) {
 	//var bounds = slot.getBounds();
 	var port = createNode({
-		image: 'images/Chip.svg',
+		radius: 5, 
+		fillColor: '#eeeeee',
 		x: x,
 		y: y,
-		width: 50,
-		height: 50
+		width: 80,
+		height: 80
 	});
 	port.name = 'IP: ' + properties.IP;
 	/* 	port.radius =  "5000";
@@ -1524,26 +1647,15 @@ function createCard(properties, x, y) {
 	//port.setStyle(Q.Styles.LABEL_ANCHOR_POSITION, Q.Position.CENTER_MIDDLE);
 	//	port.setStyle(Q.Styles.LABEL_POSITION, Q.Position.CENTER_MIDDLE);
 	port.properties = properties;
-	port.set('type', 'port');
+	port.set('type', 'chip');
 	//port.name = 'DSP芯片';
 	//	port.setStyle(Q.Styles.LABEL_ANCHOR_POSITION, Q.Position.CENTER_MIDDLE);
 	//	port.setStyle(Q.Styles.LABEL_POSITION, Q.Position.CENTER_MIDDLE);
 	port.setStyle(Q.Styles.LABEL_ANCHOR_POSITION, Q.Position.CENTER_TOP);
 	port.setStyle(Q.Styles.LABEL_POSITION, Q.Position.CENTER_BOTTOM);
-	port.setStyle(Q.Styles.LABEL_FONT_SIZE, 7);
-	rootnum = -0.5;
-	num1 = 0.5;
-	num2 = 0.5;
-	num3 = 0.5;
-	num4 = 0.5;
-	baknum = -0.5;
-	numbak1 = 0.5;
-	numbak2 = 0.5;
-	numbak3 = 0.5;
-	numbak4 = 0.5;
+	port.setStyle(Q.Styles.LABEL_FONT_SIZE, 3);
 	return port;
 }
-
 //全屏方法代码
 function toggleFullScreen() {
 	if (!document.fullscreenElement && // alternative standard method
@@ -1565,7 +1677,6 @@ function toggleFullScreen() {
 		}
 	}
 }
-
 function showMessage(message, type, time) {
 	let str = ''
 	switch (type) {
