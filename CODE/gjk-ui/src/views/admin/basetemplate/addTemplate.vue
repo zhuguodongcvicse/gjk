@@ -209,7 +209,7 @@
             <el-form-item label="此标签的配置方式">
               <el-select v-model="configureType.lableType" placeholder="请选择">
                 <el-option
-                  v-for="item in sonLableConfigTypes"
+                  v-for="item in lableConfigTypeData"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
@@ -605,60 +605,60 @@ export default {
           label: "多选个数"
         }
       ],
-      sonLableConfigTypes: [
+      lableConfigTypeData: [
         //标签配置方式
-        {
-          label: "无",
-          value: "false"
-        },
-        {
-          label: "表单",
-          value: "form"
-        },
-        {
-          label: "标签表格",
-          value: "table"
-        },
-        {
-          label: "层级特殊",
-          value: "tabTS"
-        },
-        {
-          label: "行表格",
-          value: "colTab"
-        },
-        {
-          label: "选项卡",
-          value: "tab"
-        },
-        {
-          label: "特殊处理",
-          value: "specalHandle"
-        },
-        {
-          label: "联级表单",
-          value: "coreDeployDiv"
-        },
-        {
-          label: "属性表格",
-          value: "attrTable"
-        },
-        {
-          label: "表格群",
-          value: "networkTable"
-        },
-        {
-          label: "树节点表格",
-          value: "treeTable"
-        },
-        {
-          label: "页面块标题",
-          value: "title"
-        },
-        {
-          label: "topic列表及dataStream列表",
-          value: "topicTree"
-        },
+        // {
+        //   label: "无",
+        //   value: "false"
+        // },
+        // {
+        //   label: "表单",
+        //   value: "form"
+        // },
+        // {
+        //   label: "标签表格",
+        //   value: "table"
+        // },
+        // {
+        //   label: "层级特殊",
+        //   value: "tabTS"
+        // },
+        // {
+        //   label: "行表格",
+        //   value: "colTab"
+        // },
+        // {
+        //   label: "选项卡",
+        //   value: "tab"
+        // },
+        // {
+        //   label: "特殊处理",
+        //   value: "specalHandle"
+        // },
+        // {
+        //   label: "联级表单",
+        //   value: "coreDeployDiv"
+        // },
+        // {
+        //   label: "属性表格",
+        //   value: "attrTable"
+        // },
+        // {
+        //   label: "表格群",
+        //   value: "networkTable"
+        // },
+        // {
+        //   label: "树节点表格",
+        //   value: "treeTable"
+        // },
+        // {
+        //   label: "页面块标题",
+        //   value: "title"
+        // },
+        // {
+        //   label: "topic列表及dataStream列表",
+        //   value: "topicTree"
+        // }
       ],
       dialogType: "添加标签",
       dialogVisible: false,
@@ -1417,6 +1417,128 @@ export default {
       //this.compValueType.paths = paths;
     },
 
+    lableConfigType() {
+      if (this.template == "comp_param_type") {
+        this.lableConfigTypeData = [
+          {
+            label: "无",
+            value: "false"
+          },
+          {
+            label: "表单",
+            value: "form"
+          },
+          {
+            label: "层级特殊",
+            value: "tabTS"
+          },
+          {
+            label: "行表格",
+            value: "colTab"
+          },
+          {
+            label: "选项卡",
+            value: "tab"
+          },
+          {
+            label: "特殊处理",
+            value: "specalHandle"
+          }
+        ];
+      } else if (this.template == "hsm_param_type") {
+        this.lableConfigTypeData = [
+          {
+            label: "无",
+            value: "false"
+          },
+          {
+            label: "表单",
+            value: "form"
+          },
+
+          {
+            label: "选项卡",
+            value: "tab"
+          },
+          {
+            label: "联级表单",
+            value: "coreDeployDiv"
+          },
+          {
+            label: "属性表格",
+            value: "attrTable"
+          },
+          {
+            label: "表格群",
+            value: "networkTable"
+          },
+          {
+            label: "树节点表格",
+            value: "treeTable"
+          }
+        ];
+      } else if (this.template == "sysconfig_param_type") {
+        this.lableConfigTypeData = [
+          {
+            label: "无",
+            value: "false"
+          },
+          {
+            label: "表单",
+            value: "form"
+          },
+
+          {
+            label: "选项卡",
+            value: "tab"
+          },
+          {
+            label: "联级表单",
+            value: "coreDeployDiv"
+          },
+          // {
+          //   label: "属性表格",
+          //   value: "attrTable"
+          // },
+          {
+            label: "表格群",
+            value: "networkTable"
+          },
+          {
+            label: "树节点表格",
+            value: "treeTable"
+          }
+        ];
+      } else if (this.template == "theme_param_type") {
+        this.lableConfigTypeData = [
+          {
+            label: "无",
+            value: "false"
+          },
+          {
+            label: "表单",
+            value: "form"
+          },
+
+          {
+            label: "页面块标题",
+            value: "title"
+          },
+          {
+            label: "topic列表及dataStream列表",
+            value: "topicTree"
+          }
+        ];
+      } else if (this.template == "network_param_type") {
+        this.lableConfigTypeData = [
+          {
+            label: "无",
+            value: "false"
+          }
+        ];
+      }
+    },
+
     getTreeData(XmlEntityMap) {
       //递归添加children
       var attrMap = XmlEntityMap.attributeMap;
@@ -1645,6 +1767,7 @@ export default {
     //console.log("this.$route.query",this.$route.query)
     this.BaseTemplate = JSON.parse(this.$route.query.BaseTemplate);
     this.template = this.$route.query.template;
+    this.lableConfigType();
     var BaseTemplatePathDTO = {
       path: this.BaseTemplate.baseTemplatePath
     };

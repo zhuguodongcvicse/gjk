@@ -661,24 +661,7 @@ function appendDiv() {
 
 var mousedownState = 0;
 var canvasState = false
-//初始固定画布大小
-function fixDiv(){
-	var fixDivStr = "<div class='pa1' id='0' style='top:'4000px';left:'6100px';border:'2px solid red' '>1111111111</div>"
-	$('body').append(fixDivStr);
-}
-// var div_right = document.getElementById('drop-bg')
-// div_right.onmousemove=function(event){
-// 	console.log(event)
-// 	var e=event || window.event;
-// 	var m_x=e.clientX;
-// 	var m_y=e.clientY;
-// 	var mainL=this.offsetLeft;
-// 	var mainT=this.offsetTop;
-// 	div_rightX = m_x-mainL;
-// 	div_rightY = m_y-mainT;
-// 	console.log("XXXXXXXXXXXXXXXXXXXXXXX",e.offsetX)
-// 	console.log("YYYYYYYYYYYYYYYYYYYYYYY",e.offsetY)
-// }
+
 //入口方法
 function main() {
 	window.clearInterval(int);
@@ -731,7 +714,7 @@ function main() {
 			//gjIdAndTemId = gjidAndTemid;
 			handleMessageToParent("returnFormJson", gjidAndTemid);
 			//添加画布构件点击事件
-			$('#' + a).off("click").on("click", function () { });
+			//$('#' + a).off("click").on("click", function () { });
 			$('#' + a).bind('click', function (event) {
 				//alert("节点点击事件");
 				event.stopPropagation();
@@ -1400,12 +1383,8 @@ jsPlumb.bind("connectionDragStop", function (info) {
 		}
 		if (!isConnect) {
 			jsPlumb.detach(info);
-			alert("节点类型不匹配");
+			handleMessageToParent("nodeTypeNotMatch", "节点类型不匹配");
 		}
-		// if(sourceType != targetType){
-		// 	jsPlumb.detach(info);
-		// 	alert("节点类型不匹配");
-		// }
 	}
 
 });
@@ -1619,12 +1598,13 @@ document.onkeydown = function () {
 			case "addConnection":  //新增连线为删除连线
 				var operationJSON
 				var sourceAndTarget = {}
+				console.log("删除连线状态",isRemoveConn)
 				if (!isRemoveConn) {
 					var operationJSON1 = chartOperationStack[rareOperation].pop()
+					//console.log("删除连线状态",operationJSON1)
 					operationJSON = operationJSON1.conn
-
 					sourceAndTarget.connSourceUUid = operationJSON1.connSourceUUid
-					sourceAndTarget.connTargetUUid = operationJSON.connTargetUUid
+					sourceAndTarget.connTargetUUid = operationJSON1.connTargetUUid
 				} else {
 					//console.log("使用新增连线对象")
 					chartOperationStack[rareOperation].pop()
@@ -1637,7 +1617,7 @@ document.onkeydown = function () {
 					}
 				}
 				//var operationJSON=chartOperationStack[rareOperation].pop();
-				//console.log(operationJSON)
+				//console.log("66666666",sourceAndTarget)
 				ctrlYStack['addConnection'].push(sourceAndTarget)
 				ctrlYOperationStack.push("addConnection");
 				limitY();
@@ -2588,7 +2568,6 @@ function loadJson(loadJson) {
 					config.isTarget = true
 					config.maxConnections = -1
 					config.connector[1].midpoint =midpoints[outIndex]
-					console.log("11111111",stub[outIndex])
 					config.connector[1].stub = stub[outIndex]
 					var outPoint = jsPlumb.addEndpoint(elem.blockId, {
 						anchors: [1, endpoint.anchorY, 1, 0],
@@ -2796,6 +2775,10 @@ $('.div_right').bind({
 					v.removeClass("nodeStyle")
 				});
 			}
+			$(".point").each(function (idx, elem) {
+				var $elem = $(elem);
+				$elem.remove()
+			})
 			idList = []
 			startX = e.pageX;
 			startY = e.pageY;
