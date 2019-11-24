@@ -196,69 +196,73 @@ export default {
     }
   },
   methods: {
-    goToAddCompPage(){
-        getBaseTemplate().then(response => {
-            console.log("getBaseTemplate - response", response)
-            let defauleBaseTemplate = []
-            for (let i in response.data) {
-                if (response.data[i].tempType === "构件模型") {
-                    defauleBaseTemplate.push(response.data[i])
-                }
+    goToAddCompPage() {
+      getBaseTemplate().then(response => {
+        console.log("getBaseTemplate - response", response);
+        let defauleBaseTemplate = [];
+        for (let i in response.data) {
+          if (response.data[i].tempType === "构件模型") {
+            defauleBaseTemplate.push(response.data[i]);
+          }
+        }
+        defauleBaseTemplate = JSON.parse(JSON.stringify(defauleBaseTemplate));
+        if (defauleBaseTemplate.length === 0) {
+          this.$alert(
+            "尚未添加构件建模基础模板，请先添加基础模板。",
+            "友情提示",
+            {
+              confirmButtonText: "确定"
             }
-            defauleBaseTemplate = JSON.parse(JSON.stringify(defauleBaseTemplate))
-            if(defauleBaseTemplate.length === 0) {
-                this.$alert('尚未添加构件建模基础模板，请先添加基础模板。', '友情提示', {
-                    confirmButtonText: '确定',
-                });
-                return
-            }
-            this.$store.dispatch("setAllBaseTemplate", response.data)
-            analysisXmlFile(response.data[0].tempPath).then(response => {
-                console.log("response", response);
-                this.$store.dispatch("setFetchStrInPointer");
-                //保存加载的数据
-                this.$store
-                    .dispatch("setSaveXmlMaps", response.data.data)
+          );
+          return;
+        }
+        this.$store.dispatch("setAllBaseTemplate", response.data);
+        analysisXmlFile(response.data[0].tempPath).then(response => {
+          console.log("response", response);
+          this.$store.dispatch("setFetchStrInPointer");
+          //保存加载的数据
+          this.$store
+            .dispatch("setSaveXmlMaps", response.data.data)
+            .then(() => {
+              //加载中英文映射
+              this.$store
+                .dispatch("setChineseMapping", "comp_param_type")
+                .then(() => {
+                  //加载结构体
+                  this.$store
+                    .dispatch("setStruceType")
                     .then(() => {
-                        //加载中英文映射
-                        this.$store
-                            .dispatch("setChineseMapping", "comp_param_type")
-                            .then(() => {
-                                //加载结构体
-                                this.$store
-                                    .dispatch("setStruceType")
-                                    .then(() => {
-                                        this.$router.push({
-                                            path: "/comp/showComp/addAndEditComp",
-                                            query: {
-                                                type: "add",
-                                                proFloName: "添加构件",
-                                                defauleBaseTemplate: defauleBaseTemplate
-                                            }
-                                        });
-                                    })
-                                    .catch(() => {
-                                        this.$message({
-                                            message: "保存加载的数据出错",
-                                            type: "error"
-                                        });
-                                    });
-                            })
-                            .catch(() => {
-                                this.$message({
-                                    message: "保存加载的数据出错",
-                                    type: "error"
-                                });
-                            });
-                        })
+                      this.$router.push({
+                        path: "/comp/showComp/addAndEditComp",
+                        query: {
+                          type: "add",
+                          proFloName: "添加构件",
+                          defauleBaseTemplate: defauleBaseTemplate
+                        }
+                      });
+                    })
                     .catch(() => {
-                        this.$message({
-                            message: "保存加载的数据出错",
-                            type: "error"
-                        });
+                      this.$message({
+                        message: "保存加载的数据出错",
+                        type: "error"
+                      });
                     });
+                })
+                .catch(() => {
+                  this.$message({
+                    message: "保存加载的数据出错",
+                    type: "error"
+                  });
+                });
+            })
+            .catch(() => {
+              this.$message({
+                message: "保存加载的数据出错",
+                type: "error"
+              });
             });
-        })
+        });
+      });
     },
     onExceed(file, fileList) {
       this.$message.warning(
