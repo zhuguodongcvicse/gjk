@@ -383,6 +383,7 @@ export default {
     getStructSel() {
       this.storeLengthVal = this.storeLengthVal;
       const sels = JSON.parse(JSON.stringify(this.structType));
+      console.log("11111111111111",sels)
       for (let i = 0; i < sels.length; i++) {
         const el = sels[i];
 

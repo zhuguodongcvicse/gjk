@@ -150,20 +150,24 @@
           >编辑</el-button>-->
           <el-button
             type="danger"
-            v-if="permissions.libs_software_del"
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
-          >删除</el-button>
+            v-if="scope.row.applyState=='0'||scope.row.applyState==null?true:false"
+          ><el-tag>删除</el-tag></el-button>
+<!--          v-if="permissions.libs_software_del"-->
           <el-tooltip class="item" effect="dark" content="入库" placement="top">
             <el-button
               type="primary"
               plain
               size="mini"
               @click="storageApply(scope.row,scope.index)"
-              :disabled="scope.row.applyState=='1'?true:scope.row.applyState=='2'?true:false"
-            >入库</el-button>
+              v-if="scope.row.applyState=='0'||scope.row.applyState=='3'||scope.row.applyState==null?true:false"
+            ><el-tag>入库</el-tag></el-button>
           </el-tooltip>
+          <span v-if="scope.row.applyState=='0'||scope.row.applyState=='3'||scope.row.applyState==null?false:true">
+            {{scope.row.applyState=='1'?"已申请":scope.row.applyState=='2'?"已入库":scope.row.applyState=='3'?"已驳回":scope.row.applyState=='4'?"驳回再申请":"未处理"}}
+          </span>
         </template>
       </avue-crud>
     </basic-container>

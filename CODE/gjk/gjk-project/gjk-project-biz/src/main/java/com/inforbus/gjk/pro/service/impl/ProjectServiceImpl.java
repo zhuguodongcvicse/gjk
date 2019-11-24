@@ -326,8 +326,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public R staticInspect(String filePath, String fileName) {
         Map<String, String> params = Maps.newHashMap();
+        String projectKey = "s"+fileName.hashCode();
         params.put("name", fileName);
-        params.put("project",""+fileName.hashCode());
+        params.put("project",projectKey);
         String url = "http://127.0.0.1:9000/api/projects/create";
         HttpResponse httpResponse = HttpClientUtil.toPost(url, params);
 		if(httpResponse==null){
@@ -349,7 +350,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         String diskCharacter = filePath.split(":")[0]+":";
         String execCommand = "cmd.exe /c cd " + filePath + " && "
                 + diskCharacter + " && E:\\soft\\sonar1024\\sonar-scanner-2.8\\bin\\sonar-scanner.bat -D\"sonar.projectKey="
-                + fileName.hashCode() + "\" -D\"sonar.sources=.\" -D\"sonar.host.url=http://localhost:9000\"";
+                + projectKey + "\" -D\"sonar.sources=.\" -D\"sonar.host.url=http://localhost:9000\"";
         try {
             Process execResult = Runtime.getRuntime().exec(execCommand);
             //出现error时 单个线程会阻塞
@@ -366,7 +367,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 		if(file.exists()){
         	file.renameTo(new File(filePath + "/.sonar/" + fileName + "检查报告.pdf"));
 		}
-        return new R<>(CommonConstants.SUCCESS,"filePath + \"/.sonar/\" + fileName + \".pdf\"",fileName.hashCode());
+        return new R<>(CommonConstants.SUCCESS,"filePath + \"/.sonar/\" + fileName + \".pdf\"",projectKey);
     }
 
 	@Override

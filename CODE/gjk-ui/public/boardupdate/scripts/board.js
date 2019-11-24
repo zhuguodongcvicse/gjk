@@ -962,6 +962,8 @@ function initEditor(editor) {
 		if (!selection || selection.length == 0) {
 			return false;
 		}
+		for (var i in selection) {
+			if (selection[i].properties.type == "port") {
 		// console.log("selection",selection[0].properties)
 		//Q.confirm("Delete Elements - " + selection.length, function () {
 		Q.confirm("是否删除？", function () {
@@ -1010,6 +1012,7 @@ function initEditor(editor) {
 			}
 			//  console.log("infOfExchangeCpuArr",infOfExchangeCpuArr)
 		}, this);
+	}}
 	}
 
 	var propertySheet = editor.propertyPane;
