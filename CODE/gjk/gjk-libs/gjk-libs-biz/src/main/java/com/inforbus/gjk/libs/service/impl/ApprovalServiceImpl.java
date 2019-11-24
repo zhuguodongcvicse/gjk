@@ -148,8 +148,9 @@ public class ApprovalServiceImpl extends ServiceImpl<ApprovalMapper, Approval> i
 	public List<ApprovalApply> getApprovalApplyIdByList(List<ApprovalApply> approvalApplies) {
 		List<ApprovalApply> list = new ArrayList<ApprovalApply>();
 		for (ApprovalApply item : approvalApplies) {
+			String approvalState = item.getApprovalState();
 			ApprovalApply approvalApply = isApprovalIdApplyIdExist(item);
-			approvalApply.setApprovalState("2");
+			approvalApply.setApprovalState(approvalState);
 			list.add(approvalApply);
 		}
 		return list;
