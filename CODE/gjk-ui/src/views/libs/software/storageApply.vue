@@ -5,7 +5,7 @@
         <span>是否将以下软件框架入库及相关文件提交入库？</span>
       </el-header>
       <el-main>
-        <el-form size="mini" label-position="right" label-width="120px" :model="form" :rules="projectRules">
+        <el-form size="mini" label-position="right" label-width="120px" :model="form" :rules="projectRules" ref="form">
           <el-form-item label="请选择审批人" prop="applyUser">
             <el-select v-model="form.applyUser" placeholder="请选择">
               <el-option
