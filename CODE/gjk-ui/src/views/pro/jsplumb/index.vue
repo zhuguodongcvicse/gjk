@@ -219,6 +219,10 @@ export default {
             arrMap = deepClone(this.xmlMaps[newParam.gjId]); //从基础的数据中获取
           }
           arrMap.attributeMap.id = newParam.tmpId;
+//          console.log(
+//           "arrMap.xmlEntityMaps[0].xmlEntityMaps",
+//            arrMap.xmlEntityMaps[0].xmlEntityMaps
+//         );
           this.$set(
             arrMap.xmlEntityMaps[0].xmlEntityMaps,
             "uids",
@@ -243,15 +247,17 @@ export default {
           // console.log("接收数据后处理。。。。。点击");
           // console.log("加载完成点击构件", this.tmpMaps, newParam.tmpId);
           let arrMap = this.tmpMaps.get(newParam.tmpId);
+          let tmpArrMap = {};
           if (arrMap.xmlEntityMaps[0].xmlEntityMaps.uids === undefined) {
             this.tmpMaps.set(newParam.tmpId, arrMap); // 使用map将 数据对应上
-            // this.$set(
-            //   arrMap.xmlEntitys[0].xmlEntitys,
-            //   "uids",
-            //   newParam.uuidList
-            // );
+            tmpArrMap = this.tmpMaps.get(newParam.tmpId);
+            this.$set(
+              tmpArrMap.xmlEntityMaps[0].xmlEntityMaps,
+              "uids",
+              newParam.uuidList
+            );
           }
-          this.saveXmlMaps = this.tmpMaps.get(newParam.tmpId); //tmpMaps使用map将 数据对应上
+          this.saveXmlMaps = tmpArrMap; //tmpMaps使用map将 数据对应上
         } else if (newParam.state === 3) {
           //需要复制的构件id组
           let tmpId = newParam.tmpId;
@@ -376,10 +382,10 @@ export default {
       // let iframeWin = this.$refs.iframe.contentWindow;
       jspDataParam.compId = this.saveXmlMaps.attributeMap.id;
       /* 发送iframe发送消息 */
-      //console.log("发送iframe发送消息", this.saveXmlMaps);
+      console.log("发送iframe发送消息", jspDataParam);
       this.postMessageData.cmd = "getCompDtosData";
       this.postMessageData.params = jspDataParam;
-      // this.$refs.gjkIframe.sendMessage(this.postMessageData);
+      this.$refs.gjkIframe.sendMessage(this.postMessageData);
     },
     changeSaveDBXmlMaps(saveComp, nameType) {
       let dBXmlMaps = this.deepClone(this.saveXmlMaps);
@@ -592,13 +598,12 @@ export default {
             removeCompProject(compId, projectId);
           });
           break;
-         case "nodeTypeNotMatch" :
-             this.$message({
-              showClose: true,
-              message: "节点类型不匹配",
-              type: "success"
-            });
-
+        case "nodeTypeNotMatch":
+          this.$message({
+            showClose: true,
+            message: "节点类型不匹配",
+            type: "success"
+          });
       }
     },
     //保存流程模型
@@ -637,38 +642,38 @@ export default {
       });
     },
     customFileUpload(event) {
-       this.$confirm("是否清空当前画布流程模型?", "提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        })
-      .then(data => {
-         this.postMessageData.cmd = "cleanCanvas";
-        this.$refs.gjkIframe.sendMessage(this.postMessageData);
-        // console.log("el-upload数据", event);
-        this.file = event.file;
-        // console.log("文件", this.file);
-        var formData = new FormData();
-        formData.append("file", this.file);
-        //console.log(formData);
-        importFile(formData).then(res => {
-          //console.log("导入后的数据", res.data.data);
-          res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
-            if (tmp.lableName !== "arrow") {
-              /* 将查询的东西插入到临时 */
-              // this.tempParam.push(tmp);
-              // 使用map将 数据对应上
-              this.tmpMaps.set(tmp.attributeMap.id, tmp);
-            }
-          });
-          this.postMessageData.cmd = "clickCompLoading";
-          this.postMessageData.params = res.data.data.json;
-          this.$refs.gjkIframe.sendMessage(this.postMessageData);
-        });
+      this.$confirm("是否清空当前画布流程模型?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
       })
-      .catch(function(err) {
-        next();
-      });
+        .then(data => {
+          this.postMessageData.cmd = "cleanCanvas";
+          this.$refs.gjkIframe.sendMessage(this.postMessageData);
+          // console.log("el-upload数据", event);
+          this.file = event.file;
+          // console.log("文件", this.file);
+          var formData = new FormData();
+          formData.append("file", this.file);
+          //console.log(formData);
+          importFile(formData).then(res => {
+            //console.log("导入后的数据", res.data.data);
+            res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
+              if (tmp.lableName !== "arrow") {
+                /* 将查询的东西插入到临时 */
+                // this.tempParam.push(tmp);
+                // 使用map将 数据对应上
+                this.tmpMaps.set(tmp.attributeMap.id, tmp);
+              }
+            });
+            this.postMessageData.cmd = "clickCompLoading";
+            this.postMessageData.params = res.data.data.json;
+            this.$refs.gjkIframe.sendMessage(this.postMessageData);
+          });
+        })
+        .catch(function(err) {
+          next();
+        });
       // if (confirm("是否清空当前画布构件")) {
       //   this.postMessageData.cmd = "cleanCanvas";
       //   this.$refs.gjkIframe.sendMessage(this.postMessageData);
