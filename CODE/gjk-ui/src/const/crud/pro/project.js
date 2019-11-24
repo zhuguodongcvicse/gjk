@@ -58,27 +58,27 @@ export const tableOption = {
       prop: 'projectImg',
       hide: true,
     },
-    {
-      label: '描述',
-      hide: true,
-      prop: 'description'
-    },
-    {
-      width: 150,
-      label: '默认软件框架库',
-      hide: true,
-      prop: 'defaultSoftwareId'
-    },
+    // {
+    //   label: '描述',
+    //   hide: true,
+    //   prop: 'description'
+    // },
+    // {
+    //   width: 150,
+    //   label: '默认软件框架库',
+    //   hide: true,
+    //   prop: 'defaultSoftwareId'
+    // },
     {
       label: '创建时间',
       prop: 'createTime',
       editDisabled: true
     },
-    {
-      label: '修改时间',
-      prop: 'updateTime',
-      hide: true,
-      editDisabled: true
-    },
+    // {
+    //   label: '修改时间',
+    //   prop: 'updateTime',
+    //   hide: true,
+    //   editDisabled: true
+    // },
   ]
 }

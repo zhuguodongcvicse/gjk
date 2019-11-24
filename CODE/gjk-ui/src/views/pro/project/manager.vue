@@ -19,7 +19,7 @@
         alt="收缩"
         @click="imgToClick"
         v-bind:style="{cursor:'pointer','vertical-align':'middle','position': 'absolute','top': '50%','left': '50%','transform': 'translate(-50%, -50%)'}"
-      >
+      />
     </div>
     <!--遮罩层-->
     <div id="fullbg" class="fullbg_14s" v-bind:style="rightClass"></div>
@@ -234,7 +234,7 @@ export default {
       return { x: ev.clientX + scrollLeft, y: ev.clientY + scrollTop };
     }, //移动
     dragMousedown(ev) {
-      document.getElementById('fullbg').style.display='block';
+      document.getElementById("fullbg").style.display = "block";
       let _this = this;
       let boxWidth = this.$refs.contail.offsetWidth;
       let oEvent = ev || event;
@@ -273,7 +273,7 @@ export default {
         }
       };
       document.onmouseup = function() {
-         document.getElementById('fullbg').style.display='none';
+        document.getElementById("fullbg").style.display = "none";
         document.onmousemove = null;
         document.onmouseup = null;
       };
@@ -307,22 +307,36 @@ export default {
       // console.log("node", node);
       let id = node.id;
       if (node.parentType == "11") {
-        fetchTwoNode(node, 2).then(res => {
-          //流程节点
-          let process = res.data.data;
-          // console.log("node", node, nodeRoot);
-          if (node.type == "11") {
-            this.$router.push({
-              path: "/comp/manager/process",
-              query: {
-                proId: process.parentId,
-                processId: node.id,
-                modelId: node.parentId,
-                proFloName: nodeRoot.fileName + '_' + res.data.data.fileName + '_' + node.label
-              }
+        this.$store.dispatch("setFetchStrInPointer");
+        //加载中英文映射
+        this.$store
+          .dispatch("setChineseMapping", "comp_param_type")
+          .then(() => {
+            //加载结构体
+            this.$store.dispatch("setStruceType").then(() => {
+              fetchTwoNode(node, 2).then(res => {
+                //流程节点
+                let process = res.data.data;
+                // console.log("node", node, nodeRoot);
+                if (node.type == "11") {
+                  this.$router.push({
+                    path: "/comp/manager/process",
+                    query: {
+                      proId: process.parentId,
+                      processId: node.id,
+                      modelId: node.parentId,
+                      proFloName:
+                        nodeRoot.fileName +
+                        "_" +
+                        res.data.data.fileName +
+                        "_" +
+                        node.label
+                    }
+                  });
+                }
+              });
             });
-          }
-        });
+          });
       }
       if (node.parentType == "24") {
         if (node.type == "24") {
@@ -378,7 +392,7 @@ export default {
         if (node.type == "16") {
           analysisThemeXML(node.id).then(val => {
             console.log("解析XML数据", val.data.data);
-            var xmlData = {params:val.data.data,id:node.id}
+            var xmlData = { params: val.data.data, id: node.id };
             this.$store
               .dispatch("AnalysisXML", xmlData)
               .then(() => {

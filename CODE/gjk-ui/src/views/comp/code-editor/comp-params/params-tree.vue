@@ -152,7 +152,10 @@ export default {
       "structType",
       "strInPointer",
       "cacheHeaderValueParams"
-    ])
+    ]),
+    clickNodeDataComputed() {
+      return deepClone(this.clickNodeData);
+    }
   },
   //监控data中的数据变化
   watch: {
@@ -160,6 +163,7 @@ export default {
     flowUids: {
       immediate: true,
       handler: function(uids) {
+        console.log("1111111111111111111111111111111111111111111", uids);
         uids.forEach(uid => {
           let str = new String(uid).split("*");
           if (str[1] === "input") {
@@ -174,7 +178,93 @@ export default {
         });
       }
     },
+    clickNodeDataComputed: {
+      handler: function(node, param) {
+        //流程建模更改DATA使用
+        if (node.lableName === param.lableName) {
+          let nodeCol = node.nodeData;
+          let tmpblParam = {};
+          let tmpblParamOld = {};
+          for (let key1 in nodeCol) {
+            for (let key2 in nodeCol[key1]) {
+              if (nodeCol[key1][key2].attrMappingName === this.lbParam) {
+                tmpblParam = nodeCol[key1][key2];
+                tmpblParamOld = param.nodeData[key1][key2];
+              }
+            }
+          }
+          //只是当类别发生改变是才进行发送
+          if (tmpblParam.lableName !== tmpblParamOld.lableName) {
+            let addOrDelParam = tmpblParam.lableName == "DATA" ? "add" : "del";
+            if (!tmpblParam.uid) {
+              if (this.paramType === "input") {
+                let keys = this.inputTmpuid.keys();
+                let uid =
+                  this.inputTmpuid.size +
+                  "*" +
+                  this.paramType +
+                  "*" +
+                  this.inputCmpuid;
+                this.$set(tmpblParam, "uid", uid);
+                if (addOrDelParam == "add") {
+                  this.inputTmpuid.set(this.inputTmpuid.size, uid);
+                } else if (addOrDelParam == "del") {
+                  this.inputTmpuid.remove();
+                }
+              } else if (this.paramType === "output") {
+                let uid =
+                  this.outputTmpuid.size +
+                  "*" +
+                  this.paramType +
+                  "*" +
+                  this.outputCmpuid;
+                this.$set(tmpblParam, "uid", uid);
+                if (addOrDelParam == "add") {
+                  this.outputTmpuid.set(this.outputTmpuid.size, uid);
+                } else if (addOrDelParam == "del") {
+                }
+              }
+            }
+            //配置数据
+            var tabData = {
+              // variable name
+              variableName: this.retNodeDataLableName(nodeCol, this.nameParam)
+                .lableName,
+              variableStructType: this.retNodeDataLableName(
+                nodeCol,
+                "structType"
+              ).lableName,
+              dataTypeName: this.retNodeDataLableName(nodeCol, this.bllxParam)
+                .lableName, //数据类型
+              orderNumName: this.retNodeDataLableName(
+                nodeCol,
+                this.numIndexParam
+              ).lableName, //序号
+              lengthName: this.retNodeDataLableName(nodeCol, this.lengthParam)
+                .lableName, //长度
+              categoryName: this.retNodeDataLableName(nodeCol, this.lbParam)
+                .lableName, //类别
+              voluationName: this.retNodeDataLableName(nodeCol, this.fzParam)
+                .lableName, //赋值
+              selectionVariableName: this.retNodeDataLableName(
+                nodeCol,
+                this.xzblPaeam
+              ).lableName //选择变量
+            };
 
+            let jspDataParam = {
+              compId: "",
+              inOrOut: this.paramType,
+              addOrDel: addOrDelParam,
+              uid: tmpblParam.uid,
+              data: tabData
+            };
+            this.$emit("jsplumbUidsChange", jspDataParam);
+          }
+        }
+      },
+      deep: true
+    },
     tableXmlParams: {
       immediate: true,
       handler: function() {
@@ -184,8 +274,6 @@ export default {
             : this.tableXmlParams.lableName === "输出"
             ? "output"
             : "";
-        // this.treeData = [];
-        // console.warn("初始化输入输出数据000000000000000000000");
         this.analysisAttrConfigType(this.tableXmlParams);
       }
     },
@@ -195,10 +283,6 @@ export default {
         let saveTreeData = [];
         this.analysisByBaseXmlOptionData(deepClone(treeData), saveTreeData);
         this.tableXmlParams.xmlEntityMaps = saveTreeData;
-        console.log(
-          "saveTreeDatasaveTreeDatasaveTreeDatasaveTreeData",
-          saveTreeData
-        );
         let { headerKey, headerValue } = this.cacheHeaderValueParams;
         for (let key in headerValue) {
           if (key === this.tableXmlParams.lableName) {
@@ -218,6 +302,18 @@ export default {
   },
   //方法集合
   methods: {
+    //返回lableName的值
+    retNodeDataLableName(nodeCol, name) {
+      let tmpblParam = {};
+      nodeCol.forEach(items => {
+        items.forEach(item => {
+          if (item.attrMappingName === name) {
+            tmpblParam = item;
+          }
+        });
+      });
+      return tmpblParam;
+    },
     //展开赋值返回的参数
     retStructChange(params) {
       this.structChange = params;
@@ -530,51 +626,6 @@ export default {
             this.$refs.tree.updateKeyChildren(this.aCheckedKeys[0], []);
           }
         }
-        //流程建模更改DATA使用
-        if (this.moduleType === "jsplumb") {
-          if (!col.uid) {
-            if (this.paramType === "input") {
-              this.$set(
-                col,
-                "uid",
-                this.inputTmpuid.size +
-                  "*" +
-                  this.paramType +
-                  "*" +
-                  this.inputCmpuid
-              );
-            } else if (this.paramType === "input") {
-              this.$set(
-                col,
-                "uid",
-                this.outputTmpuid.size +
-                  "*" +
-                  this.paramType +
-                  "*" +
-                  this.outputCmpuid
-              );
-            }
-          }
-          //配置数据
-          var tabData = {
-            // variableName: row.attributeNameValue,
-            // variableStructType: row.attributeStructTypeValue,
-            // dataTypeName: row.xmlEntitys[0].attributeNameValue,
-            // orderNumName: row.xmlEntitys[1].attributeNameValue,
-            // lengthName: row.xmlEntitys[2].attributeNameValue,
-            // categoryName: row.xmlEntitys[3].attributeNameValue,
-            // voluationName: row.xmlEntitys[4].attributeNameValue,
-            // selectionVariableName: row.xmlEntitys[5].attributeNameValue
-          };
-          let jspDataParam = {
-            compId: "",
-            inOrOut: this.paramType,
-            addOrDel: lableName == "DATA" ? "add" : "del",
-            uid: col.uid,
-            data: tabData
-          };
-          this.$emit("jsplumbUidsChange", jspDataParam);
-        }
       } else if (col.attrMappingName === this.nameParam) {
         //更改树上显示值
         if (this.$refs.tree !== undefined) {
@@ -847,9 +898,9 @@ export default {
         this.baseXmlOptionData = tmpData;
         let dataTree = [];
         //处理返回树形结构,此处没有问题
-        console.log("处理返回树形结构,", retDataAll);
+        // console.log("处理返回树形结构,", retDataAll);
         this.convertXmlToRootXml(retDataAll, dataTree);
-        console.log("处理返回树形结构,", dataTree);
+        // console.log("处理返回树形结构,", dataTree);
         this.treeData = dataTree;
         if (this.treeData !== undefined && this.treeData.length > 0) {
           // 当前表单
@@ -879,6 +930,7 @@ export default {
       let tmpData = {}; //处理表格 "variable"
       let tmpMaps = []; //处理表格 "variable".XmlEntityMaps
       if (attr.hasOwnProperty("xmlEntityMaps")) {
+        let indexMap = 0;
         attr.xmlEntityMaps.forEach(xml => {
           //组装树形数据
           let node = {};
@@ -895,6 +947,32 @@ export default {
           xmlChild.forEach(child => {
             if (child.attributeMap.configureType !== undefined) {
               let childArr = this.analysisMapping(child);
+              //如果再流程建模中就添加data节点（uid）
+              if (this.flowUids.length > 0) {
+                //循环所有属性
+                for (let key in childArr) {
+                  //类别和data
+                  if (
+                    childArr[key].attrMappingName === this.lbParam &&
+                    childArr[key].lableName === "DATA"
+                  ) {
+                    if (this.paramType === "input") {
+                      this.$set(
+                        childArr[key],
+                        "uid",
+                        this.inputTmpuid.get(String(indexMap++))
+                      );
+                    }
+                    if (this.paramType === "output") {
+                      this.$set(
+                        childArr[key],
+                        "uid",
+                        this.outputTmpuid.get(String(indexMap++))
+                      );
+                    }
+                  }
+                }
+              }
               tmpMaps = tmpMaps.concat(child);
               //处理合并子数据
               treeParam.push(childArr);
@@ -915,7 +993,6 @@ export default {
             } else {
               let tmpObj = {};
               tmpObj["id"] = randomUuid();
-              console.log("111111111111111111111111111111111",arrKey,deepClone(treeParam))
               tmpObj["lableName"] = arrKey;
               tmpObj["nodeData"] = deepClone(treeParam);
               tmpObj["assigParamName"] = "";
@@ -945,7 +1022,8 @@ export default {
             let attrKeys = Object.keys(mapValue);
             if (attrKeys.length > 1) {
               node = mapValue[attrKeys[0]];
-              node.lableName =node.nodeData[0][0].lableName= key + "[" + attrKeys.length + "]";
+              node.lableName = node.nodeData[0][0].lableName =
+                key + "[" + attrKeys.length + "]";
               console.log("大于1个节点", "node", node, mapValue);
               this.findArrayTmpMap.set(mapValue[attrKeys[0]].id, mapValue);
             } else {
@@ -1107,7 +1185,7 @@ export default {
     },
     //遍历保存数据根据基础baseXmlOptionData
     analysisByBaseXmlOptionData(treeData, saveTreeData, parentTree) {
-      console.log("treeDatatreeDatatreeData", treeData);
+      // console.log("treeDatatreeDatatreeData", treeData);
       treeData.forEach(tree => {
         let baseData = deepClone(this.baseXmlOptionData);
         let saveRow = deepClone(this.baseXmlOptionData);

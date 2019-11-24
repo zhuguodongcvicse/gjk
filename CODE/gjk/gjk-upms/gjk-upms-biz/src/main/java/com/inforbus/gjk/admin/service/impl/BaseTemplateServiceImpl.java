@@ -97,14 +97,17 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
             return false;
         }
         try {
-            baseTemplate.setUpdateTime(LocalDateTime.now());
-            baseMapper.updateById(baseTemplate);
+            boolean b = XmlFileHandleUtil.createXmlFile(xmlEntityMap, localPath);
+            if (b){
+                baseTemplate.setUpdateTime(LocalDateTime.now());
+                baseMapper.updateById(baseTemplate);
+                return true;
+            }
         }catch (Exception e){
             logger.error("数据保存失败,请联系管理员");
             e.printStackTrace();
-            return false;
         }
-        return XmlFileHandleUtil.createXmlFile(xmlEntityMap, localPath);//保存成功返回true
+        return false;//保存成功返回true
     }
 
     /**
