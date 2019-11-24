@@ -7,9 +7,9 @@ import com.inforbus.gjk.common.core.util.FileUtil;
 import com.inforbus.gjk.compile.task.Task;
 import com.inforbus.gjk.compile.util.ChannelSftpSingleton;
 import com.inforbus.gjk.compile.util.SftpUtil;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpProgressMonitor;
+import com.jcraft.jsch.*;
+import org.apache.commons.lang.StringUtils;
+import org.apache.tools.ant.taskdefs.Sleep;
 import org.eclipse.jgit.transport.JschSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,7 +140,7 @@ public class ComplieTask implements Task {
             } else if (platformType.equals("Linux")) {
                 //判断是否是 Linux平台
                 isFile = true;
-                str = linux(file.getAbsolutePath(), fileName, token);
+                str = linux(file.getAbsolutePath(), this.fileName, this.token);
 
             }
         } else {
@@ -263,7 +263,7 @@ public class ComplieTask implements Task {
                 }
                 p.destroy();
             }
-            if (ir != null){
+            if (ir != null) {
                 try {
                     ir.close();
                 } catch (IOException e) {
@@ -338,188 +338,111 @@ public class ComplieTask implements Task {
         String ProcessName = filePath.substring(0, filePath.lastIndexOf("APP"));
         ProcessName = ProcessName.substring(ProcessName.lastIndexOf(File.separator) + 1, ProcessName.length());
         System.out.println("流程名称====" + ProcessName);
-
-        boolean login = linuxLogin();
-        Session session = null;
         //执行linux命令编译 项目
-        try {
-            if (login){
-                session = connection.openSession();
-                //先创建流程文件夹
-                session.execCommand("mkdir " + linuxPath + "/" + ProcessName);
-                //再创建工程文件夹
-                session = connection.openSession();
-                session.execCommand("mkdir " + linuxPath + "/" + ProcessName + "/" + fileName);
-            }else {
-                return "连接失败";
-            }
-        } catch (IOException e) {
-            logger.error("IO异常请联系管理员");
-            e.getStackTrace();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
+        String cmd = null;
+        cmd = "mkdir " + linuxPath + "/" + ProcessName;
+        //先创建流程文件夹
+        boolean b = executeCommand(cmd, false);
+        cmd = "mkdir " + linuxPath + "/" + ProcessName + "/" + fileName;
+        //再创建工程文件夹
+        boolean b1 = executeCommand(cmd, false);
+        //String processPath = linuxPath + "/" + ProcessName;//流程路径
+        String projectPath = linuxPath + "/" + ProcessName + "/" + fileName;//项目路径
+//        ChannelSftp sftp = null;
+//        try {
+//            sftp = ChannelSftpSingleton.getInstance().getChannelSftp(this.ip, this.username, this.password);
+//            SftpATTRS stat = sftp.stat(projectPath);//判断项目路径是否创建成功
+//            if (stat == null){
+//                while (true){
+//                    stat = sftp.stat(projectPath);
+//                    if (stat != null){
+//                        break;
+//                    }
+//                }
+//            }
+//        } catch (JSchException e) {
+//            e.printStackTrace();
+//        } catch (SftpException e) {
+//            e.printStackTrace();
+//        }finally {
+//            if (sftp != null) {
+//                sftp.quit();
+//                sftp.disconnect();
+//            }
+//            try {
+//                ChannelSftpSingleton.getInstance().closeChannel();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
 
+        if (b && b1) {
+            String linuxAimsPath = linuxPath + "/" + ProcessName + "/" + fileName;
+            //将Windows 项目文件上传到linux服务器中
+            boolean isUploadSuccess = uploadFileToLinux(filePath, linuxAimsPath);
+            if (isUploadSuccess) {
+                cmd = "find " + linuxPath + "/" + ProcessName + "/" + fileName + " -name makefile";
+                //寻找makefile文件所在绝对路径
+                String makeFilePath = executeCommand2(cmd);
+                if (makeFilePath != null && !makeFilePath.equals("")) {
+                    cmd = "cd " + makeFilePath + " ; make clean ; make";
+                    boolean isMakeSuccess = executeCommand(cmd, true);//执行make命令
+                    if (isMakeSuccess) {
+                        cmd = "cd " + makeFilePath + " ; zip -r " + fileName + ".zip " + "*";
+                        boolean isZipSuccess = executeCommand(cmd, true);//执行打包命令
+                        if (isZipSuccess) {
 
-        //将Windows 项目文件上传到linux服务器中
-        try {
-            SftpUtil.uploadFilesToServer(filePath, linuxPath + "/" + ProcessName + "/" + fileName, ip, username, password, new SftpProgressMonitor() {
+                            //将连接状态设置成null
+                            ChannelSftpSingleton.channelSftpNull();
+                            //下载压缩包
+                            ChannelSftp chSftp = null;
+                            try {
+                                chSftp = ChannelSftpSingleton.getInstance().getChannelSftp(ip, username, password);
+                                try {
+                                    File downFile = new File(dPath);
+                                    if (!downFile.exists()) {
+                                        downFile.mkdirs();
+                                    }
+                                    SftpUtil.download(makeFilePath + "/" + fileName + ".zip", makeFilePath + "/" + fileName + ".zip", dPath, chSftp);
+                                    File rmFile = new File(dPath + "\\" + fileName + ".zip");
+                                    if (!rmFile.exists()) {
+                                        this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n压缩包文件下载失败");
+                                        return "下载失败";
+                                    }
+                                    //推送消息到rabbitmq中
+                                    this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n压缩包文件下载完毕");
+                                    //解压到工程Debug目录下
+                                    unZipFiles(dPath + "\\" + fileName + ".zip", filePath + "\\Debug");
+                                    //解压完删除压缩包
+                                    rmFile.delete();
+                                } catch (UnsupportedEncodingException e) {
+                                    logger.error("下载失败");
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    logger.error("解压失败");
+                                    e.printStackTrace();
+                                }
+                            } catch (JSchException e) {
+                                logger.error("下载失败，请联系管理员。");
+                                e.printStackTrace();
+                            }
 
-                @Override
-                public void init(int op, String src, String dest, long max) {
-                    logger.info(" 正在上传 " + src + " 到 " + dest + " , 文件大小： " + (double) (max / 1024) + "kb");
-                    System.out.println(" 正在上传 " + src + " 到 " + dest + " , 文件大小： " + (double) (max / 1024) + "kb");
+                            try {
+                                ChannelSftpSingleton.getInstance().closeChannel();
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                            //将连接状态设置成null
+                            ChannelSftpSingleton.channelSftpNull();
+                        }
+                    }
                 }
-
-                @Override
-                public void end() {
-                    logger.info("上传成功");
-                    System.out.println("上传成功");
-                }
-
-                @Override
-                public boolean count(long count) {
-                    return true;
-                }
-            });
-        } catch (Exception e) {
-            logger.error("上传失败,请检查ip地址,账号,密码是否正确");
-            e.printStackTrace();
-        }
-
-
-        //执行linux命令编译 项目
-        //makefile文件夹路径
-        String makeFilePath = "";
-        InputStream is = null;
-        BufferedReader bufRder = null;
-        try {
-            if (login){
-                session = connection.openSession();
-                //先执行查找makefile命令
-                session.execCommand("find " + linuxPath + "/" + ProcessName + "/" + fileName + " -name makefile");
-                //获取输出结果 为 makefile 的绝对路径
-                is = new StreamGobbler(session.getStdout());
-                bufRder = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-                String temp = "";
-                while ((temp = bufRder.readLine()) != null) {
-                    makeFilePath = temp.substring(0, temp.lastIndexOf("/"));
-                }
-                //找到路径后  执行make命令
-                session = connection.openSession();
-                session.execCommand("cd " + makeFilePath + " ; make clean ; make");
-
-                //成功返回
-                is = new StreamGobbler(session.getStdout());
-                bufRder = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-                while ((temp = bufRder.readLine()) != null) {
-                    //推送消息到rabbitmq中
-                    //this.rabbitmqTemplate.convertAndSend(token , token+"===@@@==="+fileName+"===@@@===\n"+temp);
-                    this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n" + temp);
-                }
-
-                //失败返回
-                is = new StreamGobbler(session.getStderr());
-                bufRder = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-                while ((temp = bufRder.readLine()) != null) {
-                    //推送消息到rabbitmq中
-                    this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n" + temp);
-                }
-
-                //执行打包命令
-                session = connection.openSession();
-                session.execCommand("cd " + makeFilePath + " ; zip -r " + fileName + ".zip " + "*");
-
-                //成功返回
-                is = new StreamGobbler(session.getStdout());
-                bufRder = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-                while ((temp = bufRder.readLine()) != null) {
-                    //推送消息到rabbitmq中
-                    this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n" + temp);
-                }
+            } else {
+                this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n 文件上传至linux系统失败,请联系管理员");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    logger.error("IO关闭失败，请联系管理员。");
-                    e.printStackTrace();
-                }
-            }
-            if (bufRder != null) {
-                try {
-                    bufRder.close();
-                } catch (IOException e) {
-                    logger.error("IO关闭失败，请联系管理员。");
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        //将连接状态设置成null
-        ChannelSftpSingleton.channelSftpNull();
-        //下载压缩包
-        ChannelSftp chSftp = null;
-        try {
-            chSftp = ChannelSftpSingleton.getInstance().getChannelSftp(ip, username, password);
-        } catch (JSchException e) {
-            logger.error("下载失败，请联系管理员。");
-            e.printStackTrace();
-        }
-        try {
-            File downFile = new File(dPath);
-            if (!downFile.exists()){
-                downFile.mkdirs();
-            }
-            SftpUtil.download(makeFilePath + "/" + fileName + ".zip", makeFilePath + "/" + fileName + ".zip", dPath, chSftp);
-            File rmFile = new File(dPath + "\\" + fileName + ".zip");
-            if (!rmFile.exists()){
-                this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n压缩包文件下载失败");
-                return "下载失败";
-            }
-            //推送消息到rabbitmq中
-            this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n压缩包文件下载完毕");
-            //解压到工程Debug目录下
-            unZipFiles(dPath + "\\" + fileName + ".zip", filePath + "\\Debug");
-            //解压完删除压缩包
-            rmFile.delete();
-        } catch (UnsupportedEncodingException e) {
-            logger.error("下载失败");
-            e.printStackTrace();
-        } catch (IOException e) {
-            logger.error("解压失败");
-            e.printStackTrace();
-        }
-        try {
-            ChannelSftpSingleton.getInstance().closeChannel();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        //将连接状态设置成null
-        ChannelSftpSingleton.channelSftpNull();
-
-        //执行完毕 删除 linux数据
-        try {
-            if (login){
-                session = connection.openSession();
-                //执行删除文件夹命令
-                session.execCommand("rm -rf " + linuxPath + "/" + ProcessName);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
+            cmd = "rm -rf " + linuxPath + "/" + ProcessName;
+            executeCommand(cmd, false);//删除流程文件夹
         }
 
         return "编译成功";
@@ -587,12 +510,12 @@ public class ComplieTask implements Task {
     }
 
     //linux系统连接方法
-    public boolean linuxLogin(){
+    public boolean linuxLogin() {
         boolean flag = false;
         try {
-            connection = new Connection(ip);
-            connection.connect();
-            flag = connection.authenticateWithPassword(username, password);
+            this.connection = new Connection(this.ip);
+            this.connection.connect();
+            flag = this.connection.authenticateWithPassword(this.username, this.password);
         } catch (IOException e) {
             logger.error("连接linux失败,请检查ip,账户,密码是否正确");
             e.printStackTrace();
@@ -600,5 +523,200 @@ public class ComplieTask implements Task {
         return flag;
     }
 
+    //linux 系统执行cmd命令行方法,flag 为是否把执行命令失败的控制台信息推送到mq中
+    public boolean executeCommand(String cmd, boolean flag) {
+        Session session = null;
+        try {
+            if (linuxLogin()) {
+                session = this.connection.openSession();
+                session.execCommand(cmd);
+                String str = processStdout(session.getStdout(), Charset.forName("UTF-8"));
+                if (flag) {
+                    if (StringUtils.isBlank(str)) {
+                        processStdout(session.getStderr(), Charset.forName("UTF-8"));
+                    }
+                }
+                return true;
+            } else {
+                System.out.println("连接linux系统失败,请检查ip,账号,密码");
+                logger.error("连接linux系统失败,请检查ip,账号,密码");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.error("IO异常");
+        } finally {
+            if (this.connection != null) {
+                this.connection.close();
+            }
+            if (session != null) {
+                session.close();
+            }
+        }
+        return false;
+    }
 
+    //rabbitmq推送消息
+    public String processStdout(InputStream in, Charset charset) {
+        InputStream stdout = new StreamGobbler(in);
+        BufferedReader reader = null;
+        String result = "";
+        try {
+            reader = new BufferedReader(new InputStreamReader(stdout, charset));
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                result = line;
+                this.rabbitmqTemplate.convertAndSend(this.token, this.fileName + "===@@@===\n" + line);
+            }
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            logger.error("获取流对象失败");
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.error("linux系统IO异常");
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    logger.error("流关闭失败");
+                }
+            }
+            if (stdout != null) {
+                try {
+                    stdout.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    logger.error("流关闭失败");
+                }
+            }
+        }
+        return result;
+    }
+
+    //linux 系统执行cmd命令行方法
+    public String executeCommand2(String cmd) {
+        String str = "";
+        Session session = null;
+        try {
+            if (linuxLogin()) {
+                session = this.connection.openSession();
+                session.execCommand(cmd);
+                str = processStdout2(session.getStdout(), Charset.forName("UTF-8"));
+                if (StringUtils.isBlank(str)) {
+                    str = processStdout2(session.getStderr(), Charset.forName("UTF-8"));
+                }
+            } else {
+                System.out.println("连接linux系统失败,请检查ip,账号,密码");
+                logger.error("连接linux系统失败,请检查ip,账号,密码");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.error("IO异常");
+        } finally {
+            if (this.connection != null) {
+                this.connection.close();
+            }
+            if (session != null) {
+                session.close();
+            }
+        }
+        return str;
+    }
+
+    //rabbitmq推送消息
+    public String processStdout2(InputStream in, Charset charset) {
+        InputStream stdout = new StreamGobbler(in);
+        BufferedReader reader = null;
+        String result = "";
+        try {
+            reader = new BufferedReader(new InputStreamReader(stdout, charset));
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                result = line.substring(0, line.lastIndexOf("/"));
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            logger.error("获取流对象失败");
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.error("linux系统IO异常");
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    logger.error("流关闭失败");
+                }
+            }
+            if (stdout != null) {
+                try {
+                    stdout.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    logger.error("流关闭失败");
+                }
+            }
+        }
+        return result;
+    }
+
+
+    //上传文件至linux系统中,参数1为被上穿文件地址,参数2为linux系统中上传的目标地址
+    public boolean uploadFileToLinux(String localFilePath, String linuxAmisPath) {
+        try {
+            SftpUtil.uploadFilesToServer(localFilePath, linuxAmisPath, this.ip, this.username, this.password, new SftpProgressMonitor() {
+                @Override
+                public void init(int op, String src, String dest, long max) {
+                    logger.info(" 正在上传 " + src + " 到 " + dest + " , 文件大小： " + (double) (max / 1024) + "kb");
+                    System.out.println(" 正在上传 " + src + " 到 " + dest + " , 文件大小： " + (double) (max / 1024) + "kb");
+                }
+
+                @Override
+                public void end() {
+                    logger.info("上传成功");
+                    System.out.println("上传成功");
+                }
+
+                @Override
+                public boolean count(long count) {
+                    return true;
+                }
+            });
+            return true;
+        } catch (Exception e) {
+            logger.error("上传失败,请检查ip地址,账号,密码是否正确");
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean createPathSuccess(String linuxAmisPath){
+        ChannelSftp chSftp = null;
+        try {
+            chSftp = ChannelSftpSingleton.getInstance().getChannelSftp(this.ip,this.username,this.password);
+            if (chSftp == null) {
+                return false;
+            }
+            chSftp.cd(linuxAmisPath);
+        } catch (JSchException e) {
+            e.printStackTrace();
+        } catch (SftpException e) {
+            e.printStackTrace();
+            return false;
+        }finally {
+            if (chSftp != null) {
+                chSftp.quit();
+                chSftp.disconnect();
+            }
+            try {
+                ChannelSftpSingleton.getInstance().closeChannel();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return true;
+    }
 }

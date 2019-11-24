@@ -181,8 +181,8 @@ function ondropLoadJSON(evt, graph, center, options) {
 	for (index in frontjson.datas) {
 		var image = frontjson.datas[index].json.image;
 		if (image == 'images/Chip.svg' || image == 'images/OpticalFiberMouth.svg' || image == 'images/InternetAccess.svg'
-		|| image == 'images/RoundMouth.svg' || image == 'images/SerialPort.svg' || image == 'images/BeforeTheBoard.svg'
-		|| image == 'images/AfterTheBoard.svg') {
+			|| image == 'images/RoundMouth.svg' || image == 'images/SerialPort.svg' || image == 'images/BeforeTheBoard.svg'
+			|| image == 'images/AfterTheBoard.svg') {
 			frontjson.datas[index].json.movable = false;
 		}
 		if (frontjson.datas[index].json.properties.chipName != null) {
@@ -194,8 +194,8 @@ function ondropLoadJSON(evt, graph, center, options) {
 	for (index in bJsonObj.datas) {
 		var image = bJsonObj.datas[index].json.image;
 		if (image == 'images/Chip.svg' || image == 'images/OpticalFiberMouth.svg' || image == 'images/InternetAccess.svg'
-		|| image == 'images/RoundMouth.svg' || image == 'images/SerialPort.svg' || image == 'images/BeforeTheBoard.svg'
-		|| image == 'images/AfterTheBoard.svg'|| image == 'rack') {
+			|| image == 'images/RoundMouth.svg' || image == 'images/SerialPort.svg' || image == 'images/BeforeTheBoard.svg'
+			|| image == 'images/AfterTheBoard.svg' || image == 'rack') {
 			bJsonObj.datas[index].json.movable = false;
 		}
 	}
@@ -1181,658 +1181,655 @@ function initEditor(editor) {
 		if (!selection || selection.length == 0) {
 			return false;
 		}
-		Q.confirm("是否 确认删除", function () {
-			var selection = this.removeSelection();
-			console.log("selection", selection)
-			for (const i in graphList.bJson) {
-				if (graphList.bJson[i].datas[0].json.properties.uniqueId == selection[0].properties.uniqueId) {
-					removeByValue(caseList, caseList[i])
-					removeByValue(graphList.fJson, graphList.fJson[i])
-					removeByValue(graphList.bJson, graphList.bJson[i])
-				}
-			}
-			if (linkList.length != 0) {
-				for (let i = 0; i < linkList.length; i++) {
-					if (linkList[i] != null && linkList[i][0].json.properties.uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
-						removeByValue(linkList, linkList[i])
-					}
-					if (linkList[i] != null && linkList[i][1].json.properties.uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
-						removeByValue(linkList, linkList[i])
-					}
-				}
-			}
-			if (linkGraphList.datas.length != 0) {
-				for (const i in linkGraphList.datas) {
-					if (linkGraphList.datas[i]._className == "Q.RectElement" && linkGraphList.datas[i].json.properties.uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
-						for (const j in linkGraphList.datas) {
-							if (linkGraphList.datas[j]._className == "Q.Edge") {
-								if (linkGraphList.datas[j].json.from._ref == linkGraphList.datas[i]._refId) {
-									for (const k in linkGraphList.datas) {
-										if (linkGraphList.datas[k]._className == "Q.RectElement" && linkGraphList.datas[j].json.to._ref == linkGraphList.datas[k]._refId) {
-											linkGraphList.datas[k].waitDelete = 0
-										}
-									}
-									linkGraphList.datas[j].waitDelete = 0
-								}
-								if (linkGraphList.datas[j].json.to._ref == linkGraphList.datas[i]._refId) {
-									for (const k in linkGraphList.datas) {
-										if (linkGraphList.datas[k]._className == "Q.RectElement" && linkGraphList.datas[j].json.from._ref == linkGraphList.datas[k]._refId) {
-											linkGraphList.datas[k].waitDelete = 0
-										}
-									}
-									linkGraphList.datas[j].waitDelete = 0
-								}
-							}
-						}
-						linkGraphList.datas[i].waitDelete = 0
-					}
-				}
-			}
-			for (let i = 0; i < linkGraphList.datas.length; i++) {
-				if (linkGraphList.datas[i].waitDelete != null) {
-					removeByValue(linkGraphList.datas, linkGraphList.datas[i])
-					i--
-				}
-			}
-			/* if (linkGraphList.datas.length != 0) {
-				for (let i = 0; i < linkGraphList.datas.length; i++) {
-					if (linkGraphList.datas[i]._className == "Q.RectElement" && linkGraphList.datas[i].json.properties.uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
-						if (linkGraphList.datas[i + 2]._className == "Q.Edge") {
-							console.log("+++")
-							console.log("linkGraphList.datas[i]",linkGraphList.datas[i])
-							console.log("linkGraphList.datas[i + 1]",linkGraphList.datas[i + 1])
-							console.log("linkGraphList.datas[i + 2]",linkGraphList.datas[i + 2])
-							removeByValue(linkGraphList.datas, linkGraphList.datas[i])
-							removeByValue(linkGraphList.datas, linkGraphList.datas[i + 1])
-							removeByValue(linkGraphList.datas, linkGraphList.datas[i + 2])
-							i = i - 3
-							break
-						}
-						if (linkGraphList.datas[i + 1]._className == "Q.Edge") {
-							console.log("---")
-							removeByValue(linkGraphList.datas, linkGraphList.datas[i - 1])
-							removeByValue(linkGraphList.datas, linkGraphList.datas[i])
-							removeByValue(linkGraphList.datas, linkGraphList.datas[i + 1])
-							i = i - 3
-							break
-						}
-					}
-				}
-			} */
-			linkMap.forEach(function (value, key) {
-				if (key.uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
-					linkMap.delete(key)
-				}
-				if (value.uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
-					linkMap.delete(key)
-				}
-			});
-			//第一次切换回正面
-			if (typeof backAllCaseJsonTemp != 'undefined' && backAllCaseJsonTemp.datas.length != 0) {
-				for (let i = 0; i < backAllCaseJsonTemp.datas.length; i++) {
-					if (backAllCaseJsonTemp.datas[i].json.properties == null || backAllCaseJsonTemp.datas[i]._className == "Q.Edge") {
-						removeByValue(backAllCaseJsonTemp.datas, backAllCaseJsonTemp.datas[i])
-						i--
-					}
-				}
-			}
-			if (typeof backAllCaseJsonTemp != 'undefined' && backAllCaseJsonTemp.datas.length != 0) {
-				for (let i = 0; i < backAllCaseJsonTemp.datas.length; i++) {
-					if (backAllCaseJsonTemp.datas[i].json.properties != null && backAllCaseJsonTemp.datas[i].json.properties.infName != null
-						&& backAllCaseJsonTemp.datas[i].json.properties.uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
-						removeByValue(backAllCaseJsonTemp.datas, backAllCaseJsonTemp.datas[i])
-						i--
-					}
-				}
-			}
-			/* for (let i = 0; i < frontCaseForDeployment.datas.length;) {
-				if (frontCaseForDeployment.datas[i].json.properties.caseName != null && frontCaseForDeployment.datas[i].json.properties.uniqueId == selection[0].properties.uniqueId) {
-					while (frontCaseForDeployment.datas[i + 1].json.properties.caseName == null) {
-						removeByValue(frontCaseForDeployment.datas, frontCaseForDeployment.datas[i])
-						i++
-						if (i == frontCaseForDeployment.datas.length) {
-							removeByValue(frontCaseForDeployment.datas, frontCaseForDeployment.datas[i])
-							break
-						}
-					}
-					break
-				} else {
-					i++
-				}
-			} */
-			console.log("backAllCaseJsonTemp", backAllCaseJsonTemp)
-			console.log("caseList", caseList)
-			console.log("graphList", graphList)
-			console.log("linkList", linkList)
-			console.log("linkGraphList", linkGraphList)
-			console.log("linkMap", linkMap)
-		}, this);
-	}
-	function removeJsonDatas(n) {
-		removeByValue(frontCaseForDeployment.datas, frontCaseForDeployment.datas[n])
-		return ++n
-	}
-	//右侧属性面板
-	var propertySheet = editor.propertyPane;
-	propertySheet.showDefaultProperties = false;
-
-	//自定义属性面板
-	propertySheet.getCustomPropertyDefinitions = function (data) {
-		clickObj = data
-		var type = data.get('type');
-		var image = data.image;
-		// console.log("propertySheet",propertySheet)
-		// console.log("data",data)
-		// console.log("type",type)
-		//这里可以获得当前点击的图元对象
-		graph.onclick = function (evt) {
-			var data = graph.getElement(evt);
-			//	console.log("data",JSON.stringify(data.properties))
-			console.log("data", data)
-			/* var parent = document.getElementsByClassName('graph-editor__property')
-			var child = document.getElementsByClassName('btn btn-primary')
-			// console.log("parent",parent)
-			// console.log("child",child)
-			// console.log("++",parent[0] instanceof jQuery)
-			// console.log("--",parent[0] instanceof HTMLElement)
-			if (child.length != 0) {
-				parent[0].removeChild(child[0]);
-			} */
-
-			if (typeof data == 'undefined') {
-				return
-			}
-			if (data.properties.chipName != null) {
-				var chipPropertyList = document.getElementsByClassName('form-control')
-				chipPropertyList.item(0).setAttribute("readonly","readonly")
-				chipPropertyList.item(1).setAttribute("readonly","readonly")
-				chipPropertyList.item(2).setAttribute("readonly","readonly")
-				chipPropertyList.item(3).setAttribute("readonly","readonly")
-				chipPropertyList.item(4).setAttribute("readonly","readonly")
-				//给ip输入框添加失去聚焦属性
-				document.getElementById('IP').childNodes.item(0).setAttribute("onblur", "upperCase()")
-				// console.log("chipPropertyList",chipPropertyList)
-				clickCheckedChip = data.properties
-				//将板卡对应卡槽的slotnum赋给fSlotNum
-				// console.log("propertySheet",propertySheet)
-				/* var submitButton = document.createElement('input');
-				submitButton.className = 'btn btn-primary '
-				submitButton.value = 'Submit';
-				propertySheet.dom.parentNode.appendChild(submitButton);
-				submitButton.onclick = function () {
-					var node = propertySheet.datas[0];
-					// console.log("node",node)
-					// console.log("node.properties.IP", node.properties.IP)
-					for (const m in graphList.fJson) {
-						for (const k in graphList.fJson[m].datas) {
-							if (graphList.fJson[m].datas[k].json.properties != null && graphList.fJson[m].datas[k].json.properties.caseName != null) {
-								for (const i in graphList.fJson[m].datas[k].json.properties.frontBoardList) {
-									for (const j in graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList) {
-										//找到数组中点击的当前芯片
-										if (graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList[j].uniqueId.indexOf(data.properties.uniqueId) != -1) {
-											//当前配置栏输入的IP赋给数组中芯片的属性
-											graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList[j].IP = node.properties.IP
-											//将该赋值后的芯片放到临时的芯片数组中
-											chipListTemp.push(graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList[j])
-										}
-									}
-								}
-							}
-						}
-					}
-					//深拷贝
-					chipListTemp = JSON.parse(JSON.stringify(chipListTemp))
-					parent[0].removeChild(child[0]);
-					console.log("chipListTemp", chipListTemp)
-				} */
-			}
-			if (data.properties.chipName != null) {
-				data.set('chipName', data.properties.chipName);
-				data.set('coreNum', data.properties.coreNum);
-				data.set('memSize', data.properties.memSize);
-				data.set('hrTypeName', data.properties.hrTypeName);
-				data.set('recvRate', data.properties.recvRate);
-			}
-			if (data.properties.infName != null) {
-				var infPropertyList = document.getElementsByClassName('form-control')
-				infPropertyList.item(0).setAttribute("readonly","readonly")
-				infPropertyList.item(1).setAttribute("readonly","readonly")
-				infPropertyList.item(2).setAttribute("readonly","readonly")
-				// console.log("infPropertyList",infPropertyList)
-				data.set('infName', data.properties.infName);
-				data.set('infRate', data.properties.infRate);
-				data.set('opticalNum', data.properties.opticalNum);
-			}
-			if (data.properties.boardType != null) {
-				var boardPropertyList = document.getElementsByClassName('form-control')
-				boardPropertyList.item(0).setAttribute("readonly","readonly")
-				boardPropertyList.item(1).setAttribute("readonly","readonly")
-				// console.log("boardPropertyList",boardPropertyList)
-				if (data.properties.boardType == 0) {
-					data.set('showBoardType', 'calculateBoard');
-				}
-				if (data.properties.boardType == 1) {
-					data.set('showBoardType', 'FpgaBoard');
-				}
-				if (data.properties.boardType == 2) {
-					data.set('showBoardType', 'exchangeBoard');
-				}
-				if (data.properties.boardType == 3) {
-					data.set('showBoardType', 'interfaceBoard');
-				}
-				data.set('boardName', data.properties.boardName);
-			}
-			if (data.properties.caseName != null) {
-				var casePropertyList = document.getElementsByClassName('form-control')
-				casePropertyList.item(0).setAttribute("readonly","readonly")
-				casePropertyList.item(1).setAttribute("readonly","readonly")
-				// console.log("casePropertyList",casePropertyList)
-			}
-			// data.set('rackname', data.properties.caseName);
-			// data.set('boardnum', data.properties.bdnum);
-		}
-		if (image == 'images/Chip.svg') {
-			return {
-				group: '芯片属性',
-				properties: [{
-					client: 'chipName',
-					displayName: '芯片名称'
-				},
-				{
-					client: 'coreNum',
-					displayName: '内核数量'
-				},
-				{
-					client: 'memSize',
-					displayName: '内存大小'
-				},
-				{
-					client: 'recvRate',
-					displayName: '接收速率'
-				},
-				{
-					client: 'hrTypeName',
-					displayName: '平台大类'
-				},
-				{
-					client: 'IP',
-					displayName: 'IP'
-				}
-				]
-			}
-		}
-		// console.log("data",data)
-		if (image == 'images/OpticalFiberMouth.svg') {
-			return {
-				group: '接口属性',
-				properties: [{
-					client: 'infName',
-					displayName: '接口名称'
-				},
-				{
-					client: 'infRate',
-					displayName: '接口速率'
-				},
-				{
-					client: 'opticalNum',
-					displayName: '光纤数量'
-				}
-				]
-			}
-		}
-		if (image == 'images/AfterTheBoard.svg' || image == 'images/BeforeTheBoard.svg') {
-			return {
-				group: '主板属性',
-				properties: [{
-					client: 'boardName',
-					displayName: '主板名称'
-				},
-				{
-					client: 'showBoardType',
-					displayName: '主板类型'
-				}
-				]
-			}
-		}
-
-		if (type == 'port') {
-			return {
-				group: '接口属性',
-				properties: [{
-					client: 'infName',
-					displayName: '接口名称'
-				},
-				{
-					client: 'infRate',
-					displayName: '接口速率'
-				}
-				]
-			}
-		}
-		if (image == 'rack') {
-			return {
-				group: '机箱属性',
-				properties: [{
-					client: 'caseName',
-					displayName: '机箱名称'
-				},
-				{
-					client: 'bdNum',
-					displayName: '主板数量'
-				}
-				]
-			}
-
-		}
-		// console.log("propertySheet",propertySheet)
-	}
-
-	//交互效果
-	function initInteraction() {
-		var currentElement;
-		var oldFillColor;
-		var highlightColor = "#FF0";
-
-		function unhighlight() {
-			if (currentElement) {
-				currentElement.setStyle(Q.Styles.SHAPE_FILL_COLOR, oldFillColor);
-			}
-		}
-
-		function highlight(element) {
-			if (currentElement == element) {
-				return;
-			}
-			unhighlight(currentElement);
-			currentElement = element;
-			if (!currentElement) {
-				return;
-			}
-			oldFillColor = currentElement.getStyle(Q.Styles.SHAPE_FILL_COLOR);
-			currentElement.setStyle(Q.Styles.SHAPE_FILL_COLOR, highlightColor);
-		}
-
-		function findSlot(element, evt) {
-			var xy = graph.toLogical(evt.event);
-			var type = element.get('type');
-
-			function canDrop(data) {
-				return data.get('type') == 'slot' && data.get('childType') == type;
-			}
-
-			var slot;
-			graph.forEachReverseVisibleUI(function (ui) {
-				// console.log("ui",ui)
-				// console.log("element",element)
-				if (ui.data == element || ui.data.isDescendantOf(element)) {
-					return;
-				}
-				var bounds = graph.getUIBounds(ui);
-				if (bounds.intersects(xy.x, xy.y)) {
-					if (canDrop(ui.data)) {
-						slot = ui.data;
-					}
-					return false;
-				}
-			});
-			return slot;
-		}
-
-		function adaptBounds(element, slot) {
-			element.parent = element.host = slot;
-			var bounds = slot.getBounds();
-			graph.moveElements([element], bounds.x - element.x, bounds.y - element.y)
-		}
-
-		var dragInfo = {};
-		graph.interactionDispatcher.addListener(function (evt) {
-			// console.log('evt',evt)
-			// console.log('evt',evt.kind == Q.InteractionEvent.ELEMENT_MOVE_END)
-			if (evt.kind === EVENT_CREATE_ELEMENT_BY_JSON) {
-				if (evt.roots.length === 1) {
-					var element = evt.roots[0];
-					var slot = findSlot(element, evt);
-					if (slot) {
-						adaptBounds(element, slot);
-					}
-				}
-				return;
-			}
-			var data = evt.data;
-			if (evt.kind == Q.InteractionEvent.ELEMENT_CREATED && evt.data instanceof Q.Node) {
-				var currentElement = graph.getElement(evt.event);
-				var slot = findSlot(data, evt);
-				if (slot) {
-					adaptBounds(data, slot);
-				}
-				return;
-			}
-			if (evt.kind == Q.InteractionEvent.ELEMENT_CREATED && evt.data instanceof Q.Edge) {
-				var edge = evt.data;
-				//校验只能接口连线
-				if (evt.data.from.image != 'images/OpticalFiberMouth.svg' && evt.data.from.image != 'images/RoundMouth.svg' &&
-				evt.data.from.image != 'images/InternetAccess.svg' && evt.data.from.image != 'images/SerialPort.svg'
-				) {
-					graph.removeElement(edge);
-				}
-				if (evt.data.to.image != 'images/OpticalFiberMouth.svg' && evt.data.to.image != 'images/RoundMouth.svg' &&
-				evt.data.to.image != 'images/InternetAccess.svg' && evt.data.to.image != 'images/SerialPort.svg'
-				) {
-					graph.removeElement(edge);
-				}
-
-
-				//连线条件限制
-
-				var edgeBundle = edge.getEdgeBundle();
-				edge.setStyle(Q.Styles.EDGE_COLOR, '#2D97F9');
-				edge.name = ' ';
-				edge.setStyle(Q.Styles.ARROW_TO, true);
-				if (edge.from.edgeCount > 1 || edge.to.edgeCount > 1) {
-					graph.removeElement(edge);
-				}
-				if (edgeBundle.length > 1) {
-					graph.removeElement(edge);
-				}
-				if (edgeBundle.node1 == edgeBundle.node2) {
-					graph.removeElement(edge);
-				}
-			}
-			if (evt.kind == Q.InteractionEvent.ELEMENT_MOVE_START) {
-				var type = data.get('type');
-				// console.log("type", type)
-				if (type && (type == 'card' || type == 'port')) {
-					dragInfo = {
-						data: data,
-						x: data.x,
-						y: data.y
-					};
-					graph.sendToTop(data);
-				} else {
-					dragInfo = null;
-				}
-				return;
-			}
-			//机箱移动结束后刷新对应一面机箱的坐标
-			if (evt.kind == Q.InteractionEvent.ELEMENT_MOVE_END) {//data.properties.caseName != null && 
-				// console.log("data", data)
-				moveLocation = data.location
-				if (data.properties.frontBoardList != null) {
-					//正面机箱坐标
-					// data.location
-					for (const i in graphList.fJson) {
-						if (graphList.fJson[i].datas[0].json.properties.uniqueId == data.properties.uniqueId) {
-							for (const j in graphList.fJson[i].datas) {
-								if (j != 0 && graphList.fJson[i].datas[j].json.location != null) {
-									if (graphList.fJson[i].datas[j].json.location.json != null) {
-										graphList.fJson[i].datas[j].json.location.json.x = graphList.fJson[i].datas[j].json.location.json.x + (moveLocation.x - graphList.fJson[i].datas[0].json.location.x)
-										graphList.fJson[i].datas[j].json.location.json.y = graphList.fJson[i].datas[j].json.location.json.y + (moveLocation.y - graphList.fJson[i].datas[0].json.location.y)
-									} else {
-										graphList.fJson[i].datas[j].json.location.x = graphList.fJson[i].datas[j].json.location.x + (moveLocation.x - graphList.fJson[i].datas[0].json.location.x)
-										graphList.fJson[i].datas[j].json.location.y = graphList.fJson[i].datas[j].json.location.y + (moveLocation.y - graphList.fJson[i].datas[0].json.location.y)
-									}
-								}
-							}
-							graphList.fJson[i].datas[0].json.location.x = moveLocation.x
-							graphList.fJson[i].datas[0].json.location.y = moveLocation.y
-						}
-					}
+		for (var i in selection) {
+			if (selection[i].properties.type == "case") {
+				Q.confirm("是否 确认删除", function () {
+					var selection = this.removeSelection();
 					for (const i in graphList.bJson) {
-						if (graphList.bJson[i].datas[0].json.properties.uniqueId == data.properties.uniqueId) {
-							for (const j in graphList.bJson[i].datas) {
-								if (j != 0 && graphList.bJson[i].datas[j].json.location != null) {
-									if (graphList.bJson[i].datas[j].json.location.json != null) {
-										graphList.bJson[i].datas[j].json.location.json.x = graphList.bJson[i].datas[j].json.location.json.x + (moveLocation.x - graphList.bJson[i].datas[0].json.location.x)
-										graphList.bJson[i].datas[j].json.location.json.y = graphList.bJson[i].datas[j].json.location.json.y + (moveLocation.y - graphList.bJson[i].datas[0].json.location.y)
-										if (linkList.length != 0) {
-											for (const k in linkList) {
-												if (linkList[k][0].json.properties != null && linkList[k][0].json.properties.uniqueId == graphList.bJson[i].datas[j].json.properties.uniqueId) {
-													linkList[k][0].json.location.json.x = graphList.bJson[i].datas[j].json.location.json.x
-													linkList[k][0].json.location.json.y = graphList.bJson[i].datas[j].json.location.json.y
-												}
-												if (linkList[k][1].json.properties != null && linkList[k][1].json.properties.uniqueId == graphList.bJson[i].datas[j].json.properties.uniqueId) {
-													linkList[k][1].json.location.json.x = graphList.bJson[i].datas[j].json.location.json.x
-													linkList[k][1].json.location.json.y = graphList.bJson[i].datas[j].json.location.json.y
+						if (graphList.bJson[i].datas[0].json.properties.uniqueId == selection[0].properties.uniqueId) {
+							removeByValue(caseList, caseList[i])
+							removeByValue(graphList.fJson, graphList.fJson[i])
+							removeByValue(graphList.bJson, graphList.bJson[i])
+						}
+					}
+					if (linkList.length != 0) {
+						for (let i = 0; i < linkList.length; i++) {
+							if (linkList[i] != null && linkList[i][0].json.properties.uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
+								removeByValue(linkList, linkList[i])
+							}
+							if (linkList[i] != null && linkList[i][1].json.properties.uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
+								removeByValue(linkList, linkList[i])
+							}
+						}
+					}
+					if (linkGraphList.datas.length != 0) {
+						for (const i in linkGraphList.datas) {
+							if (linkGraphList.datas[i]._className == "Q.RectElement" && linkGraphList.datas[i].json.properties.uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
+								for (const j in linkGraphList.datas) {
+									if (linkGraphList.datas[j]._className == "Q.Edge") {
+										if (linkGraphList.datas[j].json.from._ref == linkGraphList.datas[i]._refId) {
+											for (const k in linkGraphList.datas) {
+												if (linkGraphList.datas[k]._className == "Q.RectElement" && linkGraphList.datas[j].json.to._ref == linkGraphList.datas[k]._refId) {
+													linkGraphList.datas[k].waitDelete = 0
 												}
 											}
+											linkGraphList.datas[j].waitDelete = 0
 										}
-										if (linkGraphList.datas.length != 0) {
+										if (linkGraphList.datas[j].json.to._ref == linkGraphList.datas[i]._refId) {
 											for (const k in linkGraphList.datas) {
-												if (linkGraphList.datas[k].json.properties != null && linkGraphList.datas[k].json.properties.uniqueId == graphList.bJson[i].datas[j].json.properties.uniqueId) {
-													if (linkGraphList.datas[k].json.location != null && linkGraphList.datas[k].json.location.json != null) {
-														linkGraphList.datas[k].json.location.json.x = graphList.bJson[i].datas[j].json.location.json.x
-														linkGraphList.datas[k].json.location.json.y = graphList.bJson[i].datas[j].json.location.json.y
+												if (linkGraphList.datas[k]._className == "Q.RectElement" && linkGraphList.datas[j].json.from._ref == linkGraphList.datas[k]._refId) {
+													linkGraphList.datas[k].waitDelete = 0
+												}
+											}
+											linkGraphList.datas[j].waitDelete = 0
+										}
+									}
+								}
+								linkGraphList.datas[i].waitDelete = 0
+							}
+						}
+					}
+					for (let i = 0; i < linkGraphList.datas.length; i++) {
+						if (linkGraphList.datas[i].waitDelete != null) {
+							removeByValue(linkGraphList.datas, linkGraphList.datas[i])
+							i--
+						}
+					}
+					/* if (linkGraphList.datas.length != 0) {
+						for (let i = 0; i < linkGraphList.datas.length; i++) {
+							if (linkGraphList.datas[i]._className == "Q.RectElement" && linkGraphList.datas[i].json.properties.uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
+								if (linkGraphList.datas[i + 2]._className == "Q.Edge") {
+									console.log("+++")
+									console.log("linkGraphList.datas[i]",linkGraphList.datas[i])
+									console.log("linkGraphList.datas[i + 1]",linkGraphList.datas[i + 1])
+									console.log("linkGraphList.datas[i + 2]",linkGraphList.datas[i + 2])
+									removeByValue(linkGraphList.datas, linkGraphList.datas[i])
+									removeByValue(linkGraphList.datas, linkGraphList.datas[i + 1])
+									removeByValue(linkGraphList.datas, linkGraphList.datas[i + 2])
+									i = i - 3
+									break
+								}
+								if (linkGraphList.datas[i + 1]._className == "Q.Edge") {
+									console.log("---")
+									removeByValue(linkGraphList.datas, linkGraphList.datas[i - 1])
+									removeByValue(linkGraphList.datas, linkGraphList.datas[i])
+									removeByValue(linkGraphList.datas, linkGraphList.datas[i + 1])
+									i = i - 3
+									break
+								}
+							}
+						}
+					} */
+					linkMap.forEach(function (value, key) {
+						if (key.uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
+							linkMap.delete(key)
+						}
+						if (value.uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
+							linkMap.delete(key)
+						}
+					});
+					//第一次切换回正面
+					if (typeof backAllCaseJsonTemp != 'undefined' && backAllCaseJsonTemp.datas.length != 0) {
+						for (let i = 0; i < backAllCaseJsonTemp.datas.length; i++) {
+							if (backAllCaseJsonTemp.datas[i].json.properties == null || backAllCaseJsonTemp.datas[i]._className == "Q.Edge") {
+								removeByValue(backAllCaseJsonTemp.datas, backAllCaseJsonTemp.datas[i])
+								i--
+							}
+						}
+					}
+					if (typeof backAllCaseJsonTemp != 'undefined' && backAllCaseJsonTemp.datas.length != 0) {
+						for (let i = 0; i < backAllCaseJsonTemp.datas.length; i++) {
+							if (backAllCaseJsonTemp.datas[i].json.properties != null && backAllCaseJsonTemp.datas[i].json.properties.infName != null
+								&& backAllCaseJsonTemp.datas[i].json.properties.uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
+								removeByValue(backAllCaseJsonTemp.datas, backAllCaseJsonTemp.datas[i])
+								i--
+							}
+						}
+					}
+					/* for (let i = 0; i < frontCaseForDeployment.datas.length;) {
+						if (frontCaseForDeployment.datas[i].json.properties.caseName != null && frontCaseForDeployment.datas[i].json.properties.uniqueId == selection[0].properties.uniqueId) {
+							while (frontCaseForDeployment.datas[i + 1].json.properties.caseName == null) {
+								removeByValue(frontCaseForDeployment.datas, frontCaseForDeployment.datas[i])
+								i++
+								if (i == frontCaseForDeployment.datas.length) {
+									removeByValue(frontCaseForDeployment.datas, frontCaseForDeployment.datas[i])
+									break
+								}
+							}
+							break
+						} else {
+							i++
+						}
+					} */
+				}, this);
+			}
+		}
+		}
+		function removeJsonDatas(n) {
+			removeByValue(frontCaseForDeployment.datas, frontCaseForDeployment.datas[n])
+			return ++n
+		}
+		//右侧属性面板
+		var propertySheet = editor.propertyPane;
+		propertySheet.showDefaultProperties = false;
+
+		//自定义属性面板
+		propertySheet.getCustomPropertyDefinitions = function (data) {
+			clickObj = data
+			var type = data.get('type');
+			var image = data.image;
+			// console.log("propertySheet",propertySheet)
+			// console.log("data",data)
+			// console.log("type",type)
+			//这里可以获得当前点击的图元对象
+			graph.onclick = function (evt) {
+				var data = graph.getElement(evt);
+				//	console.log("data",JSON.stringify(data.properties))
+				console.log("data", data)
+				/* var parent = document.getElementsByClassName('graph-editor__property')
+				var child = document.getElementsByClassName('btn btn-primary')
+				// console.log("parent",parent)
+				// console.log("child",child)
+				// console.log("++",parent[0] instanceof jQuery)
+				// console.log("--",parent[0] instanceof HTMLElement)
+				if (child.length != 0) {
+					parent[0].removeChild(child[0]);
+				} */
+
+				if (typeof data == 'undefined') {
+					return
+				}
+				if (data.properties.chipName != null) {
+					var chipPropertyList = document.getElementsByClassName('form-control')
+					chipPropertyList.item(0).setAttribute("readonly", "readonly")
+					chipPropertyList.item(1).setAttribute("readonly", "readonly")
+					chipPropertyList.item(2).setAttribute("readonly", "readonly")
+					chipPropertyList.item(3).setAttribute("readonly", "readonly")
+					chipPropertyList.item(4).setAttribute("readonly", "readonly")
+					//给ip输入框添加失去聚焦属性
+					document.getElementById('IP').childNodes.item(0).setAttribute("onblur", "upperCase()")
+					// console.log("chipPropertyList",chipPropertyList)
+					clickCheckedChip = data.properties
+					//将板卡对应卡槽的slotnum赋给fSlotNum
+					// console.log("propertySheet",propertySheet)
+					/* var submitButton = document.createElement('input');
+					submitButton.className = 'btn btn-primary '
+					submitButton.value = 'Submit';
+					propertySheet.dom.parentNode.appendChild(submitButton);
+					submitButton.onclick = function () {
+						var node = propertySheet.datas[0];
+						// console.log("node",node)
+						// console.log("node.properties.IP", node.properties.IP)
+						for (const m in graphList.fJson) {
+							for (const k in graphList.fJson[m].datas) {
+								if (graphList.fJson[m].datas[k].json.properties != null && graphList.fJson[m].datas[k].json.properties.caseName != null) {
+									for (const i in graphList.fJson[m].datas[k].json.properties.frontBoardList) {
+										for (const j in graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList) {
+											//找到数组中点击的当前芯片
+											if (graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList[j].uniqueId.indexOf(data.properties.uniqueId) != -1) {
+												//当前配置栏输入的IP赋给数组中芯片的属性
+												graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList[j].IP = node.properties.IP
+												//将该赋值后的芯片放到临时的芯片数组中
+												chipListTemp.push(graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList[j])
+											}
+										}
+									}
+								}
+							}
+						}
+						//深拷贝
+						chipListTemp = JSON.parse(JSON.stringify(chipListTemp))
+						parent[0].removeChild(child[0]);
+						console.log("chipListTemp", chipListTemp)
+					} */
+				}
+				if (data.properties.chipName != null) {
+					data.set('chipName', data.properties.chipName);
+					data.set('coreNum', data.properties.coreNum);
+					data.set('memSize', data.properties.memSize);
+					data.set('hrTypeName', data.properties.hrTypeName);
+					data.set('recvRate', data.properties.recvRate);
+				}
+				if (data.properties.infName != null) {
+					var infPropertyList = document.getElementsByClassName('form-control')
+					infPropertyList.item(0).setAttribute("readonly", "readonly")
+					infPropertyList.item(1).setAttribute("readonly", "readonly")
+					infPropertyList.item(2).setAttribute("readonly", "readonly")
+					// console.log("infPropertyList",infPropertyList)
+					data.set('infName', data.properties.infName);
+					data.set('infRate', data.properties.infRate);
+					data.set('opticalNum', data.properties.opticalNum);
+				}
+				if (data.properties.boardType != null) {
+					var boardPropertyList = document.getElementsByClassName('form-control')
+					boardPropertyList.item(0).setAttribute("readonly", "readonly")
+					boardPropertyList.item(1).setAttribute("readonly", "readonly")
+					// console.log("boardPropertyList",boardPropertyList)
+					if (data.properties.boardType == 0) {
+						data.set('showBoardType', 'calculateBoard');
+					}
+					if (data.properties.boardType == 1) {
+						data.set('showBoardType', 'FpgaBoard');
+					}
+					if (data.properties.boardType == 2) {
+						data.set('showBoardType', 'exchangeBoard');
+					}
+					if (data.properties.boardType == 3) {
+						data.set('showBoardType', 'interfaceBoard');
+					}
+					data.set('boardName', data.properties.boardName);
+				}
+				if (data.properties.caseName != null) {
+					var casePropertyList = document.getElementsByClassName('form-control')
+					casePropertyList.item(0).setAttribute("readonly", "readonly")
+					casePropertyList.item(1).setAttribute("readonly", "readonly")
+					// console.log("casePropertyList",casePropertyList)
+				}
+				// data.set('rackname', data.properties.caseName);
+				// data.set('boardnum', data.properties.bdnum);
+			}
+			if (image == 'images/Chip.svg') {
+				return {
+					group: '芯片属性',
+					properties: [{
+						client: 'chipName',
+						displayName: '芯片名称'
+					},
+					{
+						client: 'coreNum',
+						displayName: '内核数量'
+					},
+					{
+						client: 'memSize',
+						displayName: '内存大小'
+					},
+					{
+						client: 'recvRate',
+						displayName: '接收速率'
+					},
+					{
+						client: 'hrTypeName',
+						displayName: '平台大类'
+					},
+					{
+						client: 'IP',
+						displayName: 'IP'
+					}
+					]
+				}
+			}
+			// console.log("data",data)
+			if (image == 'images/OpticalFiberMouth.svg') {
+				return {
+					group: '接口属性',
+					properties: [{
+						client: 'infName',
+						displayName: '接口名称'
+					},
+					{
+						client: 'infRate',
+						displayName: '接口速率'
+					},
+					{
+						client: 'opticalNum',
+						displayName: '光纤数量'
+					}
+					]
+				}
+			}
+			if (image == 'images/AfterTheBoard.svg' || image == 'images/BeforeTheBoard.svg') {
+				return {
+					group: '主板属性',
+					properties: [{
+						client: 'boardName',
+						displayName: '主板名称'
+					},
+					{
+						client: 'showBoardType',
+						displayName: '主板类型'
+					}
+					]
+				}
+			}
+
+			if (type == 'port') {
+				return {
+					group: '接口属性',
+					properties: [{
+						client: 'infName',
+						displayName: '接口名称'
+					},
+					{
+						client: 'infRate',
+						displayName: '接口速率'
+					}
+					]
+				}
+			}
+			if (image == 'rack') {
+				return {
+					group: '机箱属性',
+					properties: [{
+						client: 'caseName',
+						displayName: '机箱名称'
+					},
+					{
+						client: 'bdNum',
+						displayName: '主板数量'
+					}
+					]
+				}
+
+			}
+			// console.log("propertySheet",propertySheet)
+		}
+
+		//交互效果
+		function initInteraction() {
+			var currentElement;
+			var oldFillColor;
+			var highlightColor = "#FF0";
+
+			function unhighlight() {
+				if (currentElement) {
+					currentElement.setStyle(Q.Styles.SHAPE_FILL_COLOR, oldFillColor);
+				}
+			}
+
+			function highlight(element) {
+				if (currentElement == element) {
+					return;
+				}
+				unhighlight(currentElement);
+				currentElement = element;
+				if (!currentElement) {
+					return;
+				}
+				oldFillColor = currentElement.getStyle(Q.Styles.SHAPE_FILL_COLOR);
+				currentElement.setStyle(Q.Styles.SHAPE_FILL_COLOR, highlightColor);
+			}
+
+			function findSlot(element, evt) {
+				var xy = graph.toLogical(evt.event);
+				var type = element.get('type');
+
+				function canDrop(data) {
+					return data.get('type') == 'slot' && data.get('childType') == type;
+				}
+
+				var slot;
+				graph.forEachReverseVisibleUI(function (ui) {
+					// console.log("ui",ui)
+					// console.log("element",element)
+					if (ui.data == element || ui.data.isDescendantOf(element)) {
+						return;
+					}
+					var bounds = graph.getUIBounds(ui);
+					if (bounds.intersects(xy.x, xy.y)) {
+						if (canDrop(ui.data)) {
+							slot = ui.data;
+						}
+						return false;
+					}
+				});
+				return slot;
+			}
+
+			function adaptBounds(element, slot) {
+				element.parent = element.host = slot;
+				var bounds = slot.getBounds();
+				graph.moveElements([element], bounds.x - element.x, bounds.y - element.y)
+			}
+
+			var dragInfo = {};
+			graph.interactionDispatcher.addListener(function (evt) {
+				// console.log('evt',evt)
+				// console.log('evt',evt.kind == Q.InteractionEvent.ELEMENT_MOVE_END)
+				if (evt.kind === EVENT_CREATE_ELEMENT_BY_JSON) {
+					if (evt.roots.length === 1) {
+						var element = evt.roots[0];
+						var slot = findSlot(element, evt);
+						if (slot) {
+							adaptBounds(element, slot);
+						}
+					}
+					return;
+				}
+				var data = evt.data;
+				if (evt.kind == Q.InteractionEvent.ELEMENT_CREATED && evt.data instanceof Q.Node) {
+					var currentElement = graph.getElement(evt.event);
+					var slot = findSlot(data, evt);
+					if (slot) {
+						adaptBounds(data, slot);
+					}
+					return;
+				}
+				if (evt.kind == Q.InteractionEvent.ELEMENT_CREATED && evt.data instanceof Q.Edge) {
+					var edge = evt.data;
+					//校验只能接口连线
+					if (evt.data.from.image != 'images/OpticalFiberMouth.svg' && evt.data.from.image != 'images/RoundMouth.svg' &&
+						evt.data.from.image != 'images/InternetAccess.svg' && evt.data.from.image != 'images/SerialPort.svg'
+					) {
+						graph.removeElement(edge);
+					}
+					if (evt.data.to.image != 'images/OpticalFiberMouth.svg' && evt.data.to.image != 'images/RoundMouth.svg' &&
+						evt.data.to.image != 'images/InternetAccess.svg' && evt.data.to.image != 'images/SerialPort.svg'
+					) {
+						graph.removeElement(edge);
+					}
+
+
+					//连线条件限制
+
+					var edgeBundle = edge.getEdgeBundle();
+					edge.setStyle(Q.Styles.EDGE_COLOR, '#2D97F9');
+					edge.name = ' ';
+					edge.setStyle(Q.Styles.ARROW_TO, true);
+					if (edge.from.edgeCount > 1 || edge.to.edgeCount > 1) {
+						graph.removeElement(edge);
+					}
+					if (edgeBundle.length > 1) {
+						graph.removeElement(edge);
+					}
+					if (edgeBundle.node1 == edgeBundle.node2) {
+						graph.removeElement(edge);
+					}
+				}
+				if (evt.kind == Q.InteractionEvent.ELEMENT_MOVE_START) {
+					var type = data.get('type');
+					// console.log("type", type)
+					if (type && (type == 'card' || type == 'port')) {
+						dragInfo = {
+							data: data,
+							x: data.x,
+							y: data.y
+						};
+						graph.sendToTop(data);
+					} else {
+						dragInfo = null;
+					}
+					return;
+				}
+				//机箱移动结束后刷新对应一面机箱的坐标
+				if (evt.kind == Q.InteractionEvent.ELEMENT_MOVE_END) {//data.properties.caseName != null && 
+					// console.log("data", data)
+					moveLocation = data.location
+					if (data.properties.frontBoardList != null) {
+						//正面机箱坐标
+						// data.location
+						for (const i in graphList.fJson) {
+							if (graphList.fJson[i].datas[0].json.properties.uniqueId == data.properties.uniqueId) {
+								for (const j in graphList.fJson[i].datas) {
+									if (j != 0 && graphList.fJson[i].datas[j].json.location != null) {
+										if (graphList.fJson[i].datas[j].json.location.json != null) {
+											graphList.fJson[i].datas[j].json.location.json.x = graphList.fJson[i].datas[j].json.location.json.x + (moveLocation.x - graphList.fJson[i].datas[0].json.location.x)
+											graphList.fJson[i].datas[j].json.location.json.y = graphList.fJson[i].datas[j].json.location.json.y + (moveLocation.y - graphList.fJson[i].datas[0].json.location.y)
+										} else {
+											graphList.fJson[i].datas[j].json.location.x = graphList.fJson[i].datas[j].json.location.x + (moveLocation.x - graphList.fJson[i].datas[0].json.location.x)
+											graphList.fJson[i].datas[j].json.location.y = graphList.fJson[i].datas[j].json.location.y + (moveLocation.y - graphList.fJson[i].datas[0].json.location.y)
+										}
+									}
+								}
+								graphList.fJson[i].datas[0].json.location.x = moveLocation.x
+								graphList.fJson[i].datas[0].json.location.y = moveLocation.y
+							}
+						}
+						for (const i in graphList.bJson) {
+							if (graphList.bJson[i].datas[0].json.properties.uniqueId == data.properties.uniqueId) {
+								for (const j in graphList.bJson[i].datas) {
+									if (j != 0 && graphList.bJson[i].datas[j].json.location != null) {
+										if (graphList.bJson[i].datas[j].json.location.json != null) {
+											graphList.bJson[i].datas[j].json.location.json.x = graphList.bJson[i].datas[j].json.location.json.x + (moveLocation.x - graphList.bJson[i].datas[0].json.location.x)
+											graphList.bJson[i].datas[j].json.location.json.y = graphList.bJson[i].datas[j].json.location.json.y + (moveLocation.y - graphList.bJson[i].datas[0].json.location.y)
+											if (linkList.length != 0) {
+												for (const k in linkList) {
+													if (linkList[k][0].json.properties != null && linkList[k][0].json.properties.uniqueId == graphList.bJson[i].datas[j].json.properties.uniqueId) {
+														linkList[k][0].json.location.json.x = graphList.bJson[i].datas[j].json.location.json.x
+														linkList[k][0].json.location.json.y = graphList.bJson[i].datas[j].json.location.json.y
+													}
+													if (linkList[k][1].json.properties != null && linkList[k][1].json.properties.uniqueId == graphList.bJson[i].datas[j].json.properties.uniqueId) {
+														linkList[k][1].json.location.json.x = graphList.bJson[i].datas[j].json.location.json.x
+														linkList[k][1].json.location.json.y = graphList.bJson[i].datas[j].json.location.json.y
 													}
 												}
 											}
-										}
-									} else {
-										graphList.bJson[i].datas[j].json.location.x = graphList.bJson[i].datas[j].json.location.x + (moveLocation.x - graphList.bJson[i].datas[0].json.location.x)
-										graphList.bJson[i].datas[j].json.location.y = graphList.bJson[i].datas[j].json.location.y + (moveLocation.y - graphList.bJson[i].datas[0].json.location.y)
-									}
-								}
-							}
-							graphList.bJson[i].datas[0].json.location.x = moveLocation.x
-							graphList.bJson[i].datas[0].json.location.y = moveLocation.y
-						}
-					}
-				} else {
-					for (const i in graphList.fJson) {
-						if (graphList.fJson[i].datas[0].json.properties.uniqueId == data.properties.uniqueId) {
-							for (const j in graphList.fJson[i].datas) {
-								if (j != 0 && graphList.fJson[i].datas[j].json.location != null) {
-									if (graphList.fJson[i].datas[j].json.location.json != null) {
-										graphList.fJson[i].datas[j].json.location.json.x = graphList.fJson[i].datas[j].json.location.json.x + (moveLocation.x - graphList.fJson[i].datas[0].json.location.x)
-										graphList.fJson[i].datas[j].json.location.json.y = graphList.fJson[i].datas[j].json.location.json.y + (moveLocation.y - graphList.fJson[i].datas[0].json.location.y)
-									} else {
-										graphList.fJson[i].datas[j].json.location.x = graphList.fJson[i].datas[j].json.location.x + (moveLocation.x - graphList.fJson[i].datas[0].json.location.x)
-										graphList.fJson[i].datas[j].json.location.y = graphList.fJson[i].datas[j].json.location.y + (moveLocation.y - graphList.fJson[i].datas[0].json.location.y)
-									}
-								}
-							}
-							graphList.fJson[i].datas[0].json.location.x = moveLocation.x
-							graphList.fJson[i].datas[0].json.location.y = moveLocation.y
-						}
-					}
-					for (const i in graphList.bJson) {
-						if (graphList.bJson[i].datas[0].json.properties.uniqueId == data.properties.uniqueId) {
-							for (const j in graphList.bJson[i].datas) {
-								if (j != 0 && graphList.bJson[i].datas[j].json.location != null) {
-									if (graphList.bJson[i].datas[j].json.location.json != null) {
-										graphList.bJson[i].datas[j].json.location.json.x = graphList.bJson[i].datas[j].json.location.json.x + (moveLocation.x - graphList.bJson[i].datas[0].json.location.x)
-										graphList.bJson[i].datas[j].json.location.json.y = graphList.bJson[i].datas[j].json.location.json.y + (moveLocation.y - graphList.bJson[i].datas[0].json.location.y)
-									} else {
-										graphList.bJson[i].datas[j].json.location.x = graphList.bJson[i].datas[j].json.location.x + (moveLocation.x - graphList.bJson[i].datas[0].json.location.x)
-										graphList.bJson[i].datas[j].json.location.y = graphList.bJson[i].datas[j].json.location.y + (moveLocation.y - graphList.bJson[i].datas[0].json.location.y)
-									}
-									for (const k in linkGraphList.datas) {
-										if (graphList.bJson[i].datas[j].json.properties != null && linkGraphList.datas[k]._className == "Q.RectElement"
-											&& graphList.bJson[i].datas[j].json.properties.uniqueId == linkGraphList.datas[k].json.properties.uniqueId) {
-											linkGraphList.datas[k].json.location.json.x = graphList.bJson[i].datas[j].json.location.json.x
-											linkGraphList.datas[k].json.location.json.y = graphList.bJson[i].datas[j].json.location.json.y
+											if (linkGraphList.datas.length != 0) {
+												for (const k in linkGraphList.datas) {
+													if (linkGraphList.datas[k].json.properties != null && linkGraphList.datas[k].json.properties.uniqueId == graphList.bJson[i].datas[j].json.properties.uniqueId) {
+														if (linkGraphList.datas[k].json.location != null && linkGraphList.datas[k].json.location.json != null) {
+															linkGraphList.datas[k].json.location.json.x = graphList.bJson[i].datas[j].json.location.json.x
+															linkGraphList.datas[k].json.location.json.y = graphList.bJson[i].datas[j].json.location.json.y
+														}
+													}
+												}
+											}
+										} else {
+											graphList.bJson[i].datas[j].json.location.x = graphList.bJson[i].datas[j].json.location.x + (moveLocation.x - graphList.bJson[i].datas[0].json.location.x)
+											graphList.bJson[i].datas[j].json.location.y = graphList.bJson[i].datas[j].json.location.y + (moveLocation.y - graphList.bJson[i].datas[0].json.location.y)
 										}
 									}
+								}
+								graphList.bJson[i].datas[0].json.location.x = moveLocation.x
+								graphList.bJson[i].datas[0].json.location.y = moveLocation.y
+							}
+						}
+					} else {
+						for (const i in graphList.fJson) {
+							if (graphList.fJson[i].datas[0].json.properties.uniqueId == data.properties.uniqueId) {
+								for (const j in graphList.fJson[i].datas) {
+									if (j != 0 && graphList.fJson[i].datas[j].json.location != null) {
+										if (graphList.fJson[i].datas[j].json.location.json != null) {
+											graphList.fJson[i].datas[j].json.location.json.x = graphList.fJson[i].datas[j].json.location.json.x + (moveLocation.x - graphList.fJson[i].datas[0].json.location.x)
+											graphList.fJson[i].datas[j].json.location.json.y = graphList.fJson[i].datas[j].json.location.json.y + (moveLocation.y - graphList.fJson[i].datas[0].json.location.y)
+										} else {
+											graphList.fJson[i].datas[j].json.location.x = graphList.fJson[i].datas[j].json.location.x + (moveLocation.x - graphList.fJson[i].datas[0].json.location.x)
+											graphList.fJson[i].datas[j].json.location.y = graphList.fJson[i].datas[j].json.location.y + (moveLocation.y - graphList.fJson[i].datas[0].json.location.y)
+										}
+									}
+								}
+								graphList.fJson[i].datas[0].json.location.x = moveLocation.x
+								graphList.fJson[i].datas[0].json.location.y = moveLocation.y
+							}
+						}
+						for (const i in graphList.bJson) {
+							if (graphList.bJson[i].datas[0].json.properties.uniqueId == data.properties.uniqueId) {
+								for (const j in graphList.bJson[i].datas) {
+									if (j != 0 && graphList.bJson[i].datas[j].json.location != null) {
+										if (graphList.bJson[i].datas[j].json.location.json != null) {
+											graphList.bJson[i].datas[j].json.location.json.x = graphList.bJson[i].datas[j].json.location.json.x + (moveLocation.x - graphList.bJson[i].datas[0].json.location.x)
+											graphList.bJson[i].datas[j].json.location.json.y = graphList.bJson[i].datas[j].json.location.json.y + (moveLocation.y - graphList.bJson[i].datas[0].json.location.y)
+										} else {
+											graphList.bJson[i].datas[j].json.location.x = graphList.bJson[i].datas[j].json.location.x + (moveLocation.x - graphList.bJson[i].datas[0].json.location.x)
+											graphList.bJson[i].datas[j].json.location.y = graphList.bJson[i].datas[j].json.location.y + (moveLocation.y - graphList.bJson[i].datas[0].json.location.y)
+										}
+										for (const k in linkGraphList.datas) {
+											if (graphList.bJson[i].datas[j].json.properties != null && linkGraphList.datas[k]._className == "Q.RectElement"
+												&& graphList.bJson[i].datas[j].json.properties.uniqueId == linkGraphList.datas[k].json.properties.uniqueId) {
+												linkGraphList.datas[k].json.location.json.x = graphList.bJson[i].datas[j].json.location.json.x
+												linkGraphList.datas[k].json.location.json.y = graphList.bJson[i].datas[j].json.location.json.y
+											}
+										}
 
+									}
+								}
+								graphList.bJson[i].datas[0].json.location.x = moveLocation.x
+								graphList.bJson[i].datas[0].json.location.y = moveLocation.y
+							}
+						}
+
+						// graph.parseJSON(linkGraphList)
+					}
+					// graphList.fJson
+				}
+				/* if (evt.kind == Q.InteractionEvent.ELEMENT_MOVING && linkGraphList.length != 0) {
+					console.log("graphList.bJson*data", graphList.bJson)
+					console.log("ELEMENT_MOVING*data", data)
+					console.log("linkGraphList*data", linkGraphList)
+					for (const i in linkGraphList.datas) {
+						for (const j in graphList.bJson) {
+							for (const k in graphList.bJson[j].datas) {
+								if (graphList.bJson[j].datas[k].json.properties != null && linkGraphList.datas[i]._className == "Q.RectElement"
+									&& graphList.bJson[j].datas[k].json.properties.uniqueId == linkGraphList.datas[i].json.properties.uniqueId) {
+										console.log("++++")
+										linkGraphList.datas[i].json.location.json.x = graphList.bJson[j].datas[k].json.location.json.x
+										linkGraphList.datas[i].json.location.json.y = graphList.bJson[j].datas[k].json.location.json.y
 								}
 							}
-							graphList.bJson[i].datas[0].json.location.x = moveLocation.x
-							graphList.bJson[i].datas[0].json.location.y = moveLocation.y
 						}
 					}
-
-					// graph.parseJSON(linkGraphList)
+					// graph.removeElement(node);
+					graph.parseJSON(linkGraphList)
+				} */
+				if (!dragInfo) {
+					return
 				}
-				// graphList.fJson
-			}
-			/* if (evt.kind == Q.InteractionEvent.ELEMENT_MOVING && linkGraphList.length != 0) {
-				console.log("graphList.bJson*data", graphList.bJson)
-				console.log("ELEMENT_MOVING*data", data)
-				console.log("linkGraphList*data", linkGraphList)
-				for (const i in linkGraphList.datas) {
-					for (const j in graphList.bJson) {
-						for (const k in graphList.bJson[j].datas) {
-							if (graphList.bJson[j].datas[k].json.properties != null && linkGraphList.datas[i]._className == "Q.RectElement"
-								&& graphList.bJson[j].datas[k].json.properties.uniqueId == linkGraphList.datas[i].json.properties.uniqueId) {
-									console.log("++++")
-									linkGraphList.datas[i].json.location.json.x = graphList.bJson[j].datas[k].json.location.json.x
-									linkGraphList.datas[i].json.location.json.y = graphList.bJson[j].datas[k].json.location.json.y
-							}
-						}
+				if (evt.kind == Q.InteractionEvent.ELEMENT_MOVING) {
+					var slot = findSlot(data, evt);
+					if (!slot) {
+						unhighlight();
+					} else {
+						highlight(slot);
 					}
+					return;
 				}
-				// graph.removeElement(node);
-				graph.parseJSON(linkGraphList)
-			} */
-			if (!dragInfo) {
-				return
-			}
-			if (evt.kind == Q.InteractionEvent.ELEMENT_MOVING) {
-				var slot = findSlot(data, evt);
-				if (!slot) {
+				if (evt.kind == Q.InteractionEvent.ELEMENT_MOVE_END) {
+					// console.log("evt",evt)
 					unhighlight();
-				} else {
-					highlight(slot);
+					var data = dragInfo.data;
+					var oldSlot = data.parent;
+					var slot = findSlot(data, evt);
+					// console.log("slot", slot)
+					// console.log("data", data)
+					if (!slot || slot == oldSlot) {
+						// console.log("+++")
+						graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
+					} else {
+						adaptBounds(data, slot);
+					}
+					dragInfo = null;
 				}
-				return;
-			}
-			if (evt.kind == Q.InteractionEvent.ELEMENT_MOVE_END) {
-				// console.log("evt",evt)
-				unhighlight();
-				var data = dragInfo.data;
-				var oldSlot = data.parent;
-				var slot = findSlot(data, evt);
-				// console.log("slot", slot)
-				// console.log("data", data)
-				if (!slot || slot == oldSlot) {
-					// console.log("+++")
-					graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
-				} else {
-					adaptBounds(data, slot);
-				}
-				dragInfo = null;
-			}
-		})
-	}
-	initInteraction();
-}
-//全屏方法代码
-function toggleFullScreen() {
-	if (!document.fullscreenElement && // alternative standard method
-		!document.mozFullScreenElement && !document.webkitFullscreenElement) {// current working methods
-		if (document.documentElement.requestFullscreen) {
-			document.documentElement.requestFullscreen();
-		} else if (document.documentElement.mozRequestFullScreen) {
-			document.documentElement.mozRequestFullScreen();
-		} else if (document.documentElement.webkitRequestFullscreen) {
-			document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+			})
 		}
-	} else {
-		if (document.cancelFullScreen) {
-			document.cancelFullScreen();
-		} else if (document.mozCancelFullScreen) {
-			document.mozCancelFullScreen();
-		} else if (document.webkitCancelFullScreen) {
-			document.webkitCancelFullScreen();
+		initInteraction();
+	}
+	//全屏方法代码
+	function toggleFullScreen() {
+		if (!document.fullscreenElement && // alternative standard method
+			!document.mozFullScreenElement && !document.webkitFullscreenElement) {// current working methods
+			if (document.documentElement.requestFullscreen) {
+				document.documentElement.requestFullscreen();
+			} else if (document.documentElement.mozRequestFullScreen) {
+				document.documentElement.mozRequestFullScreen();
+			} else if (document.documentElement.webkitRequestFullscreen) {
+				document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+			}
+		} else {
+			if (document.cancelFullScreen) {
+				document.cancelFullScreen();
+			} else if (document.mozCancelFullScreen) {
+				document.mozCancelFullScreen();
+			} else if (document.webkitCancelFullScreen) {
+				document.webkitCancelFullScreen();
+			}
 		}
 	}
-}

@@ -286,20 +286,21 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	public ProjectFile getProDetailById(String id) {
 		return baseMapper.getProDetailById(id);
 	}
+
 	/*
-	* 2019年11月5日 15:22:53 wang修改
-	*
-	*
-	* */
+	 * 2019年11月5日 15:22:53 wang修改
+	 *
+	 *
+	 */
 	@Override
 	public XmlEntityMap getcoefficientXmlEntityMap(String proDetailId) {
 		ProjectFile projectFile = getProDetailById(proDetailId);
 		Project project = projectMapper.getProById(projectFile.getProjectId());
-		String json = project.getBasetemplateIds();//获取到模板idjson串
-		BaseTemplateIDsDTO baseTemplateIDsDTO = JSON.parseObject(json, BaseTemplateIDsDTO.class);//把json串转成json对象
-		//BaseTemplateIDsDTO baseTemplateIDsDTO = (BaseTemplateIDsDTO)JSON.parse(json);
-		String sysTempId = baseTemplateIDsDTO.getSysTempId();//获取到系统配置模板id
-		return getXmlEntityMap(sysTempId);//解析系统配置xml文件返回数据
+		String json = project.getBasetemplateIds();// 获取到模板idjson串
+		BaseTemplateIDsDTO baseTemplateIDsDTO = JSON.parseObject(json, BaseTemplateIDsDTO.class);// 把json串转成json对象
+		// BaseTemplateIDsDTO baseTemplateIDsDTO = (BaseTemplateIDsDTO)JSON.parse(json);
+		String sysTempId = baseTemplateIDsDTO.getSysTempId();// 获取到系统配置模板id
+		return getXmlEntityMap(sysTempId);// 解析系统配置xml文件返回数据
 	}
 
 	/**
@@ -512,22 +513,23 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 */
 	public XmlEntityMap getSysConfigXmlEntityMap(String proDetailId) {
 		ProjectFile projectFile = getProDetailById(proDetailId);
-		File hsmLocalFile = new File(gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml");//老耿代码
-		//XmlEntityMap xmlEntityMap = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);//老耿代码
+		File hsmLocalFile = new File(gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml");// 老耿代码
+		// XmlEntityMap xmlEntityMap =
+		// XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);//老耿代码
 //		if (projectFile.getFileType().equals("14")) {
 //			file = new File(gitDetailPath+projectFile.getFilePath()+ "方案展示.xml");
 //		}
 //		 if (projectFile.getFileType().equals("11")) {
 //		 file = new File(System.getProperty("user.dir") + "/流程实例.xml");
 //		 }
-		if(hsmLocalFile.exists()){
+		if (hsmLocalFile.exists()) {
 			return XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(hsmLocalFile);
 		}
 		Project project = projectMapper.getProById(projectFile.getProjectId());
-		String json = project.getBasetemplateIds();//获取到模板idjson串
-		BaseTemplateIDsDTO baseTemplateIDsDTO = JSON.parseObject(json, BaseTemplateIDsDTO.class);//把json串转成json对象
-		String hsmTempId = baseTemplateIDsDTO.getHsmTempId();//获取到软硬件映射模板id
-		return getXmlEntityMap(hsmTempId);//解析软硬件映射xml文件返回数据
+		String json = project.getBasetemplateIds();// 获取到模板idjson串
+		BaseTemplateIDsDTO baseTemplateIDsDTO = JSON.parseObject(json, BaseTemplateIDsDTO.class);// 把json串转成json对象
+		String hsmTempId = baseTemplateIDsDTO.getHsmTempId();// 获取到软硬件映射模板id
+		return getXmlEntityMap(hsmTempId);// 解析软硬件映射xml文件返回数据
 	}
 
 	/**
@@ -843,7 +845,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 					if (s.trim() != "" && s.equals(libsType)) {
 						softwareFilePath = software.getSoftwareFilePath();
 						softwareName = software.getSoftwareName();
-						if("win_sylixos".equals(libsType)){
+						if ("win_sylixos".equals(libsType)) {
 							sylixosProjectName = new File(softwareFilePath).getName();
 						}
 					}
@@ -926,37 +928,27 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		FileUtil.getSelectStrFilePathList(linuxCFilePathSet, partIntegerCodeFilePath, selectFileExtensionList);
 
-//		try {
-//			// 原始需求调用客户接口,apiFileList中存添加的.c .cpp .h文件不带后缀的文件名
-//			List<String> apiFileList = new ArrayList<String>();
-//			apiFileList.addAll(apiNeedStringSet);
-//			ExternalIOTransUtils.modifySpbInclude(apiFileList,
-//					new File(appFilePathName).getParentFile().getAbsolutePath());
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			logger.error("调用客户接口失败，请联系管理员。");
-//			r.setAllAttr(CommonConstants.FAIL, "调用客户接口失败，请联系管理员。", null);
-//			return;
-//		}
-//		try {
-//			// 原始需求调用客户接口,apiFileList中存添加的.c .cpp .h文件不带后缀的文件名
-//			List<String> apiFileList = new ArrayList<String>();
-//			apiFileList.addAll(apiNeedStringSet);
-//			ExternalIOTransUtils.modifySpbInclude(apiFileList,
-//					new File(appFilePathName).getParentFile().getAbsolutePath());
-//		} catch (IOException e) {e
-//			e.printStackTrace();
-//			logger.error("调用客户接口失败，请联系管理员。");
-//			r.setAllAttr(CommonConstants.FAIL, "调用客户接口失败，请联系管理员。", null);
-//			return;
-//		}
+		try {
+			// 原始需求调用客户接口,apiFileList中存添加的.c .cpp .h文件不带后缀的文件名
+			List<String> apiFileList = new ArrayList<String>();
+			apiFileList.addAll(apiNeedStringSet);
+			ExternalIOTransUtils.modifySpbInclude(apiFileList,
+					new File(appFilePathName).getParentFile().getAbsolutePath());
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error("调用客户接口失败，请联系管理员。");
+			r.setAllAttr(CommonConstants.FAIL, "调用客户接口失败，请联系管理员。", null);
+			return;
+		}
 
 //		try {
 //			// 调用客户接口,list中存添加的构件的函数名
 //			ExternalIOTransUtils.modifySpbInclude(compFuncNameList, appFilePathName);
 //		} catch (IOException e) {
-//			logger.error("调用客户接口失败，请联系管理员。");
 //			e.printStackTrace();
+//			logger.error("调用客户接口失败，请联系管理员。");
+//			r.setAllAttr(CommonConstants.FAIL, "调用客户接口失败，请联系管理员。", null);
+//			return;
 //		}
 
 		// 将set集合转成List集合
@@ -1663,14 +1655,14 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		return !file.exists();
 	}
 
-	public void deleteChildFile(File file){
-		if (file.isDirectory()){
+	public void deleteChildFile(File file) {
+		if (file.isDirectory()) {
 			File[] files = file.listFiles();
 			if (files.length == 0) {
 				file.delete();
 			} else {
 				for (File fileTemp : files) {
-					if (fileTemp.isDirectory()){
+					if (fileTemp.isDirectory()) {
 						deleteChildFile(fileTemp);
 					} else {
 						fileTemp.delete();
@@ -1682,12 +1674,13 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			file.delete();
 		}
 	}
+
 	/*
-	* 使用feign获取到基础模板id返回xmlEntityMap对象
-	* */
-	public XmlEntityMap getXmlEntityMap(String tempId){
-		R<BaseTemplate> R = baseTemplateService.getById(tempId);//feign调用upms接口根据id查模板对象
-		File file = new File(gitDetailPath+R.getData().getTempPath());
+	 * 使用feign获取到基础模板id返回xmlEntityMap对象
+	 */
+	public XmlEntityMap getXmlEntityMap(String tempId) {
+		R<BaseTemplate> R = baseTemplateService.getById(tempId);// feign调用upms接口根据id查模板对象
+		File file = new File(gitDetailPath + R.getData().getTempPath());
 		return XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);
 	}
 
@@ -1695,7 +1688,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	public R analysisThemeXML(String proDetailId) {
 		ProjectFile projectFile = getProDetailById(proDetailId);
 		Project project = projectMapper.getProById(projectFile.getProjectId());
-		String json = project.getBasetemplateIds();//获取到模板idjson串
+		String json = project.getBasetemplateIds();// 获取到模板idjson串
 		BaseTemplateIDsDTO baseTemplateIDsDTO = JSON.parseObject(json, BaseTemplateIDsDTO.class);
 		String flowFilePath = "";
 		String path = "";

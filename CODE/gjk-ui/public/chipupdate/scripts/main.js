@@ -512,9 +512,10 @@ function initEditor(editor) {
 		if (!selection || selection.length == 0) {
 			return false;
 		}
+		for (var i in selection) {
+			if (selection[i].properties.type == "inf") {
 		Q.confirm("是否 确认删除", function () {
 			var selection = this.removeSelection();
-			console.log("selection",selection)
 			/* for (const i in graph.toJSON().datas[0].json.properties.infOfChipList) {
 				if (selection[0].) {
 					const element = object[i];
@@ -526,6 +527,7 @@ function initEditor(editor) {
 				this.onInteractionEvent(event);
 			} */
 		}, this);
+	}}
 	}
 
 	var propertySheet = editor.propertyPane;
