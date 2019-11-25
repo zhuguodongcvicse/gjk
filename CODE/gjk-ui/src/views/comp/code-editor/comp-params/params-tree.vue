@@ -184,10 +184,12 @@ export default {
         if (node.lableName === param.lableName) {
           let nodeCol = node.nodeData;
           let tmpblParam = {};
+          let k1, k2;
           let tmpblParamOld = {};
           for (let key1 in nodeCol) {
             for (let key2 in nodeCol[key1]) {
               if (nodeCol[key1][key2].attrMappingName === this.lbParam) {
+                (k1 = key1), (k2 = key2);
                 tmpblParam = nodeCol[key1][key2];
                 tmpblParamOld = param.nodeData[key1][key2];
               }
@@ -198,18 +200,15 @@ export default {
             let addOrDelParam = tmpblParam.lableName == "DATA" ? "add" : "del";
             if (!tmpblParam.uid) {
               if (this.paramType === "input") {
-                let keys = this.inputTmpuid.keys();
                 let uid =
                   this.inputTmpuid.size +
                   "*" +
                   this.paramType +
                   "*" +
                   this.inputCmpuid;
-                this.$set(tmpblParam, "uid", uid);
                 if (addOrDelParam == "add") {
-                  this.inputTmpuid.set(this.inputTmpuid.size, uid);
-                } else if (addOrDelParam == "del") {
-                  this.inputTmpuid.remove();
+                  this.$set(tmpblParam, "uid", uid);
+                  this.$set(this.clickNodeData.nodeData[k1][k2], "uid", uid);
                 }
               } else if (this.paramType === "output") {
                 let uid =
@@ -218,10 +217,9 @@ export default {
                   this.paramType +
                   "*" +
                   this.outputCmpuid;
-                this.$set(tmpblParam, "uid", uid);
                 if (addOrDelParam == "add") {
-                  this.outputTmpuid.set(this.outputTmpuid.size, uid);
-                } else if (addOrDelParam == "del") {
+                  this.$set(tmpblParam, "uid", uid);
+                  this.$set(this.clickNodeData.nodeData[k1][k2], "uid", uid);
                 }
               }
             }
@@ -476,16 +474,22 @@ export default {
             if (bllxName === null || bllxName === undefined) {
               return;
             }
-            item.dataKey = isx
-              ? [
-                  { value: "DATA", label: "DATA" },
-                  { value: "STRUCTTYPE", label: "STRUCTTYPE" },
-                  { value: "IMMEDIATE", label: "IMMEDIATE" }
-                ]
-              : [
-                  { value: "STRUCTTYPE", label: "STRUCTTYPE" },
-                  { value: "IMMEDIATE", label: "IMMEDIATE" }
-                ];
+            item.dataKey = [
+              { value: "DATA", label: "DATA" },
+              { value: "STRUCTTYPE", label: "STRUCTTYPE" },
+              { value: "IMMEDIATE", label: "IMMEDIATE" }
+            ];
+            // item.dataKey = isx
+            //   ? [
+            //       { value: "DATA", label: "DATA" },
+            //       { value: "STRUCTTYPE", label: "STRUCTTYPE" },
+            //       { value: "IMMEDIATE", label: "IMMEDIATE" }
+            //     ]
+            //   : [
+            //       { value: "DATA", label: "DATA" },
+            //       { value: "STRUCTTYPE", label: "STRUCTTYPE" },
+            //       { value: "IMMEDIATE", label: "IMMEDIATE" }
+            //     ];
           }
         });
       });
@@ -858,18 +862,18 @@ export default {
         }
       } else if (item.attrMappingName === this.lbParam) {
         item.dataKey = [];
-        if (isx) {
-          item.dataKey.push(
-            { value: "DATA", label: "DATA" },
-            { value: "STRUCTTYPE", label: "STRUCTTYPE" },
-            { value: "IMMEDIATE", label: "IMMEDIATE" }
-          );
-        } else {
-          item.dataKey.push(
-            { value: "STRUCTTYPE", label: "STRUCTTYPE" },
-            { value: "IMMEDIATE", label: "IMMEDIATE" }
-          );
-        }
+        // if (isx) {
+        item.dataKey.push(
+          { value: "DATA", label: "DATA" },
+          { value: "STRUCTTYPE", label: "STRUCTTYPE" },
+          { value: "IMMEDIATE", label: "IMMEDIATE" }
+        );
+        // } else {
+        //   item.dataKey.push(
+        //     { value: "STRUCTTYPE", label: "STRUCTTYPE" },
+        //     { value: "IMMEDIATE", label: "IMMEDIATE" }
+        //   );
+        // }
         let retVal = item.dataKey.find(item => {
           return item.value === item.lableName;
         });

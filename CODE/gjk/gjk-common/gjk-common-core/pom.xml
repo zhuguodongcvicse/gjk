@@ -112,4 +112,20 @@
 		</dependency> -->
 
 	</dependencies>
+	<!--<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						&lt;!&ndash; 添加classpath缺少的内容&ndash;&gt;
+						<manifestEntries>
+							<Class-Path>./lib/gjk-softRadarInf-1.0.jar ./lib/nddsjava.jar</Class-Path>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>-->
 </project>

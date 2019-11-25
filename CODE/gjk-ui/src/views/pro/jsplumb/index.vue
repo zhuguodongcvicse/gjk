@@ -8,12 +8,12 @@
         </el-input>
         <el-button-group>
           <el-button type="primary" plain size="small" @click="sendMessage('save')">保存</el-button>
-          <el-button
-            type="primary"
-            plain
-            size="small"
-            @click="bottonCheckComp = !bottonCheckComp"
-          >{{bottonCheckComp?'检查更新':'还原'}}</el-button>
+<!--          <el-button-->
+<!--            type="primary"-->
+<!--            plain-->
+<!--            size="small"-->
+<!--            @click="bottonCheckComp = !bottonCheckComp"-->
+<!--          >{{bottonCheckComp?'检查更新':'还原'}}</el-button>-->
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('completeCheck')">完备性检查</el-button> -->
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('loading')">加载</el-button> -->
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('simulation')">仿真</el-button> -->
@@ -671,9 +671,9 @@ export default {
             this.$refs.gjkIframe.sendMessage(this.postMessageData);
           });
         })
-        .catch(function(err) {
-          next();
-        });
+        // .catch(function(err) {
+        //   next();
+        // });
       // if (confirm("是否清空当前画布构件")) {
       //   this.postMessageData.cmd = "cleanCanvas";
       //   this.$refs.gjkIframe.sendMessage(this.postMessageData);
@@ -761,7 +761,26 @@ export default {
   //     // }
   //   });
   // },
-  beforeRouteUpdate(to, from, next) {
+  // beforeRouteUpdate(to, from, next) {
+  //   var _this = this;
+  //   this.$confirm("是否保存当前流程模型?", "提示", {
+  //     confirmButtonText: "确定",
+  //     cancelButtonText: "取消",
+  //     type: "warning"
+  //   })
+  //     .then(data => {
+  //       _this.postMessageData.cmd = "clickCompSave";
+  //       _this.postMessageData.params = "save";
+  //       _this.$refs.gjkIframe.sendMessage(_this.postMessageData);
+  //       setTimeout(() => {
+  //         next();
+  //       }, 1000);
+  //     })
+  //     .catch(function(err) {
+  //       next();
+  //     });
+  // },
+/*  beforeRouteLeave(to, from, next) {
     var _this = this;
     this.$confirm("是否保存当前流程模型?", "提示", {
       confirmButtonText: "确定",
@@ -779,26 +798,7 @@ export default {
       .catch(function(err) {
         next();
       });
-  },
-  beforeRouteLeave(to, from, next) {
-    var _this = this;
-    this.$confirm("是否保存当前流程模型?", "提示", {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
-      type: "warning"
-    })
-      .then(data => {
-        _this.postMessageData.cmd = "clickCompSave";
-        _this.postMessageData.params = "save";
-        _this.$refs.gjkIframe.sendMessage(_this.postMessageData);
-        setTimeout(() => {
-          next();
-        }, 1000);
-      })
-      .catch(function(err) {
-        next();
-      });
-  },
+  },*/
   beforeUpdate() {}, //生命周期 - 更新之前
   updated() {}, //生命周期 - 更新之后
   beforeDestroy() {}, //生命周期 - 销毁之前
