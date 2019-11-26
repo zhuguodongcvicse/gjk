@@ -103,13 +103,28 @@
         <el-button type="primary" @click="clickHandleSaveComp(false)">确 定</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="生成构件框架" :visible.sync="compSpbShowDialog" width="30%">
+    <el-dialog title="生成构件框架" :visible.sync="compSpbShowDialog" width="40%">
       <el-form ref="ruleForm" v-model="compSpbForm" label-position="right" label-width="90px">
-        <el-form-item label="头文件模板" prop="headerTemplateFile">
+        <!-- <el-form-item label="头文件模板" prop="headerTemplateFile">
           <form-item-type v-model="compSpbForm.headerTemplateFile" lableType="uploadComm"></form-item-type>
         </el-form-item>
         <el-form-item label="源文件模板" prop="srcTemplateFile">
           <form-item-type v-model="compSpbForm.srcTemplateFile" lableType="uploadComm"></form-item-type>
+        </el-form-item> -->
+        <el-form-item label="选择构件框架" label-width="100px">
+          <el-select v-model="compSpbForm.framePaths" placeholder="placeholder">
+            <el-option
+              v-for="(item,index) in compSpbFrameData"
+              :key="index"
+              :label="item.name"
+              :value="item.id"
+            >
+              <span style="float: left">{{ item.name }}</span>
+              <span
+                style="float: right; color: #8492a6; font-size: 13px"
+              >&emsp;&emsp;{{ item.rightName }}</span>
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -125,7 +140,10 @@ import { mapGetters } from "vuex";
 import paramsDefine from "./params-define";
 import paramsFiles from "../params-files";
 import { menuTag } from "@/util/closeRouter";
-import { createSpbFrameFile } from "@/api/comp/componentdetail";
+import {
+  createSpbFrameFile,
+  findSpbFrameFile
+} from "@/api/comp/componentdetail";
 import formItemType from "@/views/comp/code-editor/comp-params/form-item-type";
 import { getObjType, deepClone } from "@/util/util";
 import {
@@ -159,11 +177,13 @@ export default {
       saveDBXmlMaps: {},
       //生成构件框架
       compSpbShowDialog: false,
+      compSpbFrameData: [],
       compSpbForm: {
         spbModelXmlFile: "",
         headerTemplateFile: "",
         srcTemplateFile: "",
-        saveDir: ""
+        saveDir: "",
+        framePaths: ""
       }
     };
   },
@@ -346,6 +366,20 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
+    findSpbFrameFile().then(res => {
+      let showData = deepClone(res.data.data);
+      showData.forEach(item => {
+        let rightName = "";
+        for (let name of item.platformName) {
+          rightName += name+","
+        }
+        // console.log('rightShowNamerightShowName',rightShowName.)
+
+        this.$set(item,"rightName",rightName.substring(0,rightName.lastIndexOf(",")))
+      });
+
+      this.compSpbFrameData=showData;
+    });
     //如果是新增构件
     if (this.$route.query.type === "add") {
       // this.selectBaseTemplateValue = this.$route.query.defauleBaseTemplate[0].tempName

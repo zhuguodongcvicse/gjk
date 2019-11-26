@@ -117,3 +117,10 @@ export function createSpbFrameFile(param) {
     data: param
   })
 }
+export function findSpbFrameFile(param) {
+  return request({
+    method: "post",
+    url: "/comp/componentdetail/findSpbFrameFile",
+    data: param
+  })
+}

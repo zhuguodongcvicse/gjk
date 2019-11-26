@@ -268,4 +268,8 @@ public class ComponentDetailController {
 	public R getCreateSpbFrameFile(@RequestBody Map<String, String> filesPath) {
 		return componentDetailService.createSpbFrameFile(filesPath.get("spbModelXmlFile"),filesPath.get("headerTemplateFile"),filesPath.get("srcTemplateFile"), filesPath.get("saveDir"));
 	}
+	@PostMapping(path = "/findSpbFrameFile")
+	public R getFindSpbFrame() {
+		return componentDetailService.findSpbFrameFile();
+	}
 }

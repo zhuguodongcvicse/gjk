@@ -217,7 +217,20 @@
 		FROM
 		gjk_component_detail
 		where id=#{id}
-
 	</select>
-
+		<!-- 查询所有框架 -->
+	<select id="findCompframe" resultType="map">
+		SELECT
+		id,name,version,file_path,apply_state,create_time,description,del_flag
+		FROM
+		gjk_compframe WHERE apply_state = 2 AND del_flag= 0 ORDER BY version DESC
+	</select>
+		<!--根据构件框架id查询框架 -->
+	<select id="findPlatform" resultType="string">
+		SELECT p.`name` from
+		gjk_platform p,gjk_compframe_platform cp where
+		p.platform_id =
+		cp.platform_id AND
+		cp.compframe_id=#{frameId};
+	</select>
 </mapper>

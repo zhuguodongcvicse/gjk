@@ -276,8 +276,8 @@ export default {
           size: param.file.size
         };
         this.itemParam = res.data.data;
-        this.$emit("change", res.data.data);
         this.$emit("fileChange", file, param);
+        this.$emit("change", res.data.data);
       });
     }
   },

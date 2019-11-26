@@ -188,4 +188,12 @@ public interface ComponentDetailService extends IService<ComponentDetail> {
 	 */
 	public R createSpbFrameFile(String spbModelXmlFile,String headerTemplateFile,String srcTemplateFile, String saveDir);
 
+	/**
+	 * @Title: findSpbFrameFile
+	 * @Description: 查询构件框架
+	 * @Author xiaohe
+	 * @DateTime 2019年11月13日 下午4:05:24
+	 */
+	public R findSpbFrameFile();
+
 }
