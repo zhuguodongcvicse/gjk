@@ -32,6 +32,9 @@ var div_rightY = ""
 //存储上一次点击的构件id
 var lastTimeId = ""
 
+var midpoints = [ 0.7, 0.5, 0.3,0.1]
+var stub = [40, 30, 20, 10]
+
 //ctrlZ时需要保存的数据
 //栈,记录用户操作的先后顺序,用来进行撤销操作,数据结构为JSON,其中的copy用来复制部件
 //是个二维栈,包括新增/删除/粘贴操作
@@ -387,8 +390,8 @@ function setExitPoint(id, gj) {
 	var differenceValue = anchorNumber / 2;
 	var x = differenceValue;
 	var outPoint
-	var midpoints = [ 0.7, 0.5, 0.3,0.1]
-	var stub = [40, 30, 20, 10]
+	// var midpoints = [ 0.7, 0.5, 0.3,0.1]
+	// var stub = [40, 30, 20, 10]
 	for (var i = 0; i < len; i++) {
 		var config = JSON.parse(JSON.stringify(getBaseNodeConfig()))
 		config.isTarget = false
@@ -1068,6 +1071,7 @@ function updatePoint(proPream) {
 				uuid: proPream.uid,
 				deleteEndpointsOnEmpty: true
 			}, config);
+			addInPoint.addClass("nodeStyle")
 			addInPoint.bind('dblclick', function (endpoint, originalEvent) {
 				addPointDiv(proPream);
 				//var mouse = mousePosition();
@@ -1104,6 +1108,7 @@ function updatePoint(proPream) {
 				uuid: proPream.uid,
 				deleteEndpointsOnEmpty: true
 			}, config);
+			addOutPoint.addClass("nodeStyle")
 			addOutPoint.bind('dblclick', function (endpoint, originalEvent) {
 				addPointDiv(proPream);
 				//var mouse = mousePosition();
@@ -1179,6 +1184,19 @@ function updatePoint(proPream) {
 			jsPlumb.setSuspendDrawing(false, true);
 		}
 	}
+
+	var newEndpoints = jsPlumb.getEndpoints(proPream.compId);
+	var index = -1
+	$.each(newEndpoints, function (n, val) {
+		if (val.getUuid().split('*')[1] == 'input') {
+			
+		} else {
+			index++
+			val.connector[1].midpoint = midpoints[index]
+			val.connector[1].stub = stub[index]
+			console.log("index++",index)
+		}
+	});
 }
 
 //删除锚点
@@ -2075,6 +2093,7 @@ function pasteJson(pasteDataJson) {
 				outIndex++
 				config.isTarget = true
 				config.maxConnections = -1
+				console.log(midpoints)
 				config.connector[1].midpoint =midpoints[outIndex]
 				config.connector[1].stub = stub[outIndex]
 				var outPoint = jsPlumb.addEndpoint(newId, {

@@ -2,6 +2,13 @@
 	var createElement = function(options) {
 		options = options || {};
 		var element = document.createElement(options.tagName || 'div');
+    // console.log("options",options)
+    // console.log("element",element)
+    /*if (document.getElementById("ioType").innerText) {
+      console.log("options",options)
+      element.setAttribute("id","IP")
+      element.removeAttribute("readonly")
+    }*/
 		if(options.class) {
 			$(element).addClass(options.class);
 		}
@@ -40,30 +47,75 @@
 			this.value = this._getValue();
 		},
 		setValue: function(v) {
-			this.input.value = valueToString(v, this.property.type);
+		  /*console.log("this.input--------------",this.input)
+		  console.log("this.select",this.select)
+		  console.log("this.option",this.option)*/
+		  if (this.input !== undefined) {
+        this.input.value = valueToString(v, this.property.type);
+      }
 		},
 		getValue: function() {
 			return stringToValue(this.input.value, this.property.type);
 		},
 		createHtml: function(parent) {
-			var property = this.property;
-			var input = Q.createElement({
-				tagName: 'input',
-				class: "form-control",
-				parent: parent
-			});
-			this.input = input;
+		  // console.log("parent",parent)
+		  // console.log("parent",parent.parentNode.childNodes.item(0).textContent)
+      var property = this.property;
+      if (parent.parentNode.childNodes.item(0).textContent === '输入输出类型') {
+        let ioTypeTemp = selectCurrentChip.properties.ioType
+        let input = Q.createElement({
+          tagName: 'select',
+          class: "form-control",
+          parent: parent
+        });
+        input.setAttribute("id","ioType")
+        input.setAttribute("value",ioTypeTemp)
+        input.setAttribute("onchange", "upperCase()")
+        let ioTypeListTemp = JSON.parse(JSON.stringify(ioTypeList))
+        let ioValListTemp = JSON.parse(JSON.stringify(ioValList))
+        ioTypeListTemp.splice(ioTypeTemp,1)
+        ioValListTemp.splice(ioTypeTemp,1)
+        for (let i = 0; i < 3; i++) {
+          let optionHTML = Q.createElement({
+            tagName: 'option',
+            class: "form-control",
+            parent: input
+          });
+          if (selectCurrentChip) {
+            if(i === 0) {
+              optionHTML.setAttribute("value", ioTypeTemp)
+              optionHTML.innerHTML = ioTypeList[ioTypeTemp]
+            } else {
+              let index = JSON.stringify(i - 1)
+              optionHTML.setAttribute("value", ioValListTemp[index])
+              optionHTML.innerHTML = ioTypeListTemp[index]
+            }
+          }
+        }
+        // console.log("input1",input)
+        // input.appendChild(ioTypeSelect.createElement("option"))beforeBegin', 'afterBegin', 'beforeEnd', or 'afterEnd'
+        // let ioTypeSelect = document.getElementById("ioType")
+        // console.log("ioTypeSelect - pane",ioTypeSelect)
+      } else {
+        var input = Q.createElement({
+          tagName: 'input',
+          class: "form-control",
+          parent: parent
+        });
+        // console.log("input2",input)
+      }
+      this.input = input;
 
-			if(property.readonly) {
-				input.setAttribute('readonly', 'readonly');
-			}
-			this.update();
-			$(input).on('input', function(evt) {
-				if(this.ajdusting) {
-					return;
-				}
-				this.setter.call(this.scope, this);
-			}.bind(this));
+      if(property.readonly) {
+        input.setAttribute('readonly', 'readonly');
+      }
+      this.update();
+      $(input).on('input', function(evt) {
+        if(this.ajdusting) {
+          return;
+        }
+        this.setter.call(this.scope, this);
+      }.bind(this));
 		}
 	}
 
@@ -714,87 +766,6 @@
 			for(var name in properties) {
 				this.createItem(group, properties[name]);
 			}
-			//console.log("面板",currentBoard)
-			//if(typeof(currentBoard) != 'undefined' && currentBoard.boardType == 1){
-			if(boardType == 1){
-				Q.createElement({
-					tagName: 'h4',
-					parent: group,
-					html: '外部互联'
-				});
-				//表格内容 
-				//var arr0=['输入','双路','输入','双路','输入',];
-				var item0='';
-				// console.log("currentBoard", currentBoard)
-				//console.log("currentBoard.outLinkArr.length",currentBoard.outLinkArr.length)
-				for (const i in clickBoardList) {
-					// console.log("clickBoardList[i]", clickBoardList[i])
-					if(clickBoardList[i].boardType == 1 && clickBoardList[i].ifClick == 0 && clickBoardList[i].outLinkArr != null && clickBoardList[i].outLinkArr.length != 0){
-						//var j=i+1;
-						//var item1='<tr><td>'+backBoardInfs[i]+'</td><td>'+ioTypeBySelect[i]+'</td></tr>';
-						// console.log("clickBoardList[i].outLinkArr", clickBoardList[i].outLinkArr)
-						for (const j in clickBoardList[i].outLinkArr) {
-							var showLinkType
-							for (const k in fpgaBoardLinkType) {
-								if (fpgaBoardLinkType[i].value == clickBoardList[i].outLinkArr[j][2]) {
-									showLinkType = fpgaBoardLinkType[i].label
-								}
-							}
-							if(clickBoardList[i].outLinkArr[j][2] == '1'){
-								var item1='<tr><td>'+clickBoardList[i].outLinkArr[j][0].ID+'</td><td>'+clickBoardList[i].outLinkArr[j][1].ID+'</td><td>'+ showLinkType +'</td><td>'+clickBoardList[i].outLinkArr[j][3].ID+'</td><td><button type="button" class="btn btn-default" data-toggle="modal" onclick="deleteExternalLink(this);">删除</button></td></tr>'
-								item0=item0+item1;
-							} else {
-								var item1='<tr><td>'+clickBoardList[i].outLinkArr[j][0].ID+'</td><td>'+clickBoardList[i].outLinkArr[j][1].ID+'</td><td>'+ showLinkType +'</td><td>'+clickBoardList[i].outLinkArr[j][3]+'</td><td><button type="button" class="btn btn-default" data-toggle="modal" onclick="deleteExternalLink(this);">删除</button></td></tr>'
-								item0=item0+item1;
-							}
-						}
-					}
-				}
-				
-				//var html1='<br/><div style="height:200px;overflow-y:auto;"><table class="table table-bordered"><tr><th>接口名称</th><th>接口类型</th></tr><tbody> <tr> <td>接口1</td> <td>输入</td> </tr> <tr> <td>接口2</td> <td>双路</td> </tr> <tr><td>接口2</td> <td>双路</td></tr><tr><td>接口3</td> <td>双路</td></tr><tr><td>接口4</td> <td>双路</td></tr></tbody></table></div>';
-				var html1='<div class="propertypane_table_14s"><table class="table table-bordered table_14s"><tr><th>CPU</th><th>CPU接口</th><th>LinkType</th><th>后板卡接口</th><th>操作</th></tr><tbody class="tbody1_14s" id="tbody1"> '+item0+'</tbody></table></div>';
-				
-				Q.createElement({
-					tagName: 'button1',
-					parent: group,
-					html: '<button type="button" class="btn btn-defaul propertypane_tablebtn_14s" data-toggle="modal" data-target="#myModal"  onclick="loadFpgaBoardDatas();">新增</button>'
-				});
-				Q.createElement({
-					tagName: 'table1',
-					parent: group,
-					html: html1
-				});
-				
-
-				//切换CPU时更改接口内容
-				var selectStartCpu = document.getElementById("selectStartCpu");
-			
-				selectStartCpu.onchange=function(){
-					selectStartCpuValue = selectStartCpu.value;
-					for (const i in currentBoard.chipList) {
-						switch(selectStartCpuValue){
-							case currentBoard.chipList[i].ID.toString() : 
-								$("#selectStartInf").empty();
-								var selectHtml = '';
-								var ifExistInf = []
-								for (const j in allInfOfFrontBoard) {
-									if (allInfOfFrontBoard[j].uniqueId.indexOf(currentBoard.chipList[i].uniqueId) != -1){
-										ifExistInf.push(allInfOfFrontBoard[j])
-										var sHtml = '<option>' + allInfOfFrontBoard[j].ID + '</option>';
-										selectHtml = selectHtml + sHtml;
-									}
-								}
-								if(ifExistInf.length == 0){
-									selectHtml = '<option>该芯片无可选接口</option>'
-								}
-								$("#selectStartInf").html(selectHtml);
-							break;
-						}
-					}
-				};
-				
-				
-			}
 		},
 		register: function(options) {
 			registerProperties(this._propertyMap, options);
@@ -866,7 +837,7 @@
 						}
 						//window.location.reload();
 					}, 350);
-					
+
 				}
 			}
 		}

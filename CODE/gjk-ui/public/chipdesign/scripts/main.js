@@ -1,8 +1,10 @@
 var inf_json = [];
-var inf_uuid;
 var chipArr;
 var infArr;
 var infOfChipList = []
+var selectCurrentChip
+var ioTypeList = ["输入","输出","输入/输出"]
+var ioValList = ["0","1","2"]
 Q.registerImage('rack', 'images/Case.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
 Q.registerImage('card', 'images/BeforeTheBoard.svg');
 Q.registerImage('behindcard', 'images/AfterTheBoard.svg');
@@ -73,7 +75,7 @@ function handleMessageFromParent(event) {
 		case 'getInfData':
 			for (var i = 0; i < infArr.length; i++) {
 				if (infArr[i].infType == 3) {
-					//console.log("infArr[i].chipInf",infArr[i].chipInf)		
+					//console.log("infArr[i].chipInf",infArr[i].chipInf)
 					inf_json[i] = {
 						properties: {
 							size: {
@@ -90,7 +92,7 @@ function handleMessageFromParent(event) {
 							infRate: infArr[i].infRate,
 							infType: infArr[i].infType,
 							ioType: infArr[i].ioType,
-							ifSetIotype: 1,
+							// ifSetIotype: 1,
 							id: infArr[i].id
 						},
 						type: 'Q.RectElement',
@@ -280,9 +282,9 @@ function initEditor(editor) {
 		var IDNum = 0
 		for (const i in json.datas[0].json.properties.infOfChipList) {
 			json.datas[0].json.properties.infOfChipList[i].ID = IDNum++
-			if (json.datas[0].json.properties.infOfChipList[i].ifClick == 0) {
+			/*if (json.datas[0].json.properties.infOfChipList[i].ifClick == 0) {
 				json.datas[0].json.properties.infOfChipList[i].ioType = document.getElementById('selectInfIoType').value
-			}
+			}*/
 			// json.datas[0].json.properties.infOfChipList[i].ioType = infIoType
 		}
 		console.log("json", json)
@@ -292,10 +294,10 @@ function initEditor(editor) {
 		window.parent.postMessage(postMessageParentData, "*")
 	}
 	function initToolbar() {
-		//网状画布 
+		//网状画布
 		var graph = editor.graph;
 		//不可改变形状大小
-		//graph.editable = false; 
+		//graph.editable = false;
 
 		var defaultStyles = graph.styles = {};
 		defaultStyles[Q.Styles.ARROW_TO] = false;
@@ -476,19 +478,23 @@ function initEditor(editor) {
 
 	var propertySheet = editor.propertyPane;
 	propertySheet.showDefaultProperties = false;
-	var infTemp
 	// var infIoTypeTemp = document.getElementById('selectInfIoType').value
 	//自定义属性面板
 	propertySheet.getCustomPropertyDefinitions = function (data) {
-		//console.log("propertySheet",propertySheet)
+		console.log("data",data)
 		var type = data.get('type');
 		//这里可以获得当前点击的图元对象
 		graph.onclick = function (evt) {
 			var data = graph.getElement(evt);
-			var parent = document.getElementsByClassName('graph-editor__property')
+      selectCurrentChip = data
+			// let ioTypeSelect = document.getElementById("ioType")
+      // console.log("ioTypeSelect",ioTypeSelect)
+			/*var parent = document.getElementsByClassName('graph-editor__property')
 			var child = document.getElementsByClassName('btn btn-primary')
+      console.log("parent",parent)
+      console.log("child",child)*/
 			// console.log("data",data)
-			if (child.length != 0) {
+			/*if (child.length != 0) {
 				parent[0].removeChild(child[0]);
 			}
 			if (data.properties.infName != null && data.properties.ifSetIotype == 0) {
@@ -515,8 +521,8 @@ function initEditor(editor) {
 						}
 					}
 				}
-			}
-			
+			}*/
+
 			/* for (let index in infArr) {
 				var inf_uuid = data.get('inf_uuid');
 				if (inf_uuid == infArr[index].id) {
@@ -530,7 +536,7 @@ function initEditor(editor) {
 					// data.set('inftype', infType);
 				}
 			}; */
-			if (data.properties.chipName != null) {
+			/*if (data.properties.chipName != null) {
 				var chipName = chipArr.chipName;
 				var coreNum = chipArr.coreNum;
 				var memSize = chipArr.memSize;
@@ -541,25 +547,35 @@ function initEditor(editor) {
 				data.set('memSize', memSize);
 				data.set('recvRate', recvRate);
 				data.set('hrTypeName', hrTypeName);
-			}
-			
+			}*/
+      /*if (data.properties.infName != null) {
+        var infName = data.properties.infName;
+        var infRate = data.properties.infRate;
+        data.set('infName', infName);
+        data.set('infRate', infRate);
+      }*/
+
 		}
 
-		/* if (type == 'inf') {
+		 if (type === 'inf') {
 			return {
 				group: '接口属性',
 				properties: [{
-					client: 'infname',
+					client: 'infName',
 					displayName: '接口名称',
 				},
 				{
-					client: 'infrate',
+					client: 'infRate',
 					displayName: '接口速率'
-				}]
+				},
+        {
+          client: 'ioType',
+          displayName: '输入输出类型'
+        }]
 			}
-		} */
+		}
 
-		if (type == 'port') {
+		if (type === 'port') {
 			return {
 				group: '芯片属性',
 				properties: [{

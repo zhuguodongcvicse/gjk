@@ -50,122 +50,142 @@
 </template>
 
 <script>
-//这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
+    //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 
-import { saveChip } from "@/api/libs/hardwarelibchip";
-import { fetchPlatformTree } from "@/api/admin/platform";
-export default {
-  //import引入的组件需要注入到对象中才能使用
-  props: ["showInf"],
-  components: {},
-  data() {
-    //这里存放数据
-    return {
-      options: [],
-      pTreeData: [],
-      treeData: [],
-      formLabelWidth: "120px",
-      form: {
-        id: "",
-        chipName: "",
-        ipConfige: "",
-        coreNum: "",
-        memSize: "",
-        recvRate: "",
-        hrTypeName: "",
-        chipData: ""
-      },
-      rules: {
-        chipName: [
-          { required: true, message: "芯片名称不能为空", trigger: "blur" }
-        ],
-        coreNum: [
-          { required: true, message: "内核数量不能为空", trigger: "blur" },
-          {
-            pattern: /^[0-9]*[1-9][0-9]*$/,
-            message: "请输入整数",
-            trigger: "blur"
-          }
-        ],
-        memSize: [
-          { required: true, message: "内存大小不能为空", trigger: "blur" },
-          {
-            pattern: /^[0-9]*[1-9][0-9]*$/,
-            message: "请输入整数",
-            trigger: "blur"
-          }
-        ],
-        recvRate: [
-          { required: true, message: "接收速率不能为空", trigger: "blur" },
-          {
-            pattern: /^[0-9]*[1-9][0-9]*$/,
-            message: "请输入整数",
-            trigger: "blur"
-          }
-        ],
-        hrTypeName: [
-          { required: true, message: "请选择平台大类", trigger: "change" }
-        ]
-      }
+    import {saveChip} from "@/api/libs/hardwarelibchip";
+    import {fetchPlatformTree} from "@/api/admin/platform";
+
+    export default {
+        //import引入的组件需要注入到对象中才能使用
+        props: ["showInf", "allChips"],
+        components: {},
+        data() {
+            //这里存放数据
+            return {
+                options: [],
+                pTreeData: [],
+                treeData: [],
+                formLabelWidth: "120px",
+                form: {
+                    id: "",
+                    chipName: "",
+                    ipConfige: "",
+                    coreNum: "",
+                    memSize: "",
+                    recvRate: "",
+                    hrTypeName: "",
+                    chipData: ""
+                },
+                //表单校验
+                rules: {
+                    chipName: [
+                        {required: true, message: "芯片名称不能为空", trigger: "blur"}
+                    ],
+                    coreNum: [
+                        {required: true, message: "内核数量不能为空", trigger: "blur"},
+                        {
+                            pattern: /^[0-9]*[1-9][0-9]*$/,
+                            message: "请输入整数",
+                            trigger: "blur"
+                        }
+                    ],
+                    memSize: [
+                        {required: true, message: "内存大小不能为空", trigger: "blur"},
+                        {
+                            pattern: /^[0-9]*[1-9][0-9]*$/,
+                            message: "请输入整数",
+                            trigger: "blur"
+                        }
+                    ],
+                    recvRate: [
+                        {required: true, message: "接收速率不能为空", trigger: "blur"},
+                        {
+                            pattern: /^[0-9]*[1-9][0-9]*$/,
+                            message: "请输入整数",
+                            trigger: "blur"
+                        }
+                    ],
+                    hrTypeName: [
+                        {required: true, message: "请选择平台大类", trigger: "change"}
+                    ]
+                }
+            };
+        },
+        //监听属性 类似于data概念
+        computed: {},
+        //监控data中的数据变化
+        watch: {},
+        //方法集合
+        methods: {
+            close(formName) {
+                // console.log(this.$refs[formName]);
+                this.$refs[formName].resetFields();
+                this.showInf.dialogFormVisible = false;
+            },
+            submit(formName) {
+                // console.log("allChips", this.allChips)
+                //芯片名称不能重复
+                for (const i in this.allChips) {
+                    if (this.allChips[i].chipName === this.form.chipName) {
+                        alert("芯片名称不能相同")
+                        return
+                    }
+                }
+                this.$refs[formName].validate(valid => {
+                    if (valid) {
+                        this.showInf.dialogFormVisible = false;
+                        //跳转到画布
+                        this.$router.push({
+                            path: "/libs/hardwarelibchip/chipdesign",
+                            query: this.form
+                        });
+                        this.$refs[formName].resetFields();
+                    } else {
+                        // console.log("error submit!!");
+                        return false;
+                    }
+                });
+            },
+            //获取平台库的数据
+            getPlatformSelectTree() {
+                fetchPlatformTree().then(response => {
+                    //平台库树结构只展示根节点数据
+                    for (let item of response.data.data) {
+                        let index = response.data.data.indexOf(item);
+                        let plaTreeData = {};
+                        plaTreeData.value = item.name;
+                        plaTreeData.label = item.label;
+                        plaTreeData.id = item.id;
+                        plaTreeData.parentId = item.parentId;
+                        this.pTreeData.push(plaTreeData);
+                    }
+                    this.options = this.pTreeData;
+                });
+            }
+        },
+        //生命周期 - 创建完成（可以访问当前this实例）
+        created() {
+            this.getPlatformSelectTree();
+        },
+        //生命周期 - 挂载完成（可以访问DOM元素）
+        mounted() {
+        },
+        beforeCreate() {
+        }, //生命周期 - 创建之前
+        beforeMount() {
+        }, //生命周期 - 挂载之前
+        beforeUpdate() {
+        }, //生命周期 - 更新之前
+        updated() {
+        }, //生命周期 - 更新之后
+        beforeDestroy() {
+        }, //生命周期 - 销毁之前
+        destroyed() {
+        }, //生命周期 - 销毁完成
+        activated() {
+        } //如果页面有keep-alive缓存功能，这个函数会触发
     };
-  },
-  //监听属性 类似于data概念
-  computed: {},
-  //监控data中的数据变化
-  watch: {},
-  //方法集合
-  methods: {
-    close(formName) {
-      // console.log(this.$refs[formName]);
-      this.$refs[formName].resetFields();
-      this.showInf.dialogFormVisible = false;
-    },
-    submit(formName) {
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          this.showInf.dialogFormVisible = false;
-          this.$router.push({
-            path: "/libs/hardwarelibchip/chipdesign",
-            query: this.form
-          });
-          this.$refs[formName].resetFields();
-        } else {
-          // console.log("error submit!!");
-          return false;
-        }
-      });
-    },
-    getPlatformSelectTree() {
-      fetchPlatformTree().then(response => {
-        //平台库树结构只展示根节点数据
-        for (let item of response.data.data) {
-          let index = response.data.data.indexOf(item);
-          let plaTreeData = {};
-          plaTreeData.value = item.name;
-          plaTreeData.label = item.label;
-          plaTreeData.id = item.id;
-          plaTreeData.parentId = item.parentId;
-          this.pTreeData.push(plaTreeData);
-        }
-        this.options = this.pTreeData;
-      });
-    }
-  },
-  //生命周期 - 创建完成（可以访问当前this实例）
-  created() {
-    this.getPlatformSelectTree();
-  },
-  //生命周期 - 挂载完成（可以访问DOM元素）
-  mounted() {},
-  beforeCreate() {}, //生命周期 - 创建之前
-  beforeMount() {}, //生命周期 - 挂载之前
-  beforeUpdate() {}, //生命周期 - 更新之前
-  updated() {}, //生命周期 - 更新之后
-  beforeDestroy() {}, //生命周期 - 销毁之前
-  destroyed() {}, //生命周期 - 销毁完成
-  activated() {} //如果页面有keep-alive缓存功能，这个函数会触发
-};
 </script>
 <style lang='scss' scoped>
-//@import url(); 引入公共css类
+  //@import url(); 引入公共css类
 </style>

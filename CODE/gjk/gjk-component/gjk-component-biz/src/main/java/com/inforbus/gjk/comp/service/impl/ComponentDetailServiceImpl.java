@@ -389,7 +389,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		} else {
 			return "";
 		}
-		
+
 //		Component component = compMapper.getCompById(compId);
 //
 //		String absolutePath = compDetailPath + compUserFilePath + File.separator + component.getCompName()
@@ -986,22 +986,22 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	 * @Description: 生成构件框架
 	 * @Author xiaohe
 	 * @DateTime 2019年11月13日 下午4:05:24
-	 * @param spbModelXmlFile 构件模型XML文件
+	 * @param spbModelXmlFile    构件模型XML文件
 	 * @param headerTemplateFile 头文件模板文件
-	 * @param srcTemplateFile 源文件模板文件
-	 * @param saveDir 保存路径(可以是平台文件路径)
+	 * @param srcTemplateFile    源文件模板文件
+	 * @param saveDir            保存路径(可以是平台文件路径)
 	 */
 	@Override
 	public R createSpbFrameFile(String spbModelXmlFile, String headerTemplateFile, String srcTemplateFile,
 			String saveDir) {
 		R retR = new R<>();
-		//查找headerTemplateFile是否存在 不存在使用默認的headerTemplateFile
+		// 查找headerTemplateFile是否存在 不存在使用默認的headerTemplateFile
 		headerTemplateFile = StringUtils.isEmpty(headerTemplateFile) ? compDetailPath + JGitUtil.getHeaderTemplateFile()
 				: headerTemplateFile;
-		//查找srcTemplateFile是否存在 不存在使用默認的srcTemplateFile
+		// 查找srcTemplateFile是否存在 不存在使用默認的srcTemplateFile
 		srcTemplateFile = StringUtils.isEmpty(srcTemplateFile) ? compDetailPath + JGitUtil.getSrcTemplateFile()
 				: srcTemplateFile;
-		saveDir=compDetailPath+saveDir;
+		saveDir = compDetailPath + saveDir;
 		File file = null;
 		try {
 			if (StringUtils.isEmpty(spbModelXmlFile)) {
@@ -1026,7 +1026,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 				if (!file.exists() || !file.isFile()) {
 					logger.error("头文件模板  does not exist");
 					return new R<>(new NullPointerException("头文件模板 does not exist"));
-				}else {
+				} else {
 //					file.createNewFile();
 					logger.info("The " + file.getName() + " file was created successfully.");
 				}
@@ -1064,6 +1064,23 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 
 		return retR;
 
+	}
+
+	/**
+	 * @Title: findSpbFrameFile
+	 * @Description: 查询构件框架列表
+	 * @Author xiaohe
+	 * @DateTime 2019年11月13日 下午4:05:24
+	 */
+	@Override
+	public R findSpbFrameFile() {
+		List<Map<String, Object>> lists = baseMapper.findCompframe();
+		for (Map<String, Object> map : lists) {
+			List<String> pfs = baseMapper.findPlatform(map.get("id").toString());
+			map.put("platformName", pfs);
+			System.out.println(pfs);
+		}
+		return new R(lists);
 	}
 
 }

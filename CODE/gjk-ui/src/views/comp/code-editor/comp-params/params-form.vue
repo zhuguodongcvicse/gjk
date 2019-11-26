@@ -502,13 +502,10 @@ export default {
       config.attrs.forEach(attr => {
         if (attr.attrConfigType === "uploadComm") {
           let analysisBaseFile = this.analysisBaseFile;
-          // console.log("analysisBaseFile",analysisBaseFile)
-          // console.log("attr",attr)
           let str = "";
           //平台
           if (attr.actionType === "analysisPlatformFile") {
             str = "platform-" + baseData.lableName;
-            let key = "platform-" + baseData.lableName;
             let path = baseData.attributeMap.name;
             // console.log("parseHeaderFileparseHeaderFile", path);
             //判断是不是需要解析文件 D:/14S_GJK_GIT/gjk/gjk/upload/func1.h 有盘符
@@ -573,31 +570,42 @@ export default {
           let obj = {};
           obj[str] = this.files;
           //数据中添加文件类型，用作判断添加的文件类型
-          obj["fileTypeTemp"] = attr.actionType;
+          // obj["fileTypeTemp"] = attr.actionType;
           //文件是否存在标识，默认-1
           let ifExistSameFile = -1;
           if (JSON.stringify(obj) !== "{}") {
-            if (analysisBaseFile.length != 0) {
-              for (let i in analysisBaseFile) {
-                //如果添加的文件和存在的相同，则标识改变
-                if (analysisBaseFile[i].fileTypeTemp == attr.actionType) {
-                  ifExistSameFile = i;
-                  break;
+            console.log("文件是否存在标识oooooo", analysisBaseFile);
+            for (let key in analysisBaseFile) {
+              for (let key2 in analysisBaseFile[key]) {
+                if (key2 === str) {
+                  console.log("文件是否存在标识", analysisBaseFile);
+                  analysisBaseFile.splice(key, 1);
                 }
               }
-              //若标识不为默认值-1
-              if (ifExistSameFile != -1) {
-                //删除相同的老数据，添加新数据
-                analysisBaseFile.splice(ifExistSameFile, 1);
-                analysisBaseFile.push(obj);
-              } else {
-                //原先不存在则直接添加
-                analysisBaseFile.push(obj);
-              }
-            } else {
-              //原先不存在则直接添加
-              analysisBaseFile.push(obj);
             }
+            console.log("文件是否存在标识oooooo", obj);
+            analysisBaseFile.push(obj);
+            // if (analysisBaseFile.length != 0) {
+            //   for (let i in analysisBaseFile) {
+            //     //如果添加的文件和存在的相同，则标识改变
+            //     if (analysisBaseFile[i].fileTypeTemp == attr.actionType) {
+            //       ifExistSameFile = i;
+            //       break;
+            //     }
+            //   }
+            //   //若标识不为默认值-1
+            //   if (ifExistSameFile != -1) {
+            //     //删除相同的老数据，添加新数据
+            //     analysisBaseFile.splice(ifExistSameFile, 1);
+            //     analysisBaseFile.push(obj);
+            //   } else {
+            //     //原先不存在则直接添加
+            //     analysisBaseFile.push(obj);
+            //   }
+            // } else {
+            //   //原先不存在则直接添加
+
+            // }
             this.$store.dispatch("setAnalysisBaseFile", analysisBaseFile);
           }
         }
@@ -886,8 +894,11 @@ export default {
     fileChange(param) {
       //调用父组件方法
       // this.$parent.$parent.$parent.$parent.saveCurrentIODate()
-      // console.log("param - fileChange",param)
-      // console.log("this.fileListOfComponent - fileChange",this.fileListOfComponent)
+      console.log("param - fileChange", param);
+      console.log(
+        "this.fileListOfComponent - fileChange",
+        this.fileListOfComponent
+      );
       //如果文件列表 不为空
       if (this.fileListOfComponent.length != 0) {
         let fileListsTemp = JSON.parse(
@@ -896,28 +907,28 @@ export default {
         //改变文件时标识“1”变为0
         fileListsTemp[1] = 0;
         this.$store.dispatch("setFileListOfComponent", fileListsTemp);
-        //删除原先存在的文件，重新上传新文件，避免重复
+        //删除原先存在的文件，重新上传新文件，避免重复//测试没有做判断
         if (
           this.fileListOfComponent[0].algorithmfile != undefined &&
           fileListsTemp[0].algorithmfile.filevo.length != 0
         ) {
           let files = [fileListsTemp[0].algorithmfile.filevo[0].relativePath];
           // console.log("files - algorithmfile", files);
-          delFilePath(files).then(res => {
-            // this.leftData.splice(index, 1);
-            // console.log("res",res)
-          });
+          delFilePath(files);
         }
         if (
           this.fileListOfComponent[0].platformfile != undefined &&
           fileListsTemp[0].platformfile.filevo.length != 0
         ) {
           let files = [fileListsTemp[0].platformfile.filevo[0].relativePath];
-          // console.log("files - platformfile", files);
-          delFilePath(files).then(res => {
-            // this.leftData.splice(index, 1);
-            // console.log("res",res)
-          });
+          delFilePath(files);
+        }
+        if (//analysisTestFile analysisAlgorithmFile
+          this.fileListOfComponent[0].testFile != undefined &&
+          fileListsTemp[0].testFile.filevo.length != 0
+        ) {
+          let files = [fileListsTemp[0].testFile.filevo[0].relativePath];
+          delFilePath(files);
         }
       }
       this.files = deepClone(param);

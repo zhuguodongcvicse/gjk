@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.inforbus.gjk.comp.api.entity.ComponentDetail;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -52,23 +53,24 @@ public interface ComponentDetailMapper extends BaseMapper<ComponentDetail> {
 
 	/**
 	 * @Title: getCompXMl
-	 * @Description:  获取对应构件的XML
+	 * @Description: 获取对应构件的XML
 	 * @Author xiaohe
 	 * @DateTime 2019年5月5日 下午4:30:00
 	 * @param compId 构件编号
-	 * @return 
+	 * @return
 	 */
 	ComponentDetail getCompXMl(@Param("compId") String compId);
+
 	/**
 	 * @Title: getCompXMl
-	 * @Description:  获取对应构件的XML
+	 * @Description: 获取对应构件的XML
 	 * @Author xiaohe
 	 * @DateTime 2019年5月5日 下午4:30:00
 	 * @param compId 构件编号
-	 * @return 
+	 * @return
 	 */
 	ComponentDetail getCommCompXMl(@Param("compId") String compId);
-	
+
 	/**
 	 * @Title: saveCompDetail
 	 * @Description: 保存构件详细信息
@@ -91,17 +93,17 @@ public interface ComponentDetailMapper extends BaseMapper<ComponentDetail> {
 
 	/**
 	 * @Title: getCompFiles
-	 * @Description: 
+	 * @Description:
 	 * @Author xiaohe
 	 * @DateTime 2019年5月23日 下午1:37:31
 	 * @param compId 构件ID
-	 * @return 
+	 * @return
 	 */
-	List<ComponentDetail> getCompFiles(@Param("compId")String compId);
+	List<ComponentDetail> getCompFiles(@Param("compId") String compId);
 
 	/**
 	 * @Title: deleteByCompId
-	 * @Description:  根据构件编号删除所有构件文件
+	 * @Description: 根据构件编号删除所有构件文件
 	 * @Author xiaohe
 	 * @DateTime 2019年5月24日 下午2:04:44
 	 * @param id 构件编号
@@ -113,22 +115,40 @@ public interface ComponentDetailMapper extends BaseMapper<ComponentDetail> {
 	 * @param fileType
 	 * @return
 	 */
-	ComponentDetail findCompXml(@Param("compId")String compId, @Param("fileType")String fileType);
+	ComponentDetail findCompXml(@Param("compId") String compId, @Param("fileType") String fileType);
 
 	/**
 	 * @Title: editCompDetail
-	 * @Description:  修改构架XML
+	 * @Description: 修改构架XML
 	 * @Author xiaohe
 	 * @DateTime 2019年5月24日 下午2:04:44
 	 * @param detail 构件
 	 */
-	void editCompDetail(@Param("compDetail")ComponentDetail detail);
-	
+	void editCompDetail(@Param("compDetail") ComponentDetail detail);
+
 	/**
 	 * 根据树节点的构件库详细信息的id查找文件路径
+	 * 
 	 * @param id
 	 * @return
 	 */
-	ComponentDetail getFilePathById(@Param("id")String id);
+	ComponentDetail getFilePathById(@Param("id") String id);
+	/**
+	 * @Title: findCompframe
+	 * @Description: 查询所有构件框架
+	 * @Author xiaohe
+	 * @DateTime 2019年11月26日 下午2:04:44
+	 * @return
+	 */
+	List<Map<String, Object>> findCompframe();
+	/**
+	 * @Title: findPlatform
+	 * @Description: 查询所有构件框架的平台
+	 * @Author xiaohe
+	 * @DateTime 2019年11月26日 下午2:04:44
+	 * @param frameId 构件框架ID
+	 * @return
+	 */
+	List<String> findPlatform(@Param("frameId") String frameId);
 
 }

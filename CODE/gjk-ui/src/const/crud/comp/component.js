@@ -74,7 +74,7 @@ export const tableOption = {
         label: '已驳回',
         value: "3"
       }, {
-        label: '驳回再审请',
+        label: '驳回再申请',
         value: "4"
       }]
     },
