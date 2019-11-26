@@ -1283,7 +1283,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		List<ProjectFile> procedureList = baseMapper.getProcedureListByProjectId(projectId);
 		List<String> procedureNameList = new ArrayList<String>();
 		for (ProjectFile file : procedureList) {
-			procedureNameList.add(file.getFileName().substring(0, file.getFileName().length() - 2));
+			procedureNameList.add(file.getFileName());
 		}
 		return procedureNameList;
 	}
@@ -1625,6 +1625,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			projectFiles.add(this.getById(procedureId));
 			List<ProjectFile> modelFile = getProFileListByModelId(procedureId);
 			if (modelFile != null && modelFile.size() > 0) {
+				String filePath = proDetailPath + modelFile.get(0).getFilePath();
+				cn.hutool.core.io.FileUtil.del(filePath);
 				projectFiles.addAll(modelFile);
 				for (ProjectFile projectFile : modelFile) {
 					List<ProjectFile> list = getProFileListByModelId(projectFile.getId());
