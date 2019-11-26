@@ -39,17 +39,13 @@
 <script>
 import {
   getInfData,
-  willGetChipData,
   saveChip,
-  updateChip
+  getObj
 } from "@/api/libs/hardwarelibchip";
 import { mapGetters } from "vuex";
 import NProgress from "nprogress"; // progress bar
 import "nprogress/nprogress.css"; // progress bar style
-import params from "@/views/comp/code-editor/params";
-import paramsDefine from "@/views/comp/code-editor/params-define";
 import { getCompList } from "@/api/comp/component";
-import { saveProcessModel } from "@/api/pro/project";
 import { menuTag } from "@/util/closeRouter";
 
 export default {
@@ -111,9 +107,13 @@ export default {
       let iframeWin = this.$refs.iframe.contentWindow;
       //console.log("iframeWin",iframeWin)
       getInfData().then(response => {
-        this.postMessageData.cmd = "updateChip";
-        this.postMessageData.params = [response.data, this.params];
-        iframeWin.postMessage(this.postMessageData, "*");
+        getObj(this.params.id).then(res => {
+            console.log("res",res)
+            this.params = res.data.data
+            this.postMessageData.cmd = "updateChip";
+            this.postMessageData.params = [response.data, this.params];
+            iframeWin.postMessage(this.postMessageData, "*");
+        })
         //console.log("postMessageData",this.postMessageData.params)
       });
     },

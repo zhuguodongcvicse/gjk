@@ -44,16 +44,25 @@
     <script src="../util/mangUtils.js"></script>
     <script type="text/javascript">
         /* function submitSetting() {
-            var aa = document.getElementsByTagName("input").value(); 
+            var aa = document.getElementsByTagName("input").value();
             console.log("chipValueList",chipValueList)
             console.log("aa",aa)
         } */
         function upperCase() {
             var x = document.getElementById("IP").childNodes.item(0).value
-            // console.log("x", x)
-            // console.log("clickchip",clickCheckedChip)
+            console.log("x", x)
+            console.log("clickCheckedChip",clickCheckedChip)
+            for (const i in ChipsWithIPs) {
+                if (ChipsWithIPs[i].uniqueId === clickCheckedChip.uniqueId) {
+                    ChipsWithIPs[i] = clickCheckedChip
+                    return
+                }
+            }
+            ChipsWithIPs.push(clickCheckedChip)
+            ChipsWithIPs = JSON.parse(JSON.stringify(ChipsWithIPs))
+            console.log("ChipsWithIPs",ChipsWithIPs)
             // document.getElementById("fname").value = x.toUpperCase()
-            for (const m in graphList.fJson) {
+            /*for (const m in graphList.fJson) {
                 for (const k in graphList.fJson[m].datas) {
                     if (graphList.fJson[m].datas[k].json.properties.caseName != null) {
                         for (const i in graphList.fJson[m].datas[k].json.properties.frontBoardList) {
@@ -69,9 +78,9 @@
                         }
                     }
                 }
-            }
+            }*/
             //深拷贝
-			chipListTemp = JSON.parse(JSON.stringify(chipListTemp))
+			      // chipListTemp = JSON.parse(JSON.stringify(chipListTemp))
         }
         function getCaption(obj) {
             var index = obj.lastIndexOf("\+");

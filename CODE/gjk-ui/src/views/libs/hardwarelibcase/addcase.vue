@@ -22,69 +22,86 @@
 </template>
 
 <script>
-//这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
-//例如：import 《组件名称》 from '《组件路径》';
-import { saveInf, putObj } from "@/api/libs/hardwarelibinf";
-export default {
-  //import引入的组件需要注入到对象中才能使用
-  props: ["showInf"],
-  components: {},
-  data() {
-    //这里存放数据
-    return {
-      formLabelWidth: "120px",
-      form: {
-        id: "",
-        caseName: "",
-        bdNum: "",
-        linkRelation: "",
-        frontCase: "",
-        backCase: ""
-      },
-      rules: {
-        caseName: [{ required: true, message: "机箱名称不能为空", trigger: "blur" }]
-      }
+    //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
+    //例如：import 《组件名称》 from '《组件路径》';
+    import {saveInf, putObj} from "@/api/libs/hardwarelibinf";
+
+    export default {
+        //import引入的组件需要注入到对象中才能使用
+        props: ["showInf", "allCases"],
+        components: {},
+        data() {
+            //这里存放数据
+            return {
+                formLabelWidth: "120px",
+                form: {
+                    id: "",
+                    caseName: "",
+                    bdNum: "",
+                    linkRelation: "",
+                    frontCase: "",
+                    backCase: ""
+                },
+                rules: {
+                    caseName: [{required: true, message: "机箱名称不能为空", trigger: "blur"}]
+                }
+            };
+        },
+        //监听属性 类似于data概念
+        computed: {},
+        //监控data中的数据变化
+        watch: {},
+        //方法集合
+        methods: {
+            close(formName) {
+                this.$refs[formName].resetFields();
+                this.showInf.dialogFormVisible = false;
+            },
+            submit(formName) {
+                //机箱名称不能重复
+                for (const i in this.allCases) {
+                    if (this.allCases[i].caseName === this.form.caseName) {
+                        alert("机箱名称不能相同")
+                        return
+                    }
+                }
+                this.$refs[formName].validate(valid => {
+                    if (valid) {
+                        this.showInf.dialogFormVisible = false;
+                        this.$router.push({
+                            path: "/libs/hardwarelibcase/casedesign",
+                            query: this.form
+                        });
+                        this.$refs[formName].resetFields();
+                    } else {
+                        // console.log("error submit!!");
+                        return false;
+                    }
+                });
+            }
+        },
+        //生命周期 - 创建完成（可以访问当前this实例）
+        created() {
+        },
+        //生命周期 - 挂载完成（可以访问DOM元素）
+        mounted() {
+        },
+        beforeCreate() {
+        }, //生命周期 - 创建之前
+        beforeMount() {
+        }, //生命周期 - 挂载之前
+        beforeUpdate() {
+        }, //生命周期 - 更新之前
+        updated() {
+        }, //生命周期 - 更新之后
+        beforeDestroy() {
+        }, //生命周期 - 销毁之前
+        destroyed() {
+        }, //生命周期 - 销毁完成
+        activated() {
+        } //如果页面有keep-alive缓存功能，这个函数会触发
     };
-  },
-  //监听属性 类似于data概念
-  computed: {},
-  //监控data中的数据变化
-  watch: {},
-  //方法集合
-  methods: {
-    close(formName) {
-      this.$refs[formName].resetFields();
-      this.showInf.dialogFormVisible = false;
-    },
-    submit(formName) {
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          this.showInf.dialogFormVisible = false;
-          this.$router.push({
-            path: "/libs/hardwarelibcase/casedesign",
-            query: this.form
-          });
-          this.$refs[formName].resetFields();
-        } else {
-          // console.log("error submit!!");
-          return false;
-        }
-      });
-    }
-  },
-  //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
-  //生命周期 - 挂载完成（可以访问DOM元素）
-  mounted() {},
-  beforeCreate() {}, //生命周期 - 创建之前
-  beforeMount() {}, //生命周期 - 挂载之前
-  beforeUpdate() {}, //生命周期 - 更新之前
-  updated() {}, //生命周期 - 更新之后
-  beforeDestroy() {}, //生命周期 - 销毁之前
-  destroyed() {}, //生命周期 - 销毁完成
-  activated() {} //如果页面有keep-alive缓存功能，这个函数会触发
-};
 </script>
 <style lang='scss' scoped>
-//@import url(); 引入公共css类
+  //@import url(); 引入公共css类
 </style>

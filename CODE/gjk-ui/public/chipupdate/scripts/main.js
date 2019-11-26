@@ -1,8 +1,10 @@
 var inf_json = [];
-var inf_uuid;
 var chipArr;
 var infArr;
 var infListTemp = []
+var selectCurrentChip
+var ioTypeList = ["输入","输出","输入/输出"]
+var ioValList = ["0","1","2"]
 Q.registerImage('rack', 'images/Case.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
 Q.registerImage('card', 'images/BeforeTheBoard.svg');
 Q.registerImage('behindcard', 'images/AfterTheBoard.svg');
@@ -74,7 +76,7 @@ function handleMessageFromParent(event) {
 			console.log(event.data.params);
 			for (var i = 0; i < infArr.length; i++) {
 				if (infArr[i].infType == 3) {
-					//		console.log("infArr[i].chipInf",infArr[i].chipInf)		
+					//		console.log("infArr[i].chipInf",infArr[i].chipInf)
 					inf_json[i] = {
 						properties: {
 							size: {
@@ -86,10 +88,10 @@ function handleMessageFromParent(event) {
 						showLabel: true,
 						clientProperties: {
 							type: 'inf',
-							//inf_uuid: infArr[i].id,
 							infName: infArr[i].infName,
 							infRate: infArr[i].infRate,
 							infType: infArr[i].infType,
+              ioType: infArr[i].ioType,
 							id: infArr[i].id
 						},
 						type: 'Q.RectElement',
@@ -336,7 +338,7 @@ function initEditor(editor) {
 		var IDNum = 0
 		for (const i in json.datas[0].json.properties.infOfChipList) {
 			json.datas[0].json.properties.infOfChipList[i].ID = IDNum++
-			json.datas[0].json.properties.infOfChipList[i].ioType = 2
+			// json.datas[0].json.properties.infOfChipList[i].ioType = 2
 		}
 		// console.log("json", JSON.stringify(json))
 		var jsonStr = JSON.stringify(json)
@@ -346,10 +348,10 @@ function initEditor(editor) {
 		window.parent.postMessage(postMessageParentData, "*")
 	}
 	function initToolbar() {
-		//网状画布 
+		//网状画布
 		var graph = editor.graph;
 		//不可改变形状大小
-		//graph.editable = false; 
+		//graph.editable = false;
 
 		var defaultStyles = graph.styles = {};
 		defaultStyles[Q.Styles.ARROW_TO] = false;
@@ -512,13 +514,14 @@ function initEditor(editor) {
 		if (!selection || selection.length == 0) {
 			return false;
 		}
+		for (var i in selection) {
+			if (selection[i].properties.type == "inf") {
 		Q.confirm("是否 确认删除", function () {
 			var selection = this.removeSelection();
-			console.log("selection",selection)
 			/* for (const i in graph.toJSON().datas[0].json.properties.infOfChipList) {
 				if (selection[0].) {
 					const element = object[i];
-					
+
 				}
 			} */
 			/* if (selection) {
@@ -526,6 +529,7 @@ function initEditor(editor) {
 				this.onInteractionEvent(event);
 			} */
 		}, this);
+	}}
 	}
 
 	var propertySheet = editor.propertyPane;
@@ -540,12 +544,13 @@ function initEditor(editor) {
 			// console.log("graph.toJSON()", graph.toJSON())
 			var data = graph.getElement(evt);
 			console.log("data",data)
-			var infName = data.properties.infName;
+      selectCurrentChip = data
+			/*var infName = data.properties.infName;
 			// var infRate = data.properties.infRate;
 			var id = data.properties.id;
 			// var infType = data.properties.infType;
 			var ioType = data.properties.ioType;
-			data.set('infname', infName);
+			data.set('infName', infName);
 			// data.set('infRate', infRate);
 			data.set('id', id);
 			// data.set('inftype', infType);
@@ -557,24 +562,24 @@ function initEditor(editor) {
 			data.set('chipName', chipName);
 			data.set('coreNum', coreNum);
 			data.set('memSize', memSize);
-			data.set('recvRate', recvRate);
+			data.set('recvRate', recvRate);*/
 		}
 
 		if (type == 'inf') {
 			return {
 				group: '接口属性',
 				properties: [{
-					client: 'infname',
+					client: 'infName',
 					displayName: '接口名称',
 				},
 				{
 					client: 'infRate',
 					displayName: '接口速率'
-				}/* ,
-				{
-					client: 'inftype',
-					displayName: '接口类型'
-				} */]
+				},
+        {
+          client: 'ioType',
+          displayName: '输入输出类型'
+        }]
 			}
 		}
 

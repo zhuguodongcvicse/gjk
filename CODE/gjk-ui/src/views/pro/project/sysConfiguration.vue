@@ -155,62 +155,43 @@ export default {
     },
     //3:获取硬件数据chipsOfHardwarelibs，修改cpu数据
     setTreeCpu(treeData, coefXmlMap) {
-      getChipsfromhardwarelibs(this.$route.query.sysId).then(Response => {
-        isXmlFileExist(this.$route.query.sysId).then(bool => {
-          if (bool.data.data) {
-            getSysConfigXmlEntityMap(this.$route.query.sysId).then(callBack => {
-              let callBackXmlMap = callBack.data.data;
-              for (let item of callBackXmlMap.xmlEntityMaps) {
-                if (
-                  parseStrToObj(item.attributeMap.configureType).lableType ==
-                  "form"
-                ) {
-                  for (let node of treeData) {
-                    let nodeConfig = parseStrToObj(
-                      node.attributeMap.configureType
-                    );
-                    if (node.attributeMap.id == item.attributeMap.id) {
-                      for (let attr of nodeConfig.attrs) {
-                        node.attributeMap[attr.attrName] =
-                          item.attributeMap[attr.attrName];
-                      }
-                    }
-                    if (node.children.length > 0) {
-                      for (let cmp of node.children) {
-                        let cmpConfig = parseStrToObj(
-                          cmp.attributeMap.configureType
-                        );
-                        if (item.xmlEntityMaps[0].xmlEntityMaps.length > 0) {
-                          for (let callBackCmp of item.xmlEntityMaps[0]
-                            .xmlEntityMaps) {
-                            if (
-                              cmp.attributeMap.cmpName ==
-                              callBackCmp.attributeMap.cmpName
-                            ) {
-                              for (let attr of cmpConfig.attrs) {
-                                cmp.attributeMap[attr.attrName] =
-                                  callBackCmp.attributeMap[attr.attrName];
-                              }
-                              cmp.xmlEntityMaps = JSON.parse(
-                                JSON.stringify(callBackCmp.xmlEntityMaps)
-                              );
-                            }
-                          }
-                        }
-                      }
+      isXmlFileExist(this.$route.query.sysId).then(bool => {
+        if (bool.data.data) {
+          getSysConfigXmlEntityMap(this.$route.query.sysId).then(callBack => {
+            let callBackXmlMap = callBack.data.data;
+            for (let item of callBackXmlMap.xmlEntityMaps) {
+              if (
+                parseStrToObj(item.attributeMap.configureType).lableType ==
+                "form"
+              ) {
+                for (let node of treeData) {
+                  let nodeConfig = parseStrToObj(
+                    node.attributeMap.configureType
+                  );
+                  if (node.attributeMap.id == item.attributeMap.id) {
+                    for (let attr of nodeConfig.attrs) {
+                      node.attributeMap[attr.attrName] =
+                        item.attributeMap[attr.attrName];
                     }
                   }
-                } else if (
-                  parseStrToObj(item.attributeMap.configureType).lableType ==
-                  "tab"
-                ) {
-                  if (coefXmlMap.xmlEntityMaps.length > 0) {
-                    for (let coef of coefXmlMap.xmlEntityMaps) {
-                      if (item.xmlEntityMaps.length > 0) {
-                        for (let callBackCoef of item.xmlEntityMaps) {
-                          if (coef.lableName == callBackCoef.lableName) {
-                            coef.xmlEntityMaps = JSON.parse(
-                              JSON.stringify(callBackCoef.xmlEntityMaps)
+                  if (node.children.length > 0) {
+                    for (let cmp of node.children) {
+                      let cmpConfig = parseStrToObj(
+                        cmp.attributeMap.configureType
+                      );
+                      if (item.xmlEntityMaps[0].xmlEntityMaps.length > 0) {
+                        for (let callBackCmp of item.xmlEntityMaps[0]
+                          .xmlEntityMaps) {
+                          if (
+                            cmp.attributeMap.cmpName ==
+                            callBackCmp.attributeMap.cmpName
+                          ) {
+                            for (let attr of cmpConfig.attrs) {
+                              cmp.attributeMap[attr.attrName] =
+                                callBackCmp.attributeMap[attr.attrName];
+                            }
+                            cmp.xmlEntityMaps = JSON.parse(
+                              JSON.stringify(callBackCmp.xmlEntityMaps)
                             );
                           }
                         }
@@ -218,40 +199,58 @@ export default {
                     }
                   }
                 }
+              } else if (
+                parseStrToObj(item.attributeMap.configureType).lableType ==
+                "tab"
+              ) {
+                if (coefXmlMap.xmlEntityMaps.length > 0) {
+                  for (let coef of coefXmlMap.xmlEntityMaps) {
+                    if (item.xmlEntityMaps.length > 0) {
+                      for (let callBackCoef of item.xmlEntityMaps) {
+                        if (coef.lableName == callBackCoef.lableName) {
+                          coef.xmlEntityMaps = JSON.parse(
+                            JSON.stringify(callBackCoef.xmlEntityMaps)
+                          );
+                        }
+                      }
+                    }
+                  }
+                }
               }
-
-              this.setNodeAttrByChip(coefXmlMap, Response, treeData);
-            });
-          } else {
-            this.setNodeAttrByChip(coefXmlMap, Response, treeData);
-          }
-        });
+            }
+            this.setNodeAttrByChip(coefXmlMap, treeData);
+          });
+        } else {
+          this.setNodeAttrByChip(coefXmlMap, treeData);
+        }
       });
     },
-    setNodeAttrByChip(coefXmlMap, Response, treeData) {
+    setNodeAttrByChip(coefXmlMap, treeData) {
       this.$set(
         this.tablePane[1],
         "modelXmlMap",
         JSON.parse(JSON.stringify(coefXmlMap))
       );
-      if (Response.data.chips) {
-        let chipsData = JSON.parse(Response.data.chips);
-        for (let node of treeData) {
-          for (let chip of chipsData) {
-            if (node.attributeMap.id == chip.nodeID) {
-              node.attributeMap.ipConfig = chip.IP;
-              this.$set(node, "coreNum", chip.coreNum);
-              if (node.children.length > 0) {
-                for (let cmpItem of node.children) {
-                  this.$set(cmpItem, "coreNum", chip.coreNum);
+      getChipsfromhardwarelibs(this.$route.query.sysId).then(Response => {
+        if (Response.data.chips) {
+          let chipsData = JSON.parse(Response.data.chips);
+          for (let node of treeData) {
+            for (let chip of chipsData) {
+              if (node.attributeMap.id == chip.nodeID) {
+                node.attributeMap.ipConfig = chip.IP;
+                this.$set(node, "coreNum", chip.coreNum);
+                if (node.children.length > 0) {
+                  for (let cmpItem of node.children) {
+                    this.$set(cmpItem, "coreNum", chip.coreNum);
+                  }
                 }
               }
             }
+            this.setStrToCordId(node, node.coreNum);
           }
-          this.setStrToCordId(node, node.coreNum);
         }
-      }
-      this.setTreeCmp(treeData);
+        this.setTreeCmp(treeData);
+      });
     },
     //4:调用api return获取cmp数据
     setTreeCmp(treeData) {

@@ -164,12 +164,12 @@ export default {
       });
     },
     currentChange(val) {
-      this.page.current = val;
+      this.page.currentPage = val;
       this.listQuery.current = val;
       this.getList(this.page);
     },
     sizeChange(val) {
-      this.page.size = val;
+      this.page.pageSize = val;
       this.listQuery.size = val;
       console.log("1234567890-=-098765432", this.page);
       this.getList(this.page);

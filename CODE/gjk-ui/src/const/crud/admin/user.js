@@ -1,5 +1,5 @@
 import { getDetails } from '@/api/admin/user'
-import { validatePhone,checkSpecificKey } from '@/util/rules'
+import { validatePhone,checkGongGao } from '@/util/rules'
 
 var validateUsername = (rule, value, callback) => {
   getDetails(value).then(response => {
@@ -46,13 +46,7 @@ export const tableOption = {
       message: '请输入工号'
     },
     {
-      min: 6,
-      max: 6,
-      message: '长度在 为 6 个字符',
-      trigger: 'blur'
-    },
-    {
-      validator: checkSpecificKey, 
+      validator: checkGongGao, 
       trigger: 'blur'
     },
     { validator: validateUsername, trigger: 'blur' }
@@ -125,7 +119,7 @@ export const tableOption = {
     rules: [{
       required: true,
       message: '请选择角色',
-      trigger: 'blur'
+      trigger: 'change'
     }]
   }, {
     fixed: true,
@@ -145,7 +139,7 @@ export const tableOption = {
     rules: [{
       required: true,
       message: '请选择状态',
-      trigger: 'blur'
+      trigger: 'change'
     }],
     dicData: [{
       label: '有效',
