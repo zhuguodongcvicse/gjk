@@ -103,10 +103,12 @@ export function saveProProcess(projectId, processName) {
 
 export function saveProCompList(projectId, compList) {
   return request({
-    url: '/pro/project/saveProCompList/' + projectId + "/" + compList,
-    method: 'put'
+    url: '/pro/project/saveProCompList/' + projectId,
+    method: 'put',
+    data: compList
   })
 }
+
 export function editProJSON(obj, proId) {
   return request({
     url: '/pro/manager/editProJson/' + proId,
@@ -264,10 +266,10 @@ export function uploadFiles(obj) {
 }
 
 
-export function removeCompProject(compId,projectId){
+export function removeCompProject(compId, projectId) {
   return request({
-    url:'/pro/project/removeCompProject/' + compId+'/'+projectId,
-    method:'get'
+    url: '/pro/project/removeCompProject/' + compId + '/' + projectId,
+    method: 'get'
   })
 }
 
@@ -276,6 +278,6 @@ export function staticInspect(obj) {
   return request({
     url: '/pro/project/staticInspect',
     method: 'post',
-    params:obj,
+    params: obj,
   })
 }

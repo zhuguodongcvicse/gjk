@@ -203,7 +203,7 @@ import {
 } from "@/api/pro/manager";
 import { mapGetters } from "vuex";
 
-import chooseTemp  from "./chooseTemplate"
+import chooseTemp from "./chooseTemplate";
 export default {
   //注入依赖，调用this.reload();用于刷新页面
   inject: ["reload"],
@@ -245,7 +245,7 @@ export default {
       }
     };
     return {
-      activeName:"first",
+      activeName: "first",
       projectsTemp: "",
       project: {},
       compHaveChildArray: [],
@@ -259,7 +259,7 @@ export default {
         sysTempId: "",
         themeTempId: "",
         networkTempId: "",
-        hsmTempId: "",
+        hsmTempId: ""
       },
       labelPosition: "right",
       dialogTableVisible: false,
@@ -344,8 +344,8 @@ export default {
     }
   },
   methods: {
-    showStructList(){
-        this.getTableData()
+    showStructList() {
+      this.getTableData();
     },
     selectAllComp() {
       let selectArray = [];
@@ -439,14 +439,17 @@ export default {
           this.project.userId = this.userInfo.userId;
           //模板ID赋值
           var basetemplate = {
-            sysTempId:this.formLabelAlign.sysTempId,
-            themeTempId:this.formLabelAlign.themeTempId,
-            networkTempId:this.formLabelAlign.networkTempId,
-            hsmTempId:this.formLabelAlign.hsmTempId
-          }
+            sysTempId: this.formLabelAlign.sysTempId,
+            themeTempId: this.formLabelAlign.themeTempId,
+            networkTempId: this.formLabelAlign.networkTempId,
+            hsmTempId: this.formLabelAlign.hsmTempId
+          };
           //给模板id赋json串值
           this.project.basetemplateIds = JSON.stringify(basetemplate);
-          console.log("this.project.basetemplateIds",this.project.basetemplateIds)
+          console.log(
+            "this.project.basetemplateIds",
+            this.project.basetemplateIds
+          );
           saveProject(this.project)
             .then(Response => {
               this.project.id = Response.data.data.id;
@@ -480,45 +483,41 @@ export default {
                   //   //校验是否选中所有平台大类
                   //   this.checkoutPlatform();
                   // })
-                  if (this.compSelectArray.length <= 0) {
-                    this.compSelectArray = null;
+                  if (
+                    this.compSelectArray == null ||
+                    this.compSelectArray.length <= 0
+                  ) {
+                    saveProCompList(this.project.id, this.compSelectArray).then(
+                      Response => {
+                        if (
+                          this.compSelectArray == null ||
+                          this.compSelectArray.length <= 0
+                        ) {
+                          let approval = {};
+                          approval.userId = this.userInfo.userId;
+                          approval.applyId = this.project.id;
+                          approval.applyType = "2";
+                          approval.libraryType = "7";
+                          if (this.formLabelAlign.applyUser != "") {
+                            approval.applyUserId = this.formLabelAlign.applyUser;
+                          }
+                          approval.approvalState = "0";
+                          //提交记录到审批管理库
+                          saveApproval(approval).then(Response => {
+                            saveApprovalApply(
+                              Response.data.data.id,
+                              this.compSelectArray
+                            );
+                            Object.assign(
+                              this.formLabelAlign,
+                              this.$options.data().formLabelAlign
+                            );
+                            this.dialogTableVisible = false;
+                          });
+                        }
+                      }
+                    );
                   }
-                  saveProCompList(this.project.id, this.compSelectArray).then(
-                    Response => {
-                      let approval = {};
-                      approval.userId = this.userInfo.userId;
-                      approval.applyId = this.project.id;
-                      approval.applyType = "2";
-                      approval.libraryType = "7";
-                      // console.log(
-                      //   "2222222222222222222222",
-                      //   this.formLabelAlign.applyUser
-                      // );
-                      if (this.formLabelAlign.applyUser != "") {
-                        // console.log(
-                        //   "11111111111111111111111111",
-                        //   this.formLabelAlign.applyUser
-                        // );
-                        approval.applyUserId = this.formLabelAlign.applyUser;
-                      }
-                      approval.approvalState = "0";
-                      //提交记录到审批管理库
-                      if (this.compSelectArray == null) {
-                        this.compSelectArray = [];
-                      }
-                      saveApproval(approval).then(Response => {
-                        saveApprovalApply(
-                          Response.data.data.id,
-                          this.compSelectArray
-                        );
-                        Object.assign(
-                          this.formLabelAlign,
-                          this.$options.data().formLabelAlign
-                        );
-                        this.dialogTableVisible = false;
-                      });
-                    }
-                  );
                 }
               );
             })
@@ -768,7 +767,7 @@ export default {
           this.$message.error("修改软件框架失败");
         }
       });
-    },
+    }
   },
   created() {
     this.getList();
