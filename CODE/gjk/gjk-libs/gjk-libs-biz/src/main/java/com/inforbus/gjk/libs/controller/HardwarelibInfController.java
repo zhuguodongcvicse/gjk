@@ -106,7 +106,7 @@ public class HardwarelibInfController {
  */
   @PostMapping("/saveInf")
   public void saveInf(@RequestBody HardwarelibInf hardwarelibInf) {
-    System.out.println("hardwarelibInf-------"+hardwarelibInf);
+//    System.out.println("hardwarelibInf-------"+hardwarelibInf);
     hardwarelibInfService.saveInf(hardwarelibInf);
 	  /*if(hardwarelibInf.getId()!="") {
 		  return new R<>(hardwarelibInfService.updateById(hardwarelibInf));

@@ -34,7 +34,7 @@
 import { saveInf, putObj } from "@/api/libs/hardwarelibinf";
 export default {
   //import引入的组件需要注入到对象中才能使用
-  props: ["showInf"],
+  props: ["showInf", "allBoards"],
   components: {},
   data() {
     //这里存放数据
@@ -66,6 +66,13 @@ export default {
       this.showInf.dialogFormVisible = false;
     },
     submit(formName) {
+      //板卡名称不能重复
+      for (const i in this.allBoards) {
+          if (this.allBoards[i].boardName === this.form.boardName) {
+              alert("板卡名称不能相同")
+              return
+          }
+      }
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.showInf.dialogFormVisible = false;

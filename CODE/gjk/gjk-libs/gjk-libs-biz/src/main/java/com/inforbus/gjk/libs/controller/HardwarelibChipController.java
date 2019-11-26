@@ -112,6 +112,7 @@ public class HardwarelibChipController {
    */
   @PostMapping("/saveChip")
   public void saveChip(@RequestBody(required = false) HardwarelibChip hardwarelibChip) {
+      System.out.println("hardwarelibChip: " + hardwarelibChip);
 	  hardwarelibChipService.saveChip(hardwarelibChip);
   }
 
