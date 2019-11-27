@@ -9,6 +9,7 @@ import com.inforbus.gjk.admin.api.entity.GjkTest;
 import com.inforbus.gjk.admin.api.vo.PlatformVO;
 import com.inforbus.gjk.admin.api.vo.TestVO;
 import com.inforbus.gjk.common.core.util.R;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -43,5 +44,21 @@ public interface GjkTestService extends IService<GjkTest> {
 	 * @return 成功、失败
 	 */
 	Boolean updateTestById(GjkTest gjkTest);
+
+	/**
+	 * 导出平台库、算法库、测试库，生成压缩文件流
+	 * @param libs
+	 * @return
+	 * @throws Exception
+	 */
+	byte[] createZip(List<String> libs) throws Exception;
+
+	/**
+	 * 解析传入的压缩文件
+	 *
+	 * @param ufile
+	 * @param importType
+	 */
+	int analysisZipFile(MultipartFile ufile, String importType);
 	
 }

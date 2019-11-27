@@ -1,6 +1,7 @@
 
 package com.inforbus.gjk.admin.controller;
 
+import cn.hutool.core.io.IoUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.inforbus.gjk.admin.api.entity.GjkAlgorithm;
@@ -17,12 +18,13 @@ import com.inforbus.gjk.common.log.annotation.SysLog;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -125,6 +127,48 @@ public class GjkTestController {
 	@PreAuthorize("@pms.hasPermission('sys_test_edit')")
 	public R update(@Valid @RequestBody GjkTest gjkTest) {
 		return new R<>(gjkTestService.updateTestById(gjkTest));
+	}
+
+	/**
+	 * 导出测试库、平台库、算法库
+	 * @param request
+	 * @param response
+	 * @param libs
+	 */
+	@PostMapping("/createZipFile")
+	@PreAuthorize("@pms.hasPermission('sys_test_export')")
+	public void createZipFile(HttpServletRequest request, HttpServletResponse response,
+							  @RequestBody List<String> libs) {
+		try {
+			byte[] data = gjkTestService.createZip(libs);
+
+			String zipFileName = (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date()) + ".zip";
+			response.reset();
+			response.setHeader("Content-Disposition", String.format("attachment; filename=%s.zip", zipFileName));
+			response.setHeader("FileName", zipFileName);
+			response.setHeader("Content-Length", "" + data.length);
+			response.setContentType("application/octet-stream; charset=UTF-8");
+
+			IoUtil.write(response.getOutputStream(), Boolean.TRUE, data);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * @Title: uploadReturnUrll
+	 * @Description: 单文件上传
+	 * @Author xiaohe
+	 * @DateTime 2019年5月13日 下午3:41:10
+	 * @param ufile
+	 * @return
+	 */
+	@ResponseBody
+	@PostMapping(path = "/importLibsZipUpload", consumes = { "multipart/mixed", "multipart/form-data" })
+	@PreAuthorize("@pms.hasPermission('sys_test_import')")
+	public R appImageUpload(@RequestParam(value = "file", required = false) MultipartFile ufile,
+							@RequestParam(value = "importType", required = false) String importType) {
+		return new R<>(gjkTestService.analysisZipFile(ufile, importType));
 	}
 
 }
