@@ -4,8 +4,11 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.FileChannel;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -293,5 +296,53 @@ public class UploadFilesUtils {
 		inputFile.read(buffer);
 		inputFile.close();
 		return new String(Base64.getEncoder().encode(buffer));
+	}
+
+	/**
+	 * @Title: encodeBase64File
+	 * @Description: 将文件转BASE64
+	 * @Author xiaohe
+	 * @DateTime 2019年11月27日 下午8:46:20
+	 * @param source 源文件路径
+	 * @param destin 拷贝文件路径
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("resource")
+	public static void NioToCopyFile(String source, String destin) throws Exception {
+		File sourcePath = new File(source);
+		File destinPath = new File(destin);
+		// 如果源文件不存在就不用赋值
+		if (sourcePath.exists()) {
+			// 目标目录是否存在、不存在就创建
+			if (!destinPath.exists()) {
+				destinPath.mkdirs();
+			}
+			//源文件路径下的所有文件和文件夹
+			File[] items = sourcePath.listFiles();
+			FileChannel in = null;
+			FileChannel out = null;
+			for (File file : items) {
+				// 判断是不是文件
+				if (file.isFile()) {
+					try {
+						//取得对应文件的通道
+						in = new FileInputStream(file).getChannel();//
+						out = new FileOutputStream(destinPath + File.separator + file.getName()).getChannel();
+						//连接两个通道，并从in通道读取，写入out中
+						in.transferTo(0, in.size(), out);
+					} catch (Exception e) {
+						throw e;
+					} finally {
+						in.close();
+						out.close();
+					}
+				} else {
+					NioToCopyFile(file.getPath(), destinPath + File.separator + file.getName());
+				}
+			}
+		} else {
+			throw new NullPointerException("source is null");
+		}
 	}
 }

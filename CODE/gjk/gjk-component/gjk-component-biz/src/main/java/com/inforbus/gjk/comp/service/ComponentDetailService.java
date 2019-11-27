@@ -183,10 +183,10 @@ public interface ComponentDetailService extends IService<ComponentDetail> {
 	 * @Author xiaohe
 	 * @DateTime 2019年11月13日 下午4:05:24
 	 * @param spbModelXmlFile
-	 * @param saveDir 
-	 * @throws Exception 
+	 * @param spbModelDir 
+	 * @param frameId 
 	 */
-	public R createSpbFrameFile(String spbModelXmlFile,String headerTemplateFile,String srcTemplateFile, String saveDir);
+	public R createSpbFrameFile(String spbModelXmlFile,String spbModelDir,String frameId);
 
 	/**
 	 * @Title: findSpbFrameFile
@@ -195,5 +195,14 @@ public interface ComponentDetailService extends IService<ComponentDetail> {
 	 * @DateTime 2019年11月13日 下午4:05:24
 	 */
 	public R findSpbFrameFile();
+	/**
+	 * @Title: findPlatform
+	 * @Description: 根据构件框架名称查询 的平台信息
+	 * @Author xiaohe
+	 * @DateTime 2019年11月26日 下午2:04:44
+	 * @param frameName 构件框架ID
+	 * @return
+	 */
+	public List<String> findPlatformByName(String frameName);
 
 }

@@ -91,6 +91,16 @@ export default {
   computed: {
     ...mapGetters(["permissions"])
   },
+  watch: {
+    innerVisible: {
+      handler: function(isData) {
+        if (!isData) {
+          this.getList();
+        }
+      },
+      deep: true
+    }
+  },
   methods: {
     getList() {
       this.tableLoading = true;

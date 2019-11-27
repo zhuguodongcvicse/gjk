@@ -137,7 +137,8 @@ public class ExternalIOTransUtils {
 			String packinfoPath, String cmpResFilePath, String appProPath) {
 		AppControl appControl = new AppControl();
 //		appControl.appInstall(cmpNameToHwType, userName, appID, appName, packinfoPath, cmpResFilePath, appProPath);
-		return appControl.appInstall(cmpNameToHwType, userName, appID, appName, packinfoPath, cmpResFilePath, appProPath);
+		return appControl.appInstall(cmpNameToHwType, userName, appID, appName, packinfoPath, cmpResFilePath,
+				appProPath);
 	}
 
 	/**
@@ -152,10 +153,11 @@ public class ExternalIOTransUtils {
 	 * @return
 	 */
 
-	public static boolean appLoad(Map<String, String> cmpNameToHwType, String userName,  int appID, String appName,
+	public static boolean appLoad(Map<String, String> cmpNameToHwType, String userName, int appID, String appName,
 			boolean existDeployConfig, String sysconfigPath, String appProPath) {
 		AppControl appControl = new AppControl();
-		return appControl.appLoad(cmpNameToHwType, userName, appID, appName, existDeployConfig, sysconfigPath, appProPath);
+		return appControl.appLoad(cmpNameToHwType, userName, appID, appName, existDeployConfig, sysconfigPath,
+				appProPath);
 
 	}
 
@@ -167,7 +169,7 @@ public class ExternalIOTransUtils {
 	 * @param appName         APP名称
 	 * @return
 	 */
-	public static boolean appUnload(Map<String, String> cmpNameToHwType, String userName,  int appID, String appName) {
+	public static boolean appUnload(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
 		AppControl appControl = new AppControl();
 		return appControl.appUnload(cmpNameToHwType, userName, appID, appName);
 	}
@@ -180,7 +182,7 @@ public class ExternalIOTransUtils {
 	 * @param appName         APP名称
 	 * @return
 	 */
-	public static boolean appRestart(Map<String, String> cmpNameToHwType, String userName,  int appID, String appName) {
+	public static boolean appRestart(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
 		AppControl appControl = new AppControl();
 		return appControl.appRestart(cmpNameToHwType, userName, appID, appName);
 	}
@@ -193,7 +195,7 @@ public class ExternalIOTransUtils {
 	 * @param appName         APP名称
 	 * @return
 	 */
-	public static boolean appStop(Map<String, String> cmpNameToHwType, String userName,  int appID, String appName) {
+	public static boolean appStop(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
 		AppControl appControl = new AppControl();
 		return appControl.appStop(cmpNameToHwType, userName, appID, appName);
 	}
@@ -206,7 +208,7 @@ public class ExternalIOTransUtils {
 	 * @param appName         APP名称
 	 * @return
 	 */
-	public static boolean appPause(Map<String, String> cmpNameToHwType, String userName,  int appID, String appName) {
+	public static boolean appPause(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
 		AppControl appControl = new AppControl();
 		return appControl.appPause(cmpNameToHwType, userName, appID, appName);
 	}
@@ -220,10 +222,10 @@ public class ExternalIOTransUtils {
 	 * @param packinfoPath    客户自存自取路径
 	 * @return
 	 */
-	public static boolean appUnInstall(Map<String, String> cmpNameToHwType, String userName,  int appID, String appName,
+	public static boolean appUnInstall(Map<String, String> cmpNameToHwType, String userName, int appID, String appName,
 			String packinfoPath) {
 		AppControl appControl = new AppControl();
-		return appControl.appUnInstall(cmpNameToHwType, userName,appID, appName, packinfoPath);
+		return appControl.appUnInstall(cmpNameToHwType, userName, appID, appName, packinfoPath);
 	}
 
 	/**
@@ -250,7 +252,7 @@ public class ExternalIOTransUtils {
 	 * @param packinfoPath          客户自存自取路径
 	 * @param cmpDeployPlanFilePath 客户自存自取路径
 	 */
-	public static void appTaskExport( String userName, int appId, String appName, String appPath, String sysconfigPath,
+	public static void appTaskExport(String userName, int appId, String appName, String appPath, String sysconfigPath,
 			String packinfoPath, String cmpDeployPlanFilePath) {
 		appInterface.appTaskExport(appId, appName, appPath, sysconfigPath, packinfoPath, cmpDeployPlanFilePath);
 	}
@@ -270,19 +272,16 @@ public class ExternalIOTransUtils {
 		cmpProCreate.modifySpbInclude(compFuncNameList, cmpAppFilePath);
 	}
 
-
 	/**
 	 * @Title: createSpbFrameFile
 	 * @Description: 生成构件框架
 	 * @Author xiaohe
 	 * @DateTime 2019年11月13日 下午2:53:28
-	 * @param spbModelXmlFile    构件模型XML文件
-	 * @param headerTemplateFile 头文件模板文件
-	 * @param srcTemplateFile    源文件模板文件
-	 * @param saveDir            保存路径(可以是平台文件路径)
+	 * @param spbModelXmlFile 构件模型XML文件
+	 * @param spbModelDir     保存路径(可以是平台文件路径)
 	 */
-	public static void createSpbFrameFile(String spbModelXmlFile, String headerTemplateFile, String srcTemplateFile,
-			String saveDir){
-		new SpbFrameAutoGen().createSpbFrameFile(spbModelXmlFile, headerTemplateFile, srcTemplateFile, saveDir);
+	public static void createSpbFrameFile(String spbModelXmlFile, String spbModelDir) {
+		new SpbFrameAutoGen().createSpbFrameFile(spbModelXmlFile, spbModelDir);
+//		new SpbFrameAutoGen().createSpbFrameFile(spbModelXmlFile, headerTemplateFile, srcTemplateFile, saveDir);
 	}
 }
