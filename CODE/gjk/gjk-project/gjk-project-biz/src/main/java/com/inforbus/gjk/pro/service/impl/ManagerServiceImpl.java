@@ -86,7 +86,6 @@ import lombok.AllArgsConstructor;
 public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> implements ManagerService {
 
 	private static final Logger logger = LoggerFactory.getLogger(ManagerServiceImpl.class);
-
 	@Autowired
 	protected ProjectMapper projectMapper;
 	@Autowired
@@ -744,6 +743,12 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				cn.hutool.core.io.FileUtil.del(appFilePath);
 			}
 
+			// 拷贝bsp对应的文件夹到app组件工程目录下
+			createBspDir(r, new File(bspDirPath).getParent(), appFilePath);
+			if (CommonConstants.FAIL.equals(r.getCode())) {
+				return r;
+			}
+
 			Map<String, String> partnamePlatformMap = new HashMap<String, String>();
 
 			// 遍历所有根组件，创建根组件文件夹
@@ -766,12 +771,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 					logger.error("流程建模与硬件建模数据匹配错误，请重新配置流程建模与硬件建模。");
 					return r.setAllAttr(CommonConstants.FAIL, "流程建模与硬件建模数据匹配错误，请重新配置流程建模与硬件建模。", null);
 				}
-			}
-
-			// 拷贝bsp对应的文件夹到app组件工程目录下
-			createBspDir(r, bspDirPath, appFilePath);
-			if (CommonConstants.FAIL.equals(r.getCode())) {
-				return r;
 			}
 
 			app.setPartnamePlatform(JSONArray.toJSONString(partnamePlatformMap));
@@ -917,18 +916,18 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		FileUtil.getSelectStrFilePathList(linuxCFilePathSet, partIntegerCodeFilePath, selectFileExtensionList);
 
-		try {
-			// 原始需求调用客户接口,apiFileList中存添加的.c .cpp .h文件不带后缀的文件名
-			List<String> apiFileList = new ArrayList<String>();
-			apiFileList.addAll(apiNeedStringSet);
-			ExternalIOTransUtils.modifySpbInclude(apiFileList,
-					new File(appFilePathName).getParentFile().getAbsolutePath());
-		} catch (IOException e) {
-			e.printStackTrace();
-			logger.error("调用客户接口失败，请联系管理员。");
-			r.setAllAttr(CommonConstants.FAIL, "调用客户接口失败，请联系管理员。", null);
-			return;
-		}
+//		try {
+//			// 原始需求调用客户接口,apiFileList中存添加的.c .cpp .h文件不带后缀的文件名
+//			List<String> apiFileList = new ArrayList<String>();
+//			apiFileList.addAll(apiNeedStringSet);
+//			ExternalIOTransUtils.modifySpbInclude(apiFileList,
+//					new File(appFilePathName).getParentFile().getAbsolutePath());
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			logger.error("调用客户接口失败，请联系管理员。");
+//			r.setAllAttr(CommonConstants.FAIL, "调用客户接口失败，请联系管理员。", null);
+//			return;
+//		}
 
 //		try {
 //			// 调用客户接口,list中存添加的构件的函数名
