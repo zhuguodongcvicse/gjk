@@ -274,9 +274,11 @@ export default {
           type: "success",
           duration: 2000
         });
+        this.onCancel()
       });
     },
     create() {
+      var parentId =  JSON.parse(JSON.stringify(this.form)).parentId
       if (this.form.algorithmId == undefined) {
         if (this.treeData.length == 0) {
           Vue.set(this.form, "parentId", "-1");
@@ -303,6 +305,8 @@ export default {
             type: "success",
             duration: 2000
           });
+          this.onCancel()
+          Vue.set(this.form, "parentId", parentId);
         });
       }
     },

@@ -270,7 +270,11 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		// 结构体页
 		List<Structlibs> structlibsList = new ArrayList<>();
 		List<String> structIdList = compStructList.stream().map(CompStruct::getStructId).collect(Collectors.toList());
-		List<Structlibs> structlibsListSub = structlibsMapper.getStructlibsByIdList(structIdList);
+		List<Structlibs> structlibsListSub = new ArrayList<>();
+		if(structIdList.size() > 0){
+			structlibsListSub = structlibsMapper.getStructlibsByIdList(structIdList);
+		}
+
 		structlibsList.addAll(structlibsListSub);
 		findStructlibsRecursion(structlibsListSub, structlibsList);
 		createSheet(workbook, structlibsList, "gjk_structlibs");
@@ -319,7 +323,10 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 	 */
 	private void findStructlibsRecursion(List<Structlibs> structlibsList, List<Structlibs> resList){
 		List<String> structIdList = structlibsList.stream().map(Structlibs::getId).collect(Collectors.toList());
-		List<Structlibs> list = structlibsMapper.getStructlibsByParentIdList(structIdList);
+		List<Structlibs> list = new ArrayList<>();
+		if(structIdList.size() > 0){
+			list = structlibsMapper.getStructlibsByIdList(structIdList);
+		}
 		if(list.size() > 0){
 			resList.addAll(list);
 			findStructlibsRecursion(list, resList);

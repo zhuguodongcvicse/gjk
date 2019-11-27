@@ -261,6 +261,7 @@ export default {
           type: "success",
           duration: 2000
         });
+        this.onCancel()
       });
     },
     create() {
@@ -281,6 +282,7 @@ export default {
           this.reload();
         }
       } else {
+        var parentId =  JSON.parse(JSON.stringify(this.form)).parentId
         Vue.set(this.form, "parentId", this.currentId);
         addObj(this.form).then(() => {
           this.getList();
@@ -290,6 +292,8 @@ export default {
             type: "success",
             duration: 2000
           });
+          tis.onCancel()
+          Vue.set(this.form, "parentId", parentId);
         });
       }
     },
