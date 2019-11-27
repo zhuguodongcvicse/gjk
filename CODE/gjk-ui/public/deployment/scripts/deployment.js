@@ -19,7 +19,7 @@ var baknum1 = 0.5;
 var baknum2 = 0.5;
 var baknum3 = 0.5;
 var baknum4 = 0.5;
-var num  = 0.4;
+var num = 0.4;
 var num1 = 0.4;
 var num2 = 0.4;
 var num3 = 0.4;
@@ -37,6 +37,8 @@ var deploymentsJsonbak;
 var bakstartIds = [];
 var bakendIds = [];
 var GAT;
+var canvasFlag = true;
+var checkFlag;
 
 // 子接收父参数
 function handleMessageFromParent(event) {
@@ -251,23 +253,23 @@ function creatbakgj(compName, cpux, cpuy, refid, compid, parttype, components, G
 	var j = 4.5 * (baknum++);
 	var gjjsonx = cpux + 5 + j;
 	var gjjsony = cpuy + 30;
-	if (gjjsonx >= cpux + 42) {
+	if (gjjsonx >= cpux + 45) {
 		gjjsony = cpuy + 34;
 		var k = 4.5 * (baknum1++);
 		gjjsonx = cpux + 5 + k;
-		if (gjjsonx >= cpux + 42) {
+		if (gjjsonx >= cpux + 45) {
 			gjjsony = cpuy + 38;
 			var k = 4.5 * (baknum2++);
 			gjjsonx = cpux + 5 + k;
-			if (gjjsonx >= cpux + 42) {
+			if (gjjsonx >= cpux + 45) {
 				gjjsony = cpuy + 42;
 				var k = 4.5 * (baknum3++);
 				gjjsonx = cpux + 5 + k;
-				if (gjjsonx >= cpux + 42) {
+				if (gjjsonx >= cpux + 45) {
 					gjjsony = cpuy + 46;
 					var k = 4.5 * (baknum4++);
 					gjjsonx = cpux + 5 + k;
-					if (gjjsonx >= cpux + 42) {
+					if (gjjsonx >= cpux + 45) {
 						gjjsony = cpuy + 46;
 						gjjsonx = cpux + 40;
 					}
@@ -291,7 +293,7 @@ function creatbakgj(compName, cpux, cpuy, refid, compid, parttype, components, G
 			},
 			"styles": {
 				"label.background.color": "#03b6ff",
-				"label.font.size": 1,
+				"label.font.size": 1.86,
 				"label.padding": 0.3,
 				"label.radius": 0.3,
 				"label.size": {
@@ -311,7 +313,7 @@ function creatbakgj(compName, cpux, cpuy, refid, compid, parttype, components, G
 				"components": components,
 				"cpuid": 11,
 				'GAT': GAT,
-				'Direction':"from"
+				'Direction': "from"
 			},
 			"location": {
 				"_className": "Q.Point",
@@ -332,25 +334,25 @@ function creatgj(compName, cpux, cpuy, refid, compid, parttype, components, GAT)
 	var j = 4.5 * (rootnum++);
 	var gjjsonx = cpux + 5 + j;
 	var gjjsony = cpuy + 10;
-	if (gjjsonx >= cpux + 42) {
+	if (gjjsonx >= cpux + 45) {
 		gjjsony = cpuy + 14;
 		var k = 4.5 * (rootnum1++);
 		gjjsonx = cpux + 5 + k;
-		if (gjjsonx >= cpux + 42) {
+		if (gjjsonx >= cpux + 45) {
 			gjjsony = cpuy + 18;
 			var k = 4.5 * (rootnum2++);
 			gjjsonx = cpux + 5 + k;
-			if (gjjsonx >= cpux + 42) {
+			if (gjjsonx >= cpux + 45) {
 				gjjsony = cpuy + 22;
 				var k = 4.5 * (rootnum3++);
 				gjjsonx = cpux + 5 + k;
-				if (gjjsonx >= cpux + 42) {
+				if (gjjsonx >= cpux + 45) {
 					gjjsony = cpuy + 26;
 					var k = 4.5 * (rootnum4++);
 					gjjsonx = cpux + 5 + k;
-					if (gjjsonx >= cpux + 42) {
+					if (gjjsonx >= cpux + 45) {
 						gjjsony = cpuy + 26;
-						gjjsonx = cpux + 40 ;		
+						gjjsonx = cpux + 40;
 					}
 				}
 			}
@@ -372,7 +374,7 @@ function creatgj(compName, cpux, cpuy, refid, compid, parttype, components, GAT)
 			},
 			"styles": {
 				"label.background.color": "#71e61c",
-				"label.font.size": 1,
+				"label.font.size": 1.86,
 				"label.padding": 0.3,
 				"label.radius": 0.3,
 				"label.size": {
@@ -392,7 +394,7 @@ function creatgj(compName, cpux, cpuy, refid, compid, parttype, components, GAT)
 				"components": components,
 				"cpuid": 11,
 				'GAT': GAT,
-				'Direction':"from"
+				'Direction': "from"
 			},
 			"location": {
 				"_className": "Q.Point",
@@ -426,6 +428,8 @@ function initEditor(editor) {
 		for (var l in json.datas) {
 			//真数据放开 并nodeID替换成nodeID
 			if (json.datas[l].json.image == 'images/Chip.svg') {
+				//增加检查属性来进行判断
+				json.datas[l].json.properties.checkFlag = true;
 				if (linkArray[i].nodeName == json.datas[l].json.properties.nodeID) {
 					//if (linkArray[i].nodeName == json.datas[l].json.properties.nodeID) {
 					var math = parseInt(100000 * Math.random());
@@ -471,16 +475,16 @@ function initEditor(editor) {
 			}
 		}
 		//变量恢复初始值
-		 rootnum = -0.5;
-		 rootnum1 = 0.5;
-		 rootnum2 = 0.5;
-		 rootnum3 = 0.5;
-		 rootnum4 = 0.5;
-		 baknum = -0.5;
-		 baknum1 = 0.5;
-		 baknum2 = 0.5;
-		 baknum3 = 0.5;
-		 baknum4 = 0.5;
+		rootnum = -0.5;
+		rootnum1 = 0.5;
+		rootnum2 = 0.5;
+		rootnum3 = 0.5;
+		rootnum4 = 0.5;
+		baknum = -0.5;
+		baknum1 = 0.5;
+		baknum2 = 0.5;
+		baknum3 = 0.5;
+		baknum4 = 0.5;
 	}
 	//遍历arrow绘画连线
 	for (var k in arrows) {
@@ -503,10 +507,7 @@ function initEditor(editor) {
 		}
 		createdge(startId, endId);
 	}
-
 	//遍历bakarrow
-
-	//console.log('dataJsondataJsondataJsondataJson', dataJson)
 	//遍历arrows数据取得startcomp
 	for (var k in arrows) {
 		var startcomp = arrows[k].startItem;
@@ -647,75 +648,11 @@ function initEditor(editor) {
 	button.className = 'boarddesign_board_14s';
 	toolbarDiv.appendChild(button)
 	button.onclick = function (evt) {
-
-		var refid;
-		var compAllArray = [];
-		var rootParts = [];
-		var backupParts = []
-		var component;
-		var nodeID;
-		var rootPartsobj;
-		var backupPartsobj;
-		var components = [];
-		var partname;
-		var bakcompAllArray = [];
-		var data = graph.toJSON();
-		console.log("data", data);
-		for (var i in data.datas) {
-
-			if (data.datas[i].json.properties.type == 'item' && data.datas[i].json.properties.type != null) {
-				if (data.datas[i].json.properties.group == 'A' && data.datas[i].json.properties.group != null) {
-					var comps = {};
-					comps.compId = data.datas[i].json.properties.compid;
-					var rootParts = [];
-					var rootPart = {};
-					rootPart.partName = data.datas[i].json.properties.partname;
-					//遍历芯片
-					for (var j in data.datas) {
-						if (data.datas[j].json.image == 'images/Chip.svg' && data.datas[j]._refId != null) {
-							refid = data.datas[j]._refId;
-							nodeID = data.datas[j].json.properties.nodeID;
-						}
-						if (data.datas[i].json.host._ref == refid) {
-							rootPart.cpuid = nodeID;
-						}
-					}
-					rootParts.push(rootPart);
-					comps.rootPart = rootParts;
-					compAllArray.push(comps);
-
-				}
-				if (data.datas[i].json.properties.group == 'B' && data.datas[i].json.properties.group != null) {
-					var comps = {};
-					var bakParts = [];
-					var bakPart = {};
-					comps.compId = data.datas[i].json.properties.compid;
-					bakPart.partName = data.datas[i].json.properties.partname;
-
-					//遍历芯片
-					for (var j in data.datas) {
-						if (data.datas[j].json.image == 'images/Chip.svg' && data.datas[j]._refId != null) {
-							refid = data.datas[j]._refId;
-							nodeID = data.datas[j].json.properties.nodeID;
-						}
-						if (data.datas[i].json.host._ref == refid) {
-							bakPart.cpuid = nodeID;
-						}
-					}
-					bakParts.push(bakPart);
-					comps.bakPart = bakParts;
-					bakcompAllArray.push(comps);
-				}
-				console.log('compAllArray', compAllArray);
-				console.log('bakcompAllArray.comps', bakcompAllArray)
-			}
+		if (canvasFlag == true) {
+			save();
+		} else {
+			showMessage('请跳转画布再进行保存', 'error', 2000)
 		}
-		var json = JSON.stringify(data);
-		postMessageParentData.cmd = "submitJSON";
-		postMessageParentData.params[0] = json;
-		postMessageParentData.params[1] = compAllArray;
-		postMessageParentData.params[2] = bakcompAllArray;
-		window.parent.postMessage(postMessageParentData, "*")
 	}
 	//全屏按钮
 	var toolbarDiv = editor.toolbar;
@@ -734,6 +671,15 @@ function initEditor(editor) {
 	toolbarDiv.appendChild(button)
 	button.onclick = function () {
 		showchip()
+	}
+	//芯片显示按钮
+	var toolbarDiv = editor.toolbar;
+	var button = document.createElement('button');
+	button.textContent = '调整构件比例';
+	button.className = 'boarddesign_board_14s';
+	toolbarDiv.appendChild(button)
+	button.onclick = function () {
+		gjSizeChange()
 	}
 	function initToolbar() {
 		//网状画布 
@@ -759,14 +705,11 @@ function initEditor(editor) {
 	propertySheet.getCustomPropertyDefinitions = function (data) {
 		var type = data.get('type');
 		var image = data.image;
-		//	 console.log("data", data)
 		//这里可以获得当前点击的图元对象
 		graph.onclick = function (evt) {
 			var data = graph.getElement(evt);
-			console.log("这个图元的信息",data)
 			if (data != null) {
 				if (data.from == null) {
-					//console.log("data", data);
 					data.set('chipname', data.properties.chipName);
 					data.set('corenum', data.properties.coreNum);
 					data.set('memsize', data.properties.memSize);
@@ -785,7 +728,7 @@ function initEditor(editor) {
 				}
 			}
 		}
-		if (image == "images/Chip.svg"  || type=='chip') {
+		if (image == "images/Chip.svg" || type == 'chip') {
 			return {
 				group: '芯片属性',
 				properties: [{
@@ -985,7 +928,6 @@ function initEditor(editor) {
 						y: data.y
 					};
 					startData = dragInfo.data.parent;
-					console.log("刚开始移动", startData);
 					//graph.sendToTop(data);
 					if (startData != null) {
 						for (const i in startData.children.datas) {
@@ -1021,7 +963,6 @@ function initEditor(editor) {
 				unhighlight();
 				var oldSlot = data.parent;
 				var slot = findSlot(data, evt);
-				console.log("鼠标移动后的对象",data)
 				//所点击当前构件的所属部件
 				var partname = data.properties.partname;
 				var host = findCellHost(evt, data);
@@ -1029,9 +970,9 @@ function initEditor(editor) {
 					for (const i in startData.children.datas) {
 						if (startData.children.datas[i].id != data.id) {
 							if (startData.children.datas[i].properties.partname == data.properties.partname) {
-								if( data.parent != null){
+								if (data.parent != null) {
 
-									if (startData.id != data.parent.id  ) {
+									if (startData.id != data.parent.id) {
 										showMessage('该芯片上还有其他同部件构件请一起移动', 'error', 2000)
 										graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
 										data.parent = startData;
@@ -1042,7 +983,7 @@ function initEditor(editor) {
 						}
 					}
 					//校验芯片上构件位置
-					if(data.properties.Direction == 'from'){
+					if (data.properties.Direction == 'from') {
 						if (data.x > startData.x + 45 && verdict == false) {
 							graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
 							data.parent = startData;
@@ -1063,13 +1004,13 @@ function initEditor(editor) {
 							data.parent = startData;
 							data.host = startData;
 						}
-					}else if (data.properties.Direction == 'back'){
+					} else if (data.properties.Direction == 'back') {
 						if (data.x > startData.x + 80 && verdict == false) {
 							graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
 							data.parent = startData;
 							data.host = startData;
 						}
-						if (data.x < startData.x  && verdict == false) {
+						if (data.x < startData.x && verdict == false) {
 							graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
 							data.parent = startData;
 							data.host = startData;
@@ -1079,7 +1020,7 @@ function initEditor(editor) {
 							data.parent = startData;
 							data.host = startData;
 						}
-						if (data.y < startData.y  && verdict == false) {
+						if (data.y < startData.y && verdict == false) {
 							graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
 							data.parent = startData;
 							data.host = startData;
@@ -1087,23 +1028,21 @@ function initEditor(editor) {
 					}
 
 				}
-				console.log("++++++++++++", data)
-				console.log("++++++++++++", data.host)
-
 				/* if(data.host != null){ */
 				if (data.host == null && verdict == true) {
 					showMessage('请将构件移动到芯片上', 'error', 5000);
-					if(data.properties.Direction == 'from'){
-					if (data.x > data.host.x + 45 || data.x < data.host.x + 7.5 ||
-						data.y > data.host.y + 45 || data.y < data.host.y + 7.5) {
-						for (var i = 0; i < movedate.length; i++) {
-							movedate[i].parent = startData;
-							movedate[i].host = startData;
-							graph.moveElements([movedate[i]], dragInfo.x - movedate[i].x, dragInfo.y - movedate[i].y + i * 3)
+					if (data.properties.Direction == 'from') {
+						if (data.x > data.host.x + 45 || data.x < data.host.x + 7.5 ||
+							data.y > data.host.y + 45 || data.y < data.host.y + 7.5) {
+							for (var i = 0; i < movedate.length; i++) {
+								movedate[i].parent = startData;
+								movedate[i].host = startData;
+								graph.moveElements([movedate[i]], dragInfo.x - movedate[i].x, dragInfo.y - movedate[i].y + i * 3)
+							}
 						}
-					}}else if(data.properties.Direction == 'back'){
-						if (data.x > data.host.x + 80 || data.x < data.host.x  ||
-							data.y > data.host.y + 80 || data.y < data.host.y ) {
+					} else if (data.properties.Direction == 'back') {
+						if (data.x > data.host.x + 80 || data.x < data.host.x ||
+							data.y > data.host.y + 80 || data.y < data.host.y) {
 							for (var i = 0; i < movedate.length; i++) {
 								movedate[i].parent = startData;
 								movedate[i].host = startData;
@@ -1113,15 +1052,16 @@ function initEditor(editor) {
 					}
 				} else if (verdict == true) {
 					//showMessage('已成功移动到IP为'+data.parent.properties.IP+'芯片上', 'success', 5000);
-					if(data.properties.Direction == 'from'){
-					if (data.x > data.host.x + 45 || data.x < data.host.x+ 7.5   ||
-						data.y > data.host.y + 45 || data.y < data.host.y  + 7.5) {
-						for (var i = 0; i < movedate.length; i++) {
-							movedate[i].parent = startData;
-							movedate[i].host = startData;
-							graph.moveElements([movedate[i]], dragInfo.x - movedate[i].x, dragInfo.y - movedate[i].y + i * 3)
+					if (data.properties.Direction == 'from') {
+						if (data.x > data.host.x + 45 || data.x < data.host.x + 7.5 ||
+							data.y > data.host.y + 45 || data.y < data.host.y + 7.5) {
+							for (var i = 0; i < movedate.length; i++) {
+								movedate[i].parent = startData;
+								movedate[i].host = startData;
+								graph.moveElements([movedate[i]], dragInfo.x - movedate[i].x, dragInfo.y - movedate[i].y + i * 3)
+							}
 						}
-					}}else if(data.properties.Direction == 'back'){
+					} else if (data.properties.Direction == 'back') {
 						if (data.x > data.host.x + 80 || data.x < data.host.x ||
 							data.y > data.host.y + 80 || data.y < data.host.y) {
 							for (var i = 0; i < movedate.length; i++) {
@@ -1141,7 +1081,6 @@ function initEditor(editor) {
 		var xy = graph.toLogical(evt.event);
 		var cell;
 		function canDrop(data) {
-			console.log("666666666666",data)
 			return data.image == 'images/Chip.svg' || data.properties.type == "chip";
 		}
 
@@ -1165,7 +1104,6 @@ function initEditor(editor) {
 	}
 	graph.interactionDispatcher.addListener(function (evt) {
 		movedate = evt.datas;
-		//console.log('EVT',evt.datas)//这里可以获取当前移动的所有图元
 		if (evt.kind != Q.InteractionEvent.ELEMENT_CREATED && evt.kind != Q.InteractionEvent.ELEMENT_MOVE_END) {
 			return;
 		}
@@ -1174,28 +1112,14 @@ function initEditor(editor) {
 			return;
 		}
 		var host = findCellHost(evt, data);
-		//		console.log('host',host);
 		data.host = data.parent = host;
 		evt.datas.forEach(function (data) { data.host = data.parent = host; })
 		if (host != null) {
 			data.properties.cpuid = host.properties.nodeID;
 		}
 
-		/* 	for(var i in data){
-			
-				console.log('CPUid',	data.properties.cpuid);
-				data.properties.cpuid  = host.properties.nodeID;
-			} */
-		//	console.log('22222EVT',evt.datas)
-
 	})
 
-/* 	graph.onclick = function (evt) {
-		var data = graph.getElement(evt);
-		if (data) {
-			var children = data.toChildren();
-		}
-	} */
 	//按这种方式导出部分json
 	function exportNodeJSON(parent) {
 		return graph.toJSON(false, {
@@ -1213,8 +1137,8 @@ function initEditor(editor) {
 						graph.select(data);
 						verdict = true;
 						if (data.properties.partname == null && data.image == "images/Chip.svg" || data.image == "rack" || data.image == "images/BeforeTheBoard.svg"
-						|| data.image == "images/OpticalFiberMouth.svg" || data.image == "images/InternetAccess.svg" ||  data.image == "images/RoundMouth.svg"
-						||  data.image == "images/SerialPort.svg"  || data.image =="images/AfterTheBoard.svg" || data.edgeType == "extend.top" ) {
+							|| data.image == "images/OpticalFiberMouth.svg" || data.image == "images/InternetAccess.svg" || data.image == "images/RoundMouth.svg"
+							|| data.image == "images/SerialPort.svg" || data.image == "images/AfterTheBoard.svg" || data.edgeType == "extend.top") {
 							showMessage('请选择构件', 'error', 2000)
 							graph.selectionModel.clear();
 							verdict = false;
@@ -1233,8 +1157,8 @@ function initEditor(editor) {
 							}
 						})
 						if (data.properties.partname == null && data.image == "images/Chip.svg" || data.image == "rack" || data.image == "images/BeforeTheBoard.svg"
-						|| data.image == "images/OpticalFiberMouth.svg" || data.image == "images/InternetAccess.svg" ||  data.image == "images/RoundMouth.svg"
-						||  data.image == "images/SerialPort.svg"  || data.image =="images/AfterTheBoard.svg" || data.edgeType == "extend.top") {
+							|| data.image == "images/OpticalFiberMouth.svg" || data.image == "images/InternetAccess.svg" || data.image == "images/RoundMouth.svg"
+							|| data.image == "images/SerialPort.svg" || data.image == "images/AfterTheBoard.svg" || data.edgeType == "extend.top") {
 							showMessage('请选择构件', 'error', 2000)
 							graph.selectionModel.clear();
 							verdict = false;
@@ -1245,12 +1169,17 @@ function initEditor(editor) {
 				{
 					text: '选中跳转的芯片', action: function () {
 						var data = graph.getElement(evt);
-						var deploymentsJson = graph.toJSON();
-						if ( data.image == "images/Chip.svg" ){
-							CHIPdate.push(data);
-							showMessage('成功选中跳转芯片'+CHIPdate.length+'个', 'success', 2000)
-						}else{
-							showMessage('请重新选择跳转的芯片', 'error', 2000)
+						if (data.image == "images/Chip.svg") {
+							if (data.properties.checkFlag == true) {
+								CHIPdate.push(data);
+								data.properties.checkFlag = false;
+								showMessage('成功选中跳转芯片' + CHIPdate.length + '个', 'success', 2000);
+							} else {
+								showMessage('已选过该芯片跳转', 'error', 2000);
+							}
+							
+						} else {
+							showMessage('请确认选择的是否为芯片', 'error', 2000);
 
 						}
 					}
@@ -1269,6 +1198,111 @@ function initEditor(editor) {
 	}
 	initInteraction();
 }
+//保存方法
+function save() {
+	var refid;
+	var compAllArray = [];
+	var rootParts = [];
+	var backupParts = []
+	var component;
+	var nodeID;
+	var rootPartsobj;
+	var backupPartsobj;
+	var components = [];
+	var partname;
+	var bakcompAllArray = [];
+	var data = graph.toJSON();
+	for (var i in data.datas) {
+		if (data.datas[i].json.properties.type == 'item' && data.datas[i].json.properties.type != null) {
+			if (data.datas[i].json.properties.group == 'A' && data.datas[i].json.properties.group != null) {
+				var comps = {};
+				comps.compId = data.datas[i].json.properties.compid;
+				var rootParts = [];
+				var rootPart = {};
+				rootPart.partName = data.datas[i].json.properties.partname;
+				//遍历芯片
+				for (var j in data.datas) {
+					if (data.datas[j].json.image == 'images/Chip.svg' && data.datas[j]._refId != null) {
+						refid = data.datas[j]._refId;
+						nodeID = data.datas[j].json.properties.nodeID;
+					}
+					if (data.datas[i].json.host._ref == refid) {
+						rootPart.cpuid = nodeID;
+					}
+				}
+				rootParts.push(rootPart);
+				comps.rootPart = rootParts;
+				compAllArray.push(comps);
+
+			}
+			if (data.datas[i].json.properties.group == 'B' && data.datas[i].json.properties.group != null) {
+				var comps = {};
+				var bakParts = [];
+				var bakPart = {};
+				comps.compId = data.datas[i].json.properties.compid;
+				bakPart.partName = data.datas[i].json.properties.partname;
+
+				//遍历芯片
+				for (var j in data.datas) {
+					if (data.datas[j].json.image == 'images/Chip.svg' && data.datas[j]._refId != null) {
+						refid = data.datas[j]._refId;
+						nodeID = data.datas[j].json.properties.nodeID;
+					}
+					if (data.datas[i].json.host._ref == refid) {
+						bakPart.cpuid = nodeID;
+					}
+				}
+				bakParts.push(bakPart);
+				comps.bakPart = bakParts;
+				bakcompAllArray.push(comps);
+			}
+		}
+	}
+	var json = JSON.stringify(data);
+	postMessageParentData.cmd = "submitJSON";
+	postMessageParentData.params[0] = json;
+	postMessageParentData.params[1] = compAllArray;
+	postMessageParentData.params[2] = bakcompAllArray;
+	window.parent.postMessage(postMessageParentData, "*")
+}
+//调整构件比例方法
+var falg1 = 1;
+function gjSizeChange() {
+	if (canvasFlag) {
+		showMessage('请跳转画布后使用', 'error', 2000)
+	}
+	if (falg1 == 1 && canvasFlag == false) {
+		var sizeChangeJson = graph.toJSON();
+		graph.clear();
+		for (const i in sizeChangeJson.datas) {
+			if (sizeChangeJson.datas[i]._className == "Q.Text") {
+				sizeChangeJson.datas[i].json.styles["label.font.size"] = 5;
+			}
+		}
+		graph.parseJSON(sizeChangeJson)
+		falg1 = 2;
+	} else if (falg1 == 2 && canvasFlag == false) {
+		var sizeChangeJson = graph.toJSON();
+		graph.clear();
+		for (const i in sizeChangeJson.datas) {
+			if (sizeChangeJson.datas[i]._className == "Q.Text") {
+				sizeChangeJson.datas[i].json.styles["label.font.size"] = 8;
+			}
+		}
+		graph.parseJSON(sizeChangeJson)
+		falg1 = 3;
+	} else if (falg1 == 3 && canvasFlag == false) {
+		var sizeChangeJson = graph.toJSON();
+		graph.clear();
+		for (const i in sizeChangeJson.datas) {
+			if (sizeChangeJson.datas[i]._className == "Q.Text") {
+				sizeChangeJson.datas[i].json.styles["label.font.size"] = 1.89;
+			}
+		}
+		graph.parseJSON(sizeChangeJson)
+		falg1 = 1;
+	}
+}
 //显示芯片方法
 var falg = true;
 var chip;
@@ -1280,222 +1314,211 @@ var RefIdArrays = [];
 var fromCompidArrays = [];
 var toCompidArrays = [];
 function showchip() {
-		if (falg && CHIPdate.length != 0) {
-			//获取当前画布数据
-			deploymentsJsonbak = graph.toJSON();
-			for(var i in CHIPdate){
-				for(var j in deploymentsJsonbak.datas){
-					if(CHIPdate[i].properties.uniqueId == deploymentsJsonbak.datas[j].json.properties.uniqueId){
-						if(deploymentsJsonbak.datas[j]._refId == undefined){
-							deploymentsJsonbak.datas[j]._refId = parseInt(1000000000 * Math.random());
-						}
+	if (CHIPdate.length == 0 && canvasFlag == true) {
+		showMessage('请选择跳转的芯片再点击跳转画布', 'error', 2000)
+	}
+	if (falg && CHIPdate.length != 0) {
+		canvasFlag = false;
+		//获取当前画布数据
+		deploymentsJsonbak = graph.toJSON();
+		for (var i in CHIPdate) {
+			for (var j in deploymentsJsonbak.datas) {
+				if (CHIPdate[i].properties.uniqueId == deploymentsJsonbak.datas[j].json.properties.uniqueId) {
+					if (deploymentsJsonbak.datas[j]._refId == undefined) {
+						deploymentsJsonbak.datas[j]._refId = parseInt(100000000 * Math.random());
 					}
 				}
 			}
-			//获取所有连线关系的refid数据
-			for (var k in deploymentsJsonbak.datas) {
-				if (deploymentsJsonbak.datas[k]._className == "Q.Edge") {
-					//	console.log("所有构件的连线关系", deploymentsJsonbak.datas[k])
-					var RefIds = {};
-					RefIds.fromRefId = deploymentsJsonbak.datas[k].json.from._ref;
-					RefIds.toRefId = deploymentsJsonbak.datas[k].json.to._ref;
-					RefIdArrays.push(RefIds);
-				}
-			}
-			for (var i in RefIdArrays) {
-				for (var k in deploymentsJsonbak.datas) {
-					if (deploymentsJsonbak.datas[k]._className == "Q.Text") {
-	
-						if (RefIdArrays[i].fromRefId == deploymentsJsonbak.datas[k]._refId) {
-							var fromcompidList = {};
-							fromcompidList.fromGAT = deploymentsJsonbak.datas[k].json.properties.GAT;
-							fromCompidArrays.push(fromcompidList);
-						}
-						if (RefIdArrays[i].toRefId == deploymentsJsonbak.datas[k]._refId) {
-							var tocompidList = {};
-							tocompidList.GAT = deploymentsJsonbak.datas[k].json.properties.GAT;
-							toCompidArrays.push(tocompidList);
-						}
-					}
-				}
-			}
-			graph.clear();
-			//遍历组装数据绘画芯片
-			for (var i = 0; i < CHIPdate.length; i++) {
-				var properties = CHIPdate[i].properties;
-				chip = createCard(properties, i * 85, 0);
-				graph.moveToCenter();
-			//遍历数据绘画构件
-				for (var index = 0; index < CHIPdate[i].children.datas.length; index++) {
-					//	console.log("----------",CHIPdate[i])
-					var name = CHIPdate[i].children.datas[index].name;
-					var properties = CHIPdate[i].children.datas[index].properties;
-					var refid = CHIPdate[i].children.datas[index].id;
-					if (CHIPdate[i].children.datas[index].properties.group == 'A') {
-						//num++;
-						var gj = createItem({ parent: chip, x: chip.x, y: chip.y, name: name, group: 'A', properties: properties, refid: refid })
-						gjdata.push(gj);
-					} else {
-					//	numbak++;
-						var gjbak = createBakItem({ parent: chip, x: chip.x, y: chip.y+20, name: name, group: 'B', properties: properties, refid: refid })
-						gjdata.push(gjbak);
-					}
-				}
-				num = 0.4;
-				numbak = 0.4;
-				num1 = 0.4;
-				num2 = 0.4;
-				num3 = 0.4;
-				num4 = 0.4;
-				numbak1 = 0.4;
-				numbak2 = 0.4;
-				numbak3 = 0.4;
-				numbak4 = 0.4;
-			}
-			for (var i in fromCompidArrays) {
-				if(toCompidArrays[i].GAT != null){
-		
-					fromCompidArrays[i].toGAT = toCompidArrays[i].GAT;
-				}
-			}
-	
-	
-			for (var k in fromCompidArrays) {
-				for (var h in gjdata) {
-					if (fromCompidArrays[k].fromGAT == gjdata[h].properties.GAT
-					) {
-						fromCompidArrays[k].fromdata = gjdata[h]
-					}
-					if (fromCompidArrays[k].toGAT == gjdata[h].properties.GAT
-					) {
-						fromCompidArrays[k].todata = gjdata[h]
-					}
-				}
-			}
-			for (var i = 0; i < fromCompidArrays.length; i++) {
-				if (fromCompidArrays[i].todata != undefined && fromCompidArrays[i].fromdata != undefined) {
-					var from = fromCompidArrays[i].fromdata;
-					var to = fromCompidArrays[i].todata;
-					createEdge({ from: from, to: to })
-					//如果连线想变成曲线,注释掉上面方法,调用下面的方法
-					//createEdge({ from: from, to: to,edgeType: 'top' })
-				}
-			}
-			CHIPdate = [];
-			fromCompidArrays = [];
-			falg = false;
-		} else if(falg == false && CHIPdate.length == 0){
-			compidArrays = [];
-			var skipdata = graph.toJSON();
-			//console.log("skipdata",skipdata);
-			var skipArrays = [];
-			for(var i in skipdata.datas){
-				if(skipdata.datas[i]._className == "Q.Text"){
-					var skipgjdata = {};
-					skipgjdata.GAT = skipdata.datas[i].json.properties.GAT;
-					skipgjdata._ref = skipdata.datas[i].json.host._ref;
-					skipgjdata.group = skipdata.datas[i].json.properties.group;
-					skipArrays.push(skipgjdata);
-					console.log("skipdata",skipdata.datas[i])
-				}
-			}
-	//赋值chip_id
-			for(var i in skipArrays){
-				for(var j in skipdata.datas){
-					if(skipdata.datas[j]._className  == "Q.RectElement"){
-						if(skipArrays[i]._ref == skipdata.datas[j]._refId){
-							skipArrays[i].uniqueId = skipdata.datas[j].json.properties.uniqueId;
-						}
-					}
-				}
-			}
-			//赋值location坐标
-			for(var i in skipArrays){
-				for(var j in deploymentsJsonbak.datas){
-					if(deploymentsJsonbak.datas[j]._className  == "Q.RectElement"){
-						if(skipArrays[i].uniqueId  == deploymentsJsonbak.datas[j].json.properties.uniqueId &&deploymentsJsonbak.datas[j]._refId !=  null ){
-						//	console.log("赋值location坐标",deploymentsJsonbak.datas[j])
-							skipArrays[i].location = deploymentsJsonbak.datas[j].json.location;
-							skipArrays[i]._refId = deploymentsJsonbak.datas[j]._refId;
-						}
-					}
-
-
-
-					
-				}
-				variable = 4;
-			}
-			//修改跳转前构件坐标数据
-			var variable = 4;
-			var variable1 = 4;
-			var y = 8;
-			var baky = 30
-			for(var i in skipArrays){	
-				for(var j in deploymentsJsonbak.datas){
-					//判断是哪个构件
-					if(deploymentsJsonbak.datas[j]._className == "Q.Text" && skipArrays[i].GAT  == deploymentsJsonbak.datas[j].json.properties.GAT){
-							//判断构件是否备份
-						if(skipArrays[i].group == "A"){
-						variable+= 3
-						var x = skipArrays[i].location.x
-						console.log("variable = 4;",variable)
-					/* 	console.log("skipArrays[i].location.x+variable",skipArrays[i].location.x + variable)
-						console.log("skipArrays[i].location.json.x+45",skipArrays[i].location.json.x+45) */
-					/* 	if(skipArrays[i].location.x + variable >= skipArrays[i].location.json.x+45){
-							variable = 7;
-							y=13;
-							alert(666)
-						} */
-						if( variable >= 43){
-							variable = 7;
-							y=13;
-						}
-						deploymentsJsonbak.datas[j].json.location.json.x =  skipArrays[i].location.json.x+variable;
-						deploymentsJsonbak.datas[j].json.location.json.y =  skipArrays[i].location.json.y+y;
-						//	console.log("skipArrays",skipArrays)
-					
-
-							deploymentsJsonbak.datas[j].json.host._ref = skipArrays[i]._refId;
-							deploymentsJsonbak.datas[j].json.parent._ref = skipArrays[i]._refId;
-							}else{
-								variable1+= 3
-							/* 	if(skipArrays[i].location.x+variable1 >= skipArrays[i].location.json.x+45){
-									variable1 = 7;
-									baky= 35;
-								} */
-								if( variable1 >= 43){
-									variable1 = 7;
-									baky= 35;
-								}
-								deploymentsJsonbak.datas[j].json.location.json.x =  skipArrays[i].location.json.x+variable1;
-								deploymentsJsonbak.datas[j].json.location.json.y =  skipArrays[i].location.json.y+baky;
-								deploymentsJsonbak.datas[j].json.host._ref = skipArrays[i]._refId;
-								deploymentsJsonbak.datas[j].json.parent._ref = skipArrays[i]._refId;					
-						}
-						
-					}
-				}
-			}
-		
-		
-			graph.clear();
-			graph.parseJSON(deploymentsJsonbak)
-			graph.moveToCenter();
-			falg = true;
 		}
+		//获取所有连线关系的refid数据
+		for (var k in deploymentsJsonbak.datas) {
+			if (deploymentsJsonbak.datas[k]._className == "Q.Edge") {
+				var RefIds = {};
+				RefIds.fromRefId = deploymentsJsonbak.datas[k].json.from._ref;
+				RefIds.toRefId = deploymentsJsonbak.datas[k].json.to._ref;
+				RefIdArrays.push(RefIds);
+			}
+		}
+		for (var i in RefIdArrays) {
+			for (var k in deploymentsJsonbak.datas) {
+				if (deploymentsJsonbak.datas[k]._className == "Q.Text") {
+
+					if (RefIdArrays[i].fromRefId == deploymentsJsonbak.datas[k]._refId) {
+						var fromcompidList = {};
+						fromcompidList.fromGAT = deploymentsJsonbak.datas[k].json.properties.GAT;
+						fromCompidArrays.push(fromcompidList);
+					}
+					if (RefIdArrays[i].toRefId == deploymentsJsonbak.datas[k]._refId) {
+						var tocompidList = {};
+						tocompidList.GAT = deploymentsJsonbak.datas[k].json.properties.GAT;
+						toCompidArrays.push(tocompidList);
+					}
+				}
+			}
+		}
+		graph.clear();
+		//遍历组装数据绘画芯片
+		for (var i = 0; i < CHIPdate.length; i++) {
+			var properties = CHIPdate[i].properties;
+			chip = createCard(properties, i * 85, 0);
+			graph.moveToCenter();
+			//遍历数据绘画构件
+			for (var index = 0; index < CHIPdate[i].children.datas.length; index++) {
+				var name = CHIPdate[i].children.datas[index].name;
+				var properties = CHIPdate[i].children.datas[index].properties;
+				var refid = CHIPdate[i].children.datas[index].id;
+				if (CHIPdate[i].children.datas[index].properties.group == 'A') {
+					//num++;
+					var gj = createItem({ parent: chip, x: chip.x, y: chip.y, name: name, group: 'A', properties: properties, refid: refid })
+					gjdata.push(gj);
+				} else {
+					//	numbak++;
+					var gjbak = createBakItem({ parent: chip, x: chip.x, y: chip.y + 20, name: name, group: 'B', properties: properties, refid: refid })
+					gjdata.push(gjbak);
+				}
+			}
+			num = 0.4;
+			numbak = 0.4;
+			num1 = 0.4;
+			num2 = 0.4;
+			num3 = 0.4;
+			num4 = 0.4;
+			numbak1 = 0.4;
+			numbak2 = 0.4;
+			numbak3 = 0.4;
+			numbak4 = 0.4;
+		}
+		for (var i in fromCompidArrays) {
+			if (toCompidArrays[i].GAT != null) {
+
+				fromCompidArrays[i].toGAT = toCompidArrays[i].GAT;
+			}
+		}
+		for (var k in fromCompidArrays) {
+			for (var h in gjdata) {
+				if (fromCompidArrays[k].fromGAT == gjdata[h].properties.GAT
+				) {
+					fromCompidArrays[k].fromdata = gjdata[h]
+				}
+				if (fromCompidArrays[k].toGAT == gjdata[h].properties.GAT
+				) {
+					fromCompidArrays[k].todata = gjdata[h]
+				}
+			}
+		}
+		for (var i = 0; i < fromCompidArrays.length; i++) {
+			if (fromCompidArrays[i].todata != undefined && fromCompidArrays[i].fromdata != undefined) {
+				var from = fromCompidArrays[i].fromdata;
+				var to = fromCompidArrays[i].todata;
+				createEdge({ from: from, to: to })
+				//如果连线想变成曲线,注释掉上面方法,调用下面的方法
+				//createEdge({ from: from, to: to,edgeType: 'top' })
+			}
+		}
+		CHIPdate = [];
+		fromCompidArrays = [];
+		falg = false;
+	} else if (falg == false && CHIPdate.length == 0) {
+		canvasFlag = true;
+		compidArrays = [];
+			var skipdata = graph.toJSON();
+			console.log("跳后数据",skipdata);
+		var skipArrays = [];
+		for (var i in skipdata.datas) {
+			if (skipdata.datas[i]._className == "Q.Text") {
+				var skipgjdata = {};
+				skipgjdata.GAT = skipdata.datas[i].json.properties.GAT;
+				skipgjdata._ref = skipdata.datas[i].json.host._ref;
+				skipgjdata.group = skipdata.datas[i].json.properties.group;
+				skipArrays.push(skipgjdata);
+			}
+		}
+		//赋值chip_id
+		for (var i in skipArrays) {
+			for (var j in skipdata.datas) {
+				if (skipdata.datas[j]._className == "Q.RectElement") {
+					if (skipArrays[i]._ref == skipdata.datas[j]._refId) {
+						skipArrays[i].uniqueId = skipdata.datas[j].json.properties.uniqueId;
+					}
+				}
+			}
+		}
+		//赋值location坐标
+		for (var i in skipArrays) {
+			for (var j in deploymentsJsonbak.datas) {
+				if (deploymentsJsonbak.datas[j]._className == "Q.RectElement") {
+						//修改检查判断值
+						deploymentsJsonbak.datas[j].json.properties.checkFlag = true;
+					if (skipArrays[i].uniqueId == deploymentsJsonbak.datas[j].json.properties.uniqueId && deploymentsJsonbak.datas[j]._refId != null) {
+					
+						skipArrays[i].location = deploymentsJsonbak.datas[j].json.location;
+						skipArrays[i]._refId = deploymentsJsonbak.datas[j]._refId;
+					}
+				}
+			}
+			variable = 4;
+		}
+		//修改跳转前构件坐标数据
+		var variable = 4;
+		var variable1 = 4;
+		var y = 8;
+		var baky = 30
+		for (var i in skipArrays) {
+			for (var j in deploymentsJsonbak.datas) {
+				//判断是哪个构件
+				if (deploymentsJsonbak.datas[j]._className == "Q.Text" && skipArrays[i].GAT == deploymentsJsonbak.datas[j].json.properties.GAT) {
+					//判断构件是否备份
+					if (skipArrays[i].group == "A") {
+						variable += 3
+						var x = skipArrays[i].location.x
+						/* 	if(skipArrays[i].location.x + variable >= skipArrays[i].location.json.x+45){
+								variable = 7;
+								y=13;
+							} */
+						if (variable >= 43) {
+							variable = 7;
+							y = 13;
+						}
+						deploymentsJsonbak.datas[j].json.location.json.x = skipArrays[i].location.json.x + variable;
+						deploymentsJsonbak.datas[j].json.location.json.y = skipArrays[i].location.json.y + y;
+						deploymentsJsonbak.datas[j].json.host._ref = skipArrays[i]._refId;
+						deploymentsJsonbak.datas[j].json.parent._ref = skipArrays[i]._refId;
+					} else {
+						variable1 += 3
+						/* 	if(skipArrays[i].location.x+variable1 >= skipArrays[i].location.json.x+45){
+								variable1 = 7;
+								baky= 35;
+							} */
+						if (variable1 >= 43) {
+							variable1 = 7;
+							baky = 35;
+						}
+						deploymentsJsonbak.datas[j].json.location.json.x = skipArrays[i].location.json.x + variable1;
+						deploymentsJsonbak.datas[j].json.location.json.y = skipArrays[i].location.json.y + baky;
+						deploymentsJsonbak.datas[j].json.host._ref = skipArrays[i]._refId;
+						deploymentsJsonbak.datas[j].json.parent._ref = skipArrays[i]._refId;
+					}
+
+				}
+			}
+		}
+		graph.clear();
+		graph.parseJSON(deploymentsJsonbak)
+		graph.moveToCenter();
+		falg = true;
+	}
 }
 function createEdge(options) {
 	var edge = graph.createEdge(options.to, options.from);
-    edge.setStyle(Q.Styles.EDGE_COLOR, '#999999');
-	edge.setStyle(Q.Styles.ARROW_TO, true); 
-	 edge.setStyle(Q.Styles.ARROW_TO_SIZE,1.8);
+	edge.setStyle(Q.Styles.EDGE_COLOR, '#999999');
+	edge.setStyle(Q.Styles.ARROW_TO, true);
+	edge.setStyle(Q.Styles.ARROW_TO_SIZE, 1.8);
 	edge.properties.type = 'edge';
-	 var arrow = new Q.ImageUI(Q.Shapes.getShape(Q.Consts.SHAPE_ARROW_2, 5, 2.5));
-    arrow.fillColor = '#99CCCC';
-    arrow.position = Q.Position.CENTER_MIDDLE;
-    arrow.anchorPosition = Q.Position.CENTER_MIDDLE;
-    edge.addUI(arrow)
+	var arrow = new Q.ImageUI(Q.Shapes.getShape(Q.Consts.SHAPE_ARROW_2, 5, 2.5));
+	arrow.fillColor = '#99CCFF';
+	arrow.position = Q.Position.CENTER_MIDDLE;
+	arrow.anchorPosition = Q.Position.CENTER_MIDDLE;
+	edge.addUI(arrow)
 	if (options.edgeType == 'top') {
 		edge.edgeType = Q.Consts.EDGE_TYPE_EXTEND_TOP;
 	} else if (options.edgeType == 'bottom') {
@@ -1510,7 +1533,6 @@ function createEdge(options) {
 
 	return edge;
 }
-
 //绘画构件
 function createItem(options) {
 	var cpux = options.x;
@@ -1536,21 +1558,21 @@ function createItem(options) {
 					gjjsonx = cpux + k;
 					gjjsony = cpuy + 26;
 					if (gjjsonx >= cpux + 78) {
-						gjjsonx = cpux +8;
+						gjjsonx = cpux + 8;
 						gjjsony = cpuy + 31;
-						
+
 					}
-					
+
 				}
 			}
 		}
 	}
 	var item = graph.createText(options.name);
 	item.set('type', 'item');
-//	if (options.parent) {
-		//	x = options.parent.x + options.parent.width * x;
-		//	y = options.parent.y + options.parent.height * y;
-		item.parent = item.host = options.parent;
+	//	if (options.parent) {
+	//	x = options.parent.x + options.parent.width * x;
+	//	y = options.parent.y + options.parent.height * y;
+	item.parent = item.host = options.parent;
 	//}
 	item.x = gjjsonx, item.y = gjjsony;
 	item.zIndex = 200;
@@ -1591,7 +1613,7 @@ function createBakItem(options) {
 					gjjsonx = cpux + k;
 					gjjsony = cpuy + 40;
 					if (gjjsonx >= cpux + 78) {
-						gjjsonx = cpux +8;
+						gjjsonx = cpux + 8;
 						gjjsony = cpuy + 45;
 					}
 				}
@@ -1600,11 +1622,11 @@ function createBakItem(options) {
 	}
 	var item = graph.createText(options.name);
 	item.set('type', 'item');
-	
+
 	//if (options.parent) {
-		//	x = options.parent.x + options.parent.width * x;
-		//	y = options.parent.y + options.parent.height * y;
-		item.parent = item.host = options.parent;
+	//	x = options.parent.x + options.parent.width * x;
+	//	y = options.parent.y + options.parent.height * y;
+	item.parent = item.host = options.parent;
 	//}
 	item.x = gjjsonx, item.y = gjjsony;
 	item.zIndex = 200;
@@ -1623,7 +1645,7 @@ function createBakItem(options) {
 Q.registerImage('group_cloud', {
 	cacheable: true,
 	width: 100, height: 100,
-	draw: function(g){
+	draw: function (g) {
 		g.fillStyle = '#FFD';
 		g.fillRect(0, 0, 100, 100);
 		g.strokeStyle = '#CCC';
@@ -1634,7 +1656,7 @@ Q.registerImage('group_cloud', {
 function createCard(properties, x, y) {
 	//var bounds = slot.getBounds();
 	var port = createNode({
-		radius: 5, 
+		radius: 5,
 		fillColor: '#eeeeee',
 		x: x,
 		y: y,

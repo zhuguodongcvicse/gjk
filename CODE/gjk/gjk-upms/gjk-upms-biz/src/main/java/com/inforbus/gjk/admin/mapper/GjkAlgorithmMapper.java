@@ -24,4 +24,9 @@ public interface GjkAlgorithmMapper extends BaseMapper<GjkAlgorithm> {
 	 * @return
 	 */
 	List<AlgorithmVO> listAlgorithmsByRoleId();
+
+	/**
+	 * 删除所有数据
+	 */
+	void deleteAll();
 }

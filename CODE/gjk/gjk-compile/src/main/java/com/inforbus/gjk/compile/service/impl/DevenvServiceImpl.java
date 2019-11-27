@@ -43,8 +43,8 @@ public class DevenvServiceImpl implements DevenvService {
     @Value("${VS2010.path}")
     private String vsPath;
 
-    @Value("${Sylixos.path}")
-    private String syPath;
+//    @Value("${Sylixos.path}")
+//    private String syPath;
 
     @Value("${Workbench.path}")
     private String wbPath;

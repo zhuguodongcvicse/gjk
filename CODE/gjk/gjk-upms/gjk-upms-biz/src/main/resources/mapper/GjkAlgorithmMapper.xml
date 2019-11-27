@@ -38,4 +38,8 @@
 			gjk_algorithm.sort DESC
     </select>
 
+	<delete id="deleteAll">
+		DELETE FROM gjk_algorithm
+	</delete>
+
 </mapper>

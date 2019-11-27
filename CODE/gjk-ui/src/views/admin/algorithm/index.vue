@@ -21,6 +21,8 @@
             icon="delete"
             @click="handleDelete"
           >删除</el-button>
+          <el-button type="primary" v-if="testManager_btn_export" @click="showInfo.dialogExportVisible = true">导出</el-button>
+          <el-button type="primary" v-if="testManager_btn_import" @click="showInfo.importLibsDialogVisible = true">导入</el-button>
         </el-button-group>
       </div>
 
@@ -59,6 +61,8 @@
           </el-card>
         </el-col>
       </el-row>
+      <export-libs :showInfo="showInfo"></export-libs>
+      <import-libs :showInfo="showInfo" @callback="getList"></import-libs>
     </basic-container>
   </div>
 </template>
@@ -72,6 +76,8 @@ import {
   putObj
 } from "@/api/admin/algorithm";
 import { mapGetters } from "vuex";
+import importLibs from "@/views/admin/test/importLibs";
+import exportLibs from "@/views/admin/test/exportLibs";
 
 export default {
   name: "algorithm",
@@ -79,6 +85,10 @@ export default {
   inject: ["reload"],
   data() {
     return {
+      showInfo: {
+          importLibsDialogVisible: false,
+          dialogExportVisible: false
+      },
       list: null,
       total: null,
       formEdit: true,
@@ -116,15 +126,20 @@ export default {
       currentId: -1,
       algorithmManager_btn_add: false,
       algorithmManager_btn_edit: false,
-      algorithmManager_btn_del: false
+      algorithmManager_btn_del: false,
+        testManager_btn_export: false,
+        testManager_btn_import: false
     };
   },
 
+  components: { importLibs, exportLibs },
   created() {
     this.getList();
     this.algorithmManager_btn_add = this.permissions["sys_algorithm_add"];
     this.algorithmManager_btn_edit = this.permissions["sys_algorithm_edit"];
     this.algorithmManager_btn_del = this.permissions["sys_algorithm_del"];
+      this.testManager_btn_export = this.permissions["sys_test_export"];
+      this.testManager_btn_import = this.permissions["sys_test_import"];
   },
   computed: {
     ...mapGetters(["elements", "permissions"])
@@ -259,9 +274,11 @@ export default {
           type: "success",
           duration: 2000
         });
+        this.onCancel()
       });
     },
     create() {
+      var parentId =  JSON.parse(JSON.stringify(this.form)).parentId
       if (this.form.algorithmId == undefined) {
         if (this.treeData.length == 0) {
           Vue.set(this.form, "parentId", "-1");
@@ -288,6 +305,8 @@ export default {
             type: "success",
             duration: 2000
           });
+          this.onCancel()
+          Vue.set(this.form, "parentId", parentId);
         });
       }
     },

@@ -52,3 +52,37 @@ export function putObj (obj) {
     data: obj
   })
 }
+
+
+export function createZipFile(libs) {
+  return request({
+    url: '/admin/test/createZipFile',
+    method: 'post',
+    data: libs,
+    responseType: 'arraybuffer'
+  }).then((response) => { // 处理返回的文件流
+    let blob = new Blob([response.data], {
+      type: 'application/zip'
+    })
+    let filename = response.headers["filename"];
+    let link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.style.display = "none"
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    window.setTimeout(function () {
+      URL.revokeObjectURL(blob)
+      document.body.removeChild(link)
+    }, 0)
+  })
+}
+
+export function importLibsZipUpload(param) {
+  return request({
+    method: "post",
+    url: "/admin/test/importLibsZipUpload",
+    headers: { "Content-Type": "multipart/form-data" },
+    data: param
+  })
+}
