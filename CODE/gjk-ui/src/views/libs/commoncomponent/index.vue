@@ -30,11 +30,16 @@
             <el-form-item label="筛选:">
               <select-tree :treeData="screenLibsTreeData" multiple :id.sync="screenLibsSelectArray"></select-tree>
             </el-form-item>
-            <el-form-item label>
-              <el-button type="primary" @click="exportCompFunc">导出</el-button>
-            </el-form-item>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <el-form-item label="搜索:">
               <el-input v-model="selectString" size="mini"></el-input>
+            </el-form-item>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+             <el-form-item label>
+              <el-button type="primary" @click="exportCompFunc">导出申请</el-button>
+            </el-form-item>
+             <el-form-item label>
+              <el-button type="primary" @click="vatchExportList">申请列表</el-button>
             </el-form-item>
           </el-form>
           <!-- <el-button type="primary" size="mini" plain @click="showScreen">筛选</el-button> -->
@@ -89,6 +94,11 @@
           </avue-crud>
         </div>
       </el-dialog>
+      <storage-apply
+      :dialog="storageApplyDialog"
+      @storageApplyDialogState="storageApplyDialogState"
+      :component="exportCompList">
+      </storage-apply>
     </basic-container>
     <!-- <el-dialog title="筛选" :visible.sync="screenDia" width="width" :before-close="dialogBeforeClose">
       <div>
@@ -130,6 +140,7 @@ import { tableOption } from "@/const/crud/libs/commoncomponent";
 // import { screenCompOption } from "@/const/crud/libs/screenComp";
 import { mapGetters } from "vuex";
 import selectTree from "@/views/pro/project/selectTree";
+import storageApply from "@/views/libs/commoncomponent/storageApply";
 export default {
   name: "commoncomponent",
   data() {
@@ -154,6 +165,7 @@ export default {
       screenLibsTreeData: [],
       screenLibsSelectArray: [],
 
+      storageApplyDialog: false,
       loading: false,
       isShowHistoricVersion: true,
 
@@ -162,7 +174,7 @@ export default {
       selectVersionCompMap: new Map(),
       currDialogId: '',
 
-        selectString: ""
+      selectString: ""
 
       // form: {},
 
@@ -179,7 +191,8 @@ export default {
   //注入依赖，调用this.reload();用于刷新页面
   inject: ["reload"],
   components: {
-    "select-tree": selectTree
+    "select-tree": selectTree,
+    "storage-apply": storageApply
   },
   computed: {
     ...mapGetters(["permissions"])
@@ -207,8 +220,17 @@ export default {
   },
   methods: {
     exportCompFunc() {
-      if (this.exportCompList.length > 0) {
-        createZipFile(this.exportCompList);
+      // if (this.exportCompList.length > 0) {
+      //   createZipFile(this.exportCompList);
+      // }
+      if(this.exportCompList.length > 0){
+        this.storageApplyDialog = true;
+      }else{
+        this.$message({
+            showClose: true,
+            message: "请至少选择一个构件",
+            type: "warning"
+          });
       }
     },
     selectionChange(list) {
@@ -444,6 +466,14 @@ export default {
      */
     refreshChange() {
       this.getTableData();
+    },
+    storageApplyDialogState(){
+      this.storageApplyDialog = false;
+    },
+    vatchExportList(){
+      this.$router.push({
+        path: "/libs/commoncomponent/batchExportList",
+      });
     }
   }
 };

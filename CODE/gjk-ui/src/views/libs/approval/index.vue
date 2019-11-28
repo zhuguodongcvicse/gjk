@@ -47,12 +47,12 @@
         </template>
       </avue-crud>
     </basic-container>
-    <apply-detail
+    <!-- <apply-detail
       :dialog="applyDetailDialog"
       @applyDetailDialogState="applyDetailDialogState"
       :applyItemMsg="applyItemMsg"
       @refresh="refreshChange"
-    />
+    /> -->
   </div>
 </template>
 
@@ -112,8 +112,12 @@ export default {
     },
     //表格单行点击事件
     handleRowClick(row, event, column) {
-      this.applyDetailDialog = true;
-      this.applyItemMsg = row;
+      this.$router.push({
+        path: "/libs/approval/applyDetail",
+        query: {
+          row: row,
+        }
+      });
     },
     showAll() {
       this.getList();
