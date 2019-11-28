@@ -119,4 +119,5 @@ public interface CommonComponentService extends IService<CommonComponent> {
 	IPage<CommonComponent> getCompListByStringAndLibsId(Page page, List<String> libsList,
 			List<String> selectStringList);
 
+	IPage<CommonComponent> findPageByBatchApprovalId(Page page,String applyId);
 }
