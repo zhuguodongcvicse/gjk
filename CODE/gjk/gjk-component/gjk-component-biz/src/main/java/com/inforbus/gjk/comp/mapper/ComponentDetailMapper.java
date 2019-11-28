@@ -138,9 +138,10 @@ public interface ComponentDetailMapper extends BaseMapper<ComponentDetail> {
 	 * @Description: 查询所有构件框架
 	 * @Author xiaohe
 	 * @DateTime 2019年11月26日 下午2:04:44
+	 * @param frameId 构件框架ID
 	 * @return
 	 */
-	List<Map<String, Object>> findCompframe();
+	List<Map<String, Object>> findCompframe(@Param("frameId") String frameId);
 	/**
 	 * @Title: findPlatform
 	 * @Description: 查询所有构件框架的平台
@@ -150,5 +151,14 @@ public interface ComponentDetailMapper extends BaseMapper<ComponentDetail> {
 	 * @return
 	 */
 	List<String> findPlatform(@Param("frameId") String frameId);
+	/**
+	 * @Title: findPlatform
+	 * @Description: 查询所有构件框架的平台
+	 * @Author xiaohe
+	 * @DateTime 2019年11月26日 下午2:04:44
+	 * @param frameId 构件框架ID
+	 * @return
+	 */
+	List<String> findPlatformByName(@Param("frameName") String frameName);
 
 }

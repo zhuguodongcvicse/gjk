@@ -266,10 +266,14 @@ public class ComponentDetailController {
 
 	@PostMapping(path = "/createSpbFrameFile")
 	public R getCreateSpbFrameFile(@RequestBody Map<String, String> filesPath) {
-		return componentDetailService.createSpbFrameFile(filesPath.get("spbModelXmlFile"),filesPath.get("headerTemplateFile"),filesPath.get("srcTemplateFile"), filesPath.get("saveDir"));
+		return componentDetailService.createSpbFrameFile(filesPath.get("spbModelXmlFile"), filesPath.get("saveDir"),filesPath.get("frameId"));
 	}
 	@PostMapping(path = "/findSpbFrameFile")
 	public R getFindSpbFrame() {
 		return componentDetailService.findSpbFrameFile();
+	}
+	@PostMapping(path = "/findPlatformByName/{frameName}")
+	public R getFindPlatformByName(@PathVariable String frameName) {
+		return new R<>(componentDetailService.findPlatformByName(frameName));
 	}
 }

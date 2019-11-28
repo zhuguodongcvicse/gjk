@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+
 import com.google.common.collect.Maps;
 import com.inforbus.gjk.common.core.entity.StringRef;
 import com.inforbus.gjk.common.core.entity.XmlEntity;
@@ -13,8 +15,6 @@ import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.util.vo.HeaderFileShowVO;
 import com.inforbus.gjk.common.core.util.vo.HeaderFileTransVO;
 import com.inforbus.gjk.common.core.util.vo.ParamTreeVO;
-
-import cn.hutool.json.JSONUtil;
 
 public class HeaderFileAndStructUtils {
 
@@ -63,22 +63,24 @@ public class HeaderFileAndStructUtils {
 		// 输入参数解析
 		headerFileShowVO.getInputXmlParams().setXmlEntitys(new ArrayList<XmlEntity>());
 		headerFileShowVO.getInputXmlParams().setLableName("输入");
-		
+
 		headerFileShowVO.getInputXmlMapParams().setXmlEntityMaps(new ArrayList<XmlEntityMap>());
 		headerFileShowVO.getInputXmlMapParams().setLableName("输入");
-		
-		paramMapToXml(headerFileShowVO.getInputXmlMapParams(),headerFileShowVO.getInputXmlParams(), headerFileShowVO.getInputParams(),
-				headerFileTransVO.getIndexToParaName(), headerFileTransVO.getInputParaNameToType());
+
+		paramMapToXml(headerFileShowVO.getInputXmlMapParams(), headerFileShowVO.getInputXmlParams(),
+				headerFileShowVO.getInputParams(), headerFileTransVO.getIndexToParaName(),
+				headerFileTransVO.getInputParaNameToType());
 
 		// 输出参数解析
 		headerFileShowVO.getOutputXmlParams().setXmlEntitys(new ArrayList<XmlEntity>());
 		headerFileShowVO.getOutputXmlParams().setLableName("输出");
-		
+
 		headerFileShowVO.getOutputXmlMapParams().setXmlEntityMaps(new ArrayList<XmlEntityMap>());
 		headerFileShowVO.getOutputXmlMapParams().setLableName("输出");
-		
-		paramMapToXml(headerFileShowVO.getOutputXmlMapParams(),headerFileShowVO.getOutputXmlParams(), headerFileShowVO.getOutputParams(),
-				headerFileTransVO.getIndexToParaName(), headerFileTransVO.getOutputParaNameToType());
+
+		paramMapToXml(headerFileShowVO.getOutputXmlMapParams(), headerFileShowVO.getOutputXmlParams(),
+				headerFileShowVO.getOutputParams(), headerFileTransVO.getIndexToParaName(),
+				headerFileTransVO.getOutputParaNameToType());
 
 		return headerFileShowVO;
 	}
@@ -96,24 +98,24 @@ public class HeaderFileAndStructUtils {
 
 		for (Map.Entry<String, String> entry : paramNameToType.entrySet()) {
 			String paramName = entry.getKey();
-			String paramType = entry.getValue();
+			String strItem = entry.getValue();
 			Integer paramIndex = indexToParaName.get(paramName);
-
-			// 参数赋值
-			ParamTreeVO paramTreeVO = new ParamTreeVO(IdGenerate.millsAndRandomId(), IdGenerate.millsAndRandomId(), "0",
-					"", paramName, paramType, 0, 0.0, "1", "");
-			paramTreeVO.setIndex(paramIndex);
-
-			paramList.add(paramTreeVO);
-			// XmlEntity
-			XmlEntity varXmlEntity = ParamVOToXmlEntity(paramTreeVO);
-			xmlEntity.getXmlEntitys().add(varXmlEntity);
-
-			// XmlEntityMap
-			XmlEntityMap varXmlEntityMap = ParamVOToXmlEntityMap(paramTreeVO);
-			xmlEntityMap.getXmlEntityMaps().add(varXmlEntityMap);
+			StringBuilder sType = new StringBuilder();
+			StringBuilder sRemarks = new StringBuilder();
+			if (splitParamTypeAndName(strItem, sType, sRemarks)) {
+				// 参数赋值
+				ParamTreeVO paramTreeVO = new ParamTreeVO(IdGenerate.millsAndRandomId(), IdGenerate.millsAndRandomId(), "0",
+						"", paramName,  sType.toString(), sRemarks.toString(), 0, 0.0, "1", "");
+				paramTreeVO.setIndex(paramIndex);
+				paramList.add(paramTreeVO);
+				// XmlEntity
+				XmlEntity varXmlEntity = ParamVOToXmlEntity(paramTreeVO);
+				xmlEntity.getXmlEntitys().add(varXmlEntity);
+				// XmlEntityMap
+				XmlEntityMap varXmlEntityMap = ParamVOToXmlEntityMap(paramTreeVO);
+				xmlEntityMap.getXmlEntityMaps().add(varXmlEntityMap);
+			}
 		}
-
 	}
 
 	/**
@@ -142,14 +144,13 @@ public class HeaderFileAndStructUtils {
 		List<String> mapValue = oriMap.get(structTypeNo);
 		for (int i = 0; i < mapValue.size(); i++) {
 			String strItem = mapValue.get(i);
-			String typeStr, nameStr;
-			StringRef pType = new StringRef();
-			StringRef pName = new StringRef();
-			if (splitParamTypeAndName(strItem, pType, pName)) {
-				typeStr = pType.getVal();
-				nameStr = pName.getVal();
+			StringBuilder sName = new StringBuilder();
+			StringBuilder sType = new StringBuilder();
+			StringBuilder sRemarks = new StringBuilder();
+			if (splitParamTypeAndName(strItem, sName, sType, sRemarks)) {
 				ParamTreeVO structChild = new ParamTreeVO(IdGenerate.millsAndRandomId(), IdGenerate.millsAndRandomId(),
-						fatherParam.getDbId(), "", nameStr, typeStr, i + 1, 0.0, "1", "");
+						fatherParam.getDbId(), "", sName.toString(), sType.toString(), sRemarks.toString(), i + 1, 0.0,
+						"1", "");
 				// AssigParamName全名设置
 				String qz = "";
 				if (fatherParam.getParentId() != "0") {
@@ -161,7 +162,7 @@ public class HeaderFileAndStructUtils {
 				}
 				structChild.setAssigParamName(qz);
 				// 判断为基本类型还是结构体类型
-				String typeStrNo = typeStr.replace("*", "");
+				String typeStrNo = sType.toString().replace("*", "");
 				typeStrNo = typeStrNo.trim();
 				if (oriMap.containsKey(typeStrNo) && parseMap.containsKey(typeStrNo)) {
 					structChild.setChildrenIds(parseMap.get(typeStrNo).getDbId());
@@ -169,6 +170,33 @@ public class HeaderFileAndStructUtils {
 				}
 				fatherParam.getChildren().add(structChild);
 			}
+//			String typeStr, nameStr;
+//			StringRef pType = new StringRef();
+//			StringRef pName = new StringRef();
+//			if (splitParamTypeAndName(strItem, pType, pName)) {
+//				typeStr = pType.getVal();
+//				nameStr = pName.getVal();
+//				ParamTreeVO structChild = new ParamTreeVO(IdGenerate.millsAndRandomId(), IdGenerate.millsAndRandomId(),
+//						fatherParam.getDbId(), "", nameStr, typeStr, i + 1, 0.0, "1", "");
+//				// AssigParamName全名设置
+//				String qz = "";
+//				if (fatherParam.getParentId() != "0") {
+//					// String fg = structChild.getFparamType().contains("*") ? "->" : ".";
+//					String fg = structType.contains("*") ? "->" : ".";
+//					qz = fatherParam.getAssigParamName() + fg + structChild.getFparamName();
+//				} else {
+//					qz = structChild.getFparamName();
+//				}
+//				structChild.setAssigParamName(qz);
+//				// 判断为基本类型还是结构体类型
+//				String typeStrNo = typeStr.replace("*", "");
+//				typeStrNo = typeStrNo.trim();
+//				if (oriMap.containsKey(typeStrNo) && parseMap.containsKey(typeStrNo)) {
+//					structChild.setChildrenIds(parseMap.get(typeStrNo).getDbId());
+//					mapToStruct(oriMap, parseMap, structChild);
+//				}
+//				fatherParam.getChildren().add(structChild);
+//			}
 
 		}
 
@@ -190,7 +218,7 @@ public class HeaderFileAndStructUtils {
 		boolean res;
 		String type = "";
 		String name = "";
-		String[] strArray = strItem.split(" ");
+		String[] strArray = strItem.split("\\|");
 		if (strArray.length >= 2) {
 			name = strArray[strArray.length - 1];
 			type = strItem.substring(0, strItem.length() - name.length() - 1);
@@ -201,6 +229,27 @@ public class HeaderFileAndStructUtils {
 			res = false;
 		}
 		return res;
+	}
+
+	/**
+	 * 参数的类型与名称拆分，用于结构体和头文件解析
+	 * 
+	 * @param strItem
+	 * @param params
+	 * @return
+	 */
+	private static boolean splitParamTypeAndName(String strItem, StringBuilder... params) {
+		String[] strArray = strItem.split("\\|");
+		for (int i = 0; i < strArray.length; i++) {
+			System.out.println(strArray[i] + "  " + i + "  " + params.length);
+			if (i < params.length) {
+//				params[i] = new StringBuilder();
+				params[i].append(strArray[i]);
+			} else {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -273,7 +322,7 @@ public class HeaderFileAndStructUtils {
 
 		return varXmlEntity;
 	}
-	
+
 	/**
 	 * 属性结构转为XmlEntityMap结构
 	 * 
@@ -288,7 +337,7 @@ public class HeaderFileAndStructUtils {
 		// variable
 		XmlEntityMap varXmlEntityMap = new XmlEntityMap();
 		varXmlEntityMap.setLableName("variable");
-		Map<String, String> varAttributeMap = new HashMap<String,String>();
+		Map<String, String> varAttributeMap = new HashMap<String, String>();
 		varAttributeMap.put("name", vo.getFparamName());
 		varAttributeMap.put("structType", "");
 		varAttributeMap.put("structId", "");
@@ -298,7 +347,7 @@ public class HeaderFileAndStructUtils {
 		// 变量类型
 		XmlEntityMap dataTyeXmlEntity = new XmlEntityMap();
 		dataTyeXmlEntity.setLableName("变量类型");
-		Map<String, String> dataTyeAttributeMap = new HashMap<String,String>();
+		Map<String, String> dataTyeAttributeMap = new HashMap<String, String>();
 		dataTyeAttributeMap.put("name", vo.getFparamType());
 		dataTyeXmlEntity.setAttributeMap(dataTyeAttributeMap);
 		dataTyeXmlEntity.setXmlEntityMaps(new ArrayList<XmlEntityMap>());
@@ -307,7 +356,7 @@ public class HeaderFileAndStructUtils {
 		// 序号
 		XmlEntityMap indexXmlEntity = new XmlEntityMap();
 		indexXmlEntity.setLableName("序号");
-		Map<String, String> indexAttributeMap = new HashMap<String,String>();
+		Map<String, String> indexAttributeMap = new HashMap<String, String>();
 		indexAttributeMap.put("name", vo.getIndex().toString());
 		indexXmlEntity.setAttributeMap(indexAttributeMap);
 		indexXmlEntity.setXmlEntityMaps(new ArrayList<XmlEntityMap>());
@@ -316,7 +365,7 @@ public class HeaderFileAndStructUtils {
 		// 长度
 		XmlEntityMap lengthXmlEntity = new XmlEntityMap();
 		lengthXmlEntity.setLableName("长度");
-		Map<String, String> lengthAttributeMap = new HashMap<String,String>();
+		Map<String, String> lengthAttributeMap = new HashMap<String, String>();
 		lengthAttributeMap.put("name", vo.getLength());
 		lengthXmlEntity.setAttributeMap(lengthAttributeMap);
 		lengthXmlEntity.setXmlEntityMaps(new ArrayList<XmlEntityMap>());
@@ -325,7 +374,7 @@ public class HeaderFileAndStructUtils {
 		// 类别
 		XmlEntityMap assignTypeXmlEntity = new XmlEntityMap();
 		assignTypeXmlEntity.setLableName("类别");
-		Map<String, String> assignTypeAttributeMap = new HashMap<String,String>();
+		Map<String, String> assignTypeAttributeMap = new HashMap<String, String>();
 		assignTypeAttributeMap.put("name", vo.getAssignType());
 		assignTypeXmlEntity.setAttributeMap(assignTypeAttributeMap);
 		assignTypeXmlEntity.setXmlEntityMaps(new ArrayList<XmlEntityMap>());
@@ -334,7 +383,7 @@ public class HeaderFileAndStructUtils {
 		// 赋值
 		XmlEntityMap assignValueXmlEntity = new XmlEntityMap();
 		assignValueXmlEntity.setLableName("赋值");
-		Map<String, String> assignValueAttributeMap = new HashMap<String,String>();
+		Map<String, String> assignValueAttributeMap = new HashMap<String, String>();
 		assignValueAttributeMap.put("name", vo.getFparamValue());
 		assignValueXmlEntity.setAttributeMap(assignValueAttributeMap);
 		assignValueXmlEntity.setXmlEntityMaps(new ArrayList<XmlEntityMap>());
@@ -343,7 +392,7 @@ public class HeaderFileAndStructUtils {
 		// 选择变量
 		XmlEntityMap selectVarXmlEntity = new XmlEntityMap();
 		selectVarXmlEntity.setLableName("选择变量");
-		Map<String, String> selectVarAttributeMap = new HashMap<String,String>();
+		Map<String, String> selectVarAttributeMap = new HashMap<String, String>();
 		selectVarAttributeMap.put("name", vo.getSelectVar());
 		selectVarXmlEntity.setAttributeMap(selectVarAttributeMap);
 		selectVarXmlEntity.setXmlEntityMaps(new ArrayList<XmlEntityMap>());
@@ -352,7 +401,6 @@ public class HeaderFileAndStructUtils {
 		return varXmlEntityMap;
 	}
 
-	
 	/**
 	 * 解析结构体（通用：包括系统表、内部表等）
 	 *

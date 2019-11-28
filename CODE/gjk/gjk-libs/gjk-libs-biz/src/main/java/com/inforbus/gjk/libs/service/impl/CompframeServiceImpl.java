@@ -65,25 +65,39 @@ public class CompframeServiceImpl extends ServiceImpl<CompframeMapper, Compframe
 		return baseMapper.getCompframePage(page, compframe);
 	}
 
+	/**
+	 * @Title: saveCompFrame
+	 * @Description: 保存构件框架
+	 * @Author xiaohe
+	 * @DateTime 2019年11月27日 上午10:33:47
+	 * @param ufile  构件文件列表
+	 * @param resMap 携带信息
+	 * @return
+	 * @see com.inforbus.gjk.libs.service#saveCompFrame(org.springframework.web.multipart.MultipartFile,
+	 *      java.util.Map)
+	 */
 	@Override
 	public R<?> saveCompFrame(MultipartFile[] ufile, Map<String, Object> resMap) {
 		R retR = new R();
 		Double version = 1.0;
-
 		// 新增
 		if (StringUtils.isEmpty(resMap.get("frameId").toString())) {
 			List<Compframe> listsVersion = baseMapper
 					.selectList(Wrappers.<Compframe>query().lambda().orderByDesc(Compframe::getVersion));
 			version = listsVersion.size() == 0 ? version : listsVersion.get(0).getVersion() + 1.0;
-//			version += 1.0;
 		} else {// 修改
 		}
 		List<String> lists = (List<String>) resMap.get("compSelectArray");
 		if (ObjectUtils.isNotEmpty(ufile)) {
 			try {
+				String fileName = "构件框架库_" + version;
 				for (MultipartFile mfile : ufile) {
+					
+					String fileShowName = fileName+mfile.getOriginalFilename()
+							.substring(mfile.getOriginalFilename().indexOf("/"));
+					
 					String path = new String((compframePath + resMap.get("filePath") + File.separator + version
-							+ File.separator + mfile.getOriginalFilename()).replace("/", File.separator));
+							+ File.separator + fileShowName).replace("/", File.separator));
 					File uploadFile = null;
 					if (StringUtils.isNotEmpty(path)) {
 						uploadFile = new File(path);
@@ -99,8 +113,8 @@ public class CompframeServiceImpl extends ServiceImpl<CompframeMapper, Compframe
 					mfile.transferTo(uploadFile);
 					JGitUtil.commitAndPush(path, "多个文件上传");
 				}
-				Compframe frame = new Compframe(IdGenerate.uuid(), "构件框架库_" + version, version,
-						resMap.get("filePath") + "/" + version, resMap.get("description").toString());
+				Compframe frame = new Compframe(IdGenerate.uuid(), fileName, version,
+						resMap.get("filePath") + "/" + version+"/"+fileName, resMap.get("description").toString());
 				baseMapper.insertCompframe(frame);
 				for (String strpt : lists) {
 					baseMapper.insertCompframePlatform(frame.getId(), strpt);

@@ -113,6 +113,7 @@ export default {
       this.$refs[formName].validate((valid, object) => {
         if (valid) {
           //调用fileUpload的click()事件
+          console.log(" this.$refs.fileUpload.$el", this.$refs.fileUpload)
           this.$refs.fileUpload.$el.click();
         }
       });
@@ -135,7 +136,7 @@ export default {
     },
     //上传文件
     resumes(files) {
-      console.log("222222222222222222", this.compFormParam,this.frameId);
+      console.log("222222222222222222", this.compFormParam, this.frameId);
       if (files.length == 0) {
         this.$message({
           type: "warning",
@@ -165,7 +166,8 @@ export default {
         formData.append("dataParams", JSON.stringify(this.compFormParam));
         saveCompFrame(formData).then(res => {
           console.log("ressssssssssssss", res);
-          this.innerVisible = loading = false;
+          loading.close();
+          this.innerVisible = false;
         });
       }
     },

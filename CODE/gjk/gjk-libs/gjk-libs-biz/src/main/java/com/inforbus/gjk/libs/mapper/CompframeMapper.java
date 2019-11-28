@@ -36,9 +36,24 @@ public interface CompframeMapper extends BaseMapper<Compframe> {
 	 * @return
 	 */
 	IPage<Compframe> getCompframePage(Page page, @Param("compframe") Compframe compframe);
-
+	/**
+	 * @Title: insertCompframe
+	 * @Description: 插入构件框架
+	 * @Author xiaohe
+	 * @DateTime 2019年11月26日 下午2:04:44
+	 * @param frame 
+	 * @return
+	 */
 	void insertCompframe( @Param("compframe")Compframe frame);
-	
+	/**
+	 * @Title: insertCompframePlatform
+	 * @Description: 插入构件框架与平台关系
+	 * @Author xiaohe
+	 * @DateTime 2019年11月26日 下午2:04:44
+	 * @param frameId 构件框架Id
+	 * @param platformId 平台Id
+	 * @return
+	 */
 	void insertCompframePlatform(@Param("frameId") String frameId, @Param("platformId") String platformId);
 
 
