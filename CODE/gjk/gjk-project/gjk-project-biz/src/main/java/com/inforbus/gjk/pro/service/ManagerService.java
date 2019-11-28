@@ -202,15 +202,7 @@ public interface ManagerService extends IService<ProjectFile> {
 	 * @param procedureId
 	 * @return
 	 */
-	R appAssemblyProjectCreate(String userName, String procedureId, String bspDirPath);
-
-	/**
-	 * 保存app组建工程的图片
-	 * 
-	 * @param file
-	 * @return
-	 */
-	App saveAppImage(MultipartFile file, App app);
+	R appAssemblyProjectCreate(MultipartFile ufile, Map<String, String> messageMap);
 
 	/**
 	 * 根据项目ID获取到所有的流程名称
@@ -283,9 +275,9 @@ public interface ManagerService extends IService<ProjectFile> {
 
 	public boolean deleteProcedureById(String procedureId);
 
-    boolean deleteFilesFromLocal(Map filePath);
+	boolean deleteFilesFromLocal(Map filePath);
 
-    R analysisThemeXML(String proDetailId);
+	R analysisThemeXML(String proDetailId);
 
 	/**
 	 * 获取修改BSP下拉列表内容

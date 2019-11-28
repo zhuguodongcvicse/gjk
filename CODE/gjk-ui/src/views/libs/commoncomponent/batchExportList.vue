@@ -13,46 +13,19 @@
         @row-update="handleUpdate"
         @row-save="handleSave"
         @row-del="rowDel"
-        @row-click="handleRowClick"
       >
-        <!-- <template slot="menuLeft">
-          <el-button type="primary"
-                     @click="handleAdd"
-                     size="small"
-                     v-if="permissions.libs_approval_add">新 增</el-button>
-          <br /><br />
-        </template>-->
-        <template slot="menuLeft">
-          <el-button type="primary" size="mini" plain @click="showAll">显示全部</el-button>
-          <el-button type="primary" size="mini" plain @click="showUnprocessed">显示未处理</el-button>
-        </template>
-
         <template slot-scope="scope" slot="menu">
-          <!-- <el-button
-            type="primary"
-            v-if="permissions.libs_approval_edit"
-            icon="el-icon-check"
-            size="small"
-            plain
-            @click="handleEdit(scope.row,scope.index)"
-          >编辑</el-button>
           <el-button
-            type="danger"
-            v-if="permissions.libs_approval_del"
-            icon="el-icon-delete"
+            type="primary"
+            icon="el-icon-check"
+            v-if="scope.row.approvalState == '2'"
             size="small"
             plain
-            @click="handleDel(scope.row,scope.index)"
-          >删除</el-button>-->
+            @click="exportCompFunc(scope.row,scope.index)"
+          >导出</el-button>
         </template>
       </avue-crud>
     </basic-container>
-    <!-- <apply-detail
-      :dialog="applyDetailDialog"
-      @applyDetailDialogState="applyDetailDialogState"
-      :applyItemMsg="applyItemMsg"
-      @refresh="refreshChange"
-    /> -->
   </div>
 </template>
 
@@ -65,16 +38,14 @@ import {
   delObj,
   getUnprocessedRecordByPage
 } from "@/api/libs/approval";
-import { tableOption } from "@/const/crud/libs/approval";
+import { createZipFile } from "@/api/libs/commoncomponent";
+import { getComponentByApplyId } from "@/api/libs/batchapproval"
+import { tableOption } from "@/const/crud/libs/batchExportList";
 import { mapGetters } from "vuex";
-import applyDetail from "./applyDetail";
 import { userInfo } from "os";
 export default {
   //注入依赖，调用this.reload();用于刷新页面
   inject: ["reload"],
-  components: {
-    "apply-detail": applyDetail
-  },
   computed: {
     ...mapGetters(["permissions", "userInfo"])
   },
@@ -89,12 +60,13 @@ export default {
       },
       listQuery: {
         current: 1,
-        size: 20
+        size: 20,
+        libraryType: '7',
+        applyType: '3',
       },
       tableLoading: false,
       tableOption: tableOption,
 
-      applyDetailDialog: false,
       //传给入库页面的构件基本信息
       applyItemMsg: {},
 
@@ -107,18 +79,6 @@ export default {
   watch: {},
   mounted: function() {},
   methods: {
-    applyDetailDialogState() {
-      this.applyDetailDialog = false;
-    },
-    //表格单行点击事件
-    handleRowClick(row, event, column) {
-      this.$router.push({
-        path: "/libs/approval/applyDetail",
-        query: {
-          row: row,
-        }
-      });
-    },
     showAll() {
       this.getList();
       this.showAllOrUnprocess = true;
@@ -136,7 +96,7 @@ export default {
     },
     getList() {
       this.tableLoading = true;
-      this.$set(this.listQuery, "applyUserId", this.userInfo.userId);
+      this.$set(this.listQuery, "userId", this.userInfo.userId);
       fetchList(this.listQuery).then(response => {
         this.tableData = response.data.data.records;
         this.page.total = response.data.data.total;
@@ -241,6 +201,11 @@ export default {
       } else {
         this.showUnprocessed();
       }
+    },
+    exportCompFunc(row) {
+        getComponentByApplyId(row.applyId).then(req => {
+            createZipFile(req.data.data);
+        }) 
     }
   }
 };

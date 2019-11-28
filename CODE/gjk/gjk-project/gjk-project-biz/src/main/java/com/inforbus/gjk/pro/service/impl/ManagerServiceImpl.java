@@ -682,12 +682,12 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @return
 	 */
 	@Override
-	public R appAssemblyProjectCreate(String userName, String procedureId, String bspDirPath) {
+	public R appAssemblyProjectCreate(MultipartFile ufile, Map<String, String> messageMap) {
 		R r = new R<>();
 		App app = null;
 
 		// 获取流程记录
-		ProjectFile projectFile = this.getById(procedureId);
+		ProjectFile projectFile = this.getById(messageMap.get("procedureXmlId"));
 		// 创建流程xml文件路径
 		String procedureFilePath = proDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml";
 		File file = new File(procedureFilePath);
@@ -720,7 +720,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			List<Map<String, Object>> maps = null;
 			try {
 				// 获取硬件存入数据库的数据
-				String chipStr = getChipsfromhardwarelibs(procedureId).getChips();
+				String chipStr = getChipsfromhardwarelibs(messageMap.get("procedureXmlId")).getChips();
 				maps = (List<Map<String, Object>>) JSONArray.parse(chipStr);
 			} catch (Exception e) {
 				logger.error("获取硬件建模数据失败，请确保硬件建模配置正确。");
@@ -731,7 +731,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			// 获取流程对应记录
 			ProjectFile proFile = this.getById(proceId);
 			// 根据"员工号_项目名称_流程名称APP"格式创建App的名字及路径，并存放在流程文件夹下
-			appFilePath = proDetailPath + this.getById(modelId).getFilePath() + File.separator + userName + "_"
+			appFilePath = proDetailPath + this.getById(modelId).getFilePath() + File.separator
+					+ messageMap.get("userName") + "_"
 					+ projectMapper.getProById(projectFile.getProjectId()).getProjectName() + "_"
 					+ proFile.getFileName() + "APP" + File.separator;
 
@@ -740,7 +741,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			}
 
 			// 拷贝bsp对应的文件夹到app组件工程目录下
-			createBspDir(r, new File(bspDirPath).getParent(), appFilePath);
+			createBspDir(r, new File(messageMap.get("bspDirPath")).getParent(), appFilePath);
 			if (CommonConstants.FAIL.equals(r.getCode())) {
 				return r;
 			}
@@ -776,11 +777,28 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			app.setProcessId(proceId);
 			app.setFlowId(flowId);
 
-			r.setData(app);
-			r.setMsg("生成App组件工程文件夹成功。");
+			try {
+				String appDirPath = appFilePath + File.separator + "Image";
+				File targetFile = new File(appDirPath);
+				if (!targetFile.exists()) {
+					targetFile.mkdirs();
+				}
+
+				appDirPath += IdGenerate.uuid()
+						+ ufile.getOriginalFilename().substring(ufile.getOriginalFilename().lastIndexOf("."));
+				targetFile = new File(appDirPath);
+				ufile.transferTo(targetFile);
+
+				app.setId(IdGenerate.uuid());
+				app.setBackPath(appDirPath.substring(proDetailPath.length()));
+			} catch (IOException e) {
+				e.printStackTrace();
+				return r.setAllAttr(CommonConstants.FAIL, "保存App组件工程img失败。", null);
+			}
 
 			JGitUtil.commitAndPush(appFilePath, "上传App组件工程");
-			return r;
+			return r.setAllAttr(CommonConstants.SUCCESS, "生成App组件工程文件夹成功。", app);
+
 		} else {
 			return r.setAllAttr(CommonConstants.FAIL, "流程配置xml文件不存在，请重新配置流程。", null);
 		}
@@ -798,7 +816,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			return;
 		}
 		try {
-			FileUtil.copyDir(proDetailPath + bspDirPath, bspFilePath);
+			FileUtil.copyFile(proDetailPath + bspDirPath, bspFilePath);
 		} catch (IOException e) {
 			logger.error("复制BSP文件夹错误，请联系系统管理员");
 			r.setAllAttr(CommonConstants.FAIL, "复制BSP文件夹错误，请联系系统管理员", null);
@@ -845,7 +863,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		try {
 			// 将软件框架所有子文件及文件夹拷贝到根组件文件夹中
-			FileUtil.copyDir(proDetailPath + softwareFilePath, assemblyName);
+			FileUtil.copyFile(proDetailPath + softwareFilePath, assemblyName);
 		} catch (IOException e) {
 			logger.error("复制软件框架" + softwareName + "文件夹错误，请联系系统管理员。");
 			r.setAllAttr(CommonConstants.FAIL, "复制软件框架" + softwareName + "文件夹错误，请联系系统管理员。", null);
@@ -980,8 +998,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		for (String hFilePath : hFilePathSet) {
 			try {
 				// TODO:makeFile文件路径待修改
-				String hMakeFilePath = "." + File.separator + new File(FileUtil.copyFile(hFilePath, includeFilePath))
-						.getAbsolutePath().substring(assemblyName.length() + 1);
+				String hMakeFilePath = "." + File.separator
+						+ new File(FileUtil.copyFile(hFilePath, includeFilePath, new File(hFilePath).getName()))
+								.getAbsolutePath().substring(assemblyName.length() + 1);
 				hMakeFilePathSet.add(hMakeFilePath);
 
 				// 调客户Api需要的不带后缀的文件名
@@ -989,6 +1008,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				apiNeedStringSet.add(hFileName.substring(0, hFileName.lastIndexOf(".")));
 			} catch (Exception e) {
 				logger.error("复制.h文件错误，请联系管理员。");
+				e.printStackTrace();
 				r.setAllAttr(CommonConstants.FAIL, "复制" + hFilePath + "文件到" + includeFilePath + "路径下错误，请联系管理员。", null);
 				return;
 			}
@@ -997,8 +1017,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// 将.c .cpp文件拷贝到指定路径下，并将拷贝后的文件路径按照makeFile文件路径切割并存入集合
 		for (String cFilePath : cFilePathSet) {
 			try {
-				String cMakeFilePath = "." + File.separator + new File(FileUtil.copyFile(cFilePath, srcFilePath))
-						.getAbsolutePath().substring(assemblyName.length() + 1);
+				String cMakeFilePath = "." + File.separator
+						+ new File(FileUtil.copyFile(cFilePath, srcFilePath, new File(cFilePath).getName()))
+								.getAbsolutePath().substring(assemblyName.length() + 1);
 				cMakeFilePathSet.add(cMakeFilePath);
 
 				// 调客户Api需要的不带后缀的文件名
@@ -1015,19 +1036,15 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	private R getMakefileTypeByProperties(String platformName) {
 		String makefileType = null;
 		// 获取当前类的路径
-/*		String filePath = ManagerServiceImpl.class.getResource("").getPath();
-		try {
-			// 中文乱码问题
-			filePath = URLDecoder.decode(filePath, "utf-8");
-		} catch (UnsupportedEncodingException e1) {
-			e1.printStackTrace();
-			logger.error("中文路径转义失败。");
-			return new R<>(CommonConstants.FAIL, "中文路径转义失败。", null);
-		}
-		// 找到bootstrap.properties的地址
-		filePath = filePath.substring(0, filePath.indexOf("target/classes/") + "target/classes/".length())
-				+ "platformType.yml";
-		File dumpFile = new File(filePath);*/
+		/*
+		 * String filePath = ManagerServiceImpl.class.getResource("").getPath(); try {
+		 * // 中文乱码问题 filePath = URLDecoder.decode(filePath, "utf-8"); } catch
+		 * (UnsupportedEncodingException e1) { e1.printStackTrace();
+		 * logger.error("中文路径转义失败。"); return new R<>(CommonConstants.FAIL, "中文路径转义失败。",
+		 * null); } // 找到bootstrap.properties的地址 filePath = filePath.substring(0,
+		 * filePath.indexOf("target/classes/") + "target/classes/".length()) +
+		 * "platformType.yml"; File dumpFile = new File(filePath);
+		 */
 		File file = null;
 		Map father;
 		try {
@@ -1092,48 +1109,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		list.addAll(c);
 		return list;
 	}
-
-	public App saveAppImage(MultipartFile file, App app) {
-		String appDirPath = proDetailPath + app.getFilePath() + File.separator + app.getFileName() + File.separator;
-		try {
-			appDirPath += "Image" + File.separator;
-			File targetFile = new File(appDirPath);
-			if (!targetFile.exists()) {
-				targetFile.mkdirs();
-			}
-
-			appDirPath += IdGenerate.uuid()
-					+ file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
-			targetFile = new File(appDirPath);
-			file.transferTo(targetFile);
-
-			JGitUtil.commitAndPush(appDirPath, "上传App组件工程图片");
-
-			app.setId(IdGenerate.uuid());
-			app.setBackPath(appDirPath.substring(proDetailPath.length()));
-		} catch (IOException e) {
-			logger.error("保存App组件工程img失败。");
-			app = null;
-			e.printStackTrace();
-		}
-		return app;
-	}
-
-	// public static void main(String[] args) {
-	// String simplePlanFile =
-	// "D:\\14S_GJK_GIT\\gjk\\gjk\\project\\gengTest\\geng流程\\模型\\缩略方案.xml";
-	// ArrayList<String> schemeFileList = new ArrayList<>();
-	// schemeFileList.add("D:\\14S_GJK_GIT\\gjk\\gjk\\project\\gengTest\\geng流程\\模型\\方案评价指标.xml");
-	// schemeFileList.add("D:\\14S_GJK_GIT\\gjk\\gjk\\project\\gengTest\\geng流程\\模型\\软硬件映射配置.xml");
-	// System.out.println(schemeFileList);
-	// try {
-	// SimpleScheme.createSimpleScheme(schemeFileList, simplePlanFile);
-	// System.out.println(simplePlanFile);
-	// } catch (IOException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	// }
 
 	@Override
 	public boolean createThemeXML(XmlEntityMap entity, String proDetailId, String name) {
