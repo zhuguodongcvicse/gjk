@@ -185,6 +185,16 @@ public class ComplieTask implements Task {
                 //推送消息到rabbitmq中
                 this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n" + line);
             }
+            if (StringUtils.isBlank(line)){
+                ir = new InputStreamReader(p.getErrorStream(), "GBK");
+                input = new LineNumberReader(ir);
+                while ((line = input.readLine()) != null) {
+                    //System.out.println(line);
+                    //strCommand += "\n"+line;
+                    //推送消息到rabbitmq中
+                    this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n" + line);
+                }
+            }
         } catch (IOException e) {
             logger.error("IO读取失败，请检查组件工程文件。");
             e.printStackTrace();
@@ -241,6 +251,13 @@ public class ComplieTask implements Task {
                 //推送消息到rabbitmq中
                 this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n" + line);
             }
+            if (StringUtils.isBlank(line)){
+                ir = new InputStreamReader(p.getErrorStream(), "GBK");
+                input = new LineNumberReader(ir);
+                while ((line = input.readLine()) != null) {
+                    this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n" + line);
+                }
+            }
             //System.out.println("111111"+strCommand);
         } catch (IOException e) {
             logger.error("IO读取失败，请检查组件工程文件。");
@@ -293,10 +310,14 @@ public class ComplieTask implements Task {
             input = new LineNumberReader(ir);
             String line = "";
             while ((line = input.readLine()) != null) {
-                //System.out.println(line);
-                //strCommand += "\n"+line;
-                //推送消息到rabbitmq中
                 this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n" + line);
+            }
+            if (StringUtils.isBlank(line)){
+                ir = new InputStreamReader(p.getErrorStream(), "GBK");
+                input = new LineNumberReader(ir);
+                while ((line = input.readLine()) != null) {
+                    this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n" + line);
+                }
             }
             //System.out.println("111111"+strCommand);
         } catch (IOException e) {

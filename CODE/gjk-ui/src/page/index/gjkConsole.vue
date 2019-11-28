@@ -230,6 +230,8 @@ export default {
         "client-id": clientid
         // additional header
       };
+      //this.client.heartbeat.incoming = 30000;
+      //this.client.heartbeat.outgoing = 30000;
       this.client.connect(headers, this.onConnected, this.onFailed);
     },
     //清除控制台

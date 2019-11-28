@@ -73,7 +73,7 @@ export function isXmlFileExist(proDetailId) {
 
 export function getSysConfigModelXml(proDetailId) {
   return request({
-    url: '/pro/manager/getcoefficientXmlEntityMap/'+proDetailId,
+    url: '/pro/manager/getcoefficientXmlEntityMap/' + proDetailId,
     method: 'get'
   })
 }
@@ -112,7 +112,7 @@ export function getSoftProcessFilePath(id) {
   })
 }
 
-export function getFilePathListById(id,appDataDTO) {
+export function getFilePathListById(id, appDataDTO) {
   return request({
     url: '/pro/manager/getFilePathListById/' + id,
     method: 'post',
@@ -168,19 +168,11 @@ export function updateProcedureDetail(proDetail) {
   })
 }
 
-export function appAssemblyProjectCreate(userName, procedureId, appDirFilePath) {
-  return request({
-    url: '/pro/manager/appAssemblyProjectCreate/' + userName + "/" + procedureId,
-    method: 'post',
-    data: appDirFilePath
-  })
-}
-
-/* 得到基本文件的路径 */
-export function appImageUpload(param) {
+/* 生成app组件工程 */
+export function appAssemblyProjectCreate(param) {
   return request({
     method: "post",
-    url: "/pro/manager/appImageUpload",
+    url: "/pro/manager/appAssemblyProjectCreate",
     headers: { "Content-Type": "multipart/form-data" },
     data: param
   })
