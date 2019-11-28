@@ -3,24 +3,20 @@ package com.inforbus.gjk.pro.service.impl;
 import java.io.*;
 import java.net.URLDecoder;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import com.inforbus.gjk.admin.api.entity.BSP;
 import com.inforbus.gjk.admin.api.entity.BaseTemplate;
 import com.inforbus.gjk.pro.api.dto.BaseTemplateIDsDTO;
 import com.inforbus.gjk.pro.api.entity.*;
 
-import com.inforbus.gjk.pro.mapper.PartPlatformSoftwareMapper;
+import com.inforbus.gjk.pro.mapper.*;
 import com.inforbus.gjk.pro.service.BaseTemplateService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.ho.yaml.Yaml;
 import org.slf4j.Logger;
@@ -68,9 +64,7 @@ import com.inforbus.gjk.pro.api.util.ProcedureXmlAnalysis;
 import com.inforbus.gjk.pro.api.util.SylixosUtil;
 import com.inforbus.gjk.pro.api.util.WorkbenchUtil;
 import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
-import com.inforbus.gjk.pro.mapper.ManagerMapper;
 import com.inforbus.gjk.pro.mapper.PartPlatformSoftwareMapper;
-import com.inforbus.gjk.pro.mapper.ProjectMapper;
 import com.inforbus.gjk.pro.service.ManagerService;
 
 import lombok.AllArgsConstructor;
@@ -92,6 +86,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	protected PartPlatformSoftwareMapper partPlatformSoftwareMapper;
 	@Autowired
 	private BaseTemplateService baseTemplateService;
+	@Autowired
+	protected PartPlatformBSPMapper partPlatformBSPMapper;
 
 	private static final String proDetailPath = JGitUtil.getLOCAL_REPO_PATH();
 	private static final String integerCodeFileName = JGitUtil.getINTEGER_CODE_FILE_NAME();
@@ -1708,5 +1704,66 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		obj.put("partList", partList);
 		// obj.put("folwModelData", folwModelData);
 		return new R<>(obj);
+	}
+
+	/**
+	 * 获取修改BSP下拉列表内容
+	 * @return
+	 */
+	@Override
+	public R getBSPListAndPlatformName() {
+		List<BSP> bspList = baseMapper.getAllBSPList();
+		for (BSP bsp : bspList) {
+			List<GjkPlatform> platformList = baseMapper.getAllPlatformListByBSPId(bsp.getId());
+			String platformNames = "";
+			for (GjkPlatform gjkPlatform : platformList) {
+				platformNames += gjkPlatform.getName() + ";";
+			}
+			// 因为用不到软件构架库库的描述字段，所有将描述字段存放平台库名称
+			bsp.setDescription(platformNames);
+		}
+		return new R<>(bspList);
+	}
+
+	@Override
+	public R showPartBSPAndPlatform(String id) {
+		return new R<>(partPlatformBSPMapper.getByProcedureId(id));
+	}
+
+	/**
+	 * 修改bsp库保存
+	 * @param bsp
+	 * @return
+	 */
+	@Override
+	public R updatePartBSPAndPlatform(BSP bsp) {
+		String procedureId = bsp.getId();
+		String bspIds = bsp.getDescription();
+		partPlatformBSPMapper.deleteByProcedureId(procedureId);
+
+		String[] bspIdsArr = bspIds.split(";");
+		List<String> bspIdList = Arrays.asList(bspIdsArr);
+
+		String ids = "'" + StringUtils.join(bspIdList, "','") + "'";
+		List<BSP> bspList = baseMapper.getAllBSPListByIdIn(ids);
+		for (BSP item : bspList) {
+			List<GjkPlatform> platformList = baseMapper.getAllPlatformListByBSPId(item.getId());
+			String platformNames = "";
+			for (GjkPlatform gjkPlatform : platformList) {
+				platformNames += gjkPlatform.getName() + ";";
+			}
+
+			PartPlatformBSP ppBsp = new PartPlatformBSP();
+			ppBsp.setId(IdGenerate.uuid());
+			ppBsp.setBspFilePath(item.getFilePath());
+			ppBsp.setBspId(item.getId());
+			ppBsp.setBspName(item.getBspName());
+			ppBsp.setBspVersion(item.getVersion());
+			ppBsp.setPlatformName(platformNames);
+			ppBsp.setProcedureId(procedureId);
+			ppBsp.setCreateTime(LocalDateTime.now());
+			partPlatformBSPMapper.insert(ppBsp);
+		}
+		return new R<>(true);
 	}
 }

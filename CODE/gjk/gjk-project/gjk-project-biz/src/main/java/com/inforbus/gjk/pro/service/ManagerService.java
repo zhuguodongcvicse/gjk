@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.inforbus.gjk.admin.api.entity.BSP;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.pro.api.entity.*;
 import org.apache.ibatis.annotations.Param;
@@ -277,4 +278,26 @@ public interface ManagerService extends IService<ProjectFile> {
 	boolean deleteFilesFromLocal(Map filePath);
 
 	R analysisThemeXML(String proDetailId);
+
+	/**
+	 * 获取修改BSP下拉列表内容
+	 * @return
+	 */
+	R getBSPListAndPlatformName();
+
+	/**
+	 * 回显修改BSP选择的值
+	 *
+	 * @param id
+	 * @return
+	 */
+	R showPartBSPAndPlatform(String id);
+
+	/**
+	 * 修改bsp库保存
+	 *
+	 * @param bsp
+	 * @return
+	 */
+	R updatePartBSPAndPlatform(BSP bsp);
 }

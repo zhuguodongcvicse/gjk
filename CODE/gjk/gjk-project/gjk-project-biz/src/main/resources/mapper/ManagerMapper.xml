@@ -92,6 +92,21 @@
         <result column="update_time" property="updateTime"/>
         <result column="del_flag" property="delFlag"/>
     </resultMap>
+
+	<resultMap id="BSPMap"
+			   type="com.inforbus.gjk.admin.api.entity.BSP">
+		<id property="id" column="id" />
+		<result property="bspName" column="bsp_name" />
+		<result property="version" column="version" />
+		<result property="filePath" column="file_path" />
+		<result property="applyState" column="apply_state" />
+		<result property="applyDesc" column="apply_desc" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="description" column="description" />
+		<result property="delFlag" column="del_flag" />
+	</resultMap>
+
     <sql id="saveSoftwareSql">
 		id,
 		software_name,
@@ -414,5 +429,25 @@
     <!--平台大类列表-->
     <select id="getPlatformList" resultMap="platformMap">
         select * from gjk_platform gp where gp.parent_id='-1' and del_flag!='1'
+    </select>
+	<!--获得bsp库列表-->
+	<select id="getAllBSPList" resultMap="BSPMap">
+		SELECT *
+		FROM gjk_bsp as gs
+		order by gs.bsp_name desc,gs.version desc
+	</select>
+	<!--根据软件框架库ID得到平台库列表-->
+	<select id="getAllPlatformListByBSPId" resultMap="platformMap">
+		select * from gjk_platform gp
+		where gp.platform_id in (
+			select gsd.platform_id from gjk_bsp_detail gsd where gsd.bsp_id=#{id}
+		)
+	</select>
+	<!--根据多个ID查询数据列表-->
+	<select id="getAllBSPListByIdIn" resultMap="BSPMap">
+        SELECT *
+        FROM gjk_bsp as gs
+        where gs.id in (${ids})  and del_flag != '1'
+        order by gs.bsp_name desc,gs.version desc
     </select>
 </mapper>

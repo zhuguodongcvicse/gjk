@@ -20,6 +20,7 @@ import java.util.zip.ZipInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.inforbus.gjk.admin.api.entity.BSP;
 import com.inforbus.gjk.pro.api.entity.*;
 
 import org.slf4j.Logger;
@@ -903,5 +904,32 @@ public class ManagerController {
 	@GetMapping("/deleteProcedureById/{procedureId}")
 	public R deleteProcedureById(@PathVariable("procedureId") String procedureId) {
 		return new R<>(managerService.deleteProcedureById(procedureId));
+	}
+
+	/**
+	 * 获取修改BSP下拉列表内容
+	 * @return
+	 */
+	@ResponseBody
+	@PostMapping(path = "/getBSPListAndPlatformName")
+	public R getBSPListAndPlatformName() {
+		return managerService.getBSPListAndPlatformName();
+	}
+
+	/**
+	 * 回显修改BSP选择的值
+	 *
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@GetMapping("/showPartBSPAndPlatform/{id}")
+	public R showPartBSPAndPlatform(@PathVariable("id") String id) {
+		return managerService.showPartBSPAndPlatform(id);
+	}
+
+	@PutMapping("/updatePartBSPAndPlatform")
+	public R updatePartBSPAndPlatform(@RequestBody BSP bsp) {
+		return new R<>(managerService.updatePartBSPAndPlatform(bsp));
 	}
 }
