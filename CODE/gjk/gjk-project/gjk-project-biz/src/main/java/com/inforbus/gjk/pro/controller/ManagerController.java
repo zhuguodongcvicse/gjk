@@ -41,6 +41,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.inforbus.gjk.common.core.constant.CommonConstants;
 import com.inforbus.gjk.common.core.entity.StringRef;
 import com.inforbus.gjk.common.core.entity.XmlEntity;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
@@ -229,12 +230,6 @@ public class ManagerController {
 		return new R<>();
 	}
 
-	@PostMapping("/appAssemblyProjectCreate/{userName}/{procedureId}")
-	public R appAssemblyProjectCreate(@PathVariable("userName") String userName,
-			@PathVariable("procedureId") String procedureId, @RequestBody Map<String, String> appDirFilePath) {
-		return managerService.appAssemblyProjectCreate(userName, procedureId, appDirFilePath.get("bspDirPath"));
-	}
-
 	/**
 	 * @Title: uploadReturnUrll
 	 * @Description: 单文件上传
@@ -244,10 +239,15 @@ public class ManagerController {
 	 * @return
 	 */
 	@ResponseBody
-	@PostMapping(path = "/appImageUpload", consumes = { "multipart/mixed", "multipart/form-data" })
+	@PostMapping(path = "/appAssemblyProjectCreate", consumes = { "multipart/mixed", "multipart/form-data" })
 	public R<?> appImageUpload(@RequestParam(value = "file", required = false) MultipartFile ufile,
-			@RequestParam(value = "appJSON", required = false) String appJSON) {
-		return new R<>(managerService.saveAppImage(ufile, JSONUtil.toBean(appJSON, App.class)));
+			@RequestParam(value = "allMessage", required = false) String allMessage) {
+		Map<String, String> map = (Map<String, String>) JSONUtil.toBean(allMessage, Map.class);
+		R r = managerService.appAssemblyProjectCreate(ufile, map);
+		if (r.getCode() == CommonConstants.SUCCESS) {
+			appService.saveApp((App) r.getData());
+		}
+		return r;
 	}
 
 	/**
@@ -335,7 +335,7 @@ public class ManagerController {
 	 * @return
 	 */
 	@PostMapping("/getFilePathListById/{id}")
-	public R getworkSpacePathById(@PathVariable("id") String id,@RequestBody AppDataDTO appDataDTO) {
+	public R getworkSpacePathById(@PathVariable("id") String id, @RequestBody AppDataDTO appDataDTO) {
 		String local_REPO_PATH = null;
 		// id：软硬件映射配置的主键id
 		List<ProjectFile> lists = managerService.getFilePathListById(id);
@@ -410,8 +410,9 @@ public class ManagerController {
 		// 客户exe文件全路径
 		String exe = JGitUtil.getSoftToHard();// "D:\\14S_GJK_GIT\\gjk\\gjk\\exe\\exe.exe";
 		// 调用客户接口执行exe
-		//appDataDTO.getUserName():当前用户名
-		String[] strArray = new String[] { exe, hardWareFilePath, mapConfigPath, sysParamFilePath, appDataDTO.getUserName() };
+		// appDataDTO.getUserName():当前用户名
+		String[] strArray = new String[] { exe, hardWareFilePath, mapConfigPath, sysParamFilePath,
+				appDataDTO.getUserName() };
 		try {
 			Process process = Runtime.getRuntime().exec(strArray);
 			InputStreamReader reader = new InputStreamReader(process.getInputStream());
@@ -510,7 +511,7 @@ public class ManagerController {
 		List<ProjectFile> lists = managerService.getFilePathListById((String) map.get("id"));
 		for (ProjectFile ls : lists) {
 			if (ls.getFileType().equals("11")) {
-				workModeFilePath = gitDetailPath +  File.separator + ls.getFilePath() + ls.getFileName() + ".xml";
+				workModeFilePath = gitDetailPath + File.separator + ls.getFilePath() + ls.getFileName() + ".xml";
 			}
 			// 方案展示的路径
 			// if (ls.getFileType().equals("14")) {
@@ -557,7 +558,7 @@ public class ManagerController {
 	}
 
 	@PostMapping("deleteSelectFile")
-	public boolean deleteSelectFile(@RequestBody Map filePath){
+	public boolean deleteSelectFile(@RequestBody Map filePath) {
 		boolean deleteFlag = managerService.deleteFilesFromLocal(filePath);
 		return deleteFlag;
 	}

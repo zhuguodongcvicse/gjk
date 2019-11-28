@@ -11,11 +11,11 @@
     <el-upload
       ref="appImage"
       class="avatar-uploader"
-      action="/pro/manager/appImageUpload"
+      action="/pro/manager/appAssemblyProjectCreate"
       :show-file-list="false"
       :on-success="handleAvatarSuccess"
       :before-upload="beforeAvatarUpload"
-      :http-request="appImageUploadFunc"
+      :http-request="appAssemblyProCreateFunc"
       :on-change="onchange"
       accept="image/jpeg, image/jpg, image/png"
     >
@@ -34,8 +34,7 @@
 //例如：import 《组件名称》 from '《组件路径》';
 import { mapGetters } from "vuex";
 import { getBSPTree } from "@/api/libs/bsp";
-import { appAssemblyProjectCreate, appImageUpload } from "@/api/pro/manager";
-import { addObj as saveApp } from "@/api/pro/app";
+import { appAssemblyProjectCreate } from "@/api/pro/manager";
 export default {
   props: ["procedure", "dialog"],
   //注入依赖，调用this.reload();用于刷新页面
@@ -66,6 +65,11 @@ export default {
       this.imageUrl = "";
       this.$emit("closeDialog");
     },
+    reflush(loading) {
+      this.closeDialog();
+      loading.close();
+      this.reload();
+    },
     handleAvatarSuccess(res, file) {
       this.imageUrl = URL.createObjectURL(file.raw);
     },
@@ -80,12 +84,11 @@ export default {
       }
       return isJPG && isLt2M;
     },
-    appImageUploadFunc(param) {
+    appAssemblyProCreateFunc(param) {
       this.appImageFile = param.file;
     },
     onchange(file, fileList) {
       var _this = this;
-      // console.log("file", file);
       var event = event || window.event;
       if (
         event.target.files != null &&
@@ -108,8 +111,7 @@ export default {
         spinner: "el-icon-loading",
         background: "rgba(0, 0, 0, 0.7)"
       });
-
-      let appDirPath = {};
+      let allMessage = {};
       getBSPTree().then(Response => {
         let bsp = Response.data.data.find(item => {
           return item.id === this.procedure.bspId;
@@ -118,76 +120,31 @@ export default {
           return item.type === "11";
         });
         if (bsp != undefined && procedureXml != undefined) {
-          this.$set(appDirPath, "bspDirPath", bsp.filePath);
-          appAssemblyProjectCreate(
-            this.userInfo.username,
-            procedureXml.id,
-            appDirPath
-          )
+          this.$set(allMessage, "userName", this.userInfo.username);
+          this.$set(allMessage, "procedureXmlId", procedureXml.id);
+          this.$set(allMessage, "bspDirPath", bsp.filePath);
+          if (this.localDeploymentPlan) {
+            this.$set(allMessage, "localDeploymentPlan", "0");
+          } else {
+            this.$set(allMessage, "localDeploymentPlan", "1");
+          }
+          let params = new FormData();
+          params.append("file", this.appImageFile);
+          params.append("allMessage", JSON.stringify(allMessage));
+          appAssemblyProjectCreate(params)
             .then(Response => {
-              if (Response.data.data != null) {
-                let app = Response.data.data;
-                let params = new FormData();
-                params.append("file", this.appImageFile);
-                params.append("appJSON", JSON.stringify(app));
-                appImageUpload(params)
-                  .then(Response => {
-                    let appRecord = Response.data.data;
-                    if (appRecord != null) {
-                      if (this.localDeploymentPlan) {
-                        this.$set(appRecord, "localDeploymentPlan", "0");
-                      } else {
-                        this.$set(appRecord, "localDeploymentPlan", "1");
-                      }
-                      saveApp(appRecord)
-                        .then(saveAppBoolean => {
-                          if (saveAppBoolean.data.data != null) {
-                            this.$message({
-                              showClose: true,
-                              message: "生成App组件工程成功",
-                              type: "success"
-                            });
-                          } else {
-                            this.$message({
-                              showClose: true,
-                              message: "保存APP数据库记录失败。",
-                              type: "error"
-                            });
-                          }
-                        })
-                        .catch(() => {
-                          this.$message({
-                            showClose: true,
-                            message: "保存APP数据库记录失败。",
-                            type: "error"
-                          });
-                          this.closeDialog();
-                          loading.close();
-                          this.reload();
-                        });
-                    } else {
-                      this.$message({
-                        showClose: true,
-                        message: "保存组件图片失败。",
-                        type: "error"
-                      });
-                    }
-                  })
-                  .catch(() => {
-                    this.closeDialog();
-                    loading.close();
-                    this.reload();
-                  });
-              }
-              this.closeDialog();
-              loading.close();
-              this.reload();
+              this.reflush(loading);
             })
-            .catch(() => {
-              this.closeDialog();
-              loading.close();
-              this.reload();
+            .catch(error => {
+              this.reflush(loading);
             });
+        } else {
+          this.$message({
+            showClose: true,
+            message: "已选择bsp失效，请重新选择bsp。",
+            type: "error"
+          });
+          this.reflush(loading);
         }
       });
     }

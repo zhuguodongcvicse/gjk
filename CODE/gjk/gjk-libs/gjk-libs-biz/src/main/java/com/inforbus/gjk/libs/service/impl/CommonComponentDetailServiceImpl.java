@@ -100,7 +100,7 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 					continue;
 				}
 				if (originalFile.isDirectory()) {
-					FileUtil.copyDir(originalFileName, gitFilePath + detail.getFilePath() + detail.getFileName());
+					FileUtil.copyFile(originalFileName, gitFilePath + detail.getFilePath() + detail.getFileName());
 				} else {
 					FileUtil.copyFile(originalFileName, gitFilePath + detail.getFilePath());
 				}
