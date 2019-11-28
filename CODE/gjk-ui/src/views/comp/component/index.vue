@@ -131,7 +131,8 @@ import {
   delObj,
   getCompDict,
   importCompZipUpload,
-  analysisXmlFile
+  analysisXmlFile,
+  isSelectLibs
 } from "@/api/comp/component";
 import { getBaseTemplate } from "@/api/admin/basetemplate";
 import { getStructTree } from "@/api/libs/structlibs";
@@ -413,8 +414,15 @@ export default {
       this.$refs.crud.rowDel(row, index);
     },
     storageApply(row, index) {
-      this.storageApplyDialog = true;
-      this.compItemMsg = row;
+        isSelectLibs(row.id).then(response => {
+            let res = response.data.data;
+            if(res){
+                this.$message.warning(res)
+                return
+            }
+            this.storageApplyDialog = true;
+            this.compItemMsg = row;
+        });
     },
     rowDel: function(row, index) {
       var _this = this;
