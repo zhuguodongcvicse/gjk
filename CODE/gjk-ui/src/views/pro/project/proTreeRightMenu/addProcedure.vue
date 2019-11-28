@@ -42,6 +42,11 @@ export default {
           iscallback = true;
           return callback(new Error("流程名已存在，请重新输入。"));
         }
+        if (/^[0-9a-zA-Z-_()\u4e00-\u9fa5]{1,32}$/.test(value) == false) {
+          return callback(
+            "请输入正确的流程名,流程名最少1个字符,最多32个字符,可包含汉字、字母、数字、—、_、()"
+          );
+        }
       }
       if (!iscallback) {
         return callback();
