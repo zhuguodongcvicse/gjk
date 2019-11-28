@@ -22,7 +22,9 @@
             icon="el-icon-edit el-icon--left"
             size="small"
             @click="goToAddCompPage()"
-          >新增</el-button><!-- @click="templateData.templateVisible = true" --> <!-- @click="goToAddCompPage()" -->
+          >新增</el-button>
+          <!-- @click="templateData.templateVisible = true" -->
+          <!-- @click="goToAddCompPage()" -->
           <!-- <el-button size="small">
             <i class="el-icon-download el-icon--left"></i>导出
           </el-button>-->
@@ -43,6 +45,15 @@
                 plain
                 @click="handleCopy(scope.row,scope.index)"
               >复制</el-button>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="复制" placement="top">
+              <el-button
+                type="primary"
+                v-if="permissions.comp_component_edit"
+                size="mini"
+                plain
+                @click="handleShow(scope.row,scope.index)"
+              >查看</el-button>
             </el-tooltip>
             <el-tooltip class="item" effect="dark" content="编辑" placement="top">
               <el-button
@@ -131,7 +142,8 @@ import {
   delObj,
   getCompDict,
   importCompZipUpload,
-  analysisXmlFile
+  analysisXmlFile,
+  isSelectLibs
 } from "@/api/comp/component";
 import { getBaseTemplate } from "@/api/admin/basetemplate";
 import { getStructTree } from "@/api/libs/structlibs";
@@ -354,6 +366,7 @@ export default {
       this.tableLoading = true;
       fetchList(this.listQuery).then(response => {
         this.tableData = response.data.data.records;
+        console.log("cxcxcx", this.tableData);
         this.page.total = response.data.data.total;
         this.tableLoading = false;
       });
@@ -409,12 +422,32 @@ export default {
         });
       });
     },
+    handleShow(row, index) {
+      this.$store.dispatch("setFetchStrInPointer");
+      //加载中英文映射
+      this.$store.dispatch("setChineseMapping", "comp_param_type").then(() => {
+        //加载结构体
+        this.$store.dispatch("setStruceType").then(() => {
+          this.$router.push({
+            path: "/comp/showComp/addAndEditComp",
+            query: { compId: row.id, type: "view", proFloName: "查看构件" }
+          });
+        });
+      });
+    },
     handleDel(row, index) {
       this.$refs.crud.rowDel(row, index);
     },
     storageApply(row, index) {
-      this.storageApplyDialog = true;
-      this.compItemMsg = row;
+        isSelectLibs(row.id).then(response => {
+            let res = response.data.data;
+            if(res){
+                this.$message.warning(res)
+                return
+            }
+            this.storageApplyDialog = true;
+            this.compItemMsg = row;
+        });
     },
     rowDel: function(row, index) {
       var _this = this;

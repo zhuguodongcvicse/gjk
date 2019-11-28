@@ -239,9 +239,21 @@ export default [{
             title: '机箱编辑'
         }
     }]
-},
-
-{
+},{
+    path: '/libs/commoncomponent',
+    component: Layout,
+    redirect: '/libs/commoncomponent/index',
+    children: [{
+        path: 'batchExportList',
+        name: 'batchExportList',
+        component: () =>
+            import( /* webpackChunkName: "page" */ '@/views/libs/commoncomponent/batchExportList'),
+        meta: {
+            // $keepAlive: true,
+            title: '申请列表'
+        }
+    }]
+},{
     path: '/admin/basetemplate12',
     name: "基础模板管理",
     component: Layout,
@@ -264,6 +276,35 @@ export default [{
         },
     ]
 
-},
+},{
+    path: '/libs/approval',
+    name: "审批管理",
+    component: Layout,
+    //component: basetemplate,
+    //redirect: '/wel/index',
+    children: [
+        {
+            path: 'applyDetail',
+            name: 'applyDetail',
+            component: () =>
+                import( /* webpackChunkName: "page" */ '@/views/libs/approval/applyDetail'),
+            meta: {
+                // $keepAlive: true,
+                title: '审批详情'
+            }
+        },
+    ]
+
+}
+// ,{
+//     path: 'applyDetail',
+//     name: 'applyDetail',
+//     component: () =>
+//         import( /* webpackChunkName: "page" */ '@/views/libs/commoncomponent/applyDetail'),
+//     meta: {
+//         // $keepAlive: true,
+//         title: '审批详情'
+//     }
+// },
 
 ]

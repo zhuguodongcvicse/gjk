@@ -7,11 +7,11 @@
     size="mini"
   >
     <el-form-item label="文件选择" v-if="show">
-      <files-upload ref="saveFiles" v-model="filesPath" @save-leftData="saveLeftData"></files-upload>
+      <files-upload ref="saveFiles" v-model="filesPath" :disabled="disabled" @save-leftData="saveLeftData"></files-upload>
     </el-form-item>
     <el-form-item label="所属分支" v-if="show">
       <el-col :span="13">
-        <el-input v-model="algorithm" :placeholder="tigPlaceholder"></el-input>
+        <el-input v-model="algorithm" :placeholder="tigPlaceholder" :disabled="disabled"></el-input>
       </el-col>
       <el-col :span="11">
         <!-- 弹出框 -->
@@ -65,7 +65,7 @@ import { randomLenNum, randomUuid, deepClone } from "@/util/util";
 // import { connect } from 'http2';
 export default {
   //import引入的组件需要注入到对象中才能使用
-  props: ["comp", "fileType", "show", "fileLists"],
+  props: ["comp", "fileType", "show", "fileLists","disabled"],
   components: {
     "icon-choose": iconchoose,
     "files-upload": filesUpload

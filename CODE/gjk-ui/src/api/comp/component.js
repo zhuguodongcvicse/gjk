@@ -1,3 +1,4 @@
+
 /*
  *    Copyright (c) 2018-2025, inforbus All rights reserved.
  *
@@ -185,5 +186,20 @@ export function checkComp(obj){
     method:"post",
     url:"/comp/component/checkComp",
     data:obj
+  })
+}
+export function compByUserId(userId){
+  return request({
+    method:"post",
+    url:"/comp/component/compByUserId",
+    params:{
+      userId:userId
+    }
+  })
+}
+export function isSelectLibs(compId) {
+  return request({
+    url: '/comp/component/isSelectLibs/' + compId,
+    method: 'get'
   })
 }

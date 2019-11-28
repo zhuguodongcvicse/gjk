@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import com.inforbus.gjk.common.core.entity.CompStruct;
 import com.inforbus.gjk.common.core.entity.Structlibs;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
+import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.libs.api.dto.CompTree;
 import com.inforbus.gjk.libs.api.entity.CommonComponent;
 import com.inforbus.gjk.libs.api.entity.CommonComponentDetail;
@@ -32,6 +33,7 @@ import com.inforbus.gjk.libs.api.vo.CompVO;
 import com.inforbus.gjk.libs.api.vo.TreeUtil;
 import com.inforbus.gjk.libs.mapper.CommonComponentMapper;
 import com.inforbus.gjk.libs.mapper.StructlibsMapper;
+import com.inforbus.gjk.libs.service.BatchApprovalService;
 import com.inforbus.gjk.libs.service.CommonComponentService;
 
 import java.io.BufferedInputStream;
@@ -80,6 +82,9 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 
 	@Autowired
 	private StructlibsMapper structlibsMapper;
+
+	@Autowired
+	private BatchApprovalService batchApprovalService;
 
 	/**
 	 * 公共构件库详细表简单分页查询
@@ -459,6 +464,20 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 	public IPage<CommonComponent> getCompListByStringAndLibsId(Page page, List<String> libsList,
 			List<String> selectStringList) {
 		return baseMapper.getCompListByStringAndLibsId(page, libsList, selectStringList);
+	}
+
+	public IPage<CommonComponent> findPageByBatchApprovalId(Page page, String applyId){
+		R componentByApplyId = batchApprovalService.getComponentByApplyId(applyId);
+		List<CommonComponent> data = (List<CommonComponent>) componentByApplyId.getData();
+		page.setTotal(data.size());
+		ArrayList<CommonComponent> commonComponents = Lists.newArrayList();
+		for (int i = 0; i < page.getSize(); i++) {
+			if(data.size() > (int) ((page.getCurrent() - 1) * page.getSize()) + i) {
+				commonComponents.add(data.get((int) ((page.getCurrent() - 1) * page.getSize()) + i));
+			}
+		}
+		page.setRecords(commonComponents);
+		return page;
 	}
 
 }

@@ -146,6 +146,15 @@ public interface ComponentDetailService extends IService<ComponentDetail> {
 	 * @param bean
 	 */
 	void delFilePath(List<String> lists);
+	/**
+	 * @Title: moveNioFile
+	 * @Description: 拷贝文件
+	 * @Author xiaohe
+	 * @DateTime 2019年7月17日 下午4:36:28
+	 * @param source
+	 * @param destin
+	 */
+	R moveNioFile(String source, String destin);
 	
 	/**
 	 * 根据树节点的构件库详细信息的id查找文件路径

@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container pull-auto libs_commoncomponent_index_14s">
+  <div>
     <basic-container v-loading="loading">
       <avue-crud
         ref="crud"
@@ -13,110 +13,12 @@
         @row-update="handleUpdate"
         @row-save="handleSave"
         @row-del="rowDel"
-        @selection-change="selectionChange"
       >
-        <!-- <template slot="menuLeft">
-          <el-button
-            type="primary"
-            @click="handleAdd"
-            size="small"
-            icon="el-icon-plus"            v-if="permissions.libs_commoncomponent_add"
-          >新 增</el-button>
-          <br>
-          <br>
-        </template>-->
-        <template slot="menuLeft">
-          <el-form :inline="true">
-            <el-form-item label="筛选:">
-              <select-tree :treeData="screenLibsTreeData" multiple :id.sync="screenLibsSelectArray"></select-tree>
-            </el-form-item>
-           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <el-form-item label="搜索:">
-              <el-input v-model="selectString" size="mini"></el-input>
-            </el-form-item>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-             <el-form-item label>
-              <el-button type="primary" @click="exportCompFunc">导出申请</el-button>
-            </el-form-item>
-             <el-form-item label>
-              <el-button type="primary" @click="vatchExportList">申请列表</el-button>
-            </el-form-item>
-          </el-form>
-          <!-- <el-button type="primary" size="mini" plain @click="showScreen">筛选</el-button> -->
-        </template>
-
-        <template slot="version" slot-scope="scope">
-          <el-tag>v{{scope.row.version}}</el-tag>&nbsp;&nbsp;&nbsp;&nbsp;
-          <el-button
-            icon="el-icon-star-on"
-            circle
-            v-if="scope.row.version!='1.0'&&isShowHistoricVersion===true"
-            size="mini"
-            @click="showAllVersion(scope.row)"
-          ></el-button>
-        </template>
         <template slot-scope="scope" slot="menu">
           <el-button type="primary" size="small" plain @click="handleEdit(scope.row,scope.index)">查看</el-button>
-          <!-- <el-button
-            type="primary"
-            v-if="permissions.libs_commoncomponent_edit"
-            size="small"
-            plain
-            @click="handleEdit(scope.row,scope.index)"
-          >编辑</el-button>
-          <el-button
-            type="danger"
-            v-if="permissions.libs_commoncomponent_del"
-            size="small"
-            plain
-            @click="handleDel(scope.row,scope.index)"
-          >删除</el-button>-->
         </template>
       </avue-crud>
-      <el-dialog
-        title="所有历史版本如下："
-        :visible.sync="showAllVersionDia"
-        width="60%"
-        :modal-append-to-body="false"
-        :before-close="dialogBeforeClose"
-        class="libs_commoncomponent_index_dialog_14s"
-      >
-        <div>
-          <avue-crud
-            ref="versionCrud"
-            :data="allVersionTableData"
-            :option="tableHisOption"
-            @selection-change="versionSelectionChange"
-          >
-            <template slot="version" slot-scope="scope">
-              <el-tag>v{{scope.row.version}}</el-tag>
-            </template>
-          </avue-crud>
-        </div>
-      </el-dialog>
-      <storage-apply
-      :dialog="storageApplyDialog"
-      @storageApplyDialogState="storageApplyDialogState"
-      :component="exportCompList">
-      </storage-apply>
     </basic-container>
-    <!-- <el-dialog title="筛选" :visible.sync="screenDia" width="width" :before-close="dialogBeforeClose">
-      <div>
-        <el-form ref="form" :model="form" label-width="80px">
-          <el-form-item label="算法：">
-            <select-tree :treeData="algorithmTreeData" multiple :id.sync="algorithmSelectArray"></select-tree>
-          </el-form-item>
-          <el-form-item label="测试：">
-            <select-tree :treeData="testTreeData" multiple :id.sync="testSelectArray"></select-tree>
-          </el-form-item>
-          <avue-crud
-            :data="screenTableData"
-            :table-loading="tableLoading"
-            :option="screenCompOption"
-          ></avue-crud>
-        </el-form>
-      </div>
-    </el-dialog>-->
   </div>
 </template>
 
@@ -132,11 +34,12 @@ import {
   getCompView,
   getCompListByString,
   getCompListByStringAndLibsId,
-  createZipFile
+  createZipFile,
+  findPageByBatchApprovalId
 } from "@/api/libs/commoncomponent";
 import { fetchAlgorithmTree } from "@/api/admin/algorithm";
 import { fetchTestTree } from "@/api/admin/test";
-import { tableOption } from "@/const/crud/libs/commoncomponent";
+import { tableOption } from "@/const/crud/libs/componentList";
 // import { screenCompOption } from "@/const/crud/libs/screenComp";
 import { mapGetters } from "vuex";
 import selectTree from "@/views/pro/project/selectTree";
@@ -194,12 +97,17 @@ export default {
     "select-tree": selectTree,
     "storage-apply": storageApply
   },
+  props: [
+    "batchId"
+  ],
   computed: {
     ...mapGetters(["permissions"])
   },
   created() {
     this.loading = true;
+    console.log("this.getList()前",this.batchId)
     this.getList();
+    console.log("this.getList()后",this.batchId)
     this.getLibsTree();
     this.loading = false;
     this.tableHisOption = JSON.parse(JSON.stringify(this.tableOption))
@@ -207,6 +115,10 @@ export default {
   },
   mounted: function() {},
   watch: {
+    batchId(batchId) {
+      console.log("batchIdbatchId****************", batchId);
+      // this.getTableData();
+    },
     screenLibsSelectArray() {
       console.log("screenLibsSelectArray", this.screenLibsSelectArray);
       this.getTableData();
@@ -362,7 +274,10 @@ export default {
       this.tableLoading = true;
       let page = JSON.parse(JSON.stringify(this.listQuery));
       this.$set(page, "version", "max");
-      fetchList(page).then(response => {
+      console.log(22,this.batchId)
+      this.$set(page, "applyId", this.batchId);
+      console.log(page)
+      findPageByBatchApprovalId(page).then(response => {
         this.tableData = response.data.data.records;
         this.page.total = response.data.data.total;
         this.tableLoading = false;

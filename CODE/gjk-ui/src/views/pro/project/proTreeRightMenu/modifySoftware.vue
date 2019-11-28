@@ -53,30 +53,7 @@ export default {
   //import引入的组件需要注入到对象中才能使用
   components: {},
   data() {
-    //这里存放数据
-    return {
-      form: {
-        softwareSelectString: []
-      },
-      softwareTreeData: [],
-      selectPlatformStrList: [],
-
-      rules: {
-        softwareSelectString: [
-          {
-            required: true,
-            message: "请至少选择一个软件框架",
-            trigger: "change"
-          }
-        ]
-      }
-    };
-  },
-  //监听属性 类似于data概念
-  computed: {},
-  //监控data中的数据变化
-  watch: {
-    "form.softwareSelectString"() {
+    var changeSelectArr = (rule, value, callback) => {
       let length = this.form.softwareSelectString.length;
       this.selectPlatformStrList = [];
       if (length > 0) {
@@ -87,13 +64,41 @@ export default {
           });
           this.changeSelectArray(software);
         }
+        let newArr = [];
+        for (let selectItem of this.selectPlatformStrList) {
+          let flag = true;
+          for (let str of newArr) {
+            if (str == selectItem.softwareId) {
+              flag = false;
+            }
+          }
+          if (flag) {
+            newArr.push(selectItem.softwareId);
+          }
+        }
+        this.form.softwareSelectString = newArr;
       }
-      console.log(
-        "******************",
-        JSON.stringify(this.selectPlatformStrList)
-      );
-    }
+      console.log("*****", JSON.stringify(this.selectPlatformStrList));
+    };
+    //这里存放数据
+    return {
+      form: {
+        softwareSelectString: []
+      },
+      softwareTreeData: [],
+      selectPlatformStrList: [],
+
+      rules: {
+        softwareSelectString: [
+          { validator: changeSelectArr, trigger: "change" }
+        ]
+      }
+    };
   },
+  //监听属性 类似于data概念
+  computed: {},
+  //监控data中的数据变化
+  watch: {},
   //方法集合
   methods: {
     dialogBeforeClose() {
@@ -104,7 +109,6 @@ export default {
     },
     changeSelectArray(software) {
       let platformNameArr = software.description.split(";");
-
       for (let str of platformNameArr) {
         if (str !== "") {
           let selectItem = this.selectPlatformStrList.find(select => {
@@ -113,16 +117,17 @@ export default {
           if (selectItem !== undefined) {
             if (selectItem.softwareId !== "") {
               let oldId = selectItem.softwareId;
+              selectItem.softwareId = software.id;
               if (oldId !== software.id) {
+                let newArray = [];
                 for (let select of this.selectPlatformStrList) {
-                  if (select.softwareId === oldId) {
-                    let index = this.selectPlatformStrList.indexOf(select);
-                    this.$delete(this.selectPlatformStrList, index);
+                  if (select.softwareId !== oldId) {
+                    newArray.push(select);
                   }
                 }
+                this.selectPlatformStrList = newArray;
               }
             }
-            selectItem.softwareId = software.id;
           } else {
             let i = { platformName: str, softwareId: software.id };
             this.selectPlatformStrList.push(i);

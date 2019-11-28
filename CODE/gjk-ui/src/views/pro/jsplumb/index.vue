@@ -8,12 +8,12 @@
         </el-input>
         <el-button-group>
           <el-button type="primary" plain size="small" @click="sendMessage('save')">保存</el-button>
-<!--          <el-button-->
-<!--            type="primary"-->
-<!--            plain-->
-<!--            size="small"-->
-<!--            @click="bottonCheckComp = !bottonCheckComp"-->
-<!--          >{{bottonCheckComp?'检查更新':'还原'}}</el-button>-->
+         <el-button
+          type="primary"
+          plain
+          size="small"
+          @click="bottonCheckComp = !bottonCheckComp"
+         >{{bottonCheckComp?'检查更新':'还原'}}</el-button>
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('completeCheck')">完备性检查</el-button> -->
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('loading')">加载</el-button> -->
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('simulation')">仿真</el-button> -->

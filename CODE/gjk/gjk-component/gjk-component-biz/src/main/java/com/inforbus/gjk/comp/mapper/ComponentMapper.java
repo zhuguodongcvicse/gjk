@@ -19,6 +19,9 @@ package com.inforbus.gjk.comp.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.inforbus.gjk.admin.api.entity.GjkAlgorithm;
+import com.inforbus.gjk.admin.api.entity.GjkPlatform;
+import com.inforbus.gjk.admin.api.entity.GjkTest;
 import com.inforbus.gjk.common.core.entity.Structlibs;
 import com.inforbus.gjk.comp.api.entity.Component;
 import com.inforbus.gjk.comp.api.entity.ComponentDetail;
@@ -216,4 +219,25 @@ public interface ComponentMapper extends BaseMapper<Component> {
 	 * @return
 	 */
 	Structlibs getStructlibsById(@Param("id") String id);
+
+	/**
+	 * 根据id获取未删除的平台库数据
+	 * @param id
+	 * @return
+	 */
+	GjkPlatform getPlatformByIdNotDelete(@Param("id") String id);
+
+	/**
+	 * 根据id获取未删除的测试库数据
+	 * @param id
+	 * @return
+	 */
+	GjkTest getTestByIdNotDelete(@Param("id") String id);
+
+	/**
+	 * 根据id获取未删除的算法库数据
+	 * @param id
+	 * @return
+	 */
+	GjkAlgorithm getAlgorithmByIdNotDelete(@Param("id") String id);
 }
