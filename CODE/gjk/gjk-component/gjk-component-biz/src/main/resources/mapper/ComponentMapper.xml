@@ -73,6 +73,40 @@
 		<result property="applyDesc" column="apply_desc" />
 	</resultMap>
 
+	<resultMap id="GjkAlgorithmMap" type="com.inforbus.gjk.admin.api.entity.GjkAlgorithm">
+		<id column="algorithm_id" property="algorithmId"/>
+		<result column="name" property="name"/>
+		<result column="permission" property="permission"/>
+		<result column="parent_id" property="parentId"/>
+		<result column="sort" property="sort"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="del_flag" property="delFlag"/>
+	</resultMap>
+
+	<resultMap id="GjkPlatformMap"
+			   type="com.inforbus.gjk.admin.api.entity.GjkPlatform">
+		<id column="platform_id" property="platformId" />
+		<result column="name" property="name" />
+		<result column="permission" property="permission" />
+		<result column="parent_id" property="parentId" />
+		<result column="sort" property="sort" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="del_flag" property="delFlag" />
+	</resultMap>
+
+	<resultMap id="GjkTestMap" type="com.inforbus.gjk.admin.api.entity.GjkTest">
+		<id column="test_id" property="testId"/>
+		<result column="name" property="name"/>
+		<result column="permission" property="permission"/>
+		<result column="parent_id" property="parentId"/>
+		<result column="sort" property="sort"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="del_flag" property="delFlag"/>
+	</resultMap>
+
 	<sql id="componentSql">
 		id,
 		comp_id,
@@ -417,5 +451,23 @@
 		SELECT *
 		FROM gjk_structlibs
 		WHERE id=#{id}
+	</select>
+
+	<select id="getTestByIdNotDelete" resultMap="GjkTestMap">
+		SELECT *
+		FROM gjk_test
+		WHERE test_id=#{id} and del_flag=0
+	</select>
+
+	<select id="getPlatformByIdNotDelete" resultMap="GjkPlatformMap">
+		SELECT *
+		FROM gjk_platform
+		WHERE platform_id=#{id} and del_flag=0
+	</select>
+
+	<select id="getAlgorithmByIdNotDelete" resultMap="GjkAlgorithmMap">
+		SELECT *
+		FROM gjk_algorithm
+		WHERE algorithm_id=#{id} and del_flag=0
 	</select>
 </mapper>
