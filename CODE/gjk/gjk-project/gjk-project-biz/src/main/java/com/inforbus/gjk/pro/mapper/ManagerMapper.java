@@ -3,6 +3,7 @@ package com.inforbus.gjk.pro.mapper;
 import java.util.List;
 import java.util.Map;
 
+import com.inforbus.gjk.admin.api.entity.BSP;
 import com.inforbus.gjk.pro.api.entity.*;
 import org.apache.ibatis.annotations.Param;
 
@@ -172,4 +173,26 @@ public interface ManagerMapper extends BaseMapper<ProjectFile> {
      * @return
      */
     List<GjkPlatform> getPlatformList();
+
+	/**
+	 * 得到BSP库列表
+	 *
+	 * @return
+	 */
+	List<BSP> getAllBSPList();
+
+	/**
+	 * 根据bsp库ID得到平台库列表
+	 *
+	 * @param id
+	 * @return
+	 */
+	List<GjkPlatform> getAllPlatformListByBSPId(@Param("id") String id);
+
+	/**
+	 * 根据多个ID查询数据列表
+	 * @param ids
+	 * @return
+	 */
+	List<BSP> getAllBSPListByIdIn(@Param("ids") String ids);
 }

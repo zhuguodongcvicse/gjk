@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.Set;
 
@@ -14,141 +15,94 @@ public class FileUtil {
 
 	/**
 	 * 将文件夹下所有子文件及子文件夹拷贝到指定文件夹下
-	 * 
+	 *
 	 * @param filePath       需要拷贝的文件夹
 	 * @param targetFilePath 指定文件夹目录
 	 * @return
 	 * @throws IOException
 	 */
-	public boolean copyDir(String filePath, String targetFilePath) throws IOException {
+	public boolean copyFile(String filePath, String targetFilePath) throws IOException {
 		File file = new File(filePath);
 		File targetFile = new File(targetFilePath);
-		// 判断目标文件夹是否存在，若不存在，则创建文件夹
-		if (!targetFile.exists()) {
-			targetFile.mkdirs();
-		}
 
-		String[] fileListPaths = null;
-		if (file.exists()) {
-			// 若文件存在，则获取文件名称列表
-			fileListPaths = file.list();
-		} else {
+		if (!file.exists()) {
+			System.out.println("源文件不存在,请检查源文件");
 			return false;
 		}
 
-		for (String fileName : fileListPaths) {
-			if ((new File(filePath + File.separator + fileName)).isDirectory()) {
-				copyDir(filePath + File.separator + fileName, targetFilePath + File.separator + fileName);
-			} else if ((new File(filePath + File.separator + fileName)).isFile()) {
-				copyFile(filePath + File.separator + fileName, targetFilePath + File.separator);
+		// 判断目标文件夹是否存在，若不存在，则创建文件夹
+		if (!targetFile.exists()) {
+			targetFile.mkdirs();
+			System.out.println("我创建了" + targetFile.getAbsolutePath());
+		}
+
+		if (file.isFile()) {
+			copyFile(filePath, targetFilePath, file.getName());
+		} else {
+			String[] fileListPaths = null;
+			if (file.exists()) {
+				// 若文件存在，则获取文件名称列表
+				fileListPaths = file.list();
+			} else {
+				return false;
+			}
+
+			for (String fileName : fileListPaths) {
+				File newFile = new File(filePath + File.separator + fileName);
+				if (newFile.isDirectory()) {
+					copyFile(newFile.getAbsolutePath(), targetFilePath + File.separator + fileName);
+				} else {
+					copyFile(newFile.getAbsolutePath(), targetFilePath);
+				}
 			}
 		}
+
 		return true;
 	}
 
 	/**
 	 * 将文件拷贝到指定的文件夹下
-	 * 
+	 *
 	 * @param filePath       需要拷贝的文件
 	 * @param targetFilePath 指定的文件夹
-	 * @return
-	 * @throws IOException
-	 */
-	public String copyFile(String filePath, String targetFilePath) throws IOException {
-		FileInputStream inputStream = null;
-		FileOutputStream outputStream = null;
-		try {
-			File file = new File(filePath);
-			File targetFile = new File(targetFilePath);
-			if (!targetFile.exists()) {
-				targetFile.mkdirs();
-			}
-			targetFilePath += File.separator + file.getName();
-			targetFile = new File(targetFilePath);
-
-			if (targetFile.exists()) {
-				targetFile.delete();
-			}
-
-			inputStream = new FileInputStream(file);
-			outputStream = new FileOutputStream(targetFile);
-
-			if (file.exists()) {
-				byte[] buffer = new byte[2048];
-				while (true) {
-					int len = inputStream.read(buffer);
-
-					if (len == -1) {
-						break;
-					} else {
-						outputStream.write(buffer, 0, len);
-					}
-				}
-			}
-		} finally {
-			if (inputStream != null) {
-				inputStream.close();
-			}
-			if (outputStream != null) {
-				outputStream.close();
-			}
-		}
-		return targetFilePath;
-	}
-
-	/**
-	 * 将文件拷贝到指定的文件夹下指定的文件
-	 * 
-	 * @param filePath       需要拷贝的文件
-	 * @param targetFilePath 指定的文件夹
+	 * @param targetFilePath 指定文件名
 	 * @return
 	 * @throws IOException
 	 */
 	public String copyFile(String filePath, String targetFilePath, String fileName) throws IOException {
-		FileInputStream inputStream = null;
-		FileOutputStream outputStream = null;
+		FileChannel in = null;
+		FileChannel out = null;
+
+		File sourcePath = new File(filePath);
+		File destinPath = new File(targetFilePath);
+
+		if (!destinPath.exists()) {
+			destinPath.mkdirs();
+		}
+
 		try {
-			File file = new File(filePath);
-			File targetFile = new File(targetFilePath);
-			if (!targetFile.exists()) {
-				targetFile.mkdirs();
-			}
-			targetFilePath += File.separator + fileName;
-			targetFile = new File(targetFilePath);
-
-			if (targetFile.exists()) {
-				targetFile.delete();
-			}
-
-			inputStream = new FileInputStream(file);
-			outputStream = new FileOutputStream(targetFile);
-
-			if (file.exists()) {
-				byte[] buffer = new byte[2048];
-				while (true) {
-					int len = inputStream.read(buffer);
-
-					if (len == -1) {
-						break;
-					} else {
-						outputStream.write(buffer, 0, len);
-					}
-				}
-			}
+			// 取得对应文件的通道
+			in = new FileInputStream(sourcePath).getChannel();
+			out = new FileOutputStream(destinPath + File.separator + fileName).getChannel();
+			// 连接两个通道，并从in通道读取，写入out中
+			in.transferTo(0, in.size(), out);
+		} catch (Exception e) {
+			throw e;
 		} finally {
-			if (inputStream != null) {
-				inputStream.close();
+			if (in != null) {
+				in.close();
 			}
-			if (outputStream != null) {
-				outputStream.close();
+			if (out != null) {
+				out.close();
 			}
 		}
+
 		return targetFilePath;
 	}
 
 	/**
 	 * 获取在指定文件路径下所有符合条件的文件的绝对路径的集合
-	 * 
+	 *
 	 * @param returnFilePathList
 	 * @param filePath
 	 * @param selectFileName
@@ -167,13 +121,13 @@ public class FileUtil {
 				}
 			}
 		} else {
-			System.out.println("传入路径错误，请联系管理员。");
+			System.out.println("传入路径错误，请联系管理员。" + filePath);
 		}
 	}
 
 	/**
 	 * 获取在指定文件路径下所有符合条件的文件的绝对路径的集合
-	 * 
+	 *
 	 * @param returnFilePathList
 	 * @param filePath
 	 * @param selectFileName
@@ -199,7 +153,7 @@ public class FileUtil {
 
 	/**
 	 * 获取在指定文件路径下所有符合条件的文件的绝对路径的集合
-	 * 
+	 *
 	 * @param returnFilePathList
 	 * @param filePath
 	 * @param selectFileNameList
@@ -213,7 +167,7 @@ public class FileUtil {
 
 	/**
 	 * 获取在指定文件路径下与搜索文件名相同的文件夹路径
-	 * 
+	 *
 	 * @param filePath
 	 * @param selectFileName
 	 * @return

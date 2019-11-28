@@ -61,7 +61,8 @@ export default {
       returnXmlEntityMap: null,
 
       //最终生成的xmlEntityMap的值
-      xmlEntityMap: {}
+      xmlEntityMap: {},
+      sysModelXmlMap: {}
     };
   },
   //监听属性 类似于data概念
@@ -84,6 +85,7 @@ export default {
       getSysConfigModelXml(this.$route.query.sysId).then(Response => {
         this.setCNENMapping(Response.data.data);
         this.xmlEntityMap = JSON.parse(JSON.stringify(Response.data.data));
+        this.sysModelXmlMap = JSON.parse(JSON.stringify(Response.data.data));
         this.xmlEntityMap.xmlEntityMaps = [];
         let coefXmlMap = null;
         let modelMap = null;
@@ -306,7 +308,19 @@ export default {
                           // );
                           if (index > 4 && item.msg == cmpXmlMap.lableName) {
                             flag = true;
-                            this.setXmlentityMapsByApiReturn(item, cmpXmlMap);
+                            this.selectXmlMapByLableNameOrLableType(
+                              this.sysModelXmlMap,
+                              item.msg,
+                              null,
+                              null
+                            );
+                            if (this.returnXmlEntityMap != null) {
+                              this.setXmlentityMapsByApiReturn(
+                                item,
+                                cmpXmlMap,
+                                this.returnXmlEntityMap
+                              );
+                            }
                           }
                         }
                         if (!flag) {
@@ -317,6 +331,7 @@ export default {
                   }
                 }
               }
+              this.setCNENMapping(cmpItem);
               this.setStrToCordId(cmpItem, cmpItem.coreNum);
             }
           }
@@ -325,20 +340,16 @@ export default {
       });
     },
 
-    setXmlentityMapsByApiReturn(item, xmlentityMap) {
+    setXmlentityMapsByApiReturn(item, xmlentityMap, modelMap) {
       let xmlEntityMaps = xmlentityMap.xmlEntityMaps;
-      if (item.data.length == xmlEntityMaps.length) {
-        this.setAttrByApiReturn(item, xmlEntityMaps);
-      } else {
-        if (xmlEntityMaps.length > 0) {
-          let itemData = JSON.parse(JSON.stringify(xmlEntityMaps[0]));
-          xmlEntityMaps = [];
-          for (let index in item.data) {
-            xmlEntityMaps.push(JSON.parse(JSON.stringify(itemData)));
-          }
-          this.setAttrByApiReturn(item, xmlEntityMaps);
-          xmlentityMap.xmlEntityMaps = xmlEntityMaps;
+      if (modelMap.xmlEntityMaps.length > 0) {
+        let itemData = JSON.parse(JSON.stringify(modelMap.xmlEntityMaps[0]));
+        xmlEntityMaps = [];
+        for (let index in item.data) {
+          xmlEntityMaps.push(JSON.parse(JSON.stringify(itemData)));
         }
+        this.setAttrByApiReturn(item, xmlEntityMaps);
+        xmlentityMap.xmlEntityMaps = xmlEntityMaps;
       }
     },
     setAttrByApiReturn(item, xmlEntityMaps) {

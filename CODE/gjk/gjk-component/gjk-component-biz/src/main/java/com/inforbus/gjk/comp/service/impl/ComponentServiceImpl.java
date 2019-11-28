@@ -22,6 +22,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.inforbus.gjk.admin.api.entity.GjkAlgorithm;
+import com.inforbus.gjk.admin.api.entity.GjkPlatform;
+import com.inforbus.gjk.admin.api.entity.GjkTest;
 import com.inforbus.gjk.common.core.entity.CompStruct;
 import com.inforbus.gjk.common.core.entity.Structlibs;
 import com.inforbus.gjk.common.core.entity.XmlEntity;
@@ -201,7 +204,8 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	 * @DateTime 2019年4月29日 上午11:37:04
 	 * @param compId 用户编号
 	 * @return
-	 * @see com.inforbus.gjk.comp.service.ComponentService#getCompByCompId(java.lang.String, boolean)
+	 * @see com.inforbus.gjk.comp.service.ComponentService#getCompByCompId(java.lang.String,
+	 *      boolean)
 	 */
 	@Override
 	public List<CompDetailVO> getCompByCompId(String compId, boolean isShowCompXml) {
@@ -347,7 +351,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		// 版本集合
 		List<Double> versions = new ArrayList<Double>();
 		// 获取所有编号的构件集合
-		if(compIdList.size()>0) {
+		if (compIdList.size() > 0) {
 			List<Component> compList = baseMapper.checkComp(compIdList);
 			for (Map.Entry<String, String> entry : compIdMap.entrySet()) {
 				for (Component comp : compList) {
@@ -371,7 +375,6 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 				versions.clear();
 			}
 		}
-		
 
 		maps.put("dtos", dtos);
 		maps.put("xmls", xmlMap);
@@ -714,15 +717,15 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 					compDetails.add((ComponentDetail) obj);
 				}
 			} else if ("gjk_structlibs".equals(tableName)) {
-                className = "com.inforbus.gjk.common.core.entity.Structlibs";
-                for (Object obj : parseSheet(sheet, className)) {
-                    structlibsList.add((Structlibs) obj);
-                }
-            } else if ("gjk_comp_struct".equals(tableName)) {
-                className = "com.inforbus.gjk.common.core.entity.CompStruct";
-                for (Object obj : parseSheet(sheet, className)) {
-                    compStructList.add((CompStruct) obj);
-                }
+				className = "com.inforbus.gjk.common.core.entity.Structlibs";
+				for (Object obj : parseSheet(sheet, className)) {
+					structlibsList.add((Structlibs) obj);
+				}
+			} else if ("gjk_comp_struct".equals(tableName)) {
+				className = "com.inforbus.gjk.common.core.entity.CompStruct";
+				for (Object obj : parseSheet(sheet, className)) {
+					compStructList.add((CompStruct) obj);
+				}
 			}
 		}
 		workbook.close();
@@ -766,7 +769,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			// 保存构件和结构体关系
 			List<CompStruct> compStructSubList = new ArrayList<>();
 			for (CompStruct item : compStructList) {
-				if(item.getCompId().equals(comp.getId())){
+				if (item.getCompId().equals(comp.getId())) {
 					compStructSubList.add(item);
 				}
 			}
@@ -777,14 +780,14 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			String newFilePath = compDetailPath + "gjk" + File.separator + "component" + File.separator
 					+ comp.getCompName() + File.separator + comp.getVersion() + File.separator;
 
-			FileUtil.copyDir(beforeFilePath, newFilePath);
+			FileUtil.copyFile(beforeFilePath, newFilePath);
 			compList.add(this.getById(comp.getId()));
 		}
 
 		// 遍历结构体structlibs
 		for (Structlibs item : structlibsList) {
 			// 判断是否存在
-			if(baseMapper.getStructlibsById(item.getId()) != null){
+			if (baseMapper.getStructlibsById(item.getId()) != null) {
 				continue;
 			}
 			baseMapper.saveStructlibs(item);
@@ -896,14 +899,14 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			PropertyDescriptor pd = new PropertyDescriptor(fieldName, clazz);
 			Method wM = pd.getWriteMethod();// 获得写方法
 
-            // 判断字段类型 转换类型
-            if(pd.getPropertyType().getName().indexOf("Double") > -1){
-                value = Double.valueOf((String)value);
-            }else if(pd.getPropertyType().getName().indexOf("Integer") > -1){
-                value = Integer.valueOf((String)value);
-            }
+			// 判断字段类型 转换类型
+			if (pd.getPropertyType().getName().indexOf("Double") > -1) {
+				value = Double.valueOf((String) value);
+			} else if (pd.getPropertyType().getName().indexOf("Integer") > -1) {
+				value = Integer.valueOf((String) value);
+			}
 
-            wM.invoke(o, value);
+			wM.invoke(o, value);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -966,6 +969,51 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		this.rabbitmqTemplate.convertAndSend(token, "lcjm" + "===@@@===" + consoleStr);
 		maps.put("compUpdate", compUpdate);
 		return maps;
+	}
+
+	/**
+	 * 判断选择的库目录文件是否存在
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@Override
+	public String isSelectLibs(String id) {
+		String res = "";
+		List<ComponentDetail> componentDetailList = compDetailMapper.listCompDetailByCompId(id);
+		for (ComponentDetail componentDetail : componentDetailList) {
+			// 过虑库目录id为空的数据
+			if (StringUtils.isBlank(componentDetail.getLibsId())) {
+				continue;
+			}
+			// 判断平台库数据是否存在
+			if (componentDetail.getFileType().equals("platformfile")) {
+				GjkPlatform platform = baseMapper.getPlatformByIdNotDelete(componentDetail.getLibsId());
+				if (platform == null) {
+					res += "平台文件、";
+				}
+			}
+			// 判断算法库数据是否存在
+			else if (componentDetail.getFileType().equals("algorithmfile")) {
+				GjkAlgorithm algorithm = baseMapper.getAlgorithmByIdNotDelete(componentDetail.getLibsId());
+				if (algorithm == null) {
+					res += "算法文件、";
+				}
+			}
+			// 判断测试库数据是否存在
+			else if (componentDetail.getFileType().equals("testfile")) {
+				GjkTest test = baseMapper.getTestByIdNotDelete(componentDetail.getLibsId());
+				if (test == null) {
+					res += "测试文件、";
+				}
+			}
+		}
+
+		if (res.length() > 0) {
+			res = res.substring(0, res.length() - 1);
+			res = "选择的" + res + "不存在";
+		}
+		return res;
 	}
 
 }
