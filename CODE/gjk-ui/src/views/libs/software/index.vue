@@ -453,7 +453,7 @@ export default {
       fetchList(this.listQuery).then(response => {
         console.log("total:::", response);
         this.tableData = response.data.data.records;
-        this.page.total = response.data.data.records.length;
+        this.page.total = response.data.data.total;
         this.tableLoading = false;
       });
     },
@@ -498,6 +498,7 @@ export default {
             message: "删除成功",
             type: "success"
           });
+          this.getList();
         })
         .catch(function(err) {});
     },

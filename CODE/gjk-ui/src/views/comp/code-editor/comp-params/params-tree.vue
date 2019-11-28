@@ -163,7 +163,6 @@ export default {
     flowUids: {
       immediate: true,
       handler: function(uids) {
-        console.log("1111111111111111111111111111111111111111111", uids);
         uids.forEach(uid => {
           let str = new String(uid).split("*");
           if (str[1] === "input") {

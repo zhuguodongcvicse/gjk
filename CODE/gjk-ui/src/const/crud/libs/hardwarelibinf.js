@@ -46,10 +46,10 @@ export const tableOption = {
       label: '接口速率',
       prop: 'infRate'
     },
-	  {
+	  /*{
       label: '接口类型',
       prop: 'infType'
-    },
+    },*/
 	  /* {
       label: '用户',
       prop: 'userId'
@@ -78,9 +78,9 @@ export const tableOption = {
       label: '光纤数量',
       prop: 'opticalNum'
     },
-    {
+    /*{
       label: 'io类型',
       prop: 'ioType'
-    }
+    }*/
   ]
 }

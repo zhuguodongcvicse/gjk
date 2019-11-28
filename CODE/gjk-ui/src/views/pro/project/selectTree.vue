@@ -1,7 +1,7 @@
 <template>
   <el-popover
     placement="bottom-start"
-    width="200"
+    :width="popoverWidth"
     @hide="popoverHide"
     trigger="click"
     v-model="isShowSelect"
@@ -52,6 +52,7 @@ export default {
   },
   data() {
     return {
+      popoverWidth: "",
       // 是否显示树状选择器
       isShowSelect: false,
       options: [],
@@ -164,6 +165,10 @@ export default {
     }
   },
   mounted() {
+    let _this = this;
+    this.$nextTick(function() {
+      _this.popoverWidth = _this.$refs.select.$el.clientWidth - 22;
+    });
     // 把传进来的参数转成数组处理
     if (this.multiple && Array.isArray(this.id)) {
       this.key = this.id;

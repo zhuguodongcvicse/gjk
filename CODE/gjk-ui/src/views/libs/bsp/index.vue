@@ -165,8 +165,8 @@
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
-            v-if="scope.row.applyState=='0'?true:false"
-          ><删除</el-button>
+            v-if="scope.row.applyState=='0'||scope.row.applyState==null?true:false"
+          >删除</el-button>
 <!--          v-if="permissions.libs_bsp_del"-->
           <el-tooltip class="item" effect="dark" content="入库" placement="top">
             <el-button
@@ -507,6 +507,7 @@ export default {
             message: "删除成功",
             type: "success"
           });
+          this.getList(this.page)
         })
         .catch(function(err) {});
     },

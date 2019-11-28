@@ -21,6 +21,8 @@
             icon="delete"
             @click="handleDelete"
           >删除</el-button>
+          <el-button type="primary" v-if="testManager_btn_export" @click="showInfo.dialogExportVisible = true">导出</el-button>
+          <el-button type="primary" v-if="testManager_btn_import" @click="showInfo.importLibsDialogVisible = true">导入</el-button>
         </el-button-group>
       </div>
 
@@ -60,6 +62,8 @@
           </el-card>
         </el-col>
       </el-row>
+      <export-libs :showInfo="showInfo"></export-libs>
+      <import-libs :showInfo="showInfo" @callback="getList"></import-libs>
     </basic-container>
   </div>
 </template>
@@ -73,6 +77,8 @@ import {
   putObj
 } from "@/api/admin/platform";
 import { mapGetters } from "vuex";
+import importLibs from "@/views/admin/test/importLibs";
+import exportLibs from "@/views/admin/test/exportLibs";
 
 export default {
   name: "platform",
@@ -80,6 +86,10 @@ export default {
   inject: ["reload"],
   data() {
     return {
+      showInfo: {
+          importLibsDialogVisible: false,
+          dialogExportVisible: false
+      },
       list: null,
       total: null,
       formEdit: true,
@@ -117,15 +127,19 @@ export default {
       currentId: -1,
       platformManager_btn_add: false,
       platformManager_btn_edit: false,
-      platformManager_btn_del: false
+      platformManager_btn_del: false,
+        testManager_btn_export: false,
+        testManager_btn_import: false
     };
   },
-
+  components: { importLibs, exportLibs },
   created() {
     this.getList();
     this.platformManager_btn_add = this.permissions["sys_platform_add"];
     this.platformManager_btn_edit = this.permissions["sys_platform_edit"];
     this.platformManager_btn_del = this.permissions["sys_platform_del"];
+      this.testManager_btn_export = this.permissions["sys_test_export"];
+      this.testManager_btn_import = this.permissions["sys_test_import"];
   },
   computed: {
     ...mapGetters(["elements", "permissions"])
@@ -256,6 +270,7 @@ export default {
           type: "success",
           duration: 2000
         });
+        this.onCancel()
       });
     },
     create() {
@@ -276,6 +291,7 @@ export default {
           this.reload();
         }
       } else {
+        var parentId =  JSON.parse(JSON.stringify(this.form)).parentId
         Vue.set(this.form, "parentId", this.currentId);
         addObj(this.form).then(() => {
           this.getList();
@@ -285,6 +301,8 @@ export default {
             type: "success",
             duration: 2000
           });
+          this.onCancel()
+          Vue.set(this.form, "parentId", parentId);
         });
       }
     },

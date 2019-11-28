@@ -55,8 +55,14 @@ public class HardwarelibInfServiceImpl extends ServiceImpl<HardwarelibInfMapper,
 		} else {
 			hardwarelibInf.setVersion(1);
 		}
-		hardwarelibInf.setId(IdGenerate.uuid());
-		baseMapper.saveInf(hardwarelibInf);
+//		long startTime = System.currentTimeMillis();
+//		for (int i = 0; i < 30; i++) {
+			hardwarelibInf.setId(IdGenerate.uuid());
+			baseMapper.saveInf(hardwarelibInf);
+//		}
+
+//		long endTime = System.currentTimeMillis();
+//		System.out.println("startTime - endTime: " + (startTime - endTime) + "/ms");
 		return hardwarelibInf;
 	}
 

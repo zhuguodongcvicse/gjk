@@ -103,18 +103,27 @@
         <el-button type="primary" @click="clickHandleSaveComp(false)">确 定</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="生成构件框架" :visible.sync="compSpbShowDialog" width="30%">
-      <el-form ref="ruleForm" v-model="compSpbForm" label-position="right" label-width="90px">
-        <el-form-item label="头文件模板" prop="headerTemplateFile">
-          <form-item-type v-model="compSpbForm.headerTemplateFile" lableType="uploadComm"></form-item-type>
+    <el-dialog title="生成构件框架" :visible.sync="compSpbShowDialog" width="40%">
+      <el-form :model="compSpbParam" ref="compForm" :rules="compSpbFormRules">
+        <el-form-item label="构件框架" label-width="90px" prop="frameId">
+          <el-select v-model="compSpbParam.frameId" placeholder="placeholder">
+            <el-option
+              v-for="(item,index) in compSpbFrameData"
+              :key="index"
+              :label="item.name"
+              :value="item.id"
+            >
+              <span style="float: left">{{ item.name }}</span>
+              <span
+                style="float: right; color: #8492a6; font-size: 13px"
+              >&emsp;&emsp;{{ item.rightName }}</span>
+            </el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="源文件模板" prop="srcTemplateFile">
-          <form-item-type v-model="compSpbForm.srcTemplateFile" lableType="uploadComm"></form-item-type>
-        </el-form-item>
+        <div class="control-container bsp_footer_btn_14s text_align_right_14s">
+          <el-button type="primary" @click.native="compSpbFormClick('compForm')">保存</el-button>
+        </div>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="clickHandleSaveComp(true)">生 成</el-button>
-      </div>
     </el-dialog>
   </el-container>
 </template>
@@ -125,7 +134,10 @@ import { mapGetters } from "vuex";
 import paramsDefine from "./params-define";
 import paramsFiles from "../params-files";
 import { menuTag } from "@/util/closeRouter";
-import { createSpbFrameFile } from "@/api/comp/componentdetail";
+import {
+  createSpbFrameFile,
+  findSpbFrameFile
+} from "@/api/comp/componentdetail";
 import formItemType from "@/views/comp/code-editor/comp-params/form-item-type";
 import { getObjType, deepClone } from "@/util/util";
 import {
@@ -159,11 +171,12 @@ export default {
       saveDBXmlMaps: {},
       //生成构件框架
       compSpbShowDialog: false,
-      compSpbForm: {
-        spbModelXmlFile: "",
-        headerTemplateFile: "",
-        srcTemplateFile: "",
-        saveDir: ""
+      compSpbFrameData: [],
+      compSpbParam: {},
+      compSpbFormRules: {
+        frameId: [
+          { required: true, message: "请选择构件框架", trigger: "change" }
+        ]
       }
     };
   },
@@ -265,6 +278,14 @@ export default {
           this.$store.dispatch("saveCurrentIODate", saveDBXmlMapsTemp);
       })*/
     },
+    compSpbFormClick(formName) {
+      this.$refs[formName].validate((valid, object) => {
+        if (valid) {
+          // console.log("1111111111222",this.compSpbParam)
+          this.clickHandleSaveComp(true);
+        }
+      });
+    },
     clickHandleSaveComp(compSpb) {
       //存构件基本信息
       const loading = this.$loading({
@@ -304,9 +325,10 @@ export default {
               ).then(resComp => {
                 //需不需要生成构件框架
                 if (compSpb) {
-                  this.compSpbForm.spbModelXmlFile = resComp.data.data;
-                  this.compSpbForm.saveDir = resFiles.data.data;
-                  createSpbFrameFile(this.compSpbForm)
+                  this.compSpbParam.spbModelXmlFile = resComp.data.data;
+                  this.compSpbParam.saveDir = resFiles.data.data;
+                  // this.compSpbForm.frameId = ;
+                  createSpbFrameFile(this.compSpbParam)
                     .then(res => {
                       this.reload();
                       loading.close();
@@ -346,6 +368,24 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
+    findSpbFrameFile().then(res => {
+      let showData = deepClone(res.data.data);
+      showData.forEach(item => {
+        let rightName = "";
+        for (let name of item.platformName) {
+          rightName += name + ",";
+        }
+        // console.log('rightShowNamerightShowName',rightShowName.)
+
+        this.$set(
+          item,
+          "rightName",
+          rightName.substring(0, rightName.lastIndexOf(","))
+        );
+      });
+
+      this.compSpbFrameData = showData;
+    });
     //如果是新增构件
     if (this.$route.query.type === "add") {
       // this.selectBaseTemplateValue = this.$route.query.defauleBaseTemplate[0].tempName
