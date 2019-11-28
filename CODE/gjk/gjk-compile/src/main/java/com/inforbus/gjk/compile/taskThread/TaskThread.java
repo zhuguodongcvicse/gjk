@@ -42,16 +42,15 @@ public class TaskThread extends Thread {
     public void run() {
         synchronized (complieQueue) {
             while (!stop) {
-                Task task = complieQueue.poll();
+                Task task = complieQueue.poll();//拿出任务
                 if (task != null) {
                     try {
-                        task.Command();
+                        task.Command();//开始任务
                     } catch (Exception e) {
                         logger.error("编译失败,请检查相关配置");
                         e.printStackTrace();
                     }
                 }else {
-
                     try {
                         complieQueue.wait(1000);
                     } catch (InterruptedException e) {
