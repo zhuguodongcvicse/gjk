@@ -35,6 +35,21 @@ public class ParamTreeVO {
 		this.structClassify = structClassify;
 		this.assigParamName = assigParamName;
 	}
+	public ParamTreeVO(String id, String dbId, String parentId, String childrenIds, String fparamName,
+			String fparamType, String paramRemarks,Integer sort, Double version, String structClassify, String assigParamName) {
+		super();
+		this.id = id;
+		this.dbId = dbId;
+		this.parentId = parentId;
+		this.childrenIds = childrenIds;
+		this.fparamName = fparamName;
+		this.fparamType = fparamType;
+		this.paramRemarks = paramRemarks;
+		this.sort = sort;
+		this.version = version;
+		this.structClassify = structClassify;
+		this.assigParamName = assigParamName;
+	}
 
 	/**
 	 * id
@@ -124,5 +139,10 @@ public class ParamTreeVO {
 	 * 入库标识
 	 */
 	private String storageFlag;
+	
+	/**
+	 * 参数注释
+	 */
+	private String paramRemarks;
 
 }

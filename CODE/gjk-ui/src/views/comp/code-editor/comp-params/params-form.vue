@@ -518,6 +518,7 @@ export default {
                 let input = this.headerFile.inputXmlMapParams;
                 let output = this.headerFile.outputXmlMapParams;
                 let paramsFormXml = [];
+                console.log("12121212121212121",deepClone(this.headerFile))
                 paramsValue.forEach(param => {
                   let tmpIfArr = ["输入", "输出"];
                   if (tmpIfArr.includes(param.lableName)) {
@@ -535,10 +536,10 @@ export default {
                       let cacheParams = this.cacheHeaderValueParams.headerValue[
                         param.lableName
                       ];
-                      console.log(
-                        "文件名字是否箱相同",
-                        isObjectEquals(fromParam, cacheParams)
-                      );
+                      // console.log(
+                      //   "文件名字是否箱相同",
+                      //   isObjectEquals(fromParam, cacheParams)
+                      // );
                       //判断cacheParams中的数据是不是跟模板一样，一样就不赋值
                       if (!isObjectEquals(fromParam, cacheParams)) {
                         this.itemTypeChangeHeaderValueParams(

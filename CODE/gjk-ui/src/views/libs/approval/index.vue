@@ -151,6 +151,8 @@ export default {
     sizeChange(val) {
       this.page.size = val;
       this.listQuery.size = val;
+      this.page.current = 1;
+      this.listQuery.current = 1;
       if (this.showAllOrUnprocess) {
         this.getList();
       } else {

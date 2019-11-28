@@ -124,3 +124,9 @@ export function findSpbFrameFile(param) {
     data: param
   })
 }
+export function findPlatformByName(param) {
+  return request({
+    method: "post",
+    url: "/comp/componentdetail/findPlatformByName/"+param,
+  })
+}

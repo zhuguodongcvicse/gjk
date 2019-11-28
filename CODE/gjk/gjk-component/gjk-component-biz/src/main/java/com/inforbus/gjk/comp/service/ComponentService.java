@@ -188,4 +188,11 @@ public interface ComponentService extends IService<Component> {
 	 * @param obj
 	 */
 	Map<String, Object> checkComp(List<Object> obj);
+
+	/**
+	 * 判断选择的库目录文件是否存在
+	 * @param id
+	 * @return
+	 */
+	String isSelectLibs(String id);
 }

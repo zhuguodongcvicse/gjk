@@ -224,5 +224,11 @@ export function returnFilePath() {
     method: 'post',
   })
 }
+export function getPlatformName() {
+  return request({
+    url: '/pro/app/getPlatformName',
+    method: 'put',
+  })
+}
 
 

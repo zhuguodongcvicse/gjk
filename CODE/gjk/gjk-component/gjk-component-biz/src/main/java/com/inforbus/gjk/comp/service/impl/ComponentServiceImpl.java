@@ -22,6 +22,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.inforbus.gjk.admin.api.entity.GjkAlgorithm;
+import com.inforbus.gjk.admin.api.entity.GjkPlatform;
+import com.inforbus.gjk.admin.api.entity.GjkTest;
 import com.inforbus.gjk.common.core.entity.CompStruct;
 import com.inforbus.gjk.common.core.entity.Structlibs;
 import com.inforbus.gjk.common.core.entity.XmlEntity;
@@ -966,6 +969,50 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		this.rabbitmqTemplate.convertAndSend(token, "lcjm" + "===@@@===" + consoleStr);
 		maps.put("compUpdate", compUpdate);
 		return maps;
+	}
+
+	/**
+	 * 判断选择的库目录文件是否存在
+	 * @param id
+	 * @return
+	 */
+	@Override
+	public String isSelectLibs(String id) {
+		String res = "";
+		List<ComponentDetail> componentDetailList = compDetailMapper.listCompDetailByCompId(id);
+		for (ComponentDetail componentDetail : componentDetailList) {
+			// 过虑库目录id为空的数据
+			if(StringUtils.isBlank(componentDetail.getLibsId())){
+				continue;
+			}
+			// 判断平台库数据是否存在
+			if(componentDetail.getFileType().equals("platformfile")){
+				GjkPlatform platform = baseMapper.getPlatformByIdNotDelete(componentDetail.getLibsId());
+				if(platform == null){
+					res += "平台文件、";
+				}
+			}
+			// 判断算法库数据是否存在
+			else if(componentDetail.getFileType().equals("algorithmfile")){
+				GjkAlgorithm algorithm = baseMapper.getAlgorithmByIdNotDelete(componentDetail.getLibsId());
+				if(algorithm == null){
+					res += "算法文件、";
+				}
+			}
+			// 判断测试库数据是否存在
+			else if(componentDetail.getFileType().equals("testfile")){
+				GjkTest test = baseMapper.getTestByIdNotDelete(componentDetail.getLibsId());
+				if(test == null){
+					res += "测试文件、";
+				}
+			}
+		}
+
+		if(res.length() > 0){
+			res = res.substring(0, res.length() -1);
+			res = "选择的" + res + "不存在";
+		}
+		return res;
 	}
 
 }

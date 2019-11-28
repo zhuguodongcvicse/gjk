@@ -305,4 +305,14 @@ public class ComponentController {
 	public R checkComp(@RequestBody List<Object> obj){
 		return new R<>(componentService.checkComp(obj));
 	}
+
+	/**
+	 * 构件入库前的判断 选择的库目录文件是否存在
+	 * @param compId
+	 * @return
+	 */
+	@GetMapping("/isSelectLibs/{compId}")
+	public R isSelectLibs(@PathVariable("compId") String compId) {
+		return new R<>(componentService.isSelectLibs(compId));
+	}
 }

@@ -187,3 +187,10 @@ export function checkComp(obj){
     data:obj
   })
 }
+
+export function isSelectLibs(compId) {
+  return request({
+    url: '/comp/component/isSelectLibs/' + compId,
+    method: 'get'
+  })
+}

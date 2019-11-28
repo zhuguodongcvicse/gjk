@@ -59,6 +59,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -986,21 +988,22 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	 * @Description: 生成构件框架
 	 * @Author xiaohe
 	 * @DateTime 2019年11月13日 下午4:05:24
-	 * @param spbModelXmlFile    构件模型XML文件
-	 * @param headerTemplateFile 头文件模板文件
-	 * @param srcTemplateFile    源文件模板文件
-	 * @param saveDir            保存路径(可以是平台文件路径)
+	 * @param spbModelXmlFile 构件模型XML文件
+	 * @param spbModelDir     保存路径(可以是平台文件路径)
+	 * @param frameId         构件框架Id
 	 */
 	@Override
-	public R createSpbFrameFile(String spbModelXmlFile, String headerTemplateFile, String srcTemplateFile,
-			String saveDir) {
+	public R createSpbFrameFile(String spbModelXmlFile, String saveDir, String frameId) {
 		R retR = new R<>();
-		// 查找headerTemplateFile是否存在 不存在使用默認的headerTemplateFile
-		headerTemplateFile = StringUtils.isEmpty(headerTemplateFile) ? compDetailPath + JGitUtil.getHeaderTemplateFile()
-				: headerTemplateFile;
-		// 查找srcTemplateFile是否存在 不存在使用默認的srcTemplateFile
-		srcTemplateFile = StringUtils.isEmpty(srcTemplateFile) ? compDetailPath + JGitUtil.getSrcTemplateFile()
-				: srcTemplateFile;
+		List<Map<String, Object>> lists = baseMapper.findCompframe(frameId);
+		//框架路径
+		String framePath = "";
+		//框架路径
+		String frameName = "";
+		for (Map<String, Object> map : lists) {
+			framePath = compDetailPath + map.get("file_path");
+			frameName = map.get("name").toString();
+		}
 		saveDir = compDetailPath + saveDir;
 		File file = null;
 		try {
@@ -1015,38 +1018,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 					return new R<>(new NullPointerException("构件模型XML文件 does not exist"));
 				}
 			}
-			if (StringUtils.isEmpty(headerTemplateFile)) {
-				logger.error("头文件模板 is null");
-				return new R<>(new NullPointerException("头文件模板 is null"));
-			} else {
-				file = new File(headerTemplateFile);
-				if (!file.getParentFile().exists()) {
-					file.getParentFile().mkdirs();
-				}
-				if (!file.exists() || !file.isFile()) {
-					logger.error("头文件模板  does not exist");
-					return new R<>(new NullPointerException("头文件模板 does not exist"));
-				} else {
-//					file.createNewFile();
-					logger.info("The " + file.getName() + " file was created successfully.");
-				}
-			}
-			if (StringUtils.isEmpty(srcTemplateFile)) {
-				logger.error("源文件模板  is null");
-				return new R<>(new NullPointerException("源文件模板 is null"));
-			} else {
-				file = new File(srcTemplateFile);
-				if (!file.getParentFile().exists()) {
-					file.getParentFile().mkdirs();
-				}
-//				file.createNewFile();
-				if (!file.exists() || !file.isFile()) {
-					logger.error("源文件模板 does not exist");
-					return new R<>(new NullPointerException("源文件模板  does not exist"));
-				} else {
-					logger.info("The " + file.getName() + " file was created successfully.");
-				}
-			}
+			UploadFilesUtils.NioToCopyFile(framePath, saveDir);
 			if (StringUtils.isEmpty(saveDir)) {
 				logger.error("saveDir is null");
 				return new R<>(new NullPointerException("saveDir is null"));
@@ -1056,12 +1028,11 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 					file.getParentFile().mkdirs();
 				}
 			}
-			ExternalIOTransUtils.createSpbFrameFile(spbModelXmlFile, headerTemplateFile, srcTemplateFile, saveDir);
+			ExternalIOTransUtils.createSpbFrameFile(spbModelXmlFile, saveDir + File.separator + frameName);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new R<>(e);
 		}
-
 		return retR;
 
 	}
@@ -1074,13 +1045,25 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	 */
 	@Override
 	public R findSpbFrameFile() {
-		List<Map<String, Object>> lists = baseMapper.findCompframe();
+		List<Map<String, Object>> lists = baseMapper.findCompframe(null);
 		for (Map<String, Object> map : lists) {
 			List<String> pfs = baseMapper.findPlatform(map.get("id").toString());
 			map.put("platformName", pfs);
 			System.out.println(pfs);
 		}
 		return new R(lists);
+	}
+	/**
+	 * @Title: findPlatform
+	 * @Description: 根据构件框架名称查询 的平台信息
+	 * @Author xiaohe
+	 * @DateTime 2019年11月26日 下午2:04:44
+	 * @param frameName 构件框架Name
+	 * @return
+	 */
+	@Override
+	public List<String> findPlatformByName(String frameName) {
+		return baseMapper.findPlatformByName(frameName);
 	}
 
 }

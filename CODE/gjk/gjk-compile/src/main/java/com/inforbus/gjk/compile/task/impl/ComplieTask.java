@@ -40,8 +40,8 @@ public class ComplieTask implements Task {
     @Value("${VS2010.path}")
     private String vsPath;
 
-    @Value("${Sylixos.path}")
-    private String syPath;
+//    @Value("${Sylixos.path}")
+//    private String syPath;
 
     @Value("${Workbench.path}")
     private String wbPath;
@@ -375,7 +375,12 @@ public class ComplieTask implements Task {
 //                e.printStackTrace();
 //            }
 //        }
-
+        int i = 0;
+        while (true){
+            i++;
+            if (i == 500)
+                break;
+        }
         if (b && b1) {
             String linuxAimsPath = linuxPath + "/" + ProcessName + "/" + fileName;
             //将Windows 项目文件上传到linux服务器中

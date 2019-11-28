@@ -101,4 +101,9 @@ public interface GjkPlatformMapper extends BaseMapper<GjkPlatform> {
 	 * @return
 	 */
 	Component getCompNameById(@Param("id") String id);
+
+	/**
+	 * 删除所有数据
+	 */
+	void deleteAll();
 }

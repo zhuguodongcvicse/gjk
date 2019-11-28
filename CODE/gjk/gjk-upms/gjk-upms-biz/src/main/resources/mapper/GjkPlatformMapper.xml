@@ -194,4 +194,7 @@
 		(SELECT a.comp_id FROM gjk_component_detail a WHERE a.id = #{id})
 	</select>
 
+	<delete id="deleteAll">
+		DELETE FROM gjk_platform
+	</delete>
 </mapper>

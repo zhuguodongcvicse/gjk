@@ -41,7 +41,15 @@ public interface CompframeService extends IService<Compframe> {
 	 * @return
 	 */
 	IPage<Compframe> getCompframePage(Page<Compframe> page, Compframe compframe);
-
+	/**
+	 * @Title: saveCompFrame
+	 * @Description: 保存构件框架
+	 * @Author xiaohe
+	 * @DateTime 2019年11月26日 下午2:04:44
+	 * @param ufile		构件文件列表
+	 * @param resMap	携带信息
+	 * @return
+	 */
 	R<?> saveCompFrame(MultipartFile[] ufile, Map<String, Object> resMap);
 
 }

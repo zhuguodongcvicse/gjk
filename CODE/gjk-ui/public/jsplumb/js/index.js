@@ -12,8 +12,10 @@ var addPointParam = new Array();
 var loadState = false;
 //存储加载后的数据
 var loadAddPointParam = new Array();
-//画布数据
+//画布数据(构件基本属性)
 var canvasData = new Map()
+//存放锚点数据
+var endpointMap = new Map()
 //复制所保存数据
 var copyData = new Array()
 //被框选的节点id
@@ -32,7 +34,7 @@ var div_rightY = ""
 //存储上一次点击的构件id
 var lastTimeId = ""
 
-var midpoints = [ 0.7, 0.5, 0.3,0.1]
+var midpoints = [0.7, 0.5, 0.3, 0.1]
 var stub = [40, 30, 20, 10]
 
 //ctrlZ时需要保存的数据
@@ -59,6 +61,12 @@ ctrlYStack['addPaste'] = []
 ctrlYStack['deletePaste'] = []
 //保存ctrlZ时所对应的操作
 var ctrlYOperationStack = new Array;
+
+//判断构件是否被删除
+var nodeList = []
+//判断连线是否为已删除过的连线
+var delConnectionMap = new Map()
+
 
 //判断用户是否手动进行连线
 var isConnection = true
@@ -173,31 +181,31 @@ function handleMessageFromParent(event) {
 					break;
 			}
 			break;
-			case 'cleanCanvas':
-				cleanCanvas();
-				break;
-			case 'bottonCheckComp':
-				if(!data.params){
-					$("#accordion").show()
-					$("#gjk").hide()
-					// $('#update').html("")
-					// $('#notUpdate').html("")
-					compUpdateState = data.compUpdateState;
-					//console.log("检查更新数据",compUpdateState)
-					appendUpdateDiv()
-				}else{
-					$("#accordion").hide()
-					$("#gjk").show()
-				}
-				break;
-			case 'completeCheck':
-				//警告
-				//let styleColor = "#F4A460"
-				//错误
-				let styleColor = "#ff0000"
-				//$('.pa').addClass("warn")
-				//endpointCheck(styleColor);
-				connectionCheck(styleColor);
+		case 'cleanCanvas':
+			cleanCanvas();
+			break;
+		case 'bottonCheckComp':
+			if (!data.params) {
+				$("#accordion").show()
+				$("#gjk").hide()
+				// $('#update').html("")
+				// $('#notUpdate').html("")
+				compUpdateState = data.compUpdateState;
+				//console.log("检查更新数据",compUpdateState)
+				appendUpdateDiv()
+			} else {
+				$("#accordion").hide()
+				$("#gjk").show()
+			}
+			break;
+		case 'completeCheck':
+			//警告
+			//let styleColor = "#F4A460"
+			//错误
+			let styleColor = "#ff0000"
+			//$('.pa').addClass("warn")
+			//endpointCheck(styleColor);
+			connectionCheck(styleColor);
 	}
 };
 
@@ -212,6 +220,15 @@ jsPlumb.ready(load);
 //构件模板id
 var gjTemplateId;
 
+//生成一个随机数
+function createNum() {
+	let random = ''
+	random = Math.ceil(Math.random() * 10000000000000000000).toString().substr(0, 9 || 4)
+	random = Date.now() + random
+	return random
+}
+
+
 // 放入拖动节点
 function dropNode(template, position) {
 	//console.log(position);
@@ -219,7 +236,9 @@ function dropNode(template, position) {
 	position.left = position.left + $(areaId).scrollLeft()
 	position.top = position.top + $(areaId).scrollTop()
 	//console.log("position+++++++++++++++",position)
-	position.id = uuid.v1()
+	//position.id = uuid.v1()
+	position.id = createNum()
+	console.log("生成的id", position.id)
 	//position.generateId = uuid.v1
 	gjTemplateId = position.id;
 	var html = renderHtml(template, position)
@@ -267,8 +286,8 @@ function setEnterPoint(id, gj) {
 	var differenceValue = anchorNumber / 2;
 	var x = differenceValue;
 	var inPoint;
-	var midpoints = [ 0.2, 0.4, 0.6, 0.8]
-	var stub = [ 20, 30, 40, 50]
+	var midpoints = [0.2, 0.4, 0.6, 0.8]
+	var stub = [20, 30, 40, 50]
 	for (var i = 0; i < len; i++) {
 		var config = JSON.parse(JSON.stringify(getBaseNodeConfig()))
 		config.isSource = false
@@ -303,6 +322,7 @@ function setEnterPoint(id, gj) {
 			mousedownState = 1;
 		});
 		differenceValue += anchorNumber;
+		endpointMap.set(i + '*input*' + id, dat[gj].inputList[i])
 	}
 }
 //鼠标悬浮锚点显示div
@@ -310,39 +330,29 @@ function addDiv(endpoint) {
 	//console.log("端点信息", endpoint)
 	var templateid = endpoint.elementId;
 	var templateUuid = endpoint.getUuid();
-	//console.log(templateUuid);
-	//console.log(templateUuid);
-	var str = templateUuid.split('*');
-	var tempUuid = str[0];
-	var strTemp = str[1];
-	var temp = strTemp.substr(0, 5);
-	// console.log(tempUuid);
-	// console.log(temp);
-	var b = $('#' + templateid + '-heading')[0].dataset.id;
+	// //console.log(templateUuid);
+	// //console.log(templateUuid);
+	// var str = templateUuid.split('*');
+	// var tempUuid = str[0];
+	// var strTemp = str[1];
+	// var temp = strTemp.substr(0, 5);
+	// // console.log(tempUuid);
+	// // console.log(temp);
+	// var b = $('#' + templateid + '-heading')[0].dataset.id;
 	//console.log("下标", b)
+
 	var str = '';
-	if (temp != 'input') {
-		str = hoverDiv(dat[b].outputList[tempUuid]);
-		// str += "<div class = 'point'>" +
-		// 	"<p>参数名称：" + dat[b].outputList[tempUuid].variableName + "</p>" +
-		// 	"<p>参数类型：" + dat[b].outputList[tempUuid].dataTypeName + "</p>" +
-		// 	"<p>参数长度：" + dat[b].outputList[tempUuid].lengthName + "</p>" +
-		// 	"<p>结构体：" + dat[b].outputList[tempUuid].variableStructType + "</p>" +
-		// 	"</div>";
-	} else {
-		//console.log("端点显示数据", dat[b].inputList);
-		str = hoverDiv(dat[b].inputList[tempUuid])
-		// str += "<div class = 'point'>" +
-		// 	"<h6>参数名称：" + dat[b].inputList[tempUuid].variableName + "</h6>" +
-		// 	"<h6>参数类型：" + dat[b].inputList[tempUuid].dataTypeName + "</h6>" +
-		// 	"<h6>参数长度：" + dat[b].inputList[tempUuid].lengthName + "</h6>" +
-		// 	"<h6>结构体：" + dat[b].inputList[tempUuid].variableStructType + "</h6>" +
-		// 	"</div>";
-	}
+	str = hoverDiv(endpointMap.get(templateUuid))
+	// if (temp != 'input') {
+	// 	str = hoverDiv(dat[b].outputList[tempUuid]);
+	// } else {
+	// 	//console.log("端点显示数据", dat[b].inputList);
+	// 	str = hoverDiv(dat[b].inputList[tempUuid])
+	// }
 	$('#drop-bg').append(str);
 	//$('body').append(str);
-	$(".point").bind('click',function(event){
-	//	console.log("+++++++++++++++",event)
+	$(".point").bind('click', function (event) {
+		//	console.log("+++++++++++++++",event)
 		event.stopPropagation();
 		$('.point').remove();
 	})
@@ -352,29 +362,18 @@ function addDiv(endpoint) {
 	})
 
 }
-// function out(e){
-// 	console.log("+++++++++++",event)
-// 	//event.stopPropagation();
-// 	//alert(111)
-// 	e.remove();
-// }
-function come(event){
-	event.stopPropagation();
-	alert(222)
-}
 
 function hoverDiv(inPointData) {
-	//console.log("端点数据", inPointData)
 	var str = '';
 	if (inPointData.variableStructType != '') {
-		str += "<div class = 'point'  οnmοuseοver='come()' style='background:#F0E6BD'>" +
+		str += "<div class = 'point'  style='background:#F0E6BD'>" +
 			"<p>参数名称：" + inPointData.variableName + "</p>" +
 			"<p>参数类型：" + inPointData.dataTypeName + "</p>" +
 			"<p>参数长度：" + inPointData.lengthName + "</p>" +
 			"<p>结构体：" + inPointData.variableStructType + "</p>" +
 			"</div>";
 	} else {
-		str += "<div class = 'point'  οnmοuseοver='come()' style='background:#F0E6BD'>" +
+		str += "<div class = 'point'  style='background:#F0E6BD'>" +
 			"<p>参数名称：" + inPointData.variableName + "</p>" +
 			"<p>参数类型：" + inPointData.dataTypeName + "</p>" +
 			"<p>参数长度：" + inPointData.lengthName + "</p>" +
@@ -421,7 +420,7 @@ function setExitPoint(id, gj) {
 			mousedownState = 1;
 		});
 		differenceValue += anchorNumber;
-
+		endpointMap.set(i + '*output*' + id, dat[gj].outputList[i])
 	}
 
 }
@@ -574,19 +573,19 @@ function checkDat() {
 			// console.log("1111",e.clientX - iX)
 			// console.log("222",dw - (e.clientX - BR))
 			// console.log("3333",(e.clientX - BR))
-			if(e.clientX - iX > 130){
+			if (e.clientX - iX > 130) {
 				$(".border").css("left", e.clientX - iX + "px")
 				$(".div_left").css("right", dw - (e.clientX - BR) + "px")
-				$(".div_right").css("left", (e.clientX - BR) + "px")	
-			}else{
+				$(".div_right").css("left", (e.clientX - BR) + "px")
+			} else {
 				$(".border").css("left", 12 + "%")
-				$(".div_left").css("right", 87 +"%")
+				$(".div_left").css("right", 87 + "%")
 				$(".div_right").css("left", 13 + "%")
 			}
 			$(".div_right").css("width", 85.5 + "%")
 			//console.log($(".div_right").width()+(e.clientX - BR)-100)
 			//根据鼠标事件相对位置计算出div的position
-			
+
 			return false;
 		}
 	})
@@ -595,18 +594,18 @@ function checkDat() {
 		//$("#gjk").load();	
 	}
 }
-function appendUpdateDiv(){
+function appendUpdateDiv() {
 	var strUpdate = ""
 	var notUpdate = ""
 	for (var i = 0; i < dat.length; i++) {
-		for(let key in compUpdateState){
-			if(compUpdateState[key] == "0"){ //已更新
-				if(dat[i].id == key){
-					strUpdate +=  "<div class = 'btn' style = 'margin:5px' data-template='tpl-menu" + i + "'>" + dat[i].compImg + "</div></br>"
+		for (let key in compUpdateState) {
+			if (compUpdateState[key] == "0") { //已更新
+				if (dat[i].id == key) {
+					strUpdate += "<div class = 'btn' style = 'margin:5px' data-template='tpl-menu" + i + "'>" + dat[i].compImg + "</div></br>"
 				}
-			}else{
-				if(dat[i].id == key){
-					notUpdate +=  "<div class = 'btn' style = 'margin:5px' data-template='tpl-menu" + i + "'>" + dat[i].compImg + "</div></br>"
+			} else {
+				if (dat[i].id == key) {
+					notUpdate += "<div class = 'btn' style = 'margin:5px' data-template='tpl-menu" + i + "'>" + dat[i].compImg + "</div></br>"
 				}
 			}
 		}
@@ -627,7 +626,7 @@ function appendDiv() {
 		// var s = dat[i].compImg.substr(dat[i].compImg.indexOf("src='") + 5);
 		// var img = s.substr(0, s.indexOf("' "));
 		//str += "<div class = 'btn'  data-template='tpl-menu" + i + "'><img src='"+img+"'><br/>" + dat[i].compName + "</div></br>"
-		str += "<div class = 'btn' id = '"+dat[i].id+"' style = 'margin:5px' data-template='tpl-menu" + i + "'>" + dat[i].compImg + "</div></br>"
+		str += "<div class = 'btn' id = '" + dat[i].id + "' style = 'margin:5px' data-template='tpl-menu" + i + "'>" + dat[i].compImg + "</div></br>"
 		//str += "<a class='btn btn-success btn-controler'  data-template='tpl-menu" + i + "' role='button'>" + dat[i].compName + "</a></br><br>";
 		Template += "<script id='tpl-menu" + i + "' type='text/html'>" +
 			"<div class='pa' id='{{id}}' style='top:{{top}}px;left:{{left}}px'>" +
@@ -644,17 +643,17 @@ function appendDiv() {
 			"</div>" +
 			"</div>" +
 			"</div></script>";
-			for(let key in compUpdateState){
-				if(compUpdateState[key] == "0"){ //已更新
-					if(dat[i].id == key){
-						strUpdate +=  "<div class = 'btn' style = 'margin:5px' data-template='tpl-menu" + i + "'>" + dat[i].compImg + "</div></br>"
-					}
-				}else{
-					if(dat[i].id == key){
-						notUpdate +=  "<div class = 'btn' style = 'margin:5px' data-template='tpl-menu" + i + "'>" + dat[i].compImg + "</div></br>"
-					}
+		for (let key in compUpdateState) {
+			if (compUpdateState[key] == "0") { //已更新
+				if (dat[i].id == key) {
+					strUpdate += "<div class = 'btn' style = 'margin:5px' data-template='tpl-menu" + i + "'>" + dat[i].compImg + "</div></br>"
+				}
+			} else {
+				if (dat[i].id == key) {
+					notUpdate += "<div class = 'btn' style = 'margin:5px' data-template='tpl-menu" + i + "'>" + dat[i].compImg + "</div></br>"
 				}
 			}
+		}
 	}
 	$('#gjk').append(str);
 	// $('#update').append(strUpdate)
@@ -686,7 +685,8 @@ function main() {
 			var a = gjTemplateId;
 			//添加画布数据
 			canvasData.set(a, JSON.parse(JSON.stringify(dat[$('#' + a + '-heading')[0].dataset.id])))
-			//console.log("画布数据",canvasData)
+			console.log("画布构件基本数据", canvasData)
+			console.log("锚点数据", endpointMap)
 			//放置画布后将新增的构件保存到栈中
 			chartOperationStack['add'].push(saveNodeJson(a));
 			//添加新增操作
@@ -721,9 +721,9 @@ function main() {
 			$('#' + a).bind('click', function (event) {
 				//alert("节点点击事件");
 				event.stopPropagation();
-				if(lastTimeId != ""){
+				if (lastTimeId != "") {
 					$('#' + lastTimeId).removeClass("nodeStyle")
-					$.each(jsPlumb.getEndpoints(lastTimeId), function (n,v) {
+					$.each(jsPlumb.getEndpoints(lastTimeId), function (n, v) {
 						v.removeClass("nodeStyle")
 					});
 				}
@@ -829,18 +829,6 @@ function main() {
 				return false
 			})
 
-			// $('#' + a).bind('mousemove', function (event) {
-			// 	mousedownState = 1;
-			// 	if(idList.indexOf(a) !=-1 ){
-			// 		for(var i = 0;i<idList.length;i++){
-			// 			if(idList[i] != a){
-			// 				$('#'+idList[i]).css({"left":50},{"top":50})
-			// 			}
-			// 		}
-			// 	}	
-			// 	return false
-			// })
-
 			//删除节点
 			$(".delete-node").off("click").on("click", function () { });
 			$(".delete-node").bind('click', function (event) {
@@ -867,9 +855,9 @@ function main() {
 		$('#' + event.currentTarget.id).attr('tabindex', 0);
 		document.getElementById(event.currentTarget.id).style.outline = "0"
 		$('#' + event.currentTarget.id).focus();
-		document.getElementById(event.currentTarget.id).onkeydown=function (e){
-			if(e.keyCode==46){
-				$("#"+event.currentTarget.id).remove()
+		document.getElementById(event.currentTarget.id).onkeydown = function (e) {
+			if (e.keyCode == 46) {
+				$("#" + event.currentTarget.id).remove()
 				//console.log("参数：",JSON.stringify(gjidAndTemid));
 				//gjIdAndTemId = gjidAndTemid;
 				handleMessageToParent("removeComp", event.currentTarget.id);
@@ -924,7 +912,7 @@ function saveNodeJson(nodeId) {
 		inPointsData: canvasData.get(nodeId).inputList,
 		compImg: canvasData.get(nodeId).compImg,
 		compId: canvasData.get(nodeId).id,
-		nodeData : canvasData.get(nodeId)
+		nodeData: canvasData.get(nodeId)
 
 	});
 	var connections = [];
@@ -950,6 +938,7 @@ function saveNodeJson(nodeId) {
 	copyDataJson.nodes = nodes;
 	copyDataJson.connections = connections;
 	copyDataJson.jsonendpoints = jsonendpoints;
+	copyDataJson.endpointMap = ""
 	//console.log(copyDataJson);
 	return copyDataJson;
 }
@@ -1014,10 +1003,10 @@ function addPointDiv(proPream) {
 	}
 	$('#drop-bg').append(str);
 	//$('body').append(str);
-	$(".point").bind('click',function(event){
+	$(".point").bind('click', function (event) {
 		//	console.log("+++++++++++++++",event)
-			event.stopPropagation();
-			$('.point').remove();
+		event.stopPropagation();
+		$('.point').remove();
 	})
 	$(".point").bind('mousedown', function (event) {
 		mousedownState = 1;
@@ -1028,7 +1017,7 @@ function addPointDiv(proPream) {
 
 //动态增加删除锚点
 function updatePoint(proPream) {
-	//console.log("进入增加删除锚点", proPream);
+	console.log("进入增加删除锚点", proPream);
 	var endpoints = jsPlumb.getEndpoints(proPream.compId);
 	//console.log(endpoints.length);
 	var inputUuidList = new Array();
@@ -1045,6 +1034,8 @@ function updatePoint(proPream) {
 		//将所有增加的参数保存
 		addPointParam.push(proPream);
 		var config = JSON.parse(JSON.stringify(getBaseNodeConfig()))
+		endpointMap.set(proPream.uid, proPream.data)
+		console.log("动态增加锚点后的数据", endpointMap)
 		if (proPream.inOrOut == 'input') {
 			//修改画布数据
 			canvasData.get(proPream.compId).inputList.push(proPream.data)
@@ -1073,7 +1064,8 @@ function updatePoint(proPream) {
 			}, config);
 			addInPoint.addClass("nodeStyle")
 			addInPoint.bind('dblclick', function (endpoint, originalEvent) {
-				addPointDiv(proPream);
+				addDiv(endpoint);
+				//addPointDiv(proPream);
 				//var mouse = mousePosition();
 				var endpointId = endpoint.getUuid().split("*")[2]
 				var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
@@ -1110,13 +1102,14 @@ function updatePoint(proPream) {
 			}, config);
 			addOutPoint.addClass("nodeStyle")
 			addOutPoint.bind('dblclick', function (endpoint, originalEvent) {
-				addPointDiv(proPream);
+				addDiv(endpoint);
+				//addPointDiv(proPream);
 				//var mouse = mousePosition();
 				var endpointId = endpoint.getUuid().split("*")[2]
 				var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
 				var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 				$('.point').css("position", "absolute");
-				$('.point').css("left", x -15);
+				$('.point').css("left", x - 15);
 				$('.point').css("top", y);
 			});
 			// addOutPoint.bind('mouseout', function () {
@@ -1148,7 +1141,8 @@ function updatePoint(proPream) {
 			var points = jsPlumb.getEndpoints(proPream.compId);
 			if (proPream.inOrOut == 'input') {
 				canvasData.get(proPream.compId).inputList.splice(proPream.compId.split("*")[0], 1)
-				//console.log("画布数据", canvasData)
+				console.log("画布数据", canvasData)
+				console.log("inputList", proPream.compId.split("*")[0])
 				var len = inputUuidList.length - 1;
 				//console.log(len);
 				var anchorNumber = 1 / len;
@@ -1189,12 +1183,12 @@ function updatePoint(proPream) {
 	var index = -1
 	$.each(newEndpoints, function (n, val) {
 		if (val.getUuid().split('*')[1] == 'input') {
-			
+
 		} else {
 			index++
 			val.connector[1].midpoint = midpoints[index]
 			val.connector[1].stub = stub[index]
-			console.log("index++",index)
+			//console.log("index++",index)
 		}
 	});
 }
@@ -1237,7 +1231,7 @@ function emptyNode(id) {
 //需保存到ctrlZ数组中的对象
 var connInfoObj = {}
 jsPlumb.bind("connection", function (connInfo, originalEvent) {
-	console.log("1111111111111",connInfo)
+	//console.log("1111111111111",connInfo)
 	if (isConnection) {
 		connInfoObj = {}
 		//console.log(connInfo)
@@ -1339,52 +1333,54 @@ jsPlumb.bind("connectionDragStop", function (info) {
 		}
 		var sourceType = "";
 		var targetType = "";
+		sourceType = endpointMap.get(sourceUid).dataTypeName
+		targetType = endpointMap.get(targetUid).dataTypeName
 		//判断源锚点是否为新增
-		var sourcePointState = false;
+		//var sourcePointState = false;
 		//新增源锚点数据下标
-		var sourceIndex = 0;
-		if (addPointParam.length > 0) {
-			$.each(addPointParam, function (index1, addPoinr) {
-				if (sourceUid == addPoinr.uid) {
-					sourcePointState = true;
-					sourceIndex = index1;
-				}
-			});
-		}
-		if (sourcePointState) {
-			sourceType = addPointParam[sourceIndex].data.dataTypeName;
-			//	console.log("源节点属性if",sourceType);
-		} else {
-			//获取源节点数据下标
-			var sourceGj = $('#' + source + '-heading')[0].dataset.id;
-			//sourceType = dat[sourceGj].outputList[sourceUid.split("*")[0]].dataTypeName;
-			sourceType = canvasData.get(source).outputList[sourceUid.split("*")[0]].dataTypeName
-			//console.log("源节点属性else",sourceType);
-		}
+		//var sourceIndex = 0;
+		// if (addPointParam.length > 0) {
+		// 	$.each(addPointParam, function (index1, addPoinr) {
+		// 		if (sourceUid == addPoinr.uid) {
+		// 			sourcePointState = true;
+		// 			sourceIndex = index1;
+		// 		}
+		// 	});
+		// }
+		// if (sourcePointState) {
+		// 	sourceType = addPointParam[sourceIndex].data.dataTypeName;
+		// 	//	console.log("源节点属性if",sourceType);
+		// } else {
+		// 	//获取源节点数据下标
+		// 	var sourceGj = $('#' + source + '-heading')[0].dataset.id;
+		// 	//sourceType = dat[sourceGj].outputList[sourceUid.split("*")[0]].dataTypeName;
+		// 	sourceType = canvasData.get(source).outputList[sourceUid.split("*")[0]].dataTypeName
+		// 	//console.log("源节点属性else",sourceType);
+		// }
 
 		//判断目标锚点是否为新增
-		targetPointState = false;
-		//新增目标节点数据下标
-		var targetIndex = 0;
-		if (addPointParam.length > 0) {
-			$.each(addPointParam, function (index2, addPoinr) {
-				//console.log("进入目标节点循环");
-				if (targetUid == addPoinr.uid) {
-					targetPointState = true;
-					targetIndex = index2;
-				}
-			});
-		}
-		if (targetPointState) {
-			targetType = addPointParam[targetIndex].data.dataTypeName
-			//console.log("目标节点属性if",targetType);
-		} else {
-			//获取目标节点数据下标
-			var targetGj = $('#' + target + '-heading')[0].dataset.id;
-			targetType = canvasData.get(target).inputList[targetUid.split("*")[0]].dataTypeName 
-			//targetType = dat[targetGj].inputList[targetUid.split("*")[0]].dataTypeName;
-			//console.log("目标节点属性else",targetType);
-		}
+		// targetPointState = false;
+		// //新增目标节点数据下标
+		// var targetIndex = 0;
+		// if (addPointParam.length > 0) {
+		// 	$.each(addPointParam, function (index2, addPoinr) {
+		// 		//console.log("进入目标节点循环");
+		// 		if (targetUid == addPoinr.uid) {
+		// 			targetPointState = true;
+		// 			targetIndex = index2;
+		// 		}
+		// 	});
+		// }
+		// if (targetPointState) {
+		// 	targetType = addPointParam[targetIndex].data.dataTypeName
+		// 	//console.log("目标节点属性if",targetType);
+		// } else {
+		// 	//获取目标节点数据下标
+		// 	var targetGj = $('#' + target + '-heading')[0].dataset.id;
+		// 	targetType = canvasData.get(target).inputList[targetUid.split("*")[0]].dataTypeName 
+		// 	//targetType = dat[targetGj].inputList[targetUid.split("*")[0]].dataTypeName;
+		// 	//console.log("目标节点属性else",targetType);
+		// }
 		// console.log("源节点类型",sourceType);
 		// console.log("目标节点类型",targetType);
 		// console.log("连线关系",connectionData)
@@ -1400,26 +1396,19 @@ jsPlumb.bind("connectionDragStop", function (info) {
 			}
 		}
 		if (!isConnect) {
-			jsPlumb.detach(info);
+			//jsPlumb.detach(info);
 			handleMessageToParent("nodeTypeNotMatch", "节点类型不匹配");
 		}
 	}
 
 });
 
-//删除连线触发事件
-// jsPlumb.bind("connectionDetached", function (conn, originalEvent) {
-// 	alert(111111)
-// 	console.log(conn)
-// });
-
-
 //Ctrl+S
 document.onkeydown = function (event) {
 	if (event.ctrlKey == true && event.keyCode == 83) {//Ctrl+S
 		event.returnvalue = false;
 		event.preventDefault();
-	//	alert(11111)
+		//	alert(11111)
 		var connected = jsPlumb.getConnections();
 		//console.log("画布所有连线关系", connected)
 		//saveFlowchart();
@@ -1438,7 +1427,7 @@ document.onkeydown = function () {
 		copyTop = copyTop + 50;
 		copyLeft = copyLeft + 50;
 		//console.log(11111111111111)
-		if(copyData.length <= 0){
+		if (copyData.length <= 0) {
 			copyData = JSON.parse(sessionStorage.getItem("copyData"));
 			//console.log("复制数据",copyData)
 		}
@@ -1586,9 +1575,9 @@ document.onkeydown = function () {
 		chartRareOperationStack.push('dragZ')
 		limitZ();
 	} else if (event.ctrlKey == true && event.keyCode == 90) {//ctrl Z
-		//	alert(1111)
+		console.log("用户所有操作",chartRareOperationStack)
 		var rareOperation = chartRareOperationStack.pop()
-		//alert(rareOperation)
+		console.log("ctrlZ对应操作", rareOperation)
 		switch (rareOperation) {
 			case "add"://如果是增加操作将删除
 				ctrlYOperationStack.push("add")
@@ -1616,25 +1605,38 @@ document.onkeydown = function () {
 			case "addConnection":  //新增连线为删除连线
 				var operationJSON
 				var sourceAndTarget = {}
-				console.log("删除连线状态",isRemoveConn)
-				if (!isRemoveConn) {
-					var operationJSON1 = chartOperationStack[rareOperation].pop()
-					//console.log("删除连线状态",operationJSON1)
-					operationJSON = operationJSON1.conn
-					sourceAndTarget.connSourceUUid = operationJSON1.connSourceUUid
-					sourceAndTarget.connTargetUUid = operationJSON1.connTargetUUid
-				} else {
-					//console.log("使用新增连线对象")
-					chartOperationStack[rareOperation].pop()
+				console.log("删除连线状态", isRemoveConn)
+				console.log("删除连线保存的数据",chartOperationStack["addConnection"])
+				//if (!isRemoveConn) {
+				var operationJSON1 = chartOperationStack[rareOperation].pop()
+				console.log("删除的对象",operationJSON1)
+				if (delNodeIsConnection(operationJSON1.conn.sourceId, operationJSON1.conn.targetId) ||
+					delConnection(operationJSON1.connSourceUUid,operationJSON1.connTargetUUid)) {
 					var connObj = newConnection.pop()
+					console.log("删除构件删除的连线对象", connObj)
 					operationJSON = connObj.removeConnection
 					sourceAndTarget.connSourceUUid = connObj.connSourceUUid
 					sourceAndTarget.connTargetUUid = connObj.connTargetUUid
 					if (newConnection.length <= 0) {
 						isRemoveConn = false
 					}
-				}
-				//var operationJSON=chartOperationStack[rareOperation].pop();
+				} else {
+					console.log("删除原有连线状态", operationJSON1)
+					operationJSON = operationJSON1.conn
+					sourceAndTarget.connSourceUUid = operationJSON1.connSourceUUid
+					sourceAndTarget.connTargetUUid = operationJSON1.connTargetUUid
+					}
+				// } else {
+				// 	console.log("使用新增连线对象",newConnection)
+				// 	chartOperationStack[rareOperation].pop()
+				// 	var connObj = newConnection.pop()
+				// 	operationJSON = connObj.removeConnection
+				// 	sourceAndTarget.connSourceUUid = connObj.connSourceUUid
+				// 	sourceAndTarget.connTargetUUid = connObj.connTargetUUid
+				// 	if (newConnection.length <= 0) {
+				// 		isRemoveConn = false
+				// 	}
+				// }
 				//console.log("66666666",sourceAndTarget)
 				ctrlYStack['addConnection'].push(sourceAndTarget)
 				ctrlYOperationStack.push("addConnection");
@@ -1647,14 +1649,16 @@ document.onkeydown = function () {
 				var operationJSON = chartOperationStack[rareOperation].pop();
 				//console.log("删除后回退的对象", operationJSON);
 				isConnection = false;
-				isRemoveConn = true;
+				//isRemoveConn = true;
 				var conn = jsPlumb.connect({ uuids: [operationJSON.connSourceUUid, operationJSON.connTargetUUid] })
 				//console.log("重新连接后的对象",conn)
 				connectionObj = {}
 				connectionObj.removeConnection = conn
 				connectionObj.connSourceUUid = operationJSON.connSourceUUid
 				connectionObj.connTargetUUid = operationJSON.connTargetUUid
+				delConnectionMap.set(operationJSON.connTargetUUid,operationJSON.connSourceUUid)
 				newConnection.push(connectionObj)
+				//alert(111111111)
 				ctrlYStack['deleteConnection'].push(connectionObj)
 				ctrlYOperationStack.push("deleteConnection");
 				limitY()
@@ -1838,8 +1842,10 @@ document.onkeydown = function () {
 			for (var i = 0; i < idList.length; i++) {
 				var copyJson = saveNodeJson(idList[i])
 				copyPream.push(copyJson)
+				nodeList.push(idList[i])
 			}
-			isRemoveConn = true
+			//delNodeIsConnection()
+			//isRemoveConn = true
 			for (var a = 0; a < idList.length; a++) {
 				jsPlumb.remove(idList[a])
 			}
@@ -1893,6 +1899,27 @@ document.onkeydown = function () {
 		}
 	}
 }
+//判断连线是否被删除
+function delConnection(sourEndUuid, tarEndUuid){
+	let isDelConnection = false
+	for (let [k, v] of delConnectionMap) {
+		if(k==tarEndUuid && v==sourEndUuid){
+			isDelConnection = true
+		}
+	}
+	return isDelConnection
+}
+//判断连线的构件是否被删除
+function delNodeIsConnection(sourNodeId, tarNodeId) {
+	let nodeIsDel = false
+	for (let i = 0; i < nodeList.length; i++) {
+		if (sourNodeId == nodeList[i] || tarNodeId == nodeList[i]) {
+			nodeIsDel = true
+		}
+	}
+	return nodeIsDel
+
+}
 
 function removeConn(obj) {
 	//if(obj.endpoints != null){
@@ -1918,7 +1945,8 @@ function pasteJson(pasteDataJson) {
 	var endpoints = pasteDataJson.jsonendpoints;
 	//console.log(nodes);
 	$.each(nodes, function (index, elem) {
-		var newId = uuid.v1()
+		//var newId = uuid.v1()
+		var newId = createNum()
 		//console.log("画布数据",canvasData,elem.blockId);
 		canvasData.set(newId, elem.nodeData)
 		connectionMap.set(elem.blockId, newId)
@@ -1939,7 +1967,7 @@ function pasteJson(pasteDataJson) {
 			"</div>" +
 			"</div>";
 		$('#drop-bg').append(Template1);
-		
+
 		addDraggable(newId)
 
 		$('#' + newId).bind('click', function (event) {
@@ -1955,23 +1983,21 @@ function pasteJson(pasteDataJson) {
 					}
 				}
 			}
+			if (lastTimeId != "") {
+				$('#' + lastTimeId).removeClass("nodeStyle")
+				$.each(jsPlumb.getEndpoints(lastTimeId), function (n, v) {
+					v.removeClass("nodeStyle")
+				});
+			}
+
+			$('#' + newId).addClass("nodeStyle")
 			var loadendpoints = jsPlumb.getEndpoints(newId);
 			var uuidList = new Array();
 			$.each(loadendpoints, function (n, val) {
 				val.addClass("nodeStyle")
 				uuidList.push(val.getUuid());
 			});
-			
-			if(lastTimeId != ""){
-				$('#' + lastTimeId).removeClass("nodeStyle")
-				$.each(jsPlumb.getEndpoints(lastTimeId), function (n,v) {
-					v.removeClass("nodeStyle")
-				});
-			}
-			$('#' + newId).addClass("nodeStyle")
-			// $.each(endpoints, function (n, val) {
-			// 	val.addClass("nodeStyle")
-			// });
+
 			lastTimeId = newId
 			//console.log("uuid集合", uuidList);
 			var TempData = [];
@@ -2052,8 +2078,8 @@ function pasteJson(pasteDataJson) {
 		$.each(endpoints, function (index, endpoint) {
 			var config = JSON.parse(JSON.stringify(getBaseNodeConfig()))
 			if (endpoint.anchorX == 0) {
-				var midpoints1 = [ 0.2, 0.4, 0.6, 0.8]
-				var midpoints = [ 30, 40, 50, 60]
+				var midpoints1 = [0.2, 0.4, 0.6, 0.8]
+				var midpoints = [30, 40, 50, 60]
 				inputIndex++
 				config.isSource = false
 				config.maxConnections = 1
@@ -2063,17 +2089,19 @@ function pasteJson(pasteDataJson) {
 					radius: 5,
 					lineWidth: 2
 				}
-				config.connector[1].midpoint =midpoints1[inputIndex]
+				config.connector[1].midpoint = midpoints1[inputIndex]
 				config.connector[1].stub = midpoints[inputIndex]
 				var inPoint = jsPlumb.addEndpoint(newId, {
 					anchors: [0, endpoint.anchorY, -1, 0],
 					uuid: endpoint.uuid.split("*")[0] + "*" + endpoint.uuid.split("*")[1] + "*" + newId,
 				}, config)
+				endpointMap.set(endpoint.uuid.split("*")[0] + "*" + endpoint.uuid.split("*")[1] + "*" + newId,
+					JSON.parse(JSON.stringify(endpointMap.get(
+						endpoint.uuid.split("*")[0] + "*" + endpoint.uuid.split("*")[1] + "*" + elem.blockId
+					))))
 				inPoint.bind('dblclick', function (endpoint, originalEvent) {
-					// console.log("222222222222222",canvasData.get(newId))
-					// console.log("进入", canvasData.get(newId).inputList[0].variableName)
-					addTemDiv(endpoint, canvasData.get(newId).inputList);
-					//var mouse = mousePosition();
+					addDiv(endpoint);
+					//addTemDiv(endpoint, canvasData.get(newId).inputList);
 					var endpointId = endpoint.getUuid().split("*")[2]
 					var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
 					var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
@@ -2088,25 +2116,30 @@ function pasteJson(pasteDataJson) {
 					mousedownState = 1;
 				});
 			} else {
-				var midpoints = [ 0.7, 0.5, 0.3,0.1]
+				var midpoints = [0.7, 0.5, 0.3, 0.1]
 				var stub = [40, 30, 20, 10]
 				outIndex++
 				config.isTarget = true
 				config.maxConnections = -1
 				console.log(midpoints)
-				config.connector[1].midpoint =midpoints[outIndex]
+				config.connector[1].midpoint = midpoints[outIndex]
 				config.connector[1].stub = stub[outIndex]
 				var outPoint = jsPlumb.addEndpoint(newId, {
 					anchors: [1, endpoint.anchorY, 1, 0],
 					uuid: endpoint.uuid.split("*")[0] + "*" + endpoint.uuid.split("*")[1] + "*" + newId,
 				}, config)
+				endpointMap.set(endpoint.uuid.split("*")[0] + "*" + endpoint.uuid.split("*")[1] + "*" + newId,
+					JSON.parse(JSON.stringify(endpointMap.get(
+						endpoint.uuid.split("*")[0] + "*" + endpoint.uuid.split("*")[1] + "*" + elem.blockId
+					))))
 				outPoint.bind('dblclick', function (endpoint, originalEvent) {
-					addTemDiv(endpoint, canvasData.get(newId).outputList);
+					//addTemDiv(endpoint, canvasData.get(newId).outputList);
+					addDiv(endpoint);
 					var endpointId = endpoint.getUuid().split("*")[2]
 					var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
 					var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 					$('.point').css("position", "absolute");
-					$('.point').css("left", x -15);
+					$('.point').css("left", x - 15);
 					$('.point').css("top", y);
 				});
 				// outPoint.bind('mouseout', function (endpoint, originalEvent) {
@@ -2150,6 +2183,7 @@ function pasteJson(pasteDataJson) {
 		isConnection = false;
 		jsPlumb.connect({ uuids: [sourceUUid, targetUUid] })
 	});
+	console.log("锚点数据", endpointMap)
 
 }
 
@@ -2178,37 +2212,40 @@ function save() {
 		var sourceuid = connection.endpoints[0].getUuid();
 
 		//设置当前连接线源锚点是否为新增
-		var addsourcePointState = false;
-		//设置新增源锚点在addPointParam集合中的下标
-		var addSPointParamindex = 0;
-		if (addPointParam.length > 0) {
-			$.each(addPointParam, function (index1, addPoinr) {
-				if (sourceuid == addPoinr.uid) {
-					addsourcePointState = true;
-					addSPointParamindex = index1;
-				}
-			});
-		}
+		// var addsourcePointState = false;
+		// //设置新增源锚点在addPointParam集合中的下标
+		// var addSPointParamindex = 0;
+		// if (addPointParam.length > 0) {
+		// 	$.each(addPointParam, function (index1, addPoinr) {
+		// 		if (sourceuid == addPoinr.uid) {
+		// 			addsourcePointState = true;
+		// 			addSPointParamindex = index1;
+		// 		}
+		// 	});
+		// }
 		var sourDataTypeName = "";
 		var sourVariableName = "";
 		var sourLength = "";
-		if (addsourcePointState) {
-			sourDataTypeName = addPointParam[addSPointParamindex].data.dataTypeName;
-			sourVariableName = addPointParam[addSPointParamindex].data.variableName;
-			sourLength = addPointParam[addSPointParamindex].data.lengthName;
-		} else {
-			var str = sourceuid.split('*');
-			//var s1 =  sourceuid.substr(0,4);
-			var sourceUuid = str[0];
-			//获取数据输出参数
-			//var sourcePrame = dat[sourceGj].outputList[sourceUuid].dataTypeName;
-			// sourDataTypeName = dat[sourceGj].outputList[sourceUuid].dataTypeName;
-			// sourVariableName = dat[sourceGj].outputList[sourceUuid].variableName;
-			// sourLength = dat[sourceGj].outputList[sourceUuid].lengthName;
-			sourDataTypeName = canvasData.get(str[2]).outputList[sourceUuid].dataTypeName;
-			sourVariableName = canvasData.get(str[2]).outputList[sourceUuid].variableName;
-			sourLength = canvasData.get(str[2]).outputList[sourceUuid].lengthName;
-		}
+		sourDataTypeName = endpointMap.get(sourceuid).dataTypeName
+		sourVariableName = endpointMap.get(sourceuid).variableName
+		sourLength = endpointMap.get(sourceuid).lengthName
+		// if (addsourcePointState) {
+		// 	sourDataTypeName = addPointParam[addSPointParamindex].data.dataTypeName;
+		// 	sourVariableName = addPointParam[addSPointParamindex].data.variableName;
+		// 	sourLength = addPointParam[addSPointParamindex].data.lengthName;
+		// } else {
+		// 	var str = sourceuid.split('*');
+		// 	//var s1 =  sourceuid.substr(0,4);
+		// 	var sourceUuid = str[0];
+		// 	//获取数据输出参数
+		// 	//var sourcePrame = dat[sourceGj].outputList[sourceUuid].dataTypeName;
+		// 	// sourDataTypeName = dat[sourceGj].outputList[sourceUuid].dataTypeName;
+		// 	// sourVariableName = dat[sourceGj].outputList[sourceUuid].variableName;
+		// 	// sourLength = dat[sourceGj].outputList[sourceUuid].lengthName;
+		// 	sourDataTypeName = canvasData.get(str[2]).outputList[sourceUuid].dataTypeName;
+		// 	sourVariableName = canvasData.get(str[2]).outputList[sourceUuid].variableName;
+		// 	sourLength = canvasData.get(str[2]).outputList[sourceUuid].lengthName;
+		// }
 		//console.log("arrow数据11111111",dat[sourceGj])
 		// var sourCompName = dat[sourceGj].functionName;
 		// console.log("数据比较",sourCompName)
@@ -2223,32 +2260,34 @@ function save() {
 		//var dataTarGjId = dat[targetGj].id;
 		//获取画布目标锚点uuid
 		var targetid = connection.endpoints[1].getUuid();
-		//设置当前连线目标节点是否为新增
-		var addTargetPointParam = false;
-		////设置新增目标锚点在addPointParam集合中的下标
-		var addTPointParamindex = 0;
-		if (addPointParam.length > 0) {
-			$.each(addPointParam, function (index1, addPoinr) {
-				if (targetid == addPoinr.uid) {
-					addTargetPointParam = true;
-					addTPointParamindex = index1;
-				}
-			});
-		}
+		// //设置当前连线目标节点是否为新增
+		// var addTargetPointParam = false;
+		// ////设置新增目标锚点在addPointParam集合中的下标
+		// var addTPointParamindex = 0;
+		// if (addPointParam.length > 0) {
+		// 	$.each(addPointParam, function (index1, addPoinr) {
+		// 		if (targetid == addPoinr.uid) {
+		// 			addTargetPointParam = true;
+		// 			addTPointParamindex = index1;
+		// 		}
+		// 	});
+		// }
 		var tarDataTypeName = "";
 		var tarVariableName = "";
-		if (addTargetPointParam) {
-			tarDataTypeName = addPointParam[addTPointParamindex].data.dataTypeName;
-			tarVariableName = addPointParam[addTPointParamindex].data.variableName;
-		} else {
-			var str = targetid.split('*');
-			//console.log("+++++++++++++++",str)
-			var targetUuid = str[0];
-			// tarDataTypeName = dat[targetGj].inputList[targetUuid].dataTypeName;
-			// tarVariableName = dat[targetGj].inputList[targetUuid].variableName;
-			tarDataTypeName = canvasData.get(str[2]).inputList[targetUuid].dataTypeName;
-			tarVariableName = canvasData.get(str[2]).inputList[targetUuid].variableName;
-		}
+		tarDataTypeName = endpointMap.get(targetid).dataTypeName
+		tarVariableName = endpointMap.get(targetid).variableName
+		// if (addTargetPointParam) {
+		// 	tarDataTypeName = addPointParam[addTPointParamindex].data.dataTypeName;
+		// 	tarVariableName = addPointParam[addTPointParamindex].data.variableName;
+		// } else {
+		// 	var str = targetid.split('*');
+		// 	//console.log("+++++++++++++++",str)
+		// 	var targetUuid = str[0];
+		// 	// tarDataTypeName = dat[targetGj].inputList[targetUuid].dataTypeName;
+		// 	// tarVariableName = dat[targetGj].inputList[targetUuid].variableName;
+		// 	tarDataTypeName = canvasData.get(str[2]).inputList[targetUuid].dataTypeName;
+		// 	tarVariableName = canvasData.get(str[2]).inputList[targetUuid].variableName;
+		// }
 
 		//获取数据输入参数
 		//var tarCompName = dat[targetGj].functionName;
@@ -2281,8 +2320,8 @@ function save() {
 			end: targetPrame,
 			length: sourLength,
 			id: id,
-			endId:targetid,
-			stateId:sourceuid
+			endId: targetid,
+			stateId: sourceuid
 		};
 		conn.push(con3);
 
@@ -2298,8 +2337,8 @@ function save() {
 	return JSON.stringify(connects);
 }
 //清空当前画布构件
-function cleanCanvas(){
-	$(".pa").each(function(index,elem){
+function cleanCanvas() {
+	$(".pa").each(function (index, elem) {
 		var $elem = $(elem)
 		jsPlumb.remove($elem.attr('id'))
 	})
@@ -2337,7 +2376,7 @@ function saveFlowchart() {
 			inPointsData: canvasData.get($elem.attr('id')).inputList,
 			compImg: canvasData.get($elem.attr('id')).compImg,
 			compId: canvasData.get($elem.attr('id')).compId,
-			nodeData : canvasData.get($elem.attr('id'))
+			nodeData: canvasData.get($elem.attr('id'))
 		});
 		//nodes.push(jsonendpoints);
 		//outPointsData.push(dat[i].outputList);
@@ -2371,11 +2410,31 @@ function saveFlowchart() {
 	flowChart.connections = connections;
 	flowChart.jsonendpoints = jsonendpoints;
 	flowChart.addPointParam = addPointParam;
+	flowChart.endpointMap = JSON.stringify(strMapToObj(endpointMap));
 	//flowChart.outPointsData = outPointsData;
 	//flowChart.inPointsData = inPointsData;
 	var flowChartJson = JSON.stringify(flowChart);
-	//console.log("流程图数据", flowChartJson);
+	console.log("锚点map", flowChart, endpointMap)
+	console.log("流程图数据", flowChartJson);
 	return flowChartJson;
+}
+
+//map转json
+function strMapToObj(strMap) {
+	let obj = Object.create(null)
+	for (let [k, v] of strMap) {
+		obj[k] = v
+	}
+	return obj
+}
+
+//json转为map
+function objToMap(obj) {
+	let strMap = new Map()
+	for (let k of Object.keys(obj)) {
+		strMap.set(k, obj[k])
+	}
+	return strMap
 }
 
 //添加锚点信息(还原)
@@ -2401,8 +2460,8 @@ function addTemDiv(endpoint, PointsData) {
 	}
 	$('#drop-bg').append(str);
 	//$('body').append(str);
-	$(".point").bind('click',function(event){
-	//	console.log("+++++++++++++++",event)
+	$(".point").bind('click', function (event) {
+		//	console.log("+++++++++++++++",event)
 		event.stopPropagation();
 		$('.point').remove();
 	})
@@ -2416,15 +2475,24 @@ function addTemDiv(endpoint, PointsData) {
 // }
 //解析json字符串还原流程图
 function loadJson(loadJson) {
-	//console.log("粘贴", loadJson);
+	console.log("粘贴", loadJson);
 	//var loadJson = {"nodes":[{"blockId":"2521ced0-8455-11e9-8180-6b92e201c8cd","positionX":120,"positionY":72,"imageId":"0","outPointsData":[{"variableName":"rr","variableStructType":"","dataTypeName":"int*","orderNumName":"","lengthName":"1","categoryName":"DATA","voluationName":"","selectionVariableName":"","parameterNumName":{}}],"inPointsData":[{"variableName":"asf","variableStructType":"","dataTypeName":"int*","orderNumName":"","lengthName":"4","categoryName":"DATA","voluationName":"","selectionVariableName":"","parameterNumName":{}}],"compImg":"<div style='text-align:center;height:80px;width:160px;border:4px solid ;border-radius:1px;background-color: #E7DC08;display: block;'><img src='./gjk/image/u7.png' style='vertical-align: middle;width: 150px; height:75px;border-radius:5px;'><i style='display: inline-block;height: 100%;vertical-align: middle;'></i><div class='desc' id='\" + i + \"'>构件001</div></div>"},{"blockId":"25cbca70-8455-11e9-8180-6b92e201c8cd","positionX":536,"positionY":69,"imageId":"0","outPointsData":[{"variableName":"rr","variableStructType":"","dataTypeName":"int*","orderNumName":"","lengthName":"1","categoryName":"DATA","voluationName":"","selectionVariableName":"","parameterNumName":{}}],"inPointsData":[{"variableName":"asf","variableStructType":"","dataTypeName":"int*","orderNumName":"","lengthName":"4","categoryName":"DATA","voluationName":"","selectionVariableName":"","parameterNumName":{}}],"compImg":"<div style='text-align:center;height:80px;width:160px;border:4px solid ;border-radius:1px;background-color: #E7DC08;display: block;'><img src='./gjk/image/u7.png' style='vertical-align: middle;width: 150px; height:75px;border-radius:5px;'><i style='display: inline-block;height: 100%;vertical-align: middle;'></i><div class='desc' id='\" + i + \"'>构件001</div></div>"},{"blockId":"268f1a70-8455-11e9-8180-6b92e201c8cd","positionX":486,"positionY":245,"imageId":"0","outPointsData":[{"variableName":"rr","variableStructType":"","dataTypeName":"int*","orderNumName":"","lengthName":"1","categoryName":"DATA","voluationName":"","selectionVariableName":"","parameterNumName":{}}],"inPointsData":[{"variableName":"asf","variableStructType":"","dataTypeName":"int*","orderNumName":"","lengthName":"4","categoryName":"DATA","voluationName":"","selectionVariableName":"","parameterNumName":{}}],"compImg":"<div style='text-align:center;height:80px;width:160px;border:4px solid ;border-radius:1px;background-color: #E7DC08;display: block;'><img src='./gjk/image/u7.png' style='vertical-align: middle;width: 150px; height:75px;border-radius:5px;'><i style='display: inline-block;height: 100%;vertical-align: middle;'></i><div class='desc' id='\" + i + \"'>构件001</div></div>"},{"blockId":"278672c0-8455-11e9-8180-6b92e201c8cd","positionX":188,"positionY":243,"imageId":"0","outPointsData":[{"variableName":"rr","variableStructType":"","dataTypeName":"int*","orderNumName":"","lengthName":"1","categoryName":"DATA","voluationName":"","selectionVariableName":"","parameterNumName":{}}],"inPointsData":[{"variableName":"asf","variableStructType":"","dataTypeName":"int*","orderNumName":"","lengthName":"4","categoryName":"DATA","voluationName":"","selectionVariableName":"","parameterNumName":{}}],"compImg":"<div style='text-align:center;height:80px;width:160px;border:4px solid ;border-radius:1px;background-color: #E7DC08;display: block;'><img src='./gjk/image/u7.png' style='vertical-align: middle;width: 150px; height:75px;border-radius:5px;'><i style='display: inline-block;height: 100%;vertical-align: middle;'></i><div class='desc' id='\" + i + \"'>构件001</div></div>"}],"connections":[{"connectionId":"con_28","pageSourceId":"2521ced0-8455-11e9-8180-6b92e201c8cd","pageTargetId":"25cbca70-8455-11e9-8180-6b92e201c8cd","anchors":[[1,0.5,0,1,0,0],[0,0.5,0,-1,0,0]],"sourceUuid":"0*output*2521ced0-8455-11e9-8180-6b92e201c8cd","targetUuid":"0*input*25cbca70-8455-11e9-8180-6b92e201c8cd"},{"connectionId":"con_33","pageSourceId":"25cbca70-8455-11e9-8180-6b92e201c8cd","pageTargetId":"268f1a70-8455-11e9-8180-6b92e201c8cd","anchors":[[1,0.5,0,1,0,0],[0,0.5,0,-1,0,0]],"sourceUuid":"0*output*25cbca70-8455-11e9-8180-6b92e201c8cd","targetUuid":"0*input*268f1a70-8455-11e9-8180-6b92e201c8cd"},{"connectionId":"con_38","pageSourceId":"2521ced0-8455-11e9-8180-6b92e201c8cd","pageTargetId":"278672c0-8455-11e9-8180-6b92e201c8cd","anchors":[[1,0.5,0,1,0,0],[0,0.5,0,-1,0,0]],"sourceUuid":"0*output*2521ced0-8455-11e9-8180-6b92e201c8cd","targetUuid":"0*input*278672c0-8455-11e9-8180-6b92e201c8cd"}],"jsonendpoints":[{"anchorX":0,"anchorY":0.5,"uuid":"0*input*2521ced0-8455-11e9-8180-6b92e201c8cd","id":"2521ced0-8455-11e9-8180-6b92e201c8cd"},{"anchorX":1,"anchorY":0.5,"uuid":"0*output*2521ced0-8455-11e9-8180-6b92e201c8cd","id":"2521ced0-8455-11e9-8180-6b92e201c8cd"},{"anchorX":0,"anchorY":0.5,"uuid":"0*input*25cbca70-8455-11e9-8180-6b92e201c8cd","id":"25cbca70-8455-11e9-8180-6b92e201c8cd"},{"anchorX":1,"anchorY":0.5,"uuid":"0*output*25cbca70-8455-11e9-8180-6b92e201c8cd","id":"25cbca70-8455-11e9-8180-6b92e201c8cd"},{"anchorX":0,"anchorY":0.5,"uuid":"0*input*268f1a70-8455-11e9-8180-6b92e201c8cd","id":"268f1a70-8455-11e9-8180-6b92e201c8cd"},{"anchorX":1,"anchorY":0.5,"uuid":"0*output*268f1a70-8455-11e9-8180-6b92e201c8cd","id":"268f1a70-8455-11e9-8180-6b92e201c8cd"},{"anchorX":0,"anchorY":0.5,"uuid":"0*input*278672c0-8455-11e9-8180-6b92e201c8cd","id":"278672c0-8455-11e9-8180-6b92e201c8cd"},{"anchorX":1,"anchorY":0.5,"uuid":"0*output*278672c0-8455-11e9-8180-6b92e201c8cd","id":"278672c0-8455-11e9-8180-6b92e201c8cd"}]}
 	var nodes = loadJson.nodes;
 	var endpoints = loadJson.jsonendpoints;
 	//console.log("锚点数据", endpoints)
 	var addPoinrData = loadJson.addPointParam;
+	if (loadJson.endpointMap != "") {
+		var loadEndpointMap = objToMap(JSON.parse(loadJson.endpointMap));
+		//将解析数据重新加入endpointMap
+		for (let [k, v] of loadEndpointMap) {
+			endpointMap.set(k, v)
+		}
+		console.log("获取解析的json", loadEndpointMap)
+		console.log("解析json串---锚点map", endpointMap)
+	}
 	//console.log(nodes);
 	$.each(nodes, function (index, elem) {
-		canvasData.set(elem.blockId,elem.nodeData)
+		canvasData.set(elem.blockId, elem.nodeData)
 		var Template1 = ""
 		Template1 +=
 			"<div class='pa' id='" + elem.blockId + "' style='top:" + elem.positionY + "px;left:" + elem.positionX + "px'>" +
@@ -2438,7 +2506,7 @@ function loadJson(loadJson) {
 			"</div>" +
 			"</div>";
 		$('#drop-bg').append(Template1);
-		
+
 		addDraggable(elem.blockId)
 
 		$('#' + elem.blockId).bind('click', function (event) {
@@ -2462,9 +2530,9 @@ function loadJson(loadJson) {
 				uuidList.push(val.getUuid());
 			});
 			$('#' + elem.blockId).addClass("nodeStyle")
-			if(lastTimeId != ""){
+			if (lastTimeId != "") {
 				$('#' + lastTimeId).removeClass("nodeStyle")
-				$.each(jsPlumb.getEndpoints(lastTimeId), function (n,v) {
+				$.each(jsPlumb.getEndpoints(lastTimeId), function (n, v) {
 					v.removeClass("nodeStyle")
 				});
 			}
@@ -2534,8 +2602,8 @@ function loadJson(loadJson) {
 			if (endpoint.id == elem.blockId) {
 				var config = JSON.parse(JSON.stringify(getBaseNodeConfig()))
 				if (endpoint.anchorX == 0) {
-					var midpoints1 = [ 0.2, 0.4, 0.6, 0.8]
-					var midpoints = [ 30, 40, 50, 60]
+					var midpoints1 = [0.2, 0.4, 0.6, 0.8]
+					var midpoints = [30, 40, 50, 60]
 					inputIndex++
 					config.isSource = false
 					config.maxConnections = 1
@@ -2545,26 +2613,28 @@ function loadJson(loadJson) {
 						radius: 5,
 						lineWidth: 2
 					}
-					config.connector[1].midpoint =midpoints1[inputIndex]
+					config.connector[1].midpoint = midpoints1[inputIndex]
 					config.connector[1].stub = midpoints[inputIndex]
 					var inPoint = jsPlumb.addEndpoint(elem.blockId, {
 						anchors: [0, endpoint.anchorY, -1, 0],
 						uuid: endpoint.uuid,
 					}, config)
 					inPoint.bind('dblclick', function (endpoint, originalEvent) {
-						$.each(addPoinrData, function (index1, addPoinr) {
-							if (endpoint.getUuid() == addPoinr.uid) {
-								addinPointState = true;
-								addPoinrIndex = index1;
-							} else {
-								addinPointState = false;
-							}
-						});
-						if (addinPointState) {
-							addPointDiv(addPoinrData[addPoinrIndex]);
-						} else {
-							addTemDiv(endpoint, elem.inPointsData);
-						}
+						// $.each(addPoinrData, function (index1, addPoinr) {
+						// 	if (endpoint.getUuid() == addPoinr.uid) {
+						// 		addinPointState = true;
+						// 		addPoinrIndex = index1;
+						// 	} else {
+						// 		addinPointState = false;
+						// 	}
+						// });
+						// if (addinPointState) {
+						// 	addPointDiv(addPoinrData[addPoinrIndex]);
+						// } else {
+						// 	addTemDiv(endpoint, elem.inPointsData);
+						// }
+						//锚点悬浮框显示
+						addDiv(endpoint);
 						// var mouse = mousePosition();
 						// console.log(mouse)
 						var endpointId = endpoint.getUuid().split("*")[2]
@@ -2581,37 +2651,38 @@ function loadJson(loadJson) {
 						mousedownState = 1;
 					});
 				} else {
-					var midpoints = [ 0.7, 0.5, 0.3,0.1]
+					var midpoints = [0.7, 0.5, 0.3, 0.1]
 					var stub = [40, 30, 20, 10]
 					outIndex++
 					config.isTarget = true
 					config.maxConnections = -1
-					config.connector[1].midpoint =midpoints[outIndex]
+					config.connector[1].midpoint = midpoints[outIndex]
 					config.connector[1].stub = stub[outIndex]
 					var outPoint = jsPlumb.addEndpoint(elem.blockId, {
 						anchors: [1, endpoint.anchorY, 1, 0],
 						uuid: endpoint.uuid,
 					}, config)
 					outPoint.bind('dblclick', function (endpoint, originalEvent) {
-						$.each(addPoinrData, function (index1, addPoinr) {
-							if (endpoint.getUuid() == addPoinr.uid) {
-								addoutPointState = true;
-								addPoinrIndex = index1;
-							} else {
-								addoutPointState = false;
-							}
-						});
-						if (addoutPointState) {
-							addPointDiv(addPoinrData[addPoinrIndex]);
-						} else {
-							addTemDiv(endpoint, elem.outPointsData);
-						}
+						// $.each(addPoinrData, function (index1, addPoinr) {
+						// 	if (endpoint.getUuid() == addPoinr.uid) {
+						// 		addoutPointState = true;
+						// 		addPoinrIndex = index1;
+						// 	} else {
+						// 		addoutPointState = false;
+						// 	}
+						// });
+						// if (addoutPointState) {
+						// 	addPointDiv(addPoinrData[addPoinrIndex]);
+						// } else {
+						// 	addTemDiv(endpoint, elem.outPointsData);
+						// }
 						//var mouse = mousePosition();
+						addDiv(endpoint);
 						var endpointId = endpoint.getUuid().split("*")[2]
 						var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
 						var x = $("#" + endpointId).offset().left + $(areaId).scrollLeft();
 						$('.point').css("position", "absolute");
-						$('.point').css("left", x -15);
+						$('.point').css("left", x - 15);
 						$('.point').css("top", y);
 					});
 					// outPoint.bind('mouseout', function (endpoint, originalEvent) {
@@ -2622,10 +2693,10 @@ function loadJson(loadJson) {
 					});
 				}
 			}
-			
+
 		});
 		//console.log("是否执行加载",loadingState)
-		if(!loadState){
+		if (!loadState) {
 			//console.log("22222222222222",elem.blockId)
 			var gjidAndTemid = [];
 			var b = $('#' + elem.blockId + '-heading')[0].dataset.id;
@@ -2649,6 +2720,7 @@ function loadJson(loadJson) {
 	});
 
 	var connections = loadJson.connections;
+	console.log
 	$.each(connections, function (index, elem) {
 		isConnection = false;
 		var c = jsPlumb.connect({ uuids: [elem.sourceUuid, elem.targetUuid] })
@@ -2656,8 +2728,11 @@ function loadJson(loadJson) {
 		connectionObj.removeConnection = c
 		connectionObj.connSourceUUid = elem.sourceUuid
 		connectionObj.connTargetUUid = elem.targetUuid
-		newConnection.push(connectionObj)
-		//console.log("新连接newConnection", newConnection)
+		if(c != undefined){
+			delConnectionMap.set(elem.targetUuid,elem.sourceUuid)
+			newConnection.push(connectionObj)
+		}
+		console.log("新连接newConnection", newConnection)
 	});
 }
 
@@ -2741,16 +2816,16 @@ var lastTime = 0;
 $('.div_right').bind({
 	click: function () {
 		var removeTemp = [];
-			removeTemp.push({
-				//构件ID
-				gjId:"",
-				//构件模板ID
-				tmpId: "",
-				//状态
-				state: 5
-			});
-			//console.log(removeTemp);
-			handleMessageToParent("returnFormJson", removeTemp);
+		removeTemp.push({
+			//构件ID
+			gjId: "",
+			//构件模板ID
+			tmpId: "",
+			//状态
+			state: 5
+		});
+		//console.log(removeTemp);
+		handleMessageToParent("returnFormJson", removeTemp);
 		if (key) {
 			//alert(idList.length)
 			key = false;
@@ -2788,9 +2863,9 @@ $('.div_right').bind({
 				//$("#"+idList[i]+"-heading").css({"box-shadow":"none"})
 				$(".pa").removeClass("ui-selected")
 			}
-			if(lastTimeId != ""){
+			if (lastTimeId != "") {
 				$('#' + lastTimeId).removeClass("nodeStyle")
-				$.each(jsPlumb.getEndpoints(lastTimeId), function (n,v) {
+				$.each(jsPlumb.getEndpoints(lastTimeId), function (n, v) {
 					v.removeClass("nodeStyle")
 				});
 			}
@@ -2852,7 +2927,7 @@ $('.div_right').bind({
 // 				// 			"transform": `scale(${scale})`
 // 				// 	})
 // 				// })
-				
+
 // 			}
 
 // 		}
@@ -3087,7 +3162,7 @@ function toggleFullScreen() {
 }
 
 //完备性检查修改锚点样式
-function endpointCheck(styleColor){
+function endpointCheck(styleColor) {
 	$(".pa").each(function (idx, elem) {
 		var $elem = $(elem);
 		//i用于定位使用什么数据
@@ -3097,20 +3172,19 @@ function endpointCheck(styleColor){
 		//循环构件上的锚点
 		$.map(endpoints, function (endpoint) {
 			//console.log("锚点",endpoint.getPaintStyle())
-			if(endpoint.anchor.x == 0){
+			if (endpoint.anchor.x == 0) {
 				endpoint.getPaintStyle().strokeStyle = styleColor
-			}else{
+			} else {
 				endpoint.getPaintStyle().strokeStyle = styleColor
 				endpoint.getPaintStyle().fillStyle = styleColor
 			}
-			
 		});
 	});
 	jsPlumb.setSuspendDrawing(false, true);
 }
 
 //完备性检查修改连线样式
-function connectionCheck(styleColor){
+function connectionCheck(styleColor) {
 	$.each(jsPlumb.getConnections(), function (idx, connection) {
 		//console.log(connection.getPaintStyle())
 		//connection.addClass("warn")

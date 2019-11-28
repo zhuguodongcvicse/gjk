@@ -124,7 +124,7 @@ public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> i
 			SoftwareDTO dto = new SoftwareDTO(soft);
 			softwareDTOs.add(dto);
 		}
-		Page<SoftwareDTO> softwareDTOPage = new Page<SoftwareDTO>(softwarePage.getCurrent(), softwarePage.getSize());
+		Page<SoftwareDTO> softwareDTOPage = new Page<SoftwareDTO>(softwarePage.getCurrent(), softwarePage.getSize(),softwarePage.getTotal());
 		softwareDTOPage.setRecords(softwareDTOs);
 		return softwareDTOPage;
 	}
