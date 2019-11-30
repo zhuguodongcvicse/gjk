@@ -63,3 +63,11 @@ export function saveCompFrame (param) {
     data: param
   })
 }
+
+export function fetchCompframeToTree(obj) {
+  return request({
+    url: '/libs/compframe/compframeToTree',
+    method: 'post',
+    data: obj
+  })
+}

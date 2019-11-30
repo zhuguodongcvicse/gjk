@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 
 import com.google.common.collect.Maps;
@@ -98,7 +99,8 @@ public class HeaderFileAndStructUtils {
 
 		for (Map.Entry<String, String> entry : paramNameToType.entrySet()) {
 			String paramName = entry.getKey();
-			String strItem = entry.getValue();
+			String strItem = entry.getValue()+"|测试结构体注释文本"+IdGenerate.millsAndRandomId();
+//			String strItem = entry.getValue();
 			Integer paramIndex = indexToParaName.get(paramName);
 			StringBuilder sType = new StringBuilder();
 			StringBuilder sRemarks = new StringBuilder();
@@ -143,7 +145,8 @@ public class HeaderFileAndStructUtils {
 		// 拆分数据类型和变量名，当变量类型不是基本类型，那么嵌套解析
 		List<String> mapValue = oriMap.get(structTypeNo);
 		for (int i = 0; i < mapValue.size(); i++) {
-			String strItem = mapValue.get(i);
+//			String strItem = mapValue.get(i);
+			String strItem = new String(mapValue.get(i)+"|测试结构体成员注释文本"+IdGenerate.millsAndRandomId());
 			StringBuilder sName = new StringBuilder();
 			StringBuilder sType = new StringBuilder();
 			StringBuilder sRemarks = new StringBuilder();
@@ -241,9 +244,7 @@ public class HeaderFileAndStructUtils {
 	private static boolean splitParamTypeAndName(String strItem, StringBuilder... params) {
 		String[] strArray = strItem.split("\\|");
 		for (int i = 0; i < strArray.length; i++) {
-			System.out.println(strArray[i] + "  " + i + "  " + params.length);
 			if (i < params.length) {
-//				params[i] = new StringBuilder();
 				params[i].append(strArray[i]);
 			} else {
 				return false;
@@ -341,6 +342,7 @@ public class HeaderFileAndStructUtils {
 		varAttributeMap.put("name", vo.getFparamName());
 		varAttributeMap.put("structType", "");
 		varAttributeMap.put("structId", "");
+		varAttributeMap.put("paramRemarks", vo.getParamRemarks());
 		varXmlEntityMap.setAttributeMap(varAttributeMap);
 		varXmlEntityMap.setXmlEntityMaps(new ArrayList<XmlEntityMap>());
 

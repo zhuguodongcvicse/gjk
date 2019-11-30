@@ -19,7 +19,7 @@
           size="mini"
           icon="el-icon-edit"
           v-if="this.$route.query.type !== 'view'"
-          @click.native="compSpbShowDialog=true"
+          @click.native="compSpbShowDialogChecked"
         >生成构件框架</el-button>
       </el-col>
       <el-col :span="4">
@@ -272,6 +272,13 @@ export default {
       const isvalid = await this.$refs.compForm.compCheckedValidate();
       if (isvalid) {
         this.dialogVisibleOfComBackup = true;
+      }
+    },
+    async compSpbShowDialogChecked() {
+      //表单校验
+      const isvalid = await this.$refs.compForm.compCheckedValidate();
+      if (isvalid) {
+        this.compSpbShowDialog = true;
       }
     },
     sleep(time) {

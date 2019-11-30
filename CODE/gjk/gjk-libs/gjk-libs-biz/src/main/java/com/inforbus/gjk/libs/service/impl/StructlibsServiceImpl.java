@@ -174,6 +174,7 @@ public class StructlibsServiceImpl extends ServiceImpl<StructlibsMapper, Structl
         entity.setStructType(paramTreeVO.getStructClassify());
         entity.setDataLength(0);
         entity.setPermission("");
+        entity.setParamRemarks(paramTreeVO.getParamRemarks());
 
         // 调用mapper层方法保存到数据库
         if (flag) {

@@ -86,6 +86,9 @@ export const tableOption = {
       }, {
         label: '项目库',
         value: "7"
+      }, {
+        label: '构件框架库',
+        value: "8"
       }]
     },
     {

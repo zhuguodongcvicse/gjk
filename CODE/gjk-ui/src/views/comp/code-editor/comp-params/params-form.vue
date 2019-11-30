@@ -304,11 +304,13 @@ export default {
           ];
           if (item.lableName === "构件编号") {
             let idCheck = deepClone(mes);
-            idCheck.push({
-              validator: this.valiaCompIdCheck,
-              trigger: "change"
-            });
-            this.$set(this.compParamsFormRules, item.lableName, idCheck);
+            // idCheck.push({
+            //   validator: this.valiaCompIdCheck,
+            //   trigger: "change"
+            // });
+            if (this.$route.query.type === "add") {
+              this.$set(this.compParamsFormRules, item.lableName, idCheck);
+            }
           } else if (item.lableName === "显示名") {
             this.$set(this.compParamsFormRules, item.lableName, mes);
           } else if (item.lableName === "属性1") {
@@ -536,7 +538,7 @@ export default {
   //方法集合
   methods: {
     //构件检验方法
-  async  compCheckedValidate() {
+    async compCheckedValidate() {
       let isvalid = false;
       this.$refs.compParamsForm.validate((valid, object) => {
         isvalid = valid;

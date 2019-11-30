@@ -101,6 +101,11 @@ import {
   getObj as getStructById,
   putObj as modifyStruct
 } from "@/api/libs/structlibs";
+import {
+  getObj as getCompframeById,
+  fetchCompframeToTree,
+  putObj as modifyCompframe
+} from "@/api/libs/compframe";
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
 export default {
@@ -286,10 +291,21 @@ export default {
               );
             });
             break;
+          case "8":
+            let compframe = {};
+            compframe.id = this.applyItemMsg.applyId;
+            compframe.applyState = "2";
+            compframe.applyDesc = "已通过";
+            modifyCompframe(compframe).then(Response => {
+              this.dialogStateShow(false);
+              //刷新页面
+              this.$emit("refresh");
+            });
+            break;
         }
-        console.log(1)
+        console.log(1);
         // this.rejectDialog = false
-        this.isButtonUse = true
+        this.isButtonUse = true;
         this.$message({
           showClose: true,
           message: "已通过",
@@ -386,9 +402,21 @@ export default {
               }
             });
             break;
+          case "8":
+            let compframe = {};
+            compframe.id = this.applyItemMsg.applyId;
+            compframe.applyState = "3";
+            compframe.applyDesc = this.rejectMassage;
+            modifyCompframe(compframe).then(Response => {
+              this.rejectDialog = false;
+              this.dialogStateShow(false);
+              //刷新页面
+              this.$emit("refresh");
+            });
+            break;
         }
-        this.rejectDialog = false
-        this.isButtonUse = true
+        this.rejectDialog = false;
+        this.isButtonUse = true;
         this.$message({
           showClose: true,
           message: "已驳回",
@@ -479,7 +507,19 @@ export default {
             this.batch = false;
             this.libsNameValue = "批量导出";
           }
-          console.log("12121212121",this.applyId)
+          console.log("12121212121", this.applyId);
+          break;
+        case "8":
+          this.libsName = "构件框架名称：";
+          this.libsType = "构件框架库";
+          getCompframeById(this.applyItemMsg.applyId).then(res => {
+            let compframe = res.data.data;
+            this.libsNameValue = compframe.name;
+            fetchCompframeToTree(compframe).then(Response => {
+              this.compTreeData = Response.data.data;
+            });
+          });
+          this.isComp = true;
           break;
       }
       this.axios.get("/admin/user/info/getUserDict").then(Response => {
@@ -510,8 +550,6 @@ export default {
       this.handleCreate();
       console.log("this.handleCreate()后", this.applyId);
     });
-
-    
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},

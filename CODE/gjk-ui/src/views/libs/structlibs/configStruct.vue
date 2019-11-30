@@ -3,7 +3,7 @@
   <!-- <el-dialog title="结构体配置" :visible.sync="showStruct.dialogFormVisible" :close-on-click-modal="false"> -->
   <el-dialog
     title="结构体配置"
-    width="40%"
+    width="50%"
     :visible.sync="showStruct.dialogFormVisible"
     :close-on-click-modal="false"
     class="libs_structlibs_configstruct_14s_25s"
@@ -54,7 +54,7 @@
           @click="addNode"
           size="small"
         >增加节点</el-button>
-        <el-button type="primary" icon="el-icon-plus" @click="addChildNode" size="small">增加子节点</el-button>
+        <!-- <el-button type="primary" icon="el-icon-plus" @click="addChildNode" size="small">增加子节点</el-button> -->
         <el-button type="primary" icon="el-icon-remove-outline" @click="delNode" size="small">删除节点</el-button>
       </el-button-group>
       <!--@cell-mouse-enter="handleFTableMouserEnter"-->
@@ -106,12 +106,16 @@
                     v-else
                   >{{ item.version }}</span>
                 </el-option>
-                <!--<el-option v-for="item in fparamTypeData" :key="item" :label="item" :value="item"></el-option>-->
-                <!--<el-option label="unsigned int" value="unsigned int"></el-option>-->
-                <!--<el-option label="float" value="float"></el-option>-->
-                <!--<el-option label="int*" value="int*"></el-option>-->
-                <!--<el-option label="float*" value="float*"></el-option>-->
               </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column prop="paramRemarks" label="注释" type="scoped solt">
+            <template slot-scope="{row}" v-if="row.delFlag!='1'">
+              <el-input
+                :disabled="mappedModel.dbId===row.parentId?false:true"
+                v-model="row.paramRemarks"
+                size="mini"
+              ></el-input>
             </template>
           </el-table-column>
         </el-table>
@@ -255,7 +259,7 @@ export default {
         this.mappedModel.version = row.version;
         this.mappedModel.storageFlag = row.storageFlag;
         this.tmpModelSel = row.dataType;
-        console.log("更新的tmpModelSel：" + this.mappedModel);
+        console.log("更新的tmpModelSel：" + JSON.parse(JSON.stringify(this.mappedModel)));
       }
     },
     setChildrenIds(childParam, parentId) {

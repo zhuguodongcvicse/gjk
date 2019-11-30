@@ -108,13 +108,24 @@ export default {
     //构件检验方法
     async compCheckedValidate() {
       let isvalid = true;
+      let names = [];
       for (let index in this.analysisParamsDefineXmlParams) {
+        let name = this.analysisParamsDefineXmlParams[index].lableName;
         const valid = await this.$refs[
           "paramsform" + index
         ][0].compCheckedValidate();
         if (!valid) {
+          names.push(name);
           isvalid = false;
         }
+      }
+      if (!isvalid) {
+        this.$notify({
+          title: "提示",
+          message: names + " 有必填信息项",
+          type: "warning",
+          duration: 2000
+        });
       }
       return Promise.resolve(isvalid);
     },

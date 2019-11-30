@@ -91,6 +91,7 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.junit.Test;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -1025,5 +1026,9 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			res = "选择的" + res + "不存在";
 		}
 		return res;
+	}	@Test
+	public void xx() {
+		String sss="";
+		System.out.println(StringUtils.isNotEmpty(sss));
 	}
 }

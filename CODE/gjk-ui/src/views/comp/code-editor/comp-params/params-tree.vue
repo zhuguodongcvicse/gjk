@@ -942,6 +942,8 @@ export default {
           let treeParam = [];
           let variable = this.analysisMapping(deepClone(xml));
           this.nameParam = variable[0].attrMappingName;
+          //注釋
+          let paramRemarks = variable[3]===undefined?"":variable[3].lableName;
           treeParam.push(variable);
           // console.log("lableName", lableName,treeParam,xml);
           let regExp = /\w+\[[0-9]+\]/i;
@@ -1009,6 +1011,7 @@ export default {
             node["lableName"] = lableName;
             node["nodeData"] = deepClone(treeParam);
             node["assigParamName"] = "";
+            node["paramRemarks"] = paramRemarks;
             node["assigStructType"] = xml.attributeMap.structType;
           }
           if (JSON.stringify(node) !== "{}") {

@@ -32,6 +32,7 @@
 		<result property="delFlag" column="del_flag" />
 		<result property="storageFlag" column="storage_flag" />
 		<result property="applyDesc" column="apply_desc" />
+		<result property="paramRemarks" column="param_remarks" />
 	</resultMap>
 
 	<sql id="saveStructlibsSql">
@@ -45,6 +46,7 @@
 		data_type,
 		struct_type,
 		data_length,
+		param_remarks,
 		permission
 	</sql>
 
@@ -115,7 +117,7 @@
 				AND update_time = #{structlibs.updateTime}
 			</if>
 			AND parent_id = '0'
-			and del_flag = '0'
+			and del_flag = '0'   ORDER BY create_time DESC , version DESC
 		</where>
 	</select>
 
@@ -135,6 +137,7 @@
 		#{structlibs.dataType},
 		#{structlibs.structType},
 		#{structlibs.dataLength},
+		#{structlibs.paramRemarks},
 		#{structlibs.permission})
 	</insert>
 
@@ -195,6 +198,7 @@
 		type=#{structlibs.type},
 		data_type=#{structlibs.dataType},
 		data_length=#{structlibs.dataLength},
+		param_remarks=#{structlibs.paramRemarks},
 		permission=#{structlibs.permission}
 		where id=#{structlibs.id}
 	</update>

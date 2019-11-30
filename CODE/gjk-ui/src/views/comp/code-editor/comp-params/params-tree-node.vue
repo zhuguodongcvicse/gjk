@@ -1,6 +1,6 @@
 <!--  -->
 <template>
-  <el-tooltip class="item0" effect="dark" :content="nodeParam.label" placement="top">
+  <el-tooltip class="item0" effect="dark" :content="nodeParam.data.paramRemarks" placement="top">
     <span class="custom-tree-node">
       <el-dialog
         title="请选择"
