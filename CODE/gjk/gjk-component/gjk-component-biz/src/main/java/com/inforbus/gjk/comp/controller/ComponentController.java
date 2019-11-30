@@ -305,10 +305,7 @@ public class ComponentController {
 	public R checkComp(@RequestBody List<Object> obj){
 		return new R<>(componentService.checkComp(obj));
 	}
-	@PostMapping("/compByUserId")
-	public R listCompByUserId(@RequestParam(value = "userId") String userId) {
-		return new R<>(componentService.listCompByUserId(userId));
-	}
+
 	/**
 	 * 构件入库前的判断 选择的库目录文件是否存在
 	 * @param compId
@@ -317,5 +314,9 @@ public class ComponentController {
 	@GetMapping("/isSelectLibs/{compId}")
 	public R isSelectLibs(@PathVariable("compId") String compId) {
 		return new R<>(componentService.isSelectLibs(compId));
+	}
+	@PostMapping("/compByUserId")
+	public R listCompByUserId(@RequestParam(value = "userId") String userId) {
+		return new R<>(componentService.listCompByUserId(userId));
 	}
 }
