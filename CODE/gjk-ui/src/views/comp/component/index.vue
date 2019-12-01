@@ -22,7 +22,14 @@
             icon="el-icon-edit el-icon--left"
             size="small"
             @click="goToAddCompPage()"
-          >新增</el-button><!-- @click="templateData.templateVisible = true" --> <!-- @click="goToAddCompPage()" -->
+          >新增</el-button>
+          <el-button
+            type="primary"
+            icon="el-icon--left"
+            size="small"
+            @click="batchStorageApply()"
+          >批量入库</el-button>
+          <!-- @click="templateData.templateVisible = true" --> <!-- @click="goToAddCompPage()" -->
           <!-- <el-button size="small">
             <i class="el-icon-download el-icon--left"></i>导出
           </el-button>-->
@@ -158,6 +165,8 @@ export default {
       },
       dialogVisible: false,
       tableData: [],
+      selectList: [],
+      batchStorageList: [],
       page: {
         total: 0, // 总页数
         currentPage: 1, // 当前页数
@@ -335,6 +344,21 @@ export default {
     //选中数据
     selectionChange(list) {
       // this.$message.success("选中的数据" + JSON.stringify(list));
+      this.selectList = list;
+      this.handleExportCompList()
+    },
+    handleExportCompList(){
+        this.batchStorageList = []
+        this.batchStorageList = this.batchStorageList.concat(
+            this.selectList
+        );
+        // 去重
+        let tmpArr = []
+        this.batchStorageList = this.batchStorageList.reduce(function(item, next) {
+            tmpArr[next.id] ? '' : tmpArr[next.id] = true && item.push(next);
+            return item;
+        }, []);
+        console.log(this.batchStorageList)
     },
     getStructTrees() {
       let struct = {};
@@ -488,13 +512,39 @@ export default {
      */
     refreshChange() {
       this.getList();
-    }
+    },
+    batchStorageApply(){
+   if(this.batchStorageList.length > 0){
+     var flag = false
+        for (let i = 0; i < this.batchStorageList.length; i++) {
+          const element = this.batchStorageList[i];
+          if(element.applyState=='2'){
+              flag = true
+          }
+        }
+        if(flag){
+          this.$message({
+            showClose: true,
+            message: "请勿选择已入库的构件",
+            type: "warning"
+          });
+        }else{
+          this.storageApplyDialog = true;
+        }
+      }else{
+        this.$message({
+            showClose: true,
+            message: "请至少选择一个未入库的构件",
+            type: "warning"
+          });
+      }
+  }
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.refreshChange();
     });
-  }
+  },
 };
 </script>
 

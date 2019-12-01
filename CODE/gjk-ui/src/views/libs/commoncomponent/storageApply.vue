@@ -117,7 +117,7 @@ export default {
                 approval.applyId = Response.data.msg
                 approval.userId = this.userInfo.userId
                 approval.applyType = "3"
-                approval.libraryType = "7"
+                approval.libraryType = "1"
                 approval.applyUserId = this.form.applyUser
                 approval.approvalState = "0"
                 saveApproval(approval).then(Response=>{
