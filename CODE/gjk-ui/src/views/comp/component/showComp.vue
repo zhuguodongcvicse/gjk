@@ -61,7 +61,9 @@ import { fetchCompLists } from "@/api/comp/component";
 import { userInfo } from "os";
 import {
   getFilePathById,
-  findPlatformByName
+  findPlatformByName,
+  delFilePath,
+  moveNioFile
 } from "@/api/comp/componentdetail";
 import SplitPane from "@/page/components/split-pane";
 import { getTreeDefaultExpandIds, findParent } from "@/util/util";
@@ -83,20 +85,32 @@ export default {
       contentmenuX: "",
       contentmenuY: "",
       contextmenuFlag: false,
-      nodeClickData: {}
+      nodeClickData: {},
+      nodeData: ["平台文件", "测试文件", "算法文件", "图标文件"]
     };
   },
   //监听属性 类似于data概念
   computed: {
     ...mapGetters(["elements", "permissions", "userInfo", "isCollapse"])
   },
+
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
     this.getCompList();
   },
   methods: {
     handleDragStart(node, ev) {
-      console.log("drag start", node);
+      console.log("drag start", node, ev);
+      node.childNodes.forEach(childNode => {
+        if (this.nodeData.includes(childNode.label)) {
+          console.log("11111111111", childNode.label);
+        } else {
+          console.log("3333", childNode.label);
+        }
+      });
+      if (this.nodeData.includes(node.label)) {
+        console.log("应该不让拖动树上数据。。。。", node.label);
+      }
     },
     handleDragEnter(draggingNode, dropNode, ev) {
       console.log("tree drag enter: ", dropNode.label);
@@ -108,7 +122,13 @@ export default {
       console.log("tree drag over: ", dropNode.label);
     },
     handleDragEnd(draggingNode, dropNode, dropType, ev) {
-      console.log("tree drag end: ", dropNode && dropNode.label, dropType);
+      let source = draggingNode.data.filePath + "\\" + draggingNode.data.label;
+      let destin = dropNode.data.filePath;
+      if (dropType === "inner") {
+        destin += dropNode.data.label;
+      }
+      moveNioFile({ source: source, destin: destin }).then(res => {});
+      console.log("要移动到哪去的文件夹路径 ", path);
     },
     handleDrop(draggingNode, dropNode, dropType, ev) {
       console.log("tree drop: ", dropNode.label, dropType);
@@ -141,7 +161,6 @@ export default {
     handleNodeClick(data) {
       console.log("PPPPPPP:", data);
       var reg = new RegExp("\\\\", "g");
-
       var a = data.filePath.replace(reg, "#$#");
       var b = a.split("#$#");
       console.log("aaaaaq:", b[5] + "_" + b[7] + "_" + b[8] + "_" + data.label);
@@ -161,9 +180,8 @@ export default {
       }
     },
     nodeContextmenu(event, data) {
-      console.log("qwqwqwq", data);
       if (true) {
-        this.contextMenus = ["构件编译", "静态检查"];
+        this.contextMenus = ["构件编译", "静态检查", "删除"];
       }
       this.nodeClickData = data;
       this.contentmenuX = event.clientX;
@@ -173,9 +191,59 @@ export default {
     handleMoving(e) {
       console.log(e.atMin, e.atMax);
     },
+    getIsDelData(node) {
+      if (this.nodeData.includes(node.label)) {
+        return true;
+      }
+      let ret = false;
+      if (node.hasOwnProperty("children")) {
+        node.children.forEach(item => {
+          if (this.nodeData.includes(item.label)) {
+            ret = true;
+          }
+        });
+        return ret;
+      }
+      if (node.hasOwnProperty("childNodes")) {
+        node.childNodes.forEach(item => {
+          if (this.nodeData.includes(item.label)) {
+            ret = true;
+          }
+        });
+        return ret;
+      }
+    },
     nodeContextmenuClick(item) {
       let path = this.nodeClickData.filePath + "\\" + this.nodeClickData.label;
-      if (item == "静态检查") {
+      if (item == "删除") {
+        var _this = this;
+        if (this.getIsDelData(this.nodeClickData)) {
+          _this.$message({
+            showClose: true,
+            message: "当前节点不能删除",
+            type: "warning"
+          });
+        } else {
+          let name = "是否确认删除 " + this.nodeClickData.label;
+          this.$confirm(name, "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning"
+          })
+            .then(function() {
+              return delFilePath([path]);
+            })
+            .then(data => {
+              _this.getCompList();
+              _this.$message({
+                showClose: true,
+                message: "删除成功",
+                type: "success"
+              });
+            })
+            .catch(function(err) {});
+        }
+      } else if (item == "静态检查") {
         let filePath = { filePath: path, fileName: this.nodeClickData.label };
         staticInspect(filePath).then(response => {
           window.open(
@@ -190,12 +258,6 @@ export default {
           platformName = val.data.data;
         });
         //获取平台类型
-        //  this.token = this.$store.getters.access_token; //获取到登录的token
-        console.log(
-          "this.nodeClickData.label",
-          this.nodeClickData,
-          this.$store.getters.access_token
-        );
         findPlatformByName(this.nodeClickData.label).then(res => {
           res.data.data.forEach(item => {
             console.log("1111", platformName[item]);
@@ -207,23 +269,8 @@ export default {
             });
           });
         });
-        // getAppByProcessId({
-        //   fileName: i.fileName,
-        //   procedureId: this.procedureId
-        // }).then(val => {
-        //   platformType = val.data.data;
-        //   getPath({
-        //     path: filePath.filePath,
-        //     fileName: i.fileName,
-        //     platformType: platformType,
-        //     token: this.$store.getters.access_token
-        //   }).then(val => {
-        //     this.$message({
-        //       message: val.data.data
-        //     });
-        //   });
-        // });
       }
+      this.contextmenuFlag = false;
     }
   }
 };

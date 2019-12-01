@@ -22,7 +22,16 @@
             icon="el-icon-edit el-icon--left"
             size="small"
             @click="goToAddCompPage()"
-          >新增</el-button><!-- @click="templateData.templateVisible = true" --> <!-- @click="goToAddCompPage()" -->
+          >新增</el-button>
+          <!-- @click="templateData.templateVisible = true" -->
+          <!-- @click="goToAddCompPage()" -->
+          <el-button
+            type="primary"
+            icon="el-icon--left"
+            size="small"
+            @click="batchStorageApply()"
+          >批量入库</el-button>
+          <!-- @click="templateData.templateVisible = true" --> <!-- @click="goToAddCompPage()" -->
           <!-- <el-button size="small">
             <i class="el-icon-download el-icon--left"></i>导出
           </el-button>-->
@@ -43,6 +52,15 @@
                 plain
                 @click="handleCopy(scope.row,scope.index)"
               >复制</el-button>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="复制" placement="top">
+              <el-button
+                type="primary"
+                v-if="permissions.comp_component_edit"
+                size="mini"
+                plain
+                @click="handleShow(scope.row,scope.index)"
+              >查看</el-button>
             </el-tooltip>
             <el-tooltip class="item" effect="dark" content="编辑" placement="top">
               <el-button
@@ -158,6 +176,8 @@ export default {
       },
       dialogVisible: false,
       tableData: [],
+      selectList: [],
+      batchStorageList: [],
       page: {
         total: 0, // 总页数
         currentPage: 1, // 当前页数
@@ -335,6 +355,21 @@ export default {
     //选中数据
     selectionChange(list) {
       // this.$message.success("选中的数据" + JSON.stringify(list));
+      this.selectList = list;
+      this.handleExportCompList()
+    },
+    handleExportCompList(){
+        this.batchStorageList = []
+        this.batchStorageList = this.batchStorageList.concat(
+            this.selectList
+        );
+        // 去重
+        let tmpArr = []
+        this.batchStorageList = this.batchStorageList.reduce(function(item, next) {
+            tmpArr[next.id] ? '' : tmpArr[next.id] = true && item.push(next);
+            return item;
+        }, []);
+        console.log(this.batchStorageList)
     },
     getStructTrees() {
       let struct = {};
@@ -355,6 +390,7 @@ export default {
       this.tableLoading = true;
       fetchList(this.listQuery).then(response => {
         this.tableData = response.data.data.records;
+        console.log("cxcxcx", this.tableData);
         this.page.total = response.data.data.total;
         this.tableLoading = false;
       });
@@ -406,6 +442,19 @@ export default {
           this.$router.push({
             path: "/comp/showComp/addAndEditComp",
             query: { compId: row.id, type: "copy", proFloName: "复制构件" }
+          });
+        });
+      });
+    },
+    handleShow(row, index) {
+      this.$store.dispatch("setFetchStrInPointer");
+      //加载中英文映射
+      this.$store.dispatch("setChineseMapping", "comp_param_type").then(() => {
+        //加载结构体
+        this.$store.dispatch("setStruceType").then(() => {
+          this.$router.push({
+            path: "/comp/showComp/addAndEditComp",
+            query: { compId: row.id, type: "view", proFloName: "查看构件" }
           });
         });
       });
@@ -488,13 +537,39 @@ export default {
      */
     refreshChange() {
       this.getList();
-    }
+    },
+    batchStorageApply(){
+   if(this.batchStorageList.length > 0){
+     var flag = false
+        for (let i = 0; i < this.batchStorageList.length; i++) {
+          const element = this.batchStorageList[i];
+          if(element.applyState=='2'){
+              flag = true
+          }
+        }
+        if(flag){
+          this.$message({
+            showClose: true,
+            message: "请勿选择已入库的构件",
+            type: "warning"
+          });
+        }else{
+          this.storageApplyDialog = true;
+        }
+      }else{
+        this.$message({
+            showClose: true,
+            message: "请至少选择一个未入库的构件",
+            type: "warning"
+          });
+      }
+  }
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.refreshChange();
     });
-  }
+  },
 };
 </script>
 

@@ -970,6 +970,17 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		maps.put("compUpdate", compUpdate);
 		return maps;
 	}
+	/**
+	 * @Title: getImgFile
+	 * @Description: listCompByUserId
+	 * @Author xiaohe
+	 * @DateTime 2019年5月23日 上午11:34:43
+	 * @param userId 用户Id
+	 */
+	@Override
+	public List<Component> listCompByUserId(String userId) {
+		return baseMapper.listCompByUserId(userId);
+	}
 
 	/**
 	 * 判断选择的库目录文件是否存在
@@ -1015,5 +1026,4 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		}
 		return res;
 	}
-
 }

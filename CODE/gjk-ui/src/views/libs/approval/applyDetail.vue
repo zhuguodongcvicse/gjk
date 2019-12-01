@@ -1,51 +1,83 @@
 <template>
-  <el-dialog
+  <!-- <el-dialog
     class="libs_approval_applydetail_14s"
     title="审批详情"
     :visible.sync="dialog"
     width="50%"
     :before-close="handleClose"
-  >
-    <el-card shadow="always" body-style="width:60%">
-      <div slot="header">
-        <span>详细信息</span>
-      </div>
-      <span>申请人：{{userName}}</span>
-      <br />
-      <br />
-      <span>申请库类别：{{libsType}}</span>
-      <br />
-      <br />
-      <span>申请{{libsName}}{{libsNameValue}}</span>
-      <br />
-      <br />
-      <span v-if="showStruct">{{structData}}</span>
-      <br />
-      <br />
-      <span>申请类型：{{applyType}}</span>
-      <br />
-      <br />
-      <span>申请日期：{{applyTime}}</span>
-    </el-card>
-    <el-card shadow="always" style="height:100%;overflow-y: auto;" v-if="showMessage">
-      <div slot="header">
-        <span>{{libsNameValue}}申请详细信息</span>
-      </div>
-      <el-tree
-        v-if="isComp===true"
-        ref="tree"
-        :data="compTreeData"
-        :default-expand-all="true"
-        :check-on-click-node="true"
-        @check-change="handleCheckChange"
-      ></el-tree>
-      <span v-if="isComp===false">
-        {{proCompIdListMsg}}
-        <span v-for="(item,index) in proCompIdList" :key="index">
-          <el-tag>{{item.compName}}</el-tag>&nbsp;
-        </span>
-      </span>
-    </el-card>
+  >-->
+  <div>
+     <el-row :gutter="10">
+      <el-col  :span="11">
+        <el-card shadow="always" style="height: 100%" class="box-card">
+          <div slot="header">
+              <span>详细信息</span>
+            </div>
+          <div style="height: 540px">
+            <span>申请人：{{userName}}</span>
+            <br />
+            <br />
+            <span>申请库类别：{{libsType}}</span>
+            <br />
+            <br />
+            <span>申请{{libsName}}{{libsNameValue}}</span>
+            <br />
+            <br />
+            <div  v-if="showStruct" style="">
+              <span>{{structData}}</span>
+              <br />
+              <br />
+            </div>
+            <span>申请类型：{{applyType}}</span>
+            <br />
+            <br />
+            <span>申请日期：{{applyTime}}</span>
+            <br />
+            <br />
+            <div style="margin-left: 60%">
+              <span>
+                <el-button type="success" @click="approvedFunc" :disabled="isButtonUse">通 过</el-button>
+                <el-button type="danger" @click="rejectFunc" :disabled="isButtonUse">驳 回</el-button>
+              </span>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+   
+      <el-col :span="13">
+        <el-card shadow="always" class="box-card" style="height:100%;overflow-y: auto;" :body-style="{ padding: '0px' }" v-if="showMessage">
+          <div slot="header">
+            <span>{{libsNameValue}}申请详细信息</span>
+          </div>
+          <div v-if="batch">
+            <el-scrollbar
+            wrapClass="scrollbar-wrap"
+            :style="{height: scrollHeight}"
+            ref="scrollbarContainer">
+              <div style="height:570px;overflow-y:auto">
+                <el-tree
+                v-if="isComp===true"
+                ref="tree"
+                :data="compTreeData"
+                :default-expand-all="true"
+                :check-on-click-node="true"
+                @check-change="handleCheckChange"
+                ></el-tree>
+              </div>
+            </el-scrollbar>
+            <span v-if="isComp===false">
+              {{proCompIdListMsg}}
+              <span v-for="(item,index) in proCompIdList" :key="index">
+                <el-tag>{{item.compName}}</el-tag>&nbsp;
+              </span>
+            </span>
+          </div>
+          <div v-if="!batch">
+            <component-list :batchId="batchId"></component-list>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
     <el-dialog width="30%" title="请填写驳回原因" :visible.sync="rejectDialog" append-to-body>
       <el-input type="textarea" :rows="3" placeholder="请输入内容" v-model="rejectMassage"></el-input>
       <span slot="footer" class="dialog-footer">
@@ -53,16 +85,13 @@
         <el-button type="primary" @click="rejectDialog=false">取 消</el-button>
       </span>
     </el-dialog>
-    <span slot="footer" class="dialog-footer">
-      <el-button type="success" @click="approvedFunc" :disabled="isButtonUse">通 过</el-button>
-      <el-button type="danger" @click="rejectFunc" :disabled="isButtonUse">驳 回</el-button>
-      <el-button type="primary" @click="dialogStateShow(false)">取 消</el-button>
-    </span>
-  </el-dialog>
+    <!-- </el-dialog> -->
+  </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+import componentList from "./componentList";
 import { fetchCompLists, getObj, modifyComp } from "@/api/comp/component";
 import { getAllDetailByCompId } from "@/api/comp/componentdetail";
 import {
@@ -99,9 +128,10 @@ import {
 export default {
   //注入依赖，调用this.reload();用于刷新页面
   inject: ["reload"],
-  props: ["dialog", "applyItemMsg"],
   //import引入的组件需要注入到对象中才能使用
-  components: {},
+  components: {
+    "component-list": componentList
+  },
   //监听属性 类似于data概念
   computed: {
     ...mapGetters(["userInfo"])
@@ -111,6 +141,9 @@ export default {
     return {
       isComp: false,
 
+      batchId: "",
+      batch: true,
+      applyItemMsg: {},
       //构件树data
       compTreeData: [],
       //存储当前审批构件构件
@@ -149,103 +182,7 @@ export default {
     };
   },
   //监控data中的数据变化
-  watch: {
-    applyItemMsg: function() {
-      Object.assign(this.$data, this.$options.data());
-      if (
-        this.applyItemMsg.approvalState != "0" &&
-        this.applyItemMsg.approvalState != "4"
-      ) {
-        this.isButtonUse = true;
-      }
-      switch (this.applyItemMsg.libraryType) {
-        case "1":
-          this.libsName = "显示名：";
-          this.libsType = "构件库";
-          getObj(this.applyItemMsg.applyId).then(Response => {
-            this.libsNameValue = Response.data.data.compName;
-            this.component = Response.data.data;
-          });
-          this.isComp = true;
-          fetchCompLists(this.applyItemMsg.applyId, true).then(Response => {
-            this.compTreeData = Response.data.data;
-          });
-          break;
-        case "2":
-          this.libsName = "硬件名称：";
-          this.libsType = "硬件库";
-          break;
-        case "3":
-          this.libsName = "软件框架名称：";
-          this.libsType = "软件框架库";
-          getSoftwareById(this.applyItemMsg.applyId).then(Response => {
-            this.libsNameValue = Response.data.data.softwareName;
-          });
-          this.isComp = true;
-          getSoftwareTreeById(this.applyItemMsg.applyId).then(Response => {
-            this.compTreeData = Response.data.data;
-          });
-          break;
-        case "4":
-          this.libsType = "平台库";
-          break;
-        case "5":
-          this.libsName = "BSP名称：";
-          this.libsType = "BSP库";
-          getBSPById(this.applyItemMsg.applyId).then(Response => {
-            this.libsNameValue = Response.data.data.bspName;
-          });
-          this.isComp = true;
-          getBSPTreeById(this.applyItemMsg.applyId).then(Response => {
-            this.compTreeData = Response.data.data;
-          });
-          break;
-        case "6":
-          this.libsName = "结构体名称：";
-          this.libsType = "结构体库";
-          getStructById(this.applyItemMsg.applyId).then(Response => {
-            this.libsNameValue = Response.data.data.name;
-            this.showStruct = true;
-            this.showMessage = false;
-            this.structData = "结构体类型：" + Response.data.data.dataType;
-          });
-          break;
-        case "7":
-          this.libsName = "项目名称：";
-          this.libsType = "构件库";
-          getProMsgById(this.applyItemMsg.applyId).then(Response => {
-            this.libsNameValue = Response.data.data.projectName;
-          });
-          this.proCompIdListMsg = "项目申请构件出库列表为：";
-          getAllCompId(this.applyItemMsg.id).then(Response => {
-            let compIdList = [];
-            for (let proComp of Response.data.data) {
-              compIdList.push(proComp.applyId);
-            }
-            getCompDict(compIdList).then(Response => {
-              this.proCompIdList = Response.data.data;
-            });
-          });
-          break;
-      }
-      this.axios.get("/admin/user/info/getUserDict").then(Response => {
-        for (let user of Response.data.data) {
-          if (this.applyItemMsg.userId == user.userId) {
-            this.userName = user.name;
-          }
-        }
-      });
-      switch (this.applyItemMsg.applyType) {
-        case "1":
-          this.applyType = "入库";
-          break;
-        case "2":
-          this.applyType = "出库";
-          break;
-      }
-      this.applyTime = this.applyItemMsg.createTime;
-    }
-  },
+  watch: {},
   //方法集合
   methods: {
     dialogStateShow(state) {
@@ -281,37 +218,39 @@ export default {
             commonComp.compImg = this.component.compImg;
             commonComp.description = this.component.description;
             commonComp.delFlag = "0";
-            saveCommonComp(commonComp).then(Response => {
-              let compVersion = Response.data.data.version;
-              getAllDetailByCompId(this.applyItemMsg.applyId).then(Response => {
-                let compDetail = [];
-                for (let item of Response.data.data) {
-                  let commonCompDetail = {};
-                  commonCompDetail.id = item.id;
-                  commonCompDetail.compId = item.compId;
-                  commonCompDetail.fileName = item.fileName;
-                  commonCompDetail.fileType = item.fileType;
-                  commonCompDetail.filePath = item.filePath;
-                  commonCompDetail.version = compVersion;
-                  commonCompDetail.paraentId = item.paraentId;
-                  commonCompDetail.paraentIds = item.paraentIds;
-                  commonCompDetail.libsId = item.libsId;
-                  compDetail.push(commonCompDetail);
-                }
-                saveCompDetailList(compDetail, this.userInfo.username);
-              });
+            if (this.applyItemMsg.applyType != "3") {
+              saveCommonComp(commonComp).then(Response => {
+                let compVersion = Response.data.data.version;
+                getAllDetailByCompId(this.applyItemMsg.applyId).then(Response => {
+                  let compDetail = [];
+                  for (let item of Response.data.data) {
+                    let commonCompDetail = {};
+                    commonCompDetail.id = item.id;
+                    commonCompDetail.compId = item.compId;
+                    commonCompDetail.fileName = item.fileName;
+                    commonCompDetail.fileType = item.fileType;
+                    commonCompDetail.filePath = item.filePath;
+                    commonCompDetail.version = compVersion;
+                    commonCompDetail.paraentId = item.paraentId;
+                    commonCompDetail.paraentIds = item.paraentIds;
+                    commonCompDetail.libsId = item.libsId;
+                    compDetail.push(commonCompDetail);
+                  }
+                  saveCompDetailList(compDetail, this.userInfo.username);
+                });
 
-              //修改构件中审批状态
-              let modifyComponent = {};
-              modifyComponent.id = this.component.id;
-              modifyComponent.applyState = "2";
-              modifyComponent.applyDesc = "入库申请已通过";
-              modifyComp(modifyComponent).then(Response => {
-                this.dialogStateShow(false);
-                //刷新页面
-                this.$emit("refresh");
+                //修改构件中审批状态
+                let modifyComponent = {};
+                modifyComponent.id = this.component.id;
+                modifyComponent.applyState = "2";
+                modifyComponent.applyDesc = "入库申请已通过";
+                modifyComp(modifyComponent).then(Response => {
+                  this.dialogStateShow(false);
+                  //刷新页面
+                  this.$emit("refresh");
+                });
               });
-            });
+            }
             break;
           case "3":
             let software = {};
@@ -372,6 +311,14 @@ export default {
             });
             break;
         }
+        console.log(1)
+        // this.rejectDialog = false
+        this.isButtonUse = true
+        this.$message({
+          showClose: true,
+          message: "已通过",
+          type: "success"
+        });
       });
     },
     //驳回时弹出驳回理由弹窗
@@ -392,13 +339,15 @@ export default {
             modifyComponent.id = this.component.id;
             modifyComponent.applyState = "3";
             modifyComponent.applyDesc = this.rejectMassage;
-            //修改构件的审批状态，审批备注中写上审批理由
-            modifyComp(modifyComponent).then(Response => {
-              this.rejectDialog = false;
-              this.dialogStateShow(false);
-              //刷新页面
-              this.$emit("refresh");
-            });
+            if (this.applyItemMsg.applyType != "3") {
+              //修改构件的审批状态，审批备注中写上审批理由
+              modifyComp(modifyComponent).then(Response => {
+                this.rejectDialog = false;
+                this.dialogStateShow(false);
+                //刷新页面
+                this.$emit("refresh");
+              });
+            }
           case "3":
             let software = {};
             software.id = this.applyItemMsg.applyId;
@@ -450,22 +399,142 @@ export default {
               for (let item of this.proCompIdList) {
                 proCompIdArray.push(item.id);
               }
-              let proId = this.applyItemMsg.applyId;
-              updateProCompApprovalState(proId, proCompIdArray, "1").then(
-                Response => {
-                  this.dialogStateShow(false);
-                  //刷新页面
-                  this.$emit("refresh");
-                }
-              );
+              let proId = this.applyItemMsg.applyId; 
+                updateProCompApprovalState(proId, proCompIdArray, "1").then(
+                  Response => {
+                    this.dialogStateShow(false);
+                    //刷新页面
+                    this.$emit("refresh");
+                  }
+                );
             });
             break;
         }
+        this.rejectDialog = false
+        this.isButtonUse = true
+        this.$message({
+          showClose: true,
+          message: "已驳回",
+          type: "success"
+        });
       });
+    },
+    handleCreate() {
+      // Object.assign(this.$data, this.$options.data());
+      console.log(this.applyItemMsg);
+      if (
+        this.applyItemMsg.approvalState != "0" &&
+        this.applyItemMsg.approvalState != "4"
+      ) {
+        this.isButtonUse = true;
+      }
+      switch (this.applyItemMsg.libraryType) {
+        case "1":
+          this.libsName = "显示名：";
+          this.libsType = "构件库";
+          if(this.applyItemMsg.applyType != "3") {
+            getObj(this.applyItemMsg.applyId).then(Response => {
+              this.libsNameValue = Response.data.data.compName;
+              this.component = Response.data.data;
+            });
+            this.isComp = true;
+            fetchCompLists(this.applyItemMsg.applyId, true).then(Response => {
+              this.compTreeData = Response.data.data;
+            });
+          }else{
+            this.batchId = this.applyItemMsg.applyId;
+            this.batch = false;
+            this.libsNameValue = "批量导出";
+          }
+          break;
+        case "2":
+          this.libsName = "硬件名称：";
+          this.libsType = "硬件库";
+          break;
+        case "3":
+          this.libsName = "软件框架名称：";
+          this.libsType = "软件框架库";
+          getSoftwareById(this.applyItemMsg.applyId).then(Response => {
+            this.libsNameValue = Response.data.data.softwareName;
+          });
+          this.isComp = true;
+          getSoftwareTreeById(this.applyItemMsg.applyId).then(Response => {
+            this.compTreeData = Response.data.data;
+          });
+          break;
+        case "4":
+          this.libsType = "平台库";
+          break;
+        case "5":
+          this.libsName = "BSP名称：";
+          this.libsType = "BSP库";
+          getBSPById(this.applyItemMsg.applyId).then(Response => {
+            this.libsNameValue = Response.data.data.bspName;
+          });
+          this.isComp = true;
+          getBSPTreeById(this.applyItemMsg.applyId).then(Response => {
+            this.compTreeData = Response.data.data;
+          });
+          break;
+        case "6":
+          this.libsName = "结构体名称：";
+          this.libsType = "结构体库";
+          getStructById(this.applyItemMsg.applyId).then(Response => {
+            this.libsNameValue = Response.data.data.name;
+            this.showStruct = true;
+            this.showMessage = false;
+            this.structData = "结构体类型：" + Response.data.data.dataType;
+          });
+          break;
+        case "7":
+          this.libsName = "项目名称：";
+          this.libsType = "项目库";
+          getProMsgById(this.applyItemMsg.applyId).then(Response => {
+            this.libsNameValue = Response.data.data.projectName;
+          });
+          this.proCompIdListMsg = "项目申请构件出库列表为：";
+          getAllCompId(this.applyItemMsg.id).then(Response => {
+            let compIdList = [];
+            for (let proComp of Response.data.data) {
+              compIdList.push(proComp.applyId);
+            }
+            getCompDict(compIdList).then(Response => {
+              this.proCompIdList = Response.data.data;
+            });
+          });
+          break;
+      }
+      this.axios.get("/admin/user/info/getUserDict").then(Response => {
+        for (let user of Response.data.data) {
+          if (this.applyItemMsg.userId == user.userId) {
+            this.userName = user.name;
+          }
+        }
+      });
+      switch (this.applyItemMsg.applyType) {
+        case "1":
+          this.applyType = "入库";
+          break;
+        case "2":
+          this.applyType = "出库";
+          break;
+        case "3":
+          this.applyType = "批量导出";
+      }
+      this.applyTime = this.applyItemMsg.createTime;
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() {
+    console.log("this.handleCreate()前", this.applyId);
+    this.applyItemMsg = this.$route.query.row;
+    this.$nextTick(vm => {
+      this.handleCreate();
+      console.log("this.handleCreate()后", this.applyId);
+    });
+
+    
+  },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   beforeCreate() {}, //生命周期 - 创建之前

@@ -276,4 +276,8 @@ public class ComponentDetailController {
 	public R getFindPlatformByName(@PathVariable String frameName) {
 		return new R<>(componentDetailService.findPlatformByName(frameName));
 	}
+	@PostMapping("/moveNioFile")
+	public R getMoveNioFile(@RequestBody Map<String, String> maps) {
+		return componentDetailService.moveNioFile(maps.get("source"),maps.get("destin"));
+	}
 }

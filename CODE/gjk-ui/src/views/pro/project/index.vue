@@ -99,15 +99,34 @@
                         <!--&gt;</el-option>-->
                         <!--</el-select>-->
                       </el-form-item>
-                      <el-form-item label="BSP选择" prop="bspSelectString">
-                        <el-select v-model="formLabelAlign.bspSelectString" placeholder="请选择">
+                      <el-form-item label="BSP选择">
+                        <el-select
+                          class="text_align_center_14s"
+                          v-model="bspSelectString"
+                          multiple
+                          placeholder="请选择"
+                          @change="selectBSPClk"
+                        >
                           <el-option
                             v-for="item in bspTreeData"
                             :key="item.id"
-                            :label="item.label"
+                            :label="item.bspName"
                             :value="item.id"
-                          ></el-option>
+                          >
+                            <span style="float: left">{{ item.bspName }}(v{{item.version}}.0)</span>
+                            <span
+                              style="float: right; color: #8492a6; font-size: 13px;margin-right: 30px;"
+                            >{{ item.description }}</span>
+                          </el-option>
                         </el-select>
+<!--                        <el-select v-model="formLabelAlign.bspSelectString" placeholder="请选择">-->
+<!--                          <el-option-->
+<!--                            v-for="item in bspTreeData"-->
+<!--                            :key="item.id"-->
+<!--                            :label="item.label"-->
+<!--                            :value="item.id"-->
+<!--                          ></el-option>-->
+<!--                        </el-select>-->
                       </el-form-item>
                     </div>
                   </el-form>
@@ -199,7 +218,9 @@ import { tableOption } from "@/const/crud/pro/project";
 import {
   getSoftwareSelect,
   getPlatformList,
-  updatePartSoftwareAndPlatform
+  updatePartSoftwareAndPlatform,
+  updatePartBSPAndPlatform,
+  getBSPSelect
 } from "@/api/pro/manager";
 import { mapGetters } from "vuex";
 
@@ -253,7 +274,7 @@ export default {
         projectName: "",
         number: "",
         hardware: "",
-        bspSelectString: "",
+        // bspSelectString: "",
         applyUser: "",
         processName: "",
         sysTempId: "",
@@ -289,6 +310,7 @@ export default {
       softwareTreeData: [],
       softwareSelectString: "",
       bspTreeData: [],
+      bspSelectString: "",
 
       applyUserSelect: [],
 
@@ -299,16 +321,15 @@ export default {
           { required: true, message: "请输入", trigger: "blur" },
           { validator: proNameSameNameCheck, trigger: "blur" }
         ],
-        bspSelectString: [
-          { required: true, message: "请选择", trigger: "change" }
-        ],
+        // bspSelectString: [
+        //   { required: true, message: "请选择", trigger: "change" }
+        // ],
         applyUser: [{ required: true, message: "请选择", trigger: "change" }],
         processName: [
           { required: true, message: "请输入", trigger: "blur" },
           { validator: processNameCheck, trigger: "blur" }
         ]
       },
-      softwareSelectString: [],
       platformFlag: false,
       //提示平台大类是否被选中
       platformNameTs: "",
@@ -329,7 +350,7 @@ export default {
     softwareSelectString: function() {
       // console.log("softwareSelectString:", this.softwareSelectString);
     },
-    "formLabelAlign.bspSelectString": function() {
+    bspSelectString: function() {
       // console.log("bspSelectString:", this.formLabelAlign.bspSelectString);
     },
     "formLabelAlign.applyUser": function() {
@@ -435,7 +456,7 @@ export default {
           this.project.projectName = this.formLabelAlign.projectName;
           this.project.processName = this.formLabelAlign.processName;
           // this.project.defaultSoftwareId = this.softwareSelectString;
-          this.project.defaultBspId = this.formLabelAlign.bspSelectString;
+          // this.project.defaultBspId = this.formLabelAlign.bspSelectString;
           this.project.userId = this.userInfo.userId;
           //模板ID赋值
           var basetemplate = {
@@ -474,6 +495,7 @@ export default {
                   // console.log("this.procedureId" + this.procedureId);
                   //保存软件框架
                   this.changeProcedureSoftwareId();
+                  this.changeProcedureBSPId();
                   // this.softwareSelectString = []
                   // showPartSoftwareAndPlatform(this.procedureId).then(Response => {
                   //   for (var k = 0; k < Response.data.data.length; k++) {
@@ -678,6 +700,52 @@ export default {
         }
         this.softwareTreeData = softwareTreeDataList;
       });
+      getBSPSelect().then(Response => {
+          let datas = Response.data.data;
+          let bspTreeDataList = [];
+          for (var i = 0; i < datas.length; i++) {
+              if (datas[i].description != "") {
+                  bspTreeDataList.push(datas[i]);
+              }
+          }
+          this.bspTreeData = bspTreeDataList;
+      });
+    },
+    //修改bsp库值改变
+    selectBSPClk(val) {
+        var valNameArr = [];
+        for (var j = 0; j < val.length; j++) {
+            for (var i = 0; i < this.bspTreeData.length; i++) {
+                if (this.bspTreeData[i].id == val[j]) {
+                    valNameArr.push(this.bspTreeData[i].description);
+                }
+            }
+        }
+        //至少选中一个
+        if (val.length > 1) {
+            //遍历下拉框得到平台名称
+            var lastPlatformName = "";
+            for (var i = 0; i < this.bspTreeData.length; i++) {
+                if (this.bspTreeData[i].id == val[val.length - 1]) {
+                    lastPlatformName = this.bspTreeData[i].description;
+                }
+            }
+            //根据分号拆分平台类
+            lastPlatformName = lastPlatformName.substring(
+                0,
+                lastPlatformName.length - 1
+            );
+            var platformNameArr = lastPlatformName.split(";");
+            // console.log("拆分后的平台类名：", platformNameArr);
+            for (var k = 0; k < platformNameArr.length; k++) {
+                for (var m = 0; m < val.length - 1; m++) {
+                    if (valNameArr[m].indexOf(platformNameArr[k]) != -1) {
+                        val.splice(m, 1);
+                        valNameArr.splice(m, 1);
+                    }
+                }
+            }
+        }
     },
     //修改软件框架值改变
     selectSoftwareClk(val) {
@@ -767,6 +835,25 @@ export default {
           this.$message.error("修改软件框架失败");
         }
       });
+    },
+    changeProcedureBSPId() {
+        if (this.bspSelectString.length == 0) {
+            return;
+        }
+        let prodetail = {};
+        prodetail.id = this.procedureId;
+        prodetail.description = this.bspSelectString.join(";");
+        // 保存选择的BSP库
+        updatePartBSPAndPlatform(prodetail).then(response => {
+            if (response.data.data) {
+                this.$message({
+                    message: "修改BSP库成功",
+                    type: "success"
+                });
+            } else {
+                this.$message.error("修改BSP库失败");
+            }
+        });
     }
   },
   created() {

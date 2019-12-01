@@ -72,10 +72,6 @@ export default {
     event: "change" //事件名随便定义。
   },
   data() {
-    const valiaFilesCheck = (rule, value, callback) => {
-      // if (condition) {
-      // }
-    };
     //这里存放数据
     return {
       uploadOption: uploadOption,

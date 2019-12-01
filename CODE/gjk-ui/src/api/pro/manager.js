@@ -239,10 +239,26 @@ export function getSoftwareSelect() {
     url: "/pro/manager/getSoftWareListAndPlatformName"
   })
 }
+
+export function getBSPSelect() {
+  return request({
+    method: "post",
+    url: "/pro/manager/getBSPListAndPlatformName"
+  })
+}
+
 //修改软件框架库保存
 export function updatePartSoftwareAndPlatform(proDetail) {
   return request({
     url: '/pro/manager/updatePartSoftwareAndPlatform',
+    method: 'put',
+    data: proDetail
+  })
+}
+//修改bsp库保存
+export function updatePartBSPAndPlatform(proDetail) {
+  return request({
+    url: '/pro/manager/updatePartBSPAndPlatform',
     method: 'put',
     data: proDetail
   })
@@ -252,6 +268,13 @@ export function showPartSoftwareAndPlatform(procedureId) {
   return request({
     method: "get",
     url: "/pro/manager/showPartSoftwareAndPlatform/" + procedureId,
+  })
+}
+//修改bsp库回显
+export function showPartBSPAndPlatform(procedureId) {
+  return request({
+    method: "get",
+    url: "/pro/manager/showPartBSPAndPlatform/" + procedureId,
   })
 }
 //得到平台大类

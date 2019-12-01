@@ -25,6 +25,7 @@ export const tableOption = {
   align: 'center',
   editBtn: false,
   delBtn: false,
+  selection: true,
   addBtn: false,
   column: [
     {

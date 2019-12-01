@@ -82,10 +82,19 @@ export function uploadFilesPath(param) {
     data: param
   })
 }
+//删除文件
 export function delFilePath(param) {
   return request({
     method: "post",
     url: "/comp/componentdetail/delFilePath",
+    data: param
+  })
+}
+//拷贝文件
+export function moveNioFile(param) {
+  return request({
+    method: "post",
+    url: "/comp/componentdetail/moveNioFile",
     data: param
   })
 }

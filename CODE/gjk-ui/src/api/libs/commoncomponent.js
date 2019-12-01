@@ -163,3 +163,11 @@ export function compViewTree(compId) {
     method: 'post'
   })
 }
+
+
+export function findPageByBatchApprovalId(obj){
+  return request({
+    url:'/libs/commoncomponent/findPageByBatchApprovalId/'+ obj.applyId+"/"+obj.current+"/"+obj.size,
+    method:'post',
+  })
+}

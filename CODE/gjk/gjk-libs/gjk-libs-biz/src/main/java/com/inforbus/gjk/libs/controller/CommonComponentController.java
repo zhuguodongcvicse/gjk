@@ -172,7 +172,7 @@ public class CommonComponentController {
 	/**
 	 * 获取构件ID和构件名称对应的字典
 	 *
-	 * @param id 类型
+	 * @param compIdList 类型
 	 * @return 同类型字典
 	 */
 	@PostMapping("/info/getCompDict")
@@ -191,6 +191,11 @@ public class CommonComponentController {
 			@RequestBody List<List<String>> list) {
 		return new R<>(commonComponentService.getCompListByStringAndLibsId(new Page<>(current, size), list.get(0),
 				list.get(1)));
+	}
+
+	@PostMapping("/findPageByBatchApprovalId/{applyId}/{page}/{size}")
+	public R<IPage<CommonComponent>> findPageByBatchApprovalId(@PathVariable("page") Integer current,@PathVariable("size") Integer size, @PathVariable("applyId") String id){
+		return new R<>(commonComponentService.findPageByBatchApprovalId(new Page<>(current, size),id));
 	}
 
 }
