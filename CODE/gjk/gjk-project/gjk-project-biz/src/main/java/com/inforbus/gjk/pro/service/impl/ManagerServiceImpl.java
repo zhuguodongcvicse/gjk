@@ -778,7 +778,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			app.setFlowId(flowId);
 
 			try {
-				String appDirPath = appFilePath + File.separator + "Image";
+				String appDirPath = appFilePath + File.separator + "Image" + File.separator;
 				File targetFile = new File(appDirPath);
 				if (!targetFile.exists()) {
 					targetFile.mkdirs();
@@ -1708,6 +1708,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 	/**
 	 * 获取修改BSP下拉列表内容
+	 * 
 	 * @return
 	 */
 	@Override
@@ -1732,6 +1733,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 	/**
 	 * 修改bsp库保存
+	 * 
 	 * @param bsp
 	 * @return
 	 */
