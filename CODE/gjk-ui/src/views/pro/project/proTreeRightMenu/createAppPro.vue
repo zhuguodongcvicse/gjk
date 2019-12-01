@@ -112,41 +112,28 @@ export default {
         background: "rgba(0, 0, 0, 0.7)"
       });
       let allMessage = {};
-      getBSPTree().then(Response => {
-        let bsp = Response.data.data.find(item => {
-          return item.id === this.procedure.bspId;
-        });
-        let procedureXml = this.procedure.children[0].children.find(item => {
-          return item.type === "11";
-        });
-        if (bsp != undefined && procedureXml != undefined) {
-          this.$set(allMessage, "userName", this.userInfo.username);
-          this.$set(allMessage, "procedureXmlId", procedureXml.id);
-          this.$set(allMessage, "bspDirPath", bsp.filePath);
-          if (this.localDeploymentPlan) {
-            this.$set(allMessage, "localDeploymentPlan", "0");
-          } else {
-            this.$set(allMessage, "localDeploymentPlan", "1");
-          }
-          let params = new FormData();
-          params.append("file", this.appImageFile);
-          params.append("allMessage", JSON.stringify(allMessage));
-          appAssemblyProjectCreate(params)
-            .then(Response => {
-              this.reflush(loading);
-            })
-            .catch(error => {
-              this.reflush(loading);
-            });
-        } else {
-          this.$message({
-            showClose: true,
-            message: "已选择bsp失效，请重新选择bsp。",
-            type: "error"
-          });
-          this.reflush(loading);
-        }
+      let procedureXml = this.procedure.children[0].children.find(item => {
+        return item.type === "11";
       });
+      if (procedureXml != undefined) {
+        this.$set(allMessage, "userName", this.userInfo.username);
+        this.$set(allMessage, "procedureXmlId", procedureXml.id);
+        if (this.localDeploymentPlan) {
+          this.$set(allMessage, "localDeploymentPlan", "0");
+        } else {
+          this.$set(allMessage, "localDeploymentPlan", "1");
+        }
+        let params = new FormData();
+        params.append("file", this.appImageFile);
+        params.append("allMessage", JSON.stringify(allMessage));
+        appAssemblyProjectCreate(params)
+          .then(Response => {
+            this.reflush(loading);
+          })
+          .catch(error => {
+            this.reflush(loading);
+          });
+      }
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
