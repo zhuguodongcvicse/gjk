@@ -6,7 +6,7 @@
       v-on:click="outerVisible=true"
     >{{leftData.length>0?"查看文件（"+leftData.length+"个）":"添加文件"}}</el-button>
     <el-dialog title="文件列表" :visible.sync="outerVisible">
-      <el-button type="primary" @click="innerVisible=true" size="mini">选择文件</el-button>
+      <el-button type="primary" @click="innerVisible=true" size="mini" :disabled="disabled">选择文件</el-button>
       <avue-crud :data="leftData" :option="leftOption">
         <template slot="size" slot-scope="scope">{{printSize(scope.row.size)}}</template>
         <template slot="menu" slot-scope="scope">
@@ -66,7 +66,8 @@ import { mapGetters } from "vuex";
 export default {
   //import引入的组件需要注入到对象中才能使用
   props: {
-    value: { type: Array }
+    value: { type: Array },
+    disabled: { type: Boolean, default: false } //组件是否禁用
   },
   model: {
     prop: "value", // ychecked与父级cstChecked联动
@@ -76,7 +77,7 @@ export default {
   data() {
     //这里存放数据
     return {
-      allFilesList: '',
+      allFilesList: "",
       uploader_key: new Date().getTime(),
       innerVisible: false,
       outerVisible: false,
@@ -148,36 +149,55 @@ export default {
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["pointHFile", "fileListOfComponent", "analysisBaseFile", "userInfo"])
+    ...mapGetters([
+      "pointHFile",
+      "fileListOfComponent",
+      "analysisBaseFile",
+      "userInfo"
+    ])
   },
   //监控data中的数据变化
   watch: {
     analysisBaseFile: {
-        handler: function(params) {
-            this.allFilesList = JSON.parse(JSON.stringify(this.analysisBaseFile))
-            // console.log("allFilesList - watch", params)
-            // console.log("allFilesList - watch", this.analysisBaseFile)
-        },
-        deep: true
+      handler: function(params) {
+        this.allFilesList = JSON.parse(JSON.stringify(this.analysisBaseFile));
+        // console.log("allFilesList - watch", params)
+        // console.log("allFilesList - watch", this.analysisBaseFile)
+      },
+      deep: true
     },
     value(v1) {
       // console.log("this.value - watch",this.value)
       // console.log("v1 - watch",v1)
       // console.log("this.allFilesList - watch",this.allFilesList)
       // console.log("this.fileListOfComponent - watch",this.fileListOfComponent)
-      if (this.fileListOfComponent[1] === 0 && this.fileListOfComponent[0].algorithmfile != undefined) {
-          for (const i in v1) {
-              if (this.fileListOfComponent[0].algorithmfile.filevo.length != 0 && this.fileListOfComponent[0].algorithmfile.filevo[0].relativePath === v1[i].relativePath){
-                  v1.splice(i, 1)
-              }
+      if (
+        this.fileListOfComponent[1] === 0 &&
+        this.fileListOfComponent[0].algorithmfile != undefined
+      ) {
+        for (const i in v1) {
+          if (
+            this.fileListOfComponent[0].algorithmfile.filevo.length != 0 &&
+            this.fileListOfComponent[0].algorithmfile.filevo[0].relativePath ===
+              v1[i].relativePath
+          ) {
+            v1.splice(i, 1);
           }
+        }
       }
-      if (this.fileListOfComponent[1] === 0 && this.fileListOfComponent[0].platformfile != undefined) {
-          for (const i in v1) {
-              if (this.fileListOfComponent[0].platformfile.filevo.length != 0 && this.fileListOfComponent[0].platformfile.filevo[0].relativePath === v1[i].relativePath){
-                  v1.splice(i, 1)
-              }
+      if (
+        this.fileListOfComponent[1] === 0 &&
+        this.fileListOfComponent[0].platformfile != undefined
+      ) {
+        for (const i in v1) {
+          if (
+            this.fileListOfComponent[0].platformfile.filevo.length != 0 &&
+            this.fileListOfComponent[0].platformfile.filevo[0].relativePath ===
+              v1[i].relativePath
+          ) {
+            v1.splice(i, 1);
           }
+        }
       }
       this.leftData = v1;
     },
@@ -262,8 +282,7 @@ export default {
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {
-  },
+  created() {},
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   beforeCreate() {}, //生命周期 - 创建之前

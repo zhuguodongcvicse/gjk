@@ -717,11 +717,34 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	@Override
 	public void delFilePath(List<String> lists) {
 		for (String path : lists) {
-			File file = new File(path);
-			if (file.exists()) {
-				file.delete();
-			}
+//			File file = new File(path);
+			UploadFilesUtils.delFolder(path);
+//			if (file.exists()) {
+//				file.delete();
+//			}
 		}
+	}
+
+	/**
+	 * @Title: moveNioFile
+	 * @Description: 拷贝文件
+	 * @Author xiaohe
+	 * @DateTime 2019年7月17日 下午4:50:43
+	 * @param lists 文件路径
+	 */
+	@Override
+	public R moveNioFile(String source, String destin) {
+		try {
+			System.out.println("source :" + source);
+			source = source.replace("/", "\\");
+			String dirName = source.substring(source.lastIndexOf("\\"));
+			UploadFilesUtils.moveNioFile(source, destin + dirName);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new R<>(e);
+		}
+		return new R<>();
+
 	}
 
 	@Override
@@ -996,9 +1019,9 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	public R createSpbFrameFile(String spbModelXmlFile, String saveDir, String frameId) {
 		R retR = new R<>();
 		List<Map<String, Object>> lists = baseMapper.findCompframe(frameId);
-		//框架路径
+		// 框架路径
 		String framePath = "";
-		//框架路径
+		// 框架路径
 		String frameName = "";
 		for (Map<String, Object> map : lists) {
 			framePath = compDetailPath + map.get("file_path");
@@ -1053,6 +1076,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		}
 		return new R(lists);
 	}
+
 	/**
 	 * @Title: findPlatform
 	 * @Description: 根据构件框架名称查询 的平台信息

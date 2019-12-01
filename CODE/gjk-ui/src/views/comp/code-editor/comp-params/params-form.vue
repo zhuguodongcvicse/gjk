@@ -1,61 +1,64 @@
 <!--  -->
 <template>
   <el-card class="params_14s comp_sxpz_14s" shadow="never" :body-style="{ padding: '0px' }">
-    <template v-for="(params,index) in paramsFormXmlParams">
-      <!-- 基本属性表单内容 -->
-      <el-form
-        ref="form"
-        :label-width="moduleType==='comp'? '30%' : '30%'"
-        v-if="analysisConfigureType(params).lableType == 'form'"
-        :key="index"
-      >
-        <el-col :span="moduleType==='comp'? 12 : 24" :gutter="100">
-          <el-form-item
-            v-for=" (showParam,index) in analysisAttrConfigType(params)"
-            :label="showParam.attrMappingName"
-            :key="index"
-            style="margin-bottom: 0px;"
-          >
-            <form-item-type
-              v-model="params.attributeMap.name"
-              v-if="moduleType==='comp' || paramType==='资源属性'"
-              placeholder="请选择文件"
-              :lableType="showParam.attrConfigType"
-              :dictKey="showParam.dataKey"
-              :readonly="readonly"
-              :disabled="disabled"
-              @change="itemTypeChange(params)"
-              @fileChange="fileChange"
-            ></form-item-type>
-            <form-item-type
-              v-model="params.attributeMap.name"
-              v-if="moduleType==='jsplumb' && paramType!=='资源属性'"
-              placeholder="请选择文件"
-              :lableType="showParam.attrConfigType"
-              :dictKey="showParam.dataKey"
-              :readonly="readonly"
-              :disabled="showParam.attrMappingName==='数据积累类型'?disabled:true"
-              @change="itemTypeChange(params)"
-              @fileChange="fileChange"
-            ></form-item-type>
-            <!--            <el-input v-model="params.attributeMap.name" :disabled="true" v-else></el-input>-->
-          </el-form-item>
+    <el-form
+      ref="compParamsForm"
+      :rules="compParamsFormRules"
+      :model="compSpbParam"
+      :label-width="moduleType==='comp'? '20%' : '20%'"
+    >
+      <template v-for="(params,index) in paramsFormXmlParams">
+        <!-- 基本属性表单内容 -->
+        <span v-if="analysisConfigureType(params).lableType == 'form'" :key="index">
+          <el-col :span="moduleType==='comp'? 12 : 24" :gutter="100">
+            <el-form-item
+              v-for=" (showParam,index) in analysisAttrConfigType(params)"
+              :label="showParam.attrMappingName"
+              :prop="showParam.attrMappingName"
+              :key="index"
+              style="margin-bottom: 15px;"
+            >
+              <form-item-type
+                v-model="params.attributeMap.name"
+                v-if="moduleType==='comp' || paramType==='资源属性'"
+                placeholder="请选择文件"
+                :lableType="showParam.attrConfigType"
+                :dictKey="showParam.dataKey"
+                :readonly="readonly"
+                :disabled="disabled"
+                @change="itemTypeChange(params)"
+                @fileChange="fileChange"
+              ></form-item-type>
+              <form-item-type
+                v-model="params.attributeMap.name"
+                v-if="moduleType==='jsplumb' && paramType!=='资源属性'"
+                placeholder="请选择文件"
+                :lableType="showParam.attrConfigType"
+                :dictKey="showParam.dataKey"
+                :readonly="readonly"
+                :disabled="showParam.attrMappingName==='数据积累类型'?disabled:true"
+                @change="itemTypeChange(params)"
+                @fileChange="fileChange"
+              ></form-item-type>
+            </el-form-item>
+          </el-col>
+        </span>
+
+        <!-- 基本属性表格内容 -->
+        <el-col :span="24" :key="index" v-if="analysisConfigureType(params).lableType == 'table'">
+          <params-tree
+            :tableXmlParams="params"
+            :moduleType="moduleType"
+            :flowUids="formXmlParam.uids"
+            :readonly="readonly"
+            :disabled="disabled"
+            @jsplumbUidsChange="$emit('jsplumbUidsChange', $event)"
+          ></params-tree>
         </el-col>
-      </el-form>
-      <!-- 基本属性表格内容 -->
-      <el-col :span="24" :key="index" v-if="analysisConfigureType(params).lableType == 'table'">
-        <params-tree
-          :tableXmlParams="params"
-          :moduleType="moduleType"
-          :flowUids="formXmlParam.uids"
-          :readonly="readonly"
-          :disabled="disabled"
-          @jsplumbUidsChange="$emit('jsplumbUidsChange', $event)"
-        ></params-tree>
-      </el-col>
-    </template>
+      </template>
+    </el-form>
     <!-- 层级属性 -->
-    <el-form ref="form" label-width="100px" v-show="isShowCJTableData">
+    <el-form ref="cjForm" label-width="100px" v-show="isShowCJTableData">
       <!-- 层级属性 处理第一层-->
       <el-form-item
         v-for=" (showParam,$index) in cjBaseDataOption"
@@ -178,6 +181,7 @@ import formItemType from "./form-item-type";
 import { getPerformanceTable } from "@/api/comp/compParams";
 import { getObjType, deepClone, isObjectEquals } from "@/util/util";
 import { delFilePath } from "@/api/comp/componentdetail";
+import { compByUserId } from "@/api/comp/component";
 import { mapGetters } from "vuex";
 import { Hash } from "crypto";
 export default {
@@ -205,6 +209,16 @@ export default {
     "form-item-type": formItemType
   },
   data() {
+    var valiaCompIdCheck = (rule, value, callback) => {
+      let back = this.compListData.find(item => {
+        return item.compId === value;
+      });
+      if (back) {
+        callback(new Error("构件编号已经存在"));
+      } else {
+        callback();
+      }
+    };
     //这里存放数据
     return {
       //用于上传文件返回文件
@@ -221,7 +235,12 @@ export default {
       cjTableOption: [], //层级表格配置
       cjTableData: [], //层级表格数据
       cjTableSel: [], //层级表单数据
-      saveCjBaseData: {} //层级保存数据
+      saveCjBaseData: {}, //层级保存数据
+      compSpbParam: {},
+      //基本表单校验
+      compParamsFormRules: {},
+      compListData: [],
+      valiaCompIdCheck: valiaCompIdCheck
     };
   },
   //监听属性 类似于data概念
@@ -275,6 +294,29 @@ export default {
           } else {
           }
         }
+        baseData.forEach(item => {
+          let mes = [
+            {
+              required: true,
+              message: "请输入" + item.lableName,
+              trigger: "change"
+            }
+          ];
+          if (item.lableName === "构件编号") {
+            let idCheck = deepClone(mes);
+            idCheck.push({
+              validator: this.valiaCompIdCheck,
+              trigger: "change"
+            });
+            this.$set(this.compParamsFormRules, item.lableName, idCheck);
+          } else if (item.lableName === "显示名") {
+            this.$set(this.compParamsFormRules, item.lableName, mes);
+          } else if (item.lableName === "属性1") {
+            this.$set(this.compParamsFormRules, item.lableName, mes);
+          }
+          //設置表單值 设置表单值
+          this.$set(this.compSpbParam, item.lableName, item.attributeMap.name);
+        });
         this.paramsFormXmlParams = baseData;
         this.baseXmlParamsData = deepClone(baseData);
         this.xnTableData = xnShowTable;
@@ -493,10 +535,23 @@ export default {
   },
   //方法集合
   methods: {
+    //构件检验方法
+  async  compCheckedValidate() {
+      let isvalid = false;
+      this.$refs.compParamsForm.validate((valid, object) => {
+        isvalid = valid;
+      });
+      return Promise.resolve(isvalid);
+    },
     //基本属性解析
     itemTypeChange(baseData) {
       let paramsValue = deepClone(this.paramsFormXmlParams);
-      // console.log("baseData",baseData)
+      //設置表單值 设置表单值
+      this.$set(
+        this.compSpbParam,
+        baseData.lableName,
+        baseData.attributeMap.name
+      );
       let config = this.analysisConfigureType(baseData);
       // console.log("config",config)
       config.attrs.forEach(attr => {
@@ -518,7 +573,7 @@ export default {
                 let input = this.headerFile.inputXmlMapParams;
                 let output = this.headerFile.outputXmlMapParams;
                 let paramsFormXml = [];
-                console.log("12121212121212121",deepClone(this.headerFile))
+                console.log("12121212121212121", deepClone(this.headerFile));
                 paramsValue.forEach(param => {
                   let tmpIfArr = ["输入", "输出"];
                   if (tmpIfArr.includes(param.lableName)) {
@@ -924,7 +979,8 @@ export default {
           let files = [fileListsTemp[0].platformfile.filevo[0].relativePath];
           delFilePath(files);
         }
-        if (//analysisTestFile analysisAlgorithmFile
+        if (
+          //analysisTestFile analysisAlgorithmFile
           this.fileListOfComponent[0].testFile != undefined &&
           fileListsTemp[0].testFile.filevo.length != 0
         ) {
@@ -967,6 +1023,10 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   async created() {
+    //获取所有的构件列表信息
+    compByUserId("").then(res => {
+      this.compListData = res.data.data;
+    });
     //清空文件中的数据
     this.$store.dispatch("clearAnalysisBaseFile");
   },

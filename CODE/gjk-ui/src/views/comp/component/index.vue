@@ -23,6 +23,8 @@
             size="small"
             @click="goToAddCompPage()"
           >新增</el-button>
+          <!-- @click="templateData.templateVisible = true" -->
+          <!-- @click="goToAddCompPage()" -->
           <el-button
             type="primary"
             icon="el-icon--left"
@@ -50,6 +52,15 @@
                 plain
                 @click="handleCopy(scope.row,scope.index)"
               >复制</el-button>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="复制" placement="top">
+              <el-button
+                type="primary"
+                v-if="permissions.comp_component_edit"
+                size="mini"
+                plain
+                @click="handleShow(scope.row,scope.index)"
+              >查看</el-button>
             </el-tooltip>
             <el-tooltip class="item" effect="dark" content="编辑" placement="top">
               <el-button
@@ -379,6 +390,7 @@ export default {
       this.tableLoading = true;
       fetchList(this.listQuery).then(response => {
         this.tableData = response.data.data.records;
+        console.log("cxcxcx", this.tableData);
         this.page.total = response.data.data.total;
         this.tableLoading = false;
       });
@@ -430,6 +442,19 @@ export default {
           this.$router.push({
             path: "/comp/showComp/addAndEditComp",
             query: { compId: row.id, type: "copy", proFloName: "复制构件" }
+          });
+        });
+      });
+    },
+    handleShow(row, index) {
+      this.$store.dispatch("setFetchStrInPointer");
+      //加载中英文映射
+      this.$store.dispatch("setChineseMapping", "comp_param_type").then(() => {
+        //加载结构体
+        this.$store.dispatch("setStruceType").then(() => {
+          this.$router.push({
+            path: "/comp/showComp/addAndEditComp",
+            query: { compId: row.id, type: "view", proFloName: "查看构件" }
           });
         });
       });

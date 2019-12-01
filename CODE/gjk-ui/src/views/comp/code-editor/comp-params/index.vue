@@ -8,6 +8,7 @@
           size="mini"
           icon="el-icon-edit"
           @click.native="inputCompBackupInfo"
+          v-if="this.$route.query.type !== 'view'"
         >
           <span v-if="this.$route.query.type === 'add'">保存</span>
           <span v-else-if="this.$route.query.type ==='edit'">修改</span>
@@ -17,6 +18,7 @@
           type="primary"
           size="mini"
           icon="el-icon-edit"
+          v-if="this.$route.query.type !== 'view'"
           @click.native="compSpbShowDialog=true"
         >生成构件框架</el-button>
       </el-col>
@@ -46,8 +48,10 @@
       <el-row>
         <el-col :span="18">
           <params-define
+            ref="compForm"
             :paramsDefineXmlParams="saveXmlMaps.xmlEntityMaps"
             moduleType="comp"
+            :disabled="this.$route.query.type === 'view'"
             @change="changeSaveDBXmlMaps"
           />
         </el-col>
@@ -60,6 +64,7 @@
               fileType="algorithm"
               ref="saveAlgorithmFiles"
               :show="true"
+              :disabled="this.$route.query.type === 'view'"
             />
           </el-card>
           <el-card class="box-card" :body-style="{padding: '10px'}">
@@ -70,6 +75,7 @@
               fileType="test"
               ref="saveTestFiles"
               :show="true"
+              :disabled="this.$route.query.type === 'view'"
             />
           </el-card>
           <el-card class="box-card" :body-style="{padding: '10px'}">
@@ -80,6 +86,7 @@
               fileType="platform"
               ref="savePlatformFiles"
               :show="true"
+              :disabled="this.$route.query.type === 'view'"
             />
           </el-card>
           <el-card class="box-card" :body-style="{padding: '10px'}">
@@ -90,6 +97,7 @@
               ref="saveCompImg"
               fileType="img"
               :show="false"
+              :disabled="this.$route.query.type === 'view'"
             />
           </el-card>
         </el-col>
@@ -259,8 +267,12 @@ export default {
       // console.log("this.saveDBXmlMaps",JSON.stringify(this.saveDBXmlMaps))
       // console.log("Date.parse(new Date()) - changeSaveDBXmlMaps",Date.parse(new Date()))
     },
-    inputCompBackupInfo() {
-      this.dialogVisibleOfComBackup = true;
+    async inputCompBackupInfo() {
+      //表单校验
+      const isvalid = await this.$refs.compForm.compCheckedValidate();
+      if (isvalid) {
+        this.dialogVisibleOfComBackup = true;
+      }
     },
     sleep(time) {
       return new Promise(resolve => setTimeout(resolve, time));

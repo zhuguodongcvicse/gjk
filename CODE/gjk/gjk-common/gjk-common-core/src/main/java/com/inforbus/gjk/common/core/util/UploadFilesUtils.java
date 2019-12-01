@@ -193,6 +193,10 @@ public class UploadFilesUtils {
 			return flag;
 		}
 		if (!file.isDirectory()) {
+			if (file.isFile()) {
+				file.delete();
+				return true;
+			}
 			return flag;
 		}
 		String[] tempList = file.list();
@@ -207,9 +211,11 @@ public class UploadFilesUtils {
 				temp.delete();
 			}
 			if (temp.isDirectory()) {
-				delAllFile(path + "/" + tempList[i]);// 先删除文件夹里面的文件
+//				delAllFile(path + "/" + tempList[i]);// 先删除文件夹里面的文件
 				delFolder(path + "/" + tempList[i]);// 再删除空文件夹
 				flag = true;
+			}else {
+				flag = false;
 			}
 		}
 		return flag;
@@ -300,7 +306,7 @@ public class UploadFilesUtils {
 
 	/**
 	 * @Title: encodeBase64File
-	 * @Description: 将文件转BASE64
+	 * @Description: 拷贝文件
 	 * @Author xiaohe
 	 * @DateTime 2019年11月27日 下午8:46:20
 	 * @param source 源文件路径
@@ -318,7 +324,7 @@ public class UploadFilesUtils {
 			if (!destinPath.exists()) {
 				destinPath.mkdirs();
 			}
-			//源文件路径下的所有文件和文件夹
+			// 源文件路径下的所有文件和文件夹
 			File[] items = sourcePath.listFiles();
 			FileChannel in = null;
 			FileChannel out = null;
@@ -326,10 +332,10 @@ public class UploadFilesUtils {
 				// 判断是不是文件
 				if (file.isFile()) {
 					try {
-						//取得对应文件的通道
+						// 取得对应文件的通道
 						in = new FileInputStream(file).getChannel();//
 						out = new FileOutputStream(destinPath + File.separator + file.getName()).getChannel();
-						//连接两个通道，并从in通道读取，写入out中
+						// 连接两个通道，并从in通道读取，写入out中
 						in.transferTo(0, in.size(), out);
 					} catch (Exception e) {
 						throw e;
@@ -345,4 +351,19 @@ public class UploadFilesUtils {
 			throw new NullPointerException("source is null");
 		}
 	}
+
+	/**
+	 * @Title: moveNioFile
+	 * @Description: 移动文件
+	 * @Author xiaohe
+	 * @DateTime 2019年11月27日 下午8:46:20
+	 * @param source 源文件路径
+	 * @param destin 拷贝文件路径
+	 * @throws Exception
+	 */
+	public static void moveNioFile(String source, String destin) throws Exception {
+		NioToCopyFile(source, destin);
+		delAllFile(source);
+	}
+
 }

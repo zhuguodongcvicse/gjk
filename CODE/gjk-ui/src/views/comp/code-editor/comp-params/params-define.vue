@@ -10,6 +10,7 @@
         <el-tab-pane :key="index" :label="item.lableName" :name="'activeName'+index">
           <!-- 处理参数 -->
           <params-form
+            :ref="'paramsform'+index"
             :formXmlParam="item.xmlEntityMaps"
             :key="index"
             :moduleType="moduleType"
@@ -104,12 +105,25 @@ export default {
   },
   //方法集合
   methods: {
-    saveCurrentIODate: function(){
-        this.$parent.$parent.$parent.$parent.$parent.saveCurrentIODate()
+    //构件检验方法
+    async compCheckedValidate() {
+      let isvalid = true;
+      for (let index in this.analysisParamsDefineXmlParams) {
+        const valid = await this.$refs[
+          "paramsform" + index
+        ][0].compCheckedValidate();
+        if (!valid) {
+          isvalid = false;
+        }
+      }
+      return Promise.resolve(isvalid);
+    },
+    saveCurrentIODate: function() {
+      this.$parent.$parent.$parent.$parent.$parent.saveCurrentIODate();
     },
     saveParamsDefineXmlParams: function(dataParam, nameType) {
       // console.log("params-define.vue中。需要保存的数据结构******", dataParam);
-      this.$emit("change", dataParam,nameType);
+      this.$emit("change", dataParam, nameType);
     },
     analysisConfigureType(config) {
       return eval("(" + config.attributeMap.configureType + ")");

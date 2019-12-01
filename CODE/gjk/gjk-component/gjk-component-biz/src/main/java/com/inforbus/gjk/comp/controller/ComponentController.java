@@ -315,4 +315,8 @@ public class ComponentController {
 	public R isSelectLibs(@PathVariable("compId") String compId) {
 		return new R<>(componentService.isSelectLibs(compId));
 	}
+	@PostMapping("/compByUserId")
+	public R listCompByUserId(@RequestParam(value = "userId") String userId) {
+		return new R<>(componentService.listCompByUserId(userId));
+	}
 }

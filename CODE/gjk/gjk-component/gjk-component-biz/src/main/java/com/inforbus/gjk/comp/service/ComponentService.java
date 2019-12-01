@@ -14,6 +14,22 @@
  * this software without specific prior written permission.
  * Author: inforbus
  */
+/*
+ *    Copyright (c) 2018-2025, inforbus All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * Neither the name of the inforbus.com developer nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ * Author: inforbus
+ */
 package com.inforbus.gjk.comp.service;
 
 import java.io.FileInputStream;
@@ -189,6 +205,14 @@ public interface ComponentService extends IService<Component> {
 	 */
 	Map<String, Object> checkComp(List<Object> obj);
 
+	/**
+	 * @Title: getImgFile
+	 * @Description: listCompByUserId
+	 * @Author xiaohe
+	 * @DateTime 2019年5月23日 上午11:34:43
+	 * @param userId 用户Id
+	 */
+	List<Component> listCompByUserId(String userId);
 	/**
 	 * 判断选择的库目录文件是否存在
 	 * @param id
