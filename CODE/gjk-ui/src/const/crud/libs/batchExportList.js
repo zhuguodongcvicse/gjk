@@ -60,6 +60,10 @@ export const tableOption = {
         {
           label: '批量导出',
           value: "3"
+        },
+        {
+          label: '批量入库',
+          value: '4'
         }]
       },
       {

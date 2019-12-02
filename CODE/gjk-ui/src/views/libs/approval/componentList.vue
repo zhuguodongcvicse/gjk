@@ -40,6 +40,8 @@ import {
 import { fetchAlgorithmTree } from "@/api/admin/algorithm";
 import { fetchTestTree } from "@/api/admin/test";
 import { tableOption } from "@/const/crud/libs/componentList";
+import { getObj as getcomponent } from "@/api/comp/component";
+import { getObj as getbatchapproval } from "@/api/libs/batchapproval";
 // import { screenCompOption } from "@/const/crud/libs/screenComp";
 import { mapGetters } from "vuex";
 import selectTree from "@/views/pro/project/selectTree";
@@ -98,16 +100,15 @@ export default {
     "storage-apply": storageApply
   },
   props: [
-    "batchId"
+    "batchId",
+    "batchType"
   ],
   computed: {
     ...mapGetters(["permissions"])
   },
   created() {
     this.loading = true;
-    console.log("this.getList()前",this.batchId)
     this.getList();
-    console.log("this.getList()后",this.batchId)
     this.getLibsTree();
     this.loading = false;
     this.tableHisOption = JSON.parse(JSON.stringify(this.tableOption))
@@ -274,14 +275,32 @@ export default {
       this.tableLoading = true;
       let page = JSON.parse(JSON.stringify(this.listQuery));
       this.$set(page, "version", "max");
-      console.log(22,this.batchId)
       this.$set(page, "applyId", this.batchId);
-      console.log(page)
-      findPageByBatchApprovalId(page).then(response => {
-        this.tableData = response.data.data.records;
-        this.page.total = response.data.data.total;
-        this.tableLoading = false;
-      });
+      if(this.batchType=='3'){
+        findPageByBatchApprovalId(page).then(response => {
+          this.tableData = response.data.data.records;
+          this.page.total = response.data.data.total;
+          this.tableLoading = false;
+        });
+      }else{
+        getbatchapproval(this.batchId).then(req=>{
+          this.tableData = []
+          var idList = JSON.parse(req.data.data.idListJson)
+          for (let i = 0; i < this.page.pageSize; i++) {
+            const element = idList[i];
+            console.log((this.page.currentPage - 1) * this.page.pageSize + i)
+            if(idList.length > (this.page.currentPage - 1) * this.page.pageSize + i) {
+              getcomponent(element).then(req=>{
+              this.tableData.push(req.data.data)
+              })
+            }else{
+              break
+            }
+          }
+          this.page.total = idList.length
+          this.tableLoading = false;
+        })
+      }
     },
     currentChange(val) {
       this.page.current = val;
@@ -302,21 +321,36 @@ export default {
       this.$refs.crud.rowAdd();
     },
     handleEdit(row, index) {
-      getCompView(row).then(res => {
-        this.$store.dispatch("setSaveXmlMaps", res.data.data.compBasicMap).then(() => {
-          this.$store
-            .dispatch("setChineseMapping", "comp_param_type")
-            .then(() => {
-              //加载结构体
-              this.$store.dispatch("setStruceType").then(() => {
-                this.$router.push({
-                  path: "/comp/showComp/commView",
-                  query: { compId: row.id, type: "view" }
+      console.log(this.batchType)
+      if(this.batchType=='3'){
+        getCompView(row).then(res => {
+          this.$store.dispatch("setSaveXmlMaps", res.data.data.compBasicMap).then(() => {
+            this.$store
+              .dispatch("setChineseMapping", "comp_param_type")
+              .then(() => {
+                //加载结构体
+                this.$store.dispatch("setStruceType").then(() => {
+                  this.$router.push({
+                    path: "/comp/showComp/commView",
+                    query: { compId: row.id, type: "view" }
+                  });
                 });
               });
-            });
+          });
+        });
+      } else {
+        this.$store.dispatch("setFetchStrInPointer");
+        //加载中英文映射
+        this.$store.dispatch("setChineseMapping", "comp_param_type").then(() => {
+        //加载结构体
+        this.$store.dispatch("setStruceType").then(() => {
+          this.$router.push({
+            path: "/comp/showComp/addAndEditComp",
+            query: { compId: row.id, type: "view", proFloName: "查看构件" }
+          });
         });
       });
+      }
     },
     handleDel(row, index) {
       this.$refs.crud.rowDel(row, index);
