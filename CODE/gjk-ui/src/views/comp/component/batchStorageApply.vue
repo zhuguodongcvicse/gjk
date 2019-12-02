@@ -26,15 +26,14 @@
 
 <script>
 import { mapGetters } from "vuex";
-import { getTreeById, putObj } from "@/api/libs/software";
 import { getUserhasApplyAuto } from "@/api/admin/user";
+import { putObj } from "@/api/comp/component";
 //当引用的方法重名时，使用as取别名区分
 import {
   saveBatchApproval
 } from "@/api/libs/batchapproval";
 import {
-  saveApproval,
-  putObj as putapproval
+  saveApproval
 } from "@/api/libs/approval";
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
@@ -42,7 +41,7 @@ export default {
   //注入依赖，调用this.reload();用于刷新页面
   inject: ["reload"],
   //import引入的组件需要注入到对象中才能使用
-  props: ["dialog", "component", "approval"],
+  props: ["dialog", "component"],
   components: {},
   //监听属性 类似于data概念
   computed: {
@@ -104,7 +103,6 @@ export default {
     //提交入库的方法
     storageApplySoftware(val) {
         this.$refs[val].validate((valid, object) => {
-           console.log(this.component)
             if (valid) {
               let approval = {}
               var batchApproval = {}
@@ -115,33 +113,33 @@ export default {
                 idListJson.push(element.id)
               }
               batchApproval.idListJson = JSON.stringify(idListJson)
-              if(this.approval == null || this.approval.approvalState != '3'){
-                saveBatchApproval(batchApproval).then(Response => {
-                  approval.applyId = Response.data.msg
-                  approval.userId = this.userInfo.userId
-                  approval.applyType = "3"
-                  approval.libraryType = "1"
-                  approval.applyUserId = this.form.applyUser
-                  approval.approvalState = "0"
-                  saveApproval(approval).then(Response=>{
-                    this.$message({
-                        message: "已提交申请，请等待库管理员审批",
-                        type: "success"
-                    });
-                  })
-                });
-              }else{
-                console.log(111)
-                approval.id = this.approval.id
-                approval.approvalState = "4"
-                console.log(approval)
-                putapproval(approval).then(Response=>{
+              saveBatchApproval(batchApproval).then(Response => {
+                approval.applyId = Response.data.msg
+                approval.userId = this.userInfo.userId
+                approval.applyType = "4"
+                approval.libraryType = "1"
+                approval.applyUserId = this.form.applyUser
+                approval.approvalState = "0"
+                saveApproval(approval).then(Response=>{
                   this.$message({
                       message: "已提交申请，请等待库管理员审批",
                       type: "success"
                   });
+                  for (let i = 0; i < this.component.length; i++) {
+                    const element = this.component[i];
+                    console.log(element.applyState)
+                    if(element.applyState == null || element.applyState == "0"){
+                        element.applyState = "1";
+                        element.applyDesc = "已提交申请，请等待库管理员审批";
+                        putObj(element).then(Response => {})
+                    } else {
+                        element.applyState = "4";
+                        element.applyDesc = "已提交申请，请等待库管理员审批";
+                        putObj(element).then(Response => {})
+                    }
+                  }
                 })
-              }
+              });
               this.reload();
               this.dialogStateShow(false);
             }

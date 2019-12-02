@@ -198,4 +198,9 @@ public class CommonComponentController {
 		return new R<>(commonComponentService.findPageByBatchApprovalId(new Page<>(current, size),id));
 	}
 
+	@PostMapping("/saveCompList")
+	public R saveCompDetailList(@RequestBody List<CommonComponent> commonComponents) {
+		return new R<>(commonComponentService.saveCommonCompList(commonComponents));
+	}
+
 }

@@ -25,6 +25,13 @@
           >新增</el-button>
           <!-- @click="templateData.templateVisible = true" -->
           <!-- @click="goToAddCompPage()" -->
+          <el-button
+            type="primary"
+            icon="el-icon--left"
+            size="small"
+            @click="batchStorageApply()"
+          >批量入库</el-button>
+          <!-- @click="templateData.templateVisible = true" --> <!-- @click="goToAddCompPage()" -->
           <!-- <el-button size="small">
             <i class="el-icon-download el-icon--left"></i>导出
           </el-button>-->
@@ -46,7 +53,7 @@
                 @click="handleCopy(scope.row,scope.index)"
               >复制</el-button>
             </el-tooltip>
-            <el-tooltip class="item" effect="dark" content="复制" placement="top">
+            <el-tooltip class="item" effect="dark" content="查看" placement="top">
               <el-button
                 type="primary"
                 v-if="permissions.comp_component_edit"
@@ -130,6 +137,11 @@
       :dialog="importCompApplyDialogVisible"
       @setImportCompDialog="setImportCompDialog"
     />
+    <batch-storage-apply
+    :dialog="batchStorageApplyDialog"
+    @storageApplyDialogState="batchStorageApplyDialogState"
+    :component="batchStorageList"
+    ></batch-storage-apply>
   </div>
 </template>
 
@@ -152,13 +164,15 @@ import { mapGetters } from "vuex";
 import importCompDialog from "./importCompDialog";
 import compTemplate from "@/views/comp/code-editor/comp-template";
 import storageApply from "./storageApply";
+import batchStorageApply from "./batchStorageApply";
 import importCompStorageApply from "./importCompStorageApply";
 export default {
   components: {
     "import-dialog-params": importCompDialog,
     "comp-template": compTemplate,
     "storage-apply": storageApply,
-    "import-storage-apply": importCompStorageApply
+    "import-storage-apply": importCompStorageApply,
+    "batch-storage-apply":batchStorageApply
   },
   name: "component",
   inject: ["reload"],
@@ -167,8 +181,11 @@ export default {
       templateData: {
         templateVisible: false
       },
+      batchStorageApplyDialog: false,
       dialogVisible: false,
       tableData: [],
+      selectList: [],
+      batchStorageList: [],
       page: {
         total: 0, // 总页数
         currentPage: 1, // 当前页数
@@ -346,6 +363,21 @@ export default {
     //选中数据
     selectionChange(list) {
       // this.$message.success("选中的数据" + JSON.stringify(list));
+      this.selectList = list;
+      this.handleExportCompList()
+    },
+    handleExportCompList(){
+        this.batchStorageList = []
+        this.batchStorageList = this.batchStorageList.concat(
+            this.selectList
+        );
+        // 去重
+        let tmpArr = []
+        this.batchStorageList = this.batchStorageList.reduce(function(item, next) {
+            tmpArr[next.id] ? '' : tmpArr[next.id] = true && item.push(next);
+            return item;
+        }, []);
+        console.log(this.batchStorageList)
     },
     getStructTrees() {
       let struct = {};
@@ -366,7 +398,6 @@ export default {
       this.tableLoading = true;
       fetchList(this.listQuery).then(response => {
         this.tableData = response.data.data.records;
-        console.log("cxcxcx", this.tableData);
         this.page.total = response.data.data.total;
         this.tableLoading = false;
       });
@@ -513,13 +544,42 @@ export default {
      */
     refreshChange() {
       this.getList();
-    }
+    },
+    batchStorageApply(){
+   if(this.batchStorageList.length > 0){
+     var flag = false
+        for (let i = 0; i < this.batchStorageList.length; i++) {
+          const element = this.batchStorageList[i];
+          if(element.applyState=='2'){
+              flag = true
+          }
+        }
+        if(flag){
+          this.$message({
+            showClose: true,
+            message: "请勿选择已入库的构件",
+            type: "warning"
+          });
+        }else{
+          this.batchStorageApplyDialog = true;
+        }
+      }else{
+        this.$message({
+            showClose: true,
+            message: "请至少选择一个未入库的构件",
+            type: "warning"
+          });
+      }
+  },
+  batchStorageApplyDialogState(){
+    this.batchStorageApplyDialog = false;
+  }
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.refreshChange();
     });
-  }
+  },
 };
 </script>
 

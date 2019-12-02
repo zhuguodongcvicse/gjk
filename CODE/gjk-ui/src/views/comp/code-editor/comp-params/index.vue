@@ -105,10 +105,20 @@
     </el-main>
 
     <el-dialog title="请输入备注内容" :visible.sync="dialogVisibleOfComBackup" width="30%">
-      <el-input placeholder="请输入备注内容" v-model="compBackupinfo" clearable></el-input>
+      <el-form ref="compBack" :model="compSpbParam" :rules="compSpbFormRules">
+        <el-form-item prop="compBackupinfo" style="margin-bottom: 0px;">
+          <el-input
+            type="textarea"
+            placeholder="请输入备注内容"
+            rows="4"
+            v-model="compSpbParam.compBackupinfo"
+          ></el-input>
+        </el-form-item>
+        <!-- <el-input placeholder="请输入备注内容" v-model="compBackParam.compBackupinfo" clearable></el-input> -->
+      </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisibleOfComBackup = false">取 消</el-button>
-        <el-button type="primary" @click="clickHandleSaveComp(false)">确 定</el-button>
+        <el-button type="primary" @click="compSpbFormClick('compBack')">确 定</el-button>
       </span>
     </el-dialog>
     <el-dialog title="生成构件框架" :visible.sync="compSpbShowDialog" width="40%">
@@ -127,6 +137,19 @@
               >&emsp;&emsp;{{ item.rightName }}</span>
             </el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item
+          label="备注内容"
+          label-width="90px"
+          prop="compBackupinfo"
+          style="margin-bottom: 0px;"
+        >
+          <el-input
+            type="textarea"
+            placeholder="请输入备注内容"
+            rows="4"
+            v-model="compSpbParam.compBackupinfo"
+          ></el-input>
         </el-form-item>
         <div class="control-container bsp_footer_btn_14s text_align_right_14s">
           <el-button type="primary" @click.native="compSpbFormClick('compForm')">保存</el-button>
@@ -151,6 +174,7 @@ import { getObjType, deepClone } from "@/util/util";
 import {
   handleSaveCompMap,
   saveComp,
+  compByUserId,
   getCompFiles,
   analysisXmlFile,
   analysisBaseTemplateXmlFile
@@ -166,10 +190,27 @@ export default {
     "form-item-type": formItemType
   },
   data() {
+    var valiaCompIdAndBackChecked = (rule, value, callback) => {
+      console.log("this.component", this.component);
+      let back = this.compListData.find(item => {
+        return (
+          item.compId === this.component.compId && item.compBackupinfo === value
+        );
+      });
+      if (back) {
+        callback(
+          new Error(
+            "构件编号为( " + this.component.compId + " )已经用过此备注。。。"
+          )
+        );
+      } else {
+        callback();
+      }
+    };
     //这里存放数据
     return {
+      compListData: [],
       structBaseTemplate: [],
-      compBackupinfo: "",
       dialogVisibleOfComBackup: false,
       selectBaseTemplateValue: "",
       //构件基本信息
@@ -181,9 +222,13 @@ export default {
       compSpbShowDialog: false,
       compSpbFrameData: [],
       compSpbParam: {},
+      backChecked: valiaCompIdAndBackChecked,
       compSpbFormRules: {
         frameId: [
           { required: true, message: "请选择构件框架", trigger: "change" }
+        ],
+        compBackupinfo: [
+          { required: true, message: "请输入备注内容", trigger: "change" }
         ]
       }
     };
@@ -300,8 +345,11 @@ export default {
     compSpbFormClick(formName) {
       this.$refs[formName].validate((valid, object) => {
         if (valid) {
-          // console.log("1111111111222",this.compSpbParam)
-          this.clickHandleSaveComp(true);
+          if (formName == "compBack") {
+            this.clickHandleSaveComp(false);
+          } else if (formName == "compForm") {
+            this.clickHandleSaveComp(true);
+          }
         }
       });
     },
@@ -313,9 +361,10 @@ export default {
         spinner: "el-icon-loading",
         background: "rgba(0, 0, 0, 0.7)"
       });
-      this.component.compBackupinfo = this.compBackupinfo;
+      this.component.compBackupinfo = this.compSpbParam.compBackupinfo;
       saveComp(this.component).then(res => {
         let comp = res.data.data;
+        console.log("32323232", comp);
         this.$refs.saveAlgorithmFiles.fetchSavefiles(comp).then(() => {
           this.$refs.saveTestFiles.fetchSavefiles(comp).then(() => {
             this.$refs.savePlatformFiles.fetchSavefiles(comp).then(resFiles => {
@@ -387,6 +436,16 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
+    //获取所有的构件列表信息
+    compByUserId("").then(res => {
+      this.compListData = res.data.data;
+    });
+    if (this.$route.query.type !== "edit") {
+      this.compSpbFormRules.compBackupinfo.push({
+        validator: this.backChecked,
+        trigger: "change"
+      });
+    }
     findSpbFrameFile().then(res => {
       let showData = deepClone(res.data.data);
       showData.forEach(item => {
@@ -433,7 +492,7 @@ export default {
         // console.log("res",res)
         //基本构件
         //备注信息赋值
-        this.compBackupinfo = res.data.data.comp.compBackupinfo;
+        this.compSpbParam.compBackupinfo = res.data.data.comp.compBackupinfo;
         this.component = res.data.data.comp;
         this.$store.dispatch("setSaveXmlMaps", res.data.data.compBasicMap);
         this.fileList = res.data.data;

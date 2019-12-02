@@ -446,7 +446,7 @@ export default {
         this.compUpdateState = response.data.data.compUpdate;
         // 所有文件DTO
         this.dtos = response.data.data.dtos;
-        // console.log("dtos列表", this.dtos);
+        console.log("dtos列表", this.dtos);
         // 设置所有构件XML
         this.xmls = response.data.data.xmls;
         // 设置所有构件XMLMaps

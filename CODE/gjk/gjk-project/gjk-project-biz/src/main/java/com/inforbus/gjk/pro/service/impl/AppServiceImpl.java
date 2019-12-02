@@ -110,12 +110,18 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 			String appPath = proDetailPath + app.getFilePath() + File.separator + app.getFileName();
 			File appFile = new File(appPath);
 			List<ProjectFileVO> tree = Lists.newArrayList();
+			if (!appFile.exists()) {
+				return Lists.newArrayList();
+			}
 
 			String id = IdGenerate.uuid();
 			tree.add(new ProjectFileVO(id, appFile.getName(), "App组件工程", "app",
-					appFile.getParentFile().getAbsolutePath(), processId, processId,"0"));
+					appFile.getParentFile().getAbsolutePath(), processId, processId, "0"));
 			File[] fileList = appFile.listFiles();
 			for (File file : fileList) {
+				if (file.getName().equals("bsp") && appFile.getName().equals("AppPro")) {
+					continue;
+				}
 				addAppFileTree(tree, id, file, processId);
 			}
 
@@ -158,7 +164,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 
 	@Override
 	public void deleteAppByAPPId(String id) {
-		App appData= baseMapper.selectAPPByAPPId(id);
+		App appData = baseMapper.selectAPPByAPPId(id);
 		String appPath = proDetailPath + appData.getFilePath() + File.separator + appData.getFileName();
 		UploadFilesUtils.delFolder(appPath);
 		baseMapper.deleteAppByAPPId(id);
