@@ -116,7 +116,6 @@ export default {
         return item.type === "11";
       });
       if (procedureXml != undefined) {
-        this.$set(allMessage, "userName", this.userInfo.username);
         this.$set(allMessage, "procedureXmlId", procedureXml.id);
         if (this.localDeploymentPlan) {
           this.$set(allMessage, "localDeploymentPlan", "0");

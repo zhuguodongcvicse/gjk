@@ -729,8 +729,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				return r;
 			}
 
-			R prop = getMakefileTypeByProperties();
 			Map platformProp = null;
+			// 获取配置文件并解析
+			R prop = getMakefileTypeByProperties();
 			if (CommonConstants.FAIL.equals(prop.getCode())) {
 				return r;
 			} else {
@@ -740,17 +741,14 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			// 获取流程对应记录
 			ProjectFile proFile = this.getById(proceId);
 			// 根据"员工号_项目名称_流程名称APP"格式创建App的名字及路径，并存放在流程文件夹下
-			appFilePath = proDetailPath + this.getById(modelId).getFilePath() + File.separator
-					+ messageMap.get("userName") + "_"
-					+ projectMapper.getProById(projectFile.getProjectId()).getProjectName() + "_"
-					+ proFile.getFileName() + "APP" + File.separator;
+			appFilePath = proDetailPath + File.separator + this.getById(modelId).getFilePath() + File.separator + "app"
+					+ File.separator + "AppPro" + File.separator;
 
 			if (new File(appFilePath).exists()) {
 				cn.hutool.core.io.FileUtil.del(appFilePath);
 			}
 
 			Map<String, String> partnamePlatformMap = new HashMap<String, String>();
-
 			// 遍历所有根组件，创建根组件文件夹
 			for (HardwareNode hardwareNode : hardwareNodes) {
 				boolean flag = false;
@@ -771,16 +769,35 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 								return r;
 							}
 
+							String softwareFilePath = "";
+							String softwareName = "";
+							for (PartPlatformSoftware software : partPlatformSoftwares) {
+								if (software.getPlatformName().contains(libsType)) {
+									softwareFilePath = software.getSoftwareFilePath();
+									softwareName = software.getSoftwareName();
+								}
+							}
+							String bspFilePath = "";
+							for (PartPlatformBSP bsp : partPlatformBSPs) {
+								if (bsp.getPlatformName().contains(libsType)) {
+									bspFilePath = bsp.getBspFilePath();
+								}
+							}
+
+							// 获取Sylixos工程名
 							String sylixosProjectName = null;
-							copySoftwareAndBsp(r, appFilePath, part, libsType, platformType, partPlatformSoftwares,
-									partPlatformBSPs);
+							if ("Sylixos".equals(platformType)) {
+								sylixosProjectName = new File(softwareFilePath).getName();
+							}
+							// 拷贝bsp和软件框架
+							copySoftwareAndBsp(r, appFilePath, part.getPartName(), libsType, platformType,
+									softwareFilePath, softwareName, bspFilePath);
 							if (CommonConstants.FAIL.equals(r.getCode())) {
 								return r;
-							} else {
-								sylixosProjectName = (String) r.getData();
 							}
-							modifyAssemblyDir(r, appFilePath, part, libsType, platformType, partPlatformSoftwares,
-									integerCodeFilePath, sylixosProjectName);
+
+							modifyAssemblyDir(r, appFilePath + part.getPartName(), part, platformType,
+									integerCodeFilePath, proDetailPath + bspFilePath, sylixosProjectName);
 							if (CommonConstants.FAIL.equals(r.getCode())) {
 								return r;
 							}
@@ -827,71 +844,46 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		}
 	}
 
-	private R copySoftwareAndBsp(R r, String appFilePath, Part part, String libsType, String platformType,
-			List<PartPlatformSoftware> partPlatformSoftwares, List<PartPlatformBSP> partPlatformBSPs) {
-		// 创建根组件文件夹的名称及文件路径
-		String assemblyName = appFilePath + part.getPartName();
-
-		String softwareFilePath = "";
-		String softwareName = "";
-		String sylixosProjectName = null;
-		for (PartPlatformSoftware software : partPlatformSoftwares) {
-			if (software.getPlatformName().contains(libsType)) {
-				softwareFilePath = software.getSoftwareFilePath();
-				softwareName = software.getSoftwareName();
-			}
+	private void copySoftwareAndBsp(R r, String appFilePath, String partName, String libsType, String platformType,
+			String softwareFilePath, String softwareName, String bspFilePath) {
+		if ("".equals(bspFilePath)) {
+			logger.error(partName + "寻找bsp错误，请配置" + libsType + "对应的bsp。");
+			r.setAllAttr(CommonConstants.FAIL, partName + "寻找bsp错误，请配置" + libsType + "对应的bsp。", null);
+			return;
 		}
-		String bspFilePath = "";
-		for (PartPlatformBSP bsp : partPlatformBSPs) {
-			if (bsp.getPlatformName().contains(libsType)) {
-				bspFilePath = bsp.getBspFilePath();
-			}
-		}
-
-		if ("Sylixos".equals(platformType)) {
-			sylixosProjectName = new File(softwareFilePath).getName();
-			if ("".equals(bspFilePath)) {
-				logger.error(part.getPartName() + "寻找bsp错误，请配置" + libsType + "对应的bsp。");
-				return r.setAllAttr(CommonConstants.FAIL, part.getPartName() + "寻找bsp错误，请配置" + libsType + "对应的bsp。",
-						null);
-			}
-			File file = new File(appFilePath + "bsp" + File.separator + platformType + File.separator
-					+ new File(bspFilePath).getName());
-			if (!file.exists()) {
-				// 拷贝bsp对应的文件夹到app组件工程目录下
-				createBspDir(r, bspFilePath, file.getAbsolutePath());
-				if (CommonConstants.FAIL.equals(r.getCode())) {
-					return r;
+		Thread thread = new Thread() {
+			@Override
+			public void run() {
+				File file = new File(appFilePath + "bsp" + File.separator + platformType + File.separator
+						+ new File(bspFilePath).getName());
+				if (!file.exists()) {
+					// 拷贝bsp对应的文件夹到app组件工程目录下
+					file.mkdirs();
+					try {
+						FileUtil.copyFile(proDetailPath + bspFilePath, file.getAbsolutePath());
+					} catch (IOException e) {
+						logger.error("复制BSP文件夹错误，请联系系统管理员");
+						r.setAllAttr(CommonConstants.FAIL, "复制BSP文件夹错误，请联系系统管理员", null);
+						return;
+					}
 				}
 			}
-		}
+		};
+		thread.start();
 
 		if ("".equals(softwareFilePath)) {
-			logger.error(part.getPartName() + "寻找软件框架错误，请配置" + libsType + "对应的软件框架。");
-			return r.setAllAttr(CommonConstants.FAIL, part.getPartName() + "寻找软件框架错误，请配置" + libsType + "对应的软件框架。",
-					null);
+			logger.error(partName + "寻找软件框架错误，请配置" + libsType + "对应的软件框架。");
+			r.setAllAttr(CommonConstants.FAIL, partName + "寻找软件框架错误，请配置" + libsType + "对应的软件框架。", null);
+			return;
 		}
-
 		try {
+			// 创建根组件文件夹的名称及文件路径
+			String assemblyName = appFilePath + partName;
 			// 将软件框架所有子文件及文件夹拷贝到根组件文件夹中
 			FileUtil.copyFile(proDetailPath + softwareFilePath, assemblyName);
 		} catch (IOException e) {
 			logger.error("复制软件框架" + softwareName + "文件夹错误，请联系系统管理员。");
-			return r.setAllAttr(CommonConstants.FAIL, "复制软件框架" + softwareName + "文件夹错误，请联系系统管理员。", null);
-		}
-		return new R<>(sylixosProjectName);
-	}
-
-	private void createBspDir(R r, String bspDirPath, String appFilePath) {
-		File bspFile = new File(appFilePath);
-		if (!bspFile.exists()) {
-			bspFile.mkdirs();
-		}
-		try {
-			FileUtil.copyFile(proDetailPath + bspDirPath, appFilePath);
-		} catch (IOException e) {
-			logger.error("复制BSP文件夹错误，请联系系统管理员");
-			r.setAllAttr(CommonConstants.FAIL, "复制BSP文件夹错误，请联系系统管理员", null);
+			r.setAllAttr(CommonConstants.FAIL, "复制软件框架" + softwareName + "文件夹错误，请联系系统管理员。", null);
 			return;
 		}
 	}
@@ -900,18 +892,14 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * 拷贝.c .h .cpp文件 并在之后调用makeFile
 	 * 
 	 * @param r
-	 * @param appFilePath
+	 * @param assemblyName        根组件文件夹路径
 	 * @param part
-	 * @param libsType
 	 * @param makefileType
-	 * @param partPlatformSoftwares
 	 * @param integerCodeFilePath
 	 * @param sylixosProjectName
 	 */
-	private void modifyAssemblyDir(R r, String appFilePath, Part part, String libsType, String makefileType,
-			List<PartPlatformSoftware> partPlatformSoftwares, String integerCodeFilePath, String sylixosProjectName) {
-		// 创建根组件文件夹的名称及文件路径
-		String assemblyName = appFilePath + part.getPartName();
+	private void modifyAssemblyDir(R r, String assemblyName, Part part, String makefileType, String integerCodeFilePath,
+			String bspFilePath, String sylixosProjectName) {
 
 		// 创建空集合，存储所有.h文件路径
 		Set<String> hFilePathSet = new HashSet<String>();
@@ -1021,7 +1009,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 					} else if (makefileType.trim().toLowerCase().equals("Workbench".toLowerCase())) {
 						WorkbenchUtil.updateWorkbench(assemblyName);
 					} else if (makefileType.trim().toLowerCase().equals("Sylixos".toLowerCase())) {
-						SylixosUtil.updateSylixos(assemblyName, sylixosProjectName);
+						SylixosUtil.updateSylixos(assemblyName, bspFilePath, sylixosProjectName);
 					} else if (makefileType.trim().toLowerCase().startsWith("Linux".toLowerCase())) {
 						LinuxUtil.updateLinux(cFilePathList, assemblyName, ".c");
 						// LinuxUtil.updateLinux(linuxCFilePath, assemblyName, ".c");
