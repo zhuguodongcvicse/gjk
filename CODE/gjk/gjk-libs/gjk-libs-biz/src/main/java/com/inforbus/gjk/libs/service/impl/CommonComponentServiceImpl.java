@@ -466,6 +466,7 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		return baseMapper.getCompListByStringAndLibsId(page, libsList, selectStringList);
 	}
 
+    @Override
 	public IPage<CommonComponent> findPageByBatchApprovalId(Page page, String applyId){
 		R componentByApplyId = batchApprovalService.getComponentByApplyId(applyId);
 		List<CommonComponent> data = (List<CommonComponent>) componentByApplyId.getData();
@@ -479,5 +480,13 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		page.setRecords(commonComponents);
 		return page;
 	}
+
+	@Override
+	public boolean saveCommonCompList(List<CommonComponent> commonComponents){
+	    commonComponents.forEach(comm->{
+	        this.saveCommonComp(comm);
+        });
+	    return true;
+    }
 
 }

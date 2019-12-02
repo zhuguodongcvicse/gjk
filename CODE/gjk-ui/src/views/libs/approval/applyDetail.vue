@@ -52,7 +52,7 @@
           <div v-if="batch">
             <el-scrollbar
             wrapClass="scrollbar-wrap"
-            :style="{height: scrollHeight}"
+            :style="{height: '100%'}"
             ref="scrollbarContainer">
               <div style="height:570px;overflow-y:auto">
                 <el-tree
@@ -73,7 +73,7 @@
             </span>
           </div>
           <div v-if="!batch">
-            <component-list :batchId="batchId"></component-list>
+            <component-list :batchType="batchType" :batchId="batchId"></component-list>
           </div>
         </el-card>
       </el-col>
@@ -98,7 +98,8 @@ import {
   addObj,
   saveCommonComp,
   saveCompDetailList,
-  getCompDict
+  getCompDict,
+  saveCompList
 } from "@/api/libs/commoncomponent";
 import {
   getObj as getProMsgById,
@@ -109,6 +110,7 @@ import {
   getAllApprovalApplyByApprovalId as getAllCompId,
   updateApprovalApplyById
 } from "@/api/libs/approval";
+import { getObj as getbatch } from "@/api/libs/batchapproval"
 import {
   getObj as getSoftwareById,
   getTreeById as getSoftwareTreeById,
@@ -141,6 +143,7 @@ export default {
     return {
       isComp: false,
 
+      batchType: '',
       batchId: "",
       batch: true,
       applyItemMsg: {},
@@ -148,6 +151,8 @@ export default {
       compTreeData: [],
       //存储当前审批构件构件
       component: {},
+      //批量入库的构件
+      componentlists: [],
 
       //如果是构件申请，显示构件名称
       //如果是硬件申请，显示硬件名称
@@ -218,7 +223,7 @@ export default {
             commonComp.compImg = this.component.compImg;
             commonComp.description = this.component.description;
             commonComp.delFlag = "0";
-            if (this.applyItemMsg.applyType != "3") {
+            if (this.applyItemMsg.applyType != "3" && this.applyItemMsg.applyType != "4") {
               saveCommonComp(commonComp).then(Response => {
                 let compVersion = Response.data.data.version;
                 getAllDetailByCompId(this.applyItemMsg.applyId).then(Response => {
@@ -250,6 +255,45 @@ export default {
                   this.$emit("refresh");
                 });
               });
+            }else if(this.applyItemMsg.applyType == "4"){
+              let commonComps = []
+              for(let item of this.componentlists){
+                let commonComp = {};
+                commonComp.id = item.id;
+                commonComp.compId = item.compId;
+                commonComp.compName = item.compName;
+                commonComp.compFuncname = item.compFuncname;
+                commonComp.userId = item.userId;
+                commonComp.compImg = item.compImg;
+                commonComp.description = item.description;
+                commonComp.delFlag = "0";
+                let compVersion = item.version;
+                getAllDetailByCompId(item.id).then(Response => {
+                  let compDetail = [];
+                  for (let item of Response.data.data) {
+                    let commonCompDetail = {};
+                    commonCompDetail.id = item.id;
+                    commonCompDetail.compId = item.compId;
+                    commonCompDetail.fileName = item.fileName;
+                    commonCompDetail.fileType = item.fileType;
+                    commonCompDetail.filePath = item.filePath;
+                    commonCompDetail.version = compVersion;
+                    commonCompDetail.paraentId = item.paraentId;
+                    commonCompDetail.paraentIds = item.paraentIds;
+                    commonCompDetail.libsId = item.libsId;
+                    console.log(commonCompDetail)
+                    compDetail.push(commonCompDetail);
+                  }
+                  saveCompDetailList(compDetail, this.userInfo.username);
+                });
+                let modifyComponent = {};
+                modifyComponent.id = item.id;
+                modifyComponent.applyState = "2";
+                modifyComponent.applyDesc = "入库申请已通过";
+                modifyComp(modifyComponent)
+                commonComps.push(commonComp)
+              }
+              saveCompList(commonComps)
             }
             break;
           case "3":
@@ -311,7 +355,6 @@ export default {
             });
             break;
         }
-        console.log(1)
         // this.rejectDialog = false
         this.isButtonUse = true
         this.$message({
@@ -339,7 +382,7 @@ export default {
             modifyComponent.id = this.component.id;
             modifyComponent.applyState = "3";
             modifyComponent.applyDesc = this.rejectMassage;
-            if (this.applyItemMsg.applyType != "3") {
+            if (this.applyItemMsg.applyType != "3" && this.applyItemMsg.applyType != "4") {
               //修改构件的审批状态，审批备注中写上审批理由
               modifyComp(modifyComponent).then(Response => {
                 this.rejectDialog = false;
@@ -347,6 +390,14 @@ export default {
                 //刷新页面
                 this.$emit("refresh");
               });
+            }else if(this.applyItemMsg.applyType == "4"){
+               for(let item of this.componentlists){
+                  let modifyComponent = {};
+                  modifyComponent.id = item.id;
+                  modifyComponent.applyState = "3";
+                  modifyComponent.applyDesc = this.rejectMassage;
+                  modifyComp(modifyComponent)
+               }
             }
           case "3":
             let software = {};
@@ -432,8 +483,26 @@ export default {
         case "1":
           this.libsName = "显示名：";
           this.libsType = "构件库";
-          if(this.applyItemMsg.applyType != "3") {
-            getObj(this.applyItemMsg.applyId).then(Response => {
+          if(this.applyItemMsg.applyType == "3") {
+            this.batchId = this.applyItemMsg.applyId;
+            this.batch = false;
+            this.libsNameValue = "批量导出";
+          }else if(this.applyItemMsg.applyType == "4"){
+            this.batchId = this.applyItemMsg.applyId;
+            this.batch = false;
+            this.libsNameValue = "批量入库";
+            var that = this
+            getbatch(this.batchId).then(req=>{
+              var idList = JSON.parse(req.data.data.idListJson);
+              for (let i = 0; i < idList.length; i++) {
+                const element = idList[i];
+                getObj(element).then(Response => {
+                  that.componentlists.push(Response.data.data)
+                })
+              }
+            })
+          }else{
+              getObj(this.applyItemMsg.applyId).then(Response => {
               this.libsNameValue = Response.data.data.compName;
               this.component = Response.data.data;
             });
@@ -441,10 +510,6 @@ export default {
             fetchCompLists(this.applyItemMsg.applyId, true).then(Response => {
               this.compTreeData = Response.data.data;
             });
-          }else{
-            this.batchId = this.applyItemMsg.applyId;
-            this.batch = false;
-            this.libsNameValue = "批量导出";
           }
           break;
         case "2":
@@ -520,17 +585,20 @@ export default {
           break;
         case "3":
           this.applyType = "批量导出";
+          break;
+        case "4":
+          this.applyType = "批量入库";
+          break;
       }
+      this.batchType = this.applyItemMsg.applyType
       this.applyTime = this.applyItemMsg.createTime;
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    console.log("this.handleCreate()前", this.applyId);
     this.applyItemMsg = this.$route.query.row;
     this.$nextTick(vm => {
       this.handleCreate();
-      console.log("this.handleCreate()后", this.applyId);
     });
 
     

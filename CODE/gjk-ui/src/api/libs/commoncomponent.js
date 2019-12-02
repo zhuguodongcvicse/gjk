@@ -171,3 +171,12 @@ export function findPageByBatchApprovalId(obj){
     method:'post',
   })
 }
+
+
+export function saveCompList(obj){
+  return request({
+    url:'/libs/commoncomponent/saveCompList',
+    method:'post',
+    data: obj
+  })
+}
