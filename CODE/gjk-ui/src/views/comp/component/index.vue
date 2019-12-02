@@ -53,7 +53,7 @@
                 @click="handleCopy(scope.row,scope.index)"
               >复制</el-button>
             </el-tooltip>
-            <el-tooltip class="item" effect="dark" content="复制" placement="top">
+            <el-tooltip class="item" effect="dark" content="查看" placement="top">
               <el-button
                 type="primary"
                 v-if="permissions.comp_component_edit"
@@ -137,6 +137,11 @@
       :dialog="importCompApplyDialogVisible"
       @setImportCompDialog="setImportCompDialog"
     />
+    <batch-storage-apply
+    :dialog="batchStorageApplyDialog"
+    @storageApplyDialogState="batchStorageApplyDialogState"
+    :component="batchStorageList"
+    ></batch-storage-apply>
   </div>
 </template>
 
@@ -159,13 +164,15 @@ import { mapGetters } from "vuex";
 import importCompDialog from "./importCompDialog";
 import compTemplate from "@/views/comp/code-editor/comp-template";
 import storageApply from "./storageApply";
+import batchStorageApply from "./batchStorageApply";
 import importCompStorageApply from "./importCompStorageApply";
 export default {
   components: {
     "import-dialog-params": importCompDialog,
     "comp-template": compTemplate,
     "storage-apply": storageApply,
-    "import-storage-apply": importCompStorageApply
+    "import-storage-apply": importCompStorageApply,
+    "batch-storage-apply":batchStorageApply
   },
   name: "component",
   inject: ["reload"],
@@ -174,6 +181,7 @@ export default {
       templateData: {
         templateVisible: false
       },
+      batchStorageApplyDialog: false,
       dialogVisible: false,
       tableData: [],
       selectList: [],
@@ -390,7 +398,6 @@ export default {
       this.tableLoading = true;
       fetchList(this.listQuery).then(response => {
         this.tableData = response.data.data.records;
-        console.log("cxcxcx", this.tableData);
         this.page.total = response.data.data.total;
         this.tableLoading = false;
       });
@@ -554,7 +561,7 @@ export default {
             type: "warning"
           });
         }else{
-          this.storageApplyDialog = true;
+          this.batchStorageApplyDialog = true;
         }
       }else{
         this.$message({
@@ -563,6 +570,9 @@ export default {
             type: "warning"
           });
       }
+  },
+  batchStorageApplyDialogState(){
+    this.batchStorageApplyDialog = false;
   }
   },
   beforeRouteEnter(to, from, next) {

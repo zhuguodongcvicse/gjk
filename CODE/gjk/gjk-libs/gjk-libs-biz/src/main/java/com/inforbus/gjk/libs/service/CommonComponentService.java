@@ -120,4 +120,11 @@ public interface CommonComponentService extends IService<CommonComponent> {
 			List<String> selectStringList);
 
 	IPage<CommonComponent> findPageByBatchApprovalId(Page page,String applyId);
+
+	/**
+	 * 批量保存
+	 * @param commonComponents
+	 * @return
+	 */
+	boolean saveCommonCompList(List<CommonComponent> commonComponents);
 }

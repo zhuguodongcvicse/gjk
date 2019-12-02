@@ -23,9 +23,23 @@
             plain
             @click="exportCompFunc(scope.row,scope.index)"
           >导出</el-button>
+          <el-button
+            type="primary"
+            icon="el-icon-check"
+            v-if="scope.row.approvalState == '3'"
+            size="small"
+            plain
+            @click="batchExport(scope.row,scope.index)"
+          >导出申请</el-button>
         </template>
       </avue-crud>
     </basic-container>
+    <storage-apply
+    :dialog="storageApplyDialog"
+    @storageApplyDialogState="storageApplyDialogState"
+    :component="exportCompList"
+    :approval="approval1">
+    </storage-apply>
   </div>
 </template>
 
@@ -41,11 +55,15 @@ import {
 import { createZipFile } from "@/api/libs/commoncomponent";
 import { getComponentByApplyId } from "@/api/libs/batchapproval"
 import { tableOption } from "@/const/crud/libs/batchExportList";
+import storageApply from "./storageApply";
 import { mapGetters } from "vuex";
 import { userInfo } from "os";
 export default {
   //注入依赖，调用this.reload();用于刷新页面
   inject: ["reload"],
+  components: {
+    "storage-apply": storageApply
+  },
   computed: {
     ...mapGetters(["permissions", "userInfo"])
   },
@@ -61,9 +79,12 @@ export default {
       listQuery: {
         current: 1,
         size: 20,
-        libraryType: '7',
+        libraryType: '1',
         applyType: '3',
       },
+      exportCompList: [],
+      approval1: {},
+      storageApplyDialog: false,
       tableLoading: false,
       tableOption: tableOption,
 
@@ -122,6 +143,11 @@ export default {
       } else {
         this.showUnprocessed();
       }
+    },
+    batchExport(row,index){
+      this.storageApplyDialog = true;
+      this.approval1 = row
+      this.exportCompList.push('1')
     },
     /**
      * @title 打开新增窗口
@@ -206,6 +232,9 @@ export default {
         getComponentByApplyId(row.applyId).then(req => {
             createZipFile(req.data.data);
         }) 
+    },
+    storageApplyDialogState(){
+      this.storageApplyDialog=false
     }
   }
 };

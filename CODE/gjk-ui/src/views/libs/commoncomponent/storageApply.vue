@@ -33,7 +33,8 @@ import {
   saveBatchApproval
 } from "@/api/libs/batchapproval";
 import {
-  saveApproval
+  saveApproval,
+  putObj as putapproval
 } from "@/api/libs/approval";
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
@@ -41,7 +42,7 @@ export default {
   //注入依赖，调用this.reload();用于刷新页面
   inject: ["reload"],
   //import引入的组件需要注入到对象中才能使用
-  props: ["dialog", "component"],
+  props: ["dialog", "component", "approval"],
   components: {},
   //监听属性 类似于data概念
   computed: {
@@ -103,6 +104,7 @@ export default {
     //提交入库的方法
     storageApplySoftware(val) {
         this.$refs[val].validate((valid, object) => {
+           console.log(this.component)
             if (valid) {
               let approval = {}
               var batchApproval = {}
@@ -113,20 +115,33 @@ export default {
                 idListJson.push(element.id)
               }
               batchApproval.idListJson = JSON.stringify(idListJson)
-              saveBatchApproval(batchApproval).then(Response => {
-                approval.applyId = Response.data.msg
-                approval.userId = this.userInfo.userId
-                approval.applyType = "3"
-                approval.libraryType = "1"
-                approval.applyUserId = this.form.applyUser
-                approval.approvalState = "0"
-                saveApproval(approval).then(Response=>{
+              if(this.approval == null || this.approval.approvalState != '3'){
+                saveBatchApproval(batchApproval).then(Response => {
+                  approval.applyId = Response.data.msg
+                  approval.userId = this.userInfo.userId
+                  approval.applyType = "3"
+                  approval.libraryType = "1"
+                  approval.applyUserId = this.form.applyUser
+                  approval.approvalState = "0"
+                  saveApproval(approval).then(Response=>{
+                    this.$message({
+                        message: "已提交申请，请等待库管理员审批",
+                        type: "success"
+                    });
+                  })
+                });
+              }else{
+                console.log(111)
+                approval.id = this.approval.id
+                approval.approvalState = "4"
+                console.log(approval)
+                putapproval(approval).then(Response=>{
                   this.$message({
                       message: "已提交申请，请等待库管理员审批",
                       type: "success"
                   });
                 })
-              });
+              }
               this.reload();
               this.dialogStateShow(false);
             }
