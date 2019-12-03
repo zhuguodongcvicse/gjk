@@ -1162,6 +1162,7 @@ export default {
         Vue.set(this.configureType, "mappingKeys", undefined);
       }
 
+      var currentAttrMap = this.currentXmlMap.attributeMap;
       this.currentXmlMap.attributeMap = {};
       var attrs = this.configureType.attrs;
       if (attrs.length > 0) {
@@ -1211,7 +1212,7 @@ export default {
             Vue.set(i, "attrMappingName", i.attrName);
           }
 
-          Vue.set(this.currentXmlMap.attributeMap, i.attrName, ""); //遍历添加属性
+          Vue.set(this.currentXmlMap.attributeMap, i.attrName, currentAttrMap[i.attrName]); //遍历添加属性
         }
         if (attrs.length > 0) {
           await getDictMappingData(this.DictVO).then(response => {

@@ -85,7 +85,7 @@ public class WorkbenchUtil {
 	 */
 	public static boolean replaceFileNull(String filepath,String sourceStr,List<String> list,String other){
 		try {
-			InputStreamReader isr = new InputStreamReader(new FileInputStream(filepath),"GBK");
+			InputStreamReader isr = new InputStreamReader(new FileInputStream(filepath),"UTF-8");
 			BufferedReader fis = new BufferedReader(isr);// 创建文件输入流
 			char[] data = new char[1024]; // 创建缓冲字符数组
 			int rn = 0;
@@ -103,7 +103,7 @@ public class WorkbenchUtil {
 				subStr = subStr.substring(0,subStr.indexOf("PRJ_ROOT_DIR :="));
 				//System.out.println(subStr);
 				String str = sb.toString().replace(subStr,sourceStr+" := "+other.replace("\\", "/")+"\r");
-				OutputStreamWriter fout = new OutputStreamWriter(new FileOutputStream(filepath),"GBK");
+				OutputStreamWriter fout = new OutputStreamWriter(new FileOutputStream(filepath),"UTF-8");
 				fout.write(str.toCharArray());// 把替换完成的字符串写入文件内
 				fout.close();// 关闭输出流
 			}else if(sourceStr.equals("PRJ_ROOT_DIR")) {
@@ -111,7 +111,7 @@ public class WorkbenchUtil {
 				subStr = subStr.substring(0,subStr.indexOf("#Global"));
 				//System.out.println(subStr);
 				String str = sb.toString().replace(subStr,sourceStr+" := $(WS_ROOT_DIR)/"+other+"\r\r\r\r");
-				OutputStreamWriter fout = new OutputStreamWriter(new FileOutputStream(filepath),"GBK");
+				OutputStreamWriter fout = new OutputStreamWriter(new FileOutputStream(filepath),"UTF-8");
 				fout.write(str.toCharArray());// 把替换完成的字符串写入文件内
 				fout.close();// 关闭输出流
 			}else if(sourceStr.equals("IDE_LIBRARIES")) {
@@ -137,7 +137,7 @@ public class WorkbenchUtil {
 						.replace(subStr2,"srFrame_Mul/$(MODE_DIR)/% : "+sourceStr+" = "+paths+"\r")
 						.replace(subStr3,"srFrame_Mul_partialImage/$(MODE_DIR)/% : "+sourceStr+" = "+paths+"\r");
 				
-				OutputStreamWriter fout = new OutputStreamWriter(new FileOutputStream(filepath),"GBK");
+				OutputStreamWriter fout = new OutputStreamWriter(new FileOutputStream(filepath),"UTF-8");
 				fout.write(str.toCharArray());// 把替换完成的字符串写入文件内
 				fout.close();// 关闭输出流
 			}else if(sourceStr.equals("OBJ_DIR")) {
@@ -154,7 +154,7 @@ public class WorkbenchUtil {
 				}
 				
 				String str = sb.toString().replace(subStr,paths);
-				OutputStreamWriter fout = new OutputStreamWriter(new FileOutputStream(filepath),"GBK");
+				OutputStreamWriter fout = new OutputStreamWriter(new FileOutputStream(filepath),"UTF-8");
 				fout.write(str.toCharArray());// 把替换完成的字符串写入文件内
 				fout.close();// 关闭输出流
 				
@@ -176,7 +176,7 @@ public class WorkbenchUtil {
 				}
 				
 				String str = sb.toString().replace(subStr,paths);
-				OutputStreamWriter fout = new OutputStreamWriter(new FileOutputStream(filepath),"GBK");
+				OutputStreamWriter fout = new OutputStreamWriter(new FileOutputStream(filepath),"UTF-8");
 				fout.write(str.toCharArray());// 把替换完成的字符串写入文件内
 				fout.close();// 关闭输出流
 			}else if(sourceStr.equals("DEP_FILES")) {
@@ -200,7 +200,7 @@ public class WorkbenchUtil {
 				}
 				
 				String str = sb.toString().replace(subStr,paths);
-				OutputStreamWriter fout = new OutputStreamWriter(new FileOutputStream(filepath),"GBK");
+				OutputStreamWriter fout = new OutputStreamWriter(new FileOutputStream(filepath),"UTF-8");
 				fout.write(str.toCharArray());// 把替换完成的字符串写入文件内
 				fout.close();// 关闭输出流
 			}
