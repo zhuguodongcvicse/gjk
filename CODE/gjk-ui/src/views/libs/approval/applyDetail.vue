@@ -621,6 +621,16 @@ export default {
                 this.proCompIdList = Response.data.data;
               });
             });
+            this.proCompIdListMsg = "项目申请构件出库列表为：";
+            getAllCompId(this.applyItemMsg.id).then(Response => {
+              let compIdList = [];
+              for (let proComp of Response.data.data) {
+                compIdList.push(proComp.applyId);
+              }
+              getCompDict(compIdList).then(Response => {
+                this.proCompIdList = Response.data.data;
+              });
+            });
           } else {
             this.batchId = this.applyItemMsg.applyId;
             this.batch = false;
