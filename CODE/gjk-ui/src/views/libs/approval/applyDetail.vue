@@ -7,12 +7,12 @@
     :before-close="handleClose"
   >-->
   <div>
-    <el-row :gutter="10">
-      <el-col :span="11">
+     <el-row :gutter="10">
+      <el-col  :span="11">
         <el-card shadow="always" style="height: 100%" class="box-card">
           <div slot="header">
-            <span>详细信息</span>
-          </div>
+              <span>详细信息</span>
+            </div>
           <div style="height: 540px">
             <span>申请人：{{userName}}</span>
             <br />
@@ -56,19 +56,55 @@
             <span>{{libsNameValue}}申请详细信息</span>
           </div>
           <div v-if="batch">
+            <el-table :data="hardwareLibData" v-if="hardwareLibData.length !== 0">
+              //接口表格内容
+              <el-table-column prop="infName" label="接口名称" v-if="hardwareLibData[0].infName !== undefined">
+                <!--          <template slot-scope="scope">{{ scope.row.name }}</template>-->
+              </el-table-column>
+              <el-table-column prop="infRate" label="接口速率"
+                               v-if="hardwareLibData[0].infRate !== undefined"></el-table-column>
+              <el-table-column prop="opticalNum" label="光纤数量"
+                               v-if="hardwareLibData[0].opticalNum !== '' && hardwareLibData[0].opticalNum !== undefined"></el-table-column>
+
+              //芯片表格内容
+              <el-table-column prop="chipName" label="芯片名称"
+                               v-if="hardwareLibData[0].chipName !== undefined"></el-table-column>
+              <el-table-column prop="coreNum" label="内核数量"
+                               v-if="hardwareLibData[0].coreNum !== undefined"></el-table-column>
+              <el-table-column prop="memSize" label="内存大小"
+                               v-if="hardwareLibData[0].memSize !== undefined"></el-table-column>
+              <el-table-column prop="recvRate" label="接收速率"
+                               v-if="hardwareLibData[0].recvRate !== undefined"></el-table-column>
+              <el-table-column prop="hrTypeName" label="平台类型"
+                               v-if="hardwareLibData[0].hrTypeName !== undefined"></el-table-column>
+              //板卡表格内容
+              <el-table-column prop="boardName" label="板卡名称"
+                               v-if="hardwareLibData[0].boardName !== undefined"></el-table-column>
+              <el-table-column prop="boardType" label="板卡类型"
+                               v-if="hardwareLibData[0].boardType !== undefined"></el-table-column>
+              <el-table-column prop="cpuNum" label="cpu数量"
+                               v-if="hardwareLibData[0].cpuNum !== undefined"></el-table-column>
+              //备注信息
+              <el-table-column prop="backupInfo" label="备注信息"
+                               v-if="hardwareLibData[0].backupInfo !== undefined"></el-table-column>
+              //所属用户
+              <el-table-column prop="userId" label="所属用户"
+                               v-if="hardwareLibData[0].userId !== undefined"></el-table-column>
+
+            </el-table>
+            <div v-if="hardwareLibData.length !== 0">
             <el-scrollbar
-              wrapClass="scrollbar-wrap"
-              :style="{height: '100%'}"
-              ref="scrollbarContainer"
-            >
+            wrapClass="scrollbar-wrap"
+            :style="{height: '100%'}"
+            ref="scrollbarContainer">
               <div style="height:570px;overflow-y:auto">
                 <el-tree
-                  v-if="isComp===true"
-                  ref="tree"
-                  :data="compTreeData"
-                  :default-expand-all="true"
-                  :check-on-click-node="true"
-                  @check-change="handleCheckChange"
+                v-if="isComp===true"
+                ref="tree"
+                :data="compTreeData"
+                :default-expand-all="true"
+                :check-on-click-node="true"
+                @check-change="handleCheckChange"
                 ></el-tree>
               </div>
             </el-scrollbar>
@@ -78,6 +114,7 @@
                 <el-tag>{{item.compName}}</el-tag>&nbsp;
               </span>
             </span>
+            </div>
           </div>
           <div v-if="!batch">
             <component-list :batchType="batchType" :batchId="batchId"></component-list>
@@ -101,6 +138,11 @@ import { mapGetters } from "vuex";
 import componentList from "./componentList";
 import { fetchCompLists, getObj, modifyComp } from "@/api/comp/component";
 import { getAllDetailByCompId } from "@/api/comp/componentdetail";
+    import {updateInf, getObj as getInfObj} from "@/api/libs/hardwarelibinf";
+    import {updateChip, getObj as getChipObj} from "@/api/libs/hardwarelibchip";
+    import {saveBoard, updateBoard, getObj as getBoardObj} from "@/api/libs/hardwarelibboard";
+    import {menuTag} from "@/util/closeRouter";
+
 import {
   addObj,
   saveCommonComp,
@@ -117,7 +159,7 @@ import {
   getAllApprovalApplyByApprovalId as getAllCompId,
   updateApprovalApplyById
 } from "@/api/libs/approval";
-import { getObj as getbatch } from "@/api/libs/batchapproval";
+import { getObj as getbatch } from "@/api/libs/batchapproval"
 import {
   getObj as getSoftwareById,
   getTreeById as getSoftwareTreeById,
@@ -161,6 +203,8 @@ export default {
       applyItemMsg: {},
       //构件树data
       compTreeData: [],
+                //硬件库数据
+                hardwareLibData: [],
       //存储当前审批构件构件
       component: {},
       //批量入库的构件
@@ -235,31 +279,26 @@ export default {
             commonComp.compImg = this.component.compImg;
             commonComp.description = this.component.description;
             commonComp.delFlag = "0";
-            if (
-              this.applyItemMsg.applyType != "3" &&
-              this.applyItemMsg.applyType != "4"
-            ) {
+            if (this.applyItemMsg.applyType != "3" && this.applyItemMsg.applyType != "4") {
               saveCommonComp(commonComp).then(Response => {
                 let compVersion = Response.data.data.version;
-                getAllDetailByCompId(this.applyItemMsg.applyId).then(
-                  Response => {
-                    let compDetail = [];
-                    for (let item of Response.data.data) {
-                      let commonCompDetail = {};
-                      commonCompDetail.id = item.id;
-                      commonCompDetail.compId = item.compId;
-                      commonCompDetail.fileName = item.fileName;
-                      commonCompDetail.fileType = item.fileType;
-                      commonCompDetail.filePath = item.filePath;
-                      commonCompDetail.version = compVersion;
-                      commonCompDetail.paraentId = item.paraentId;
-                      commonCompDetail.paraentIds = item.paraentIds;
-                      commonCompDetail.libsId = item.libsId;
-                      compDetail.push(commonCompDetail);
-                    }
-                    saveCompDetailList(compDetail, this.userInfo.username);
+                getAllDetailByCompId(this.applyItemMsg.applyId).then(Response => {
+                  let compDetail = [];
+                  for (let item of Response.data.data) {
+                    let commonCompDetail = {};
+                    commonCompDetail.id = item.id;
+                    commonCompDetail.compId = item.compId;
+                    commonCompDetail.fileName = item.fileName;
+                    commonCompDetail.fileType = item.fileType;
+                    commonCompDetail.filePath = item.filePath;
+                    commonCompDetail.version = compVersion;
+                    commonCompDetail.paraentId = item.paraentId;
+                    commonCompDetail.paraentIds = item.paraentIds;
+                    commonCompDetail.libsId = item.libsId;
+                    compDetail.push(commonCompDetail);
                   }
-                );
+                  saveCompDetailList(compDetail, this.userInfo.username);
+                });
 
                 //修改构件中审批状态
                 let modifyComponent = {};
@@ -272,9 +311,9 @@ export default {
                   this.$emit("refresh");
                 });
               });
-            } else if (this.applyItemMsg.applyType == "4") {
-              let commonComps = [];
-              for (let item of this.componentlists) {
+            }else if(this.applyItemMsg.applyType == "4"){
+              let commonComps = []
+              for(let item of this.componentlists){
                 let commonComp = {};
                 commonComp.id = item.id;
                 commonComp.compId = item.compId;
@@ -298,7 +337,7 @@ export default {
                     commonCompDetail.paraentId = item.paraentId;
                     commonCompDetail.paraentIds = item.paraentIds;
                     commonCompDetail.libsId = item.libsId;
-                    console.log(commonCompDetail);
+                    console.log(commonCompDetail)
                     compDetail.push(commonCompDetail);
                   }
                   saveCompDetailList(compDetail, this.userInfo.username);
@@ -307,11 +346,59 @@ export default {
                 modifyComponent.id = item.id;
                 modifyComponent.applyState = "2";
                 modifyComponent.applyDesc = "入库申请已通过";
-                modifyComp(modifyComponent);
-                commonComps.push(commonComp);
+                modifyComp(modifyComponent)
+                commonComps.push(commonComp)
               }
-              saveCompList(commonComps);
+              saveCompList(commonComps)
             }
+                            break;
+                        case "2-1":
+                            let infTemp = {};
+                            infTemp.id = this.applyItemMsg.applyId;
+                            infTemp.applyState = "2";
+                            infTemp.applyDesc = "已通过";
+                            infTemp.infId = this.hardwareLibData[0].infId;
+                            infTemp.userId = this.hardwareLibData[0].userId;
+                            updateInf(infTemp).then(Response => {
+                                this.dialogStateShow(false);
+                                //生成随机数,用来刷新页面
+                                this.refreshListFlag = Math.random()
+                                //将随机数放到store
+                                this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
+                            });
+                            this.hardwareLibData = []
+                            break;
+                        case "2-2":
+                            let chipTemp = {};
+                            chipTemp.id = this.applyItemMsg.applyId;
+                            chipTemp.applyState = "2";
+                            chipTemp.applyDesc = "已通过";
+                            chipTemp.chipId = this.hardwareLibData[0].chipId
+                            chipTemp.userId = this.hardwareLibData[0].userId
+                            updateChip(chipTemp).then(Response => {
+                                this.dialogStateShow(false);
+                                //生成随机数,用来刷新页面
+                                this.refreshListFlag = Math.random()
+                                //将随机数放到store
+                                this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
+                            });
+                            this.hardwareLibData = []
+                            break;
+                        case "2-3":
+                            let boardTemp = {};
+                            boardTemp.id = this.applyItemMsg.applyId;
+                            boardTemp.applyState = "2";
+                            boardTemp.applyDesc = "已通过";
+                            boardTemp.boardId = this.hardwareLibData[0].boardId
+                            boardTemp.userId = this.hardwareLibData[0].userId
+                            updateBoard(boardTemp).then(Response => {
+                                this.dialogStateShow(false);
+                                //生成随机数,用来刷新页面
+                                this.refreshListFlag = Math.random()
+                                //将随机数放到store
+                                this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
+                            });
+                            this.hardwareLibData = []
             break;
           case "3":
             let software = {};
@@ -384,13 +471,16 @@ export default {
             break;
         }
         // this.rejectDialog = false
-        this.isButtonUse = true;
+        this.isButtonUse = true
         this.$message({
           showClose: true,
           message: "已通过",
           type: "success"
         });
+                    this.reload()
       });
+                var tag1 = this.tag;
+                menuTag(this.$route.path, "remove", this.tagList, tag1);
     },
     //驳回时弹出驳回理由弹窗
     rejectFunc() {
@@ -410,10 +500,7 @@ export default {
             modifyComponent.id = this.component.id;
             modifyComponent.applyState = "3";
             modifyComponent.applyDesc = this.rejectMassage;
-            if (
-              this.applyItemMsg.applyType != "3" &&
-              this.applyItemMsg.applyType != "4"
-            ) {
+            if (this.applyItemMsg.applyType != "3" && this.applyItemMsg.applyType != "4") {
               //修改构件的审批状态，审批备注中写上审批理由
               modifyComp(modifyComponent).then(Response => {
                 this.rejectDialog = false;
@@ -421,15 +508,57 @@ export default {
                 //刷新页面
                 this.$emit("refresh");
               });
-            } else if (this.applyItemMsg.applyType == "4") {
-              for (let item of this.componentlists) {
-                let modifyComponent = {};
-                modifyComponent.id = item.id;
-                modifyComponent.applyState = "3";
-                modifyComponent.applyDesc = this.rejectMassage;
-                modifyComp(modifyComponent);
-              }
+            }else if(this.applyItemMsg.applyType == "4"){
+               for(let item of this.componentlists){
+                  let modifyComponent = {};
+                  modifyComponent.id = item.id;
+                  modifyComponent.applyState = "3";
+                  modifyComponent.applyDesc = this.rejectMassage;
+                  modifyComp(modifyComponent)
+               }
             }
+                        case "2-1":
+                            let infTemp = {};
+                            infTemp.id = this.applyItemMsg.applyId;
+                            infTemp.applyState = "3";
+                            infTemp.applyDesc = "被驳回，驳回原因： " + this.rejectMassage;
+                            updateInf(infTemp).then(Response => {
+                                this.rejectDialog = false;
+                                this.dialogStateShow(false);
+                                //生成随机数,用来刷新页面
+                                this.refreshListFlag = Math.random()
+                                //将随机数放到store
+                                this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
+                            });
+                            break;
+                        case "2-2":
+                            let chipTemp = {};
+                            chipTemp.id = this.applyItemMsg.applyId;
+                            chipTemp.applyState = "3";
+                            chipTemp.applyDesc = "被驳回，驳回原因： " + this.rejectMassage;
+                            updateChip(chipTemp).then(Response => {
+                                this.rejectDialog = false;
+                                this.dialogStateShow(false);
+                                //生成随机数,用来刷新页面
+                                this.refreshListFlag = Math.random()
+                                //将随机数放到store
+                                this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
+                            });
+                            break;
+                        case "2-3":
+                            let boardTemp = {};
+                            boardTemp.id = this.applyItemMsg.applyId;
+                            boardTemp.applyState = "3";
+                            boardTemp.applyDesc = "被驳回，驳回原因： " + this.rejectMassage;
+                            updateBoard(boardTemp).then(Response => {
+                                this.rejectDialog = false;
+                                this.dialogStateShow(false);
+                                //生成随机数,用来刷新页面
+                                this.refreshListFlag = Math.random()
+                                //将随机数放到store
+                                this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
+                            });
+                            break;
           case "3":
             let software = {};
             software.id = this.applyItemMsg.applyId;
@@ -482,13 +611,13 @@ export default {
                 proCompIdArray.push(item.id);
               }
               let proId = this.applyItemMsg.applyId;
-              updateProCompApprovalState(proId, proCompIdArray, "1").then(
-                Response => {
-                  this.dialogStateShow(false);
-                  //刷新页面
-                  this.$emit("refresh");
-                }
-              );
+                updateProCompApprovalState(proId, proCompIdArray, "1").then(
+                  Response => {
+                    this.dialogStateShow(false);
+                    //刷新页面
+                    this.$emit("refresh");
+                  }
+                );
             });
             break;
           case "8":
@@ -504,14 +633,16 @@ export default {
             });
             break;
         }
-        this.rejectDialog = false;
-        this.isButtonUse = true;
+        this.rejectDialog = false
+        this.isButtonUse = true
         this.$message({
           showClose: true,
           message: "已驳回",
           type: "success"
         });
       });
+                var tag1 = this.tag;
+                menuTag(this.$route.path, "remove", this.tagList, tag1);
     },
     handleCreate() {
       // Object.assign(this.$data, this.$options.data());
@@ -526,26 +657,26 @@ export default {
         case "1":
           this.libsName = "显示名：";
           this.libsType = "构件库";
-          if (this.applyItemMsg.applyType == "3") {
+          if(this.applyItemMsg.applyType == "3") {
             this.batchId = this.applyItemMsg.applyId;
             this.batch = false;
             this.libsNameValue = "批量导出";
-          } else if (this.applyItemMsg.applyType == "4") {
+          }else if(this.applyItemMsg.applyType == "4"){
             this.batchId = this.applyItemMsg.applyId;
             this.batch = false;
             this.libsNameValue = "批量入库";
-            var that = this;
-            getbatch(this.batchId).then(req => {
+            var that = this
+            getbatch(this.batchId).then(req=>{
               var idList = JSON.parse(req.data.data.idListJson);
               for (let i = 0; i < idList.length; i++) {
                 const element = idList[i];
                 getObj(element).then(Response => {
-                  that.componentlists.push(Response.data.data);
-                });
+                  that.componentlists.push(Response.data.data)
+                })
               }
-            });
-          } else {
-            getObj(this.applyItemMsg.applyId).then(Response => {
+            })
+          }else{
+              getObj(this.applyItemMsg.applyId).then(Response => {
               this.libsNameValue = Response.data.data.compName;
               this.component = Response.data.data;
             });
@@ -555,9 +686,30 @@ export default {
             });
           }
           break;
-        case "2":
-          this.libsName = "硬件名称：";
-          this.libsType = "硬件库";
+                    case "2-1":
+                        this.libsName = "硬件名称：";
+                        this.libsType = "接口库";
+                        getInfObj(this.applyItemMsg.applyId).then(response => {
+                            console.log("response.data.data", response.data.data)
+                            this.libsNameValue = response.data.data.infName
+                            this.hardwareLibData.push(response.data.data)
+                        })
+                        break;
+                    case "2-2":
+                        this.libsName = "硬件名称：";
+                        this.libsType = "芯片库";
+                        getChipObj(this.applyItemMsg.applyId).then(response => {
+                            this.libsNameValue = response.data.data.chipName
+                            this.hardwareLibData.push(response.data.data)
+                        })
+                        break;
+                    case "2-3":
+                        this.libsName = "硬件名称：";
+                        this.libsType = "板卡库";
+                        getBoardObj(this.applyItemMsg.applyId).then(response => {
+                            this.libsNameValue = response.data.data.boardName
+                            this.hardwareLibData.push(response.data.data)
+                        })
           break;
         case "3":
           this.libsName = "软件框架名称：";
@@ -598,19 +750,19 @@ export default {
           this.libsName = "项目名称：";
           this.libsType = "项目库";
           if ((this.applyItemMsg.applyType = "3")) {
-            getProMsgById(this.applyItemMsg.applyId).then(Response => {
-              this.libsNameValue = Response.data.data.projectName;
+          getProMsgById(this.applyItemMsg.applyId).then(Response => {
+            this.libsNameValue = Response.data.data.projectName;
+          });
+          this.proCompIdListMsg = "项目申请构件出库列表为：";
+          getAllCompId(this.applyItemMsg.id).then(Response => {
+            let compIdList = [];
+            for (let proComp of Response.data.data) {
+              compIdList.push(proComp.applyId);
+            }
+            getCompDict(compIdList).then(Response => {
+              this.proCompIdList = Response.data.data;
             });
-            this.proCompIdListMsg = "项目申请构件出库列表为：";
-            getAllCompId(this.applyItemMsg.id).then(Response => {
-              let compIdList = [];
-              for (let proComp of Response.data.data) {
-                compIdList.push(proComp.applyId);
-              }
-              getCompDict(compIdList).then(Response => {
-                this.proCompIdList = Response.data.data;
-              });
-            });
+          });
             this.proCompIdListMsg = "项目申请构件出库列表为：";
             getAllCompId(this.applyItemMsg.id).then(Response => {
               let compIdList = [];
@@ -672,7 +824,7 @@ export default {
           this.applyType = "批量入库";
           break;
       }
-      this.batchType = this.applyItemMsg.applyType;
+      this.batchType = this.applyItemMsg.applyType
       this.applyTime = this.applyItemMsg.createTime;
     }
   },
