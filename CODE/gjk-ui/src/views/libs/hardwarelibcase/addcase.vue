@@ -10,9 +10,9 @@
       <el-form-item label="机箱名称" :label-width="formLabelWidth" prop="caseName">
         <el-input v-model="form.caseName" autocomplete="off"></el-input>
       </el-form-item>
-      <!-- <el-form-item label="板卡数量" :label-width="formLabelWidth" prop="bdNum">
-        <el-input v-model="form.bdNum" autocomplete="off"></el-input>
-      </el-form-item>-->
+       <el-form-item label="备注信息" :label-width="formLabelWidth" prop="backupInfo">
+        <el-input v-model="form.backupInfo" autocomplete="off"></el-input>
+      </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button type="primary" @click="submit('form')">确 定</el-button>
@@ -22,9 +22,7 @@
 </template>
 
 <script>
-    //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
-    //例如：import 《组件名称》 from '《组件路径》';
-    import {saveInf, putObj} from "@/api/libs/hardwarelibinf";
+    import {mapGetters} from "vuex";
 
     export default {
         //import引入的组件需要注入到对象中才能使用
@@ -38,6 +36,7 @@
                     id: "",
                     caseName: "",
                     bdNum: "",
+                    backupInfo: "",
                     linkRelation: "",
                     frontCase: "",
                     backCase: ""
@@ -48,7 +47,7 @@
             };
         },
         //监听属性 类似于data概念
-        computed: {},
+        computed: {...mapGetters(["permissions", "refreshListFlag", "userInfo"])},
         //监控data中的数据变化
         watch: {},
         //方法集合
@@ -68,6 +67,7 @@
                 this.$refs[formName].validate(valid => {
                     if (valid) {
                         this.showInf.dialogFormVisible = false;
+                        this.form.userId = this.userInfo.name
                         this.$router.push({
                             path: "/libs/hardwarelibcase/casedesign",
                             query: this.form

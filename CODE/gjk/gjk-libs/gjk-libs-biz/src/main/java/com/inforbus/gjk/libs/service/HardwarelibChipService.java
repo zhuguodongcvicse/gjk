@@ -38,8 +38,5 @@ public interface HardwarelibChipService extends IService<HardwarelibChip> {
 
   	void saveChip(HardwarelibChip hardwarelibChip);
 
-
-	void saveChipJson(HardwarelibChip hardwarelibChip);
-
-	HardwarelibChip getChipByName(String chipName);
+	void updateChipById(HardwarelibChip hardwarelibChip);
 }

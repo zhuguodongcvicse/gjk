@@ -53,7 +53,7 @@ public class SylixosUtil {
 				FileUtil.getSelectStrFilePathList(setPaths, sylixosPath, selectFileExtensionList);// 查找.c文件
 				List<String> listPaths = new ArrayList<String>();
 				listPaths.addAll(setPaths);
-				replaceFileNull(childFile.getAbsolutePath(), "LOCAL_SRCS", listPaths, null);// 修改文件中.c路径
+				replaceFileNull(childFile.getAbsolutePath(), "LOCAL_SRCS", listPaths, null,childFile.getParentFile().getName());// 修改文件中.c路径
 
 			} else if (childFile.getName().equals("config.mk")) {
 				String parent = sylixosFile.getParent();
@@ -724,6 +724,6 @@ public class SylixosUtil {
     }
 
     public static void main(String[] args) {
-        updateSylixos("D:\\14S_GJK_GIT\\gjk\\gjk\\project\\测试sylixos2_0\\test\\admin_测试sylixos2_0_testAPP\\s1", "716");
+        //updateSylixos("D:\\14S_GJK_GIT\\gjk\\gjk\\project\\测试sylixos2_0\\test\\admin_测试sylixos2_0_testAPP\\s1", "716");
     }
 }

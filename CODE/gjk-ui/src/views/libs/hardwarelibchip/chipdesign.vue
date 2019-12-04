@@ -28,10 +28,8 @@
 
 <script>
     import {menuTag} from "@/util/closeRouter";
-    import {
-        getInfData,
-        saveChip
-    } from "@/api/libs/hardwarelibchip";
+    import {saveChip} from "@/api/libs/hardwarelibchip";
+    import {getInfList} from "@/api/libs/hardwarelibinf";
     import {mapGetters} from "vuex";
     import NProgress from "nprogress"; // progress bar
     import "nprogress/nprogress.css"; // progress bar style
@@ -97,24 +95,34 @@
                 this.load();
             }
         },
-        computed: {...mapGetters(["tagWel", "tagList", "tag", "website"])},
+        computed: {...mapGetters(["tagWel", "tagList", "tag", "website", "userInfo"])},
         methods: {
-            test() {
-            },
             sendMessage() {
                 //父向子传参
                 let iframeWin = this.$refs.iframe.contentWindow;
                 //查找所有接口
-                getInfData().then(response => {
+                getInfList().then(response => {
+                    let infsGoStorage = []
+                    for (const i in response.data) {
+                        if (response.data[i].userId === this.userInfo.name || response.data[i].applyState === '2') {
+                            infsGoStorage.push(response.data[i])
+                        }
+                    }
                     //switch判断标识
                     this.postMessageData.cmd = "getInfData";
                     // 将接口和芯片表单数据传到HTML
-                    this.postMessageData.params = [response.data, this.params];
+                    this.postMessageData.params = [infsGoStorage, this.params];
                     iframeWin.postMessage(this.postMessageData, "*");
                 });
             },
             // 接受子页面发来的信息
             handleMessage(event) {
+                if (this.params === '' || this.params === null) {
+                    return
+                }
+                if (event.data.params === undefined) {
+                    return;
+                }
                 //画布中芯片的数据
                 let jsonData = event.data.params;
                 // console.log("jsonData",jsonData)

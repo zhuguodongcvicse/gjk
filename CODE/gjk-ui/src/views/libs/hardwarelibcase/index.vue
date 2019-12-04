@@ -26,6 +26,7 @@
           <br>
           <br>
         </template>
+
         <template slot-scope="scope" slot="menu">
           <el-button
             type="primary"
@@ -36,6 +37,14 @@
           >编辑
           </el-button>
           <el-button
+            type="primary"
+            v-if="permissions.libs_hardwarelibcase_edit"
+            size="small"
+            plain
+            @click="copyCase(scope.row,scope.index)"
+          >复制
+          </el-button>
+          <el-button
             type="danger"
             v-if="permissions.libs_hardwarelibcase_del"
             size="small"
@@ -44,6 +53,7 @@
           >删除
           </el-button>
         </template>
+
       </avue-crud>
     </basic-container>
 
@@ -52,9 +62,13 @@
         <el-form-item label="机箱名称" prop="caseName">
           <el-input v-model="form.caseName"/>
         </el-form-item>
+        <el-form-item label="备注信息" prop="backupInfo">
+          <el-input v-model="form.backupInfo"/>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="updateCase('form', form)">确 定</el-button>
+        <el-button type="primary" v-if="clickCopyOrEdit === 'edit'" @click="updateCase('form', form)">确 定</el-button>
+        <el-button type="primary" v-if="clickCopyOrEdit === 'copy'" @click="copyOneCase('form', form)">确 定</el-button>
         <el-button @click="dialogFormVisible = false">取 消</el-button>
       </div>
     </el-dialog>
@@ -74,6 +88,7 @@
         getCaseJson
     } from "@/api/libs/hardwarelibcase";
     import {tableOption} from "@/const/crud/libs/hardwarelibcase";
+    import {getUserhasApplyAuto} from "@/api/admin/user";
     import {mapGetters} from "vuex";
     import addcase from "@/views/libs/hardwarelibcase/addcase";
 
@@ -82,6 +97,8 @@
         components: {addcase},
         data() {
             return {
+                clickCopyOrEdit: '', //复制或者编辑操作标志符
+                allUsersOfLibs: [], //用户数据，用来做用户筛选
                 BoardDataParams: "",
                 queryData: [],
                 form: {},
@@ -111,11 +128,12 @@
         },
         created() {
             this.getList();
+            this.getAllUsers();
         },
         mounted: function () {
         },
         computed: {
-            ...mapGetters(["permissions", "refreshListFlag"])
+            ...mapGetters(["permissions", "refreshListFlag", "userInfo"])
         },
         watch: {
             refreshListFlag: {
@@ -130,35 +148,102 @@
             showdialog() {
                 this.showInf.dialogFormVisible = true;
             },
-
             getList() {
                 this.tableLoading = true;
                 fetchList(this.listQuery).then(response => {
                     //console.log(response.data.data.records)
                     this.tableData = response.data.data.records;
-                    //查询的所有机箱数据赋值，用于查找是否有重复数据
-                    this.allCases = this.tableData
+                    //判断板卡数据是否为空
+                    if (this.allCases.length !== 0) {
+                        //清空数据
+                        this.allCases = []
+                        for (const i in this.tableData) {
+                            //如果用户名和登录用户名相同，则将该板卡放到板卡数据
+                            if (this.tableData[i].userId === this.userInfo.name) {
+                                this.allCases.push(this.tableData[i])
+                            }
+                        }
+                    } else {
+                        //板卡数据为空则将用户名相同的板卡放到芯片数组
+                        for (const i in this.tableData) {
+                            if (this.tableData[i].userId === this.userInfo.name) {
+                                this.allCases.push(this.tableData[i])
+                            }
+                        }
+                    }
                     this.allCases = JSON.parse(JSON.stringify(this.allCases))
                     this.page.total = response.data.data.total;
                     this.tableLoading = false;
                 });
             },
-            editCase(row, index) {
-                this.dialogFormVisible = true;
-                this.form = row;
-                //console.log("row",row)
-                // console.log("this.form",this.form)
-                getBoardData().then(response => {
-                    this.queryData = response.data;
-                    /* getCaseJson(row.id).then(res => {
-                        this.form.boardJson = res.data.boardJson
-                        //console.log("this.form",this.form)
-                        this.queryData = [this.infDataParams,this.chipDataParams]
-                      }) */
+            getAllUsers() {
+                //查询所有用户
+                getUserhasApplyAuto().then(response => {
+                    // console.log("response",response)
+                    //如果数组中有数据
+                    if (this.allUsersOfLibs.length !== 0) {
+                        //清空数组
+                        this.allUsersOfLibs = []
+                        //循环数据库的用户数据，判断用户数组中有没有数据
+                        for (const i in response.data.data) {
+                            if (this.allUsersOfLibs.hasOwnProperty(response.data.data[i])) {
+                                //有则跳出本次循环
+                                continue
+                            } else {
+                                //没有则加入
+                                this.allUsersOfLibs.push({label: response.data.data[i].name, value: response.data.data[i].name})
+                            }
+                        }
+                    } else {
+                        //若数组为空则加入数据库的所有数据
+                        for (const i in response.data.data) {
+                            this.allUsersOfLibs.push({label: response.data.data[i].name, value: response.data.data[i].name})
+                        }
+                    }
+                    // console.log("this.allUsersOfLibs",this.allUsersOfLibs)
+                    //将用户数组中的数据赋值给用来筛选的数据
+                    for (const i in this.tableOption.column) {
+                        if (this.tableOption.column[i].prop === 'userId') {
+                            this.tableOption.column[i].dicData = JSON.parse(JSON.stringify(this.allUsersOfLibs))
+                        }
+                    }
+                    // console.log("this.tableOption",this.tableOption)
                 });
             },
+            editCase(row, index) {
+                //复制或弹窗标志赋值
+                this.clickCopyOrEdit = 'edit'
+                this.dialogFormVisible = true;
+                //接口对象赋值为点击对象
+                this.form = row;
+            },
+            copyCase(row) {
+                // console.log("row",row)
+                //复制或弹窗标志赋值
+                this.clickCopyOrEdit = 'copy'
+                this.dialogFormVisible = true;
+                //接口对象赋值为点击对象
+                this.form = row;
+            },
             updateCase(formName, form) {
-                //芯片名称不能重复
+                this.$refs[formName].validate(valid => {
+                    if (valid) {
+                        this.dialogFormVisible = false;
+                        remote("hardware_FpgaBoard_inf_linkType").then(res1 => {
+                            this.$router.push({
+                                path: "/libs/hardwarelibcase/caseupdate",
+                                query: [form, res1.data.data, this.clickCopyOrEdit]
+                            });
+                        });
+                    } else {
+                        // console.log("error submit!!");
+                        return false;
+                    }
+                });
+                // this.$refs[formName].resetFields();
+            },
+            copyOneCase(formName, form){
+                //机箱名称不能重复
                 for (const i in this.allCases) {
                     if (this.allCases[i].caseName === this.form.caseName) {
                         alert("机箱名称不能相同")
@@ -168,12 +253,10 @@
                 this.$refs[formName].validate(valid => {
                     if (valid) {
                         this.dialogFormVisible = false;
-                        var fpgaBoardLinkType;
                         remote("hardware_FpgaBoard_inf_linkType").then(res1 => {
-                            fpgaBoardLinkType = res1.data.data;
                             this.$router.push({
                                 path: "/libs/hardwarelibcase/caseupdate",
-                                query: [this.queryData, form, fpgaBoardLinkType]
+                                query: [form, res1.data.data, this.clickCopyOrEdit]
                             });
                         });
                     } else {
@@ -219,6 +302,7 @@
                     })
                     .then(data => {
                         _this.tableData.splice(index, 1);
+                        this.allCases.splice(index, 1)
                         _this.$message({
                             showClose: true,
                             message: "删除成功",

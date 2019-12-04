@@ -43,92 +43,98 @@ import java.util.List;
 @RequestMapping("/hardwarelibcase")
 public class HardwarelibCaseController {
 
-  private final  HardwarelibCaseService hardwarelibCaseService;
+    private final HardwarelibCaseService hardwarelibCaseService;
 
-  private final HardwarelibBoardService hardwarelibBoardService;
+    private final HardwarelibBoardService hardwarelibBoardService;
 
-  /**
-   * 简单分页查询
-   * @param page 分页对象
-   * @param hardwarelibCase 机箱设计
-   * @return
-   */
-  @GetMapping("/page")
-  public R<IPage<HardwarelibCase>> getHardwarelibCasePage(Page<HardwarelibCase> page, HardwarelibCase hardwarelibCase) {
-    return  new R<>(hardwarelibCaseService.getHardwarelibCasePage(page,hardwarelibCase));
-  }
+    /**
+     * 简单分页查询
+     *
+     * @param page            分页对象
+     * @param hardwarelibCase 机箱设计
+     * @return
+     */
+    @GetMapping("/page")
+    public R<IPage<HardwarelibCase>> getHardwarelibCasePage(Page<HardwarelibCase> page, HardwarelibCase hardwarelibCase) {
+        return new R<>(hardwarelibCaseService.getHardwarelibCasePage(page, hardwarelibCase));
+    }
 
 
-  /**
-   * 通过id查询单条记录
-   * @param id
-   * @return R
-   */
-  @GetMapping("/{id}")
-  public R<HardwarelibCase> getById(@PathVariable("id") String id){
-    return new R<>(hardwarelibCaseService.getById(id));
-  }
+    /**
+     * 通过id查询单条记录
+     *
+     * @param id
+     * @return R
+     */
+    @GetMapping("/{id}")
+    public R<HardwarelibCase> getById(@PathVariable("id") String id) {
+        return new R<>(hardwarelibCaseService.getById(id));
+    }
 
-  /**
-   * 新增记录
-   * @param hardwarelibCase
-   * @return R
-   */
-  @SysLog("新增机箱设计")
-  @PostMapping
-  @PreAuthorize("@pms.hasPermission('libs_hardwarelibcase_add')")
-  public R save(@RequestBody HardwarelibCase hardwarelibCase){
-    return new R<>(hardwarelibCaseService.save(hardwarelibCase));
-  }
+    /**
+     * 新增记录
+     *
+     * @param hardwarelibCase
+     * @return R
+     */
+    @SysLog("新增机箱设计")
+    @PostMapping
+    @PreAuthorize("@pms.hasPermission('libs_hardwarelibcase_add')")
+    public R save(@RequestBody HardwarelibCase hardwarelibCase) {
+        return new R<>(hardwarelibCaseService.save(hardwarelibCase));
+    }
 
-  /**
-   * 修改记录
-   * @param hardwarelibCase
-   * @return R
-   */
-  @SysLog("修改机箱设计")
-  @PutMapping
-  @PreAuthorize("@pms.hasPermission('libs_hardwarelibcase_edit')")
-  public R update(@RequestBody HardwarelibCase hardwarelibCase){
-    return new R<>(hardwarelibCaseService.updateById(hardwarelibCase));
-  }
+    /**
+     * 修改记录
+     *
+     * @param hardwarelibCase
+     * @return R
+     */
+    @SysLog("修改机箱设计")
+    @PutMapping
+    @PreAuthorize("@pms.hasPermission('libs_hardwarelibcase_edit')")
+    public R update(@RequestBody HardwarelibCase hardwarelibCase) {
+        return new R<>(hardwarelibCaseService.updateById(hardwarelibCase));
+    }
 
-  /**
-   * 通过id删除一条记录
-   * @param id
-   * @return R
-   */
-  @SysLog("删除机箱设计")
-  @DeleteMapping("/{id}")
-  @PreAuthorize("@pms.hasPermission('libs_hardwarelibcase_del')")
-  public R removeById(@PathVariable String id){
-    return new R<>(hardwarelibCaseService.removeById(id));
-  }
+    /**
+     * 通过id删除一条记录
+     *
+     * @param id
+     * @return R
+     */
+    @SysLog("删除机箱设计")
+    @DeleteMapping("/{id}")
+    @PreAuthorize("@pms.hasPermission('libs_hardwarelibcase_del')")
+    public R removeById(@PathVariable String id) {
+        return new R<>(hardwarelibCaseService.removeById(id));
+    }
 
-	@PostMapping("saveCase")
-	public void saveCase(@RequestBody(required = false) HardwarelibCase hardwarelibCase){
-		hardwarelibCaseService.saveCase(hardwarelibCase);
-	}
+    /**
+     * 保存机箱
+     * @param hardwarelibCase
+     */
+    @PostMapping("saveCase")
+    public void saveCase(@RequestBody(required = false) HardwarelibCase hardwarelibCase) {
+        hardwarelibCaseService.saveCase(hardwarelibCase);
+    }
 
-	@GetMapping("getBoardData")
-	public List<HardwarelibBoard> getBoardData(){
-		return hardwarelibBoardService.list(null);
-	}
+    /**
+     * 编辑机箱
+     * @param hardwarelibCase
+     */
+    @PostMapping("updateCase")
+    public void updateBoard(@RequestBody HardwarelibCase hardwarelibCase) {
+        System.out.println(hardwarelibCase);
+        hardwarelibCaseService.updateCaseById(hardwarelibCase);
+    }
 
-	@PostMapping("updateCase")
-	public void updateBoard(@RequestBody HardwarelibCase hardwarelibCase){
-		System.out.println(hardwarelibCase);
-		hardwarelibCaseService.updateById(hardwarelibCase);
-	}
-
-	@GetMapping("getCaseJson/{id}")
-	public HardwarelibCase getCaseJson(@PathVariable String id){
-		System.out.println(id);
-		return hardwarelibCaseService.getById(id);
-	}
-
+    /**
+     * 获取所有机箱
+     * @return
+     */
     @GetMapping("getCaseData")
-    public List<HardwarelibCase> getCase(){
+    public List<HardwarelibCase> getCase() {
         List<HardwarelibCase> hardwarelibCaseList = hardwarelibCaseService.list(null);
         return hardwarelibCaseList;
     }

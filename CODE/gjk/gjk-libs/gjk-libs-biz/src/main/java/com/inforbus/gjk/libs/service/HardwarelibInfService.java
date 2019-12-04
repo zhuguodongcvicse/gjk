@@ -42,4 +42,5 @@ public interface HardwarelibInfService extends IService<HardwarelibInf> {
 
   List<HardwarelibInf> getInfList();
 
+  void updateInfById(HardwarelibInf hardwarelibInf);
 }

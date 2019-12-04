@@ -45,97 +45,98 @@ import java.util.List;
 @RequestMapping("/hardwarelibchip")
 public class HardwarelibChipController {
 
-  private final  HardwarelibChipService hardwarelibChipService;
+    private final HardwarelibChipService hardwarelibChipService;
 
-  private final HardwarelibInfService hardwarelibInfService;
+    /**
+     * 简单分页查询
+     *
+     * @param page            分页对象
+     * @param hardwarelibChip 芯片设计
+     * @return
+     */
+    @GetMapping("/page")
+    public R<IPage<HardwarelibChip>> getHardwarelibChipPage(Page<HardwarelibChip> page, HardwarelibChip hardwarelibChip) {
+        return new R<>(hardwarelibChipService.getHardwarelibChipPage(page, hardwarelibChip));
+    }
 
-  /**
-   * 简单分页查询
-   * @param page 分页对象
-   * @param hardwarelibChip 芯片设计
-   * @return
-   */
-  @GetMapping("/page")
-  public R<IPage<HardwarelibChip>> getHardwarelibChipPage(Page<HardwarelibChip> page, HardwarelibChip hardwarelibChip) {
-    return  new R<>(hardwarelibChipService.getHardwarelibChipPage(page,hardwarelibChip));
-  }
 
+    /**
+     * 通过id查询单条记录
+     *
+     * @param id
+     * @return R
+     */
+    @GetMapping("/{id}")
+    public R<HardwarelibChip> getById(@PathVariable("id") String id) {
+        return new R<>(hardwarelibChipService.getById(id));
+    }
 
-  /**
-   * 通过id查询单条记录
-   * @param id
-   * @return R
-   */
-  @GetMapping("/{id}")
-  public R<HardwarelibChip> getById(@PathVariable("id") String id){
-    return new R<>(hardwarelibChipService.getById(id));
-  }
+    /**
+     * 新增记录
+     *
+     * @param hardwarelibChip
+     * @return R
+     */
+    @SysLog("新增芯片设计")
+    @PostMapping
+    @PreAuthorize("@pms.hasPermission('libs_hardwarelibchip_add')")
+    public R save(@RequestBody HardwarelibChip hardwarelibChip) {
+        return new R<>(hardwarelibChipService.save(hardwarelibChip));
+    }
 
-  /**
-   * 新增记录
-   * @param hardwarelibChip
-   * @return R
-   */
-  @SysLog("新增芯片设计")
-  @PostMapping
-  @PreAuthorize("@pms.hasPermission('libs_hardwarelibchip_add')")
-  public R save(@RequestBody HardwarelibChip hardwarelibChip){
-    return new R<>(hardwarelibChipService.save(hardwarelibChip));
-  }
+    /**
+     * 修改记录
+     *
+     * @param hardwarelibChip
+     * @return R
+     */
+    @SysLog("修改芯片设计")
+    @PutMapping
+    @PreAuthorize("@pms.hasPermission('libs_hardwarelibchip_edit')")
+    public R update(@RequestBody HardwarelibChip hardwarelibChip) {
+        return new R<>(hardwarelibChipService.updateById(hardwarelibChip));
+    }
 
-  /**
-   * 修改记录
-   * @param hardwarelibChip
-   * @return R
-   */
-  @SysLog("修改芯片设计")
-  @PutMapping
-  @PreAuthorize("@pms.hasPermission('libs_hardwarelibchip_edit')")
-  public R update(@RequestBody HardwarelibChip hardwarelibChip){
-    return new R<>(hardwarelibChipService.updateById(hardwarelibChip));
-  }
+    /**
+     * 通过id删除一条记录
+     *
+     * @param id
+     * @return R
+     */
+    @SysLog("删除芯片设计")
+    @DeleteMapping("/{id}")
+    @PreAuthorize("@pms.hasPermission('libs_hardwarelibchip_del')")
+    public R removeById(@PathVariable String id) {
+        return new R<>(hardwarelibChipService.removeById(id));
+    }
 
-  /**
-   * 通过id删除一条记录
-   * @param id
-   * @return R
-   */
-  @SysLog("删除芯片设计")
-  @DeleteMapping("/{id}")
-  @PreAuthorize("@pms.hasPermission('libs_hardwarelibchip_del')")
-  public R removeById(@PathVariable String id){
-    return new R<>(hardwarelibChipService.removeById(id));
-  }
-  /**
-   * 芯片新增
-   * @return
-   */
-  @PostMapping("/saveChip")
-  public void saveChip(@RequestBody(required = false) HardwarelibChip hardwarelibChip) {
-      System.out.println("hardwarelibChip: " + hardwarelibChip);
-	  hardwarelibChipService.saveChip(hardwarelibChip);
-  }
+    /**
+     * 芯片新增
+     *
+     * @return
+     */
+    @PostMapping("/saveChip")
+    public void saveChip(@RequestBody(required = false) HardwarelibChip hardwarelibChip) {
+        System.out.println("hardwarelibChip: " + hardwarelibChip);
+        hardwarelibChipService.saveChip(hardwarelibChip);
+    }
 
-	/**
-	 * 左侧芯片回显
-	 * @return
-	 */
-	@GetMapping("interfaceDate")
-	public List<HardwarelibInf> getInf(){
-	  	List<HardwarelibInf> infList = hardwarelibInfService.getInfList();
-		return infList;
-  }
+    /**
+     * 芯片编辑
+     * @param hardwarelibChip
+     */
+    @PostMapping("updateChip")
+    public void updateChip(@RequestBody HardwarelibChip hardwarelibChip) {
+        System.out.println(hardwarelibChip);
+        hardwarelibChipService.updateChipById(hardwarelibChip);
+    }
 
-	@GetMapping("getChipJson/{id}")
-	public HardwarelibChip getCaseJson(@PathVariable String id){
-		System.out.println(id);
-		return hardwarelibChipService.getById(id);
-	}
-
-	@PostMapping("updateChip")
-	public void updateChip(@RequestBody HardwarelibChip hardwarelibChip){
-		System.out.println(hardwarelibChip);
-		hardwarelibChipService.updateById(hardwarelibChip);
-	}
-
+    /**
+     * 获取所有芯片
+     * @return
+     */
+    @GetMapping("getChipList")
+    public List<HardwarelibChip> getChipList() {
+        return hardwarelibChipService.list();
+    }
 }

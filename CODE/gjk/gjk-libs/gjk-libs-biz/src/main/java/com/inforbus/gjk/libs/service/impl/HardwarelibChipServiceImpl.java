@@ -27,6 +27,9 @@ import com.inforbus.gjk.libs.mapper.HardwarelibChipMapper;
 import com.inforbus.gjk.libs.service.HardwarelibChipService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 /**
  * 芯片设计
  *
@@ -48,27 +51,61 @@ public class HardwarelibChipServiceImpl extends ServiceImpl<HardwarelibChipMappe
 
 	@Override
 	public void saveChip(HardwarelibChip hardwarelibChip) {
-		if (hardwarelibChip.getId() != null && hardwarelibChip.getId() != "") {
-			hardwarelibChip.setVersion(hardwarelibChip.getVersion() + 1);
-		} else {
-			hardwarelibChip.setVersion(1);
-		}
+  		//设置UUID
 		hardwarelibChip.setId(IdGenerate.uuid());
+		//设置芯片id
+		if (hardwarelibChip.getChipId() ==null) {
+			long currentTime = System.currentTimeMillis();
+			hardwarelibChip.setChipId(hardwarelibChip.getUserId() + currentTime);
+		}
+		//设置创建时间和更新时间
+		hardwarelibChip.setCreateTime(LocalDateTime.now());
+		hardwarelibChip.setUpdateTime(hardwarelibChip.getCreateTime());
+		hardwarelibChip.setDelFlag("0");
+
+		//只有入库才有版本
+		hardwarelibChip.setVersion(null);
 		baseMapper.insert(hardwarelibChip);
 	}
 
 	@Override
-	public void saveChipJson(HardwarelibChip hardwarelibChip) {
-		baseMapper.insert(hardwarelibChip);
+	public void updateChipById(HardwarelibChip hardwarelibChip) {
+		if ("2".equals(hardwarelibChip.getApplyState())) {
+			//版本临时变量
+			int infVersionTemp;
+			//如果版本为空则赋值为0（其实版本都是空）
+			if (hardwarelibChip.getVersion() != null) {
+				infVersionTemp = hardwarelibChip.getVersion();
+			} else {
+				infVersionTemp = 0;
+			}
+			//是否进入过for循环
+			int ifSetVersionFlag = 1;
+			//条件构造器
+			QueryWrapper<HardwarelibChip> wrapper = new QueryWrapper<>();
+			//接口id相同条件
+			wrapper.eq("chip_id", hardwarelibChip.getChipId());
+			//已入库条件，因为只有入库才有版本
+			wrapper.eq("apply_state", hardwarelibChip.getApplyState());
+			//找出所有符合条件的接口
+			List<HardwarelibChip> hardwarelibInfs = baseMapper.selectList(wrapper);
+			//循环找出最高版本，如果有更高版本则赋值给临时值
+			for (HardwarelibChip inf : hardwarelibInfs) {
+				if (infVersionTemp <= inf.getVersion()) {
+					infVersionTemp = inf.getVersion();
+				}
+				//是否进入过循环标志赋值为0，说明有更高版本
+				ifSetVersionFlag = 0;
+			}
+			//如果没有最高版本则设置版本为1
+			if (ifSetVersionFlag == 1) {
+				hardwarelibChip.setVersion(1);
+			} else {
+				//有最高版本就在最高版本基础上+1
+				hardwarelibChip.setVersion(infVersionTemp + 1);
+			}
+		}
+		hardwarelibChip.setUpdateTime(LocalDateTime.now());
+		baseMapper.updateById(hardwarelibChip);
 	}
-
-	@Override
-	public HardwarelibChip getChipByName(String chipName) {
-		QueryWrapper<HardwarelibChip> wrapper = new QueryWrapper<>();
-		wrapper.eq("chip_name",chipName);
-		HardwarelibChip chip = baseMapper.selectOne(wrapper);
-		System.out.println(chip);
-		return chip;
-	}
-
 }

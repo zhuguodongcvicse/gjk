@@ -608,6 +608,7 @@ function initEditor(editor) {
 	button.className = 'boarddesign_board_14s';
 	toolbarDiv.appendChild(button)
 	button.onclick = function (evt) {
+	  let cpuNum
 		//芯片赋值
 		var data = graph.toJSON();
 		data.datas[0].json.properties.chipList = chipList
@@ -615,22 +616,24 @@ function initEditor(editor) {
 		if (boardArr.boardType == 0) {
 			data.datas[0].json.properties.ExchangeCpu = infOfExchangeCpuArr
 			infOfExchangeCpuArr = []
+      cpuNum = data.datas[0].json.properties.chipList.length
 		} else if (boardArr.boardType == 1) {
 			//console.log("showStartInfList",showStartInfList);
 			for (const i in showStartInfList) {
 				InternalLinkArr.push([showStartCpuList[i], showStartInfList[i], showEndCpuList[i], showEndInfList[i]])
 			}
 			data.datas[0].json.properties.InternalLink = InternalLinkArr
-		}
+      cpuNum = data.datas[0].json.properties.chipList.length
+    }
 		var json = JSON.stringify(data);
 		postMessageParentData.cmd = "submitJSON";
-		postMessageParentData.params = json;
-		console.log("data", data);
+		postMessageParentData.params = [json, cpuNum];
+		// console.log("data", data);
 		//closePane()
 		window.parent.postMessage(postMessageParentData, "*")
 	}
 	function initToolbar() {
-		//网状画布 
+		//网状画布
 		/* var graph = editor.graph;
 		//不可改变形状大小
 		//	graph.editable = true; */
@@ -737,12 +740,12 @@ function initEditor(editor) {
 					return
 				}
 				var currentElement = graph.getElement(evt.event);
-				console.log("currentElement", currentElement)
-				if (currentElement && currentElement.image == 'images/BeforeTheBoard.svg') {
+				// console.log("currentElement", currentElement)
+				if (currentElement && currentElement.image === 'images/BeforeTheBoard.svg') {
 					//	node.host = currentElement;
-				} else if (currentElement && currentElement.image == 'images/AfterTheBoard.svg') {
+				} else if (currentElement && currentElement.image === 'images/AfterTheBoard.svg') {
 					//	node.host = currentElement;
-				} else if (currentElement && currentElement.image == 'images/Chip.svg') {
+				} else if (currentElement && currentElement.image === 'images/Chip.svg') {
 					graph.removeElement(node);
 					return
 				} else {

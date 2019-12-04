@@ -32,10 +32,8 @@
 
 <script>
     import {remote} from "@/api/admin/dict";
-    import {handlerSaveSysXml} from "@/api/pro/manager";
-    import {getChipData} from "@/api/libs/hardwarelibboard";
-    import {getInfData} from "@/api/libs/hardwarelibchip";
-    import {getBoardData, saveCase} from "@/api/libs/hardwarelibcase";
+    import {getBoardList} from "@/api/libs/hardwarelibboard";
+    import {saveCase} from "@/api/libs/hardwarelibcase";
     import {mapGetters} from "vuex";
     import NProgress from "nprogress"; // progress bar
     import "nprogress/nprogress.css"; // progress bar style
@@ -88,26 +86,24 @@
                 this.load();
             }
         },
-        computed: {...mapGetters(["tagWel", "tagList", "tag", "website"])},
+        computed: {...mapGetters(["tagWel", "tagList", "tag", "website", "userInfo"])},
         methods: {
-            testMap() {
-                var str = "abcdefg";
-                var char = str.charAt(2); //c
-                console.log(char);
-            },
             sendMessage() {
-                var fpgaBoardLinkType;
+                let iframeWin = this.$refs.iframe.contentWindow;
+                let fpgaBoardLinkType;
                 remote("hardware_FpgaBoard_inf_linkType").then(res1 => {
                     fpgaBoardLinkType = res1.data.data;
                     // console.log("fpgaBoardLinkType",fpgaBoardLinkType)
-                    getBoardData().then(response => {
-                        let iframeWin = this.$refs.iframe.contentWindow;
+                    getBoardList().then(response => {
+                        let boardListTemp = []
+                        for (const i in response.data) {
+                            if (response.data[i].userId === this.userInfo.name || response.data[i].applyState === '2') {
+                                boardListTemp.push(response.data[i])
+                            }
+                        }
+                        boardListTemp = JSON.parse(JSON.stringify(boardListTemp))
                         this.postMessageData.cmd = "getBoardAndCaseData";
-                        this.postMessageData.params = [
-                            this.params,
-                            response.data,
-                            fpgaBoardLinkType
-                        ];
+                        this.postMessageData.params = [this.params, boardListTemp, fpgaBoardLinkType];
                         iframeWin.postMessage(this.postMessageData, "*");
                         //console.log(this.postMessageData)
                     });
@@ -117,13 +113,18 @@
             handleMessage(event) {
                 //console.log("开始接受消息了");
                 // console.log("接收子页面数据:****", event.data.params);
+                if (this.params === '' || this.params === null) {
+                    return
+                }
+                if (event.data.params === undefined) {
+                    return;
+                }
                 switch (event.data.cmd) {
                     case "submitCaseJSON":
                         //给机箱form赋值
                         this.params.frontCase = event.data.params[0];
                         this.params.backCase = event.data.params[1];
-                        this.params.linkRelation = event.data.params[2];
-                        this.params.bdNum = event.data.params[3];
+                        this.params.bdNum = event.data.params[2];
                         this.ifSave = 0;
                         saveCase(this.params).then(response => {
                             this.$message({

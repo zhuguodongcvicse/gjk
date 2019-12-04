@@ -50,10 +50,7 @@ export const tableOption = {
       label: '接口类型',
       prop: 'infType'
     },*/
-	  /* {
-      label: '用户',
-      prop: 'userId'
-    }, */
+
 	  /* {
       label: '创建时间',
       prop: 'createTime'
@@ -66,10 +63,7 @@ export const tableOption = {
       label: '',
       prop: 'projectImg'
     }, */
-	  /*{
-      label: '版本',
-      prop: 'version'
-    },*/
+
 	  /* {
       label: '逻辑删除',
       prop: 'delFlag'
@@ -82,5 +76,41 @@ export const tableOption = {
       label: 'io类型',
       prop: 'ioType'
     }*/
+    /*{
+      label: '用户',
+      prop: 'userId'
+    }*/
+    {
+      label: '用户',
+      prop: 'userId',
+      type: 'select',
+      filter: true,
+      dicData:[/*{ label: '男', value: '男' },
+        { label: '女', value: '女' }*/],
+      /*filterMethod:function(value, row, column) {
+        console.log("row",row)
+        return row.userId === value;
+      }*/
+    },
+    {
+      label: '版本',
+      prop: 'version'
+    },
+    {
+      label: '备注',
+      prop: 'backupInfo'
+    },
+    {
+      label: '创建时间',
+      prop: 'createTime'
+    },
+    {
+      label: '修改时间',
+      prop: 'updateTime'
+    },
+    {
+      label: '审批状态',
+      prop: 'applyDesc'
+    },
   ]
 }

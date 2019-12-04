@@ -10,10 +10,10 @@
       :before-upload="beforeUpload"
     >
       <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-      
+
       <el-button type="primary" class="pro_deployment_btn" @click="analysisXml()">确定</el-button>
       <el-button @click="visible = false">取消</el-button>
-     
+
       <div slot="tip"  class="el-upload__tip">只能上传xml文件</div>
       <div slot="tip" class="el-upload-list__item-name">{{fileName}}</div>
     </el-upload>-->
@@ -139,7 +139,7 @@ export default {
     },
     // 接受子页面发来的信息
     handleMessage(event) {
-      // console.log("event.data", event.data);
+      console.log("event.data", event.data);
       if (event.data.params == null) {
         return;
       }
@@ -185,7 +185,7 @@ export default {
         this.params.linkRelation
       ];
       this.hrConfigXmlEntityMap = createXmlEntityMap(paramsList);
-      // console.log("this.hrConfigXmlEntityMap",this.hrConfigXmlEntityMap)
+      console.log("this.hrConfigXmlEntityMap",this.hrConfigXmlEntityMap)
       createHardwarelibXML(this.hrConfigXmlEntityMap, this.params.id).then(
         response => {
           // console.log("this.params",this.params)

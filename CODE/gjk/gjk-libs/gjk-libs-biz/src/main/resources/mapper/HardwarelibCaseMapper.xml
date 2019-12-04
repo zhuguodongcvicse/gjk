@@ -20,79 +20,76 @@
 
 <mapper namespace="com.inforbus.gjk.libs.mapper.HardwarelibCaseMapper">
 
-  <resultMap id="hardwarelibCaseMap" type="com.inforbus.gjk.libs.api.entity.HardwarelibCase">
-                  <id property="id" column="id"/>
-                        <result property="caseName" column="case_name"/>
-                        <result property="sn" column="sn"/>
-                        <result property="caseId" column="case_id"/>
-                        <result property="userId" column="user_id"/>
-                        <result property="createTime" column="create_time"/>
-                        <result property="updateTime" column="update_time"/>
-                        <result property="version" column="version"/>
-                        <result property="delFlag" column="del_flag"/>
-                        <result property="bdNum" column="bd_num"/>
-                        <result property="linkRelation" column="link_relation"/>
-                        <result property="frontCase" column="front_case"/>
-                        <result property="backCase" column="back_case"/>
-            </resultMap>
+    <resultMap id="hardwarelibCaseMap" type="com.inforbus.gjk.libs.api.entity.HardwarelibCase">
+        <id property="id" column="id"/>
+        <result property="caseName" column="case_name"/>
+        <result property="caseId" column="case_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="bdNum" column="bd_num"/>
+        <result property="backupInfo" column="backup_info"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="frontCase" column="front_case"/>
+        <result property="backCase" column="back_case"/>
+        <result property="version" column="version"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
 
-  <!--hardwarelibCase简单分页查询-->
-  <select id="getHardwarelibCasePage" resultMap="hardwarelibCaseMap">
-    SELECT
+    <!--hardwarelibCase简单分页查询-->
+    <select id="getHardwarelibCasePage" resultMap="hardwarelibCaseMap">
+        SELECT
         id,
         case_name,
-        sn,
         case_id,
         user_id,
+        bd_num,
+        backup_info,
         create_time,
         update_time,
-        version,
-        del_flag,
-        bd_num,
-        link_relation,
         front_case,
-        back_case
-    FROM gjk_hardwarelib_case
-    <where>
-              <if test="hardwarelibCase.id != null and hardwarelibCase.id.trim() != ''">
-          AND id = #{hardwarelibCase.id}
-        </if>
-              <if test="hardwarelibCase.caseName != null and hardwarelibCase.caseName.trim() != ''">
-          AND case_name = #{hardwarelibCase.caseName}
-        </if>
-              <if test="hardwarelibCase.sn != null and hardwarelibCase.sn.trim() != ''">
-          AND sn = #{hardwarelibCase.sn}
-        </if>
-              <if test="hardwarelibCase.caseId != null and hardwarelibCase.caseId.trim() != ''">
-          AND case_id = #{hardwarelibCase.caseId}
-        </if>
-              <if test="hardwarelibCase.userId != null and hardwarelibCase.userId.trim() != ''">
-          AND user_id = #{hardwarelibCase.userId}
-        </if>
-              <if test="hardwarelibCase.createTime != null and hardwarelibCase.createTime.trim() != ''">
-          AND create_time = #{hardwarelibCase.createTime}
-        </if>
-              <if test="hardwarelibCase.updateTime != null and hardwarelibCase.updateTime.trim() != ''">
-          AND update_time = #{hardwarelibCase.updateTime}
-        </if>
-              <!--<if test="hardwarelibCase.description != null and hardwarelibCase.description.trim() != ''">
-          AND description = #{hardwarelibCase.description}
-        </if>-->
-              <if test="hardwarelibCase.delFlag != null and hardwarelibCase.delFlag.trim() != ''">
-          AND del_flag = #{hardwarelibCase.delFlag}
-        </if>
-              <if test="hardwarelibCase.bdNum != null and hardwarelibCase.bdNum.trim() != ''">
-          AND bd_num = #{hardwarelibCase.bdNum}
-        </if>
-              <if test="hardwarelibCase.frontCase != null and hardwarelibCase.frontCase.trim() != ''">
-          AND case_data = #{hardwarelibCase.frontCase}
-        </if>
-              <if test="hardwarelibCase.backCase != null and hardwarelibCase.backCase.trim() != ''">
-          AND case_data = #{hardwarelibCase.backCase}
-        </if>
-          </where>
-  </select>
-
+        back_case,
+        version,
+        del_flag
+        FROM gjk_hardwarelib_case
+        <where>
+            <if test="hardwarelibCase.id != null and hardwarelibCase.id.trim() != ''">
+                AND id = #{hardwarelibCase.id}
+            </if>
+            <if test="hardwarelibCase.caseName != null and hardwarelibCase.caseName.trim() != ''">
+                AND case_name = #{hardwarelibCase.caseName}
+            </if>
+            <if test="hardwarelibCase.caseId != null and hardwarelibCase.caseId.trim() != ''">
+                AND case_id = #{hardwarelibCase.caseId}
+            </if>
+            <if test="hardwarelibCase.userId != null and hardwarelibCase.userId.trim() != ''">
+                AND user_id = #{hardwarelibCase.userId}
+            </if>
+            <if test="hardwarelibCase.bdNum != null and hardwarelibCase.bdNum.trim() != ''">
+                AND bd_num = #{hardwarelibCase.bdNum}
+            </if>
+            <if test="hardwarelibCase.backupInfo != null and hardwarelibCase.backupInfo.trim() != ''">
+                AND backup_info = #{hardwarelibCase.backupInfo}
+            </if>
+            <if test="hardwarelibCase.createTime != null and hardwarelibCase.createTime.trim() != ''">
+                AND create_time = #{hardwarelibCase.createTime}
+            </if>
+            <if test="hardwarelibCase.updateTime != null and hardwarelibCase.updateTime.trim() != ''">
+                AND update_time = #{hardwarelibCase.updateTime}
+            </if>
+            <if test="hardwarelibCase.frontCase != null and hardwarelibCase.frontCase.trim() != ''">
+                AND case_data = #{hardwarelibCase.frontCase}
+            </if>
+            <if test="hardwarelibCase.backCase != null and hardwarelibCase.backCase.trim() != ''">
+                AND case_data = #{hardwarelibCase.backCase}
+            </if>
+            <if test="hardwarelibCase.version != null and hardwarelibCase.version.trim() != ''">
+                AND version = #{hardwarelibCase.version}
+            </if>
+            <if test="hardwarelibCase.delFlag != null and hardwarelibCase.delFlag.trim() != ''">
+                AND del_flag = #{hardwarelibCase.delFlag}
+            </if>
+        </where>
+    </select>
 
 
 </mapper>

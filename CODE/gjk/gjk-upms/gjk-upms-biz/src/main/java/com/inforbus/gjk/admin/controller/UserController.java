@@ -219,4 +219,9 @@ public class UserController {
 	public R registered(@RequestBody UserDTO userDto) {
 		return new R<>(userService.saveUser(userDto));
 	}
+
+	@GetMapping("getAllUser")
+	public List getAllUser(){
+		return userService.list(null);
+	}
 }

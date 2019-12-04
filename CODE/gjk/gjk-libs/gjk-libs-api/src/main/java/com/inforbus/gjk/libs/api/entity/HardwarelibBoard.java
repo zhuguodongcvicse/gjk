@@ -22,7 +22,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * 板子设计
@@ -34,58 +36,64 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = true)
 @TableName("gjk_hardwarelib_board")
 public class HardwarelibBoard extends Model<HardwarelibBoard> {
-private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /**
-   *
-   */
-	@TableId(value = "id", type = IdType.ID_WORKER_STR)
+     *
+     */
+    @TableId(value = "id", type = IdType.ID_WORKER_STR)
     private String id;
     /**
-   *
-   */
+     * 板卡名称
+     */
     private String boardName;
     /**
-   *
-   */
-    private String sn;
-    /**
-   *
-   */
+     * 板卡id
+     */
     private String boardId;
     /**
-   *
-   */
-    private BigDecimal cpuNum;
-    /**
-   *
-   */
-    private String hrTypeName;
-    /**
-   *
-   */
+     * 用户名
+     */
     private String userId;
     /**
-   *
-   */
-    private String createTime;
+     * CPU数量
+     */
+    private Integer cpuNum;
     /**
-   *
-   */
-    private String updateTime;
+     * 板卡类型
+     */
+    private String boardType;
     /**
-   *
-   */
+     * 备注信息
+     */
+    private String backupInfo;
+    /**
+     * 审批状态
+     */
+    private String applyState;
+    /**
+     * 审批描述
+     */
+    private String applyDesc;
+    /**
+     *版本
+     */
     private Integer version;
     /**
-   *
-   */
-    private String delFlag;
+     * 创建时间
+     */
+    private LocalDateTime createTime;
     /**
-   *
-   */
-    private BigDecimal boardType;
-
-	private String boardJson;
+     * 更新时间
+     */
+    private LocalDateTime updateTime;
+    /**
+     *板卡json数据
+     */
+    private String boardJson;
+    /**
+     *逻辑删除标识位
+     */
+    private String delFlag;
 
 }
