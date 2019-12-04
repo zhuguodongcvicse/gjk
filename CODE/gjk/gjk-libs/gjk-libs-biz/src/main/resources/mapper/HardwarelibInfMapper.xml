@@ -20,108 +20,122 @@
 
 <mapper namespace="com.inforbus.gjk.libs.mapper.HardwarelibInfMapper">
 
-  <resultMap id="hardwarelibInfMap" type="com.inforbus.gjk.libs.api.entity.HardwarelibInf">
-                  <id property="id" column="id"/>
-                        <result property="infName" column="inf_name"/>
-                        <result property="sn" column="sn"/>
-                        <result property="infId" column="inf_id"/>
-                        <result property="infRate" column="inf_rate"/>
-                        <result property="infType" column="inf_type"/>
-                        <result property="userId" column="user_id"/>
-                        <result property="createTime" column="create_time"/>
-                        <result property="updateTime" column="update_time"/>
-                        <result property="projectImg" column="project_img"/>
-                        <result property="version" column="version"/>
-                        <result property="delFlag" column="del_flag"/>
-                        <result property="opticalNum" column="optical_num"/>
-                        <result property="ioType" column="io_type"/>
-            </resultMap>
-     <sql id="saveInfSql">
+    <resultMap id="hardwarelibInfMap" type="com.inforbus.gjk.libs.api.entity.HardwarelibInf">
+        <id property="id" column="id"/>
+        <result property="infName" column="inf_name"/>
+        <result property="infId" column="inf_id"/>
+        <result property="infRate" column="inf_rate"/>
+        <result property="infType" column="inf_type"/>
+        <result property="userId" column="user_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="backupInfo" column="backup_info"/>
+        <result property="version" column="version"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="opticalNum" column="optical_num"/>
+        <result property="ioType" column="io_type"/>
+        <result property="applyState" column="apply_state"/>
+        <result property="applyDesc" column="apply_desc"/>
+    </resultMap>
+    <sql id="saveInfSql">
 		id,
 		inf_name,
 		inf_rate,
 		inf_type,
 		optical_num,
+		inf_id,
 		version,
 		del_flag,
-		io_type
+		io_type,
+		user_id,
+		backup_info,
+		apply_state,
+		apply_desc
 	</sql>
-	<!-- 保存接口 -->
-	<insert id="saveInf"
-		parameterType="com.inforbus.gjk.libs.api.entity.HardwarelibInf">
-		INSERT INTO gjk_hardwarelib_inf (
-		<include refid="saveInfSql" />
-		) VALUES
-		(#{hardwarelibInf.id},
-		#{hardwarelibInf.infName},
-		#{hardwarelibInf.infRate},
-		#{hardwarelibInf.infType},
+    <!-- 保存接口 -->
+    <insert id="saveInf"
+            parameterType="com.inforbus.gjk.libs.api.entity.HardwarelibInf">
+        INSERT INTO gjk_hardwarelib_inf (
+        <include refid="saveInfSql"/>
+        ) VALUES
+        (#{hardwarelibInf.id},
+        #{hardwarelibInf.infName},
+        #{hardwarelibInf.infRate},
+        #{hardwarelibInf.infType},
         #{hardwarelibInf.opticalNum},
+        #{hardwarelibInf.infId},
         #{hardwarelibInf.version},
-		#{hardwarelibInf.delFlag},
-    #{hardwarelibInf.ioType})
-	</insert>
-  <!--hardwarelibInf简单分页查询-->
-  <select id="getHardwarelibInfPage" resultMap="hardwarelibInfMap">
-    SELECT
-                  id,
-                        inf_name,
-                        sn,
-                        inf_id,
-                        inf_rate,
-                        inf_type,
-                        user_id,
-                        create_time,
-                        update_time,
-                        project_img,
-                        version,
-                        del_flag,
-                        optical_num,
-                        io_type
-              FROM gjk_hardwarelib_inf
-    <where>
-              <if test="hardwarelibInf.id != null and hardwarelibInf.id.trim() != ''">
-          AND id = #{hardwarelibInf.id}
-        </if>
-              <if test="hardwarelibInf.infName != null and hardwarelibInf.infName.trim() != ''">
-          AND inf_name = #{hardwarelibInf.infName}
-        </if>
-              <if test="hardwarelibInf.sn != null and hardwarelibInf.sn.trim() != ''">
-          AND sn = #{hardwarelibInf.sn}
-        </if>
-              <if test="hardwarelibInf.infId != null and hardwarelibInf.infId.trim() != ''">
-          AND inf_id = #{hardwarelibInf.infId}
-        </if>
-              <if test="hardwarelibInf.infRate != null and hardwarelibInf.infRate.trim() != ''">
-          AND inf_rate = #{hardwarelibInf.infRate}
-        </if>
-              <if test="hardwarelibInf.infType != null and hardwarelibInf.infType.trim() != ''">
-          AND inf_type = #{hardwarelibInf.infType}
-        </if>
-              <if test="hardwarelibInf.userId != null and hardwarelibInf.userId.trim() != ''">
-          AND user_id = #{hardwarelibInf.userId}
-        </if>
-              <if test="hardwarelibInf.createTime != null and hardwarelibInf.createTime.trim() != ''">
-          AND create_time = #{hardwarelibInf.createTime}
-        </if>
-              <if test="hardwarelibInf.updateTime != null and hardwarelibInf.updateTime.trim() != ''">
-          AND update_time = #{hardwarelibInf.updateTime}
-        </if>
-              <if test="hardwarelibInf.projectImg != null and hardwarelibInf.projectImg.trim() != ''">
-          AND project_img = #{hardwarelibInf.projectImg}
-        </if>
-              <!--<if test="hardwarelibInf.version != null ">
-          AND version = #{hardwarelibInf.version}
-        </if>-->
-              <if test="hardwarelibInf.delFlag != null and hardwarelibInf.delFlag.trim() != ''">
-          AND del_flag = #{hardwarelibInf.delFlag}
-        </if>
-              <if test="hardwarelibInf.opticalNum != null and hardwarelibInf.opticalNum.trim() != ''">
-          AND del_flag = #{hardwarelibInf.opticalNum}
-        </if>
-          </where>
-  </select>
-
+        #{hardwarelibInf.delFlag},
+        #{hardwarelibInf.ioType},
+        #{hardwarelibInf.userId},
+        #{hardwarelibInf.backupInfo},
+        #{hardwarelibInf.applyState},
+        #{hardwarelibInf.applyDesc})
+    </insert>
+    <!--hardwarelibInf简单分页查询-->
+    <select id="getHardwarelibInfPage" resultMap="hardwarelibInfMap">
+        SELECT
+        id,
+        inf_name,
+        inf_id,
+        inf_rate,
+        inf_type,
+        user_id,
+        create_time,
+        update_time,
+        backup_info,
+        version,
+        del_flag,
+        optical_num,
+        io_type,
+        apply_state,
+        apply_desc
+        FROM gjk_hardwarelib_inf
+        <where>
+            <if test="hardwarelibInf.id != null and hardwarelibInf.id.trim() != ''">
+                AND id = #{hardwarelibInf.id}
+            </if>
+            <if test="hardwarelibInf.infName != null and hardwarelibInf.infName.trim() != ''">
+                AND inf_name = #{hardwarelibInf.infName}
+            </if>
+            <if test="hardwarelibInf.infId != null and hardwarelibInf.infId.trim() != ''">
+                AND inf_id = #{hardwarelibInf.infId}
+            </if>
+            <if test="hardwarelibInf.infRate != null and hardwarelibInf.infRate.trim() != ''">
+                AND inf_rate = #{hardwarelibInf.infRate}
+            </if>
+            <if test="hardwarelibInf.infType != null and hardwarelibInf.infType.trim() != ''">
+                AND inf_type = #{hardwarelibInf.infType}
+            </if>
+            <if test="hardwarelibInf.userId != null and hardwarelibInf.userId.trim() != ''">
+                AND user_id = #{hardwarelibInf.userId}
+            </if>
+            <if test="hardwarelibInf.createTime != null and hardwarelibInf.createTime.trim() != ''">
+                AND create_time = #{hardwarelibInf.createTime}
+            </if>
+            <if test="hardwarelibInf.updateTime != null and hardwarelibInf.updateTime.trim() != ''">
+                AND update_time = #{hardwarelibInf.updateTime}
+            </if>
+            <if test="hardwarelibInf.backupInfo != null and hardwarelibInf.backupInfo.trim() != ''">
+                AND backup_info = #{hardwarelibInf.backupInfo}
+            </if>
+            <!--<if test="hardwarelibInf.version != null ">
+        AND version = #{hardwarelibInf.version}
+      </if>-->
+            <if test="hardwarelibInf.delFlag != null and hardwarelibInf.delFlag.trim() != ''">
+                AND del_flag = #{hardwarelibInf.delFlag}
+            </if>
+            <if test="hardwarelibInf.opticalNum != null and hardwarelibInf.opticalNum.trim() != ''">
+                AND optical_num = #{hardwarelibInf.opticalNum}
+            </if>
+            <if test="hardwarelibInf.applyState != null and hardwarelibInf.applyState.trim() != ''">
+                AND apply_state = #{hardwarelibInf.applyState}
+            </if>
+            <if test="hardwarelibInf.applyDesc != null and hardwarelibInf.applyDesc.trim() != ''">
+                AND apply_desc = #{hardwarelibInf.applyDesc}
+            </if>
+        </where>
+    </select>
 
 
 </mapper>

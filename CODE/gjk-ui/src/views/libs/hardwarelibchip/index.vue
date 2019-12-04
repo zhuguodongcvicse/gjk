@@ -15,7 +15,6 @@
         @row-del="rowDel"
       >
         <template slot="menuLeft">
-          <!-- <el-button type="primary"  @click="showdialog">新增</el-button> -->
           <el-button
             type="primary"
             @click="showdialog"
@@ -27,22 +26,39 @@
           <br>
           <br>
         </template>
+
         <template slot-scope="scope" slot="menu">
           <el-button
             type="primary"
-            v-if="permissions.libs_hardwarelibchip_edit"
+            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="editChip(scope.row,scope.index)"
           >编辑
           </el-button>
           <el-button
+            type="primary"
+            v-if="permissions.libs_hardwarelibinf_edit"
+            size="small"
+            plain
+            @click="copyChip(scope.row,scope.index)"
+          >复制
+          </el-button>
+          <el-button
             type="danger"
-            v-if="permissions.libs_hardwarelibchip_del"
+            v-if="permissions.libs_hardwarelibinf_del && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
           >删除
+          </el-button>
+          <el-button
+            type="primary"
+            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            size="small"
+            plain
+            @click="goStorage(scope.row,scope.index)"
+          >入库
           </el-button>
         </template>
       </avue-crud>
@@ -63,8 +79,8 @@
           <el-input v-model="form.recvRate"/>
         </el-form-item>
 
-        <el-form-item label="平台大类" :label-width="formLabelWidth" prop="hrTypeName">
-          <el-select v-model="form.hrTypeName" placeholder="请选择平台">
+        <el-form-item label="平台大类" prop="hrTypeName">
+          <el-select v-model="form.hrTypeName" placeholder="请选择平台" :disabled="handleDisable()">
             <el-option
               v-for="item in options"
               :key="item.value"
@@ -73,17 +89,29 @@
             ></el-option>
           </el-select>
         </el-form-item>
+
+        <el-form-item label="备注信息" prop="backupInfo">
+          <el-input v-model="form.backupInfo"/>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="updateChip('form', form)">确 定</el-button>
+        <el-button type="primary" v-if="clickCopyOrEdit === 'copy'" @click="copyOneChip('form', form)">确 定</el-button>
+        <el-button type="primary" v-if="clickCopyOrEdit === 'edit'" @click="updateChip('form', form)">确 定</el-button>
         <el-button @click="dialogFormVisible = false">取 消</el-button>
       </div>
     </el-dialog>
     <addChip :showInf="showInf" :allChips="allChips" ref="pram"></addChip>
+    <storage-apply
+      :dialog="dialog"
+      :infWillToStorage="infWillToStorage"
+      @storageApplyDialogState="storageApplyDialogState"
+      :approveUsers="approveUsers"
+    />
   </div>
 </template>
 
 <script>
+    import { getAllUser } from "@/api/libs/hardwarelibinf";
     import {
         fetchList,
         addObj,
@@ -94,20 +122,29 @@
     import {fetchPlatformTree} from "@/api/admin/platform";
     import {mapGetters} from "vuex";
     import addChip from "@/views/libs/hardwarelibchip/addChip";
+    import {getUserhasApplyAuto} from "@/api/admin/user";
+    import chipStorageApply from "./chipStorageApply";
 
     export default {
         name: "hardwarelibchip",
-        components: {addChip},
+        components: {"addChip": addChip, "storage-apply": chipStorageApply},
         data() {
             return {
-                formLabelWidth: "120px",
+                infWillToStorage: '', //要入库的接口
+                clickCopyOrEdit: '', //复制或者编辑操作标志符
+                allUsersOfLibs: [], //用户数据，用来做用户筛选
+                allChips: [], //本用户下所有的芯片数据
+                approveUsers: [], //具有审批权限的用户，用于选择审批人
                 options: [],
-                allChips: [],
                 pTreeData: [],
                 treeData: [],
                 queryData: "",
                 form: [],
                 dialogFormVisible: false,
+                //入库操作弹窗是否打开
+                dialog: {
+                    storageApplyDialog: false
+                },
                 showInf: {
                     //param: {},
                     dialogFormVisible: false
@@ -161,12 +198,13 @@
         created() {
             // location.reload()
             this.getList();
+            this.getAllUsers();
             this.getPlatformSelectTree();
         },
         mounted: function () {
         },
         computed: {
-            ...mapGetters(["permissions", "refreshListFlag"])
+            ...mapGetters(["permissions", "refreshListFlag", "userInfo"])
         },
         watch: {
             //监听store里的数据，即保存芯片时存入的随机数
@@ -177,45 +215,98 @@
                     this.getList();
                 },
                 deep: true
+            },
+            dialogFormVisible: {
+                handler: function (params) {
+                    if (this.dialogFormVisible === false) {
+                        this.refreshChange()
+                    }
+                },
             }
         },
         methods: {
+            handleDisable(){
+                return this.clickCopyOrEdit === 'copy'
+            },
             showdialog() {
                 this.showInf.dialogFormVisible = true;
             },
+            storageApplyDialogState() {
+                this.dialog.storageApplyDialog = false;
+            },
             editChip(row, index) {
+                //复制或弹窗标志赋值
+                this.clickCopyOrEdit = 'edit'
                 this.dialogFormVisible = true;
+                //接口对象赋值为点击对象
                 this.form = row;
-                // console.log("row",row)
-                // console.log(this.form)
-                /* getChipJson(row.id).then(response => {
-                  this.queryData = response.data.chipData
-                  console.log("this.queryData",this.queryData)
-                }) */
+            },
+            copyChip(row) {
+                // console.log("row", row)
+                //复制或弹窗标志赋值
+                this.clickCopyOrEdit = 'copy'
+                this.dialogFormVisible = true;
+                //接口对象赋值为点击对象
+                this.form = row;
+                // console.log("this.form",this.form)
             },
             updateChip(formName, form) {
-                // console.log("form", form)
-                // console.log("this.allChips", this.allChips)
-                //芯片名称不能重复
-                for (const i in this.allChips) {
-                    if (this.allChips[i].chipName === this.form.chipName) {
-                        alert("芯片名称不能相同")
-                        return
-                    }
-                }
                 this.$refs[formName].validate(valid => {
                     if (valid) {
                         this.dialogFormVisible = false;
                         //跳转到画布
                         this.$router.push({
                             path: "/libs/hardwarelibchip/chipupdate",
-                            query: form
+                            query: [form, this.clickCopyOrEdit]
                         });
                         // this.$refs[formName].resetFields();
                     } else {
-                        // console.log("error submit!!");
                         return false;
                     }
+                });
+            },
+            copyOneChip(formName, form) {
+                // console.log("form", form)
+                //复制不能与本用户的芯片库同名
+                for (const i in this.allChips) {
+                    if (this.allChips[i].chipName === this.form.chipName) {
+                        alert("接口名称不能相同")
+                        return
+                    }
+                }
+                this.$refs[formName].validate(valid => {
+                    if (valid) {
+                        this.dialogFormVisible = false;
+                        form.userId = this.userInfo.name
+                        form.applyState = '0'
+                        form.applyDesc = null
+                        //跳转到画布
+                        this.$router.push({
+                            path: "/libs/hardwarelibchip/chipupdate",
+                            query: [form, this.clickCopyOrEdit]
+                        });
+                        // this.$refs[formName].resetFields();
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            //入库方法
+            goStorage(row) {
+                //入库接口赋值为列表点击芯片
+                this.infWillToStorage = JSON.parse(JSON.stringify(row))
+                //打开弹窗
+                this.dialog.storageApplyDialog = true;
+                getUserhasApplyAuto().then(Response => {
+                    // console.log("Response", Response);
+                    this.approveUsers = [];
+                    for (let item of Response.data.data) {
+                        let user = {};
+                        user.value = item.userId;
+                        user.label = item.name + "(" + item.username + ")";
+                        this.approveUsers.push(user);
+                    }
+                    // console.log("this.approveUsers", this.approveUsers);
                 });
             },
             //获取平台库的数据
@@ -237,13 +328,63 @@
             getList() {
                 this.tableLoading = true;
                 fetchList(this.listQuery).then(response => {
-                    // console.log("response", response);
+                    this.tableData = []
                     this.tableData = response.data.data.records;
-                    //查询的所有芯片数据赋值，用于查找是否有重复数据
-                    this.allChips = this.tableData
+                    //所有判断芯片数据是否为空
+                    if (this.allChips.length !== 0) {
+                        //清空数据
+                        this.allChips = []
+                        for (const i in this.tableData) {
+                            //如果用户名和登录用户名相同，则将该芯片放到芯片数据
+                            if (this.tableData[i].userId === this.userInfo.name) {
+                                this.allChips.push(this.tableData[i])
+                            }
+                        }
+                    } else {
+                        //芯片数据为空则将用户名相同的芯片放到芯片数组
+                        for (const i in this.tableData) {
+                            if (this.tableData[i].userId === this.userInfo.name) {
+                                this.allChips.push(this.tableData[i])
+                            }
+                        }
+                    }
                     this.allChips = JSON.parse(JSON.stringify(this.allChips))
                     this.page.total = response.data.data.total;
                     this.tableLoading = false;
+                });
+            },
+            getAllUsers() {
+                //查询所有用户
+                getAllUser().then(response => {
+                    // console.log("response",response)
+                    //如果数组中有数据
+                    if (this.allUsersOfLibs.length !== 0) {
+                        //清空数组
+                        this.allUsersOfLibs = []
+                        //循环数据库的用户数据，判断用户数组中有没有数据
+                        for (const i in response.data) {
+                            if (this.allUsersOfLibs.hasOwnProperty(response.data[i])) {
+                                //有则跳出本次循环
+                                continue
+                            } else {
+                                //没有则加入
+                                this.allUsersOfLibs.push({label: response.data[i].name, value: response.data[i].name})
+                            }
+                        }
+                    } else {
+                        //若数组为空则加入数据库的所有数据
+                        for (const i in response.data) {
+                            this.allUsersOfLibs.push({label: response.data[i].name, value: response.data[i].name})
+                        }
+                    }
+                    // console.log("this.allUsersOfLibs",this.allUsersOfLibs)
+                    //将用户数组中的数据赋值给用来筛选的数据
+                    for (const i in this.tableOption.column) {
+                        if (this.tableOption.column[i].prop === 'userId') {
+                            this.tableOption.column[i].dicData = JSON.parse(JSON.stringify(this.allUsersOfLibs))
+                        }
+                    }
+                    // console.log("this.tableOption",this.tableOption)
                 });
             },
             currentChange(val) {
@@ -284,7 +425,7 @@
                     })
                     .then(data => {
                         _this.tableData.splice(index, 1);
-                        this.allChips.splice(index, 1)
+                        this.allChips = _this.tableData
                         _this.$message({
                             showClose: true,
                             message: "删除成功",

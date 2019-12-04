@@ -37,4 +37,6 @@ public interface HardwarelibBoardService extends IService<HardwarelibBoard> {
   IPage<HardwarelibBoard> getHardwarelibBoardPage(Page<HardwarelibBoard> page, HardwarelibBoard hardwarelibBoard);
 
 	void saveBoard(HardwarelibBoard hardwarelibBoard);
+
+    void updateBoardById(HardwarelibBoard hardwarelibBoard);
 }

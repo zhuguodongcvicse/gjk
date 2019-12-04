@@ -74,10 +74,13 @@ export const getChipOfCaseList = frontBoardOfCaseList => {
 export const createXmlEntityMap = paramsList => {
     paramsList[0] = JSON.parse(paramsList[0])
     paramsList[1] = JSON.parse(paramsList[1])
-    /* for (const i in paramsList[0]) {
-        paramsList[0][i] = JSON.parse(paramsList[0][i])
-        paramsList[1][i] = JSON.parse(paramsList[1][i])
-    } */
+  console.log("paramsList[0]",paramsList[0])
+  console.log("paramsList[1]",paramsList[1])
+
+  /* for (const i in paramsList[0]) {
+      paramsList[0][i] = JSON.parse(paramsList[0][i])
+      paramsList[1][i] = JSON.parse(paramsList[1][i])
+  } */
     var frontJson = paramsList[0]
     var backJson = paramsList[1]
     var linkRelation = JSON.parse(paramsList[2])
@@ -528,6 +531,6 @@ export const createXmlEntityMap = paramsList => {
     hrConfigXmlEntityMap.lableName = 'hrConfig'
     hrConfigXmlEntityMap.attributeMap = {}
     // console.log("hrConfigXmlEntityMap",hrConfigXmlEntityMap)
-    
+
     return hrConfigXmlEntityMap
 }

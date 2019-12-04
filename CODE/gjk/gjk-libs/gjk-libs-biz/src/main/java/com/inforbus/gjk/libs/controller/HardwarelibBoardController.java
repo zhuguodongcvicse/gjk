@@ -46,8 +46,6 @@ public class HardwarelibBoardController {
 
   private final  HardwarelibBoardService hardwarelibBoardService;
 
-  private final HardwarelibChipService hardwarelibChipService;
-
   @Autowired
 	ApplicationContext applicationContext;
 
@@ -109,23 +107,30 @@ public class HardwarelibBoardController {
     return new R<>(hardwarelibBoardService.removeById(id));
   }
 
+  /**
+   * 保存板卡
+   * @param hardwarelibBoard
+   */
   @PostMapping("saveBoard")
 	public void saveBoard(@RequestBody(required = false) HardwarelibBoard hardwarelibBoard){
   		hardwarelibBoardService.saveBoard(hardwarelibBoard);
   }
 
-  @GetMapping("getChipData")
-	public List<HardwarelibChip> getChipData(){
-		return hardwarelibChipService.list(null);
-  }
-
+  /**
+   * 更新板卡
+   * @param hardwarelibBoard
+   */
   @PostMapping("updateBoard")
   public void updateBoard(@RequestBody(required = false) HardwarelibBoard hardwarelibBoard){
-    hardwarelibBoardService.updateById(hardwarelibBoard);
+    hardwarelibBoardService.updateBoardById(hardwarelibBoard);
   }
 
-  @GetMapping("getBoardJson/{id}")
-  public HardwarelibBoard getBoardJson(@PathVariable String id){
-    return hardwarelibBoardService.getById(id);
+  /**
+   * 获取所有板卡
+   * @return
+   */
+  @GetMapping("getBoardList")
+  public List<HardwarelibBoard> getBoardList() {
+    return hardwarelibBoardService.list();
   }
 }

@@ -34,6 +34,9 @@
         </el-select>
       </el-form-item>
 
+      <el-form-item label="备注信息" :label-width="formLabelWidth" prop="backupInfo">
+        <el-input v-model="form.backupInfo" autocomplete="off"></el-input>
+      </el-form-item>
       <!-- <el-form-item label="接口类型" :label-width="formLabelWidth" prop="infType">
         <el-select v-model="form.infType" placeholder="请选择接口类型">
           <el-option label="类型0" value="0"></el-option>
@@ -52,7 +55,7 @@
 <script>
     //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 
-    import {saveChip} from "@/api/libs/hardwarelibchip";
+    import {mapGetters} from "vuex";
     import {fetchPlatformTree} from "@/api/admin/platform";
 
     export default {
@@ -74,7 +77,9 @@
                     memSize: "",
                     recvRate: "",
                     hrTypeName: "",
-                    chipData: ""
+                    chipData: "",
+                    backupInfo: "",
+                    userId: ""
                 },
                 //表单校验
                 rules: {
@@ -112,7 +117,7 @@
             };
         },
         //监听属性 类似于data概念
-        computed: {},
+        computed: {...mapGetters(["permissions", "refreshListFlag", "userInfo"])},
         //监控data中的数据变化
         watch: {},
         //方法集合
@@ -134,6 +139,7 @@
                 this.$refs[formName].validate(valid => {
                     if (valid) {
                         this.showInf.dialogFormVisible = false;
+                        this.form.userId = this.userInfo.name
                         //跳转到画布
                         this.$router.push({
                             path: "/libs/hardwarelibchip/chipdesign",

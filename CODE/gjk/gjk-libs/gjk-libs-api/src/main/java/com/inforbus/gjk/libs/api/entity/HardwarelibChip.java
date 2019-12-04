@@ -49,17 +49,21 @@ private static final long serialVersionUID = 1L;
    */
     private String chipName;
     /**
-   * SN
-   */
-    private String sn;
-    /**
-   * 顺序号
-   */
+     * 芯片ID
+     */
     private String chipId;
     /**
-   * IP
-   */
-    private String ipConfige;
+     * 用户ID
+     */
+    private String userId;
+    /**
+     * 内核数量
+     */
+    private BigDecimal coreNum;
+    /**
+     * 内存大小
+     */
+    private BigDecimal memSize;
     /**
    * 硬件类型名称
    */
@@ -69,36 +73,36 @@ private static final long serialVersionUID = 1L;
    */
     private String recvRate;
     /**
-   * 创建时间
-   */
-    private String createTime;
+     * 审批状态
+     */
+    private String applyState;
     /**
-   * 修改时间
-   */
-    private String updateTime;
+     * 审批描述
+     */
+    private String applyDesc;
     /**
-   * 版本
-   */
+     * 备注信息
+     */
+    private String backupInfo;
+    /**
+     * 版本
+     */
     private Integer version;
-    /**
-   * 删除标志
-   */
-    private String delFlag;
-    /**
-   * 内核数量
-   */
-    private BigDecimal coreNum;
-    /**
-   * 内存大小
-   */
-    private BigDecimal memSize;
-    /**
-   * 节点ID
-   */
-    private String nodeId;
     /**
      * 芯片数据
      */
     private String chipData;
+    /**
+   * 创建时间
+   */
+    private LocalDateTime createTime;
+    /**
+   * 修改时间
+   */
+    private LocalDateTime updateTime;
+    /**
+   * 删除标志
+   */
+    private String delFlag;
 
 }

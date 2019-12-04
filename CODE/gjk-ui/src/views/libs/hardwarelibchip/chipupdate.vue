@@ -37,147 +37,157 @@
 </template>
 
 <script>
-import {
-  getInfData,
-  saveChip,
-  getObj
-} from "@/api/libs/hardwarelibchip";
-import { mapGetters } from "vuex";
-import NProgress from "nprogress"; // progress bar
-import "nprogress/nprogress.css"; // progress bar style
-import { getCompList } from "@/api/comp/component";
-import { menuTag } from "@/util/closeRouter";
+    import {saveChip, updateChip} from "@/api/libs/hardwarelibchip";
+    import {getInfList} from "@/api/libs/hardwarelibinf";
+    import {mapGetters} from "vuex";
+    import NProgress from "nprogress"; // progress bar
+    import "nprogress/nprogress.css"; // progress bar style
+    import {menuTag} from "@/util/closeRouter";
 
-export default {
-  name: "AvueIframe",
-  beforeRouteLeave(to, from, next) {
-    if (this.ifSave == 0) {
-      this.params = "";
-      next();
-    } else {
-      this.params = "";
-      // alert("已离开当前页面,数据清除");
-      next();
-    }
-  },
-  data() {
-    return {
-      refreshListFlag: 1,
-      ifSave: 1,
-      formObj: "",
-      params: "",
-      /* 用于iframe参数 */
-      postMessageData: {
-        cmd: "", //用于switch 判断
-        params: [] //具体参数
-      }
+    export default {
+        name: "AvueIframe",
+        beforeRouteLeave(to, from, next) {
+            if (this.ifSave == 0) {
+                this.params = "";
+                next();
+            } else {
+                this.params = "";
+                // alert("已离开当前页面,数据清除");
+                next();
+            }
+        },
+        data() {
+            return {
+                refreshListFlag: 1,
+                ifSave: 1,
+                formObj: "",
+                params: "",
+                /* 用于iframe参数 */
+                postMessageData: {
+                    cmd: "", //用于switch 判断
+                    params: [] //具体参数
+                }
+            };
+        },
+        created() {
+            NProgress.configure({showSpinner: false});
+            let formObj = this.$route.query[0];
+            this.params = formObj
+        },
+        async mounted() {
+            clearTimeout(this.timer); //清除延迟执行
+            this.timer = setTimeout(() => {
+                //设置延迟执行
+                this.sendMessage();
+            }, 1000);
+            this.load();
+            //this.sendMessage();
+            window.addEventListener("message", this.handleMessage); // 子接收方式二参数
+        },
+        watch: {
+            $route: function () {
+                this.load();
+            }
+        },
+        computed: {...mapGetters(["tagWel", "tagList", "tag", "website", "userInfo"])},
+        methods: {
+            sendMessage() {
+                // 父向子传参方式二
+                //console.log("sendMessage")
+                let iframeWin = this.$refs.iframe.contentWindow;
+                //console.log("iframeWin",iframeWin)
+                getInfList().then(response => {
+                    let infsGoStorage = []
+                    for (const i in response.data) {
+                        if (response.data[i].userId === this.userInfo.name || response.data[i].applyState === '2') {
+                            infsGoStorage.push(response.data[i])
+                        }
+                    }
+                    this.postMessageData.cmd = "updateChip";
+                    this.postMessageData.params = [infsGoStorage, this.params, this.$route.query[1]];
+                    iframeWin.postMessage(this.postMessageData, "*");
+                    //console.log("postMessageData",this.postMessageData.params)
+                });
+            },
+            // 接受子页面发来的信息
+            handleMessage(event) {
+                if (this.params === '' || this.params === null) {
+                    return
+                }
+                if (event.data.params === undefined) {
+                    return;
+                }
+                this.params.chipData = event.data.params;
+                this.params = JSON.parse(JSON.stringify(this.params))
+                this.ifSave = 0;
+                switch (event.data.cmd) {
+                    case "edit":
+                        updateChip(this.params).then(response => {
+                            this.$message({
+                                showClose: true,
+                                message: "修改成功",
+                                type: "success"
+                            });
+                            this.refreshListFlag = Math.random()
+                            this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
+                        });
+                        var tag1 = this.tag;
+                        menuTag(this.$route.path, "remove", this.tagList, tag1);
+                        break;
+                    case "copy":
+                        // console.log("this.params", this.params);
+                        saveChip(this.params).then(response => {
+                            this.$message({
+                                showClose: true,
+                                message: "复制成功",
+                                type: "success"
+                            });
+                            this.refreshListFlag = Math.random()
+                            this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
+                        });
+                        var tag1 = this.tag;
+                        menuTag(this.$route.path, "remove", this.tagList, tag1);
+                        break;
+                }
+            },
+            // 显示等待框
+            show() {
+                NProgress.start();
+            },
+            // 隐藏等待狂
+            hide() {
+                NProgress.done();
+            },
+            // 加载浏览器窗口变化自适应
+            resize() {
+                window.onresize = () => {
+                    this.iframeInit();
+                };
+            },
+            // 加载组件
+            load() {
+                this.show();
+                this.iframeInit();
+            },
+            //iframe窗口初始化
+            iframeInit() {
+                const iframe = this.$refs.iframe;
+                // console.log(this.xmlParam,"测试");
+                const clientHeight =
+                    document.documentElement.clientHeight - (screen > 1 ? 200 : 130);
+                iframe.style.height = `${clientHeight}px`;
+                if (iframe.attachEvent) {
+                    iframe.attachEvent("onload", () => {
+                        this.hide();
+                    });
+                } else {
+                    iframe.onload = () => {
+                        this.hide();
+                    };
+                }
+            }
+        }
     };
-  },
-  created() {
-    NProgress.configure({ showSpinner: false });
-    var formObj = this.$route.query;
-    this.params = formObj;
-    // console.log("this.params",this.params)
-  },
-  async mounted() {
-    clearTimeout(this.timer); //清除延迟执行
-    this.timer = setTimeout(() => {
-      //设置延迟执行
-      this.sendMessage();
-    }, 1000);
-    this.load();
-    //this.sendMessage();
-    window.addEventListener("message", this.handleMessage); // 子接收方式二参数
-  },
-  watch: {
-    $route: function() {
-      this.load();
-    }
-  },
-  computed: { ...mapGetters(["tagWel", "tagList", "tag", "website"]) },
-  methods: {
-    getCompAndDetail() {
-      // 根据用户编号查询构件及文件列表
-      getCompList(this.userInfo.userId).then(response => {});
-    },
-
-    sendMessage() {
-      // 父向子传参方式二
-      //console.log("sendMessage")
-      let iframeWin = this.$refs.iframe.contentWindow;
-      //console.log("iframeWin",iframeWin)
-      getInfData().then(response => {
-        getObj(this.params.id).then(res => {
-            console.log("res",res)
-            this.params = res.data.data
-            this.postMessageData.cmd = "updateChip";
-            this.postMessageData.params = [response.data, this.params];
-            iframeWin.postMessage(this.postMessageData, "*");
-        })
-        //console.log("postMessageData",this.postMessageData.params)
-      });
-    },
-    // 接受子页面发来的信息
-    handleMessage(event) {
-      //console.log(event);
-      this.params.chipData = event.data.params;
-      this.ifSave = 0;
-      switch (event.data.cmd) {
-        case "submitJSON":
-          // 处理业务逻辑
-          // console.log("this.params", this.params);
-          saveChip(this.params).then(response => {
-            this.$message({
-              showClose: true,
-              message: "修改成功",
-              type: "success"
-            });
-            this.refreshListFlag = Math.random()
-            this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
-          });
-          var tag1 = this.tag;
-          menuTag(this.$route.path, "remove", this.tagList, tag1);
-          break;
-      }
-    },
-    // 显示等待框
-    show() {
-      NProgress.start();
-    },
-    // 隐藏等待狂
-    hide() {
-      NProgress.done();
-    },
-    // 加载浏览器窗口变化自适应
-    resize() {
-      window.onresize = () => {
-        this.iframeInit();
-      };
-    },
-    // 加载组件
-    load() {
-      this.show();
-      this.iframeInit();
-    },
-    //iframe窗口初始化
-    iframeInit() {
-      const iframe = this.$refs.iframe;
-      // console.log(this.xmlParam,"测试");
-      const clientHeight =
-        document.documentElement.clientHeight - (screen > 1 ? 200 : 130);
-      iframe.style.height = `${clientHeight}px`;
-      if (iframe.attachEvent) {
-        iframe.attachEvent("onload", () => {
-          this.hide();
-        });
-      } else {
-        iframe.onload = () => {
-          this.hide();
-        };
-      }
-    }
-  }
-};
 </script>
 
 

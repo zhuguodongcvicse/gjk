@@ -53,10 +53,6 @@ private static final long serialVersionUID = 1L;
     /**
    *
    */
-    private String sn;
-    /**
-   *
-   */
     private String infId;
     /**
    *
@@ -73,15 +69,15 @@ private static final long serialVersionUID = 1L;
     /**
    *
    */
-    private String createTime;
+    private LocalDateTime createTime;
     /**
    *
    */
-    private String updateTime;
+    private LocalDateTime updateTime;
     /**
    *
    */
-    private String projectImg;
+    private String backupInfo;
     /**
    *
    */
@@ -94,5 +90,9 @@ private static final long serialVersionUID = 1L;
 	private String opticalNum;
 
 	private String ioType;
+
+	private String applyState;
+
+	private String applyDesc;
 
 }

@@ -25,6 +25,8 @@ import com.inforbus.gjk.libs.mapper.HardwarelibCaseMapper;
 import com.inforbus.gjk.libs.service.HardwarelibCaseService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 /**
  * 机箱设计
  *
@@ -46,12 +48,26 @@ public class HardwarelibCaseServiceImpl extends ServiceImpl<HardwarelibCaseMappe
 
 	@Override
 	public void saveCase(HardwarelibCase hardwarelibCase) {
-        if (hardwarelibCase.getId() != null && hardwarelibCase.getId() != "") {
-            hardwarelibCase.setVersion(hardwarelibCase.getVersion() + 1);
-        } else {
-            hardwarelibCase.setVersion(1);
+        //设置UUID
+        hardwarelibCase.setId(IdGenerate.uuid());
+        //设置芯片id
+        if (hardwarelibCase.getCaseId() ==null) {
+            long currentTime = System.currentTimeMillis();
+            hardwarelibCase.setCaseId(hardwarelibCase.getUserId() + currentTime);
         }
-		hardwarelibCase.setId(IdGenerate.uuid());
+        //设置创建时间和更新时间
+        hardwarelibCase.setCreateTime(LocalDateTime.now());
+        hardwarelibCase.setUpdateTime(hardwarelibCase.getCreateTime());
+        hardwarelibCase.setDelFlag("0");
+
+        //只有入库才有版本
+        hardwarelibCase.setVersion(null);
 		baseMapper.insert(hardwarelibCase);
 	}
+
+    @Override
+    public void updateCaseById(HardwarelibCase hardwarelibCase) {
+        hardwarelibCase.setUpdateTime(LocalDateTime.now());
+        baseMapper.updateById(hardwarelibCase);
+    }
 }

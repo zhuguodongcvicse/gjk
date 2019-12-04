@@ -20,119 +20,131 @@
 
 <mapper namespace="com.inforbus.gjk.libs.mapper.HardwarelibChipMapper">
 
-  <resultMap id="hardwarelibChipMap" type="com.inforbus.gjk.libs.api.entity.HardwarelibChip">
-                  <id property="id" column="id"/>
-                        <result property="chipName" column="chip_name"/>
-                        <result property="sn" column="sn"/>
-                        <result property="chipId" column="chip_id"/>
-                        <result property="ipConfige" column="ip_confige"/>
-                        <result property="hrTypeName" column="hr_type_name"/>
-                        <result property="recvRate" column="recv_rate"/>
-                        <result property="createTime" column="create_time"/>
-                        <result property="updateTime" column="update_time"/>
-                        <result property="version" column="version"/>
-                        <result property="delFlag" column="del_flag"/>
-                        <result property="coreNum" column="core_num"/>
-                        <result property="memSize" column="mem_size"/>
-                        <result property="nodeId" column="node_id"/>
-                        <result property="chipData" column="chip_data"/>
-            </resultMap>
+    <resultMap id="hardwarelibChipMap" type="com.inforbus.gjk.libs.api.entity.HardwarelibChip">
+        <id property="id" column="id"/>
+        <result property="chipName" column="chip_name"/>
+        <result property="chipId" column="chip_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="coreNum" column="core_num"/>
+        <result property="memSize" column="mem_size"/>
+        <result property="recvRate" column="recv_rate"/>
+        <result property="hrTypeName" column="hr_type_name"/>
+        <result property="applyState" column="apply_state"/>
+        <result property="applyDesc" column="apply_desc"/>
+        <result property="backupInfo" column="backup_info"/>
+        <result property="version" column="version"/>
+        <result property="chipData" column="chip_data"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
 
-  <sql id= "ChipSql">
+    <sql id="ChipSql">
   	id,
   	chip_name,
-  	hr_type_name,
-  	ip_confige,
+  	chip_id,
+  	user_id,
   	core_num,
   	mem_size,
   	recv_rate,
+  	hr_type_name,
+  	apply_state,
+  	apply_desc,
+  	backup_info,
   	version,
   	chip_data
   </sql>
-   <!-- 保存芯片 -->
-   <insert id="saveChip"
-   		parameterType = "com.inforbus.gjk.libs.api.entity.HardwarelibChip">
-   		INSERT INTO gjk_hardwarelib_chip(<include refid="ChipSql" />)
-   		VALUES
-   		(#{hardwarelibChip.id},
-   		#{hardwarelibChip.chipName},
-         #{hardwarelibChip.hrTypeName},
-         #{hardwarelibChip.ipConfige},
-         #{hardwarelibChip.coreNum},
-         #{hardwarelibChip.memSize},
-       #{hardwarelibChip.recvRate},
-       #{hardwarelibChip.version},
-   		#{hardwarelibChip.chipData}
-   		)
-   </insert>
-  <!--hardwarelibChip简单分页查询-->
-  <select id="getHardwarelibChipPage" resultMap="hardwarelibChipMap">
-    SELECT
-                  id,
-                        chip_name,
-                        sn,
-                        chip_id,
-                        ip_confige,
-                        hr_type_name,
-                        recv_rate,
-                        create_time,
-                        update_time,
-                        version,
-                        del_flag,
-                        core_num,
-                        mem_size,
-                        node_id,
-                        chip_data
-              FROM gjk_hardwarelib_chip
-    <where>
-              <if test="hardwarelibChip.id != null and hardwarelibChip.id.trim() != ''">
-          AND id = #{hardwarelibChip.id}
-        </if>
-              <if test="hardwarelibChip.chipName != null and hardwarelibChip.chipName.trim() != ''">
-          AND chip_name = #{hardwarelibChip.chipName}
-        </if>
-              <if test="hardwarelibChip.sn != null and hardwarelibChip.sn.trim() != ''">
-          AND sn = #{hardwarelibChip.sn}
-        </if>
-              <if test="hardwarelibChip.chipId != null and hardwarelibChip.chipId.trim() != ''">
-          AND chip_id = #{hardwarelibChip.chipId}
-        </if>
-              <if test="hardwarelibChip.ipConfige != null and hardwarelibChip.ipConfige.trim() != ''">
-          AND ip_confige = #{hardwarelibChip.ipConfige}
-        </if>
-              <if test="hardwarelibChip.hrTypeName != null and hardwarelibChip.hrTypeName.trim() != ''">
-          AND hr_type_name = #{hardwarelibChip.hrTypeName}
-        </if>
-              <if test="hardwarelibChip.recvRate != null and hardwarelibChip.recvRate.trim() != ''">
-          AND recv_rate = #{hardwarelibChip.recvRate}
-        </if>
-              <if test="hardwarelibChip.createTime != null and hardwarelibChip.createTime.trim() != ''">
-          AND create_time = #{hardwarelibChip.createTime}
-        </if>
-              <if test="hardwarelibChip.updateTime != null and hardwarelibChip.updateTime.trim() != ''">
-          AND update_time = #{hardwarelibChip.updateTime}
-        </if>
-              <!--<if test="hardwarelibChip.description != null and hardwarelibChip.description.trim() != ''">
-          AND description = #{hardwarelibChip.description}
-        </if>-->
-              <if test="hardwarelibChip.delFlag != null and hardwarelibChip.delFlag.trim() != ''">
-          AND del_flag = #{hardwarelibChip.delFlag}
-        </if>
-              <if test="hardwarelibChip.coreNum != null and hardwarelibChip.coreNum.trim() != ''">
-          AND core_num = #{hardwarelibChip.coreNum}
-        </if>
-              <if test="hardwarelibChip.memSize != null and hardwarelibChip.memSize.trim() != ''">
-          AND mem_size = #{hardwarelibChip.memSize}
-        </if>
-              <if test="hardwarelibChip.nodeId != null and hardwarelibChip.nodeId.trim() != ''">
-          AND node_id = #{hardwarelibChip.nodeId}
-        </if>
-        	  <if test="hardwarelibChip.chipData != null">
-          AND chip_data = #{hardwarelibChip.chipData}
-        	  </if>
-          </where>
-  </select>
-
+    <!-- 保存芯片 -->
+    <insert id="saveChip"
+            parameterType="com.inforbus.gjk.libs.api.entity.HardwarelibChip">
+        INSERT INTO gjk_hardwarelib_chip(<include refid="ChipSql"/>)
+        VALUES
+        (#{hardwarelibChip.id},
+        #{hardwarelibChip.chipName},
+        #{hardwarelibChip.chipId},
+        #{hardwarelibChip.userId},
+        #{hardwarelibChip.coreNum},
+        #{hardwarelibChip.memSize},
+        #{hardwarelibChip.recvRate},
+        #{hardwarelibChip.hrTypeName},
+        #{hardwarelibChip.applyState},
+        #{hardwarelibChip.applyDesc},
+        #{hardwarelibChip.backupInfo},
+        #{hardwarelibChip.version},
+        #{hardwarelibChip.chipData}
+        )
+    </insert>
+    <!--hardwarelibChip简单分页查询-->
+    <select id="getHardwarelibChipPage" resultMap="hardwarelibChipMap">
+        SELECT
+        id,
+        chip_name,
+        chip_id,
+        user_id,
+        core_num,
+        mem_size,
+        recv_rate,
+        hr_type_name,
+        apply_state,
+        apply_desc,
+        backup_info,
+        version,
+        chip_data,
+        create_time,
+        update_time,
+        del_flag
+        FROM gjk_hardwarelib_chip
+        <where>
+            <if test="hardwarelibChip.id != null and hardwarelibChip.id.trim() != ''">
+                AND id = #{hardwarelibChip.id}
+            </if>
+            <if test="hardwarelibChip.chipName != null and hardwarelibChip.chipName.trim() != ''">
+                AND chip_name = #{hardwarelibChip.chipName}
+            </if>
+            <if test="hardwarelibChip.chipId != null and hardwarelibChip.chipId.trim() != ''">
+                AND chip_id = #{hardwarelibChip.chipId}
+            </if>
+            <if test="hardwarelibChip.userId != null and hardwarelibChip.userId.trim() != ''">
+                AND user_id = #{hardwarelibChip.userId}
+            </if>
+            <if test="hardwarelibChip.coreNum != null and hardwarelibChip.coreNum.trim() != ''">
+                AND core_num = #{hardwarelibChip.coreNum}
+            </if>
+            <if test="hardwarelibChip.memSize != null and hardwarelibChip.memSize.trim() != ''">
+                AND mem_size = #{hardwarelibChip.memSize}
+            </if>
+            <if test="hardwarelibChip.recvRate != null and hardwarelibChip.recvRate.trim() != ''">
+                AND recv_rate = #{hardwarelibChip.recvRate}
+            </if>
+            <if test="hardwarelibChip.hrTypeName != null and hardwarelibChip.hrTypeName.trim() != ''">
+                AND hr_type_name = #{hardwarelibChip.hrTypeName}
+            </if>
+            <if test="hardwarelibChip.applyState != null and hardwarelibChip.applyState.trim() != ''">
+                AND apply_state = #{hardwarelibChip.applyState}
+            </if>
+            <if test="hardwarelibChip.applyDesc != null and hardwarelibChip.applyDesc.trim() != ''">
+                AND apply_desc = #{hardwarelibChip.applyDesc}
+            </if>
+            <if test="hardwarelibChip.backupInfo != null and hardwarelibChip.backupInfo.trim() != ''">
+                AND backup_info = #{hardwarelibChip.backupInfo}
+            </if>
+            <if test="hardwarelibChip.version != null and hardwarelibChip.version.trim() != ''">
+                AND version = #{hardwarelibChip.version}
+            </if>
+            <if test="hardwarelibChip.chipData != null">
+                AND chip_data = #{hardwarelibChip.chipData}
+            </if>
+            <if test="hardwarelibChip.createTime != null and hardwarelibChip.createTime.trim() != ''">
+                AND create_time = #{hardwarelibChip.createTime}
+            </if>
+            <if test="hardwarelibChip.updateTime != null and hardwarelibChip.updateTime.trim() != ''">
+                AND update_time = #{hardwarelibChip.updateTime}
+            </if>
+            <if test="hardwarelibChip.delFlag != null and hardwarelibChip.delFlag.trim() != ''">
+                AND del_flag = #{hardwarelibChip.delFlag}
+            </if>
+        </where>
+    </select>
 
 
 </mapper>

@@ -26,47 +26,53 @@ export const tableOption = {
   delBtn: false,
   addBtn: false,
   column: [
-	  /* {
+    /* {
       label: 'id',
       prop: 'id'
     }, */
-	  {
+    {
       label: '机箱名称',
       prop: 'caseName'
     },
-	  /* {
-      label: '唯一标识符',
-      prop: 'sn'
-    }, */
-	  /* {
+    /* {
       label: '机箱id',
       prop: 'caseId'
-    },
-	  {
-      label: '用户id',
-      prop: 'userId'
     }, */
-	  /* {
-      label: '创建时间',
-      prop: 'createTime'
-    },
-	  {
-      label: '更新时间',
-      prop: 'updateTime'
-    }, */
-	  /* {
-      label: '说明',
-      prop: 'description'
-    }, */
-	  /* {
-      label: '逻辑删除',
-      prop: 'delFlag'
-    }, */
-	  {
+    {
       label: '板子数量',
       prop: 'bdNum'
     },
-	  /*{
+    {
+      label: '备注信息',
+      prop: 'backupInfo'
+    },
+    {
+      label: '用户',
+      prop: 'userId',
+      type: 'select',
+      filter: true,
+      dicData: [/*{ label: '男', value: '男' },
+        { label: '女', value: '女' }*/],
+      /*filterMethod:function(value, row, column) {
+        console.log("row",row)
+        return row.userId === value;
+      }*/
+    },
+    {
+      label: '创建时间',
+      prop: 'createTime'
+    },
+    {
+      label: '更新时间',
+      prop: 'updateTime'
+    },
+
+    /* {
+      label: '逻辑删除',
+      prop: 'delFlag'
+    }, */
+
+    /*{
       label: '版本',
       prop: 'version'
     }*/

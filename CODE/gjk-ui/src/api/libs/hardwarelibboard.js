@@ -63,13 +63,6 @@ export function saveBoard(obj){
     data: obj
   })
 }
-//返回芯片数据 
-export function getChipData() {
-  return request({
-    url: '/libs/hardwarelibboard/getChipData',
-    method: 'get'
-  })
-}
 //编辑主板
 export function updateBoard(obj){
   return request({
@@ -78,10 +71,11 @@ export function updateBoard(obj){
     data: obj
   })
 }
-//拿到机箱json
-export function getBoardJson(id) {
+
+//获取所有板卡
+export function getBoardList(id) {
   return request({
-    url: '/libs/hardwarelibboard/getBoardJson/' + id,
+    url: '/libs/hardwarelibboard/getBoardList',
     method: 'get'
   })
 }
