@@ -86,6 +86,8 @@ var addPasteData = {}
 var compUpdateState = {}
 //删除构件列表
 gjkCompId = ""
+//构件所属部件map
+var componentMap = new Map()
 // 子向父传参
 function handleMessageToParent(cmd, gjIdAndTemId) {
 	window.parent.postMessage({
@@ -145,12 +147,9 @@ function handleMessageFromParent(event) {
 			loadAddPointParam = data.params.addPointParam
 			//alert("1111111"+loadState)
 			break
-		case 'clickSimulation':
-			if (data.params) {
-				$(".fz").show();
-			} else {
-				$(".fz").hide();
-			}
+		case 'sendCompFzData':
+			console.log("989898989898888888888888")
+			componentMap.set(data.params.compId,data.params.compData)
 			break
 		case 'alignment':
 			var id = ""
@@ -235,7 +234,7 @@ function dropNode(template, position) {
 	position.left -= $('#side-buttons').outerWidth()
 	position.left = position.left + $(areaId).scrollLeft()
 	position.top = position.top + $(areaId).scrollTop()
-	//console.log("position+++++++++++++++",position)
+	console.log("position+++++++++++++++",position)
 	//position.id = uuid.v1()
 	position.id = createNum()
 	console.log("生成的id", position.id)
@@ -465,7 +464,7 @@ function addDraggable(id) {
 	jsPlumb.draggable(id, {
 		containment: 'parent',
 		//正在移动
-		drag: function (a, b, c) {
+		drag: function () {
 			if (isNode(id)) {
 				var t0 = $(this).context.offsetTop;
 				var h0 = $(this).context.offsetLeft;
@@ -482,7 +481,7 @@ function addDraggable(id) {
 					if (t0 + t < 0 || h0 + h < 150) {
 						return
 					}
-					$a.offset({ "top": t0 + t, "left": h0 + h });
+					$a.offset({ "top": t0 + t - $(areaId).scrollTop(), "left": h0 + h - $(areaId).scrollLeft()});
 					jsPlumb.setSuspendDrawing(false, true);
 
 				}
@@ -490,7 +489,7 @@ function addDraggable(id) {
 
 		},
 		//开始移动
-		start: function (a, b) {
+		start: function () {
 			//alert("开始移动")
 			dragNode = {}
 			oldPosition = []
@@ -502,6 +501,7 @@ function addDraggable(id) {
 				dragNode.oldPosition = oldPosition
 				var t0 = $(this).context.offsetTop;
 				var h0 = $(this).context.offsetLeft;
+				//console.log("开始移动",$(this))
 				var arr = $(".ui-selected").toArray();
 				for (var i = 0; i < arr.length; i++) {
 					$a = $(arr[i]);
@@ -511,7 +511,7 @@ function addDraggable(id) {
 					var t1 = $a.context.offsetTop;
 					var h1 = $a.context.offsetLeft;
 					topList[i] = t1 - t0;
-					leftList[i] = h1 - h0 + 140; //220
+					leftList[i] = h1 - h0 + 145; //220
 				}
 			} else {
 				oldPosition.push(saveNodePosition(id))
@@ -666,6 +666,9 @@ var canvasState = false
 
 //入口方法
 function main() {
+	let dropDiv = document.getElementById("drop-bg")
+	dropDiv.scrollTop = 1800
+	dropDiv.scrollLeft = 2300
 	window.clearInterval(int);
 	jsPlumb.setContainer("drop-bg");
 	appendDiv();
@@ -1231,7 +1234,6 @@ function emptyNode(id) {
 //需保存到ctrlZ数组中的对象
 var connInfoObj = {}
 jsPlumb.bind("connection", function (connInfo, originalEvent) {
-	//console.log("1111111111111",connInfo)
 	if (isConnection) {
 		connInfoObj = {}
 		//console.log(connInfo)
@@ -1246,19 +1248,52 @@ jsPlumb.bind("connection", function (connInfo, originalEvent) {
 	//console.log("保存连线对象",connectionObj)
 
 })
+//双击连线出现仿真图标
+jsPlumb.bind("dblclick", function (conn, originalEvent) {
+		connectionObjClick = {};
+		console.log("双击获取连线数据",conn)
+		let startId = conn.sourceId
+		let endId = conn.targetId
+		if(componentMap.get(startId) === componentMap.get(endId)){
+			handleMessageToParent("returnFZInfo", "所选连线俩端构件属于同一组件");
+		}else{
+			let id = createNum()
+			conn.setLabel(function(){
+				return '<div class ="fz" id = "'+id+'" style="width:20px;height:12px;"></div>'
+			})
+			$('#' + id).attr('tabindex', 0);
+			$('#' + id).focus();
+			$("#"+id).bind("click",function(){
+				document.getElementById(id).onkeydown = function (e) {
+					if (e.keyCode == 46) {
+						$("#"+id).remove()	
+					}
+				}
+				return false
+			})
+			$("#"+id).bind("dblclick",function(){
+				handleMessageToParent("returnFZ", "");
+			})
+		}
+		
+})
 //var removeConnection; //点击连线所获取的对象
 var connectionObj = {};//连线关系
 var connectionObjClick = {}
 //删除连线
 jsPlumb.bind("click", function (conn, originalEvent) {
+	//alert("单机连线")
 	connectionObjClick = {};
 	//console.log(connectionObjClick)
 	//conn.getPaintStyle().stroke = "red"
 	//conn.getPaintStyle().strokeStyle = "red"
+	console.log("连线单击触发")
 	connectionObjClick.removeConnection = conn
 	//console.log(conn)
 	connectionObjClick.connSourceUUid = conn.endpoints[0].getUuid();
 	connectionObjClick.connTargetUUid = conn.endpoints[1].getUuid()
+
+	
 	//console.log(connectionObjClick)
 	//console.log(conn)
 	// document.onkeydown=function(event){
@@ -1396,7 +1431,7 @@ jsPlumb.bind("connectionDragStop", function (info) {
 			}
 		}
 		if (!isConnect) {
-			//jsPlumb.detach(info);
+			jsPlumb.detach(info);
 			handleMessageToParent("nodeTypeNotMatch", "节点类型不匹配");
 		}
 	}
@@ -1512,7 +1547,8 @@ document.onkeydown = function () {
 			nodePosition.left = div.offsetLeft
 			nodePosition.id = idList[i]
 			oldPosition.push(nodePosition)
-			div.style.left = Math.min($(".div_right").width(), div.offsetLeft + 10) + "px"
+			//div.style.left = Math.min($(".div_right").width(), div.offsetLeft + 10) + "px"
+			div.style.left = div.offsetLeft + 10
 		}
 		dragNode.oldPosition = oldPosition;
 		jsPlumb.setSuspendDrawing(false, true);
@@ -1556,14 +1592,27 @@ document.onkeydown = function () {
 		dragNode = {}
 		for (var i = 0; i < idList.length; i++) {
 			var div = document.getElementById(idList[i])
+			var div1 = document.getElementById("drop-bg")
 			//保存移动前的位置
 			nodePosition = {}
 			nodePosition.top = div.offsetTop
 			nodePosition.left = div.offsetLeft
 			nodePosition.id = idList[i]
 			oldPosition.push(nodePosition)
-			div.style.top = Math.min($(".div_right").height(), div.offsetTop + 10) + "px"
+			//div.style.top = Math.min($(".div_right").height(), div.offsetTop + 10) + "px"
+			//div.style.top = div.offsetTop + 10 +"px"
+			//if(div.style.top + div.style.height >= $(".div_right").height()){
+				//div1.scrollTop = 10
+			//}
+			// if(isDropTop()){
+			// 	//	div1.scrollTop += 10
+			// 	console.log("当前滚动条高度",$(areaId).scrollTop())
+			// 	div.style.top = div.offsetTop +10*3 + "px"
+			// }else{
+			// 	div.style.top = div.offsetTop + 10 +"px"
+			// }
 		}
+		
 		dragNode.oldPosition = oldPosition;
 		jsPlumb.setSuspendDrawing(false, true);
 		//保存移动后的位置
@@ -3139,6 +3188,26 @@ function limitY() {
 	}
 }
 
+//判断节点在移动的过程中是否达到当前画布浏览器窗口的top
+function isDropTop(){
+	let isDropTop = false
+	console.log("浏览器的top",$(".div_right").height())
+	
+	for(let i = 0; i<idList.length; i++){
+		let div = document.getElementById(idList[i])
+		console.log("节点top",div.offsetTop)
+		console.log("节点的height",div.offsetHeight)
+		console.log("节点的div",div)
+		console.log(idList)
+		if((div.offsetTop + div.offsetHeight) >= $(".div_right").height()){
+			isDropTop = true
+		}
+	}
+	return isDropTop
+}
+
+
+
 //全屏方法代码
 function toggleFullScreen() {
 	if (!document.fullscreenElement && // alternative standard method
@@ -3195,5 +3264,9 @@ function connectionCheck(styleColor) {
 	});
 	jsPlumb.setSuspendDrawing(false, true);
 }
+
+$(".fz").bind('dbclick', function (event) {
+	console.log("仿真数据",event)
+})
 
 //})();

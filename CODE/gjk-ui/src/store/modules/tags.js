@@ -31,7 +31,8 @@ const navs = {
   state: {
     tagList: getStore({ name: 'tagList' }) || [],
     tag: getStore({ name: 'tag' }) || tagObj,
-    tagWel: tagWel
+    tagWel: tagWel,
+    isSave:''
   },
   actions: {},
   mutations: {
@@ -48,6 +49,9 @@ const navs = {
       state.tagList.push(action)
       setFistTag(state.tagList)
       setStore({ name: 'tagList', content: state.tagList, type: 'session' })
+    },
+    IS_SAVE: (state,param) =>{
+      state.isSave = param
     },
     DEL_TAG: (state, action) => {
       state.tagList = state.tagList.filter(item => {

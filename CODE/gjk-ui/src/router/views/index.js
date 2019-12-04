@@ -78,6 +78,10 @@ export default [{
                 title: '流程模型'
             }
         }, {
+            path: 'simulator',
+            name: '仿真',
+            component: () => import('@/page/common/codeEditor'),
+        },{
             path: 'codeEditor',
             name: '编辑',
             component: () => import('@/page/common/codeEditor')
