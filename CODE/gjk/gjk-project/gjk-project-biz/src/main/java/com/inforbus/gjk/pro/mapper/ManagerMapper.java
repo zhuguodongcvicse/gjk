@@ -3,8 +3,12 @@ package com.inforbus.gjk.pro.mapper;
 import java.util.List;
 import java.util.Map;
 
-import com.inforbus.gjk.admin.api.entity.BSP;
+import com.inforbus.gjk.admin.api.entity.*;
+import com.inforbus.gjk.common.core.entity.CompStruct;
+import com.inforbus.gjk.common.core.entity.Structlibs;
 import com.inforbus.gjk.pro.api.entity.*;
+import com.inforbus.gjk.pro.api.entity.GjkPlatform;
+import com.inforbus.gjk.pro.api.entity.Software;
 import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -195,4 +199,64 @@ public interface ManagerMapper extends BaseMapper<ProjectFile> {
 	 * @return
 	 */
 	List<BSP> getAllBSPListByIdIn(@Param("ids") String ids);
+
+	/**
+	 * 查询表列信息
+	 *
+	 * @param tableName 表名称
+	 * @return
+	 */
+	List<Map<String, String>> queryColumns(String tableName);
+
+	/**
+	 * 根据多个ID查询数据列表 软件框架和平台关系
+	 * @param ids
+	 * @return
+	 */
+	List<SoftwareDetail> getSoftwareDetailBySoftwareIdIn(@Param("ids") String ids);
+
+	/**
+	 * 根据多个ID查询数据列表 软件框架文件
+	 * @param ids
+	 * @return
+	 */
+	List<SoftwareFile> getSoftwareFileBySoftwareIdIn(@Param("ids") String ids);
+
+	/**
+	 * 根据多个ID查询数据列表 BSP和平台关系
+	 * @param ids
+	 * @return
+	 */
+	List<BSPDetail> getBSPDetailByBSPIdIn(@Param("ids") String ids);
+
+	/**
+	 * 根据多个ID查询数据列表 BSP文件
+	 * @param ids
+	 * @return
+	 */
+	List<BSPFile> getBSPFileByBSPIdIn(@Param("ids") String ids);
+	/**
+	 * 根据多个ID查询数据列表 结构库
+	 * @param ids
+	 * @return
+	 */
+	List<CommonComponent> getCommonComponentByIdIn(@Param("ids") String ids);
+	/**
+	 * 根据多个ID查询数据列表 结构库详情
+	 * @param ids
+	 * @return
+	 */
+	List<CommonComponentDetail> getCommonComponentDetailByCompIdIn(@Param("ids") String ids);
+	/**
+	 * 根据构件库id集合，获取构件库和结构体关系数据
+	 * @param compIdList
+	 * @return
+	 */
+	List<CompStruct> getCompStructByCompIdList(@Param("compIdList") List<String> compIdList);
+	/**
+	 * 得到结构体数据，根据id集合
+	 * @param idList
+	 * @return
+	 */
+	List<Structlibs> getStructlibsByIdList(@Param("idList") List<String> idList);
 }
