@@ -252,9 +252,10 @@ public class ExternalIOTransUtils {
 	 * @param packinfoPath          客户自存自取路径
 	 * @param cmpDeployPlanFilePath 客户自存自取路径
 	 */
-	public static void appTaskExport(String userName, int appId, String appName, String appPath, String sysconfigPath,
+	public static boolean appTaskExport(String userName, int appId, String appName, String appPath, String sysconfigPath,
 			String packinfoPath, String cmpDeployPlanFilePath) {
-		appInterface.appTaskExport(appId, appName, appPath, sysconfigPath, packinfoPath, cmpDeployPlanFilePath);
+		AppControl appControl = new AppControl();
+		return appControl.appTaskExport(userName, appId, appName, appPath, sysconfigPath, packinfoPath, cmpDeployPlanFilePath);
 	}
 
 	/**

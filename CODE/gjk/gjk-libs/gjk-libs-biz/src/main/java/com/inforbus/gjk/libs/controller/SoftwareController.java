@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.TreeUtil;
+import com.inforbus.gjk.common.core.util.UnZipFilesUtils;
 import com.inforbus.gjk.common.log.annotation.SysLog;
 import com.inforbus.gjk.libs.api.dto.SoftwareDTO;
 import com.inforbus.gjk.libs.api.entity.Software;
@@ -30,6 +31,7 @@ import com.inforbus.gjk.libs.service.SoftwareService;
 import lombok.AllArgsConstructor;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -170,7 +172,7 @@ public class SoftwareController {
 	}
 
 	@PostMapping("/uploadFiles/{versionDisc}")
-	public String uploadFiles(@RequestParam(value = "file") MultipartFile[] files, @PathVariable String versionDisc) {
+	public String uploadFiles(@RequestParam(value = "file") MultipartFile[] files, @PathVariable String versionDisc) throws IOException {
 //		String path = "E:/tmp/";
 		String path = softwarePath;
 		String res = path + ",";
@@ -178,7 +180,9 @@ public class SoftwareController {
 			System.out.println("file.getOriginalFilename():" + file.getOriginalFilename());
 			if (file != null) {
 				String p = path + "gjk/software/" + versionDisc + ".0" + File.separator + file.getOriginalFilename();
-				String ss = p.substring(0, p.lastIndexOf("/"));
+				String bb = p.replaceAll("\\\\", "/");
+				String ss = p.substring(0, bb.lastIndexOf("/")) + File.separator;
+				File zipfile = new File(bb);
 				File ff = new File(ss);
 				if (ff.exists()) {
 					ff.delete();
@@ -192,6 +196,10 @@ public class SoftwareController {
 				try {
 					// 上传文件
 					file.transferTo(new File(p));
+					//调用解压方法：zipPath 压缩文件地址（全路径）      descDir 指定目录（全路径）
+					UnZipFilesUtils.unZipFile(bb, ss);
+					//解压完删除压缩包
+					zipfile.delete();
 //					return p;
 				} catch (Exception e) {
 					res += "文件 " + file.getOriginalFilename() + " 上传失败\n";

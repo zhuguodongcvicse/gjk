@@ -432,7 +432,7 @@ public class AppController {
 	 */
 
 	@PostMapping(value = "/appTaskExport")
-	public void appTaskExport(@RequestBody AppDataDTO appDataDTO) {
+	public R appTaskExport(@RequestBody AppDataDTO appDataDTO) {
 		String bb = appDataDTO.getSysconfigPath().replaceAll("\\\\", "/");
 		// String aa = bb.substring(0,bb.lastIndexOf("/",bb.indexOf("/")+1));
 		String aa = bb.substring(0, bb.lastIndexOf("/"));
@@ -444,9 +444,17 @@ public class AppController {
 		String selfGenerateCodeResult = gitFilePath + aa + File.separator + softToHardResult + File.separator
 				+ "组件划分方案.xml";
 		String appPath = gitFilePath + aa + File.separator + appDataDTO.getAppProPath();
-		// 还未给接口，自己模拟的接口 + File.separator +
-		ExternalIOTransUtils.appTaskExport(appDataDTO.getUserName(), appDataDTO.getFlowId(), appDataDTO.getAppName(),
-				appPath, gitFilePath + appDataDTO.getSysconfigPath(), selfSoftToHardResult, selfGenerateCodeResult);
+		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
+				boolean returnVal;
+				try {
+					// 调用注销接口
+					returnVal = ExternalIOTransUtils.appTaskExport(appDataDTO.getUserName(), appDataDTO.getFlowId(), appDataDTO.getAppName(),
+							appPath, gitFilePath + appDataDTO.getSysconfigPath(), selfSoftToHardResult, selfGenerateCodeResult);
+				} catch (Exception e) {
+					e.printStackTrace();
+					returnVal = false;
+				}
+		return new R<>(returnVal);
 	}
 
 	/**
