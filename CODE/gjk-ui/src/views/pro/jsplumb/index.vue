@@ -176,7 +176,8 @@ export default {
       bottonCheckComp: true,
       bottonState: "",
       dialogVisibleOfCloseRouter: false,
-      dialogNext: ""
+      dialogNext: "",
+      flowFilePath: "" //流程建模文件路径
     };
   },
   //监听属性 类似于data概念
@@ -657,7 +658,7 @@ export default {
         case "returnFZ":
           this.$router.push({
             path: "/comp/manager/simulator",
-            query: ""
+            query: { flowFilePath: this.flowFilePath, startId: data.params.startId,endId:data.params.endId }
           });
           break;
       }
@@ -673,7 +674,7 @@ export default {
       });
       handlerSaveSysXml(param, this.$route.query.processId).then(res => {
         // console.log("handlerSaveSysXml", res.data.data);
-        // console.log("列表", res.data);
+        this.flowFilePath = res.data.data
         editProJSON(
           JSON.parse(this.saveParams.saveflowChartJson),
           this.$route.query.processId
@@ -704,11 +705,11 @@ export default {
          * @param {store中取} tagList
          * @param {store中取} tag1
          */
-        if (this.isSave == 3) {
-          var tag1 = this.tag;
-          console.log("当前路由", this.$route);
-          menuTag(this.$route.path, "remove", this.tagList, tag1);
-        }
+        // if (this.isSave == 3) {
+        //   var tag1 = this.tag;
+        //   console.log("当前路由", this.$route);
+        //   menuTag(this.$route.path, "remove", this.tagList, tag1);
+        // }
       });
     },
     customFileUpload(event) {

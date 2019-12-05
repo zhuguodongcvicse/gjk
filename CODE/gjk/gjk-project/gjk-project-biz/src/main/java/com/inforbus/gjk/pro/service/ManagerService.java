@@ -67,7 +67,7 @@ public interface ManagerService extends IService<ProjectFile> {
 	 * @param proDetailId
 	 * @return
 	 */
-	boolean createXmlFile(XmlEntityMap entity, String proDetailId);
+	String createXmlFile(XmlEntityMap entity, String proDetailId);
 
 	/**
 	 * @Title: getProDetailById

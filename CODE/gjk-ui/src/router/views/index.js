@@ -80,7 +80,7 @@ export default [{
         }, {
             path: 'simulator',
             name: '仿真',
-            component: () => import('@/page/common/codeEditor'),
+            component: () => import('@/views/pro/project/Simulation/simulation'),
         },{
             path: 'codeEditor',
             name: '编辑',
