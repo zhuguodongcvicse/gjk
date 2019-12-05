@@ -65,21 +65,20 @@ visoConfig.baseStyle = {
     //   length: 10,
     //   location: 0.7
     // }],
-    ['Label', {
-      label:'<div class ="fz" style="width:16px;height:9px; display:none"></div>',//<div style="border:1px solid red">11</div>
-      cssClass: '',
-      labelStyle: {
-        color: 'red'
-      },
-      events: {
-        click: function (labelOverlay, originalEvent) {
-         // console.log('click on label overlay for :' + labelOverlay.component)
-          console.log(labelOverlay)
-          console.log(originalEvent)
-        }
-      }
-    }]
+    // ['Label', {
+    //   label:'<div class ="fz" style="width:20px;height:12px;"></div>',//<div style="border:1px solid red">11</div>
+    //   //label:'<div style="border:1px solid red">11</div>',
+    //   cssClass: '',
+    //   labelStyle: {
+    //     color: 'red'
+    //   },
+    //   events: {
+    //     click: function (labelOverlay, originalEvent) {
+    //      alert(1111)
+    //     }
+    //   }
+    // }]
   ]
 }
 
-visoConfig.baseArchors = ['RightMiddle', 'LeftMiddle']
+// visoConfig.baseArchors = ['RightMiddle', 'LeftMiddle']

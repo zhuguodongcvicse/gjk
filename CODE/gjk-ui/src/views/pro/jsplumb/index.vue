@@ -8,17 +8,16 @@
         </el-input>
         <el-button-group>
           <el-button type="primary" plain size="small" @click="sendMessage('save')">保存</el-button>
-         <el-button
-          type="primary"
-          plain
-          size="small"
-          @click="bottonCheckComp = !bottonCheckComp"
-         >{{bottonCheckComp?'检查更新':'还原'}}</el-button>
-          <!-- <el-button type="primary" plain size="small" @click="sendMessage('completeCheck')">完备性检查</el-button> -->
+          <el-button
+            type="primary"
+            plain
+            size="small"
+            @click="bottonCheckComp = !bottonCheckComp"
+          >{{bottonCheckComp?'检查更新':'还原'}}</el-button>
+          <el-button type="primary" plain size="small" @click="sendMessage('completeCheck')">完备性检查</el-button>
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('loading')">加载</el-button> -->
-          <!-- <el-button type="primary" plain size="small" @click="sendMessage('simulation')">仿真</el-button> -->
+          <el-button type="primary" plain size="small" @click="sendMessage('simulation')">仿真</el-button>
           <el-button type="primary" plain size="small" @click="sendMessage('exportJSON')">导出</el-button>
-
           <!-- <input type="file" @change="getFile($event)"> -->
           <el-upload
             class="upload-demo inline-block"
@@ -104,6 +103,19 @@
         />
       </div>
     </el-main>
+    <el-dialog
+      title="提示"
+      :visible.sync="dialogVisibleOfCloseRouter"
+      class="libs_hardwarelibinf_addinf_14s"
+      width="30%"
+    >
+      <!--  :before-close="handleClose" -->
+      <span>是否保存当前模型？</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="closeRouter()">不保存</el-button>
+        <el-button type="primary" @click="saveFlowData()">保存</el-button>
+      </span>
+    </el-dialog>
   </el-container>
 </template>
 <script>
@@ -117,12 +129,14 @@ import {
   findProJSON,
   exportFile,
   importFile,
-  removeCompProject
+  removeCompProject,
+  completeCheck
 } from "@/api/pro/project";
 import { handlerSaveSysXml } from "@/api/pro/manager";
 import { remote } from "@/api/admin/dict";
 import { randomLenNum, randomUuid, deepClone, getObjType } from "@/util/util";
 import { removeCompApproval, checkApproval } from "@/api/libs/approval";
+import { menuTag } from "@/util/closeRouter";
 // import screenfull from 'screenfull'
 //例如：import 《组件名称》 from '《组件路径》';
 export default {
@@ -160,12 +174,15 @@ export default {
       index: 0,
       compUpdateState: {}, //构件更新状态
       bottonCheckComp: true,
-      bottonState: ""
+      bottonState: "",
+      dialogVisibleOfCloseRouter: false,
+      dialogNext: "",
+      flowFilePath: "" //流程建模文件路径
     };
   },
   //监听属性 类似于data概念
   computed: {
-    // ...mapGetters(["saveXmlMaps"])
+    ...mapGetters(["isSave", "tag", "tagList"])
   },
   components: {
     "gjk-iframe": gjkIframe,
@@ -178,6 +195,15 @@ export default {
       deep: true, //对象内部的属性监听，也叫深度监听
       handler: function(param) {
         this.isShow_14s = param.length > 0 ? true : false;
+      }
+    },
+    isSave: {
+      handler: function() {
+        if (this.isSave == "2") {
+          this.postMessageData.cmd = "clickCompSave";
+          this.postMessageData.params = "save";
+          this.$refs.gjkIframe.sendMessage(this.postMessageData);
+        }
       }
     },
     bottonCheckComp: {
@@ -219,10 +245,10 @@ export default {
             arrMap = deepClone(this.xmlMaps[newParam.gjId]); //从基础的数据中获取
           }
           arrMap.attributeMap.id = newParam.tmpId;
-//          console.log(
-//           "arrMap.xmlEntityMaps[0].xmlEntityMaps",
-//            arrMap.xmlEntityMaps[0].xmlEntityMaps
-//         );
+          //          console.log(
+          //           "arrMap.xmlEntityMaps[0].xmlEntityMaps",
+          //            arrMap.xmlEntityMaps[0].xmlEntityMaps
+          //         );
           this.$set(
             arrMap.xmlEntityMaps[0].xmlEntityMaps,
             "uids",
@@ -302,6 +328,7 @@ export default {
         } else if (newParam.state === 5) {
           this.saveXmlMaps.xmlEntityMaps = [];
         }
+        console.log("itemitemitemitemitem",this.tmpMaps)
       },
       deep: true //对象内部的属性监听，也叫深度监听
     },
@@ -372,6 +399,7 @@ export default {
           //保存流程模型
           this.saveProcessModel(xmlEntityMap);
         }
+                console.log("itemitemitemitemitem",this.tmpMaps)
       }
     }
   },
@@ -396,7 +424,17 @@ export default {
         const item = dBXmlMaps.xmlEntityMaps[key];
         if (item.lableName === nameType) {
           if (item.lableName === "层级属性") {
-            // console.log("234567890-09876543", saveComp);
+            for (let index in deepClone(saveComp)) {
+              const item = deepClone(saveComp)[index];
+              if (item.lableName == "所属部件") {
+                this.postMessageData.cmd = "sendCompFzData";
+                this.postMessageData.params = {
+                  compId: dBXmlMaps.attributeMap.id,
+                  compData: item.attributeMap.name
+                };
+                this.$refs.gjkIframe.sendMessage(this.postMessageData);
+              }
+            }
             this.refreshCjParamAll(deepClone(saveComp));
           }
           dBXmlMaps.xmlEntityMaps[key].xmlEntityMaps = saveComp;
@@ -451,7 +489,7 @@ export default {
         this.xmls = response.data.data.xmls;
         // 设置所有构件XMLMaps
         this.xmlMaps = response.data.data.xmlMaps;
-        // console.log("设置所有构件XMLMaps", this.xmlMaps);
+        console.log("设置所有构件XMLMaps", this.tmpMaps);
       });
     },
     sendMessage(state) {
@@ -488,6 +526,7 @@ export default {
         this.postMessageData.params = "save";
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
       } else if (state === "save") {
+        this.$store.commit("IS_SAVE", "3");
         this.postMessageData.cmd = "clickCompSave";
         this.postMessageData.params = "save";
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
@@ -516,8 +555,12 @@ export default {
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
         //exportFile(this.$route.query.processId);
       } else if (state === "completeCheck") {
-        this.postMessageData.cmd = "completeCheck";
-        this.$refs.gjkIframe.sendMessage(this.postMessageData);
+        completeCheck(this.$route.query.processId).then(res => {
+          console.log("返回数据", res.data.data);
+        });
+
+        // this.postMessageData.cmd = "completeCheck";
+        // this.$refs.gjkIframe.sendMessage(this.postMessageData);
       }
       // else if(state === "checkComp"){
       //   console.log(this.dtos)
@@ -604,6 +647,20 @@ export default {
             message: "节点类型不匹配",
             type: "success"
           });
+          break;
+        case "returnFZInfo":
+          this.$message({
+            showClose: true,
+            message: data.params,
+            type: "success"
+          });
+          break;
+        case "returnFZ":
+          this.$router.push({
+            path: "/comp/manager/simulator",
+            query: { flowFilePath: this.flowFilePath, startId: data.params.startId,endId:data.params.endId }
+          });
+          break;
       }
     },
     //保存流程模型
@@ -617,7 +674,7 @@ export default {
       });
       handlerSaveSysXml(param, this.$route.query.processId).then(res => {
         // console.log("handlerSaveSysXml", res.data.data);
-        // console.log("列表", res.data);
+        this.flowFilePath = res.data.data
         editProJSON(
           JSON.parse(this.saveParams.saveflowChartJson),
           this.$route.query.processId
@@ -639,6 +696,20 @@ export default {
 
           // }, 1000);
         });
+        /**
+         * 组件computed: { ...mapGetters(["tagWel", "tagList", "tag", "website"]) },
+         * 声明var tag1 = this.tag
+         * 调用menuTag(this.$route.path, "remove", this.tagList, tag1);
+         * @param {当前路由的url} value
+         * @param {"remove"} action
+         * @param {store中取} tagList
+         * @param {store中取} tag1
+         */
+        // if (this.isSave == 3) {
+        //   var tag1 = this.tag;
+        //   console.log("当前路由", this.$route);
+        //   menuTag(this.$route.path, "remove", this.tagList, tag1);
+        // }
       });
     },
     customFileUpload(event) {
@@ -646,34 +717,33 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
-      })
-        .then(data => {
-          this.postMessageData.cmd = "cleanCanvas";
-          this.$refs.gjkIframe.sendMessage(this.postMessageData);
-          // console.log("el-upload数据", event);
-          this.file = event.file;
-          // console.log("文件", this.file);
-          var formData = new FormData();
-          formData.append("file", this.file);
-          //console.log(formData);
-          importFile(formData).then(res => {
-            //console.log("导入后的数据", res.data.data);
-            res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
-              if (tmp.lableName !== "arrow") {
-                /* 将查询的东西插入到临时 */
-                // this.tempParam.push(tmp);
-                // 使用map将 数据对应上
-                this.tmpMaps.set(tmp.attributeMap.id, tmp);
-              }
-            });
-            this.postMessageData.cmd = "clickCompLoading";
-            this.postMessageData.params = res.data.data.json;
-            this.$refs.gjkIframe.sendMessage(this.postMessageData);
+      }).then(data => {
+        this.postMessageData.cmd = "cleanCanvas";
+        this.$refs.gjkIframe.sendMessage(this.postMessageData);
+        // console.log("el-upload数据", event);
+        this.file = event.file;
+        // console.log("文件", this.file);
+        var formData = new FormData();
+        formData.append("file", this.file);
+        //console.log(formData);
+        importFile(formData).then(res => {
+          //console.log("导入后的数据", res.data.data);
+          res.data.data.xmlJson.xmlEntityMaps.forEach(tmp => {
+            if (tmp.lableName !== "arrow") {
+              /* 将查询的东西插入到临时 */
+              // this.tempParam.push(tmp);
+              // 使用map将 数据对应上
+              this.tmpMaps.set(tmp.attributeMap.id, tmp);
+            }
           });
-        })
-        // .catch(function(err) {
-        //   next();
-        // });
+          this.postMessageData.cmd = "clickCompLoading";
+          this.postMessageData.params = res.data.data.json;
+          this.$refs.gjkIframe.sendMessage(this.postMessageData);
+        });
+      });
+      // .catch(function(err) {
+      //   next();
+      // });
       // if (confirm("是否清空当前画布构件")) {
       //   this.postMessageData.cmd = "cleanCanvas";
       //   this.$refs.gjkIframe.sendMessage(this.postMessageData);
@@ -730,6 +800,21 @@ export default {
         return false;
       }
       screenfull.toggle();
+    },
+    closeRouter() {
+      let next = this.dialogNext;
+      this.dialogVisibleOfCloseRouter = false;
+      next();
+    },
+    saveFlowData() {
+      let next = this.dialogNext;
+      this.dialogVisibleOfCloseRouter = false;
+      this.postMessageData.cmd = "clickCompSave";
+      this.postMessageData.params = "save";
+      this.$refs.gjkIframe.sendMessage(this.postMessageData);
+      setTimeout(() => {
+        next();
+      }, 1000);
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
@@ -761,44 +846,70 @@ export default {
   //     // }
   //   });
   // },
-  // beforeRouteUpdate(to, from, next) {
-  //   var _this = this;
-  //   this.$confirm("是否保存当前流程模型?", "提示", {
-  //     confirmButtonText: "确定",
-  //     cancelButtonText: "取消",
-  //     type: "warning"
-  //   })
-  //     .then(data => {
-  //       _this.postMessageData.cmd = "clickCompSave";
-  //       _this.postMessageData.params = "save";
-  //       _this.$refs.gjkIframe.sendMessage(_this.postMessageData);
-  //       setTimeout(() => {
-  //         next();
-  //       }, 1000);
-  //     })
-  //     .catch(function(err) {
-  //       next();
-  //     });
-  // },
-/*  beforeRouteLeave(to, from, next) {
-    var _this = this;
-    this.$confirm("是否保存当前流程模型?", "提示", {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
-      type: "warning"
-    })
-      .then(data => {
-        _this.postMessageData.cmd = "clickCompSave";
-        _this.postMessageData.params = "save";
-        _this.$refs.gjkIframe.sendMessage(_this.postMessageData);
-        setTimeout(() => {
-          next();
-        }, 1000);
-      })
-      .catch(function(err) {
+  beforeRouteUpdate(to, from, next) {
+    //alert(this.isSave)
+    if (this.isSave == "") {
+      // alert("update")
+      var _this = this;
+      _this.postMessageData.cmd = "clickCompSave";
+      _this.postMessageData.params = "save";
+      _this.$refs.gjkIframe.sendMessage(_this.postMessageData);
+      setTimeout(() => {
         next();
-      });
-  },*/
+      }, 1000);
+    }
+  },
+  beforeRouteLeave(to, from, next) {
+    //alert("99999-----",this.isSave)
+    switch (this.isSave) {
+      case "0":
+        next(false);
+        break;
+      case "1":
+        next();
+        break;
+      case "2":
+        next();
+        break;
+      case "3":
+        next();
+        break;
+      case "":
+        // this.dialogVisibleOfCloseRouter = true
+        // this.dialogNext = next
+        console.log("跳转的路由", to);
+        if (to.path != "/comp/manager/simulator") {
+          var _this = this;
+          _this.postMessageData.cmd = "clickCompSave";
+          _this.postMessageData.params = "save";
+          _this.$refs.gjkIframe.sendMessage(_this.postMessageData);
+          setTimeout(() => {
+            next();
+          }, 1000);
+        } else {
+          next();
+        }
+        break;
+    }
+    this.$store.commit("IS_SAVE", "");
+    // var _this = this;
+    // this.$confirm("是否保存当前流程模型?", "提示", {
+    //   confirmButtonText: "确定",
+    //   cancelButtonText: "取消",
+    //   type: "warning"
+    // })
+    //   .then(data => {
+    //     _this.postMessageData.cmd = "clickCompSave";
+    //     _this.postMessageData.params = "save";
+    //     _this.$refs.gjkIframe.sendMessage(_this.postMessageData);
+    //     setTimeout(() => {
+    //       next();
+    //     }, 1000);
+    //   })
+    //   .catch(function(err) {
+    //     next();
+    //   });
+  },
   beforeUpdate() {}, //生命周期 - 更新之前
   updated() {}, //生命周期 - 更新之后
   beforeDestroy() {}, //生命周期 - 销毁之前
