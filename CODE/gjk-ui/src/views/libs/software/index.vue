@@ -39,18 +39,18 @@
                 <el-form-item label="文件选择" label-width="90px">
                   <uploader-unsupport></uploader-unsupport>
                   <div>
-                    <!-- <uploader-btn >
-                        <template slot-scope="scope">
-                          <el-tag type="info" size="mini">选择文件</el-tag>
-                        </template>
-                    </uploader-btn>-->
+                    <uploader-btn>
+                      <template slot-scope="scope">
+                        <el-tag type="info" size="mini">选择文件</el-tag>
+                      </template>
+                    </uploader-btn>
                   </div>
                   <div>
-                    <uploader-btn :directory="true">
+                    <!-- <uploader-btn :directory="true">
                       <template slot-scope="scope">
                         <el-tag type="info" size="mini">选择文件夹</el-tag>
                       </template>
-                    </uploader-btn>
+                    </uploader-btn>-->
                   </div>
                 </el-form-item>
                 <el-form-item>
@@ -153,21 +153,21 @@
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
-            v-if="scope.row.applyState=='0'||scope.row.applyState==null?true:false"
-          ><el-tag>删除</el-tag></el-button>
-<!--          v-if="permissions.libs_software_del"-->
+            v-if="scope.row.applyState=='0'||scope.row.applyState==null||scope.row.applyState=='3'?true:false"
+          >删除</el-button>
+          <!--          v-if="permissions.libs_software_del"-->
           <el-tooltip class="item" effect="dark" content="入库" placement="top">
             <el-button
               type="primary"
               plain
               size="mini"
               @click="storageApply(scope.row,scope.index)"
-              v-if="scope.row.applyState=='0'||scope.row.applyState=='3'||scope.row.applyState==null?true:false"
-            ><el-tag>入库</el-tag></el-button>
+              v-if="scope.row.applyState=='0'||scope.row.applyState==null?true:false"
+            >入 库</el-button>
           </el-tooltip>
-          <span v-if="scope.row.applyState=='0'||scope.row.applyState=='3'||scope.row.applyState==null?false:true">
-            {{scope.row.applyState=='1'?"已申请":scope.row.applyState=='2'?"已入库":scope.row.applyState=='3'?"已驳回":scope.row.applyState=='4'?"驳回再申请":"未处理"}}
-          </span>
+          <span
+            v-if="scope.row.applyState=='0'||scope.row.applyState=='3'||scope.row.applyState==null?false:true"
+          >{{scope.row.applyState=='1'?"已申请":scope.row.applyState=='2'?"已入库":scope.row.applyState=='3'?"已驳回":scope.row.applyState=='4'?"驳回再申请":"未处理"}}</span>
         </template>
       </avue-crud>
     </basic-container>
@@ -357,12 +357,23 @@ export default {
             }
           })
           .then(() => {
-            this.software.filePath =
-              "gjk/software/" +
-              parseFloat(this.versionSize).toFixed(1) +
-              "/" +
-              this.folderName +
-              "/";
+            if (
+              this.folderName.substring(0, this.folderName.lastIndexOf("."))
+            ) {
+              this.software.filePath =
+                "gjk/software/" +
+                parseFloat(this.versionSize).toFixed(1) +
+                "/" +
+                this.folderName.substring(0, this.folderName.lastIndexOf(".")) +
+                "/";
+            } else {
+              this.software.filePath =
+                "gjk/software/" +
+                parseFloat(this.versionSize).toFixed(1) +
+                "/" +
+                this.folderName +
+                "/";
+            }
             //保持软件框架库信息
             this.software.version = this.versionSize;
             this.software.description = this.description;
@@ -393,15 +404,15 @@ export default {
                 }
               }
               this.filePathList.forEach((e, index) => {
-                let tmpSoftFile = JSON.parse(JSON.stringify(this.softwareFile));
-                tmpSoftFile.fileName = e.fileName;
-                tmpSoftFile.softwareId = softId;
-                tmpSoftFile.filePath =
-                  "gjk/software/" +
-                  parseFloat(this.versionSize).toFixed(1) +
-                  "/" +
-                  e.fileName;
-                saveSoftwareFile(tmpSoftFile).then(response => {});
+                // let tmpSoftFile = JSON.parse(JSON.stringify(this.softwareFile));
+                // tmpSoftFile.fileName = e.fileName;
+                // tmpSoftFile.softwareId = softId;
+                // tmpSoftFile.filePath =
+                //   "gjk/software/" +
+                //   parseFloat(this.versionSize).toFixed(1) +
+                //   "/" +
+                //   e.fileName;
+                // saveSoftwareFile(tmpSoftFile).then(response => {});
               });
             });
           })
@@ -554,6 +565,7 @@ export default {
 
     storageApplyDialogState() {
       this.storageApplyDialog = false;
+      this.reload();
     },
 
     storageApply(row, index) {
