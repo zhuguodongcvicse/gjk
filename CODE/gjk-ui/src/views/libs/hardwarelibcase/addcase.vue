@@ -2,7 +2,7 @@
   <el-dialog
     width="35%"
     class="libs_hardwarelibcase_addcase_14s"
-    title="板子设计"
+    title="机箱设计"
     :visible.sync="showInf.dialogFormVisible"
     :close-on-click-modal="false"
   >

@@ -73,6 +73,7 @@
             NProgress.configure({showSpinner: false});
             let formObj = this.$route.query[0];
             this.params = formObj
+            // console.log("formObj",formObj)
         },
         async mounted() {
             clearTimeout(this.timer); //清除延迟执行
