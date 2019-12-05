@@ -215,7 +215,6 @@
 		}
 
 		function loadFpgaBoardDatas() {
-
 			//显示下拉的cpu
       if (dragCpuList.length !== 0) {
           $("#selectStartCpu").empty();
@@ -235,7 +234,6 @@
           $("#selectEndCpu").html(selectEndCpuHtml);
       }
 			//显示下拉的接口
-			// if (selectInfCount != 0) {
       if (dragCpuList.length !== 0) {
           if (dragCpuList[0].infOfChipList.length != 0) {
               $("#selectStartInf").empty();
@@ -363,7 +361,6 @@
 				}
 			}
 			//console.log("dragdragdrag", JSON.parse(JSON.stringify(dragCpuList)))
-			selectInfCount++
 			//console.log("StartInfOfChip2", JSON.parse(JSON.stringify(StartInfOfChip)))
 		}
 		function deletecalculateBoardLink(obj) {

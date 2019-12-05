@@ -142,6 +142,13 @@
                     this.getList();
                 },
                 deep: true
+            },
+            dialogFormVisible: {
+                handler: function (params) {
+                    if (this.dialogFormVisible === false) {
+                        this.refreshChange()
+                    }
+                },
             }
         },
         methods: {
@@ -302,7 +309,7 @@
                     })
                     .then(data => {
                         _this.tableData.splice(index, 1);
-                        this.allCases.splice(index, 1)
+                        this.getList()
                         _this.$message({
                             showClose: true,
                             message: "删除成功",

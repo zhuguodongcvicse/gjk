@@ -728,7 +728,7 @@
 					parent: group,
 					html: '交换芯片'
 				});
-				//表格内容 
+				//表格内容
 				//console.log("boardArrqqqqqqq",boardArr)
 				//var arr0=['输入','双路','输入','双路','输入',];
 				var item0 = '';
@@ -771,7 +771,7 @@
 					parent: group,
 					html: '内部互联'
 				});
-				//表格内容 
+				//表格内容
 				//var arr0=['输入','双路','输入','双路','输入',];
 				// console.log("showStartCpuList",showStartCpuList)
 				// console.log("showStartInfList",showStartInfList)
@@ -805,9 +805,7 @@
 						switch (selectStartCpuValue) {
 							case dragCpuList[i].ID.toString():
 								if (dragCpuList[i].infOfChipList.length != 0) {
-									dragCpuList[i].infOfChipList = dragCpuList[i].infOfChipList
 									$("#selectStartInf").empty();
-									// console.log("dragCpuList[i].infOfChipList", dragCpuList[i].infOfChipList)
 									var selectStartInfHtml = '';
 									for (const j in dragCpuList[i].infOfChipList) {
 										if (dragCpuList[i].infOfChipList[j].ioType != 0) {
@@ -833,17 +831,14 @@
 						switch (selectEndCpuValue) {
 							case dragCpuList[i].ID.toString():
 								if (dragCpuList[i].infOfChipList.length != 0) {
-									dragCpuList[i].infOfChipList = dragCpuList[i].infOfChipList
 									$("#selectEndInf").empty();
 									var selectEndInfHtml = '';
-									// console.log("dragCpuList[i].infOfChipList", dragCpuList[i].infOfChipList)
 									for (const j in dragCpuList[i].infOfChipList) {
 										if (dragCpuList[i].infOfChipList[j].ioType != 1) {
 											var sHtml = '<option>' + dragCpuList[i].infOfChipList[j].ID + '</option>';
 											selectEndInfHtml = selectEndInfHtml + sHtml;
 										}
 									}
-									// console.log("selectEndInfHtml***",selectEndInfHtml)
 									$("#selectEndInf").html(selectEndInfHtml);
 								} else {
 									$("#selectEndInf").empty();
