@@ -1272,7 +1272,7 @@ jsPlumb.bind("dblclick", function (conn, originalEvent) {
 				return false
 			})
 			$("#"+id).bind("dblclick",function(){
-				handleMessageToParent("returnFZ", "");
+				handleMessageToParent("returnFZ", {startId:startId,endId:endId});
 			})
 		}
 		

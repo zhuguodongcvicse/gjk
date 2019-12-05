@@ -393,6 +393,7 @@ export default {
     },
     storageApplyDialogState() {
       this.storageApplyDialog = false;
+      this.reload();
     },
     getList() {
       this.tableLoading = true;

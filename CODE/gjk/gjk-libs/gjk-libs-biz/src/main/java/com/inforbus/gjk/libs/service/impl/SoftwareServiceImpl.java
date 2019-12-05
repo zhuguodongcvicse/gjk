@@ -34,6 +34,7 @@ import com.inforbus.gjk.libs.mapper.SoftwareMapper;
 import com.inforbus.gjk.libs.service.SoftwareService;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,6 +69,8 @@ public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> i
 	public Software saveSoftware(Software software) {
 		software.setDelFlag("0");
 		software.setId(IdGenerate.uuid());
+		software.setCreateTime(LocalDateTime.now());
+		software.setUpdateTime(LocalDateTime.now());
 //		software.setVersion(1.0);
 		baseMapper.saveSoftware(software);
 		return software;

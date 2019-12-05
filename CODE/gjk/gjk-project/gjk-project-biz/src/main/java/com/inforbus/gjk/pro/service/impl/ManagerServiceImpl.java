@@ -251,13 +251,13 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 *      java.lang.String, java.lang.String)
 	 */
 	@Override
-	public boolean createXmlFile(XmlEntityMap entity, String proDetailId) {
+	public String createXmlFile(XmlEntityMap entity, String proDetailId) {
 		ProjectFile projectFile = this.getById(proDetailId);
 		String filePath = null;
 		if (projectFile != null) {
 			filePath = proDetailPath + projectFile.getFilePath() + File.separator + projectFile.getFileName() + ".xml";
 		} else {
-			return false;
+			//return false;
 		}
 		File file = new File(filePath);
 		if (!file.getParentFile().exists()) {
@@ -265,7 +265,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		}
 		boolean flag = XmlFileHandleUtil.createXmlFile(entity, file);
 		JGitUtil.commitAndPush(file.getAbsolutePath(), "上传项目相关文件");
-		return flag;
+		return filePath;
 	}
 
 	/**

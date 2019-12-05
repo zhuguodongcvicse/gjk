@@ -233,6 +233,8 @@ export default {
       if (this.form.algorithmId) {
         this.formEdit = false;
         this.formStatus = "update";
+      }else{
+        alert("请选择一个节点进行编辑！！！");
       }
     },
     handlerAdd() {

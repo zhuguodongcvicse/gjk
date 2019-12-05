@@ -34,6 +34,7 @@ import com.inforbus.gjk.libs.mapper.BSPMapper;
 import com.inforbus.gjk.libs.service.BSPService;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,6 +69,8 @@ public class BSPServiceImpl extends ServiceImpl<BSPMapper, BSP> implements BSPSe
 	public BSP saveBSP(BSP bsp) {
 		bsp.setDelFlag("0");
 		bsp.setId(IdGenerate.uuid());
+		bsp.setCreateTime(LocalDateTime.now());
+		bsp.setUpdateTime(LocalDateTime.now());
 		baseMapper.saveBSP(bsp);
 		return bsp;
 	}
