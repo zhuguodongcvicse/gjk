@@ -31,7 +31,7 @@ export default [{
         path: 'index',
         name: '构件信息',
         component: () => import('@/views/comp/component/index')
-    },{
+    }, {
         path: 'commView',
         name: '查看构件',
         component: () => import('@/views/libs/commoncomponent/commView')
@@ -152,6 +152,11 @@ export default [{
             }
         },
         ])('00000')
+    },
+    {
+        path: '/pro/manager',
+        name: '项目信息',
+        component: () => import('@/views/pro/project/manager')
     }]
 
 }, {
@@ -239,7 +244,7 @@ export default [{
             title: '机箱编辑'
         }
     }]
-},{
+}, {
     path: '/libs/commoncomponent',
     component: Layout,
     redirect: '/libs/commoncomponent/index',
@@ -253,7 +258,7 @@ export default [{
             title: '申请列表'
         }
     }]
-},{
+}, {
     path: '/admin/basetemplate12',
     name: "基础模板管理",
     component: Layout,
@@ -276,7 +281,7 @@ export default [{
         },
     ]
 
-},{
+}, {
     path: '/libs/approval',
     name: "审批管理",
     component: Layout,
@@ -296,15 +301,15 @@ export default [{
     ]
 
 }
-// ,{
-//     path: 'applyDetail',
-//     name: 'applyDetail',
-//     component: () =>
-//         import( /* webpackChunkName: "page" */ '@/views/libs/commoncomponent/applyDetail'),
-//     meta: {
-//         // $keepAlive: true,
-//         title: '审批详情'
-//     }
-// },
+    // ,{
+    //     path: 'applyDetail',
+    //     name: 'applyDetail',
+    //     component: () =>
+    //         import( /* webpackChunkName: "page" */ '@/views/libs/commoncomponent/applyDetail'),
+    //     meta: {
+    //         // $keepAlive: true,
+    //         title: '审批详情'
+    //     }
+    // },
 
 ]
