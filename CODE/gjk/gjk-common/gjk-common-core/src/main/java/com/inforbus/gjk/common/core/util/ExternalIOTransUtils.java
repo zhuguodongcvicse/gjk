@@ -1,30 +1,27 @@
 package com.inforbus.gjk.common.core.util;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.google.common.collect.Maps;
-
 import com.inforbus.gjk.common.core.appinter.appInterface;
-import com.inforbus.gjk.common.core.util.vo.*;
+import com.inforbus.gjk.common.core.util.vo.HeaderFileTransVO;
 
-import SpbModelDesign.SpbFrameAutoGen;
-import appProCreate.cmpProCreate;
+import SpbModel.HeadFile;
+import SpbModel.Performance;
+import SpbModel.Struc;
 import appcontrol.AppControl;
-import customtoconfig.TopicConfig;
-import headerfile.HeadFile;
-import headerfile.Performance;
-import mapping.SimpleScheme;
-import systemconfiguration.SystemConfig;
-import systempara.SystemPara;
+import flowModel.SimpleScheme;
+import flowModel.SpbFrameAutoGen;
+import flowModel.SystemConfig;
+import flowModel.SystemPara;
+import flowModel.TopicConfig;
+import flowModel.cmpProCreate;
+
+
 
 /**
  * 外部接口转换工具类
@@ -97,7 +94,7 @@ public class ExternalIOTransUtils {
 	 */
 	public static Map<String, List<String>> parseStruct(String filePath) {
 		Map<String, List<String>> structTypeToMember = Maps.newHashMap();
-		headerfile.Struc.parseStruct(filePath, structTypeToMember);
+		Struc.parseStruct(filePath, structTypeToMember);
 		return structTypeToMember;
 	}
 
@@ -135,10 +132,11 @@ public class ExternalIOTransUtils {
 	 */
 	public static boolean appInstall(Map<String, String> cmpNameToHwType, String userName, int appID, String appName,
 			String packinfoPath, String cmpResFilePath, String appProPath) {
-		AppControl appControl = new AppControl();
-//		appControl.appInstall(cmpNameToHwType, userName, appID, appName, packinfoPath, cmpResFilePath, appProPath);
-		return appControl.appInstall(cmpNameToHwType, userName, appID, appName, packinfoPath, cmpResFilePath,
-				appProPath);
+//		AppControl appControl = new AppControl();
+////		appControl.appInstall(cmpNameToHwType, userName, appID, appName, packinfoPath, cmpResFilePath, appProPath);
+//		return appControl.appInstall(cmpNameToHwType, userName, appID, appName, packinfoPath, cmpResFilePath,
+//				appProPath);
+		return AppControl.getAppControl().appInstall(cmpNameToHwType, userName, appID, appName, packinfoPath, cmpResFilePath, appProPath);
 	}
 
 	/**
@@ -155,9 +153,10 @@ public class ExternalIOTransUtils {
 
 	public static boolean appLoad(Map<String, String> cmpNameToHwType, String userName, int appID, String appName,
 			boolean existDeployConfig, String sysconfigPath, String appProPath) {
-		AppControl appControl = new AppControl();
-		return appControl.appLoad(cmpNameToHwType, userName, appID, appName, existDeployConfig, sysconfigPath,
-				appProPath);
+//		AppControl appControl = new AppControl();
+//		return appControl.appLoad(cmpNameToHwType, userName, appID, appName, existDeployConfig, sysconfigPath,
+//				appProPath);
+		return AppControl.getAppControl().appLoad(cmpNameToHwType, userName, appID, appName, existDeployConfig, sysconfigPath, appProPath);
 
 	}
 
@@ -170,8 +169,9 @@ public class ExternalIOTransUtils {
 	 * @return
 	 */
 	public static boolean appUnload(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
-		AppControl appControl = new AppControl();
-		return appControl.appUnload(cmpNameToHwType, userName, appID, appName);
+//		AppControl appControl = new AppControl();
+//		return appControl.appUnload(cmpNameToHwType, userName, appID, appName);
+		return AppControl.getAppControl().appUnload(cmpNameToHwType, userName, appID, appName);
 	}
 
 	/**
@@ -183,8 +183,9 @@ public class ExternalIOTransUtils {
 	 * @return
 	 */
 	public static boolean appRestart(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
-		AppControl appControl = new AppControl();
-		return appControl.appRestart(cmpNameToHwType, userName, appID, appName);
+//		AppControl appControl = new AppControl();
+//		return appControl.appRestart(cmpNameToHwType, userName, appID, appName);
+		return AppControl.getAppControl().appRestart(cmpNameToHwType, userName, appID, appName);
 	}
 
 	/**
@@ -196,8 +197,9 @@ public class ExternalIOTransUtils {
 	 * @return
 	 */
 	public static boolean appStop(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
-		AppControl appControl = new AppControl();
-		return appControl.appStop(cmpNameToHwType, userName, appID, appName);
+//		AppControl appControl = new AppControl();
+//		return appControl.appStop(cmpNameToHwType, userName, appID, appName);
+		return AppControl.getAppControl().appStop(cmpNameToHwType, userName, appID, appName);
 	}
 
 	/**
@@ -209,8 +211,9 @@ public class ExternalIOTransUtils {
 	 * @return
 	 */
 	public static boolean appPause(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
-		AppControl appControl = new AppControl();
-		return appControl.appPause(cmpNameToHwType, userName, appID, appName);
+//		AppControl appControl = new AppControl();
+//		return appControl.appPause(cmpNameToHwType, userName, appID, appName);
+		return AppControl.getAppControl().appPause(cmpNameToHwType, userName, appID, appName);
 	}
 
 	/**
@@ -224,8 +227,9 @@ public class ExternalIOTransUtils {
 	 */
 	public static boolean appUnInstall(Map<String, String> cmpNameToHwType, String userName, int appID, String appName,
 			String packinfoPath) {
-		AppControl appControl = new AppControl();
-		return appControl.appUnInstall(cmpNameToHwType, userName, appID, appName, packinfoPath);
+//		AppControl appControl = new AppControl();
+//		return appControl.appUnInstall(cmpNameToHwType, userName, appID, appName, packinfoPath);
+		return AppControl.getAppControl().appUnInstall(cmpNameToHwType, userName, appID, appName, packinfoPath);
 	}
 
 	/**
@@ -252,10 +256,9 @@ public class ExternalIOTransUtils {
 	 * @param packinfoPath          客户自存自取路径
 	 * @param cmpDeployPlanFilePath 客户自存自取路径
 	 */
-	public static boolean appTaskExport(String userName, int appId, String appName, String appPath, String sysconfigPath,
+	public static void appTaskExport(String userName, int appId, String appName, String appPath, String sysconfigPath,
 			String packinfoPath, String cmpDeployPlanFilePath) {
-		AppControl appControl = new AppControl();
-		return appControl.appTaskExport(userName, appId, appName, appPath, sysconfigPath, packinfoPath, cmpDeployPlanFilePath);
+		appInterface.appTaskExport(appId, appName, appPath, sysconfigPath, packinfoPath, cmpDeployPlanFilePath);
 	}
 
 	/**

@@ -425,7 +425,7 @@
                     })
                     .then(data => {
                         _this.tableData.splice(index, 1);
-                        this.allChips = _this.tableData
+                        this.getList()
                         _this.$message({
                             showClose: true,
                             message: "删除成功",

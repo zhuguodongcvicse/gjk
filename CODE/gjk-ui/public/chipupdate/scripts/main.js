@@ -72,9 +72,11 @@ function handleMessageFromParent(event) {
   infArr = event.data.params[0]
   chipArr = event.data.params[1]
   operateSymbol = event.data.params[2]
+  console.log("event.data.params", event.data.params);
+  let chipTemp = JSON.parse(JSON.stringify(chipArr))
+  console.log("chipTemp", chipTemp)
   switch (event.data.cmd) {
     case 'updateChip':
-      console.log(event.data.params);
       for (var i = 0; i < infArr.length; i++) {
         if (infArr[i].infType == 3) {
           //		console.log("infArr[i].chipInf",infArr[i].chipInf)
@@ -339,10 +341,19 @@ function initEditor(editor) {
       json.datas[0].json.properties.infOfChipList = infListTemp
     }
     //遍历芯片上所有的接口，给接口赋自增ID和默认iotype
-    var IDNum = 0
+    let IDNum = 0
     for (const i in json.datas[0].json.properties.infOfChipList) {
+      //芯片中的接口ID赋值
       json.datas[0].json.properties.infOfChipList[i].ID = IDNum++
-      // json.datas[0].json.properties.infOfChipList[i].ioType = 2
+      //找到数据中芯片，将ioType值赋值给自定义数据中
+      for (const j in json.datas) {
+        if (json.datas[j].json.properties.infName !== undefined) {
+          //如果是同一个接口则赋值
+          if (json.datas[j].json.properties.uniqueId === json.datas[0].json.properties.infOfChipList[i].uniqueId) {
+            json.datas[0].json.properties.infOfChipList[i].ioType = json.datas[j].json.properties.ioType
+          }
+        }
+      }
     }
     // console.log("json", JSON.stringify(json))
     var jsonStr = JSON.stringify(json)
@@ -376,6 +387,21 @@ function initEditor(editor) {
 
   //绘画芯片
   var chipObj = JSON.parse(chipArr.chipData);
+  //向自定义数据刷入编辑表单时的数据
+  for (const key in chipArr) {
+    if (key === "chipName") {
+      chipObj.datas[0].json.properties.chipName = chipArr[key]
+    }
+    if (key === "coreNum") {
+      chipObj.datas[0].json.properties.coreNum = chipArr[key]
+    }
+    if (key === "memSize") {
+      chipObj.datas[0].json.properties.memSize = chipArr[key]
+    }
+    if (key === "recvRate") {
+      chipObj.datas[0].json.properties.recvRate = chipArr[key]
+    }
+  }
   graph.parseJSON(chipObj);
   graph.moveToCenter();
 

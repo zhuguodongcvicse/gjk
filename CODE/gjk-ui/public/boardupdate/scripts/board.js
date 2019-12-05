@@ -8,27 +8,19 @@ var infArr_Port = [];
 var infArr_serial = [];
 var infId = []
 var backBoardInfList = []
-var startId
-var chip_id;
 var infCount = 1
 var infOfChip = []
-var startInfNameBySelect = []
-var endInfNameBySelect = []
 var infOfExchangeCpuArr = []
 var ExchangeCpu
 var dragCpuList = []
-var selectedStartInfs = []
-var selectInfCount = 0
 var showStartCpuList = []
 var showEndCpuList = []
 var showStartInfList = []
 var showEndInfList = []
 var showExternalInf = []
 var StartInfOfChip = new Array()
-var EndInfOfChip = []
 var selectStartCpuValue
 var selectEndCpuValue
-var sel5value
 var ioTypeList = []
 var linkTypeList = []
 var chipList = []
@@ -36,7 +28,6 @@ var alreadyExistExchangeLink = []
 var alreadyExistInternalLink = []
 var chipIDNum
 var infIDNum = 0
-var ifDeleteFlag = 0
 var allInfList = []
 var InternalLinkArr = []
 var calculateBoardLinkType
@@ -148,7 +139,7 @@ function getObjType(obj) {
 
 // 子接收父参数
 function handleMessageFromParent(event) {
-  console.log("event.data", event.data)
+  // console.log("event.data", event.data)
   //板卡数据
   boardArr = event.data.params[0]
   //LinkType类型
@@ -168,7 +159,6 @@ function handleMessageFromParent(event) {
   copyOrEditSymbol = event.data.params[5]
   switch (event.data.cmd) {
     case 'boardupdate':
-      console.log("JSON.parse(boardArr.boardJson).datas[0]", JSON.parse(boardArr.boardJson).datas[0])
       if (boardArr.boardType == 0) {
         //板卡上已有的交换芯片
         alreadyExistExchangeLink = deepClone(JSON.parse(boardArr.boardJson).datas[0].json.properties.ExchangeCpu)
@@ -235,7 +225,16 @@ function handleMessageFromParent(event) {
           showEndInfList = showEndInfList.concat(alreadyExistInternalLink[i][3])
         }
       }
-
+      if (boardArr.boardType === '2' || boardArr.boardType === '3') {
+        let backInfListTemp = JSON.parse(boardArr.boardJson).datas[0].json.properties.backBoardInfList
+        backBoardInfList = backInfListTemp
+        infIDNum = backInfListTemp.length
+        for (let i in backInfListTemp) {
+          if (backInfListTemp[i].ID >= infIDNum) {
+            infIDNum = backInfListTemp[i].ID
+          }
+        }
+      }
       //芯片json
       for (var i = 0; i < chipArr.length; i++) {
         var chipData = JSON.parse(chipArr[i].chipData)
@@ -251,7 +250,6 @@ function handleMessageFromParent(event) {
           editable: false,
           clientProperties: {
             type: 'port',
-            chip_id: chipArr[i].id,
             id: chipArr[i].id,
             chipName: chipArr[i].chipName,
             coreNum: chipArr[i].coreNum,
@@ -414,61 +412,6 @@ function initbehind() {
 
 var EVENT_CREATE_ELEMENT_BY_JSON = 'create.element.by.json';
 
-function ondropLoadJSON(evt, graph, center, options) {
-  var url = options.url;
-  if (!url) {
-    return;
-  }
-  Q.loadJSON(url, function (json) {
-    var result = loadJSONInParent(graph, json, center);
-    if (!result || !result.length) {
-      return;
-    }
-    var roots = [];
-    result.forEach(function (e) {
-      if (e.parent === graph.currentSubnetwork) {
-        roots.push(e);
-      }
-    })
-    graph.interactionDispatcher.onEvent({
-      kind: EVENT_CREATE_ELEMENT_BY_JSON,
-      datas: result,
-      roots: roots,
-      event: evt
-    })
-  })
-}
-
-function loadJSONInParent(graph, json, center, parent) {
-  parent = parent || graph.currentSubnetwork;
-  var result = graph.parseJSON(json);
-  if (!result) {
-    return
-  }
-  var bounds = new Q.Rect();
-  result.forEach(function (e) {
-    if (e instanceof Q.Node) {
-      bounds.add(e.x, e.y);
-    }
-    if (parent && !e.parent) {
-      e.parent = parent;
-    }
-  })
-  if (!bounds.isEmpty()) {
-    var xOffset = center.x - bounds.cx;
-    var yOffset = center.y - bounds.cy;
-
-    result.forEach(function (e) {
-      if (e.location) {
-        e.x += xOffset;
-        e.y += yOffset;
-      }
-    })
-  }
-
-  return result;
-}
-
 var graph;
 
 function createNode(options, parent) {
@@ -485,12 +428,6 @@ function createNode(options, parent) {
     item.parent = item.host = parent;
   }
   return item;
-}
-
-function getSlot(parent, id) {
-  if (parent._slots) {
-    return parent._slots[id];
-  }
 }
 
 function addSlot(parent, id, x, y, width, height, childType) {
@@ -512,29 +449,6 @@ function addSlot(parent, id, x, y, width, height, childType) {
     parent._slots = {};
   }
   return parent._slots[id] = slot;
-}
-
-function createRack() {
-  var width = 700,
-    height = 500;
-  // 468,295
-  var rack = createNode({
-    image: 'rack',
-    width: width,
-    height: height
-  });
-  var startX = 32,
-    startY = 23,
-    gap = 1.8,
-    itemWidth = 62,
-    itemHeight = 380,
-    count = 10;
-  var i = 0;
-  while (i++ < count) {
-    addSlot(rack, i, startX, startY, itemWidth, itemHeight, 'card');
-    startX += itemWidth + gap;
-  }
-  return rack;
 }
 
 function uuid(len, radix) {
@@ -576,105 +490,6 @@ function removeByValue(arr, val) {
       break;
     }
   }
-}
-
-//uniqueId = uuid(10,62)
-//设置绘画后主板
-function createBehindCard(slot) {
-
-  //var bounds = slot.getBounds();
-  var width = 62,
-    height = 400;
-  var card = createNode({
-    image: 'images/AfterTheBoard.svg',
-    x: width.x,
-    y: height.y,
-    width: width,
-    height: height,
-    radius: 8,
-    fillColor: '#CDF'
-  }, slot);
-  card.set('type', 'card');
-  card.set('boardName', boardArr.boardName);
-  card.set('boardType', boardArr.boardType);
-  card.set('backBoardInfList', backBoardInfList);
-  card.set('id', boardArr.id);
-  //card.set('uniqueId', uniqueId);
-  //card.name = '后面主板';
-  card.setStyle(Q.Styles.LABEL_POSITION, Q.Position.CENTER_TOP);
-  card.setStyle(Q.Styles.LABEL_ANCHOR_POSITION, Q.Position.CENTER_TOP);
-
-  var startX = 5,
-    startY = 40,
-    gap = 10,
-    itemWidth = width - 40,
-    itemHeight = 20,
-    startX1 = 35,
-    itemWidth1 = width - 40,
-    itemHeight1 = 20,
-    count = 12;
-  var i = 0;
-  while (i++ < count) {
-    addSlot(card, i, startX, startY, itemWidth, itemHeight, 'port');
-    addSlot(card, i, startX1, startY, itemWidth1, itemHeight1, 'port');
-    startY += itemHeight + gap;
-  }
-  return card;
-}
-
-//设置绘画前主板
-function createCard(slot) {
-  //var bounds = slot.getBounds();
-  var width = 62,
-    height = 400;
-  var card = createNode({
-    image: 'images/BeforeTheBoard.svg',
-    x: width.x,
-    y: height.y,
-    width: width,
-    height: height,
-    radius: 8,
-    fillColor: '#CDF'
-  }, slot);
-  card.set('type', 'card');
-  card.set('boardName', boardArr.boardName);
-  card.set('cpuNum', boardArr.cpuNum);
-  card.set('boardType', boardArr.boardType);
-  card.set('id', boardArr.id);
-  //card.name = '正面主板';
-  card.setStyle(Q.Styles.LABEL_POSITION, Q.Position.CENTER_TOP);
-  card.setStyle(Q.Styles.LABEL_ANCHOR_POSITION, Q.Position.CENTER_TOP);
-
-  var startX = 5,
-    startY = 40,
-    gap = 10,
-    itemWidth = width - 10,
-    itemHeight = 50,
-    count = 4;
-  var i = 0;
-  while (i++ < count) {
-    addSlot(card, i, startX, startY, itemWidth, itemHeight, 'port');
-    startY += itemHeight + gap;
-  }
-  return card;
-}
-
-//设置绘画芯片
-function createPort(slot) {
-  console.log("***")
-  var bounds = slot.getBounds();
-  var port = createNode({
-    image: 'cell',
-    x: bounds.x,
-    y: bounds.y,
-    width: bounds.width,
-    height: bounds.height
-  }, slot);
-  port.set('type', 'port');
-  port.name = '001';
-  port.setStyle(Q.Styles.LABEL_ANCHOR_POSITION, Q.Position.CENTER_MIDDLE);
-  port.setStyle(Q.Styles.LABEL_POSITION, Q.Position.CENTER_MIDDLE);
-  return port;
 }
 
 //回显绘画画布,监控
@@ -730,19 +545,21 @@ function initEditor(editor) {
     let cpuNum
     //芯片赋值
     var data = graph.toJSON();
-    data.datas[0].json.properties.chipList = chipList
     //json串保存交换芯片
-    if (boardArr.boardType == 0) {
+    if (boardArr.boardType === '0') {
+      data.datas[0].json.properties.chipList = chipList
       data.datas[0].json.properties.ExchangeCpu = infOfExchangeCpuArr
       infOfExchangeCpuArr = []
       cpuNum = data.datas[0].json.properties.chipList.length
-    } else if (boardArr.boardType == 1) {
-      //console.log("showStartInfList",showStartInfList);
+    } else if (boardArr.boardType === '1') {
+      data.datas[0].json.properties.chipList = chipList
       for (const i in showStartInfList) {
         InternalLinkArr.push([showStartCpuList[i], showStartInfList[i], showEndCpuList[i], showEndInfList[i]])
       }
       data.datas[0].json.properties.InternalLink = InternalLinkArr
       cpuNum = data.datas[0].json.properties.chipList.length
+    } else {
+      data.datas[0].json.properties.backBoardInfList = backBoardInfList
     }
     var json = JSON.stringify(data);
     postMessageParentData.cmd = copyOrEditSymbol;
@@ -774,17 +591,22 @@ function initEditor(editor) {
   }
 
   //绘画主板
+  let boardObj
   if (boardArr.boardType == 0 || boardArr.boardType == 1) {
     //vcreateCard();
-    var boardObj = JSON.parse(boardArr.boardJson);
-    graph.parseJSON(boardObj);
-    graph.moveToCenter();
+    boardObj = JSON.parse(boardArr.boardJson);
   } else {
     //createBehindCard();
-    var boardObj = JSON.parse(boardArr.boardJson);
-    graph.parseJSON(boardObj);
-    graph.moveToCenter();
+    boardObj = JSON.parse(boardArr.boardJson);
   }
+  //向自定义数据刷入编辑表单时的数据
+  for (const key in boardArr) {
+    if (key === "boardName") {
+      boardObj.datas[0].json.properties.boardName = boardArr[key]
+    }
+  }
+  graph.parseJSON(boardObj);
+  graph.moveToCenter();
 
   //交互效果
   function initInteraction() {
@@ -863,7 +685,7 @@ function initEditor(editor) {
           return
         }
         var currentElement = graph.getElement(evt.event);
-        console.log("currentElement", currentElement)
+        // console.log("currentElement", currentElement)
         if (currentElement && currentElement.image == 'images/BeforeTheBoard.svg') {
           //	node.host = currentElement;
         } else if (currentElement && currentElement.image == 'images/AfterTheBoard.svg') {
@@ -899,7 +721,7 @@ function initEditor(editor) {
           if (boardArr.boardType == 0) {
             infOfChip = evt.data.properties.infOfChipList
           }
-          /* if (boardArr.boardType == 1 && selectInfCount != 0) {
+          /* if (boardArr.boardType == 1) {
             for (const i in evt.data.properties.infOfChipList) {
               StartInfOfChip.push(evt.data.properties.infOfChipList[i])
             }
@@ -907,7 +729,7 @@ function initEditor(editor) {
         }
         //如果是接口，添加到数组
         if (evt.data.properties.infName != null) {
-          evt.data.properties.ID = infIDNum++
+          evt.data.properties.ID = ++infIDNum
           backBoardInfList.push(evt.data.properties)
         }
 
@@ -1008,6 +830,13 @@ function initEditor(editor) {
               }
             }
           }
+          if (boardArr.boardType === '2' || boardArr.boardType === '3') {
+            for (const i in backBoardInfList) {
+              if (backBoardInfList[i].uniqueId === selection[0].properties.uniqueId) {
+                removeByValue(backBoardInfList, backBoardInfList[i])
+              }
+            }
+          }
           for (const i in dragCpuList) {
             if (dragCpuList[i].uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
               removeByValue(dragCpuList, dragCpuList[i])
@@ -1028,7 +857,6 @@ function initEditor(editor) {
     //	console.log("propertySheet", propertySheet)
     var type = data.get('type');
     var image = data.image;
-    // console.log("tppe", type)
     //这里可以获得当前点击的图元对象
     graph.onclick = function (evt) {
       var data = graph.getElement(evt);
@@ -1062,8 +890,7 @@ function initEditor(editor) {
           data.set('opticalNum', data.properties.opticalNum);
           data.set('ioType', data.properties.ioType);
         }
-
-        console.log("data", data);
+        // console.log("data", data);
       }
     }
     if (image == 'images/Chip.svg') {
@@ -1142,19 +969,6 @@ function initEditor(editor) {
             client: 'ioType',
             displayName: 'I/O类型'
           }
-        ]
-      }
-    }
-    if (type == 'case') {
-      return {
-        group: '机箱',
-        properties: [{
-          client: 'boardName',
-          displayName: '主板名称'
-        }, {
-          client: 'showBoardType',
-          displayName: '主板类型'
-        }
         ]
       }
     }
