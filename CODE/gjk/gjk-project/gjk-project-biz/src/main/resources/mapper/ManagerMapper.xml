@@ -614,13 +614,26 @@
         where gs.id in (${ids})  and del_flag!='1'
         order by gs.software_name desc,gs.version desc
     </select>
+	<select id="getSoftwareById" resultMap="softwareMap">
+        SELECT *
+        FROM gjk_software as gs
+        where gs.id = ${id}
+    </select>
 	<select id="getSoftwareDetailBySoftwareIdIn" resultMap="softwareDetailMap">
 		SELECT * FROM gjk_software_detail
 		WHERE software_id IN (${ids})
 	</select>
+	<select id="getSoftwareDetailBySoftwareIdAndPlatformId" resultMap="softwareDetailMap">
+		SELECT * FROM gjk_software_detail
+		WHERE software_id = ${softwareId} and platform_id = ${platformId}
+	</select>
 	<select id="getSoftwareFileBySoftwareIdIn" resultMap="softwareFileMap">
 		SELECT * FROM gjk_software_file
 		WHERE software_id IN (${ids})
+	</select>
+	<select id="getSoftwareFileBySoftwareIdAndFileName" resultMap="softwareFileMap">
+		SELECT * FROM gjk_software_file
+		WHERE software_id = ${id} and file_name = ${fileName}
 	</select>
     <!--根据软件框架库ID得到平台库列表-->
     <select id="getAllPlatformListBySoftwareId" resultMap="platformMap">
@@ -686,9 +699,18 @@
         where gs.id in (${ids})  and del_flag != '1'
         order by gs.bsp_name desc,gs.version desc
     </select>
+	<select id="getBSPById" resultMap="BSPMap">
+        SELECT *
+        FROM gjk_bsp as gs
+        where gs.id = ${id}
+    </select>
 	<select id="getBSPDetailByBSPIdIn" resultMap="bspDetailMap">
 		SELECT * FROM gjk_bsp_detail
 		WHERE bsp_id IN (${ids})
+	</select>
+	<select id="getBSPDetailByBSPIdAndPlatformId" resultMap="bspDetailMap">
+		SELECT * FROM gjk_bsp_detail
+		WHERE bsp_id = ${bspId} and platform_id = ${platformId}
 	</select>
 	<select id="getBSPFileByBSPIdIn" resultMap="bspFileMap">
 		SELECT * FROM gjk_bsp_file

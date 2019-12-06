@@ -2060,6 +2060,10 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		// 项目详情表
 		for (ProjectFile projectFile : projectDetailList) {
+			// 判断id是否存在
+			if(baseMapper.getProDetailById(projectFile.getId()) != null){
+				continue;
+			}
 			// 项目id替换成导入的项目id
 			projectFile.setProjectId(projectId);
 			String[] filePathArr = projectFile.getFilePath().split(String.format("\\%s", File.separator));
@@ -2075,47 +2079,65 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		// app表
 		for (App app : appList) {
-			appMapper.saveApp(app);
+			if(appMapper.selectById(app.getId()) == null){
+				appMapper.saveApp(app);
+			}
 		}
 
 		// 基础模版表
 		for (BaseTemplate baseTemplate : baseTemplateList) {
-			baseMapper.saveBaseTemplate(baseTemplate);
+			if(baseTemplateService.getById(baseTemplate.getTempId()).getData() == null){
+				baseMapper.saveBaseTemplate(baseTemplate);
+			}
 		}
 
 		// 软件框架与流程关系表
 		for (PartPlatformSoftware partPlatformSoftware : partPlatformSoftwareList) {
-			partPlatformSoftwareMapper.savePartPlatformSoftware(partPlatformSoftware);
+			if(partPlatformSoftwareMapper.selectById(partPlatformSoftware.getId()) == null){
+				partPlatformSoftwareMapper.savePartPlatformSoftware(partPlatformSoftware);
+			}
 		}
 
 		// 软件框架表
 		for (Software software : softwareList) {
-			baseMapper.saveSoftware(software);
+			if(baseMapper.getSoftwareById(software.getId()) == null){
+				baseMapper.saveSoftware(software);
+			}
 		}
 
 		// 软件框架与平台关系表
 		for (SoftwareDetail softwareDetail : softwareDetailList) {
-			baseMapper.saveSoftwareDetail(softwareDetail);
+			if(baseMapper.getSoftwareDetailBySoftwareIdAndPlatformId(softwareDetail.getSoftwareId(), softwareDetail.getPlatformId()) == null){
+				baseMapper.saveSoftwareDetail(softwareDetail);
+			}
 		}
 
 		// 软件框架文件表
 		for (SoftwareFile softwareFile : softwareFileList) {
-			baseMapper.saveSoftwareFile(softwareFile);
+			if(baseMapper.getSoftwareFileBySoftwareIdAndFileName(softwareFile.getSoftwareId(), softwareFile.getFileName()) == null){
+				baseMapper.saveSoftwareFile(softwareFile);
+			}
 		}
 
 		// bsp与流程关系表
 		for (PartPlatformBSP partPlatformBSP : partPlatformBSPList) {
-			partPlatformBSPMapper.insert(partPlatformBSP);
+			if(partPlatformBSPMapper.selectById(partPlatformBSP.getId()) == null){
+				partPlatformBSPMapper.insert(partPlatformBSP);
+			}
 		}
 
 		// bsp表
 		for (BSP bsp : bspList) {
-			baseMapper.saveBSP(bsp);
+			if(baseMapper.getBSPById(bsp.getId()) == null){
+				baseMapper.saveBSP(bsp);
+			}
 		}
 
 		// bsp和平台关系表
 		for (BSPDetail bspDetail : bspDetailList) {
-			baseMapper.saveBSPDetail(bspDetail);
+			if(baseMapper.getBSPDetailByBSPIdAndPlatformId(bspDetail.getBspId(), bspDetail.getPlatformId()) == null){
+				baseMapper.saveBSPDetail(bspDetail);
+			}
 		}
 
 		// BSP文件表

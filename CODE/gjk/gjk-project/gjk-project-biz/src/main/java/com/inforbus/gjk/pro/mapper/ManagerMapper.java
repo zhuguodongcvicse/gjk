@@ -344,4 +344,42 @@ public interface ManagerMapper extends BaseMapper<ProjectFile> {
 	 * @param structlibs
 	 */
 	void saveStructlibs(@Param("structlibs") Structlibs structlibs);
+
+	/**
+	 * 根据id获取软件框架数据
+	 * @param id
+	 * @return
+	 */
+	Software getSoftwareById(@Param("id") String id);
+
+	/**
+	 * 根据软件id和平台id获取数据
+	 * @param softwareId
+	 * @param platformId
+	 * @return
+	 */
+	SoftwareDetail getSoftwareDetailBySoftwareIdAndPlatformId(@Param("softwareId") String softwareId, @Param("platformId") String platformId);
+
+	/**
+	 * 根据软件id和文件名称查询数据
+	 * @param softwareId
+	 * @param fileName
+	 * @return
+	 */
+	SoftwareFile getSoftwareFileBySoftwareIdAndFileName(@Param("id") String softwareId, @Param("fileName") String fileName);
+
+	/**
+	 * 根据id获取bsp数据
+	 * @param id
+	 * @return
+	 */
+	BSP getBSPById(@Param("id") String id);
+
+	/**
+	 * 查询bsp关系数据
+	 * @param bspId
+	 * @param platformId
+	 * @return
+	 */
+	BSPDetail getBSPDetailByBSPIdAndPlatformId(@Param("bspId") String bspId, @Param("platformId") String platformId);
 }
