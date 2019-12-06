@@ -259,4 +259,89 @@ public interface ManagerMapper extends BaseMapper<ProjectFile> {
 	 * @return
 	 */
 	List<Structlibs> getStructlibsByIdList(@Param("idList") List<String> idList);
+
+	/**
+	 * 保存基础模版
+	 * @param baseTemplate
+	 * @return
+	 */
+	int saveBaseTemplate(@Param("baseTemplate") BaseTemplate baseTemplate);
+
+	/**
+	 *
+	 * @Title: saveSoftware  保存软件框架库信息
+	 * @Description:
+	 * @Author cvicse
+	 * @DateTime 2019年6月14日 上午11:40:43
+	 * @param software
+	 */
+	void saveSoftware(@Param("soft") Software software);
+
+	/**
+	 * 保存软件框架详情
+	 * @param softwareDetail
+	 */
+	void saveSoftwareDetail(@Param("softDetail") SoftwareDetail softwareDetail);
+
+	/**
+	 * 保存软件框架文件数据
+	 * @param softwareFile
+	 */
+	void saveSoftwareFile(@Param("softFile") SoftwareFile softwareFile);
+
+	/**
+	 *
+	 * @Title: saveBSP  保存bsp信息
+	 * @Description:
+	 * @Author cvicse
+	 * @DateTime 2019年6月14日 上午11:40:43
+	 * @param bsp
+	 */
+	void saveBSP(@Param("bs") BSP bsp);
+
+	/**
+	 * 保存bsp子表
+	 * @Title: saveBSPDetail
+	 * @Description:
+	 * @Author cvicse
+	 * @DateTime 2019年6月14日 下午4:48:49
+	 * @param BSPDetail
+	 */
+	void saveBSPDetail(@Param("bspDetail") BSPDetail BSPDetail);
+
+	/**
+	 * 保存bsp文件路径子表
+	 * @Title: saveBSPFile
+	 * @Description:
+	 * @Author cvicse
+	 * @DateTime 2019年6月14日 下午4:48:49
+	 * @param BSPFile
+	 */
+	void saveBSPFile(@Param("bspFile") BSPFile BSPFile);
+
+	/**
+	 * @Title: saveCommonComp
+	 * @Description: 保存公共构件
+	 * @Author cvics
+	 * @DateTime 2019年6月11日 下午2:27:22
+	 * @param commonComponent
+	 */
+	void saveCommonComp(@Param("comp") CommonComponent commonComponent);
+	/**
+	 * 保存公共构件详细表数据
+	 *
+	 * @param commonComponentDetail
+	 */
+	void saveCommonCompDetail(@Param("compDetail") CommonComponentDetail commonComponentDetail);
+
+	/**
+	 * 保存构件库和结构体表关系
+	 * @param compStruct
+	 */
+	void saveCompAndStruct(@Param("compStruct") CompStruct compStruct);
+	/**
+	 * 保存结构体
+	 * @param structlibs
+	 */
+	void saveStructlibs(@Param("structlibs") Structlibs structlibs);
 }
