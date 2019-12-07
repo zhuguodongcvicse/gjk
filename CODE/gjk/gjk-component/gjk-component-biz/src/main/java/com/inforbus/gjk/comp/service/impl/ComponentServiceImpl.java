@@ -91,6 +91,7 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.junit.Test;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -396,14 +397,15 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	public Component saveComp(Component component) {
 		component.setDelFlag("0");
 		if (StringUtils.isNotEmpty(component.getId())) {
-			String version = ("0").equals(component.getApplyState()) ? component.getVersion()
-					: Double.toString(Double.parseDouble(component.getVersion()) + 1);
-			component.setVersion(version);
+//			String version = ("0").equals(component.getApplyState()) ? component.getVersion()
+//					: Double.toString(Double.parseDouble(component.getVersion()) + 1);
+//			component.setVersion(version);
 			// 修改主表信息
 			baseMapper.editComp(component);
 		} else {
 			component.setId(IdGenerate.uuid());
-			component.setVersion(getVersion(component));
+//			component.setVersion(getVersion(component));
+			component.setCreateTime(LocalDateTime.now());
 			baseMapper.saveComp(component);
 		}
 		return component;
@@ -1025,5 +1027,9 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			res = "选择的" + res + "不存在";
 		}
 		return res;
+	}	@Test
+	public void xx() {
+		String sss="";
+		System.out.println(StringUtils.isNotEmpty(sss));
 	}
 }

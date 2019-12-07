@@ -21,19 +21,35 @@
         <template slot-scope="scope" slot="menu">
           <el-button
             type="primary"
-            v-if="permissions.libs_hardwarelibinf_edit"
+            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="editInf(scope.row,scope.index)"
           >编辑
           </el-button>
           <el-button
+            type="primary"
+            v-if="permissions.libs_hardwarelibinf_edit"
+            size="small"
+            plain
+            @click="copyInf(scope.row,scope.index)"
+          >复制
+          </el-button>
+          <el-button
             type="danger"
-            v-if="permissions.libs_hardwarelibinf_del"
+            v-if="permissions.libs_hardwarelibinf_del && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
           >删除
+          </el-button>
+          <el-button
+            type="primary"
+            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            size="small"
+            plain
+            @click="goStorage(scope.row,scope.index)"
+          >入库
           </el-button>
         </template>
       </avue-crud>
@@ -61,50 +77,85 @@
 
         <el-form-item
           label="光纤数量"
-          :label-width="formLabelWidth"
           prop="opticalNum"
           v-if="form.infType == 2"
         >
           <el-input v-model="form.opticalNum" autocomplete="off"></el-input>
         </el-form-item>
+
+        <el-form-item label="备注信息" prop="backupInfo">
+          <el-input v-model="form.backupInfo"></el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="updateInf('form', form)">确 定</el-button>
+        <el-button type="primary" v-if="clickCopyOrEdit === 'copy'" @click="copyOneInf('form', form)">确 定</el-button>
+        <el-button type="primary" v-if="clickCopyOrEdit === 'edit'" @click="updateInf('form', form)">确 定</el-button>
         <el-button @click="dialogFormVisible = false">取 消</el-button>
       </div>
     </el-dialog>
-
-    <addInf :showInf="showInf" ref="pram"></addInf>
+    <addInf :showInf="showInf" :allInfs="allInfs" ref="pram"></addInf>
+    <storage-apply
+      :dialog="dialog"
+      :allInfs="allInfs"
+      :infWillToStorage="infWillToStorage"
+      @storageApplyDialogState="storageApplyDialogState"
+      :approveUsers="approveUsers"
+    />
   </div>
 </template>
 
 <script>
     import {
         fetchList,
-        getObj,
         addObj,
         putObj,
         delObj,
-        saveInf
+        saveInf,
+        getAllUser,
+        updateInf
     } from "@/api/libs/hardwarelibinf";
     import {tableOption} from "@/const/crud/libs/hardwarelibinf";
+    import infStorageApply from "./infStorageApply";
     import {mapGetters} from "vuex";
-    import {request} from "http";
-    import {constants} from "crypto";
     import addInf from "@/views/libs/hardwarelibinf/addInf";
+    import {getUserhasApplyAuto} from "@/api/admin/user";
 
     export default {
         name: "hardwarelibinf",
-        components: {addInf},
-        watch: {},
+        components: {"addInf": addInf, "storage-apply": infStorageApply},
+        watch: {
+            //监听store里的数据，即存入的随机数
+            //当随机数发生变化时说明已经保存过，此时刷新列表
+            refreshListFlag: {
+                // immediate: true,
+                handler: function (params) {
+                    this.getList();
+                },
+                deep: true
+            },
+            dialogFormVisible: {
+                handler: function (params) {
+                    if (this.dialogFormVisible === false) {
+                        this.refreshChange()
+                    }
+                },
+            }
+        },
         data() {
             return {
-                infTemp: "",
+                infWillToStorage: '', //要入库的接口
+                clickCopyOrEdit: '', //复制或者编辑操作标志符
+                allUsersOfLibs: [], //用户数据，用来做用户筛选
                 dialogFormVisible: false,
+                //入库操作弹窗是否打开
+                dialog: {
+                    storageApplyDialog: false
+                },
+                //添加接口操作弹窗是否打开
                 showInf: {
-                    //param: {},
                     dialogFormVisible: false
                 },
+                //接口前端实体对象
                 form: {
                     id: "",
                     infName: "",
@@ -113,24 +164,30 @@
                     opticalNum: "",
                     ioType: "2"
                 },
-                showEdit: false,
-                editId: null,
-                tableData: [],
+                tableData: [], //接口列表数据
+                allInfs: [], //本用户下所有的接口数据
+                approveUsers: [], //具有审批权限的用户，用于选择审批人
+                //分页
                 page: {
                     total: 0, // 总页数
                     currentPage: 1, // 当前页数
                     pageSize: 20 // 每页显示多少条
                 },
+                //分页
                 listQuery: {
                     current: 1,
                     size: 20
                 },
                 tableLoading: false,
+                //列表列字段数据
                 tableOption: tableOption,
+                //表单校验规则
                 rules: {
+                    //接口名称
                     infName: [
                         {required: true, message: "接口名不能为空", trigger: "blur"}
                     ],
+                    //接口速率
                     infRate: [
                         {required: true, message: "接口速率不能为空", trigger: "blur"},
                         {
@@ -139,9 +196,11 @@
                             trigger: "blur"
                         }
                     ],
+                    //接口类型
                     infType: [
                         {required: true, message: "请选择接口类型", trigger: "change"}
                     ],
+                    //光纤数量
                     opticalNum: [
                         {required: true, message: "不能为空", trigger: "blur"},
                         {
@@ -155,73 +214,173 @@
         },
         created() {
             this.getList();
+            this.getAllUsers();
+            // console.log("permissions",this.permissions)
         },
         mounted: function () {
         },
         computed: {
-            ...mapGetters(["permissions"])
+            ...mapGetters(["permissions", "userInfo", "refreshListFlag"])
         },
         methods: {
-            test() {
-                setTimeout(function () {
-                    alert("执行了");
-                }, "1000"); //1秒后执行函数，只执行一次。
-                this.showInf.dialogFormVisible = true;
-            },
             showdialog() {
                 this.showInf.dialogFormVisible = true;
             },
-            // dialogState(param) {
-            //   console.log("param", this.$route);
-            //   console.log(param.state);
-            //   this.showInf.dialogFormVisible = param.state;
-            //   saveInf(param.param).then(request => {
-            //     // next(vm => {
-            //     //   vm.$router.replace("/library/hardwarelibs/hardwarelibinf");
-            //     // });
-            //     //this.getList();
-            //   });
-            // },
-
+            storageApplyDialogState() {
+                this.dialog.storageApplyDialog = false;
+            },
             getList() {
                 this.tableLoading = true;
                 fetchList(this.listQuery).then(response => {
-                    this.$store.dispatch("allInfList", response.data.data.records);
-                    // console.log("response.data.data.records",response.data.data.records)
+                    this.tableData = []
                     this.tableData = response.data.data.records;
+                    //所有判断接口数据是否为空
+                    if (this.allInfs.length !== 0) {
+                        //清空数据
+                        this.allInfs = []
+                        for (const i in this.tableData) {
+                            //如果接口用户名和登录用户名相同，则将该接口放到接口数据
+                            if (this.tableData[i].userId === this.userInfo.name) {
+                                this.allInfs.push(this.tableData[i])
+                            }
+                        }
+                    } else {
+                        //接口数据为空则将用户名相同的接口放到接口数组
+                        for (const i in this.tableData) {
+                            if (this.tableData[i].userId === this.userInfo.name) {
+                                this.allInfs.push(this.tableData[i])
+                            }
+                        }
+                    }
+                    this.allInfs = JSON.parse(JSON.stringify(this.allInfs))
                     this.page.total = response.data.data.total;
                     this.tableLoading = false;
                 });
             },
+            getAllUsers() {
+                //查询所有用户
+                getAllUser().then(response => {
+                    // console.log("response",response)
+                    //如果数组中有数据
+                    if (this.allUsersOfLibs.length !== 0) {
+                        //清空数组
+                        this.allUsersOfLibs = []
+                        //循环数据库的用户数据，判断用户数组中有没有数据
+                        for (const i in response.data) {
+                            if (this.allUsersOfLibs.hasOwnProperty(response.data[i])) {
+                                //有则跳出本次循环
+                                continue
+                            } else {
+                                //没有则加入
+                                this.allUsersOfLibs.push({label: response.data[i].name, value: response.data[i].name})
+                            }
+                        }
+                    } else {
+                        //若数组为空则加入数据库的所有数据
+                        for (const i in response.data) {
+                            this.allUsersOfLibs.push({label: response.data[i].name, value: response.data[i].name})
+                        }
+                    }
+                    // console.log("this.allUsersOfLibs",this.allUsersOfLibs)
+                    //将用户数组中的数据赋值给用来筛选的数据
+                    for (const i in this.tableOption.column) {
+                        if (this.tableOption.column[i].prop === 'userId') {
+                            this.tableOption.column[i].dicData = JSON.parse(JSON.stringify(this.allUsersOfLibs))
+                        }
+                    }
+                    // console.log("this.tableOption",this.tableOption)
+                });
+            },
             editInf(row) {
+                // console.log("row",row)
+                //复制或弹窗标志赋值
+                this.clickCopyOrEdit = 'edit'
                 this.dialogFormVisible = true;
+                //接口对象赋值为点击对象
                 this.form = row;
-                this.infTemp = row.infName;
+                // console.log("this.form",this.form)
+            },
+            copyInf(row) {
+                // console.log("row", row)
+                //复制或弹窗标志赋值
+                this.clickCopyOrEdit = 'copy'
+                this.dialogFormVisible = true;
+                //接口对象赋值为点击对象
+                this.form = row;
                 // console.log("this.form",this.form)
             },
             updateInf(formName, form) {
                 this.$refs[formName].validate(valid => {
                     if (valid) {
-                        if (form.infName == this.infTemp) {
-                            alert("接口名称不能重复,您可以取名为“XXX.1,XXX.2”,或者换一个名字");
-                            return;
-                        }
                         this.dialogFormVisible = false;
-                        saveInf(form).then(response => {
+                        updateInf(form).then(response => {
                             this.$message({
                                 showClose: true,
-                                message: "修改成功",
+                                message: "复制成功",
                                 type: "success"
                             });
+                            //更新后重新刷新列表
                             this.getList();
                             // console.log("this",this)
                         });
-                        this.infTemp = "";
                         // this.$refs[formName].resetFields();
                     } else {
                         // console.log("error submit!!");
                         return false;
                     }
+                });
+            },
+            copyOneInf(formName, form) {
+                //接口名称不能重复
+                // console.log("this.allInfs", this.allInfs)
+                // console.log("form", form)
+                //复制不能与本用户的接口库同名
+                for (const i in this.allInfs) {
+                    if (this.allInfs[i].infName === this.form.infName) {
+                        alert("接口名称不能相同")
+                        return
+                    }
+                }
+                this.$refs[formName].validate(valid => {
+                    if (valid) {
+                        this.dialogFormVisible = false;
+                        //接口的用户名改为本用户
+                        form.userId = this.userInfo.name
+                        form.applyState = '0'
+                        form.applyDesc = null
+                        saveInf(form).then(response => {
+                            this.$message({
+                                showClose: true,
+                                message: "复制成功",
+                                type: "success"
+                            });
+                            //更新后重新刷新列表
+                            this.getList();
+                            // console.log("this",this)
+                        });
+                        // this.$refs[formName].resetFields();
+                    } else {
+                        // console.log("error submit!!");
+                        return false;
+                    }
+                });
+            },
+            //入库方法
+            goStorage(row) {
+                //入库接口赋值为列表点击接口
+                this.infWillToStorage = JSON.parse(JSON.stringify(row))
+                //打开弹窗
+                this.dialog.storageApplyDialog = true;
+                getUserhasApplyAuto().then(Response => {
+                    // console.log("Response", Response);
+                    this.approveUsers = [];
+                    for (let item of Response.data.data) {
+                        let user = {};
+                        user.value = item.userId;
+                        user.label = item.name + "(" + item.username + ")";
+                        this.approveUsers.push(user);
+                    }
+                    // console.log("this.approveUsers", this.approveUsers);
                 });
             },
             currentChange(val) {
@@ -272,6 +431,7 @@
                     })
                     .then(data => {
                         _this.tableData.splice(index, 1);
+                        this.getList()
                         _this.$message({
                             showClose: true,
                             message: "删除成功",

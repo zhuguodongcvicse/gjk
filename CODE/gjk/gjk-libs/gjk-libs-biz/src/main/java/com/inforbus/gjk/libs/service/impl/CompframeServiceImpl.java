@@ -22,19 +22,18 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.Lists;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.R;
-import com.inforbus.gjk.common.core.util.UploadFilesUtils;
+import com.inforbus.gjk.libs.api.dto.CompframeTree;
 import com.inforbus.gjk.libs.api.entity.Compframe;
 import com.inforbus.gjk.libs.mapper.CompframeMapper;
 import com.inforbus.gjk.libs.service.CompframeService;
 
-import cn.hutool.json.JSONArray;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Array;
 import java.util.List;
 import java.util.Map;
 
@@ -92,10 +91,10 @@ public class CompframeServiceImpl extends ServiceImpl<CompframeMapper, Compframe
 			try {
 				String fileName = "构件框架库_" + version;
 				for (MultipartFile mfile : ufile) {
-					
-					String fileShowName = fileName+mfile.getOriginalFilename()
-							.substring(mfile.getOriginalFilename().indexOf("/"));
-					
+
+					String fileShowName = fileName
+							+ mfile.getOriginalFilename().substring(mfile.getOriginalFilename().indexOf("/"));
+
 					String path = new String((compframePath + resMap.get("filePath") + File.separator + version
 							+ File.separator + fileShowName).replace("/", File.separator));
 					File uploadFile = null;
@@ -114,7 +113,7 @@ public class CompframeServiceImpl extends ServiceImpl<CompframeMapper, Compframe
 					JGitUtil.commitAndPush(path, "多个文件上传");
 				}
 				Compframe frame = new Compframe(IdGenerate.uuid(), fileName, version,
-						resMap.get("filePath") + "/" + version+"/"+fileName, resMap.get("description").toString());
+						resMap.get("filePath") + "/" + version + "/" + fileName, resMap.get("description").toString());
 				baseMapper.insertCompframe(frame);
 				for (String strpt : lists) {
 					baseMapper.insertCompframePlatform(frame.getId(), strpt);
@@ -131,4 +130,39 @@ public class CompframeServiceImpl extends ServiceImpl<CompframeMapper, Compframe
 		return retR;
 	}
 
+	@Override
+	public List<CompframeTree> compframeToTree(Compframe compframe) {
+		List<CompframeTree> trees = Lists.newArrayList();
+		compframe.setFilePath(compframePath + compframe.getFilePath());
+		trees.add(new CompframeTree(compframe, "-1"));
+		compframe.getFilePath();
+		File file = new File(compframe.getFilePath());
+		if (file.isDirectory()) {
+			File[] childFileList = file.listFiles();
+			for (File childFile : childFileList) {
+				addCompframeTree(trees, childFile, compframe.getId());
+			}
+		} else {
+			trees.add(new CompframeTree(file, IdGenerate.uuid(), compframe.getId()));
+		}
+		return trees;
+	}
+
+	/**
+	 * 递归生成文件树
+	 * 
+	 * @param tree
+	 * @param parentId
+	 * @param file
+	 */
+	private void addCompframeTree(List<CompframeTree> tree, File file, String parentId) {
+		String fileId = IdGenerate.uuid();
+		tree.add(new CompframeTree(file, fileId, parentId));
+		if (file.isDirectory()) {
+			File[] childFileList = file.listFiles();
+			for (File childFile : childFileList) {
+				addCompframeTree(tree, childFile, fileId);
+			}
+		}
+	}
 }

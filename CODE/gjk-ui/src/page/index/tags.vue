@@ -42,10 +42,10 @@
     </div>
     <el-dialog title="提示" :visible.sync="dialogVisibleOfCloseRouter" width="30%">
       <!--  :before-close="handleClose" -->
-      <span>请选择您的操作</span>
+      <span>是否保存当前模型？</span>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="closeRouter()">不保存并关闭</el-button>
-        <el-button type="primary" @click="saveFlowData()">保存</el-button>
+        <el-button type="primary" @click="saveFlowData()">保存并关闭</el-button>
       </span>
     </el-dialog>
   </div>
@@ -128,6 +128,7 @@
             },
             closeRouter() {
                 if (this.routerPathAction === "remove") {
+                    this.$store.commit("IS_SAVE", "1");
                     let {tag, key} = this.findTag(this.routerPathValue);
                     this.$store.commit("DEL_TAG", tag);
                     if (tag.value === this.tag.value) {
@@ -138,16 +139,29 @@
                 this.dialogVisibleOfCloseRouter = false
             },
             saveFlowData() {
-                this.dialogVisibleOfCloseRouter = false
+                if(this.routerPathAction === "remove"){
+                    this.$store.commit("IS_SAVE", "2");
+                    setTimeout(() => {
+                        let {tag, key} = this.findTag(this.routerPathValue);
+                        this.$store.commit("DEL_TAG", tag);
+                        if (tag.value === this.tag.value) {
+                            tag = this.tagList[key === 0 ? key : key - 1]; //如果关闭本标签让前推一个
+                            this.openTag(tag);
+                        }
+                        this.dialogVisibleOfCloseRouter = false
+                    }, 1000);
+                }
+                //this.$store.commit("IS_SAVE", "2");  
             },
             menuTag(value, action) {
-                // console.log("value", value)
+                 console.log("value", value)
                 // console.log("action", action)
-                // if (value.indexOf("hardwarelibcase") != -1){
-                //     this.routerPathValue = value
-                //     this.routerPathAction = "remove"
-                //     this.dialogVisibleOfCloseRouter = true
-                // } else {
+                if (value.split("?")[0] == "/comp/manager/process"){
+                     this.$store.commit("IS_SAVE", "0");
+                    this.routerPathValue = value
+                    this.routerPathAction = "remove"
+                    this.dialogVisibleOfCloseRouter = true
+                } else {
                     if (action === "remove") {
                         let {tag, key} = this.findTag(value);
                         this.$store.commit("DEL_TAG", tag);
@@ -156,7 +170,7 @@
                             this.openTag(tag);
                         }
                     }
-                // }
+                }
             },
             openTag(item) {
                 // console.log("item", item);

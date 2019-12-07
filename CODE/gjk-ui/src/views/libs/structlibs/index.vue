@@ -148,7 +148,6 @@ export default {
     },
     getList(page, params) {
       this.tableLoading = true;
-      console.log("1234567890-=-0987654321234567890-09876543", page);
       fetchList(
         Object.assign(
           {

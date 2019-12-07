@@ -20,77 +20,86 @@
 
 <mapper namespace="com.inforbus.gjk.libs.mapper.HardwarelibBoardMapper">
 
-  <resultMap id="hardwarelibBoardMap" type="com.inforbus.gjk.libs.api.entity.HardwarelibBoard">
-                  <id property="id" column="id"/>
-                        <result property="boardName" column="board_name"/>
-                        <result property="sn" column="sn"/>
-                        <result property="boardId" column="board_id"/>
-                        <result property="cpuNum" column="cpu_num"/>
-                        <result property="hrTypeName" column="hr_type_name"/>
-                        <result property="userId" column="user_id"/>
-                        <result property="createTime" column="create_time"/>
-                        <result property="updateTime" column="update_time"/>
-                        <result property="version" column="version"/>
-                        <result property="delFlag" column="del_flag"/>
-                        <result property="boardType" column="board_type"/>
-            </resultMap>
+    <resultMap id="hardwarelibBoardMap" type="com.inforbus.gjk.libs.api.entity.HardwarelibBoard">
+        <id property="id" column="id"/>
+        <result property="boardName" column="board_name"/>
+        <result property="boardId" column="board_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="boardType" column="board_type"/>
+        <result property="cpuNum" column="cpu_num"/>
+        <result property="backupInfo" column="backup_info"/>
+        <result property="applyState" column="apply_state"/>
+        <result property="applyDesc" column="apply_desc"/>
+        <result property="version" column="version"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="boardJson" column="board_json"/>
+    </resultMap>
 
-  <!--hardwarelibBoard简单分页查询-->
-  <select id="getHardwarelibBoardPage" resultMap="hardwarelibBoardMap">
-    SELECT
-                  id,
-                        board_name,
-                        sn,
-                        board_id,
-                        cpu_num,
-                        hr_type_name,
-                        user_id,
-                        create_time,
-                        update_time,
-                        version,
-                        del_flag,
-                        board_type
-              FROM gjk_hardwarelib_board
-    <where>
-              <if test="hardwarelibBoard.id != null and hardwarelibBoard.id.trim() != ''">
-          AND id = #{hardwarelibBoard.id}
-        </if>
-              <if test="hardwarelibBoard.boardName != null and hardwarelibBoard.boardName.trim() != ''">
-          AND board_name = #{hardwarelibBoard.boardName}
-        </if>
-              <if test="hardwarelibBoard.sn != null and hardwarelibBoard.sn.trim() != ''">
-          AND sn = #{hardwarelibBoard.sn}
-        </if>
-              <if test="hardwarelibBoard.boardId != null and hardwarelibBoard.boardId.trim() != ''">
-          AND board_id = #{hardwarelibBoard.boardId}
-        </if>
-              <if test="hardwarelibBoard.cpuNum != null and hardwarelibBoard.cpuNum.trim() != ''">
-          AND cpu_num = #{hardwarelibBoard.cpuNum}
-        </if>
-              <if test="hardwarelibBoard.hrTypeName != null and hardwarelibBoard.hrTypeName.trim() != ''">
-          AND hr_type_name = #{hardwarelibBoard.hrTypeName}
-        </if>
-              <if test="hardwarelibBoard.userId != null and hardwarelibBoard.userId.trim() != ''">
-          AND user_id = #{hardwarelibBoard.userId}
-        </if>
-              <if test="hardwarelibBoard.createTime != null and hardwarelibBoard.createTime.trim() != ''">
-          AND create_time = #{hardwarelibBoard.createTime}
-        </if>
-              <if test="hardwarelibBoard.updateTime != null and hardwarelibBoard.updateTime.trim() != ''">
-          AND update_time = #{hardwarelibBoard.updateTime}
-        </if>
-              <!--<if test="hardwarelibBoard.description != null and hardwarelibBoard.description.trim() != ''">
-          AND description = #{hardwarelibBoard.description}
-        </if>-->
-              <if test="hardwarelibBoard.delFlag != null and hardwarelibBoard.delFlag.trim() != ''">
-          AND del_flag = #{hardwarelibBoard.delFlag}
-        </if>
-              <if test="hardwarelibBoard.boardType != null and hardwarelibBoard.boardType.trim() != ''">
-          AND type = #{hardwarelibBoard.boardType}
-        </if>
-          </where>
-  </select>
-
+    <!--hardwarelibBoard简单分页查询-->
+    <select id="getHardwarelibBoardPage" resultMap="hardwarelibBoardMap">
+        SELECT
+        id,
+        board_name,
+        board_id,
+        user_id,
+        board_type,
+        cpu_num,
+        backup_info,
+        apply_state,
+        apply_desc,
+        version,
+        create_time,
+        update_time,
+        del_flag,
+        board_json
+        FROM gjk_hardwarelib_board
+        <where>
+            <if test="hardwarelibBoard.id != null and hardwarelibBoard.id.trim() != ''">
+                AND id = #{hardwarelibBoard.id}
+            </if>
+            <if test="hardwarelibBoard.boardName != null and hardwarelibBoard.boardName.trim() != ''">
+                AND board_name = #{hardwarelibBoard.boardName}
+            </if>
+            <if test="hardwarelibBoard.boardId != null and hardwarelibBoard.boardId.trim() != ''">
+                AND board_id = #{hardwarelibBoard.boardId}
+            </if>
+            <if test="hardwarelibBoard.userId != null and hardwarelibBoard.userId.trim() != ''">
+                AND user_id = #{hardwarelibBoard.userId}
+            </if>
+            <if test="hardwarelibBoard.boardType != null and hardwarelibBoard.boardType.trim() != ''">
+                AND board_type = #{hardwarelibBoard.boardType}
+            </if>
+            <if test="hardwarelibBoard.cpuNum != null and hardwarelibBoard.cpuNum.trim() != ''">
+                AND cpu_num = #{hardwarelibBoard.cpuNum}
+            </if>
+            <if test="hardwarelibBoard.backupInfo != null and hardwarelibBoard.backupInfo.trim() != ''">
+                AND backup_info = #{hardwarelibBoard.backupInfo}
+            </if>
+            <if test="hardwarelibBoard.applyState != null and hardwarelibBoard.applyState.trim() != ''">
+                AND apply_state = #{hardwarelibBoard.applyState}
+            </if>
+            <if test="hardwarelibBoard.applyDesc != null and hardwarelibBoard.applyDesc.trim() != ''">
+                AND apply_desc = #{hardwarelibBoard.applyDesc}
+            </if>
+            <if test="hardwarelibBoard.version != null and hardwarelibBoard.version.trim() != ''">
+                AND version = #{hardwarelibBoard.version}
+            </if>
+            <if test="hardwarelibBoard.createTime != null and hardwarelibBoard.createTime.trim() != ''">
+                AND create_time = #{hardwarelibBoard.createTime}
+            </if>
+            <if test="hardwarelibBoard.updateTime != null and hardwarelibBoard.updateTime.trim() != ''">
+                AND update_time = #{hardwarelibBoard.updateTime}
+            </if>
+            <if test="hardwarelibBoard.boardJson != null and hardwarelibBoard.boardJson.trim() != ''">
+                AND board_json = #{hardwarelibBoard.boardJson}
+            </if>
+            <if test="hardwarelibBoard.delFlag != null and hardwarelibBoard.delFlag.trim() != ''">
+                AND del_flag = #{hardwarelibBoard.delFlag}
+            </if>
+        </where>
+    </select>
 
 
 </mapper>

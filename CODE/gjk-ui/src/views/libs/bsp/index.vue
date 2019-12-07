@@ -41,18 +41,18 @@
                   <el-form-item label="文件选择: " label-width="90px">
                     <uploader-unsupport></uploader-unsupport>
                     <div>
-                      <!-- <uploader-btn>
-                      <template slot-scope="scope">
-                        <el-tag type="info" size="mini">选择文件</el-tag>
-                      </template>
-                      </uploader-btn>-->
+                      <uploader-btn>
+                        <template slot-scope="scope">
+                          <el-tag type="info" size="mini">选择文件</el-tag>
+                        </template>
+                      </uploader-btn>
                     </div>
                     <div>
-                      <uploader-btn :directory="true">
+                      <!-- <uploader-btn :directory="true">
                         <template slot-scope="scope">
                           <el-tag type="info" size="mini">选择文件夹</el-tag>
                         </template>
-                      </uploader-btn>
+                      </uploader-btn>-->
                     </div>
                   </el-form-item>
                   <el-form-item>
@@ -161,25 +161,24 @@
           >编辑</el-button>-->
           <el-button
             type="danger"
-
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
-            v-if="scope.row.applyState=='0'||scope.row.applyState==null?true:false"
+            v-if="scope.row.applyState=='0'||scope.row.applyState==null||scope.row.applyState=='3'?true:false"
           >删除</el-button>
-<!--          v-if="permissions.libs_bsp_del"-->
+          <!--          v-if="permissions.libs_bsp_del"-->
           <el-tooltip class="item" effect="dark" content="入库" placement="top">
             <el-button
               type="primary"
               plain
               size="mini"
               @click="storageApply(scope.row,scope.index)"
-              v-if="scope.row.applyState=='0'||scope.row.applyState=='3'||scope.row.applyState==null?true:false"
+              v-if="scope.row.applyState=='0'||scope.row.applyState==null?true:false"
             >入 库</el-button>
           </el-tooltip>
-          <span v-if="scope.row.applyState=='0'||scope.row.applyState=='3'||scope.row.applyState==null?false:true">
-            {{scope.row.applyState=='1'?"已申请":scope.row.applyState=='2'?"已入库":scope.row.applyState=='3'?"已驳回":scope.row.applyState=='4'?"驳回再申请":"未处理"}}
-          </span>
+          <span
+            v-if="scope.row.applyState=='0'||scope.row.applyState=='3'||scope.row.applyState==null?false:true"
+          >{{scope.row.applyState=='1'?"已申请":scope.row.applyState=='2'?"已入库":scope.row.applyState=='3'?"已驳回":scope.row.applyState=='4'?"驳回再申请":"未处理"}}</span>
         </template>
       </avue-crud>
     </basic-container>
@@ -367,12 +366,23 @@ export default {
             }
           })
           .then(() => {
-            this.software.filePath =
-              "gjk/bsp/" +
-              parseFloat(this.versionSize).toFixed(1) +
-              "/" +
-              this.folderName +
-              "/";
+            if (
+              this.folderName.substring(0, this.folderName.lastIndexOf("."))
+            ) {
+              this.software.filePath =
+                "gjk/bsp/" +
+                parseFloat(this.versionSize).toFixed(1) +
+                "/" +
+                this.folderName.substring(0, this.folderName.lastIndexOf(".")) +
+                "/";
+            } else {
+              this.software.filePath =
+                "gjk/bsp/" +
+                parseFloat(this.versionSize).toFixed(1) +
+                "/" +
+                this.folderName +
+                "/";
+            }
             //保持软件框架库信息
             this.software.version = this.versionSize;
             this.software.description = this.description;
@@ -401,17 +411,7 @@ export default {
                   }
                 }
               }
-              this.filePathList.forEach((e, index) => {
-                let tmpSoftFile = JSON.parse(JSON.stringify(this.softwareFile));
-                tmpSoftFile.fileName = e.fileName;
-                tmpSoftFile.bspId = softId;
-                tmpSoftFile.filePath =
-                  "gjk/bsp/" +
-                  parseFloat(this.versionSize).toFixed(1) +
-                  "/" +
-                  e.fileName;
-                saveBSPFile(tmpSoftFile).then(response => {});
-              });
+              this.filePathList.forEach((e, index) => {});
             });
           })
           .then(() => {
@@ -421,14 +421,12 @@ export default {
                 setTimeout(() => {
                   loading.close();
                   alert(resData[1]);
-                // console.log("response:", resData[1]);
-                // console.log("response:", response);
-                //保存到数据库中的文件路径
-                this.softFilePath = resData[0];
-                //显示在页面上的文件路径
-                this.frameFilePath = resData[0] + this.folderName + "/";
-                this.dialogTableVisible = false;
-                 }, 500);
+                  //保存到数据库中的文件路径
+                  this.softFilePath = resData[0];
+                  //显示在页面上的文件路径
+                  this.frameFilePath = resData[0] + this.folderName + "/";
+                  this.dialogTableVisible = false;
+                }, 500);
                 this.reload();
               }
             );
@@ -465,13 +463,13 @@ export default {
       });
     },
     currentChange(val) {
-      console.log(val)
+      console.log(val);
       this.page.current = val;
       this.listQuery.current = val;
       this.getList();
     },
     sizeChange(val) {
-       console.log(val)
+      console.log(val);
       this.page.size = val;
       this.listQuery.size = val;
       this.getList();
@@ -507,7 +505,7 @@ export default {
             message: "删除成功",
             type: "success"
           });
-          this.getList(this.page)
+          this.getList(this.page);
         })
         .catch(function(err) {});
     },
@@ -563,6 +561,7 @@ export default {
 
     storageApplyDialogState() {
       this.storageApplyDialog = false;
+      this.reload();
     },
 
     storageApply(row, index) {

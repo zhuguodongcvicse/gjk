@@ -488,15 +488,22 @@ export default {
       this.appDataDTO.appProPath = domain.filePath + "/" + domain.fileName;
       //系统配置模块xml路径
       this.appDataDTO.sysconfigPath = domain.sysconfigFilePath;
-
+      console.log("qqqqqqq----",this.appFilePath, this.appName);
+      let mm = {};
+            mm.oriFilePath = this.appFilePath;
+            mm.downloadAPPFileName = this.appName;
+            handleDown(mm).then(res => {});
       //导出接口
       appTaskExport(this.appDataDTO)
-        .then(res => {})
-        .then(Response => {
-          let mm = {};
-          mm.oriFilePath = this.appFilePath;
-          mm.downloadAPPFileName = this.appName;
-          handleDown(mm).then(res => {});
+        .then(res => {
+          if(res){
+            let mm = {};
+            mm.oriFilePath = this.appFilePath;
+            mm.downloadAPPFileName = this.appName;
+            handleDown(mm).then(res => {});
+          }else{
+            alert("接口返回值为false！！！");
+          }
         });
     },
     //编译图标

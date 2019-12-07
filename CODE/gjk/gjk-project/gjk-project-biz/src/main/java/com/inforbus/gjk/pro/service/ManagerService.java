@@ -67,7 +67,7 @@ public interface ManagerService extends IService<ProjectFile> {
 	 * @param proDetailId
 	 * @return
 	 */
-	boolean createXmlFile(XmlEntityMap entity, String proDetailId);
+	String createXmlFile(XmlEntityMap entity, String proDetailId);
 
 	/**
 	 * @Title: getProDetailById
@@ -300,4 +300,22 @@ public interface ManagerService extends IService<ProjectFile> {
 	 * @return
 	 */
 	R updatePartBSPAndPlatform(BSP bsp);
+
+    /**
+     * 导出项目流程压缩文件流
+     * @param projectId
+     * @param processId
+     * @return
+     * @throws Exception
+     */
+    byte[] createZip(String projectId, String processId) throws Exception;
+
+	/**
+	 * 解析传入的压缩文件
+	 *
+	 * @param ufile
+	 * @param projectId
+	 */
+	int analysisZipFile(MultipartFile ufile, String projectId);
+
 }

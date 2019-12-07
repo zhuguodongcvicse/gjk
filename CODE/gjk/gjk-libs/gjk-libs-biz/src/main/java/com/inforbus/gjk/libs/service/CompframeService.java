@@ -16,6 +16,7 @@
  */
 package com.inforbus.gjk.libs.service;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +25,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.inforbus.gjk.common.core.util.R;
+import com.inforbus.gjk.libs.api.dto.CompframeTree;
 import com.inforbus.gjk.libs.api.entity.Compframe;
 
 /**
@@ -51,5 +53,15 @@ public interface CompframeService extends IService<Compframe> {
 	 * @return
 	 */
 	R<?> saveCompFrame(MultipartFile[] ufile, Map<String, Object> resMap);
+	/**
+	 * @Title: compframeToTree
+	 * @Description: 保存构件框架
+	 * @Author xiaohe
+	 * @DateTime 2019年11月26日 下午2:04:44
+	 * @param ufile		构件文件列表
+	 * @param resMap	携带信息
+	 * @return
+	 */
+	List<CompframeTree> compframeToTree(Compframe compframe);
 
 }

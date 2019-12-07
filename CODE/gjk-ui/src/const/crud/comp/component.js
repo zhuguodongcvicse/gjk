@@ -50,11 +50,11 @@ export const tableOption = {
       },
       dicUrl: '/admin/user/info/getUserDict'
     },
-    {
-      label: '版本',
-      slot: true,
-      prop: 'version'
-    },
+    // {
+    //   label: '版本',
+    //   slot: true,
+    //   prop: 'version'
+    // },
     {
       label: '图标',
       prop: 'compImg'
@@ -87,10 +87,10 @@ export const tableOption = {
       label: '创建时间',
       prop: 'createTime'
     },
-    {
-      label: '修改时间',
-      prop: 'updateTime'
-    },
+    // {
+    //   label: '修改时间',
+    //   prop: 'updateTime'
+    // },
     {
       label: '备注信息',
       prop: 'compBackupinfo'

@@ -289,19 +289,12 @@ export default {
             console.log("ggggfg:::", this.textContext);
             //文件后缀名，用于判断区分文件后缀名，使用文本编辑器还是什么
             this.fileSuffix = response.data.data.textContext.split("@%#@*+-+@")[0];
-            // if (
-            //   this.fileSuffix === "c" ||
-            //   this.fileSuffix === "h" ||
-            //   this.fileSuffix === "cpp"
-            // ) {
-            //   this.isShowEditor = true;
-            //   this.isShowChild = false;
-            // } else {
-            //   this.isShowChild = true;
-            //   this.isShowEditor = false;
-            // }
           }
         });
+      }else{
+        this.tFilePath = "";
+        this.textContext = "";
+        this.filePath = "";
       }
     },
     resetForm() {

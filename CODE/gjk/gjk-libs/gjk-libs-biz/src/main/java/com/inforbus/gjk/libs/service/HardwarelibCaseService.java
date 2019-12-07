@@ -38,4 +38,5 @@ public interface HardwarelibCaseService extends IService<HardwarelibCase> {
 
 	void saveCase(HardwarelibCase hardwarelibCase);
 
+    void updateCaseById(HardwarelibCase hardwarelibCase);
 }

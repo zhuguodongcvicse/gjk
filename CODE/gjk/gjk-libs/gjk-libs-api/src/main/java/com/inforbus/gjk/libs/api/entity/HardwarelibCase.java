@@ -41,58 +41,56 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @TableName("gjk_hardwarelib_case")
 public class HardwarelibCase extends Model<HardwarelibCase> {
-private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /**
-   * id
-   */
-	@TableId(value = "id", type = IdType.ID_WORKER_STR)
+     * id
+     */
+    @TableId(value = "id", type = IdType.ID_WORKER_STR)
     private String id;
     /**
-   * 机箱名称
-   */
+     * 机箱名称
+     */
     private String caseName;
     /**
-   * 唯一标识符
-   */
-    private String sn;
-    /**
-   * 机箱id
-   */
+     * 机箱id
+     */
     private String caseId;
     /**
-   * 用户id
-   */
+     * 用户id
+     */
     private String userId;
     /**
-   * 创建时间
-   */
-    private String createTime;
+     * 板子数量
+     */
+    private Integer bdNum;
     /**
-   * 更新时间
-   */
-    private String updateTime;
+     * 备注信息
+     */
+    private String backupInfo;
     /**
-   * 说明
-   */
+     * 创建时间
+     */
+    private LocalDateTime createTime;
+    /**
+     * 更新时间
+     */
+    private LocalDateTime updateTime;
+    /**
+     * 正面机箱json
+     */
+    private String frontCase;
+    /**
+     * 背面机箱json
+     */
+    private String backCase;
+    /**
+     * 版本
+     */
     private Integer version;
     /**
-   * 逻辑删除
-   */
-    private String delFlag;
-    /**
-   * 板子数量
-   */
-    private BigDecimal bdNum;
-    /**
-     * 连线关系
+     * 逻辑删除
      */
-    private String linkRelation;
-    /**
-   * 机箱json
-   */
-    private String frontCase;
-
-	private String backCase;
+    private String delFlag;
 
 }

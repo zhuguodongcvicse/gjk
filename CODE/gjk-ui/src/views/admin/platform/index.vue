@@ -230,6 +230,8 @@ export default {
       if (this.form.platformId) {
         this.formEdit = false;
         this.formStatus = "update";
+      }else{
+        alert("请选择一个节点进行编辑！！！");
       }
     },
     handlerAdd() {

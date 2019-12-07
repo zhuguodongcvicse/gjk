@@ -37,6 +37,10 @@ public class StructDTO extends StructTreeNode {
 	 * 赋值参数
 	 */
 	private String assigParamName;
+	/**
+	 * 参数注释
+	 */
+	private String paramRemarks;
 	private String queryParam;
 
 	public StructDTO() {
@@ -53,6 +57,7 @@ public class StructDTO extends StructTreeNode {
 		this.fparamName = struct.getName();
 		this.structClassify = struct.getStructType();
 		this.fparamType = struct.getDataType();
+		this.paramRemarks=struct.getParamRemarks();
 	}
 
 }

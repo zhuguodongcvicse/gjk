@@ -14,80 +14,90 @@
 </head>
 
 <body class="layout">
-    <div id="editor" class="graph-editor public_boarddesign_mainboardindex_14s" data-options="region:'center'"></div>
-    
-    <script src="scripts/qunee-min.js"></script>
-    <!-- build:js libs/js.js -->
-    <script src="libs/jquery.min.js"></script>
-    <script src="libs/bootstrap/js/bootstrap.min.js"></script>
-    <script src="libs/layout.border.js"></script>
-    <script src="libs/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
-    <!-- endbuild -->
-    <!-- build:js libs/graph.editor/graph.editor.js -->
-    <script src="src/common/i18n.js"></script>
-    <script src="src/common/CopyPaste.js"></script>
-    <script src="src/common/DomSupport.js"></script>
-    <script src="src/common/DragSupport.js"></script>
-    <script src="src/common/FileSupport.js"></script>
-    <script src="src/common/JSONSerializer.js"></script>
-    <script src="src/common/Exportpane.js"></script>
-    <script src="src/common/Toolbar.js"></script>
-    <script src="src/common/ToolBox.js"></script>
-    <script src="src/common/PopupMenu.js"></script>
-    <script src="src/common/Propertypane.js"></script>
-    <script src="src/common/GridBackground.js"></script>
-    <!-- <script src="src/graph.editor.js"></script> -->
-    <script src="graph.editor/graph.editor.js"></script>
-    <!-- endbuild -->
-    <script src="scripts/graphs.js"></script>
-    <script src="scripts/casemain.js"></script>
-    <script src="../util/mangUtils.js"></script>
-    <script type="text/javascript">
-        /* function submitSetting() {
-            var aa = document.getElementsByTagName("input").value(); 
-            console.log("chipValueList",chipValueList)
-            console.log("aa",aa)
-        } */
-        function upperCase() {
-            var x = document.getElementById("IP").childNodes.item(0).value
-            // console.log("x", x)
-            // console.log("clickchip",clickCheckedChip)
-            // document.getElementById("fname").value = x.toUpperCase()
-            for (const m in graphList.fJson) {
-                for (const k in graphList.fJson[m].datas) {
-                    if (graphList.fJson[m].datas[k].json.properties.caseName != null) {
-                        for (const i in graphList.fJson[m].datas[k].json.properties.frontBoardList) {
-                            for (const j in graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList) {
-                                //�ҵ������е���ĵ�ǰоƬ
-                                if (graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList[j].uniqueId.indexOf(clickCheckedChip.uniqueId) != -1) {
-                                    //��ǰ�����������IP����������оƬ������
-                                    graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList[j].IP = clickCheckedChip.IP
-                                    //���ø�ֵ���оƬ�ŵ���ʱ��оƬ������
-                                    chipListTemp.push(graphList.fJson[m].datas[k].json.properties.frontBoardList[i].chipList[j])
+<div id="editor" class="graph-editor public_boarddesign_mainboardindex_14s" data-options="region:'center'"></div>
+
+<script src="scripts/qunee-min.js"></script>
+<!-- build:js libs/js.js -->
+<script src="libs/jquery.min.js"></script>
+<script src="libs/bootstrap/js/bootstrap.min.js"></script>
+<script src="libs/layout.border.js"></script>
+<script src="libs/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+<!-- endbuild -->
+<!-- build:js libs/graph.editor/graph.editor.js -->
+<script src="src/common/i18n.js"></script>
+<script src="src/common/CopyPaste.js"></script>
+<script src="src/common/DomSupport.js"></script>
+<script src="src/common/DragSupport.js"></script>
+<script src="src/common/FileSupport.js"></script>
+<script src="src/common/JSONSerializer.js"></script>
+<script src="src/common/Exportpane.js"></script>
+<script src="src/common/Toolbar.js"></script>
+<script src="src/common/ToolBox.js"></script>
+<script src="src/common/PopupMenu.js"></script>
+<script src="src/common/Propertypane.js"></script>
+<script src="src/common/GridBackground.js"></script>
+<!-- <script src="src/graph.editor.js"></script> -->
+<script src="graph.editor/graph.editor.js"></script>
+<!-- endbuild -->
+<script src="scripts/graphs.js"></script>
+<script src="scripts/casemain.js"></script>
+<script src="../util/mangUtils.js"></script>
+<script type="text/javascript">
+    /* function submitSetting() {
+        var aa = document.getElementsByTagName("input").value();
+        console.log("chipValueList",chipValueList)
+        console.log("aa",aa)
+    } */
+    function upperCase() {
+        // var x = document.getElementById("IP").childNodes.item(0).value
+        let IP = document.getElementById("IP").value
+        // console.log("IP", IP)
+        //直接点击图元获取芯片数据会丢失芯片中接口的数据，懒得找框架代码，就从所有数据里直接赋值了
+        /*console.log("clickCheckedChip",clickCheckedChip)
+        clickCheckedChip.IP = IP
+        for (const i in ChipsWithIPs) {
+            if (ChipsWithIPs[i].uniqueId === clickCheckedChip.uniqueId) {
+                ChipsWithIPs[i] = clickCheckedChip
+                return
+            }
+        }
+        ChipsWithIPs.push(clickCheckedChip)
+        ChipsWithIPs = JSON.parse(JSON.stringify(ChipsWithIPs))
+        console.log("ChipsWithIPs",ChipsWithIPs)*/
+        for (const n in graphList.fJson) {
+            for (const i in graphList.fJson[n].datas) {
+                if (graphList.fJson[n].datas[i].json.properties != null && graphList.fJson[n].datas[i].json.properties.caseName != null) {
+                    for (const j in graphList.fJson[n].datas[i].json.properties.frontBoardList) {
+                        if (graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList != null) {
+                            for (const k in graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList) {
+                                //带有IP的临时数据赋给数据
+                                if (graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].uniqueId.indexOf(clickCheckedChip.uniqueId) !== -1) {
+                                    graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].IP = IP
                                 }
                             }
                         }
                     }
                 }
             }
-            //���
-			chipListTemp = JSON.parse(JSON.stringify(chipListTemp))
         }
-        function getCaption(obj) {
-            var index = obj.lastIndexOf("\+");
-            obj = obj.substring(index + 1, obj.length);
-            //  console.log(obj);
-            return obj;
-        }
-        function removeByValue(arr, val) {
-            for (var i = 0; i < arr.length; i++) {
-                if (arr[i] == val) {
-                    arr.splice(i, 1);
-                    break;
-                }
+    }
+
+    function getCaption(obj) {
+        var index = obj.lastIndexOf("\+");
+        obj = obj.substring(index + 1, obj.length);
+        //  console.log(obj);
+        return obj;
+    }
+
+    function removeByValue(arr, val) {
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i] == val) {
+                arr.splice(i, 1);
+                break;
             }
         }
-    </script>
+    }
+</script>
 </body>
 
 </html>

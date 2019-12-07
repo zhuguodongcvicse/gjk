@@ -112,6 +112,35 @@
         <el-button type="button" @click.native="isUpdataTemp = false">取消</el-button>
       </div>
     </el-dialog>
+    <el-dialog
+      title="导入项目流程"
+      :visible.sync="importProjectDialogVisible"
+      width="35%"
+      :before-close="dialogBeforeClose"
+      :append-to-body="true"
+    >
+      <i>请上传项目导出的压缩包(上传文件编码格式为zip)</i>
+      <br />
+      <br />
+      <el-upload
+        ref="importProject"
+        class="avatar-uploader"
+        action="/pro/manager/importProjectZipUpload"
+        :before-upload="beforeAvatarUpload"
+        :http-request="importProjectFileUploadFunc"
+        :on-exceed="onExceed"
+        :before-remove="beforeRemove"
+        :file-list="importProjectFileList"
+        accept=".zip"
+        :limit="1"
+      >
+        <el-button size="small" type="primary">上传压缩包</el-button>
+      </el-upload>
+      <div slot="footer">
+        <el-button @click="closeImportProjectDialog">取 消</el-button>
+        <el-button type="primary" @click="importProjectFile">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -125,7 +154,9 @@ import {
 import {
   fetchProList,
   fetchProTree,
-  deleteSelectFile
+  deleteSelectFile,
+  createZipFile,
+  importProjectZipUpload
 } from "@/api/pro/manager";
 import { getAppByProcessId } from "@/api/pro/app";
 import { getPath } from "@/api/compile/devenv";
@@ -171,7 +202,7 @@ export default {
       softwareDialogVisible: false,
       bspDialogVisible: false,
       selectPhotoDialogVisible: false,
-
+      importProjectDialogVisible: false,
       token: "",
 
       projects: [],
@@ -181,6 +212,7 @@ export default {
       procedureId: "",
       currentNodeData: {}, //当前节点数据对象
       menus: [],
+      importProjectFileList: [],
 
       appComponentId: "",
       filePathName: "",
@@ -414,7 +446,9 @@ export default {
       } else if (item == "添加流程") {
         this.addProcedureDialogVisible = true;
       } else if (item == "申请构件") {
-        this.addProCompDialogVisible = true;
+          this.addProcedureDialogVisible = true;
+      } else if (item == "导入") {
+        this.importProjectDialogVisible = true;
       } else if (item == "删除流程") {
         this.deleteProcedureDialogVisible = true;
       } else if (item == "删除") {
@@ -481,6 +515,15 @@ export default {
             "_blank"
           );
         });
+      } else if(item == "导出"){
+          console.log('导出')
+          console.log('this.currentNodeData::', this.currentNodeData)
+          let param = {
+              projectId: this.currentNodeData.parentId,
+              processId: this.currentNodeData.id
+          }
+          createZipFile(param)
+          $("#projectRightMenu").hide();
       }
     },
     findTargetNode(currentNodeObj, targetNodeObj) {
@@ -530,7 +573,8 @@ export default {
           "修改模板",
           "集成代码生成",
           "APP组件工程生成",
-          "删除流程"
+          "删除流程",
+          "导出"
         ];
         this.procedure = data;
         this.procedureId = data.id;
@@ -552,7 +596,7 @@ export default {
         this.menus = ["编译", "删除", "增加文件", "增加文件夹"];
         this.fileData = data;
       } else if (data.parentId == "-1") {
-        this.menus = ["添加流程", "申请构件"];
+        this.menus = ["添加流程", "申请构件", "导入"];
       } else if (data.type == "app" && data.isDirectory == "0") {
         this.procedureId = data.processId;
         this.menus = ["删除", "增加文件", "增加文件夹"];
@@ -802,7 +846,58 @@ export default {
         }
         this.isUpdataTemp = false;
       });
-    }
+    },
+      dialogBeforeClose(done) {
+          done();
+          this.$refs.importProject.clearFiles();
+          this.importProjectFileList = [];
+      },
+      beforeAvatarUpload(file) {
+          const isZIP =
+              file.type === "application/x-zip-compressed" || "application/zip";
+          if (!isZIP) {
+              this.$message.error(
+                  "上传文件格式只能是压缩文件，请传入项目导出的压缩文件。"
+              );
+          }
+          return isZIP /*&& isLt2M*/;
+      },
+      importProjectFileUploadFunc(param) {
+          this.importProjectFileList.push(param.file);
+      },
+      onExceed(file, fileList) {
+          this.$message.warning(
+              `当前限制选择1个文件，本次选择了 ${
+                  file.length
+              } 个文件，共选择了 ${file.length + fileList.length} 个文件`
+          );
+      },
+      beforeRemove(file, fileList) {
+          this.importProjectFileList = [];
+      },
+      closeImportProjectDialog() {
+          this.importProjectDialogVisible = false;
+          this.$refs.importProject.clearFiles();
+          this.importProjectFileList = [];
+      },
+      importProjectFile() {
+          if (this.importProjectFileList.length == 0) {
+              this.$message.warning("请选择文件上传。");
+          } else {
+              let params = new FormData();
+              params.append("file", this.importProjectFileList[0]);
+              params.append("projectId", this.currentNodeData.id);
+              importProjectZipUpload(params).then(Response => {
+                  if (Response.data.data == -1) {
+                      this.$message.warning("上传的压缩包内容错误，请重新选择文件上传。");
+                  } else {
+                      this.$message.success("导入成功。");
+                      this.getProjects();
+                      this.closeImportProjectDialog();
+                  }
+              });
+          }
+      }
   }
 };
 </script>

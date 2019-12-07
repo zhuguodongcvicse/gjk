@@ -76,6 +76,18 @@ export const tableOption = {
         label: '硬件库',
         value: "2"
       }, {
+        label: '接口设计',
+        value: "2-1"
+      }, {
+        label: '芯片设计',
+        value: "2-2"
+      }, {
+        label: '板卡设计',
+        value: "2-3"
+      }, {
+        label: '机箱设计',
+        value: "2-4"
+      }, {
         label: '软件框架库',
         value: "3"
       }, {
@@ -90,6 +102,9 @@ export const tableOption = {
       }, {
         label: '项目库',
         value: "7"
+      }, {
+        label: '构件框架库',
+        value: "8"
       }]
     },
     {

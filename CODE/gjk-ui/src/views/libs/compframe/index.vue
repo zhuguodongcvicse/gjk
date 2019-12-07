@@ -27,27 +27,31 @@
         <template slot="version" slot-scope="scope">
           <el-tag>V{{parseFloat(scope.row.version).toFixed(1)}}</el-tag>
         </template>
-        <template slot-scope="scope" slot="menu">
-          <!-- <el-button
-            type="primary"
-            v-if="permissions.libs_compframe_edit"
-            icon="el-icon-check"
-            size="small"
-            plain
-            @click="handleEdit(scope.row,scope.index)"
-          >编辑</el-button>-->
+        <template slot-scope="{row,index}" slot="menu">
           <el-button
             type="danger"
             v-if="permissions.libs_compframe_del"
-            icon="el-icon-delete"
+            v-show="row.applyState == '0'"
             size="small"
             plain
-            @click="handleDel(scope.row,scope.index)"
-          >删除</el-button>
+            @click="handleDel(row,index)"
+          >
+            <el-tag>删除</el-tag>
+          </el-button>
+          <el-button type="primary" size="small" plain>
+            <!-- v-show="row.applyState == '0' || row.applyState == '3'" -->
+            <el-tag
+              v-if="row.applyState == '0'|| row.applyState == '3'"
+              @click="compFrameApplysClick(row,index)"
+            >入库</el-tag>
+            <el-tag v-else-if="row.applyState == '1'||row.applyState == '4'">已提交</el-tag>
+            <el-tag v-else>已入库</el-tag>
+          </el-button>
         </template>
       </avue-crud>
     </basic-container>
     <comp-addframe v-model="innerVisible" :uploaderkey="new Date().getTime()" :frameId="frameId"></comp-addframe>
+    <comp-frameApplys ref="applysData" v-model="addframeVisible"></comp-frameApplys>
   </div>
 </template>
 
@@ -62,9 +66,14 @@ import {
 import { tableOption } from "@/const/crud/libs/compframe";
 import { mapGetters } from "vuex"; //addframe.vue
 import compAddframe from "./addframe";
+import compFrameApplys from "./frameApplys";
 export default {
   name: "compframe",
-  components: { "comp-addframe": compAddframe },
+  components: {
+    "comp-addframe": compAddframe,
+    "comp-frameApplys": compFrameApplys
+  },
+  inject: ["reload"],
   data() {
     return {
       tableData: [],
@@ -79,9 +88,11 @@ export default {
       },
       tableLoading: false,
       tableOption: tableOption,
-
       innerVisible: false,
-      frameId: ""
+      addframe: false,
+      frameId: "",
+      addframeVisible: false,
+      applysParam: {}
     };
   },
   created() {
@@ -96,6 +107,16 @@ export default {
       handler: function(isData) {
         if (!isData) {
           this.getList();
+          this.reload();
+        }
+      },
+      deep: true
+    },
+    addframeVisible: {
+      handler: function(isData) {
+        if (!isData) {
+          this.getList();
+          this.reload();
         }
       },
       deep: true
@@ -194,6 +215,10 @@ export default {
      */
     refreshChange() {
       this.getList();
+    },
+    compFrameApplysClick(param) {
+      this.$refs.applysData.fetchTreeDataLoading(param);
+      this.addframeVisible = true;
     }
   }
 };

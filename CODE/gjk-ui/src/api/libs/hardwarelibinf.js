@@ -55,10 +55,32 @@ export function putObj(obj) {
   })
 }
 
-export function saveInf(obj){
+export function saveInf(obj) {
   return request({
-    url:'/libs/hardwarelibinf/saveInf',
-    method : 'post',
-    data : obj
+    url: '/libs/hardwarelibinf/saveInf',
+    method: 'post',
+    data: obj
+  })
+}
+
+export function updateInf(obj) {
+  return request({
+    url: '/libs/hardwarelibinf/updateInf',
+    method: 'post',
+    data: obj
+  })
+}
+//获取所有用户
+export function getAllUser() {
+  return request({
+    url: '/admin/user/getAllUser',
+    method: 'get'
+  })
+}
+//返回接口数据
+export function getInfList() {
+  return request({
+    url: '/libs/hardwarelibinf/getInfList',
+    method: 'get'
   })
 }

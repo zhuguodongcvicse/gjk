@@ -26,62 +26,63 @@ export const tableOption = {
   delBtn: false,
   addBtn: false,
   column: [
-	  /* {
-      label: 'ID',
-      prop: 'id'
-    }, */
 	  {
       label: '芯片名称',
       prop: 'chipName'
     },
-	  /* {
-      label: 'SN',
-      prop: 'sn'
+    {
+      label: '内核数量',
+      prop: 'coreNum'
+    },
+    {
+      label: '内存大小',
+      prop: 'memSize'
+    },
+    {
+      label: '接收速率',
+      prop: 'recvRate'
     },
 	  {
-      label: '顺序号',
-      prop: 'chipId'
-    },
-	  {
-      label: 'IP',
-      prop: 'ipConfige'
-    }, */
-	  {
-      label: '硬件类型名称',
+      label: '平台类型',
       prop: 'hrTypeName'
     },
-	  /* {
+    {
       label: '用户',
-      prop: 'userId'
-    }, */
-	  /* {
+      prop: 'userId',
+      type: 'select',
+      filter: true,
+      dicData:[/*{ label: '男', value: '男' },
+        { label: '女', value: '女' }*/],
+      /*filterMethod:function(value, row, column) {
+        console.log("row",row)
+        return row.userId === value;
+      }*/
+    },
+    {
+      label: '备注',
+      prop: 'backupInfo'
+    },
+    {
+      label: '审批状态',
+      prop: 'applyDesc'
+    },
+    {
+      label: '版本',
+      prop: 'version'
+    },
+    {
       label: '创建时间',
       prop: 'createTime'
     },
-	  {
+    {
       label: '修改时间',
       prop: 'updateTime'
-    }, */
-	  /*{
-      label: '版本',
-      prop: 'version'
-    },*/
+    },
 	  /* {
       label: '删除标志',
       prop: 'delFlag'
     }, */
-	  {
-      label: '内核数量',
-      prop: 'coreNum'
-    },
-	  {
-      label: '内存大小',
-      prop: 'memSize'
-    },
-	  {
-      label: '接收速率',
-      prop: 'recvRate'
-    }/* ,
+	  /* ,
     {
       label:"芯片数据",
       prop:'chipData'

@@ -18,7 +18,6 @@ var infOfExchangeCpuArr = []
 var ExchangeCpu
 var dragCpuList = []
 var selectedStartInfs = []
-var selectInfCount = 0
 var showStartCpuList = []
 var showEndCpuList = []
 var showStartInfList = []
@@ -608,29 +607,33 @@ function initEditor(editor) {
 	button.className = 'boarddesign_board_14s';
 	toolbarDiv.appendChild(button)
 	button.onclick = function (evt) {
+	  let cpuNum
 		//芯片赋值
 		var data = graph.toJSON();
-		data.datas[0].json.properties.chipList = chipList
 		//json串保存交换芯片
 		if (boardArr.boardType == 0) {
+      data.datas[0].json.properties.chipList = chipList
 			data.datas[0].json.properties.ExchangeCpu = infOfExchangeCpuArr
 			infOfExchangeCpuArr = []
+      cpuNum = data.datas[0].json.properties.chipList.length
 		} else if (boardArr.boardType == 1) {
+      data.datas[0].json.properties.chipList = chipList
 			//console.log("showStartInfList",showStartInfList);
 			for (const i in showStartInfList) {
 				InternalLinkArr.push([showStartCpuList[i], showStartInfList[i], showEndCpuList[i], showEndInfList[i]])
 			}
 			data.datas[0].json.properties.InternalLink = InternalLinkArr
-		}
+      cpuNum = data.datas[0].json.properties.chipList.length
+    }
 		var json = JSON.stringify(data);
 		postMessageParentData.cmd = "submitJSON";
-		postMessageParentData.params = json;
-		console.log("data", data);
+		postMessageParentData.params = [json, cpuNum];
+		// console.log("data", data);
 		//closePane()
 		window.parent.postMessage(postMessageParentData, "*")
 	}
 	function initToolbar() {
-		//网状画布 
+		//网状画布
 		/* var graph = editor.graph;
 		//不可改变形状大小
 		//	graph.editable = true; */
@@ -737,12 +740,12 @@ function initEditor(editor) {
 					return
 				}
 				var currentElement = graph.getElement(evt.event);
-				console.log("currentElement", currentElement)
-				if (currentElement && currentElement.image == 'images/BeforeTheBoard.svg') {
+				// console.log("currentElement", currentElement)
+				if (currentElement && currentElement.image === 'images/BeforeTheBoard.svg') {
 					//	node.host = currentElement;
-				} else if (currentElement && currentElement.image == 'images/AfterTheBoard.svg') {
+				} else if (currentElement && currentElement.image === 'images/AfterTheBoard.svg') {
 					//	node.host = currentElement;
-				} else if (currentElement && currentElement.image == 'images/Chip.svg') {
+				} else if (currentElement && currentElement.image === 'images/Chip.svg') {
 					graph.removeElement(node);
 					return
 				} else {
@@ -773,11 +776,8 @@ function initEditor(editor) {
 					if (boardArr.boardType == 0) {
 						infOfChip = evt.data.properties.infOfChipList
 					}
-					if (boardArr.boardType == 1 && selectInfCount != 0) {
+					if (boardArr.boardType == 1) {
 						for (const i in evt.data.properties.infOfChipList) {
-							/* if (evt.data.properties.infOfChipList[i].infName.indexOf(evt.data.properties.infOfChipList[i].uniqueId)) {
-								evt.data.properties.infOfChipList[i].infName = evt.data.properties.infOfChipList[i].infName + evt.data.properties.infOfChipList[i].uniqueId
-							} */
 							StartInfOfChip.push(evt.data.properties.infOfChipList[i])
 						}
 					}
@@ -796,7 +796,7 @@ function initEditor(editor) {
 			}
 			if (evt.kind == Q.InteractionEvent.ELEMENT_MOVE_START) {
 				var type = data.get('type');
-				console.log("type",type)
+				// console.log("type",type)
 				if (type && (type == 'card' || type == 'port')) {
 					dragInfo = {
 						data: data,
@@ -885,6 +885,13 @@ function initEditor(editor) {
 					}
 				}
 			}
+			if(boardArr.boardType === '2' || boardArr.boardType === '3') {
+        for (const i in backBoardInfList) {
+          if (backBoardInfList[i].uniqueId === selection[0].properties.uniqueId) {
+            removeByValue(backBoardInfList, backBoardInfList[i])
+          }
+        }
+      }
 			for (const i in dragCpuList) {
 				if (dragCpuList[i].uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
 					removeByValue(dragCpuList, dragCpuList[i])
@@ -934,12 +941,11 @@ function initEditor(editor) {
 				}
 				if (data.properties.infName != null) {
 					data.set('infName', data.properties.infName);
-					data.set('fiberspeed', data.properties.infRate);
-					data.set('fibernum', data.properties.opticalNum);
+					data.set('infRate', data.properties.infRate);
+					data.set('opticalNum', data.properties.opticalNum);
 					data.set('ioType', data.properties.ioType);
 				}
-
-				console.log("data", data);
+				// console.log("data", data);
 			}
 		}
 		if (image == 'images/Chip.svg') {
@@ -976,11 +982,11 @@ function initEditor(editor) {
 					displayName: '接口名称'
 				},
 				{
-					client: 'fiberspeed',
+					client: 'infRate',
 					displayName: '接口速率'
 				},
 				{
-					client: 'fibernum',
+					client: 'opticalNum',
 					displayName: '光纤数量'
 				},
 				{
@@ -1011,7 +1017,7 @@ function initEditor(editor) {
 					displayName: '接口名称'
 				},
 				{
-					client: 'fiberspeed',
+					client: 'infRate',
 					displayName: '接口速率'
 				},
 				{

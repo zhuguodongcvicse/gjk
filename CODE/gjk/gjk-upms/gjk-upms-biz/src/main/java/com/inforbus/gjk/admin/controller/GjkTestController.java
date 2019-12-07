@@ -166,7 +166,7 @@ public class GjkTestController {
 	@ResponseBody
 	@PostMapping(path = "/importLibsZipUpload", consumes = { "multipart/mixed", "multipart/form-data" })
 	@PreAuthorize("@pms.hasPermission('sys_test_import')")
-	public R appImageUpload(@RequestParam(value = "file", required = false) MultipartFile ufile,
+	public R importLibsZipUpload(@RequestParam(value = "file", required = false) MultipartFile ufile,
 							@RequestParam(value = "importType", required = false) String importType) {
 		return new R<>(gjkTestService.analysisZipFile(ufile, importType));
 	}

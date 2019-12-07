@@ -281,6 +281,7 @@ export default {
     },
     saveCompImg(param) {
       let imgretStr = deepClone(this.imgValue.saveCompImgStr);
+
       imgretStr.compParam.comp = param;
       let imgHtml = deepClone(this.compImg.imgHtml);
       //设置构件图标中的版本
@@ -290,6 +291,7 @@ export default {
       );
       imgretStr.compParam.compImg = this.compImg;
       imgretStr.compParam.username = this.userInfo.username
+      // imgretStr.compParam.createTime = param.createTime
       saveCompImg(imgretStr);
     },
     //保存对应文件
@@ -307,7 +309,8 @@ export default {
         version: param.version,
         fileType: this.fileType,
         paths: this.compValueType.paths,
-        userCurrent: this.userInfo.username
+        userCurrent: this.userInfo.username,
+        createTime: param.createTime,
       };
       return Promise.resolve(fetchSavefiles(savefiles));
     },

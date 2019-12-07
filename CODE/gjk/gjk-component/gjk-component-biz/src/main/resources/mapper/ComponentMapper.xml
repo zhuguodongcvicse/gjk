@@ -54,7 +54,7 @@
 	</resultMap>
 
 	<resultMap id="structlibsMap"
-			   type="com.inforbus.gjk.common.core.entity.Structlibs">
+		type="com.inforbus.gjk.common.core.entity.Structlibs">
 		<id property="id" column="id" />
 		<result property="parentId" column="parent_id" />
 		<result property="childrenIds" column="children_ids" />
@@ -73,19 +73,20 @@
 		<result property="applyDesc" column="apply_desc" />
 	</resultMap>
 
-	<resultMap id="GjkAlgorithmMap" type="com.inforbus.gjk.admin.api.entity.GjkAlgorithm">
-		<id column="algorithm_id" property="algorithmId"/>
-		<result column="name" property="name"/>
-		<result column="permission" property="permission"/>
-		<result column="parent_id" property="parentId"/>
-		<result column="sort" property="sort"/>
-		<result column="create_time" property="createTime"/>
-		<result column="update_time" property="updateTime"/>
-		<result column="del_flag" property="delFlag"/>
+	<resultMap id="GjkAlgorithmMap"
+		type="com.inforbus.gjk.admin.api.entity.GjkAlgorithm">
+		<id column="algorithm_id" property="algorithmId" />
+		<result column="name" property="name" />
+		<result column="permission" property="permission" />
+		<result column="parent_id" property="parentId" />
+		<result column="sort" property="sort" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="del_flag" property="delFlag" />
 	</resultMap>
 
 	<resultMap id="GjkPlatformMap"
-			   type="com.inforbus.gjk.admin.api.entity.GjkPlatform">
+		type="com.inforbus.gjk.admin.api.entity.GjkPlatform">
 		<id column="platform_id" property="platformId" />
 		<result column="name" property="name" />
 		<result column="permission" property="permission" />
@@ -96,15 +97,16 @@
 		<result column="del_flag" property="delFlag" />
 	</resultMap>
 
-	<resultMap id="GjkTestMap" type="com.inforbus.gjk.admin.api.entity.GjkTest">
-		<id column="test_id" property="testId"/>
-		<result column="name" property="name"/>
-		<result column="permission" property="permission"/>
-		<result column="parent_id" property="parentId"/>
-		<result column="sort" property="sort"/>
-		<result column="create_time" property="createTime"/>
-		<result column="update_time" property="updateTime"/>
-		<result column="del_flag" property="delFlag"/>
+	<resultMap id="GjkTestMap"
+		type="com.inforbus.gjk.admin.api.entity.GjkTest">
+		<id column="test_id" property="testId" />
+		<result column="name" property="name" />
+		<result column="permission" property="permission" />
+		<result column="parent_id" property="parentId" />
+		<result column="sort" property="sort" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="del_flag" property="delFlag" />
 	</resultMap>
 
 	<sql id="componentSql">
@@ -262,7 +264,19 @@
 	<insert id="saveComp"
 		parameterType="com.inforbus.gjk.comp.api.entity.Component">
 		INSERT INTO gjk_component (
-		<include refid="saveComponentSql" />
+		id,
+		comp_id,
+		comp_name,
+		comp_funcname,
+		user_id,
+		version,
+		comp_img,
+		comp_backupinfo,
+		apply_state,
+		<if test="comp.createTime != null">
+			create_time,
+		</if>
+		apply_desc
 		) VALUES (#{comp.id},
 		#{comp.compId},
 		#{comp.compName},
@@ -272,6 +286,9 @@
 		#{comp.compImg},
 		#{comp.compBackupinfo},
 		#{comp.applyState},
+		<if test="comp.createTime != null">
+			#{comp.createTime},
+		</if>
 		#{comp.applyDesc})
 	</insert>
 	<update id="editComp"
@@ -420,20 +437,21 @@
 	</select>
 	<!-- 保存结构体 -->
 	<insert id="saveStructlibs"
-			parameterType="com.inforbus.gjk.common.core.entity.Structlibs">
+		parameterType="com.inforbus.gjk.common.core.entity.Structlibs">
 		INSERT INTO gjk_structlibs (
-			id,
-			parent_id,
-			children_ids,
-			name,
-			sort,
-			version,
-			type,
-			data_type,
-			struct_type,
-			data_length,
-			permission
-		) VALUES (
+		id,
+		parent_id,
+		children_ids,
+		name,
+		sort,
+		version,
+		type,
+		data_type,
+		struct_type,
+		data_length,
+		permission
+		)
+		VALUES (
 		#{structlibs.id},
 		#{structlibs.parentId},
 		#{structlibs.childrenIds},
@@ -449,25 +467,30 @@
 	<!-- 根据id查询一条结构体数据 -->
 	<select id="getStructlibsById" resultMap="structlibsMap">
 		SELECT *
-		FROM gjk_structlibs
+		FROM
+		gjk_structlibs
 		WHERE id=#{id}
 	</select>
 
 	<select id="getTestByIdNotDelete" resultMap="GjkTestMap">
 		SELECT *
-		FROM gjk_test
+		FROM
+		gjk_test
 		WHERE test_id=#{id} and del_flag=0
 	</select>
 
 	<select id="getPlatformByIdNotDelete" resultMap="GjkPlatformMap">
 		SELECT *
-		FROM gjk_platform
+		FROM
+		gjk_platform
 		WHERE platform_id=#{id} and del_flag=0
 	</select>
 
-	<select id="getAlgorithmByIdNotDelete" resultMap="GjkAlgorithmMap">
+	<select id="getAlgorithmByIdNotDelete"
+		resultMap="GjkAlgorithmMap">
 		SELECT *
 		FROM gjk_algorithm
-		WHERE algorithm_id=#{id} and del_flag=0
+		WHERE algorithm_id=#{id} and
+		del_flag=0
 	</select>
 </mapper>

@@ -2,12 +2,13 @@
 	var createElement = function(options) {
 		options = options || {};
 		var element = document.createElement(options.tagName || 'div');
-		if (options.parent.innerText == 'IP') {
+		/* if (options.class == 'input-group input-group-sm col-sm-7') {
+			element.setAttribute("readonly","readonly")
+		} */
+		/*if (options.parent.innerText == 'IP') {
 			element.setAttribute("id","IP")
-			// console.log("element.childNodes777",element.childNodes[0])
-			// console.log("options",options)
-			// console.log("options.parent",options.parent)
-		}
+			element.removeAttribute("readonly")
+		}*/
 		if(options.class) {
 			$(element).addClass(options.class);
 		}
@@ -52,24 +53,49 @@
 			return stringToValue(this.input.value, this.property.type);
 		},
 		createHtml: function(parent) {
-			var property = this.property;
-			var input = Q.createElement({
-				tagName: 'input',
-				class: "form-control",
-				parent: parent
-			});
-			this.input = input;
-			// console.log("input",input.parentNode)
-			if(property.readonly) {
-				input.setAttribute('readonly', 'readonly');
-			}
-			this.update();
-			$(input).on('input', function(evt) {
-				if(this.ajdusting) {
-					return;
-				}
-				this.setter.call(this.scope, this);
-			}.bind(this));
+      // console.log("parent",parent)
+      // console.log("parent--",parent.parentNode.childNodes.item(0).textContent)
+      //判断创建的输入框是否是IP输入框
+      if (parent.parentNode.childNodes.item(0).textContent === 'IP') {
+        var property = this.property;
+        var input = Q.createElement({
+          tagName: 'input',
+          class: "form-control",
+          parent: parent
+        });
+        this.input = input;
+        //设置id为IP
+        input.setAttribute('id','IP')
+        //设置失去聚焦实践
+        input.setAttribute("onblur", "upperCase()")
+        // console.log("input",input)
+        this.update();
+        $(input).on('input', function(evt) {
+          if(this.ajdusting) {
+            return;
+          }
+          this.setter.call(this.scope, this);
+        }.bind(this));
+      } else {
+        var property = this.property;
+        var input = Q.createElement({
+          tagName: 'input',
+          class: "form-control",
+          parent: parent
+        });
+        this.input = input;
+        if(property.readonly) {
+          input.setAttribute('readonly', 'readonly');
+        }
+        input.setAttribute('readonly', 'readonly');
+        this.update();
+        $(input).on('input', function(evt) {
+          if(this.ajdusting) {
+            return;
+          }
+          this.setter.call(this.scope, this);
+        }.bind(this));
+      }
 		}
 	}
 
@@ -630,7 +656,7 @@
 				parent: formItem,
 				class: "input-group input-group-sm col-sm-7"
 			});
-			
+
 			// var aa = $("#form-control")
             // console.log("aa",aa.document)
 			var cellEditor = createCellEditor(property, inputDIV, function() {

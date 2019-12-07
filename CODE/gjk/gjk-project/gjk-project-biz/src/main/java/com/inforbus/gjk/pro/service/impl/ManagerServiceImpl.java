@@ -1,23 +1,33 @@
 package com.inforbus.gjk.pro.service.impl;
 
+import java.beans.PropertyDescriptor;
 import java.io.*;
+import java.lang.reflect.Method;
 import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import com.inforbus.gjk.admin.api.entity.BSP;
-import com.inforbus.gjk.admin.api.entity.BaseTemplate;
+import com.inforbus.gjk.admin.api.entity.*;
+import com.inforbus.gjk.common.core.entity.*;
 import com.inforbus.gjk.pro.api.dto.BaseTemplateIDsDTO;
 import com.inforbus.gjk.pro.api.entity.*;
 
+import com.inforbus.gjk.pro.api.entity.GjkPlatform;
+import com.inforbus.gjk.pro.api.entity.Software;
 import com.inforbus.gjk.pro.mapper.*;
 import com.inforbus.gjk.pro.service.BaseTemplateService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.WordUtils;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.*;
 import org.ho.yaml.Yaml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +45,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.inforbus.gjk.common.core.constant.CommonConstants;
-import com.inforbus.gjk.common.core.entity.StringRef;
-import com.inforbus.gjk.common.core.entity.XmlEntity;
-import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.ExternalIOTransUtils;
@@ -88,6 +95,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	private BaseTemplateService baseTemplateService;
 	@Autowired
 	protected PartPlatformBSPMapper partPlatformBSPMapper;
+	@Autowired
+	private AppMapper appMapper;
 
 	private static final String proDetailPath = JGitUtil.getLOCAL_REPO_PATH();
 	private static final String integerCodeFileName = JGitUtil.getINTEGER_CODE_FILE_NAME();
@@ -241,13 +250,13 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 *      java.lang.String, java.lang.String)
 	 */
 	@Override
-	public boolean createXmlFile(XmlEntityMap entity, String proDetailId) {
+	public String createXmlFile(XmlEntityMap entity, String proDetailId) {
 		ProjectFile projectFile = this.getById(proDetailId);
 		String filePath = null;
 		if (projectFile != null) {
 			filePath = proDetailPath + projectFile.getFilePath() + File.separator + projectFile.getFileName() + ".xml";
 		} else {
-			return false;
+			//return false;
 		}
 		File file = new File(filePath);
 		if (!file.getParentFile().exists()) {
@@ -255,7 +264,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		}
 		boolean flag = XmlFileHandleUtil.createXmlFile(entity, file);
 		JGitUtil.commitAndPush(file.getAbsolutePath(), "上传项目相关文件");
-		return flag;
+		return filePath;
 	}
 
 	/**
@@ -1823,5 +1832,901 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			partPlatformBSPMapper.insert(ppBsp);
 		}
 		return new R<>(true);
+	}
+	
+	
+    @Override
+    public byte[] createZip(String projectId, String processId) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ZipOutputStream zip = new ZipOutputStream(outputStream);
+
+        createExcelFileToZipIO(projectId, processId, zip);
+
+        IOUtils.closeQuietly(zip);
+        return outputStream.toByteArray();
+    }
+
+	@Override
+	public int analysisZipFile(MultipartFile ufile, String projectId) {
+		Project project = projectMapper.getProById(projectId);
+		String filePath = serverPath + "gjk" + File.separator + "zipFile" + File.separator
+				+ (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date()) + "-" + ufile.getOriginalFilename();
+		try {
+			File file = new File(filePath);
+			if (!file.getParentFile().exists()) {
+				file.getParentFile().mkdirs();
+			}
+			ufile.transferTo(file);
+
+			String descDirPath = filePath.substring(0, filePath.lastIndexOf("."));
+			// 解压zip文件夹
+			unZipFiles(filePath, descDirPath);
+
+			int tag = 0;
+
+			File[] files = new File(descDirPath).listFiles();
+			for (File item : files) {
+				// 表数据入库处理
+				if(item.getName().equals("mysql")){
+					String excelFilePath = descDirPath + File.separator + "mysql" + File.separator + "MySQL.xls";
+					tag = readExcel(descDirPath, excelFilePath, projectId);
+				}
+
+				// 引用的资源文件拷贝到指定目录
+				else{
+					if(item.getName().equals("project")){
+						// project 需要把目录改成导入项目的目录名
+						String targetFilePath = serverPath + "gjk" + File.separator + item.getName() + File.separator + project.getProjectName();
+						FileUtil.copyFile(item.listFiles()[0].getPath(), targetFilePath);
+					}else{
+						String targetFilePath = serverPath + "gjk" + File.separator + item.getName();
+						FileUtil.copyFile(item.getPath(), targetFilePath);
+					}
+				}
+			}
+
+			// 删除压缩包
+			cn.hutool.core.io.FileUtil.del(filePath);
+			// 删除解压包
+			cn.hutool.core.io.FileUtil.del(descDirPath);
+			return tag;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
+	}
+
+	/**
+	 * 解析excel文件
+	 * @param unZipFilePath
+	 * @param path
+	 * @param projectId
+	 * @return
+	 * @throws Exception
+	 */
+	public int readExcel(String unZipFilePath, String path, String projectId) throws Exception {
+		// 获取整个表格文件对象
+		XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(path));
+
+		List<Project> projectList = new ArrayList<>();
+		List<ProjectFile> projectDetailList = new ArrayList<>();
+		List<App> appList = new ArrayList<>();
+		List<BaseTemplate> baseTemplateList = new ArrayList<>();
+		List<PartPlatformSoftware> partPlatformSoftwareList = new ArrayList<>();
+		List<Software> softwareList = new ArrayList<>();
+		List<SoftwareDetail> softwareDetailList = new ArrayList<>();
+		List<SoftwareFile> softwareFileList = new ArrayList<>();
+		List<PartPlatformBSP> partPlatformBSPList = new ArrayList<>();
+		List<BSP> bspList = new ArrayList<>();
+		List<BSPDetail> bspDetailList = new ArrayList<>();
+		List<BSPFile> bspFileList = new ArrayList<>();
+		List<ProComp> proCompList = new ArrayList<>();
+		List<CommonComponent> compList = new ArrayList<>();
+		List<CommonComponentDetail> compDetailList = new ArrayList<>();
+		List<CompStruct> compStructList = new ArrayList<>();
+		List<Structlibs> structlibsList = new ArrayList<>();
+
+		// 获取所有sheet对象
+		Iterator<Sheet> sheetIterator = workbook.sheetIterator();
+		while (sheetIterator.hasNext()) {
+			Sheet sheet = sheetIterator.next();
+			String tableName = sheet.getSheetName();
+			String className = null;
+			// 项目表
+			if ("gjk_project".equals(tableName)) {
+				className = "com.inforbus.gjk.pro.api.entity.Project";
+				for (Object obj : parseSheet(sheet, className)) {
+					projectList.add((Project) obj);
+				}
+			}
+			// 项目详情表
+			else if("gjk_project_detail".equals(tableName)){
+				className = "com.inforbus.gjk.pro.api.entity.ProjectFile";
+				for (Object obj : parseSheet(sheet, className)) {
+					projectDetailList.add((ProjectFile) obj);
+				}
+			}
+			// app表
+			else if("gjk_app".equals(tableName)){
+				className = "com.inforbus.gjk.pro.api.entity.App";
+				for (Object obj : parseSheet(sheet, className)) {
+					appList.add((App) obj);
+				}
+			}
+			// 基础模版表
+			else if("gjk_base_template".equals(tableName)){
+				className = "com.inforbus.gjk.admin.api.entity.BaseTemplate";
+				for (Object obj : parseSheet(sheet, className)) {
+					baseTemplateList.add((BaseTemplate) obj);
+				}
+			}
+			// 软件框架与流程关系表
+			else if("gjk_app_part_platform_software".equals(tableName)){
+				className = "com.inforbus.gjk.pro.api.entity.PartPlatformSoftware";
+				for (Object obj : parseSheet(sheet, className)) {
+					partPlatformSoftwareList.add((PartPlatformSoftware) obj);
+				}
+			}
+			// 软件框架表
+			else if("gjk_software".equals(tableName)){
+				className = "com.inforbus.gjk.pro.api.entity.Software";
+				for (Object obj : parseSheet(sheet, className)) {
+					softwareList.add((Software) obj);
+				}
+			}
+			// 软件框架与平台关系表
+			else if("gjk_software_detail".equals(tableName)){
+				className = "com.inforbus.gjk.admin.api.entity.SoftwareDetail";
+				for (Object obj : parseSheet(sheet, className)) {
+					softwareDetailList.add((SoftwareDetail) obj);
+				}
+			}
+			// 软件框架文件表
+			else if("gjk_software_file".equals(tableName)){
+				className = "com.inforbus.gjk.admin.api.entity.SoftwareFile";
+				for (Object obj : parseSheet(sheet, className)) {
+					softwareFileList.add((SoftwareFile) obj);
+				}
+			}
+			// 软件框架文件表
+			else if("gjk_app_part_platform_bsp".equals(tableName)){
+				className = "com.inforbus.gjk.pro.api.entity.PartPlatformBSP";
+				for (Object obj : parseSheet(sheet, className)) {
+					partPlatformBSPList.add((PartPlatformBSP) obj);
+				}
+			}
+			// bsp表
+			else if("gjk_bsp".equals(tableName)){
+				className = "com.inforbus.gjk.admin.api.entity.BSP";
+				for (Object obj : parseSheet(sheet, className)) {
+					bspList.add((BSP) obj);
+				}
+			}
+			// bsp和平台关系表
+			else if("gjk_bsp_detail".equals(tableName)){
+				className = "com.inforbus.gjk.admin.api.entity.BSPDetail";
+				for (Object obj : parseSheet(sheet, className)) {
+					bspDetailList.add((BSPDetail) obj);
+				}
+			}
+			// BSP文件表
+			else if("gjk_bsp_file".equals(tableName)){
+				className = "com.inforbus.gjk.admin.api.entity.BSPFile";
+				for (Object obj : parseSheet(sheet, className)) {
+					bspFileList.add((BSPFile) obj);
+				}
+			}
+			// 项目和构件关系表
+			else if("gjk_project_comp".equals(tableName)){
+				className = "com.inforbus.gjk.pro.api.entity.ProComp";
+				for (Object obj : parseSheet(sheet, className)) {
+					proCompList.add((ProComp) obj);
+				}
+			}
+			// 构件库表
+			else if("gjk_common_component".equals(tableName)){
+				className = "com.inforbus.gjk.pro.api.entity.CommonComponent";
+				for (Object obj : parseSheet(sheet, className)) {
+					compList.add((CommonComponent) obj);
+				}
+			}
+			// 结构库详细表
+			else if("gjk_common_component_detail".equals(tableName)){
+				className = "com.inforbus.gjk.pro.api.entity.CommonComponentDetail";
+				for (Object obj : parseSheet(sheet, className)) {
+					compDetailList.add((CommonComponentDetail) obj);
+				}
+			}
+			// 构件库和结构体表关系表
+			else if("gjk_comp_struct".equals(tableName)){
+				className = "com.inforbus.gjk.common.core.entity.CompStruct";
+				for (Object obj : parseSheet(sheet, className)) {
+					compStructList.add((CompStruct) obj);
+				}
+			}
+			// 结构体表
+			else if("gjk_structlibs".equals(tableName)){
+				className = "com.inforbus.gjk.common.core.entity.Structlibs";
+				for (Object obj : parseSheet(sheet, className)) {
+					structlibsList.add((Structlibs) obj);
+				}
+			}
+		}
+		workbook.close();
+
+		// 数据导入处理
+		// 项目表
+		Project project = projectMapper.getProById(projectId);
+		project.setBasetemplateIds(projectList.get(0).getBasetemplateIds());
+
+		// 项目详情表
+		for (ProjectFile projectFile : projectDetailList) {
+			// 判断id是否存在
+			if(baseMapper.getProDetailById(projectFile.getId()) != null){
+				continue;
+			}
+			// 项目id替换成导入的项目id
+			projectFile.setProjectId(projectId);
+			String[] filePathArr = projectFile.getFilePath().split(String.format("\\%s", File.separator));
+			filePathArr[2] = project.getProjectName();
+			String newFilePath = "";
+			for (String s : filePathArr) {
+				newFilePath += s + File.separator;
+			}
+			// 项目文件路径替换成导入项目的名称
+			projectFile.setFilePath(newFilePath);
+			baseMapper.saveProDetail(projectFile);
+		}
+
+		// app表
+		for (App app : appList) {
+			if(appMapper.selectById(app.getId()) == null){
+				appMapper.saveApp(app);
+			}
+		}
+
+		// 基础模版表
+		for (BaseTemplate baseTemplate : baseTemplateList) {
+			if(baseTemplateService.getById(baseTemplate.getTempId()).getData() == null){
+				baseMapper.saveBaseTemplate(baseTemplate);
+			}
+		}
+
+		// 软件框架与流程关系表
+		for (PartPlatformSoftware partPlatformSoftware : partPlatformSoftwareList) {
+			if(partPlatformSoftwareMapper.selectById(partPlatformSoftware.getId()) == null){
+				partPlatformSoftwareMapper.savePartPlatformSoftware(partPlatformSoftware);
+			}
+		}
+
+		// 软件框架表
+		for (Software software : softwareList) {
+			if(baseMapper.getSoftwareById(software.getId()) == null){
+				baseMapper.saveSoftware(software);
+			}
+		}
+
+		// 软件框架与平台关系表
+		for (SoftwareDetail softwareDetail : softwareDetailList) {
+			if(baseMapper.getSoftwareDetailBySoftwareIdAndPlatformId(softwareDetail.getSoftwareId(), softwareDetail.getPlatformId()) == null){
+				baseMapper.saveSoftwareDetail(softwareDetail);
+			}
+		}
+
+		// 软件框架文件表
+		for (SoftwareFile softwareFile : softwareFileList) {
+			if(baseMapper.getSoftwareFileBySoftwareIdAndFileName(softwareFile.getSoftwareId(), softwareFile.getFileName()) == null){
+				baseMapper.saveSoftwareFile(softwareFile);
+			}
+		}
+
+		// bsp与流程关系表
+		for (PartPlatformBSP partPlatformBSP : partPlatformBSPList) {
+			if(partPlatformBSPMapper.selectById(partPlatformBSP.getId()) == null){
+				partPlatformBSPMapper.insert(partPlatformBSP);
+			}
+		}
+
+		// bsp表
+		for (BSP bsp : bspList) {
+			if(baseMapper.getBSPById(bsp.getId()) == null){
+				baseMapper.saveBSP(bsp);
+			}
+		}
+
+		// bsp和平台关系表
+		for (BSPDetail bspDetail : bspDetailList) {
+			if(baseMapper.getBSPDetailByBSPIdAndPlatformId(bspDetail.getBspId(), bspDetail.getPlatformId()) == null){
+				baseMapper.saveBSPDetail(bspDetail);
+			}
+		}
+
+		// BSP文件表
+		for (BSPFile bspFile : bspFileList) {
+			baseMapper.saveBSPFile(bspFile);
+		}
+
+		// 项目和构件关系表
+		for (ProComp proComp : proCompList) {
+			// 项目id替换成导入项目的id
+			proComp.setProjectId(projectId);
+			projectMapper.saveProComp(proComp);
+		}
+
+		// 构件库表
+		for (CommonComponent commonComponent : compList) {
+			baseMapper.saveCommonComp(commonComponent);
+		}
+
+		// 结构库详细表
+		for (CommonComponentDetail commonComponentDetail : compDetailList) {
+			baseMapper.saveCommonCompDetail(commonComponentDetail);
+		}
+
+		// 构件库和结构体表关系表
+		for (CompStruct compStruct : compStructList) {
+			baseMapper.saveCompAndStruct(compStruct);
+		}
+
+		// 结构体表
+		for (Structlibs structlibs : structlibsList) {
+			baseMapper.saveStructlibs(structlibs);
+		}
+
+		return 1;
+	}
+
+	/**
+	 * 解析工作簿
+	 *
+	 * @param sheet
+	 * @throws Exception
+	 */
+	private List<Object> parseSheet(Sheet sheet, String className) throws Exception {
+		List<Object> objects = new ArrayList<Object>();
+
+		// 获取所有Row对象
+		Iterator<Row> iterator = sheet.iterator();
+		int index = 0;
+		// 存列信息
+		List<String> columnList = new ArrayList<>();
+		while (iterator.hasNext()) {
+			if (index == 0) {
+				columnList = parseRow(iterator.next());
+			} else {
+				objects.add(parseRow(iterator.next(), className, columnList));
+			}
+			index++;
+		}
+		return objects;
+	}
+
+	/**
+	 * 解析列
+	 *
+	 * @param next
+	 */
+	private List<String> parseRow(Row next) {
+		List<String> list = new ArrayList<String>();
+		// 获取所有Cell对象取值
+		Iterator<Cell> cellIterator = next.cellIterator();
+		while (cellIterator.hasNext()) {
+			Cell cell = cellIterator.next();
+			cell.setCellType(CellType.STRING);
+			list.add(cell.getStringCellValue());
+		}
+		return list;
+	}
+
+	/**
+	 * 解析每行数据
+	 *
+	 * @param next
+	 * @throws ClassNotFoundException
+	 * @throws Exception
+	 */
+	private Object parseRow(Row next, String calssName, List<String> columnList) throws Exception {
+		Class<?> cla = Class.forName(calssName);
+		Object obj = cla.newInstance();
+
+		// 获取所有Cell对象取值
+		Iterator<Cell> cellIterator = next.cellIterator();
+		int index = 0;
+		while (cellIterator.hasNext()) {
+			Cell cell = cellIterator.next();
+			cell.setCellType(CellType.STRING);
+			if (!"".equals(cell.getStringCellValue())) {
+				if ("CreateTime".equals(columnList.get(index)) || "UpdateTime".equals(columnList.get(index))) {
+					LocalDateTime parse = LocalDateTime.parse(cell.getStringCellValue());
+					setFieldValueByName(columnList.get(index), cla, obj, parse);
+				} else {
+					setFieldValueByName(columnList.get(index), cla, obj, cell.getStringCellValue());
+				}
+			}
+			index++;
+		}
+		return obj;
+	}
+
+	/**
+	 * set属性值
+	 *
+	 * @param fieldName 字段名称
+	 * @param o         对象
+	 * @return Object
+	 */
+	private void setFieldValueByName(String fieldName, Class<?> clazz, Object o, Object value) {
+		try {
+			String firstLetter = fieldName.substring(0, 1).toLowerCase();
+			fieldName = firstLetter + fieldName.substring(1); // 获取方法名
+			PropertyDescriptor pd = new PropertyDescriptor(fieldName, clazz);
+			Method wM = pd.getWriteMethod();// 获得写方法
+
+			// 判断字段类型 转换类型
+			if(pd.getPropertyType().getName().indexOf("Double") > -1){
+				value = Double.valueOf((String)value);
+			}else if(pd.getPropertyType().getName().indexOf("Integer") > -1 || pd.getPropertyType().getName().indexOf("int") > -1){
+				value = Integer.valueOf((String)value);
+			}
+
+			wM.invoke(o, value);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+     * 生成Excel文件并添加到压缩文件流中
+     * @param projectId
+     * @param processId
+     * @param zip
+     * @throws Exception
+     * @throws IOException
+     */
+    private void createExcelFileToZipIO(String projectId, String processId, ZipOutputStream zip) throws Exception, IOException {
+		// 创建表格工作空间
+		XSSFWorkbook workbook = new XSSFWorkbook();
+
+		// 项目表
+		List<Project> projectList = new ArrayList<>();
+		Project project = projectMapper.selectById(projectId);
+		projectList.add(project);
+		createSheet(workbook, projectList, "gjk_project");
+
+		// 项目详细信息表
+		List<ProjectFile> projectDetailList = new ArrayList<>();
+		//查询流程数据
+		ProjectFile projectFile = baseMapper.getProDetailById(processId);
+		projectDetailList.add(projectFile);
+		//查询模型数据
+		List<ProjectFile> processTemplatList = baseMapper.getProFileListByModelId(processId);
+		projectDetailList.addAll(processTemplatList);
+		for (ProjectFile file : processTemplatList) {
+			//查询流程建模、硬件建模、软硬件映射配置、方案展示、部署图、自定义配置、系统配置数据
+			List<ProjectFile> list11_17 = baseMapper.getProFileListByModelId(file.getId());
+			projectDetailList.addAll(list11_17);
+		}
+		createSheet(workbook, projectDetailList, "gjk_project_detail");
+
+		// 项目文件
+		for (ProjectFile projectDetail : projectDetailList) {
+			if(projectDetail.getFileType().equals("9")){
+				String peoFlowPath = serverPath + projectDetail.getFilePath() + projectDetail.getFileName();
+				if (new File(peoFlowPath).exists()) {
+					zipDirOrFile(zip, new File(peoFlowPath),
+							"project" + File.separator + project.getProjectName() + File.separator + projectDetail.getFileName());
+				}
+				break;
+			}
+		}
+
+		// app表
+		App app = appMapper.getAppByProcessId(projectId);
+		List<App> appList = new ArrayList<>();
+		if(app != null){
+			appList.add(app);
+		}
+		createSheet(workbook, appList, "gjk_app");
+
+		// 基础模版表
+		JSONObject jsonObject = JSONObject.parseObject(project.getBasetemplateIds());
+		R<BaseTemplate> sysTemplateR = baseTemplateService.getById(jsonObject.getString("sysTempId"));
+		R<BaseTemplate> themeTemplateR = baseTemplateService.getById(jsonObject.getString("themeTempId"));
+		R<BaseTemplate> networkTemplateR = baseTemplateService.getById(jsonObject.getString("networkTempId"));
+		R<BaseTemplate> hsmTemplateR = baseTemplateService.getById(jsonObject.getString("hsmTempId"));
+		List<BaseTemplate> baseTemplateList = new ArrayList<>();
+		baseTemplateList.add(sysTemplateR.getData());
+		baseTemplateList.add(themeTemplateR.getData());
+		baseTemplateList.add(networkTemplateR.getData());
+		baseTemplateList.add(hsmTemplateR.getData());
+		createSheet(workbook, baseTemplateList, "gjk_base_template");
+
+		// 基础模版文件
+		for (BaseTemplate baseTemplate : baseTemplateList) {
+			String peoFlowPath = serverPath + baseTemplate.getTempPath();
+			File file = new File(peoFlowPath);
+			if (file.exists()) {
+				zipDirOrFile(zip, file, "baseTemplate" + File.separator + file.getName());
+			}
+		}
+
+		// 软件框架与流程关系表
+		List<PartPlatformSoftware> partPlatformSoftwareList = partPlatformSoftwareMapper.getByProcedureId(processId);
+		createSheet(workbook, partPlatformSoftwareList, "gjk_app_part_platform_software");
+
+		// 软件框架表
+		List<String> softwareIdList = partPlatformSoftwareList.stream().map(PartPlatformSoftware::getSoftwareId).collect(Collectors.toList());
+		List<Software> softwareList = new ArrayList<>();
+		String ids = "";
+		if (softwareIdList.size() > 0) {
+			ids = "'" + StringUtils.join(softwareIdList, "','") + "'";
+			softwareList = baseMapper.getAllSoftwareListByIdIn(ids);
+		}
+		createSheet(workbook, softwareList, "gjk_software");
+
+		// 软件框架文件
+		for (Software software : softwareList) {
+			String peoFlowPath = serverPath + software.getFilePath();
+			File file = new File(peoFlowPath);
+			if (file.exists()) {
+				zipDirOrFile(zip, file, "software" + File.separator + software.getVersion() + File.separator + file.getName());
+			}
+		}
+
+
+		// 软件框架与平台关系表
+		List<SoftwareDetail> softwareDetailList = new ArrayList<>();
+		if (ids.length() > 0) {
+			softwareDetailList = baseMapper.getSoftwareDetailBySoftwareIdIn(ids);
+		}
+		createSheet(workbook, softwareDetailList, "gjk_software_detail");
+
+		// 软件框架文件表
+		List<SoftwareFile> softwareFileList = new ArrayList<>();
+		if (ids.length() > 0) {
+			softwareFileList = baseMapper.getSoftwareFileBySoftwareIdIn(ids);
+		}
+		createSheet(workbook, softwareFileList, "gjk_software_file");
+
+		// bsp与流程关系表
+		List<PartPlatformBSP> partPlatformBSPList = partPlatformBSPMapper.getByProcedureId(processId);
+		createSheet(workbook, partPlatformBSPList, "gjk_app_part_platform_bsp");
+
+		// bsp表
+		List<String> bspIdList = partPlatformBSPList.stream().map(PartPlatformBSP::getBspId).collect(Collectors.toList());
+		List<BSP> bspList = new ArrayList<>();
+		String bspIds = "";
+		if (bspIdList.size() > 0) {
+			bspIds = "'" + StringUtils.join(bspIdList, "','") + "'";
+			bspList = baseMapper.getAllBSPListByIdIn(bspIds);
+		}
+		createSheet(workbook, bspList, "gjk_bsp");
+
+		// bsp文件
+		for (BSP bsp : bspList) {
+			String peoFlowPath = serverPath + bsp.getFilePath();
+			File file = new File(peoFlowPath);
+			if (file.exists()) {
+				zipDirOrFile(zip, file, "bsp" + File.separator + bsp.getVersion() + File.separator + file.getName());
+			}
+		}
+
+
+
+		// bsp和平台关系表
+		List<BSPDetail> bspDetailList = new ArrayList<>();
+		if (bspIds.length() > 0) {
+			bspDetailList = baseMapper.getBSPDetailByBSPIdIn(bspIds);
+		}
+		createSheet(workbook, bspDetailList, "gjk_bsp_detail");
+
+		// BSP文件表
+		List<BSPFile> bspFileList = new ArrayList<>();
+		if (bspIds.length() > 0) {
+			bspFileList = baseMapper.getBSPFileByBSPIdIn(bspIds);
+		}
+		createSheet(workbook, bspFileList, "gjk_bsp_file");
+
+		// 项目和构件关系表
+		List<ProComp> proCompList = projectMapper.getProjectCompByProId(projectId);
+		createSheet(workbook, proCompList, "gjk_project_comp");
+
+		// 构件库表
+		List<String> compIdList = proCompList.stream().map(ProComp::getCompId).collect(Collectors.toList());
+		List<CommonComponent> compList = new ArrayList<>();
+		String compIds = "";
+		if (compIdList.size() > 0) {
+			compIds = "'" + StringUtils.join(compIdList, "','") + "'";
+			compList = baseMapper.getCommonComponentByIdIn(compIds);
+		}
+		createSheet(workbook, compList, "gjk_common_component");
+
+		// 结构库详细表
+		List<CommonComponentDetail> compDetailList = new ArrayList<>();
+		if (compIds.length() > 0) {
+			compDetailList = baseMapper.getCommonComponentDetailByCompIdIn(compIds);
+		}
+		createSheet(workbook, compDetailList, "gjk_common_component_detail");
+
+		// 结构库文件
+		for (CommonComponent commonComponent : compList) {
+			String compPath = serverPath + "gjk" + File.separator + "common" + File.separator + "component" + File.separator
+					+ commonComponent.getCompId() + File.separator + commonComponent.getVersion() + File.separator;
+			File file = new File(compPath);
+			if (file.exists()) {
+				zipDirOrFile(zip, file, "common" + File.separator + "component" + File.separator + commonComponent.getCompId() + File.separator + commonComponent.getVersion());
+			}
+		}
+
+
+		// 构件库和结构体表关系表
+		List<CompStruct> compStructList = new ArrayList<>();
+		if (compIdList.size() > 0) {
+			compStructList = baseMapper.getCompStructByCompIdList(compIdList);
+		}
+		createSheet(workbook, compStructList, "gjk_comp_struct");
+
+		// 结构体表
+		List<Structlibs> structlibsList = new ArrayList<>();
+		List<String> structIdList = compStructList.stream().map(CompStruct::getStructId).collect(Collectors.toList());
+		List<Structlibs> structlibsListSub = new ArrayList<>();
+		if (structIdList.size() > 0) {
+			structlibsListSub = baseMapper.getStructlibsByIdList(structIdList);
+		}
+		structlibsList.addAll(structlibsListSub);
+		findStructlibsRecursion(structlibsListSub, structlibsList);
+		createSheet(workbook, structlibsList, "gjk_structlibs");
+
+
+		// 创建Excel文件保存的临时地址
+		File file = new File(serverPath + "gjk" + File.separator + "testExcel" + File.separator + "MySQL.xls");
+		if (!file.getParentFile().exists()) {
+			file.getParentFile().mkdirs();
+		}
+
+		// 创建Excel文件压缩目录
+		ZipEntry entry = new ZipEntry("mysql" + File.separator + "MySQL.xls");
+		zip.putNextEntry(entry);
+		// 将Excel文件内容写入临时文件
+		OutputStream op = new FileOutputStream(file);
+		workbook.write(op);
+		// 将Excel文件读入压缩文件流
+		zip.write(FileUtils.readFileToByteArray(file));
+		// 将临时文件删除
+		file.delete();
+		zip.flush();
+		zip.closeEntry();
+	}
+
+	/**
+	 * 递归获取结构体数据
+	 * @param structlibsList
+	 * @param resList
+	 */
+	private void findStructlibsRecursion(List<Structlibs> structlibsList, List<Structlibs> resList){
+		List<String> structIdList = structlibsList.stream().map(Structlibs::getId).collect(Collectors.toList());
+		List<Structlibs> list = new ArrayList<>();
+		if(structIdList.size() > 0){
+			list = baseMapper.getStructlibsByIdList(structIdList);
+		}
+		if(list.size() > 0){
+			resList.addAll(list);
+			findStructlibsRecursion(list, resList);
+		}
+	}
+
+	/**
+     * 创建一个sheep标签 并处理数据
+     * @param workbook
+     * @param dataList
+     * @param tableName
+     * @throws Exception
+     */
+    private void createSheet(XSSFWorkbook workbook, List<?> dataList, String tableName) throws Exception {
+        XSSFSheet compDetailSheet = workbook.createSheet(tableName);
+        // set Sheet页头部
+        List<String> compDetailColumnList = setSheetHeader(workbook, compDetailSheet, tableName);
+        // set Sheet页内容
+        List<Object> list = new ArrayList<Object>();
+        list.addAll(dataList);
+        setSheetContent(workbook, compDetailSheet, list, compDetailColumnList);
+    }
+
+    /**
+     * 配置Excel表格的顶部信息，如：学号 姓名 年龄 出生年月
+     *
+     * @param xWorkbook
+     * @param xSheet
+     */
+    private List<String> setSheetHeader(XSSFWorkbook xWorkbook, XSSFSheet xSheet, String tableName) {
+        List<String> columnList = new ArrayList<>();
+
+        // 设置表格的宽度 xSheet.setColumnWidth(0, 20 * 256); 中的数字 20 自行设置为自己适用的
+        xSheet.setColumnWidth(0, 20 * 256);
+        xSheet.setColumnWidth(1, 15 * 256);
+        xSheet.setColumnWidth(2, 15 * 256);
+        xSheet.setColumnWidth(3, 20 * 256);
+
+        // 创建表格的样式
+        XSSFCellStyle cs = xWorkbook.createCellStyle();
+        // 设置居中
+        cs.setAlignment(HorizontalAlignment.CENTER);
+        // 设置字体
+        Font headerFont = xWorkbook.createFont();
+        headerFont.setFontHeightInPoints((short) 12);
+//		headerFont.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
+        headerFont.setFontName("宋体");
+        cs.setFont(headerFont);
+        cs.setWrapText(true);// 是否自动换行
+
+        // 创建一行
+        XSSFRow row = xSheet.createRow(0);
+
+        int columnNum = 0;
+        // 设置每一列
+        for (Map<String, String> column : queryColumns(tableName)) {
+            XSSFCell cell = row.createCell(columnNum);
+            cell.setCellStyle(cs);
+            cell.setCellValue(columnToJava(column.get("columnName")));
+            columnList.add(columnToJava(column.get("columnName")));
+            columnNum++;
+        }
+        return columnList;
+    }
+
+    /**
+     * 配置(赋值)表格内容部分
+     *
+     * @param xWorkbook
+     * @param xSheet
+     * @throws Exception
+     */
+    private void setSheetContent(XSSFWorkbook xWorkbook, XSSFSheet xSheet, List<Object> objList,
+                                 List<String> columnList) throws Exception {
+        // 创建内容样式（头部以下的样式）
+        CellStyle cs = xWorkbook.createCellStyle();
+        cs.setWrapText(true);
+        cs.setAlignment(HorizontalAlignment.CENTER);
+
+        int rowIndex = 1;
+        if (null != objList && objList.size() > 0) {
+            for (Object obj : objList) {
+                XSSFRow xRow = xSheet.createRow(rowIndex);
+                int columnIndex = 0;
+                for (String key : columnList) {
+                    Object temp = getFieldValueByName(key, obj);
+                    String strTemp = "";
+                    if (temp != null) {
+                        strTemp = temp.toString();
+                    }
+                    XSSFCell cell = xRow.createCell(columnIndex);
+                    cell.setCellStyle(cs);
+                    // 把每个对象此字段的属性写入这一列excel中
+                    cell.setCellValue(strTemp);
+
+                    columnIndex++;
+                }
+                rowIndex++;
+            }
+        }
+    }
+
+    /**
+     * 获取属性值
+     *
+     * @param fieldName 字段名称
+     * @param o         对象
+     * @return Object
+     */
+    private static Object getFieldValueByName(String fieldName, Object o) {
+        try {
+            String firstLetter = fieldName.substring(0, 1).toUpperCase();
+            String getter = "get" + firstLetter + fieldName.substring(1); // 获取方法名
+            Method method = o.getClass().getMethod(getter, new Class[] {}); // 获取方法对象
+            Object value = method.invoke(o, new Object[] {}); // 用invoke调用此对象的get字段方法
+            return value; // 返回值
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 获取表中的字段名
+     *
+     * @param tableName
+     * @return
+     */
+    private List<Map<String, String>> queryColumns(String tableName) {
+        return baseMapper.queryColumns(tableName);
+    }
+
+    /**
+     * 列名转换成Java属性名
+     */
+    private String columnToJava(String columnName) {
+        return WordUtils.capitalizeFully(columnName, new char[] { '_' }).replace("_", "");
+    }
+
+	/**
+	 * 根据打包路径打包文件或文件夹
+	 *
+	 * @param zip  打包压缩文件流
+	 * @param file 需要打包的文件或文件夹
+	 * @param dir  打包路径
+	 * @throws Exception
+	 */
+	private void zipDirOrFile(ZipOutputStream zip, File file, String dir) throws Exception {
+		// 如果当前的是文件夹，则进行进一步处理
+		if (file.isDirectory()) {
+			// 得到文件列表信息
+			File[] files = file.listFiles();
+			// 将文件夹添加到下一级打包目录
+			zip.putNextEntry(new ZipEntry(dir + "/"));
+			dir = dir.length() == 0 ? "" : dir + "/";
+			// 循环将文件夹中的文件打包
+			for (int i = 0; i < files.length; i++) {
+				zipDirOrFile(zip, files[i], dir + files[i].getName()); // 递归处理
+			}
+		} else { // 当前的是文件，打包处理
+			// 文件输入流
+			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+			ZipEntry entry = new ZipEntry(dir);
+			zip.putNextEntry(entry);
+			zip.write(FileUtils.readFileToByteArray(file));
+			IOUtils.closeQuietly(bis);
+			zip.flush();
+			zip.closeEntry();
+		}
+	}
+
+	/**
+	 * 解压文件到指定目录
+	 *
+	 * @param zipPath 压缩文件地址
+	 * @param descDir 指定目录
+	 * @throws IOException
+	 */
+	private static void unZipFiles(String zipPath, String descDir) throws IOException {
+		try {
+			File zipFile = new File(zipPath);
+			if (!zipFile.exists()) {
+				throw new IOException("需解压文件不存在.");
+			}
+			File pathFile = new File(descDir);
+			if (!pathFile.exists()) {
+				pathFile.mkdirs();
+			}
+			ZipFile zip = new ZipFile(zipFile);
+			for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
+				ZipEntry entry = (ZipEntry) entries.nextElement();
+				String zipEntryName = entry.getName();
+				String outPath = descDir + File.separator + zipEntryName;
+
+				// 判断文件全路径是否为文件夹,如果是上面已经上传,不需要解压
+				if (entry.isDirectory()) {
+					continue;
+				}
+
+				// 判断路径是否存在,不存在则创建文件路径
+				File file = new File(outPath);
+				if (!file.exists()) {
+					file.getParentFile().mkdirs();
+				}
+				InputStream in = zip.getInputStream(entry);
+				// 输出文件路径信息
+				OutputStream out = new FileOutputStream(outPath);
+				byte[] buf1 = new byte[1024];
+				int len;
+				while ((len = in.read(buf1)) > 0) {
+					out.write(buf1, 0, len);
+				}
+				in.close();
+				out.close();
+			}
+			zip.close();
+		} catch (Exception e) {
+			throw new IOException(e);
+		}
 	}
 }

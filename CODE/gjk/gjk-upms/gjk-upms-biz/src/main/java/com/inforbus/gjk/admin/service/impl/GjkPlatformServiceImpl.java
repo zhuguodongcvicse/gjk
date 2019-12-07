@@ -169,51 +169,18 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 		String firstId = IdGenerate.uuid();
 		gjkPlatform.setPlatformId(firstId);
 		gjkPlatform.setParentId(softwareDetail.getPlatformId());
-		gjkPlatform.setName("软件框架库");
+		gjkPlatform.setName("软件框架库" + "_" + String.valueOf(software.getVersion()));
 		gjkPlatforms.add(gjkPlatform);
-
-		// 组装第二层 软件框架库 版本
-		gjkPlatform = new GjkPlatform();
-		String secondId = IdGenerate.uuid();
-		gjkPlatform.setPlatformId(secondId);
-		gjkPlatform.setParentId(firstId);
-		gjkPlatform.setName(String.valueOf(software.getVersion()));
-		gjkPlatforms.add(gjkPlatform);
-
+		
 		// 解析文件夹
-		List<SoftwareFile> softwareFiles = fileMap.get(softwareDetail.getSoftwareId());
-		for (SoftwareFile sofware : softwareFiles) {
-			// 如果是-1，无文件夹，直接组装数据；否则，解析文件夹
-			if (sofware.getFileName().indexOf("/") == -1) {
-				gjkPlatform = new GjkPlatform();
-				gjkPlatform.setPlatformId(IdGenerate.uuid());
-				gjkPlatform.setParentId(secondId);
-				gjkPlatform.setName(sofware.getFileName());
-				gjkPlatform.setPermission(libsPath + File.separator + sofware.getFilePath());
-				gjkPlatforms.add(gjkPlatform);
-			} else {
-				// 分解文件夹
-				String[] strs = sofware.getFileName().split("/");
-				String parentId = secondId;
-				for (String str : strs) {
-					// 如果文件夹实体类已经建立，则修改 parentID
-					GjkPlatform isExist = this.isExist(str, gjkPlatforms);
-					if (null != isExist) {
-						parentId = isExist.getPlatformId();
-					} else {
-						gjkPlatform = new GjkPlatform();
-						gjkPlatform.setPlatformId(IdGenerate.uuid());
-						gjkPlatform.setParentId(parentId);
-						// 重置parentID
-						parentId = gjkPlatform.getPlatformId();
-						gjkPlatform.setName(str);
-						gjkPlatform.setPermission(libsPath + File.separator + sofware.getFilePath());
-						gjkPlatforms.add(gjkPlatform);
-					}
-				}
+		File file = new File(
+				libsPath + File.separator + "gjk/software/" + File.separator + String.valueOf(software.getVersion()));
+		if (file.isDirectory()) {
+			File[] childFileList = file.listFiles();
+			for (File childFile : childFileList) {
+				addGjkPlatformTree(gjkPlatforms, firstId, childFile);
 			}
 		}
-
 		return gjkPlatforms;
 	}
 
@@ -232,50 +199,60 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 		String firstId = IdGenerate.uuid();
 		gjkPlatform.setPlatformId(firstId);
 		gjkPlatform.setParentId(softwareDetail.getPlatformId());
-		gjkPlatform.setName("BSP");
-		gjkPlatforms.add(gjkPlatform);
-
-		// 组装第二层 软件框架库 版本
-		gjkPlatform = new GjkPlatform();
-		String secondId = IdGenerate.uuid();
-		gjkPlatform.setPlatformId(secondId);
-		gjkPlatform.setParentId(firstId);
-		gjkPlatform.setName(String.valueOf(software.getVersion()));
+		gjkPlatform.setName("BSP" + "_" + String.valueOf(software.getVersion()));
 		gjkPlatforms.add(gjkPlatform);
 
 		// 解析文件夹
-		List<BSPFile> softwareFiles = fileMap.get(softwareDetail.getBspId());
-		for (BSPFile sofware : softwareFiles) {
-			// 如果是-1，无文件夹，直接组装数据；否则，解析文件夹
-			if (sofware.getFileName().indexOf("/") == -1) {
-				gjkPlatform = new GjkPlatform();
-				gjkPlatform.setPlatformId(IdGenerate.uuid());
-				gjkPlatform.setParentId(secondId);
-				gjkPlatform.setName(sofware.getFileName());
-				gjkPlatform.setPermission(libsPath + File.separator + sofware.getFilePath());
-				gjkPlatforms.add(gjkPlatform);
-			} else {
-				// 分解文件夹
-				String[] strs = sofware.getFileName().split("/");
-				String parentId = secondId;
-				for (String str : strs) {
-					// 如果文件夹实体类已经建立，则修改 parentID
-					GjkPlatform isExist = this.isExist(str, gjkPlatforms);
-					if (null != isExist) {
-						parentId = isExist.getPlatformId();
-					} else {
-						gjkPlatform = new GjkPlatform();
-						gjkPlatform.setPlatformId(IdGenerate.uuid());
-						gjkPlatform.setParentId(parentId);
-						// 重置parentID
-						parentId = gjkPlatform.getPlatformId();
-						gjkPlatform.setName(str);
-						gjkPlatform.setPermission(libsPath + File.separator + sofware.getFilePath());
-						gjkPlatforms.add(gjkPlatform);
-					}
-				}
+		File file = new File(
+				libsPath + File.separator + "gjk/bsp/" + File.separator + String.valueOf(software.getVersion()));
+		if (file.isDirectory()) {
+			File[] childFileList = file.listFiles();
+			for (File childFile : childFileList) {
+				addGjkPlatformTree(gjkPlatforms, firstId, childFile);
 			}
 		}
+
+		// 组装第二层 软件框架库 版本
+//		gjkPlatform = new GjkPlatform();
+//		String secondId = IdGenerate.uuid();
+//		gjkPlatform.setPlatformId(secondId);
+//		gjkPlatform.setParentId(firstId);
+//		gjkPlatform.setName(String.valueOf(software.getVersion()));
+//		gjkPlatforms.add(gjkPlatform);
+
+		// 解析文件夹
+//		List<BSPFile> softwareFiles = fileMap.get(softwareDetail.getBspId());
+//		for (BSPFile sofware : softwareFiles) {
+//			// 如果是-1，无文件夹，直接组装数据；否则，解析文件夹
+//			if (sofware.getFileName().indexOf("/") == -1) {
+//				gjkPlatform = new GjkPlatform();
+//				gjkPlatform.setPlatformId(IdGenerate.uuid());
+//				gjkPlatform.setParentId(secondId);
+//				gjkPlatform.setName(sofware.getFileName());
+//				gjkPlatform.setPermission(libsPath + File.separator + sofware.getFilePath());
+//				gjkPlatforms.add(gjkPlatform);
+//			} else {
+//				// 分解文件夹
+//				String[] strs = sofware.getFileName().split("/");
+//				String parentId = secondId;
+//				for (String str : strs) {
+//					// 如果文件夹实体类已经建立，则修改 parentID
+//					GjkPlatform isExist = this.isExist(str, gjkPlatforms);
+//					if (null != isExist) {
+//						parentId = isExist.getPlatformId();
+//					} else {
+//						gjkPlatform = new GjkPlatform();
+//						gjkPlatform.setPlatformId(IdGenerate.uuid());
+//						gjkPlatform.setParentId(parentId);
+//						// 重置parentID
+//						parentId = gjkPlatform.getPlatformId();
+//						gjkPlatform.setName(str);
+//						gjkPlatform.setPermission(libsPath + File.separator + sofware.getFilePath());
+//						gjkPlatforms.add(gjkPlatform);
+//					}
+//				}
+//			}
+//		}
 
 		return gjkPlatforms;
 	}
@@ -420,7 +397,7 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 				String sssId = IdGenerate.uuid();
 				gjkAlgorithm.setAlgorithmId(commInfos.getId());
 				gjkAlgorithm.setParentId(commInfos.getLibsId());
-				gjkAlgorithm.setName(compName.getCompName());
+				gjkAlgorithm.setName(compName.getCompName()  + "_" + compName.getVersion());
 				gjkAlgorithms.add(gjkAlgorithm);
 				// 展示构件名
 				if (commInfos.getFileName().equals("算法文件")) {
@@ -485,7 +462,7 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 				String sssId = IdGenerate.uuid();
 				gjkTest.setTestId(commInfos.getId());
 				gjkTest.setParentId(commInfos.getLibsId());
-				gjkTest.setName(compName.getCompName());
+				gjkTest.setName(compName.getCompName() + "_" + compName.getVersion());
 				gjkTests.add(gjkTest);
 				// 展示构件名
 				if (commInfos.getFileName().equals("测试文件")) {
@@ -551,7 +528,7 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 				String sssId = IdGenerate.uuid();
 				gjkPlatform.setPlatformId(commInfos.getId());
 				gjkPlatform.setParentId(commInfos.getLibsId());
-				gjkPlatform.setName(compName.getCompName());
+				gjkPlatform.setName(compName.getCompName()  + "_" + compName.getVersion());
 				gjkPlatforms.add(gjkPlatform);
 				// 展示构件名
 				if (commInfos.getFileName().equals("平台文件")) {

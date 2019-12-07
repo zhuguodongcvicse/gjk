@@ -105,5 +105,10 @@ public class Structlibs extends Model<Structlibs> {
 	 * 审批描述
 	 */
 	private String applyDesc;
+	/**
+	 * 结构体注释
+	 */
+	private String paramRemarks;
+	
 
 }

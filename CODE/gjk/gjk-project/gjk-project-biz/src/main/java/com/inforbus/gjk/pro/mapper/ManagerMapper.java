@@ -3,8 +3,12 @@ package com.inforbus.gjk.pro.mapper;
 import java.util.List;
 import java.util.Map;
 
-import com.inforbus.gjk.admin.api.entity.BSP;
+import com.inforbus.gjk.admin.api.entity.*;
+import com.inforbus.gjk.common.core.entity.CompStruct;
+import com.inforbus.gjk.common.core.entity.Structlibs;
 import com.inforbus.gjk.pro.api.entity.*;
+import com.inforbus.gjk.pro.api.entity.GjkPlatform;
+import com.inforbus.gjk.pro.api.entity.Software;
 import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -195,4 +199,187 @@ public interface ManagerMapper extends BaseMapper<ProjectFile> {
 	 * @return
 	 */
 	List<BSP> getAllBSPListByIdIn(@Param("ids") String ids);
+
+	/**
+	 * 查询表列信息
+	 *
+	 * @param tableName 表名称
+	 * @return
+	 */
+	List<Map<String, String>> queryColumns(String tableName);
+
+	/**
+	 * 根据多个ID查询数据列表 软件框架和平台关系
+	 * @param ids
+	 * @return
+	 */
+	List<SoftwareDetail> getSoftwareDetailBySoftwareIdIn(@Param("ids") String ids);
+
+	/**
+	 * 根据多个ID查询数据列表 软件框架文件
+	 * @param ids
+	 * @return
+	 */
+	List<SoftwareFile> getSoftwareFileBySoftwareIdIn(@Param("ids") String ids);
+
+	/**
+	 * 根据多个ID查询数据列表 BSP和平台关系
+	 * @param ids
+	 * @return
+	 */
+	List<BSPDetail> getBSPDetailByBSPIdIn(@Param("ids") String ids);
+
+	/**
+	 * 根据多个ID查询数据列表 BSP文件
+	 * @param ids
+	 * @return
+	 */
+	List<BSPFile> getBSPFileByBSPIdIn(@Param("ids") String ids);
+	/**
+	 * 根据多个ID查询数据列表 结构库
+	 * @param ids
+	 * @return
+	 */
+	List<CommonComponent> getCommonComponentByIdIn(@Param("ids") String ids);
+	/**
+	 * 根据多个ID查询数据列表 结构库详情
+	 * @param ids
+	 * @return
+	 */
+	List<CommonComponentDetail> getCommonComponentDetailByCompIdIn(@Param("ids") String ids);
+	/**
+	 * 根据构件库id集合，获取构件库和结构体关系数据
+	 * @param compIdList
+	 * @return
+	 */
+	List<CompStruct> getCompStructByCompIdList(@Param("compIdList") List<String> compIdList);
+	/**
+	 * 得到结构体数据，根据id集合
+	 * @param idList
+	 * @return
+	 */
+	List<Structlibs> getStructlibsByIdList(@Param("idList") List<String> idList);
+
+	/**
+	 * 保存基础模版
+	 * @param baseTemplate
+	 * @return
+	 */
+	int saveBaseTemplate(@Param("baseTemplate") BaseTemplate baseTemplate);
+
+	/**
+	 *
+	 * @Title: saveSoftware  保存软件框架库信息
+	 * @Description:
+	 * @Author cvicse
+	 * @DateTime 2019年6月14日 上午11:40:43
+	 * @param software
+	 */
+	void saveSoftware(@Param("soft") Software software);
+
+	/**
+	 * 保存软件框架详情
+	 * @param softwareDetail
+	 */
+	void saveSoftwareDetail(@Param("softDetail") SoftwareDetail softwareDetail);
+
+	/**
+	 * 保存软件框架文件数据
+	 * @param softwareFile
+	 */
+	void saveSoftwareFile(@Param("softFile") SoftwareFile softwareFile);
+
+	/**
+	 *
+	 * @Title: saveBSP  保存bsp信息
+	 * @Description:
+	 * @Author cvicse
+	 * @DateTime 2019年6月14日 上午11:40:43
+	 * @param bsp
+	 */
+	void saveBSP(@Param("bs") BSP bsp);
+
+	/**
+	 * 保存bsp子表
+	 * @Title: saveBSPDetail
+	 * @Description:
+	 * @Author cvicse
+	 * @DateTime 2019年6月14日 下午4:48:49
+	 * @param BSPDetail
+	 */
+	void saveBSPDetail(@Param("bspDetail") BSPDetail BSPDetail);
+
+	/**
+	 * 保存bsp文件路径子表
+	 * @Title: saveBSPFile
+	 * @Description:
+	 * @Author cvicse
+	 * @DateTime 2019年6月14日 下午4:48:49
+	 * @param BSPFile
+	 */
+	void saveBSPFile(@Param("bspFile") BSPFile BSPFile);
+
+	/**
+	 * @Title: saveCommonComp
+	 * @Description: 保存公共构件
+	 * @Author cvics
+	 * @DateTime 2019年6月11日 下午2:27:22
+	 * @param commonComponent
+	 */
+	void saveCommonComp(@Param("comp") CommonComponent commonComponent);
+	/**
+	 * 保存公共构件详细表数据
+	 *
+	 * @param commonComponentDetail
+	 */
+	void saveCommonCompDetail(@Param("compDetail") CommonComponentDetail commonComponentDetail);
+
+	/**
+	 * 保存构件库和结构体表关系
+	 * @param compStruct
+	 */
+	void saveCompAndStruct(@Param("compStruct") CompStruct compStruct);
+	/**
+	 * 保存结构体
+	 * @param structlibs
+	 */
+	void saveStructlibs(@Param("structlibs") Structlibs structlibs);
+
+	/**
+	 * 根据id获取软件框架数据
+	 * @param id
+	 * @return
+	 */
+	Software getSoftwareById(@Param("id") String id);
+
+	/**
+	 * 根据软件id和平台id获取数据
+	 * @param softwareId
+	 * @param platformId
+	 * @return
+	 */
+	SoftwareDetail getSoftwareDetailBySoftwareIdAndPlatformId(@Param("softwareId") String softwareId, @Param("platformId") String platformId);
+
+	/**
+	 * 根据软件id和文件名称查询数据
+	 * @param softwareId
+	 * @param fileName
+	 * @return
+	 */
+	SoftwareFile getSoftwareFileBySoftwareIdAndFileName(@Param("id") String softwareId, @Param("fileName") String fileName);
+
+	/**
+	 * 根据id获取bsp数据
+	 * @param id
+	 * @return
+	 */
+	BSP getBSPById(@Param("id") String id);
+
+	/**
+	 * 查询bsp关系数据
+	 * @param bspId
+	 * @param platformId
+	 * @return
+	 */
+	BSPDetail getBSPDetailByBSPIdAndPlatformId(@Param("bspId") String bspId, @Param("platformId") String platformId);
 }

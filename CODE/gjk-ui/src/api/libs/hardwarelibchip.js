@@ -63,21 +63,14 @@ export function saveChip(obj){
     data:obj
   })
 }
-//返回接口数据 
-export function getInfData() {
+//获取所有芯片
+export function getChipList() {
   return request({
-    url: '/libs/hardwarelibchip/interfaceDate',
+    url: '/libs/hardwarelibchip/getChipList',
     method: 'get'
   })
 }
-//返回芯片json
-export function getChipJson(id) {
-  return request({
-    url: '/libs/hardwarelibchip/getChipJson/' + id,
-    method: 'get'
-  })
-}
-//更新机箱 
+//更新机箱
 export function updateChip(obj) {
   return request({
     url: '/libs/hardwarelibchip/updateChip',

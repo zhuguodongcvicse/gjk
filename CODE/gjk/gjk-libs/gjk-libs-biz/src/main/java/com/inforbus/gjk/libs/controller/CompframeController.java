@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Maps;
 import com.inforbus.gjk.common.core.util.R;
+import com.inforbus.gjk.common.core.util.TreeUtil;
 import com.inforbus.gjk.common.log.annotation.SysLog;
 import com.inforbus.gjk.libs.api.entity.Compframe;
 import com.inforbus.gjk.libs.service.CompframeService;
@@ -123,5 +124,10 @@ public class CompframeController {
 		Map<String, Object> resMap = Maps.newHashMap();
 		resMap.putAll(JSONUtil.parseObj(dataParams));
 		return compframeService.saveCompFrame(ufile,resMap);
+	}
+	@SysLog("修改构件框架库")
+	@PostMapping("/compframeToTree")
+	public R compframeToTree(@RequestBody Compframe compframe) {
+		return new R<>(TreeUtil.buildByLoop(compframeService.compframeToTree(compframe), "-1"));
 	}
 }

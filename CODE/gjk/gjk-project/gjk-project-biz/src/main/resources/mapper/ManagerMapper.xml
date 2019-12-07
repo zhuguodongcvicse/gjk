@@ -13,6 +13,8 @@
 		<result property="parentId" column="parent_id" />
 		<result property="softwareId" column="software_id" />
 		<result property="bspId" column="bsp_id" />
+		<result property="jsonPath" column="json_path" />
+		<result property="newfilePath" column="newfile_path" />
 	</resultMap>
 
 	<resultMap type="com.inforbus.gjk.pro.api.entity.ProjectPlan"
@@ -107,7 +109,112 @@
 		<result property="delFlag" column="del_flag" />
 	</resultMap>
 
-    <sql id="saveSoftwareSql">
+	<resultMap id="softwareDetailMap"
+			   type="com.inforbus.gjk.admin.api.entity.SoftwareDetail">
+		<id property="software_id" column="softwareId" />
+		<result property="platform_id" column="platformId" />
+	</resultMap>
+
+	<resultMap id="softwareFileMap"
+			   type="com.inforbus.gjk.admin.api.entity.SoftwareFile">
+		<id property="software_id" column="softwareId" />
+		<result property="file_name" column="fileName" />
+		<result property="file_path" column="filePath" />
+	</resultMap>
+
+	<resultMap id="bspDetailMap"
+			   type="com.inforbus.gjk.admin.api.entity.BSPDetail">
+		<id property="bsp_id" column="bspId" />
+		<result property="platform_id" column="platformId" />
+	</resultMap>
+
+	<resultMap id="bspFileMap"
+			   type="com.inforbus.gjk.admin.api.entity.BSPFile">
+		<id property="bsp_id" column="bspId" />
+		<result property="file_name" column="fileName" />
+		<result property="file_path" column="filePath" />
+	</resultMap>
+
+	<resultMap id="commonComponentMap"
+			   type="com.inforbus.gjk.pro.api.entity.CommonComponent">
+		<id property="id" column="id" />
+		<result property="compId" column="comp_id" />
+		<result property="compName" column="comp_name" />
+		<result property="compFuncname" column="comp_funcname" />
+		<result property="userId" column="user_id" />
+		<result property="version" column="version" />
+		<result property="compImg" column="comp_img" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="description" column="description" />
+		<result property="delFlag" column="del_flag" />
+	</resultMap>
+	<resultMap id="commonComponentDetailMap"
+			   type="com.inforbus.gjk.pro.api.entity.CommonComponentDetail">
+		<id property="id" column="id" />
+		<result property="compId" column="comp_id" />
+		<result property="fileName" column="file_name" />
+		<result property="fileType" column="file_type" />
+		<result property="filePath" column="file_path" />
+		<result property="paraentId" column="paraent_id" />
+		<result property="version" column="version" />
+		<result property="paraentIds" column="paraent_ids" />
+		<result property="libsId" column="libs_id" />
+	</resultMap>
+
+	<resultMap id="compStructMap"
+			   type="com.inforbus.gjk.common.core.entity.CompStruct">
+		<id property="id" column="id" />
+		<result property="compId" column="comp_id" />
+		<result property="structId" column="struct_id" />
+	</resultMap>
+
+	<resultMap id="structlibsMap"
+			   type="com.inforbus.gjk.common.core.entity.Structlibs">
+		<id property="id" column="id" />
+		<result property="parentId" column="parent_id" />
+		<result property="childrenIds" column="children_ids" />
+		<result property="name" column="name" />
+		<result property="version" column="version" />
+		<result property="type" column="type" />
+		<result property="dataType" column="data_type" />
+		<result property="structType" column="struct_type" />
+		<result property="dataLength" column="data_length" />
+		<result property="permission" column="permission" />
+		<result property="sort" column="sort" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="delFlag" column="del_flag" />
+		<result property="storageFlag" column="storage_flag" />
+		<result property="applyDesc" column="apply_desc" />
+		<result property="paramRemarks" column="param_remarks" />
+	</resultMap>
+
+	<resultMap id="baseTemplateMap" type="com.inforbus.gjk.admin.api.entity.BaseTemplate">
+		<id property="tempId" column="temp_id"/>
+		<result property="tempName" column="temp_name"/>
+		<result property="tempPath" column="temp_path"/>
+		<result property="tempType" column="temp_type"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="remarks" column="remarks"/>
+		<result property="tempVersion" column="temp_version"/>
+	</resultMap>
+
+	<sql id="saveBaseTemplateSql">
+		temp_id,
+		temp_name,
+		temp_path,
+		temp_type,
+		create_time,
+		update_time,
+		del_flag,
+		remarks,
+		temp_version
+	</sql>
+
+	<sql id="saveSoftwareSql">
 		id,
 		software_name,
 		version,
@@ -129,7 +236,9 @@
 		file_path,
 		parent_id,
 		software_id,
-		bsp_id
+		bsp_id,
+		json_path,
+		newfile_path
 	</sql>
 
 	<sql id="saveProjectPlanSql">
@@ -180,6 +289,39 @@
 		flowId,
 		modelId
 	</sql>
+	<sql id="saveBSPSql">
+		id,
+		bsp_name,
+		version,
+		file_path,
+		apply_state,
+		apply_desc,
+		create_time,
+		update_time,
+		description,
+		del_flag
+	</sql>
+	<sql id="saveCommonCompSql">
+		id,
+		comp_id,
+		comp_name,
+		comp_funcname,
+		user_id,
+		version,
+		comp_img,
+		description
+	</sql>
+	<sql id="commonComponentDetailSql">
+		id,
+		comp_id,
+		file_name,
+		file_type,
+		file_path,
+		paraent_id,
+		version,
+		paraent_ids,
+		libs_id
+	</sql>
 
 	<select id="getChipsById" resultMap="chipsfromhardwarelibs">
 		SELECT
@@ -227,7 +369,24 @@
 		#{proDetail.filePath},
 		#{proDetail.parentId},
 		#{proDetail.softwareId},
-		#{proDetail.bspId})
+		#{proDetail.bspId},
+		#{proDetail.jsonPath},
+		#{proDetail.newfilePath})
+	</insert>
+	<!-- 保存基础模版信息 -->
+	<insert id="saveBaseTemplate"
+			parameterType="com.inforbus.gjk.admin.api.entity.BaseTemplate">
+		INSERT INTO gjk_base_template (
+		<include refid="saveBaseTemplateSql" />
+		) VALUES (#{baseTemplate.tempId},
+		#{baseTemplate.tempName},
+		#{baseTemplate.tempPath},
+		#{baseTemplate.tempType},
+		#{baseTemplate.createTime},
+		#{baseTemplate.updateTime},
+		#{baseTemplate.delFlag},
+		#{baseTemplate.remarks},
+		#{baseTemplate.tempVersion})
 	</insert>
 
 	<select id="getIdByProjectIdAndFileType"
@@ -315,6 +474,42 @@
 		)
 	</insert>
 
+	<!-- 保存软件框架信息 -->
+	<insert id="saveSoftware"
+			parameterType="com.inforbus.gjk.pro.api.entity.Software">
+		INSERT INTO gjk_software (
+		<include refid="saveSoftwareSql" />
+		) VALUES (
+		#{soft.id},
+		#{soft.softwareName},
+		#{soft.version},
+		#{soft.filePath},
+		#{soft.applyState},
+		#{soft.applyDesc},
+		#{soft.createTime},
+		#{soft.updateTime},
+		#{soft.description},
+		#{soft.delFlag})
+	</insert>
+	<!-- 保存软件框架子表信息 -->
+	<insert id="saveSoftwareDetail"
+			parameterType="com.inforbus.gjk.admin.api.entity.SoftwareDetail">
+		INSERT INTO gjk_software_detail (
+		 platform_id, software_id
+		) VALUES (
+		#{softDetail.platformId},
+		#{softDetail.softwareId})
+	</insert>
+	<!-- 保存软件框架子表信息 -->
+	<insert id="saveSoftwareFile"
+			parameterType="com.inforbus.gjk.admin.api.entity.SoftwareFile">
+		INSERT INTO gjk_software_file (
+		 software_id, file_name, file_path
+		) VALUES (
+		#{softFile.softwareId},
+		#{softFile.fileName},
+		#{softFile.filePath})
+	</insert>
 	<!-- 根据当前软硬件映射配置的parentid，查找当前流程下的所有模块的文件路径 -->
 	<select id="getPlanFilePathListByParentId"
 		resultMap="projectPlanMap">
@@ -419,6 +614,27 @@
         where gs.id in (${ids})  and del_flag!='1'
         order by gs.software_name desc,gs.version desc
     </select>
+	<select id="getSoftwareById" resultMap="softwareMap">
+        SELECT *
+        FROM gjk_software as gs
+        where gs.id = ${id}
+    </select>
+	<select id="getSoftwareDetailBySoftwareIdIn" resultMap="softwareDetailMap">
+		SELECT * FROM gjk_software_detail
+		WHERE software_id IN (${ids})
+	</select>
+	<select id="getSoftwareDetailBySoftwareIdAndPlatformId" resultMap="softwareDetailMap">
+		SELECT * FROM gjk_software_detail
+		WHERE software_id = ${softwareId} and platform_id = ${platformId}
+	</select>
+	<select id="getSoftwareFileBySoftwareIdIn" resultMap="softwareFileMap">
+		SELECT * FROM gjk_software_file
+		WHERE software_id IN (${ids})
+	</select>
+	<select id="getSoftwareFileBySoftwareIdAndFileName" resultMap="softwareFileMap">
+		SELECT * FROM gjk_software_file
+		WHERE software_id = ${id} and file_name = ${fileName}
+	</select>
     <!--根据软件框架库ID得到平台库列表-->
     <select id="getAllPlatformListBySoftwareId" resultMap="platformMap">
 	select * from gjk_platform gp
@@ -430,6 +646,39 @@
     <select id="getPlatformList" resultMap="platformMap">
         select * from gjk_platform gp where gp.parent_id='-1' and del_flag!='1'
     </select>
+	<!-- 保存bsp信息 -->
+	<insert id="saveBSP"
+			parameterType="com.inforbus.gjk.admin.api.entity.BSP">
+		INSERT INTO gjk_bsp (
+		<include refid="saveBSPSql" />
+		) VALUES (#{bs.id},
+		#{bs.bspName},
+		#{bs.version},
+		#{bs.filePath},
+		#{bs.applyState},
+		#{bs.applyDesc},
+		#{bs.createTime},
+		#{bs.updateTime},
+		#{bs.description},
+		#{bs.delFlag}
+		)
+	</insert>
+	<insert id="saveBSPDetail"
+			parameterType="com.inforbus.gjk.admin.api.entity.BSPDetail">
+		INSERT INTO gjk_bsp_detail (
+			platform_id, bsp_id
+		) VALUES (
+			#{bspDetail.platformId},
+			#{bspDetail.bspId})
+	</insert>
+	<insert id="saveBSPFile"
+			parameterType="com.inforbus.gjk.admin.api.entity.BSPFile">
+		INSERT INTO gjk_bsp_file (
+		file_name, bsp_id, file_path
+		) VALUES (#{bspFile.fileName},
+		#{bspFile.bspId},
+		#{bspFile.filePath})
+	</insert>
 	<!--获得bsp库列表-->
 	<select id="getAllBSPList" resultMap="BSPMap">
 		SELECT *
@@ -450,4 +699,118 @@
         where gs.id in (${ids})  and del_flag != '1'
         order by gs.bsp_name desc,gs.version desc
     </select>
+	<select id="getBSPById" resultMap="BSPMap">
+        SELECT *
+        FROM gjk_bsp as gs
+        where gs.id = ${id}
+    </select>
+	<select id="getBSPDetailByBSPIdIn" resultMap="bspDetailMap">
+		SELECT * FROM gjk_bsp_detail
+		WHERE bsp_id IN (${ids})
+	</select>
+	<select id="getBSPDetailByBSPIdAndPlatformId" resultMap="bspDetailMap">
+		SELECT * FROM gjk_bsp_detail
+		WHERE bsp_id = ${bspId} and platform_id = ${platformId}
+	</select>
+	<select id="getBSPFileByBSPIdIn" resultMap="bspFileMap">
+		SELECT * FROM gjk_bsp_file
+		WHERE bsp_id IN (${ids})
+	</select>
+
+	<select id="queryColumns" resultType="map">
+		select column_name
+		columnName, data_type dataType, column_comment columnComment,
+		column_key columnKey, extra from information_schema.columns
+		where
+		table_name = #{tableName} and table_schema = (select database())
+		order
+		by ordinal_position
+	</select>
+	<!-- 保存公共构件 -->
+	<insert id="saveCommonComp"
+			parameterType="com.inforbus.gjk.pro.api.entity.CommonComponent">
+		INSERT INTO gjk_common_component (
+		<include refid="saveCommonCompSql" />
+		) VALUES (#{comp.id},
+		#{comp.compId},
+		#{comp.compName},
+		#{comp.compFuncname},
+		#{comp.userId},
+		#{comp.version},
+		#{comp.compImg},
+		#{comp.description})
+	</insert>
+	<!-- 根据多个id查询构件库数据 -->
+	<select id="getCommonComponentByIdIn" resultMap="commonComponentMap">
+		SELECT * FROM gjk_common_component
+		WHERE id IN (${ids})
+	</select>
+	<!-- 保存公共构件详细信息 -->
+	<insert id="saveCommonCompDetail"
+			parameterType="com.inforbus.gjk.pro.api.entity.CommonComponentDetail">
+		INSERT INTO gjk_common_component_detail (
+		<include refid="commonComponentDetailSql" />
+		) VALUES
+		(#{compDetail.id},
+		#{compDetail.compId},
+		#{compDetail.fileName},
+		#{compDetail.fileType},
+		#{compDetail.filePath},
+		#{compDetail.paraentId},
+		#{compDetail.version},
+		#{compDetail.paraentIds},
+		#{compDetail.libsId})
+	</insert>
+	<!-- 根据多个id查询构件库详情数据 -->
+	<select id="getCommonComponentDetailByCompIdIn" resultMap="commonComponentDetailMap">
+		SELECT * FROM gjk_common_component_detail
+		WHERE comp_id IN (${ids})
+	</select>
+	<insert id="saveCompAndStruct" parameterType="com.inforbus.gjk.common.core.entity.CompStruct">
+		INSERT INTO `gjk_comp_struct`
+		( `id`, `comp_id`, `struct_id`)
+		VALUES
+		(#{compStruct.id}, #{compStruct.compId}, #{compStruct.structId})
+	</insert>
+	<!-- 根据多个id查询构件结构体关系数据 -->
+	<select id="getCompStructByCompIdList" resultMap="compStructMap">
+		select id, comp_id, struct_id
+		from gjk_comp_struct
+		where comp_id in
+		<foreach collection="compIdList" item="item" index="index"
+				 open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	<!-- 根据多个id查询结构体数据 -->
+	<select id="getStructlibsByIdList" resultMap="structlibsMap">
+		select *
+		from gjk_structlibs
+		where id in
+		<foreach collection="idList" item="item" index="index"
+				 open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	<!-- 保存结构体 -->
+	<insert id="saveStructlibs"
+			parameterType="com.inforbus.gjk.common.core.entity.Structlibs">
+		INSERT INTO gjk_structlibs (
+		id, parent_id, children_ids, name, sort,
+		version, type, data_type, struct_type, data_length,
+		permission
+		)
+		VALUES (
+		#{structlibs.id},
+		#{structlibs.parentId},
+		#{structlibs.childrenIds},
+		#{structlibs.name},
+		#{structlibs.sort},
+		#{structlibs.version},
+		#{structlibs.type},
+		#{structlibs.dataType},
+		#{structlibs.structType},
+		#{structlibs.dataLength},
+		#{structlibs.permission})
+	</insert>
 </mapper>

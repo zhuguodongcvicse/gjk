@@ -2,7 +2,7 @@
   <div
     class="app-container calendar-list-container libs_platformlib_index_14s"
   >
-    <basic-container>
+    <!-- <basic-container> -->
       <el-row class="admin_menu_index_main_14s">
         <div class="split-pane-page-wrapper">
           <split-pane v-model="offset" @on-moving="handleMoving" min="150px">
@@ -52,7 +52,7 @@
           </split-pane>
         </div>
       </el-row>
-    </basic-container>
+    <!-- </basic-container> -->
   </div>
 </template>
 
@@ -288,26 +288,11 @@ export default {
           this.textContext = response.data.data.textContext.split("@%#@*+-+@")[1];
           //文件后缀名，用于判断区分文件后缀名，使用文本编辑器还是什么
           this.fileSuffix = response.data.data.textContext.split("@%#@*+-+@")[0];
-          // if (
-          //   this.fileSuffix === "c" ||
-          //   this.fileSuffix === "h" ||
-          //   this.fileSuffix === "cpp" ||
-          //   this.fileSuffix === "d" 
-          // ) {
-          //   this.isShowEditor = true;
-          //   this.isShowChild = false;
-          // } else {
-          //   this.isShowChild = true;
-          //   this.isShowEditor = false;
-          // }
-          // if(
-            
-          // ){
-
-          // }else{
-
-          // }
         });
+      }else{
+        this.tFilePath = "";
+        this.textContext = "";
+        this.filePath = "";
       }
     },
     resetForm() {

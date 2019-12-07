@@ -27,6 +27,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 /**
  * 接口设计
@@ -106,13 +108,25 @@ public class HardwarelibInfController {
  */
   @PostMapping("/saveInf")
   public void saveInf(@RequestBody HardwarelibInf hardwarelibInf) {
-//    System.out.println("hardwarelibInf-------"+hardwarelibInf);
     hardwarelibInfService.saveInf(hardwarelibInf);
-	  /*if(hardwarelibInf.getId()!="") {
-		  return new R<>(hardwarelibInfService.updateById(hardwarelibInf));
-	  }else {
-		  return new R<>(hardwarelibInfService.saveInf(hardwarelibInf));
-	  }*/
+  }
+
+  /**
+   * 编辑接口
+   * @param hardwarelibInf
+   */
+  @PostMapping("updateInf")
+  public void updateInf(@RequestBody HardwarelibInf hardwarelibInf) {
+    hardwarelibInfService.updateInfById(hardwarelibInf);
+  }
+
+  /**
+   * 左侧芯片回显
+   * @return
+   */
+  @GetMapping("getInfList")
+  public List<HardwarelibInf> getInfList() {
+    return hardwarelibInfService.getInfList();
   }
 
 }
