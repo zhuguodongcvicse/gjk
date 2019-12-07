@@ -811,6 +811,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			}
 
 			app.setPartnamePlatform(JSONArray.toJSONString(partnamePlatformMap));
+			app.setLocalDeploymentPlan(messageMap.get("localDeploymentPlan"));
 			app.setFileName(new File(appFilePath).getName());
 			app.setFilePath(new File(appFilePath).getParent().substring(proDetailPath.length()));
 			app.setSysconfigFilePath(sysConfigFilePath);
