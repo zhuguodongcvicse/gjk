@@ -64,6 +64,8 @@ function handleMessageFromParent(event) {
       boardNum = caseData.bdNum
       var existFrontBoards = JSON.parse(caseData.frontCase).datas[0].json.properties.frontBoardList
       var existBackBoards = JSON.parse(caseData.backCase).datas[0].json.properties.backBoardList
+      fBoardList = JSON.parse(JSON.stringify(existFrontBoards))
+      bBoardList = JSON.parse(JSON.stringify(existBackBoards))
       //配置界面弹窗的接口显示，去重
       // console.log("existFrontBoards", existFrontBoards)
       // console.log("existBackBoards", existBackBoards)
@@ -754,6 +756,9 @@ function initEditor(editor) {
 
   //合并数组
   function concatDataList() {
+    // console.log("clickBoardList",clickBoardList)
+    // console.log("fBoardList",fBoardList)
+    // return
     for (const i in clickBoardList) {
       for (const j in fBoardList) {
         if (clickBoardList[i].uniqueId == fBoardList[j].uniqueId) {
@@ -762,6 +767,7 @@ function initEditor(editor) {
         }
       }
     }
+    fBoardList = JSON.parse(JSON.stringify(fBoardList))
     fJson.datas[0].json.properties.frontBoardList = fBoardList
     bJson.datas[0].json.properties.backBoardList = bBoardList
   }

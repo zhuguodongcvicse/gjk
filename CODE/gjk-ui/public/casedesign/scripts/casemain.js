@@ -1002,29 +1002,36 @@ function initEditor(editor) {
         }
         // console.log("点击",data.properties)
 
-        data.set('chipName', data._mn3.chipName);
-        data.set('coreNum', data._mn3.coreNum);
-        data.set('memSize', data._mn3.memSize);
-        data.set('boardName', data._mn3.boardName);
-        data.set('recvRate', data._mn3.recvRate);
-        data.set('hrTypeName', data._mn3.hrTypeName);
-        if (data._mn3.boardType == 0) {
-          data.set('showBoardType', 'calculateBoard');
+        if( data.properties.chipName !== undefined) {
+          data.set('chipName', data._mn3.chipName);
+          data.set('coreNum', data._mn3.coreNum);
+          data.set('memSize', data._mn3.memSize);
+          data.set('boardName', data._mn3.boardName);
+          data.set('recvRate', data._mn3.recvRate);
+          data.set('hrTypeName', data._mn3.hrTypeName);
         }
-        if (data._mn3.boardType == 1) {
-          data.set('showBoardType', 'FpgaBoard');
+
+        if (data.properties.boardType !== undefined) {
+          if (data._mn3.boardType == 0) {
+            data.set('showBoardType', 'calculateBoard');
+          }
+          if (data._mn3.boardType == 1) {
+            data.set('showBoardType', 'FpgaBoard');
+          }
+          if (data._mn3.boardType == 2) {
+            data.set('showBoardType', 'exchangeBoard');
+          }
+          if (data._mn3.boardType == 3) {
+            data.set('showBoardType', 'interfaceBoard');
+          }
         }
-        if (data._mn3.boardType == 2) {
-          console.log("data*****", data)
-          data.set('showBoardType', 'exchangeBoard');
+        if (data.properties.infName !== undefined) {
+          data.set('infName', data._mn3.infName);
+          data.set('infRate', data._mn3.infRate);
+          data.set('opticalNum', data._mn3.opticalNum);
+          data.set('caseName', data._mn3.caseName);
         }
-        if (data._mn3.boardType == 3) {
-          data.set('showBoardType', 'interfaceBoard');
-        }
-        data.set('infName', data._mn3.infName);
-        data.set('infRate', data._mn3.infRate);
-        data.set('opticalNum', data._mn3.opticalNum);
-        data.set('caseName', data._mn3.caseName);
+
         // data.set('boardnum',data._mn3.bdnum);
         // console.log("data", data)
       }

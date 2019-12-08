@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     class="libs_hardwarelibinf_addinf_14s"
-    title="接口入库"
+    title="板卡入库"
     :visible.sync="dialog.storageApplyDialog"
     width="30%"
     :before-close="handleClose"

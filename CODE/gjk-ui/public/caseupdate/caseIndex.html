@@ -113,7 +113,7 @@
                 }
             }
             currentBoard = JSON.parse(JSON.stringify(currentBoard))
-            console.log("currentBoard", currentBoard)
+            // console.log("currentBoard", currentBoard)
             if (currentBoard.boardType == 0 || currentBoard.boardType == 1) {
                 //cpu显示
                 $("#selectStartCpu").empty();
@@ -329,7 +329,7 @@
                         for (const j in clickBoardList[i].outLinkArr) {
                             if (clickBoardList[i].outLinkArr[j][0].ID == tr.children[0].innerText &&
                                 clickBoardList[i].outLinkArr[j][1].ID == tr.children[1].innerText &&
-                                clickBoardList[i].outLinkArr[j][2] == tr.children[2].innerText) {
+                                clickBoardList[i].outLinkArr[j][3].ID == tr.children[3].innerText) {
                                 allInfOfFrontBoard.push(clickBoardList[i].outLinkArr[j][1])
                                 allInfOfFrontBoard = JSON.parse(JSON.stringify(allInfOfFrontBoard))
                                 if (clickBoardList[i].outLinkArr[j][2] == '1') {
