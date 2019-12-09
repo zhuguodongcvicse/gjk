@@ -246,8 +246,7 @@ export default {
           return;
         }
         this.$store.dispatch("setAllBaseTemplate", response.data);
-        analysisXmlFile(response.data[0].tempPath).then(response => {
-          console.log("response", response);
+        analysisXmlFile(defauleBaseTemplate[0].tempPath).then(response => {
           this.$store.dispatch("setFetchStrInPointer");
           //保存加载的数据
           this.$store

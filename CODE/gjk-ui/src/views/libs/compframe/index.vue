@@ -35,17 +35,15 @@
             size="small"
             plain
             @click="handleDel(row,index)"
-          >
-            <el-tag>删除</el-tag>
-          </el-button>
+          >删除</el-button>
           <el-button type="primary" size="small" plain>
             <!-- v-show="row.applyState == '0' || row.applyState == '3'" -->
-            <el-tag
+            <span
               v-if="row.applyState == '0'|| row.applyState == '3'"
               @click="compFrameApplysClick(row,index)"
-            >入库</el-tag>
-            <el-tag v-else-if="row.applyState == '1'||row.applyState == '4'">已提交</el-tag>
-            <el-tag v-else>已入库</el-tag>
+            >入库</span>
+            <span v-else-if="row.applyState == '1'||row.applyState == '4'">已提交</span>
+            <span v-else>已入库</span>
           </el-button>
         </template>
       </avue-crud>
