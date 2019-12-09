@@ -322,7 +322,7 @@ export default {
     resumes(files) {
       // console.log("files:", files);
       if (files.length == 0) {
-        alert("请选择一个不为空的文件夹！！！");
+        alert("请选择一个压缩文件（.zip）！！！");
       } else {
         const loading = this.$loading({
           lock: true,

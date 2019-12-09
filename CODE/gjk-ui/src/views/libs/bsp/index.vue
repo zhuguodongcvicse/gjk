@@ -331,9 +331,22 @@ export default {
     },
     //上传
     resumes(files) {
+      // if (files[0].fileType != null) {
+      //   const isZIP =
+      //     files[0].fileType === "application/x-zip-compressed" ||
+      //     "application/zip";
+      //   alert(isZIP);
+      //   if (!isZIP) {
+      //     alert("44444");
+      //     this.$message.error(
+      //       "上传文件格式只能是压缩文件，请传入构件库导出的压缩文件。"
+      //     );
+      //   }
+      // }
+
       // console.log("files:", files);
       if (files.length == 0) {
-        alert("请选择一个不为空的文件夹！！！");
+        alert("请选择一个压缩文件（.zip）！！！");
       } else {
         const loading = this.$loading({
           lock: true,
