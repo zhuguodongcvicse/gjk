@@ -149,7 +149,7 @@ function handleMessageFromParent(event) {
 			break
 		case 'sendCompFzData':
 			console.log("989898989898888888888888")
-			componentMap.set(data.params.compId,data.params.compData)
+			componentMap.set(data.params.compId, data.params.compData)
 			break
 		case 'alignment':
 			var id = ""
@@ -205,6 +205,13 @@ function handleMessageFromParent(event) {
 			//$('.pa').addClass("warn")
 			//endpointCheck(styleColor);
 			connectionCheck(styleColor);
+			break;
+		case 'startSimulation':
+			getSimulationData();
+			break;
+		case 'endSimulation':
+			deleteFzPicture();
+			break;
 	}
 };
 
@@ -234,7 +241,7 @@ function dropNode(template, position) {
 	position.left -= $('#side-buttons').outerWidth()
 	position.left = position.left + $(areaId).scrollLeft()
 	position.top = position.top + $(areaId).scrollTop()
-	console.log("position+++++++++++++++",position)
+	console.log("position+++++++++++++++", position)
 	//position.id = uuid.v1()
 	position.id = createNum()
 	console.log("生成的id", position.id)
@@ -481,7 +488,7 @@ function addDraggable(id) {
 					if (t0 + t < 0 || h0 + h < 150) {
 						return
 					}
-					$a.offset({ "top": t0 + t - $(areaId).scrollTop(), "left": h0 + h - $(areaId).scrollLeft()});
+					$a.offset({ "top": t0 + t - $(areaId).scrollTop(), "left": h0 + h - $(areaId).scrollLeft() });
 					jsPlumb.setSuspendDrawing(false, true);
 
 				}
@@ -1248,34 +1255,69 @@ jsPlumb.bind("connection", function (connInfo, originalEvent) {
 	//console.log("保存连线对象",connectionObj)
 
 })
-//双击连线出现仿真图标
-jsPlumb.bind("dblclick", function (conn, originalEvent) {
-		connectionObjClick = {};
-		console.log("双击获取连线数据",conn)
-		let startId = conn.sourceId
-		let endId = conn.targetId
-		if(componentMap.get(startId) === componentMap.get(endId)){
-			handleMessageToParent("returnFZInfo", "所选连线俩端构件属于同一组件");
-		}else{
-			let id = createNum()
-			conn.setLabel(function(){
-				return '<div class ="fz" id = "'+id+'" style="width:20px;height:12px;"></div>'
-			})
-			$('#' + id).attr('tabindex', 0);
-			$('#' + id).focus();
-			$("#"+id).bind("click",function(){
-				document.getElementById(id).onkeydown = function (e) {
-					if (e.keyCode == 46) {
-						$("#"+id).remove()	
+
+//删除仿真图标
+function deleteFzPicture() {
+	var arr = $(".fz").toArray();
+	arr.forEach(arrTmp => {
+		$a = $(arrTmp);
+		$("#" + $a.context.id).remove()
+	})
+}
+
+//获取所有仿真所需数据
+var simulationData = []
+function getSimulationData() {
+	let index = 0;
+	$.each(jsPlumb.getConnections(), function (idx, connection) {
+		if (connection.getLabel() != null) {
+			index++
+			let simulation = {}
+			simulation.startId = connection.sourceId
+			simulation.endId = connection.targetId
+			if (index == 1) {
+				simulationData.push(simulation)
+			} else {
+				for (let i = 0; i < simulationData.length; i++) {
+					if (connection.sourceId != simulationData[i].startId && connection.targetId != simulationData[i].endId) {
+						simulationData.push(simulation)
 					}
 				}
-				return false
-			})
-			$("#"+id).bind("dblclick",function(){
-				handleMessageToParent("returnFZ", {startId:startId,endId:endId});
-			})
+			}
 		}
-		
+	})
+	handleMessageToParent("returnSimulationData", simulationData);
+	console.log("仿真数据", simulationData)
+}
+
+//双击连线出现仿真图标
+jsPlumb.bind("dblclick", function (conn, originalEvent) {
+	connectionObjClick = {};
+	console.log("双击获取连线数据", conn)
+	let startId = conn.sourceId
+	let endId = conn.targetId
+	if (componentMap.get(startId) === componentMap.get(endId)) {
+		handleMessageToParent("returnFZInfo", "所选连线俩端构件属于同一组件");
+	} else {
+		let id = createNum()
+		conn.setLabel(function () {
+			return '<div class ="fz" id = "' + id + '" style="width:20px;height:12px;"></div>'
+		})
+		$('#' + id).attr('tabindex', 0);
+		$('#' + id).focus();
+		$("#" + id).bind("click", function () {
+			document.getElementById(id).onkeydown = function (e) {
+				if (e.keyCode == 46) {
+					$("#" + id).remove()
+				}
+			}
+			return false
+		})
+		$("#" + id).bind("dblclick", function () {
+			handleMessageToParent("returnFZ", { startId: startId, endId: endId });
+		})
+	}
+
 })
 //var removeConnection; //点击连线所获取的对象
 var connectionObj = {};//连线关系
@@ -1293,7 +1335,7 @@ jsPlumb.bind("click", function (conn, originalEvent) {
 	connectionObjClick.connSourceUUid = conn.endpoints[0].getUuid();
 	connectionObjClick.connTargetUUid = conn.endpoints[1].getUuid()
 
-	
+
 	//console.log(connectionObjClick)
 	//console.log(conn)
 	// document.onkeydown=function(event){
@@ -1602,7 +1644,7 @@ document.onkeydown = function () {
 			//div.style.top = Math.min($(".div_right").height(), div.offsetTop + 10) + "px"
 			//div.style.top = div.offsetTop + 10 +"px"
 			//if(div.style.top + div.style.height >= $(".div_right").height()){
-				//div1.scrollTop = 10
+			//div1.scrollTop = 10
 			//}
 			// if(isDropTop()){
 			// 	//	div1.scrollTop += 10
@@ -1612,7 +1654,7 @@ document.onkeydown = function () {
 			// 	div.style.top = div.offsetTop + 10 +"px"
 			// }
 		}
-		
+
 		dragNode.oldPosition = oldPosition;
 		jsPlumb.setSuspendDrawing(false, true);
 		//保存移动后的位置
@@ -1624,7 +1666,7 @@ document.onkeydown = function () {
 		chartRareOperationStack.push('dragZ')
 		limitZ();
 	} else if (event.ctrlKey == true && event.keyCode == 90) {//ctrl Z
-		console.log("用户所有操作",chartRareOperationStack)
+		console.log("用户所有操作", chartRareOperationStack)
 		var rareOperation = chartRareOperationStack.pop()
 		console.log("ctrlZ对应操作", rareOperation)
 		switch (rareOperation) {
@@ -1655,12 +1697,12 @@ document.onkeydown = function () {
 				var operationJSON
 				var sourceAndTarget = {}
 				console.log("删除连线状态", isRemoveConn)
-				console.log("删除连线保存的数据",chartOperationStack["addConnection"])
+				console.log("删除连线保存的数据", chartOperationStack["addConnection"])
 				//if (!isRemoveConn) {
 				var operationJSON1 = chartOperationStack[rareOperation].pop()
-				console.log("删除的对象",operationJSON1)
+				console.log("删除的对象", operationJSON1)
 				if (delNodeIsConnection(operationJSON1.conn.sourceId, operationJSON1.conn.targetId) ||
-					delConnection(operationJSON1.connSourceUUid,operationJSON1.connTargetUUid)) {
+					delConnection(operationJSON1.connSourceUUid, operationJSON1.connTargetUUid)) {
 					var connObj = newConnection.pop()
 					console.log("删除构件删除的连线对象", connObj)
 					operationJSON = connObj.removeConnection
@@ -1674,7 +1716,7 @@ document.onkeydown = function () {
 					operationJSON = operationJSON1.conn
 					sourceAndTarget.connSourceUUid = operationJSON1.connSourceUUid
 					sourceAndTarget.connTargetUUid = operationJSON1.connTargetUUid
-					}
+				}
 				// } else {
 				// 	console.log("使用新增连线对象",newConnection)
 				// 	chartOperationStack[rareOperation].pop()
@@ -1705,7 +1747,7 @@ document.onkeydown = function () {
 				connectionObj.removeConnection = conn
 				connectionObj.connSourceUUid = operationJSON.connSourceUUid
 				connectionObj.connTargetUUid = operationJSON.connTargetUUid
-				delConnectionMap.set(operationJSON.connTargetUUid,operationJSON.connSourceUUid)
+				delConnectionMap.set(operationJSON.connTargetUUid, operationJSON.connSourceUUid)
 				newConnection.push(connectionObj)
 				//alert(111111111)
 				ctrlYStack['deleteConnection'].push(connectionObj)
@@ -1949,10 +1991,10 @@ document.onkeydown = function () {
 	}
 }
 //判断连线是否被删除
-function delConnection(sourEndUuid, tarEndUuid){
+function delConnection(sourEndUuid, tarEndUuid) {
 	let isDelConnection = false
 	for (let [k, v] of delConnectionMap) {
-		if(k==tarEndUuid && v==sourEndUuid){
+		if (k == tarEndUuid && v == sourEndUuid) {
 			isDelConnection = true
 		}
 	}
@@ -2300,6 +2342,10 @@ function save() {
 		// console.log("数据比较",sourCompName)
 		var sourCompName = canvasData.get(source).functionName;
 		//console.log("数据比较+++++++++",sourCompName)
+		let reg = /\w+\[[0-9]+\]/i; //
+		if (!reg.test(sourVariableName)) {
+
+		}
 		var sourcePrame = sourDataTypeName + " " + sourVariableName + "_" + sourCompName
 
 		//获取画布目标节点id
@@ -2777,8 +2823,8 @@ function loadJson(loadJson) {
 		connectionObj.removeConnection = c
 		connectionObj.connSourceUUid = elem.sourceUuid
 		connectionObj.connTargetUUid = elem.targetUuid
-		if(c != undefined){
-			delConnectionMap.set(elem.targetUuid,elem.sourceUuid)
+		if (c != undefined) {
+			delConnectionMap.set(elem.targetUuid, elem.sourceUuid)
 			newConnection.push(connectionObj)
 		}
 		console.log("新连接newConnection", newConnection)
@@ -3189,17 +3235,17 @@ function limitY() {
 }
 
 //判断节点在移动的过程中是否达到当前画布浏览器窗口的top
-function isDropTop(){
+function isDropTop() {
 	let isDropTop = false
-	console.log("浏览器的top",$(".div_right").height())
-	
-	for(let i = 0; i<idList.length; i++){
+	console.log("浏览器的top", $(".div_right").height())
+
+	for (let i = 0; i < idList.length; i++) {
 		let div = document.getElementById(idList[i])
-		console.log("节点top",div.offsetTop)
-		console.log("节点的height",div.offsetHeight)
-		console.log("节点的div",div)
+		console.log("节点top", div.offsetTop)
+		console.log("节点的height", div.offsetHeight)
+		console.log("节点的div", div)
 		console.log(idList)
-		if((div.offsetTop + div.offsetHeight) >= $(".div_right").height()){
+		if ((div.offsetTop + div.offsetHeight) >= $(".div_right").height()) {
 			isDropTop = true
 		}
 	}
@@ -3266,7 +3312,7 @@ function connectionCheck(styleColor) {
 }
 
 $(".fz").bind('dbclick', function (event) {
-	console.log("仿真数据",event)
+	console.log("仿真数据", event)
 })
 
 //})();
