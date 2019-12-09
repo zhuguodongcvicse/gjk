@@ -565,7 +565,9 @@ function initEditor(editor) {
       graphList.fJson = JSON.parse(JSON.stringify(graphList.fJson))
       var linkArr = Array.from(linkMap)
       var linkStr = JSON.stringify(linkArr)
-      graphList.link = JSON.stringify([])
+      if (graphList.link === undefined) {
+        graphList.link = JSON.stringify([])
+      }
       frontCaseForDeployment = JSON.stringify(frontCaseForDeployment)
       postMessageParentData.cmd = "submitCaseJSON";
       postMessageParentData.params = [graphList, linkStr, allChipToFlow, frontCaseForDeployment]
@@ -849,12 +851,80 @@ function initEditor(editor) {
       //进入背面
       if (graph.name == null) {
         frontCaseForDeployment = graph.toJSON()
-        graph.clear();
         graph.name = '背部视图'
+        //找到连线的两个接口放到数组
+        // setLinkList()
+        //删除qunee自己生成的连线数据
+        if (backAllCaseJsonTemp !== undefined) {
+          for (let i = 0; i < backAllCaseJsonTemp.datas.length; i++) {
+            if (backAllCaseJsonTemp.datas[i].json.properties == null) {
+              removeByValue(backAllCaseJsonTemp.datas, backAllCaseJsonTemp.datas[i])
+              i--
+            }
+          }
+        }
+        //找到机箱内部连线，放到数组为绘画准备数据，同时放到map为生成xml准备数据
+        for (const i in graphList.bJson) {
+          for (const j in graphList.bJson[i].datas) {
+            if (graphList.bJson[i].datas[j].json.properties == null) {
+              for (const k in graphList.bJson) {
+                for (const m in graphList.bJson[k].datas) {
+                  if (graphList.bJson[i].datas[j].json.from._ref == graphList.bJson[k].datas[m]._refId) {
+                    // console.log("起始接口-机箱内部", graphList.bJson[k].datas[m]._refId)
+                    for (const p in graphList.bJson[k].datas) {
+                      if (graphList.bJson[k].datas[p].json.properties != null) {
+                        if (graphList.bJson[i].datas[j].json.to._ref == graphList.bJson[k].datas[p]._refId) {
+                          // console.log("终止接口-机箱内部", graphList.bJson[k].datas[p]._refId)
+                          var linkListStr = JSON.stringify(linkList)
+                          if (linkListStr.indexOf(graphList.bJson[k].datas[m].json.properties.uniqueId) == -1) {
+                            linkList.push([graphList.bJson[k].datas[m], graphList.bJson[k].datas[p]])
+                            linkMap.set(graphList.bJson[k].datas[m].json.properties, graphList.bJson[k].datas[p].json.properties)
+                            break
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        // console.log("linkList", linkList)
+        //删除机箱内部连线
+        for (const i in graphList.bJson) {
+          for (let j = 0; j < graphList.bJson[i].datas.length; j++) {
+            if (graphList.bJson[i].datas[j].json.properties == null) {
+              removeByValue(graphList.bJson[i].datas, graphList.bJson[i].datas[j])
+              j--
+            }
+          }
+        }
+        graph.clear();
         //画出背面机箱
         for (const i in graphList.bJson) {
           graph.parseJSON(graphList.bJson[i], {transform: false});
         }
+        //创建自己的连线
+        let edgejson = createEdgejson()
+        //赋值连线的refid，将连线和两个重新画出的接口放到数组
+        // console.log("linkList",linkList)
+        for (const i in linkList) {
+          linkList[i][0]._refId = '1' + parseInt(1500 * Math.random())
+          linkList[i][1]._refId = '1' + parseInt(1500 * Math.random())
+          edgejson.json.from._ref = parseInt(linkList[i][0]._refId)
+          edgejson.json.to._ref = parseInt(linkList[i][1]._refId)
+          // console.log("edgejson",edgejson)
+          var linkGraphListStr = JSON.stringify(linkGraphList)
+          if (linkGraphListStr.indexOf(linkList[i][0].json.properties.uniqueId) == -1) {
+            linkGraphList.datas.push(linkList[i][0])
+            linkGraphList.datas.push(linkList[i][1])
+            linkGraphList.datas.push(edgejson)
+          }
+          linkGraphList = JSON.parse(JSON.stringify(linkGraphList))
+        }
+        //画出接口和连线
+        graph.parseJSON(linkGraphList)
         setEditable(false);
       }
       //进入背面
