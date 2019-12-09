@@ -3,14 +3,14 @@
     <el-row>
       <el-col>
         <el-form :inline="true" size="mini" label-width="80px">
-          <!--<el-form-item label="区域一">
+          <el-form-item label="区域一">
             <el-select placeholder="请选择展示帧号">
             </el-select>
           </el-form-item>
           <el-form-item label="区域二">
             <el-select placeholder="请选择展示帧号">
             </el-select>
-          </el-form-item>-->
+          </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="start">
               开始
