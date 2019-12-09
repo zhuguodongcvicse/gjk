@@ -299,3 +299,36 @@ export function deleteSelectFile(filePath) {
     data: filePath
   })
 }
+
+export function createZipFile(data) {
+  return request({
+    method: "post",
+    url: "/pro/manager/createZipFile",
+    data: data,
+    responseType: 'arraybuffer'
+  }).then((response) => { // 处理返回的文件流
+    let blob = new Blob([response.data], {
+      type: 'application/zip'
+    })
+    let filename = response.headers["filename"];
+    let link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.style.display = "none"
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    window.setTimeout(function () {
+      URL.revokeObjectURL(blob)
+      document.body.removeChild(link)
+    }, 0)
+  })
+}
+
+export function importProjectZipUpload(param) {
+  return request({
+    method: "post",
+    url: "/pro/manager/importProjectZipUpload",
+    headers: { "Content-Type": "multipart/form-data" },
+    data: param
+  })
+}

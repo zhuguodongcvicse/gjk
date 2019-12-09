@@ -102,6 +102,13 @@ public interface ProjectMapper extends BaseMapper<Project> {
 	ProComp getIdByProIdCompId(@Param("proComp") ProComp proComp);
 
 	/**
+	 * 根据项目ID获取 项目和构件关系数据
+	 * @param projectId
+	 * @return
+	 */
+	List<ProComp> getProjectCompByProId(@Param("projectId") String projectId);
+
+	/**
 	 * @Title: saveProCompList
 	 * @Description: 保存与项目相关的构件
 	 * @Author cvics

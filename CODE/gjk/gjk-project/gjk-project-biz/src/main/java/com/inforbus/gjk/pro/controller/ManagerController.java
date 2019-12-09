@@ -10,10 +10,8 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -25,16 +23,7 @@ import com.inforbus.gjk.pro.api.entity.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSON;
@@ -931,5 +920,49 @@ public class ManagerController {
 	@PutMapping("/updatePartBSPAndPlatform")
 	public R updatePartBSPAndPlatform(@RequestBody BSP bsp) {
 		return new R<>(managerService.updatePartBSPAndPlatform(bsp));
+	}
+
+	/**
+	 * 项目流程导出
+	 * @param request
+	 * @param response
+	 * @param params
+	 */
+    @PostMapping("/createZipFile")
+    public void createZipFile(HttpServletRequest request,
+                              HttpServletResponse response,
+							  @RequestBody Map<String, Object> params) {
+        try {
+        	String projectId = (String) params.get("projectId");
+			String processId = (String) params.get("processId");
+
+            byte[] data = managerService.createZip(projectId, processId);
+
+            String zipFileName = (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date()) + ".zip";
+            response.reset();
+            response.setHeader("Content-Disposition", String.format("attachment; filename=%s.zip", zipFileName));
+            response.setHeader("FileName", zipFileName);
+            response.setHeader("Content-Length", "" + data.length);
+            response.setContentType("application/octet-stream; charset=UTF-8");
+
+            IoUtil.write(response.getOutputStream(), Boolean.TRUE, data);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+	/**
+	 * @Title: importProjectZipUpload
+	 * @Description: 单文件上传
+	 * @Author xiaohe
+	 * @DateTime 2019年5月13日 下午3:41:10
+	 * @param ufile
+	 * @return
+	 */
+	@ResponseBody
+	@PostMapping(path = "/importProjectZipUpload", consumes = { "multipart/mixed", "multipart/form-data" })
+	public R importProjectZipUpload(@RequestParam(value = "file", required = false) MultipartFile ufile,
+							@RequestParam(value = "projectId", required = false) String projectId) {
+		return new R<>(managerService.analysisZipFile(ufile, projectId));
 	}
 }

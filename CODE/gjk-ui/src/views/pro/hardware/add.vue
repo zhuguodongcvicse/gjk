@@ -180,7 +180,7 @@ export default {
         this.params.linkRelation
       ];
       this.hrConfigXmlEntityMap = createXmlEntityMap(paramsList);
-      // console.log("this.hrConfigXmlEntityMap",this.hrConfigXmlEntityMap)
+      console.log("this.hrConfigXmlEntityMap",this.hrConfigXmlEntityMap)
       createHardwarelibXML(this.hrConfigXmlEntityMap, this.params.id).then(
         response => {
           // console.log("this.params",this.params)

@@ -85,7 +85,12 @@ public class ProjectFile extends Model<Project> {
 	/**
 	 * 调用客户接口生成新文件路径
 	 */
-//	private String newFilePath;
+	private String newfilePath;
+
+	/**
+	 * json路径
+	 */
+	private String jsonPath;
 
 	/**
 	 * bsp的id
