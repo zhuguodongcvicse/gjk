@@ -43,8 +43,8 @@ public class SysDict extends Model<SysDict> {
 	/**
 	 * 编号
 	 */
-	@TableId(value = "id", type = IdType.AUTO)
-	private Integer id;
+	@TableId(value = "id",type = IdType.INPUT)
+	private String id;
 	/**
 	 * 数据值
 	 */

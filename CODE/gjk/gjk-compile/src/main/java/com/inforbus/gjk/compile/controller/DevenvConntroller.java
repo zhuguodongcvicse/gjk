@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.inforbus.gjk.compile.config.ExtractApplicationContext;
 import com.inforbus.gjk.compile.task.Task;
-import com.inforbus.gjk.compile.task.impl.ComplieTask;
+import com.inforbus.gjk.compile.task.impl.CompileTask;
 import com.inforbus.gjk.compile.taskThread.TaskThread;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,19 +28,19 @@ public class DevenvConntroller {
     private TaskThread taskThread;//任务线程类
 
     @PutMapping(value = "/Command")
-    public R Command(@RequestBody Map<String, String> map) {
+    public R command(@RequestBody Map<String, String> map) {
         String path = map.get("path");
         String fileName = map.get("fileName");
         String platformType = map.get("platformType");
         String token = map.get("token");
-        ComplieTask complieTask = (ComplieTask) ExtractApplicationContext.getBean("complieTask");//获取到编译任务类对象
-        complieTask.setFileName(fileName);
-        complieTask.setPath1(path);
-        complieTask.setPlatformType(platformType);
-        complieTask.setToken(token);
-        ConcurrentLinkedQueue<Task> complieQueue = taskThread.getComplieQueue();
-        int count = complieQueue.size();//获取到排队人数
-        taskThread.addTask(complieTask);//使用另一条线程执行编译功能
+        CompileTask compileTask = (CompileTask) ExtractApplicationContext.getBean("compileTask");// 从spring容器中获取到编译任务类对象
+        compileTask.setFileName(fileName);
+        compileTask.setPath1(path);
+        compileTask.setPlatformType(platformType);
+        compileTask.setToken(token);
+        ConcurrentLinkedQueue<Task> compileQueue = taskThread.getCompileQueue();
+        int count = compileQueue.size();//获取到排队人数
+        taskThread.addTask(compileTask);//使用另一条线程执行编译功能
         String str = "";
         str = "正在编译...请稍候";
         if (count > 0)

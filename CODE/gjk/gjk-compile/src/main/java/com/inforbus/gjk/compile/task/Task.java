@@ -8,5 +8,5 @@ package com.inforbus.gjk.compile.task;
 *
 * */
 public interface Task {
-    boolean Command();
+    boolean command();
 }
