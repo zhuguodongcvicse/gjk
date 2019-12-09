@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @Component(value="taskThread")
 public class TaskThread extends Thread {
 
-    private static final Logger logger = LoggerFactory.getLogger(ComplieTask.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskThread.class);
     private ConcurrentLinkedQueue<Task> compileQueue;//非阻塞队列
     private boolean stop = false;
 
