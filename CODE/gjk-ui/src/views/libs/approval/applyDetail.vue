@@ -277,7 +277,7 @@
                             commonComp.compFuncname = this.component.compFuncname;
                             commonComp.userId = this.component.userId;
                             commonComp.compImg = this.component.compImg;
-                            commonComp.description = this.component.description;
+                            commonComp.description = this.component.compBackupinfo;
                             commonComp.delFlag = "0";
                             if (this.applyItemMsg.applyType != "3" && this.applyItemMsg.applyType != "4") {
                                 saveCommonComp(commonComp).then(Response => {

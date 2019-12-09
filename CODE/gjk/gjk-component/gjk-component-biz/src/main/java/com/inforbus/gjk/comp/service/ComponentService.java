@@ -198,9 +198,11 @@ public interface ComponentService extends IService<Component> {
 	 * 
 	 * @param ufile
 	 */
-	List<Component> analysisZipFile(MultipartFile ufile);
+	List<Component> analysisZipFile(MultipartFile ufile, String userId);
+
 	/**
 	 * 检查更新
+	 * 
 	 * @param obj
 	 */
 	Map<String, Object> checkComp(List<Object> obj);
@@ -213,8 +215,10 @@ public interface ComponentService extends IService<Component> {
 	 * @param userId 用户Id
 	 */
 	List<Component> listCompByUserId(String userId);
+
 	/**
 	 * 判断选择的库目录文件是否存在
+	 * 
 	 * @param id
 	 * @return
 	 */
