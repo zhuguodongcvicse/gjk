@@ -68,7 +68,7 @@
           highlight-current-row
           @current-change="handleFTableCurrentChange"
         >
-          <el-table-column prop="fparamName" label="名称" type="scoped solt">
+          <el-table-column prop="fparamName" label="类型" type="scoped solt">
             <template slot-scope="{row}" v-if="row.delFlag!='1'">
               <el-input
                 :disabled="mappedModel.dbId===row.parentId?false:true"
@@ -79,7 +79,7 @@
               <span size="mini">{{row.fparamValue}}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="fparamType" label="类型">
+          <el-table-column prop="fparamType" label="名称">
             <template slot-scope="{row}" v-if="row.delFlag!='1'">
               <el-select
                 :disabled="mappedModel.dbId===row.parentId?false:true"

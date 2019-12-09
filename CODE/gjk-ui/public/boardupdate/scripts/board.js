@@ -228,7 +228,7 @@ function handleMessageFromParent(event) {
       if (boardArr.boardType === '2' || boardArr.boardType === '3') {
         let backInfListTemp = JSON.parse(boardArr.boardJson).datas[0].json.properties.backBoardInfList
         backBoardInfList = backInfListTemp
-        infIDNum = backInfListTemp.length
+        infIDNum = 0
         for (let i in backInfListTemp) {
           if (backInfListTemp[i].ID >= infIDNum) {
             infIDNum = backInfListTemp[i].ID
@@ -687,9 +687,11 @@ function initEditor(editor) {
         var currentElement = graph.getElement(evt.event);
         // console.log("currentElement", currentElement)
         if (currentElement && currentElement.image == 'images/BeforeTheBoard.svg') {
-          //	node.host = currentElement;
+          node.zIndex = "550"
+         node.host = currentElement;
         } else if (currentElement && currentElement.image == 'images/AfterTheBoard.svg') {
-          //	node.host = currentElement;
+          node.zIndex = "550"
+          node.host = currentElement;
         } else if (currentElement && currentElement.image == 'images/Chip.svg') {
           graph.removeElement(node);
           return

@@ -405,10 +405,9 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		} else {
 			component.setId(IdGenerate.uuid());
 //			component.setVersion(getVersion(component));
-			component.setCreateTime(LocalDateTime.now());
 			baseMapper.saveComp(component);
 		}
-		return component;
+		return this.getById(component.getId());
 	}
 
 	@Override

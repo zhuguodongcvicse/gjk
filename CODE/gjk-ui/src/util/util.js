@@ -205,12 +205,12 @@ export const exitFullScreen = () => {
 
 export const findParent = (menu, id) => {
   for (let i = 0; i < menu.length; i++) {
-    if (menu[i].children.length != 0) {
+    if (menu[i].children!=undefined && menu[i].children.length != 0) {
       for (let j = 0; j < menu[i].children.length; j++) {
         if (menu[i].children[j].id == id) {
           return menu[i]
         } else {
-          if (menu[i].children[j].children.length != 0) {
+          if (menu[i].children[j].children!=undefined && menu[i].children[j].children.length != 0) {
             return findParent(menu[i].children[j].children, id)
           }
         }

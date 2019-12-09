@@ -221,7 +221,10 @@ export default {
       //生成构件框架
       compSpbShowDialog: false,
       compSpbFrameData: [],
-      compSpbParam: {},
+      compSpbParam: {
+        compBackupinfo: "",
+        frameId: ""
+      },
       backChecked: valiaCompIdAndBackChecked,
       compSpbFormRules: {
         frameId: [
@@ -396,6 +399,7 @@ export default {
                   this.compSpbParam.spbModelXmlFile = resComp.data.data;
                   this.compSpbParam.saveDir = resFiles.data.data;
                   // this.compSpbForm.frameId = ;
+                  console.log("createSpbFrameFile",this.compSpbParam)
                   createSpbFrameFile(this.compSpbParam)
                     .then(res => {
                       this.reload();

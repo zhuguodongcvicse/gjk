@@ -96,11 +96,11 @@ export const uploadOption = {
       prop: "formatedSize",
       slot: true
     },
-    {
-      label: "状态",
-      prop: "status",
-      slot: true
-    },
+    // {
+    //   label: "状态",
+    //   prop: "status",
+    //   slot: true
+    // },
     // {
     //   label: "进度",
     //   prop: "name"

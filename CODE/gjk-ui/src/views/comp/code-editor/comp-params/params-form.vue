@@ -5,7 +5,7 @@
       ref="compParamsForm"
       :rules="compParamsFormRules"
       :model="compSpbParam"
-      :label-width="moduleType==='comp'? '20%' : '20%'"
+      :label-width="moduleType==='comp'? '25%' : '35%'"
     >
       <template v-for="(params,index) in paramsFormXmlParams">
         <!-- 基本属性表单内容 -->
@@ -313,7 +313,7 @@ export default {
             }
           } else if (item.lableName === "显示名") {
             this.$set(this.compParamsFormRules, item.lableName, mes);
-          } else if (item.lableName === "属性1") {
+          } else if (item.lableName === "函数名") {
             this.$set(this.compParamsFormRules, item.lableName, mes);
           }
           //設置表單值 设置表单值

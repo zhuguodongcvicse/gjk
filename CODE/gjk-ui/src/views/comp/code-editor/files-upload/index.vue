@@ -102,19 +102,19 @@ export default {
             prop: "formatedSize",
             slot: true
           },
-          {
-            label: "状态",
-            prop: "status",
-            slot: true
-          },
-          {
-            label: "进度",
-            prop: "name"
-          },
-          {
-            label: "名称",
-            prop: "fparamName"
-          }
+          // {
+          //   label: "状态",
+          //   prop: "status",
+          //   slot: true
+          // },
+          // {
+          //   label: "进度",
+          //   prop: "name"
+          // },
+          // {
+          //   label: "名称",
+          //   prop: "fparamName"
+          // }
         ]
       },
       leftOption: {

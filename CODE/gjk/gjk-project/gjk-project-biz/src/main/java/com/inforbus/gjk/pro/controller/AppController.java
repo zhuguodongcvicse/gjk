@@ -448,8 +448,9 @@ public class AppController {
 				boolean returnVal;
 				try {
 					// 调用注销接口
-					returnVal = ExternalIOTransUtils.appTaskExport(appDataDTO.getUserName(), appDataDTO.getFlowId(), appDataDTO.getAppName(),
+					ExternalIOTransUtils.appTaskExport(appDataDTO.getUserName(), appDataDTO.getFlowId(), appDataDTO.getAppName(),
 							appPath, gitFilePath + appDataDTO.getSysconfigPath(), selfSoftToHardResult, selfGenerateCodeResult);
+					returnVal = true;
 				} catch (Exception e) {
 					e.printStackTrace();
 					returnVal = false;

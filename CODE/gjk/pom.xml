@@ -173,6 +173,7 @@
 		<module>gjk-libs</module>
 		<module>gjk-dataCenter</module>
 		<module>gjk-compile</module>
+		<module>gjk-simulation</module>
 	</modules>
 
 	<dependencyManagement>

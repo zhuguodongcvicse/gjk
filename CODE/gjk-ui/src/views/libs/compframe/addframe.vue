@@ -11,14 +11,14 @@
           style="margin-bottom: 0px;"
         >
           <el-button-group>
-            <uploader-btn :directory="true" class="uploaderbtn uploaderbtn2">选择文件夹</uploader-btn>
+            <uploader-btn :directory="true" class="uploaderbtn uploaderbtn2">选择文件</uploader-btn>
           </el-button-group>
         </el-form-item>
         <uploader-files>
           <template slot-scope="filess">
             <avue-crud :data="filess.files" :option="uploadOption">
               <template slot="formatedSize" slot-scope="scope">{{printSize(scope.row.size)}}</template>
-              <template slot="status" slot-scope="scope">{{ scope.row.paused===true?"暂停":"还不知道"}}</template>
+              <!-- <template slot="status" slot-scope="scope">{{ scope.row.paused===true?"暂停":"还不知道"}}</template> -->
               <template slot-scope="scope" slot="menu">
                 <el-button
                   size="mini"

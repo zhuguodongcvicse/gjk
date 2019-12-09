@@ -63,6 +63,11 @@ spring:
           uri: lb://gjk-compile
           predicates:
             - Path=/compile/**
+        # 编译中心模块
+        - id: gjk-simulation
+          uri: lb://gjk-simulation
+          predicates:
+            - Path=/simula/**
        
 
 security:

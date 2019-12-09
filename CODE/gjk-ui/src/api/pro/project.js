@@ -179,13 +179,6 @@ export function deleteChipsFromHardwarelibs(id) {
     method: 'delete'
   })
 }
-
-export function simulation() {
-  return request({
-    url: '/pro/simulation/simulationData',
-    method: 'get'
-  })
-}
 export function realData() {
   return request({
     url: '/pro/simulation/realData',

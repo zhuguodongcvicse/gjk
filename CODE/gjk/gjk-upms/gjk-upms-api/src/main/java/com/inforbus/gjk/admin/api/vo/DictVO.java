@@ -35,7 +35,7 @@ public class DictVO implements Serializable {
 	/**
 	 * 主键ID
 	 */
-	private Integer id;
+	private String id;
 	/**
 	 * 数据值
 	 */
