@@ -134,7 +134,7 @@ import {
   removeCompProject,
   completeCheck
 } from "@/api/pro/project";
-import {startSimulator} from "@/api/simula/simulation";
+import {startSimulator,stopSimulation} from "@/api/simula/simulation";
 import { handlerSaveSysXml } from "@/api/pro/manager";
 import { remote } from "@/api/admin/dict";
 import { randomLenNum, randomUuid, deepClone, getObjType } from "@/util/util";
@@ -181,7 +181,7 @@ export default {
       dialogVisibleOfCloseRouter: false,
       dialogNext: "",
       flowFilePath: "" ,//流程建模文件路径
-      simulationData :[], //存放仿真数据 
+      simulationData :[], //存放仿真数据
     };
   },
   //监听属性 类似于data概念
@@ -203,7 +203,7 @@ export default {
     },
     simulationData:{
       handler:function(){
-        startSimulator({userName:this.userInfo.userName,connectionList:this.simulationData,filePath:this.flowFilePath})
+        startSimulator({username:this.userInfo.username,connectionList:this.simulationData,filePath:this.flowFilePath})
       }
     },
 
@@ -579,6 +579,21 @@ export default {
         this.postMessageData.cmd = "endSimulation";
         this.postMessageData.params = "";
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
+        stopSimulation(this.userInfo.username).then(req=>{
+              if(req.data.data){
+                  this.$message({
+                      showClose: true,
+                      message: "成功",
+                      type: "success"
+                  });
+              }else{
+                  this.$message({
+                      showClose: true,
+                      message: "未开启仿真",
+                      type: "warning"
+                  });
+              }
+          })
       }
       // else if(state === "checkComp"){
       //   console.log(this.dtos)

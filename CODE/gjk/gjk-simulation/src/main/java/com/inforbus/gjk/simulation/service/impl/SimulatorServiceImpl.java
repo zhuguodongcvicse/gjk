@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class SimulatorServiceImpl implements SimulatorService {
@@ -34,7 +35,9 @@ public class SimulatorServiceImpl implements SimulatorService {
     public boolean startSimulator(String username, List<String> componentLinks, String filePath) {
         //启用客户线程，传入参数
         String channelName = username+"SimulatorChannel";
-        new SimulatorQueue(host,channelName).start();
+        SimulatorQueue simulatorQueue = new SimulatorQueue(host, channelName);
+        Global.USERS_SIMULATOR_THREAD.put(username,simulatorQueue);
+        simulatorQueue.start();
         //暂时模拟数据接口
         Subscriber subscriber = new Subscriber();
         subscriber.setQueueSize(Integer.parseInt(queueSize));
@@ -46,12 +49,16 @@ public class SimulatorServiceImpl implements SimulatorService {
 
     @Override
     public boolean stopSimulator(String username) {
-        Map<String, Thread> simulatorQueues = Global.USERS_SIMULATOR_QUEUES.get(username);
-        simulatorQueues.keySet().stream().forEach(mapKey->{
-            SimulatorQueue simulatorQueue = (SimulatorQueue)simulatorQueues.get(mapKey);
-            simulatorQueue.close();
-        });
-        Global.USERS_SIMULATOR_QUEUES.remove(username);
+        SimulatorQueue simulatorQueues = (SimulatorQueue) Global.USERS_SIMULATOR_THREAD.get(username);
+        if(simulatorQueues == null){
+            return false;
+        }
+        simulatorQueues.close();
+        Global.USERS_SIMULATOR_THREAD.remove(username);
+        Set<String> keys = redisTemplate.keys("Simulator:" + username + ":");
+        for (String key : keys) {
+            redisTemplate.delete(key);
+        }
         return true;
     }
 

@@ -5,7 +5,7 @@
       ref="compParamsForm"
       :rules="compParamsFormRules"
       :model="compSpbParam"
-      :label-width="moduleType==='comp'? '25%' : '20%'"
+      :label-width="moduleType==='comp'? '25%' : '35%'"
     >
       <template v-for="(params,index) in paramsFormXmlParams">
         <!-- 基本属性表单内容 -->

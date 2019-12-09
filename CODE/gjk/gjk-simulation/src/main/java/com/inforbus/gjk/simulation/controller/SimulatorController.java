@@ -39,4 +39,9 @@ public class SimulatorController {
 	public R getData(@PathVariable("username") String username, @RequestBody SimulationDTO simulationDTO){
 		return new R<>(simulatorService.getData(username, simulationDTO));
 	}
+
+	@PostMapping("/stopSimulator/{username}")
+	public R stopSimulator(@PathVariable("username") String username){
+		return new R<>(simulatorService.stopSimulator(username));
+	}
 }

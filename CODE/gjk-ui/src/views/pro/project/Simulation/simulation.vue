@@ -4,11 +4,21 @@
       <el-col>
         <el-form :inline="true" size="mini" label-width="80px">
           <el-form-item label="区域一">
-            <el-select placeholder="请选择展示帧号">
+            <el-select placeholder="请选择展示帧号" v-model="myChartsSelectValue">
+              <el-option
+                v-for="(attribute,index) in myChartsSelectData"
+                :key="index"
+                :label="attribute.label"
+                :value="attribute.value"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="区域二">
-            <el-select placeholder="请选择展示帧号">
+            <el-select placeholder="请选择展示帧号" v-model="myChartsSelectValue">
+              <el-option
+                v-for="(attribute,index) in myChartsSelectData"
+                :key="index"
+                :label="attribute.label"
+                :value="attribute.value"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item>
@@ -98,7 +108,7 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import { getDataSource, simulation,startSimulator } from "@/api/simula/simulation"
+import { getDataSource, simulation, startSimulator } from "@/api/simula/simulation"
 
 export default {
   name: "hello",
@@ -121,6 +131,11 @@ export default {
         xaxisData: [],
         yaxisData: []
       },
+      flag: false,
+      myChartsSelectData: [],
+      myCharts1SelectData: [],
+      myChartsSelectValue: '',
+      myCharts1SelectValue: '',
       tableData: [],
       datasource:[],
       tableHeight: "400px",//表格显示区域固定高度
@@ -163,6 +178,9 @@ export default {
     drawLine1(data) {
       this.myChartsShow = true;
       simulation(data).then(response => {
+        if(this.flag){
+          return;
+        }
         this.tableData = [{name:"test1",value: "test1"},{name: "test2",value: "test2"}]
         let self = this;
         if (self && !self._isDestroyed) {//循环发送请求解决路由页面依旧发请求问题
@@ -254,6 +272,9 @@ export default {
     drawLine2(data) {
       this.myCharts1Show = true;
       simulation(data).then(response => {
+        if(this.flag){
+          return;
+        }
         let self = this;
         if (self && !self._isDestroyed) {//循环发送请求解决路由页面依旧发请求问题
           this.myCharts1 = setTimeout(() => {
@@ -348,12 +369,14 @@ export default {
         if(this.myCharts1FormData!=undefined){
             this.drawLine2(this.myCharts1FormData)
         }
+        this.flag = false;
     },
     stop(){
         window.clearTimeout(this.myCharts);
-        this.myCharts = null
         window.clearTimeout(this.myCharts1);
+        this.myCharts = null
         this.myCharts1 = null
+        this.flag = true;
     },
     getDataSource(flowFilePath, startId, endId){
       var simulationDto = {"flowFilePath":flowFilePath,"startId":startId, "endId":endId}
@@ -383,17 +406,12 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    //this.getSimulation();
      var flowFilePath = this.$route.query.flowFilePath
      var startId = this.$route.query.startId
      var endId = this.$route.query.endId
      var list = [startId+"|"+endId]
      var data = {"username":"admin", componentLinks: list, filePath: flowFilePath}
-     // startSimulator(data)
-     var that = this;
-     setTimeout(() => {
-       that.getDataSource(flowFilePath,startId,endId);
-     }, 2000);
+     this.getDataSource(flowFilePath,startId,endId);
   },
 
   //生命周期 - 挂载完成（可以访问DOM元素）
