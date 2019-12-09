@@ -119,14 +119,14 @@
                             >{{ item.description }}</span>
                           </el-option>
                         </el-select>
-<!--                        <el-select v-model="formLabelAlign.bspSelectString" placeholder="请选择">-->
-<!--                          <el-option-->
-<!--                            v-for="item in bspTreeData"-->
-<!--                            :key="item.id"-->
-<!--                            :label="item.label"-->
-<!--                            :value="item.id"-->
-<!--                          ></el-option>-->
-<!--                        </el-select>-->
+                        <!--                        <el-select v-model="formLabelAlign.bspSelectString" placeholder="请选择">-->
+                        <!--                          <el-option-->
+                        <!--                            v-for="item in bspTreeData"-->
+                        <!--                            :key="item.id"-->
+                        <!--                            :label="item.label"-->
+                        <!--                            :value="item.id"-->
+                        <!--                          ></el-option>-->
+                        <!--                        </el-select>-->
                       </el-form-item>
                     </div>
                   </el-form>
@@ -192,6 +192,7 @@
 <script>
 import { fetchAlgorithmTree } from "@/api/admin/algorithm";
 import { fetchTestTree } from "@/api/admin/test";
+import { fetchPlatformTrees } from "@/api/admin/platform";
 import addDialog from "@/views/pro/project/addDialog";
 import selectTree from "./selectTree";
 import { getAllComp, screenCompByLibs } from "@/api/libs/commoncomponent";
@@ -423,6 +424,11 @@ export default {
           for (let item of testTree.data.data) {
             this.screenLibsTree.push(item);
           }
+          fetchPlatformTrees(this.listQuery).then(platformTree => {
+            for (let platformItem of platformTree.data.data) {
+              this.screenLibsTree.push(platformItem);
+            }
+          });
         });
       });
     },
@@ -701,51 +707,51 @@ export default {
         this.softwareTreeData = softwareTreeDataList;
       });
       getBSPSelect().then(Response => {
-          let datas = Response.data.data;
-          let bspTreeDataList = [];
-          for (var i = 0; i < datas.length; i++) {
-              if (datas[i].description != "") {
-                  bspTreeDataList.push(datas[i]);
-              }
+        let datas = Response.data.data;
+        let bspTreeDataList = [];
+        for (var i = 0; i < datas.length; i++) {
+          if (datas[i].description != "") {
+            bspTreeDataList.push(datas[i]);
           }
-          this.bspTreeData = bspTreeDataList;
+        }
+        this.bspTreeData = bspTreeDataList;
       });
     },
     //修改bsp库值改变
     selectBSPClk(val) {
-        var valNameArr = [];
-        for (var j = 0; j < val.length; j++) {
-            for (var i = 0; i < this.bspTreeData.length; i++) {
-                if (this.bspTreeData[i].id == val[j]) {
-                    valNameArr.push(this.bspTreeData[i].description);
-                }
-            }
+      var valNameArr = [];
+      for (var j = 0; j < val.length; j++) {
+        for (var i = 0; i < this.bspTreeData.length; i++) {
+          if (this.bspTreeData[i].id == val[j]) {
+            valNameArr.push(this.bspTreeData[i].description);
+          }
         }
-        //至少选中一个
-        if (val.length > 1) {
-            //遍历下拉框得到平台名称
-            var lastPlatformName = "";
-            for (var i = 0; i < this.bspTreeData.length; i++) {
-                if (this.bspTreeData[i].id == val[val.length - 1]) {
-                    lastPlatformName = this.bspTreeData[i].description;
-                }
-            }
-            //根据分号拆分平台类
-            lastPlatformName = lastPlatformName.substring(
-                0,
-                lastPlatformName.length - 1
-            );
-            var platformNameArr = lastPlatformName.split(";");
-            // console.log("拆分后的平台类名：", platformNameArr);
-            for (var k = 0; k < platformNameArr.length; k++) {
-                for (var m = 0; m < val.length - 1; m++) {
-                    if (valNameArr[m].indexOf(platformNameArr[k]) != -1) {
-                        val.splice(m, 1);
-                        valNameArr.splice(m, 1);
-                    }
-                }
-            }
+      }
+      //至少选中一个
+      if (val.length > 1) {
+        //遍历下拉框得到平台名称
+        var lastPlatformName = "";
+        for (var i = 0; i < this.bspTreeData.length; i++) {
+          if (this.bspTreeData[i].id == val[val.length - 1]) {
+            lastPlatformName = this.bspTreeData[i].description;
+          }
         }
+        //根据分号拆分平台类
+        lastPlatformName = lastPlatformName.substring(
+          0,
+          lastPlatformName.length - 1
+        );
+        var platformNameArr = lastPlatformName.split(";");
+        // console.log("拆分后的平台类名：", platformNameArr);
+        for (var k = 0; k < platformNameArr.length; k++) {
+          for (var m = 0; m < val.length - 1; m++) {
+            if (valNameArr[m].indexOf(platformNameArr[k]) != -1) {
+              val.splice(m, 1);
+              valNameArr.splice(m, 1);
+            }
+          }
+        }
+      }
     },
     //修改软件框架值改变
     selectSoftwareClk(val) {
@@ -837,23 +843,23 @@ export default {
       });
     },
     changeProcedureBSPId() {
-        if (this.bspSelectString.length == 0) {
-            return;
+      if (this.bspSelectString.length == 0) {
+        return;
+      }
+      let prodetail = {};
+      prodetail.id = this.procedureId;
+      prodetail.description = this.bspSelectString.join(";");
+      // 保存选择的BSP库
+      updatePartBSPAndPlatform(prodetail).then(response => {
+        if (response.data.data) {
+          this.$message({
+            message: "修改BSP库成功",
+            type: "success"
+          });
+        } else {
+          this.$message.error("修改BSP库失败");
         }
-        let prodetail = {};
-        prodetail.id = this.procedureId;
-        prodetail.description = this.bspSelectString.join(";");
-        // 保存选择的BSP库
-        updatePartBSPAndPlatform(prodetail).then(response => {
-            if (response.data.data) {
-                this.$message({
-                    message: "修改BSP库成功",
-                    type: "success"
-                });
-            } else {
-                this.$message.error("修改BSP库失败");
-            }
-        });
+      });
     }
   },
   created() {

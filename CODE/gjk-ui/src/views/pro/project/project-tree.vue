@@ -446,7 +446,7 @@ export default {
       } else if (item == "添加流程") {
         this.addProcedureDialogVisible = true;
       } else if (item == "申请构件") {
-          this.addProcedureDialogVisible = true;
+        this.addProCompDialogVisible = true;
       } else if (item == "导入") {
         this.importProjectDialogVisible = true;
       } else if (item == "删除流程") {
@@ -515,15 +515,15 @@ export default {
             "_blank"
           );
         });
-      } else if(item == "导出"){
-          console.log('导出')
-          console.log('this.currentNodeData::', this.currentNodeData)
-          let param = {
-              projectId: this.currentNodeData.parentId,
-              processId: this.currentNodeData.id
-          }
-          createZipFile(param)
-          $("#projectRightMenu").hide();
+      } else if (item == "导出") {
+        console.log("导出");
+        console.log("this.currentNodeData::", this.currentNodeData);
+        let param = {
+          projectId: this.currentNodeData.parentId,
+          processId: this.currentNodeData.id
+        };
+        createZipFile(param);
+        $("#projectRightMenu").hide();
       }
     },
     findTargetNode(currentNodeObj, targetNodeObj) {
@@ -847,57 +847,57 @@ export default {
         this.isUpdataTemp = false;
       });
     },
-      dialogBeforeClose(done) {
-          done();
-          this.$refs.importProject.clearFiles();
-          this.importProjectFileList = [];
-      },
-      beforeAvatarUpload(file) {
-          const isZIP =
-              file.type === "application/x-zip-compressed" || "application/zip";
-          if (!isZIP) {
-              this.$message.error(
-                  "上传文件格式只能是压缩文件，请传入项目导出的压缩文件。"
-              );
-          }
-          return isZIP /*&& isLt2M*/;
-      },
-      importProjectFileUploadFunc(param) {
-          this.importProjectFileList.push(param.file);
-      },
-      onExceed(file, fileList) {
-          this.$message.warning(
-              `当前限制选择1个文件，本次选择了 ${
-                  file.length
-              } 个文件，共选择了 ${file.length + fileList.length} 个文件`
-          );
-      },
-      beforeRemove(file, fileList) {
-          this.importProjectFileList = [];
-      },
-      closeImportProjectDialog() {
-          this.importProjectDialogVisible = false;
-          this.$refs.importProject.clearFiles();
-          this.importProjectFileList = [];
-      },
-      importProjectFile() {
-          if (this.importProjectFileList.length == 0) {
-              this.$message.warning("请选择文件上传。");
-          } else {
-              let params = new FormData();
-              params.append("file", this.importProjectFileList[0]);
-              params.append("projectId", this.currentNodeData.id);
-              importProjectZipUpload(params).then(Response => {
-                  if (Response.data.data == -1) {
-                      this.$message.warning("上传的压缩包内容错误，请重新选择文件上传。");
-                  } else {
-                      this.$message.success("导入成功。");
-                      this.getProjects();
-                      this.closeImportProjectDialog();
-                  }
-              });
-          }
+    dialogBeforeClose(done) {
+      done();
+      this.$refs.importProject.clearFiles();
+      this.importProjectFileList = [];
+    },
+    beforeAvatarUpload(file) {
+      const isZIP =
+        file.type === "application/x-zip-compressed" || "application/zip";
+      if (!isZIP) {
+        this.$message.error(
+          "上传文件格式只能是压缩文件，请传入项目导出的压缩文件。"
+        );
       }
+      return isZIP /*&& isLt2M*/;
+    },
+    importProjectFileUploadFunc(param) {
+      this.importProjectFileList.push(param.file);
+    },
+    onExceed(file, fileList) {
+      this.$message.warning(
+        `当前限制选择1个文件，本次选择了 ${
+          file.length
+        } 个文件，共选择了 ${file.length + fileList.length} 个文件`
+      );
+    },
+    beforeRemove(file, fileList) {
+      this.importProjectFileList = [];
+    },
+    closeImportProjectDialog() {
+      this.importProjectDialogVisible = false;
+      this.$refs.importProject.clearFiles();
+      this.importProjectFileList = [];
+    },
+    importProjectFile() {
+      if (this.importProjectFileList.length == 0) {
+        this.$message.warning("请选择文件上传。");
+      } else {
+        let params = new FormData();
+        params.append("file", this.importProjectFileList[0]);
+        params.append("projectId", this.currentNodeData.id);
+        importProjectZipUpload(params).then(Response => {
+          if (Response.data.data == -1) {
+            this.$message.warning("上传的压缩包内容错误，请重新选择文件上传。");
+          } else {
+            this.$message.success("导入成功。");
+            this.getProjects();
+            this.closeImportProjectDialog();
+          }
+        });
+      }
+    }
   }
 };
 </script>

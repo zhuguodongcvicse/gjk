@@ -276,7 +276,7 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		List<Structlibs> structlibsList = new ArrayList<>();
 		List<String> structIdList = compStructList.stream().map(CompStruct::getStructId).collect(Collectors.toList());
 		List<Structlibs> structlibsListSub = new ArrayList<>();
-		if(structIdList.size() > 0){
+		if (structIdList.size() > 0) {
 			structlibsListSub = structlibsMapper.getStructlibsByIdList(structIdList);
 		}
 
@@ -306,6 +306,7 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 
 	/**
 	 * 创建一个sheep标签 并处理数据
+	 * 
 	 * @param workbook
 	 * @param dataList
 	 * @param tableName
@@ -323,16 +324,17 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 
 	/**
 	 * 递归获取结构体数据
+	 * 
 	 * @param structlibsList
 	 * @param resList
 	 */
-	private void findStructlibsRecursion(List<Structlibs> structlibsList, List<Structlibs> resList){
+	private void findStructlibsRecursion(List<Structlibs> structlibsList, List<Structlibs> resList) {
 		List<String> structIdList = structlibsList.stream().map(Structlibs::getId).collect(Collectors.toList());
 		List<Structlibs> list = new ArrayList<>();
-		if(structIdList.size() > 0){
+		if (structIdList.size() > 0) {
 			list = structlibsMapper.getStructlibsByIdList(structIdList);
 		}
-		if(list.size() > 0){
+		if (list.size() > 0) {
 			resList.addAll(list);
 			findStructlibsRecursion(list, resList);
 		}
@@ -457,23 +459,31 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 
 	@Override
 	public IPage<CommonComponent> getCompListByString(Page page, List<String> selectStringList) {
-		return baseMapper.getCompListByString(page, selectStringList);
+		List<String> strings = new ArrayList<String>();
+		for (String selectStr : selectStringList) {
+			strings.add(selectStr.toLowerCase());
+		}
+		return baseMapper.getCompListByString(page, strings);
 	}
 
 	@Override
 	public IPage<CommonComponent> getCompListByStringAndLibsId(Page page, List<String> libsList,
 			List<String> selectStringList) {
-		return baseMapper.getCompListByStringAndLibsId(page, libsList, selectStringList);
+		List<String> strings = new ArrayList<String>();
+		for (String selectStr : selectStringList) {
+			strings.add(selectStr.toLowerCase());
+		}
+		return baseMapper.getCompListByStringAndLibsId(page, libsList, strings);
 	}
 
-    @Override
-	public IPage<CommonComponent> findPageByBatchApprovalId(Page page, String applyId){
+	@Override
+	public IPage<CommonComponent> findPageByBatchApprovalId(Page page, String applyId) {
 		R componentByApplyId = batchApprovalService.getComponentByApplyId(applyId);
 		List<CommonComponent> data = (List<CommonComponent>) componentByApplyId.getData();
 		page.setTotal(data.size());
 		ArrayList<CommonComponent> commonComponents = Lists.newArrayList();
 		for (int i = 0; i < page.getSize(); i++) {
-			if(data.size() > (int) ((page.getCurrent() - 1) * page.getSize()) + i) {
+			if (data.size() > (int) ((page.getCurrent() - 1) * page.getSize()) + i) {
 				commonComponents.add(data.get((int) ((page.getCurrent() - 1) * page.getSize()) + i));
 			}
 		}
@@ -482,11 +492,11 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 	}
 
 	@Override
-	public boolean saveCommonCompList(List<CommonComponent> commonComponents){
-	    commonComponents.forEach(comm->{
-	        this.saveCommonComp(comm);
-        });
-	    return true;
-    }
+	public boolean saveCommonCompList(List<CommonComponent> commonComponents) {
+		commonComponents.forEach(comm -> {
+			this.saveCommonComp(comm);
+		});
+		return true;
+	}
 
 }

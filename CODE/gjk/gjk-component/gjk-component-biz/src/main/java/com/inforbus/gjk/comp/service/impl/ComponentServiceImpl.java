@@ -605,7 +605,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	}
 
 	@Override
-	public List<Component> analysisZipFile(MultipartFile ufile) {
+	public List<Component> analysisZipFile(MultipartFile ufile, String userId) {
 		String filePath = compDetailPath + "gjk" + File.separator + "zipFile" + File.separator
 				+ (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date()) + "-" + ufile.getOriginalFilename();
 		try {
@@ -622,7 +622,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			List<Component> components = null;
 			if ("component".equals(new File(descDirPath).listFiles()[0].getName())) {
 				String excelFilePath = descDirPath + File.separator + "component" + File.separator + "MySQL.xls";
-				components = readExcel(descDirPath, excelFilePath);
+				components = readExcel(descDirPath, excelFilePath, userId);
 				// 删除压缩包
 				cn.hutool.core.io.FileUtil.del(filePath);
 				// 删除解压包
@@ -691,7 +691,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	 * @param path
 	 * @throws Exception
 	 */
-	public List<Component> readExcel(String unZipFilePath, String path) throws Exception {
+	public List<Component> readExcel(String unZipFilePath, String path, String userId) throws Exception {
 		List<Component> compList = new ArrayList<Component>();
 
 		// 获取整个表格文件对象
@@ -746,12 +746,15 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 				}
 			}
 
-			String beforeFilePath = unZipFilePath + File.separator + "component" + File.separator + comp.getCompName()
-					+ File.separator + comp.getVersion() + File.separator;
-			String beforeDetailFilePath = "gjk" + File.separator + "component" + File.separator + comp.getCompName()
-					+ File.separator + comp.getVersion() + File.separator;
+			String beforeFilePath = unZipFilePath + File.separator + "component" + File.separator + comp.getCompId()
+					+ File.separator + comp.getCreateTime().toString().replaceAll("[[\\s-T:punct:]]", "")
+					+ File.separator;
+			String beforeDetailFilePath = "gjk" + File.separator + "component" + File.separator + comp.getCompId()
+					+ File.separator + comp.getCreateTime().toString().replaceAll("[[\\s-T:punct:]]", "")
+					+ File.separator;
 
 			comp.setVersion(getVersion(comp));
+			comp.setUserId(userId);
 			comp.setApplyState("0");
 			comp.setApplyDesc("未申请入库");
 			comp.setCreateTime(LocalDateTime.now());
@@ -761,9 +764,9 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 
 			for (ComponentDetail detail : componentDetails) {
 				String filePath = detail.getFilePath().substring(beforeDetailFilePath.length());
-				detail.setFilePath("gjk" + File.separator + "component" + File.separator + comp.getCompName()
-						+ File.separator + comp.getVersion() + File.separator + filePath);
-				detail.setVersion(comp.getVersion());
+				detail.setFilePath("gjk" + File.separator + "component" + File.separator + comp.getCompId()
+						+ File.separator + comp.getCreateTime().toString().replaceAll("[[\\s-T:punct:]]", "")
+						+ File.separator + filePath);
 				detail.setId(IdGenerate.uuid());
 				compDetailMapper.saveCompDetail(detail);
 			}
@@ -972,6 +975,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		maps.put("compUpdate", compUpdate);
 		return maps;
 	}
+
 	/**
 	 * @Title: getImgFile
 	 * @Description: listCompByUserId
@@ -1027,9 +1031,11 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			res = "选择的" + res + "不存在";
 		}
 		return res;
-	}	@Test
+	}
+
+	@Test
 	public void xx() {
-		String sss="";
+		String sss = "";
 		System.out.println(StringUtils.isNotEmpty(sss));
 	}
 }

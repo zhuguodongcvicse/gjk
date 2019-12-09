@@ -297,17 +297,20 @@ public class ComponentController {
 	 */
 	@ResponseBody
 	@PostMapping(path = "/importCompZipUpload", consumes = { "multipart/mixed", "multipart/form-data" })
-	public R<?> appImageUpload(@RequestParam(value = "file", required = false) MultipartFile ufile) {
-		return new R<>(componentService.analysisZipFile(ufile));
+	public R<?> appImageUpload(@RequestParam(value = "file", required = false) MultipartFile ufile,
+			@RequestParam(value = "userId", required = false) String userId) {
+		return new R<>(componentService.analysisZipFile(ufile, userId));
 	}
+
 	@ResponseBody
 	@PostMapping(path = "/checkComp")
-	public R checkComp(@RequestBody List<Object> obj){
+	public R checkComp(@RequestBody List<Object> obj) {
 		return new R<>(componentService.checkComp(obj));
 	}
 
 	/**
 	 * 构件入库前的判断 选择的库目录文件是否存在
+	 * 
 	 * @param compId
 	 * @return
 	 */
@@ -315,6 +318,7 @@ public class ComponentController {
 	public R isSelectLibs(@PathVariable("compId") String compId) {
 		return new R<>(componentService.isSelectLibs(compId));
 	}
+
 	@PostMapping("/compByUserId")
 	public R listCompByUserId(@RequestParam(value = "userId") String userId) {
 		return new R<>(componentService.listCompByUserId(userId));

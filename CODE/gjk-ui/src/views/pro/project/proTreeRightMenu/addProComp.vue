@@ -49,6 +49,7 @@ import {
 import { getAllComp, screenCompByLibs } from "@/api/libs/commoncomponent";
 import { fetchAlgorithmTree } from "@/api/admin/algorithm";
 import { fetchTestTree } from "@/api/admin/test";
+import { fetchPlatformTrees } from "@/api/admin/platform";
 import { getUserhasApplyAuto } from "@/api/admin/user";
 import selectTree from "@/views/pro/project/selectTree";
 export default {
@@ -146,6 +147,11 @@ export default {
           for (let item of testTree.data.data) {
             this.screenLibsTree.push(item);
           }
+          fetchPlatformTrees(this.listQuery).then(platformTree => {
+            for (let platformItem of platformTree.data.data) {
+              this.screenLibsTree.push(platformItem);
+            }
+          });
         });
       });
     },

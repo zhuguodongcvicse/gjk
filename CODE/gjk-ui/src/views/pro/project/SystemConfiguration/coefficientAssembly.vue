@@ -78,7 +78,7 @@
               </template>
             </el-table-column>
           </template>
-          <el-table-column fixed="right" label="操作" header-align="center">
+          <el-table-column label="操作" header-align="center">
             <template slot-scope="{row,$index}">
               <el-button
                 type="danger"

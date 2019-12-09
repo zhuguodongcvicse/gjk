@@ -16,73 +16,52 @@
  */
 
 export const tableOption = {
-    border: true,
-    stripe: true,
-    menu: true,
-    menuAlign: 'center',
-    align: 'center',
-    editBtn: false,
-    delBtn: false,
-    addBtn: false,
-    labelWidth:120,
-    column: [{
-        hide: true,
-        label: '',
-        prop: 'id'
+  border: true,
+  stripe: true,
+  menu: true,
+  menuAlign: 'center',
+  align: 'center',
+  editBtn: false,
+  delBtn: false,
+  addBtn: false,
+  labelWidth: 120,
+  column: [
+    {
+      label: '构件编号',
+      prop: 'compId'
+    },
+    {
+      label: '构件名称',
+      prop: 'compName'
+    },
+    {
+      hide: true,
+      label: '构件函数名',
+      prop: 'compFuncname'
+    },
+    {
+      label: '用户',
+      prop: 'userId',
+      type: 'select',
+      props: {
+        label: 'name',
+        value: 'userId'
       },
-      {
-        label: '构件编号',
-        prop: 'compId'
-      },
-      {
-        label: '构件名称',
-        prop: 'compName'
-      },
-      {
-        hide: true,
-        label: '构件函数名',
-        prop: 'compFuncname'
-      },
-      {
-        label: '用户',
-        prop: 'userId',
-        type: 'select',
-        props: {
-          label: 'name',
-          value: 'userId'
-        },
-        dicUrl: '/admin/user/info/getUserDict'
-      },
-      {
-        label: '版本',
-        prop: 'version',
-        slot: true
-      },
-      {
-        label: '构件图片',
-        hide: true,
-        prop: 'compImg'
-      },
-      {
-        label: '创建时间',
-        hide: true,
-        prop: 'createTime'
-      },
-      {
-        hide: true,
-        label: '修改时间',
-        prop: 'updateTime'
-      },
-      {
-        label: '描述',
-        hide: true,
-        prop: 'description'
-      },
-      {
-        hide: true,
-        label: '0-正常，1-删除',
-        prop: 'delFlag'
-      },
-    ]
-  }
-  
+      dicUrl: '/admin/user/info/getUserDict'
+    },
+    {
+      label: '版本',
+      prop: 'version',
+      slot: true
+    },
+    {
+      label: '构件图片',
+      prop: 'compImg'
+    },
+    {
+      label: '描述',
+      hide: true,
+      prop: 'description'
+    }
+  ]
+}
