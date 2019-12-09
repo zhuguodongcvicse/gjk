@@ -687,9 +687,11 @@ function initEditor(editor) {
         var currentElement = graph.getElement(evt.event);
         // console.log("currentElement", currentElement)
         if (currentElement && currentElement.image == 'images/BeforeTheBoard.svg') {
-          //	node.host = currentElement;
+          node.zIndex = "550"
+         node.host = currentElement;
         } else if (currentElement && currentElement.image == 'images/AfterTheBoard.svg') {
-          //	node.host = currentElement;
+          node.zIndex = "550"
+          node.host = currentElement;
         } else if (currentElement && currentElement.image == 'images/Chip.svg') {
           graph.removeElement(node);
           return

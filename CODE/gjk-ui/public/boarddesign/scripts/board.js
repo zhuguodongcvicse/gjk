@@ -729,11 +729,10 @@ function initEditor(editor) {
 						adaptBounds(element, slot);
 					}
 				}
-
 				return;
 			}
 			var data = evt.data;
-			//判断芯片接口是否在主板上不是移除
+			//判断芯片节口是否在主板上不是移除
 			if (evt.kind == Q.InteractionEvent.ELEMENT_CREATED && evt.data instanceof Q.Node) {
 				var node = evt.data;
 				// console.log("node1",node)
@@ -741,13 +740,11 @@ function initEditor(editor) {
 					return
 				}
 				var currentElement = graph.getElement(evt.event);
-				 console.log("currentElement", currentElement)
+				// console.log("currentElement", currentElement)
 				if (currentElement && currentElement.image === 'images/BeforeTheBoard.svg') {
-					node.host = currentElement;	
-				node.zIndex = "550"
+					//	node.host = currentElement;
 				} else if (currentElement && currentElement.image === 'images/AfterTheBoard.svg') {
-					node.host = currentElement;
-				node.zIndex = "550"
+					//	node.host = currentElement;
 				} else if (currentElement && currentElement.image === 'images/Chip.svg') {
 					graph.removeElement(node);
 					return
@@ -755,7 +752,6 @@ function initEditor(editor) {
 					graph.removeElement(node);
 					return
 				}
-				console.log('node',node)
 				//拖拽触发
 				evt.data.properties.num = infCount++
 				evt.data.properties.uniqueId = uuid(15, 62)
@@ -830,7 +826,6 @@ function initEditor(editor) {
 				var data = dragInfo.data;
 				var oldSlot = data.parent;
 				var slot = findSlot(data, evt);
-				console.log('slot',slot)
 				if (!slot || slot == oldSlot) {
 					graph.moveElements([data], dragInfo.x - data.x, dragInfo.y - data.y)
 				} else {
