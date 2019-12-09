@@ -488,7 +488,6 @@ export default {
       this.appDataDTO.appProPath = domain.filePath + "/" + domain.fileName;
       //系统配置模块xml路径
       this.appDataDTO.sysconfigPath = domain.sysconfigFilePath;
-      console.log("qqqqqqq----",this.appFilePath, this.appName);
       let mm = {};
             mm.oriFilePath = this.appFilePath;
             mm.downloadAPPFileName = this.appName;
@@ -502,7 +501,10 @@ export default {
             mm.downloadAPPFileName = this.appName;
             handleDown(mm).then(res => {});
           }else{
-            alert("接口返回值为false！！！");
+            this.$notify.error({
+            title: "错误",
+            message: "调用客户接口出错！！！"
+          });
           }
         });
     },
