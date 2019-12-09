@@ -1429,6 +1429,10 @@ export default {
             label: "表单",
             value: "form"
           },
+           {
+            label: "输入输出",
+            value: "table"
+          },
           {
             label: "层级特殊",
             value: "tabTS"

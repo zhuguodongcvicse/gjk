@@ -16,7 +16,9 @@
           >{{bottonCheckComp?'检查更新':'还原'}}</el-button>
           <el-button type="primary" plain size="small" @click="sendMessage('completeCheck')">完备性检查</el-button>
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('loading')">加载</el-button> -->
-          <el-button type="primary" plain size="small" @click="sendMessage('simulation')">仿真</el-button>
+          <!-- <el-button type="primary" plain size="small" @click="sendMessage('simulation')">仿真</el-button> -->
+           <el-button type="primary" plain size="small" @click="sendMessage('startSimulation')">开始仿真</el-button>
+            <el-button type="primary" plain size="small" @click="sendMessage('endSimulation')">结束仿真</el-button>
           <el-button type="primary" plain size="small" @click="sendMessage('exportJSON')">导出</el-button>
           <!-- <input type="file" @change="getFile($event)"> -->
           <el-upload
@@ -33,7 +35,7 @@
         </el-button-group>
         <el-select
           v-model="alignmentValue"
-          style="width:30%; margin-left:20px"
+          style="width:13%; margin-left:10px"
           @change="sendMessage('alignment')"
         >
           <!-- size="mini" v-bind:style="'display:block'" -->
@@ -177,7 +179,8 @@ export default {
       bottonState: "",
       dialogVisibleOfCloseRouter: false,
       dialogNext: "",
-      flowFilePath: "" //流程建模文件路径
+      flowFilePath: "" ,//流程建模文件路径
+      simulationData :[], //存放仿真数据 
     };
   },
   //监听属性 类似于data概念
@@ -197,6 +200,12 @@ export default {
         this.isShow_14s = param.length > 0 ? true : false;
       }
     },
+    simulationData:{
+      handler:function(){
+
+      }
+    },
+
     isSave: {
       handler: function() {
         if (this.isSave == "2") {
@@ -561,6 +570,14 @@ export default {
 
         // this.postMessageData.cmd = "completeCheck";
         // this.$refs.gjkIframe.sendMessage(this.postMessageData);
+      } else if(state === "startSimulation"){  //开始仿真
+        this.postMessageData.cmd = "startSimulation";
+        this.postMessageData.params = "";
+        this.$refs.gjkIframe.sendMessage(this.postMessageData);
+      } else if(state === "endSimulation"){
+        this.postMessageData.cmd = "endSimulation";
+        this.postMessageData.params = "";
+        this.$refs.gjkIframe.sendMessage(this.postMessageData);
       }
       // else if(state === "checkComp"){
       //   console.log(this.dtos)
@@ -586,10 +603,6 @@ export default {
           // console.log("连线关系数据", this.postMessageData);
           this.$refs.gjkIframe.sendMessage(this.postMessageData);
         });
-        // console.log(
-        //   "this.$route.params.processId",
-        //     this.dtos
-        // );
         this.index++;
         if (this.index == 1) {
           findProJSON(this.$route.query.processId).then(res => {
@@ -603,8 +616,24 @@ export default {
                     // this.tempParam.push(tmp);
                     // 使用map将 数据对应上
                     this.tmpMaps.set(tmp.attributeMap.id, tmp);
+                    tmp.xmlEntityMaps.forEach(tempData =>{
+                      if(tempData.lableName == "层级属性"){
+                        tempData.xmlEntityMaps.forEach(item =>{
+                          if(item.lableName == "所属部件"){
+                             this.postMessageData.cmd = "sendCompFzData";
+                             this.postMessageData.params = {
+                               compId: tmp.attributeMap.id,
+                               compData: item.attributeMap.name
+                             };
+                            this.$refs.gjkIframe.sendMessage(this.postMessageData);
+                          }
+                        })
+                      }
+                    })
                   }
                 });
+                this.flowFilePath = res.data.data.flowFilePath;
+                console.log("流程建模文件路径", this.flowFilePath)
                 this.postMessageData.cmd = "clickCompLoading";
                 this.postMessageData.params = res.data.data.json;
                 this.$refs.gjkIframe.sendMessage(this.postMessageData);
@@ -661,6 +690,9 @@ export default {
             query: { flowFilePath: this.flowFilePath, startId: data.params.startId,endId:data.params.endId }
           });
           break;
+        case "returnSimulationData":
+          console.log("vue接收数据",data.params)
+          this.simulationData = data.params
       }
     },
     //保存流程模型

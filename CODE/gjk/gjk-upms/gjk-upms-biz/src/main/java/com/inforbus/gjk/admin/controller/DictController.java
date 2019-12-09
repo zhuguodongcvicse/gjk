@@ -25,6 +25,7 @@ import com.inforbus.gjk.admin.api.dto.RoleDTO;
 import com.inforbus.gjk.admin.api.entity.SysDict;
 import com.inforbus.gjk.admin.api.vo.DictVO;
 import com.inforbus.gjk.admin.service.SysDictService;
+import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.log.annotation.SysLog;
 
@@ -113,6 +114,7 @@ public class DictController {
 	@CacheEvict(value = "dict_details", key = "#sysDict.type")
 	@PreAuthorize("@pms.hasPermission('sys_dict_add')")
 	public R save(@Valid @RequestBody SysDict sysDict) {
+		sysDict.setId(IdGenerate.uuid());
 		return new R<>(sysDictService.save(sysDict));
 	}
 

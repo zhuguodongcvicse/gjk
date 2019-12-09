@@ -4,7 +4,9 @@ import com.jcraft.jsch.*;
 import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Value;
- 
+ /*
+ * sftp连接linux服务器
+ * */
 public class ChannelSftpSingleton {
  
     private static ChannelSftpSingleton instance;
@@ -18,7 +20,7 @@ public class ChannelSftpSingleton {
         if (instance == null) {
             instance = new ChannelSftpSingleton();
         }
-        return instance;
+        return instance;//返回连接对象
     }
     public static void channelSftpNull() {
         if (channelSftp != null) {

@@ -15,7 +15,7 @@
         @row-del="rowDel"
       >
         <template slot="menuLeft">
-          <el-button type="primary" @click="showdialog">新增</el-button>
+<!--          <el-button type="primary" @click="showdialog">新增</el-button>-->
         </template>
 
         <template slot-scope="scope" slot="menu">

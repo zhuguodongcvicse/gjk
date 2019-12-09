@@ -58,8 +58,8 @@ import com.inforbus.gjk.pro.service.ManagerService;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.json.JSONUtil;
+import flowModel.BackNodeInfoForSpb;
 import lombok.AllArgsConstructor;
-import mapping.BackNodeInfoForSpb;
 
 /**
  * @ClassName: ManagerController

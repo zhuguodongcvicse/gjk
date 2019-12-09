@@ -82,6 +82,7 @@ import {
   randomUuid,
   deepClone,
   getObjType,
+  findParent,
   getStrType
 } from "@/util/util";
 import { getStructTree, saveStructMap } from "@/api/libs/structlibs";
@@ -258,6 +259,20 @@ export default {
             };
             this.$emit("jsplumbUidsChange", jspDataParam);
           }
+        }
+        //根据当前节点查询父级节点
+        let parentData = findParent(this.treeData, node.id);
+        let regExp = /\w+\[[0-9]+\]/i;
+        //判断父级节点是否有数据
+        if (parentData && regExp.test(parentData.lableName)) {
+          //将数组中的值更换
+          let parentArr = deepClone(this.findArrayTmpMap.get(parentData.id));
+          for (let key in parentArr) {
+            if (parentArr[key].id == node.id) {
+              parentArr[key] = node;
+            }
+          }
+          this.findArrayTmpMap.set(parentData.id, parentArr);
         }
       },
       deep: true
@@ -780,15 +795,17 @@ export default {
         let key = this.$refs.tree.getCurrentNode().id;
         let dataVal = [];
         let arrData = deepClone(this.findArrayTmpMap.get(key));
+        //TODO
+        console.log("arrDataarrData", arrData);
         for (let key in arrData) {
-          arrData[key].id = randomUuid();
-          arrData[key].nodeData[0][0].lableName = arrData[key].lableName =
-            "[" + key + "]";
-          //保存需要赋值的数据
-          arrData[key].assigParamName = paramName.replace(
-            /\[[0-9]+\]/i,
-            "[" + key + "]"
-          );
+          // arrData[key].id = randomUuid();
+          // arrData[key].nodeData[0][0].lableName = arrData[key].lableName =
+          //   "[" + key + "]";
+          // //保存需要赋值的数据
+          // arrData[key].assigParamName = paramName.replace(
+          //   /\[[0-9]+\]/i,
+          //   "[" + key + "]"
+          // );
           dataVal.push(deepClone(arrData[key]));
         }
         // console.log("查询数据库返回表单元素", dataVal);
@@ -942,8 +959,10 @@ export default {
           let treeParam = [];
           let variable = this.analysisMapping(deepClone(xml));
           this.nameParam = variable[0].attrMappingName;
+          console.log("paramRemarks",variable)
           //注釋
-          let paramRemarks = variable[3]===undefined?"":variable[3].lableName;
+          let paramRemarks =
+            variable[3] === undefined ? "" : variable[3].lableName;
           treeParam.push(variable);
           // console.log("lableName", lableName,treeParam,xml);
           let regExp = /\w+\[[0-9]+\]/i;
@@ -990,20 +1009,27 @@ export default {
               lableName.indexOf("[") + 1,
               lableName.indexOf("]")
             );
-            let obj = {};
+            let parent = {};
             if (arrayTmpMap.has(arrKey)) {
-              obj = arrayTmpMap.get(arrKey);
-              this.$set(obj, length, obj[Object.keys(obj)[0]]);
-              arrayTmpMap.set(arrKey, obj);
+              parent = arrayTmpMap.get(arrKey);
+              let childArr = deepClone(parent);
+              childArr.nodeData = deepClone(treeParam);
+              parent.tmpLength += 1;
+              if (parent.children) {
+                parent.children.push(childArr);
+              }
             } else {
-              let tmpObj = {};
-              tmpObj["id"] = randomUuid();
-              tmpObj["lableName"] = arrKey;
-              tmpObj["nodeData"] = deepClone(treeParam);
-              tmpObj["assigParamName"] = "";
-              tmpObj["assigStructType"] = xml.attributeMap.structType;
-              this.$set(obj, length, tmpObj);
-              arrayTmpMap.set(arrKey, obj);
+              parent["id"] = randomUuid();
+              parent["lableName"] = arrKey;
+              parent["nodeData"] = deepClone(treeParam);
+              parent["assigParamName"] = "";
+              parent["paramRemarks"] = paramRemarks;
+              parent["assigStructType"] = xml.attributeMap.structType;
+              parent["tmpLength"] = Number(length);
+              parent["paramRemarks"] = paramRemarks;
+              //设置children
+              parent["children"] = [deepClone(parent)];
+              arrayTmpMap.set(arrKey, parent);
             }
           } else {
             //给树赋值显示值
@@ -1022,25 +1048,46 @@ export default {
         if (arrayTmpMap.size > 0) {
           let nodes = [];
           //循环map
-          arrayTmpMap.forEach((mapValue, key) => {
+          arrayTmpMap.forEach((parent, key) => {
+            console.log("arrayTmpMaparrayTmpMaparrayTmpMap", key);
             //组装树形数据
             let node = {};
-            let attrKeys = Object.keys(mapValue);
+            let childArr = deepClone(parent.children);
+            let attrKeys = Object.keys(childArr);
             if (attrKeys.length > 1) {
-              node = mapValue[attrKeys[0]];
+              node = deepClone(parent);
+              node.id = randomUuid();
               node.lableName = node.nodeData[0][0].lableName =
                 key + "[" + attrKeys.length + "]";
-              console.log("大于1个节点", "node", node, mapValue);
-              this.findArrayTmpMap.set(mapValue[attrKeys[0]].id, mapValue);
-            } else {
-              node = mapValue[attrKeys[0]];
-              node.lableName = key + "[" + attrKeys[0] + "]";
-              // console.log("0000000000000000000", "等于1个节点", attrKeys[0]);
-              let saveMapValue = {};
-              for (let index = 0; index < Number(attrKeys[0]); index++) {
-                this.$set(saveMapValue, index, node);
+              let children = [];
+              for (let key in childArr) {
+                let param = deepClone(childArr[key]);
+                param.id = randomUuid();
+                param.lableName = param.nodeData[0][0].lableName =
+                  "[" + key + "]";
+                param.children = [];
+                children.push(param);
               }
-              this.findArrayTmpMap.set(mapValue[attrKeys[0]].id, saveMapValue);
+              node.children = children;
+              console.log("大于1个节点", node);
+              this.findArrayTmpMap.set(node.id, children);
+            } else {
+              node = deepClone(parent);
+              node.id = randomUuid();
+              node.lableName = node.nodeData[0][0].lableName =
+                key + "[" + node.tmpLength + "]";
+              node.children = [];
+              console.log("等于1个节点", node.tmpLength);
+              let saveMapValue = [];
+              for (let index = 0; index < node.tmpLength; index++) {
+                let param = deepClone(childArr[0]);
+                param.id = randomUuid();
+                param.lableName = param.nodeData[0][0].lableName =
+                  "[" + index + "]";
+                param.children = [];
+                saveMapValue.push(param);
+              }
+              this.findArrayTmpMap.set(node.id, saveMapValue);
             }
             nodes.push(node);
           });
@@ -1221,7 +1268,7 @@ export default {
             if (!assigStructType.isType) {
               let regExp = /\w+\[[0-9]+\]/i;
               //如果有数组就单独处理
-              if (regExp.test(tmpName)) {
+              if (regExp.test(tree.lableName)) {
                 tree.assigParamName = tree.lableName.replace(/\[[0-9]+\]/i, "");
               }
               //是指针

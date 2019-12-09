@@ -8,10 +8,11 @@ import com.inforbus.gjk.compile.task.Task;
 import com.inforbus.gjk.compile.taskThread.StreamManage;
 import com.inforbus.gjk.compile.util.ChannelSftpSingleton;
 import com.inforbus.gjk.compile.util.SftpUtil;
-import com.jcraft.jsch.*;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.SftpException;
+import com.jcraft.jsch.SftpProgressMonitor;
 import org.apache.commons.lang.StringUtils;
-import org.apache.tools.ant.taskdefs.Sleep;
-import org.eclipse.jgit.transport.JschSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -26,16 +27,10 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-/*
- * 2019年10月30日 11:19:08
- * wang创建
- * 编译任务类,编译功能
- *
- * */
-@Component("complieTask")
+@Component("compileTask")
 @Scope("prototype")
-public class ComplieTask implements Task {
-    private static final Logger logger = LoggerFactory.getLogger(ComplieTask.class);
+public class CompileTask implements Task {
+    private static final Logger logger = LoggerFactory.getLogger(CompileTask.class);
 
     //配置文件读取路径
     @Value("${VS2010.path}")
@@ -106,7 +101,7 @@ public class ComplieTask implements Task {
     }
 
     @Override
-    public boolean Command() {
+    public boolean command() {
         Set<String> filePathList = new TreeSet<String>();
         //VS编译
         String fileEndName = ".sln";
@@ -172,8 +167,8 @@ public class ComplieTask implements Task {
         Process p = null;
         try {
             p = rt.exec(cmd, null, dir);//打开cmd执行make命令
-            StreamManage errorThread = new StreamManage(p.getErrorStream(), "UTF-8",this.rabbitmqTemplate, fileName, token);//编译错误控制台信息
-            StreamManage successThread = new StreamManage(p.getInputStream(), "UTF-8",this.rabbitmqTemplate, fileName, token);//编译正常控制台信息
+            StreamManage errorThread = new StreamManage(p.getErrorStream(), "GBK",this.rabbitmqTemplate, fileName, token);//编译错误控制台信息
+            StreamManage successThread = new StreamManage(p.getInputStream(), "GBK",this.rabbitmqTemplate, fileName, token);//编译正常控制台信息
             errorThread.start();//开启编译错误流线程
             successThread.start();//开启编译正常流线程
             return true;
