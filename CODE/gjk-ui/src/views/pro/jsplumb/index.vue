@@ -134,6 +134,7 @@ import {
   removeCompProject,
   completeCheck
 } from "@/api/pro/project";
+import {startSimulator} from "@/api/simula/simulation";
 import { handlerSaveSysXml } from "@/api/pro/manager";
 import { remote } from "@/api/admin/dict";
 import { randomLenNum, randomUuid, deepClone, getObjType } from "@/util/util";
@@ -185,7 +186,7 @@ export default {
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["isSave", "tag", "tagList"])
+    ...mapGetters(["isSave", "tag", "tagList",'userInfo'])
   },
   components: {
     "gjk-iframe": gjkIframe,
@@ -202,7 +203,7 @@ export default {
     },
     simulationData:{
       handler:function(){
-
+        startSimulator({userName:this.userInfo.userName,connectionList:this.simulationData,filePath:this.flowFilePath})
       }
     },
 
