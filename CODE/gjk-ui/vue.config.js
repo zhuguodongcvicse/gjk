@@ -123,6 +123,13 @@ module.exports = {
         pathRewrite: {
           '^/compile': '/compile'
         }
+      },
+      '/simula': {
+        target: url,
+        ws: true,
+        pathRewrite: {
+          '^/simula': '/simula'
+        }
       }
     }
   }
