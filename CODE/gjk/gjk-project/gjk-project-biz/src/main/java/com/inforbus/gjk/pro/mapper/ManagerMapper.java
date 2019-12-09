@@ -129,6 +129,10 @@ public interface ManagerMapper extends BaseMapper<ProjectFile> {
 
     Hardwarelibs getHardwarelibByProjectId(@Param("projectId") String projectId);
 
+    Hardwarelibs getHardwarelibsByFlowId(@Param("flowId") String flowId);
+
+	Hardwarelibs getHardwarelibsById(@Param("id") String id);
+
     /**
      * 根据项目ID获取到所有的流程记录
      *
@@ -143,7 +147,11 @@ public interface ManagerMapper extends BaseMapper<ProjectFile> {
 
     void saveChipsfromhardwarelibs(@Param("chipsfromhardwarelibs") Chipsfromhardwarelibs chipsfromhardwarelibs);
 
+    Chipsfromhardwarelibs getChipsfromhardwarelibsById(@Param("id") String id);
+
 	Chipsfromhardwarelibs getChipsById(@Param("modelId") String modelId);
+
+	Chipsfromhardwarelibs getChipsByFlowId(@Param("flowId") String flowId);
 
 	void updateChipsfromhardwarelibs(Chipsfromhardwarelibs chipsfromhardwarelibs);
 
@@ -382,4 +390,84 @@ public interface ManagerMapper extends BaseMapper<ProjectFile> {
 	 * @return
 	 */
 	BSPDetail getBSPDetailByBSPIdAndPlatformId(@Param("bspId") String bspId, @Param("platformId") String platformId);
+
+	/**
+	 * 查询bsp文件数据
+	 * @param bspId
+	 * @param fileName
+	 * @param filePath
+	 * @return
+	 */
+	BSPFile getBSPFileByBSPIdAndFileNameAndFilePath(@Param("bspId") String bspId,@Param("fileName") String fileName,@Param("filePath") String filePath);
+
+	/**
+	 * 更新构件库
+	 * @param commonComponent
+	 * @return
+	 */
+	int updateCommonComp(@Param("comp") CommonComponent commonComponent);
+
+	/**
+	 * 更新构件详情
+	 * @param commonComponent
+	 * @return
+	 */
+	int updateCommonCompDetail(@Param("comp") CommonComponentDetail commonComponent);
+
+	/**
+	 * 根据id获取构件结构体关系数据
+	 * @param id
+	 * @return
+	 */
+	CompStruct getCompStructById(@Param("id") String id);
+
+	/**
+	 * 根据id获取结构体数据
+	 * @param id
+	 * @return
+	 */
+	Structlibs getStructlibsById(@Param("id") String id);
+
+	/**
+	 * 更新结构体
+	 * @param tructlibs
+	 * @return
+	 */
+	int updateStructlibs(@Param("structlibs") Structlibs tructlibs);
+
+	List<SysDict> getSysDictByRemarksIn(@Param("remarks") String remarks);
+
+	/**
+	 * 根据id获取字典数据
+	 * @param id
+	 * @return
+	 */
+	SysDict getSysDictById(@Param("id") String id);
+
+	/**
+	 * 保存字典数据
+	 * @param sysDict
+	 */
+	void saveSysDict(@Param("sysDict") SysDict sysDict);
+
+	/**
+	 * 更新字典
+	 * @param sysDict
+	 * @return
+	 */
+	int updateSysDict(@Param("sysDict") SysDict sysDict);
+
+	/**
+	 * 更新芯片
+	 * @param chips
+	 * @return
+	 */
+	int updateChipsfromhardwarelibsById(@Param("chips") Chipsfromhardwarelibs chips);
+
+	/**
+	 * 更新硬件建模
+	 * @param hardware
+	 * @return
+	 */
+	int updateHardwarelibById(@Param("hardware") Hardwarelibs hardware);
 }
