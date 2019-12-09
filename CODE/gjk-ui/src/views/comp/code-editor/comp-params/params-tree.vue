@@ -962,7 +962,7 @@ export default {
           console.log("paramRemarks",variable)
           //注釋
           let paramRemarks =
-            variable[3] === undefined ? "" : variable[3].lableName;
+            variable[3] === undefined ? "" : variable[2].lableName;
           treeParam.push(variable);
           // console.log("lableName", lableName,treeParam,xml);
           let regExp = /\w+\[[0-9]+\]/i;
