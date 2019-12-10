@@ -17,14 +17,17 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-tree
-        ref="tree"
-        :data="compframeTreeData"
-        :default-expand-all="true"
-        :check-on-click-node="true"
-      ></el-tree>
+      <div class="compframeDiv">
+        <el-tree
+          ref="tree"
+          :data="compframeTreeData"
+          :default-expand-all="true"
+          :check-on-click-node="true"
+        ></el-tree>
+      </div>
       <!-- @check-change="handleCheckChange" -->
     </el-form>
+
     <div slot="footer">
       <el-button @click="dialogVisible = false">取 消</el-button>
       <el-button type="primary" @click="frameApplysClickSubmit('compForm')">确 定</el-button>
@@ -192,5 +195,11 @@ export default {
 };
 </script>
 <style lang='scss' scoped>
+.compframeDiv {
+  height: 50vh;
+  word-wrap: break-word;
+  word-break: break-all;
+  overflow-y: auto;
+}
 //@import url(); 引入公共css类
 </style>

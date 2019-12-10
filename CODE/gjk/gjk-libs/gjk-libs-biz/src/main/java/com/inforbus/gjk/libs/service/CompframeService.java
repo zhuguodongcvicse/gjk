@@ -52,7 +52,7 @@ public interface CompframeService extends IService<Compframe> {
 	 * @param resMap	携带信息
 	 * @return
 	 */
-	R<?> saveCompFrame(MultipartFile[] ufile, Map<String, Object> resMap);
+	R<?> saveCompFrame(MultipartFile ufile, Map<String, Object> resMap);
 	/**
 	 * @Title: compframeToTree
 	 * @Description: 保存构件框架
