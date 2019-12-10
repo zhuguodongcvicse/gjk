@@ -325,11 +325,19 @@
                     this.options = this.pTreeData;
                 });
             },
+            sortKey(array, key) {
+                return array.sort(function (a, b) {
+                    let x = Date.parse(a[key])
+                    let y = Date.parse(b[key])
+                    return ((y < x) ? -1 : (y > x) ? 1 : 0)
+                })
+            },
             getList() {
                 this.tableLoading = true;
                 fetchList(this.listQuery).then(response => {
                     this.tableData = []
                     this.tableData = response.data.data.records;
+                    this.tableData = this.sortKey(this.tableData, 'createTime')
                     //所有判断芯片数据是否为空
                     if (this.allChips.length !== 0) {
                         //清空数据

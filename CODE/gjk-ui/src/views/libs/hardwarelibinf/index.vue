@@ -229,11 +229,25 @@
             storageApplyDialogState() {
                 this.dialog.storageApplyDialog = false;
             },
+            sortKey(array, key) {
+                return array.sort(function (a, b) {
+                    let x = Date.parse(a[key])
+                    let y = Date.parse(b[key])
+                    return ((y < x) ? -1 : (y > x) ? 1 : 0)
+                })
+            },
             getList() {
                 this.tableLoading = true;
                 fetchList(this.listQuery).then(response => {
                     this.tableData = []
                     this.tableData = response.data.data.records;
+                    if (this.tableData != null && this.tableData.length != 0) {
+                        if (this.tableData[0].updateTime != null) {
+                            this.tableData = this.sortKey(this.tableData, 'updateTime')
+                        } else {
+                            this.tableData = this.sortKey(this.tableData, 'createTime')
+                        }
+                    }
                     //所有判断接口数据是否为空
                     if (this.allInfs.length !== 0) {
                         //清空数据

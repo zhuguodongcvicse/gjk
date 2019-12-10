@@ -150,6 +150,7 @@ public class GjkTestServiceImpl extends ServiceImpl<GjkTestMapper, GjkTest> impl
 		List<GjkTest> testList = new ArrayList<>();
 		List<GjkAlgorithm> algorithmList = new ArrayList<>();
 		List<GjkPlatform> platformList = new ArrayList<>();
+		int testTag = 0, algorithmTag = 0, platformTag = 0;
 
 		// 获取所有sheet对象
 		Iterator<Sheet> sheetIterator = workbook.sheetIterator();
@@ -158,16 +159,19 @@ public class GjkTestServiceImpl extends ServiceImpl<GjkTestMapper, GjkTest> impl
 			String tableName = sheet.getSheetName();
 			String className = null;
 			if ("gjk_test".equals(tableName)) {
+				testTag = 1;
 				className = "com.inforbus.gjk.admin.api.entity.GjkTest";
 				for (Object obj : parseSheet(sheet, className)) {
 					testList.add((GjkTest) obj);
 				}
 			} else if ("gjk_algorithm".equals(tableName)) {
+				algorithmTag = 1;
 				className = "com.inforbus.gjk.admin.api.entity.GjkAlgorithm";
 				for (Object obj : parseSheet(sheet, className)) {
 					algorithmList.add((GjkAlgorithm) obj);
 				}
 			} else if ("gjk_platform".equals(tableName)) {
+				platformTag = 1;
 				className = "com.inforbus.gjk.admin.api.entity.GjkPlatform";
 				for (Object obj : parseSheet(sheet, className)) {
 					platformList.add((GjkPlatform) obj);
@@ -179,25 +183,31 @@ public class GjkTestServiceImpl extends ServiceImpl<GjkTestMapper, GjkTest> impl
 		// 判断导入类型
 		// 覆盖导入
 		if(importType.equals("allImport")){
-			// 测试库表清空
-			baseMapper.deleteAll();
-			// 测试库数据入库
-			for (GjkTest gjkTest : testList) {
-				baseMapper.insert(gjkTest);
+			if(testTag == 1){
+				// 测试库表清空
+				baseMapper.deleteAll();
+				// 测试库数据入库
+				for (GjkTest gjkTest : testList) {
+					baseMapper.insert(gjkTest);
+				}
 			}
 
-			// 平台库表清空
-			gjkPlatformMapper.deleteAll();
-			// 平台库数据入库
-			for (GjkPlatform gjkPlatform : platformList) {
-				gjkPlatformMapper.insert(gjkPlatform);
+			if(platformTag == 1){
+				// 平台库表清空
+				gjkPlatformMapper.deleteAll();
+				// 平台库数据入库
+				for (GjkPlatform gjkPlatform : platformList) {
+					gjkPlatformMapper.insert(gjkPlatform);
+				}
 			}
 
-			// 算法库表清空
-			gjkAlgorithmMapper.deleteAll();
-			// 算法库数据入库
-			for (GjkAlgorithm gjkAlgorithm : algorithmList) {
-				gjkAlgorithmMapper.insert(gjkAlgorithm);
+			if(algorithmTag == 1){
+				// 算法库表清空
+				gjkAlgorithmMapper.deleteAll();
+				// 算法库数据入库
+				for (GjkAlgorithm gjkAlgorithm : algorithmList) {
+					gjkAlgorithmMapper.insert(gjkAlgorithm);
+				}
 			}
 		}
 
@@ -211,9 +221,10 @@ public class GjkTestServiceImpl extends ServiceImpl<GjkTestMapper, GjkTest> impl
 				Integer num = baseMapper.selectCount(wrapper);
 				if(num == 0){
 					// 判断id 如果存在则重置id
-					wrapper = new QueryWrapper<>();
-					wrapper.eq("test_id", gjkTest.getTestId());
-					num = baseMapper.selectCount(wrapper);
+//					wrapper = new QueryWrapper<>();
+//					wrapper.eq("test_id", gjkTest.getTestId());
+//					wrapper.in("del_flag", "0", "1");
+					num = baseMapper.selectCountById(gjkTest.getTestId());
 					if(num > 0){
 						gjkTest.setTestId(IdGenerate.uuid());
 					}
@@ -229,9 +240,10 @@ public class GjkTestServiceImpl extends ServiceImpl<GjkTestMapper, GjkTest> impl
 				Integer num = gjkPlatformMapper.selectCount(wrapper);
 				if(num == 0){
 					// 判断id 如果存在则重置id
-					wrapper = new QueryWrapper<>();
-					wrapper.eq("platform_id", gjkPlatform.getPlatformId());
-					num = gjkPlatformMapper.selectCount(wrapper);
+//					wrapper = new QueryWrapper<>();
+//					wrapper.eq("platform_id", gjkPlatform.getPlatformId());
+//					wrapper.in("del_flag", "0", "1");
+					num = gjkPlatformMapper.selectCountById(gjkPlatform.getPlatformId());
 					if(num > 0){
 						gjkPlatform.setPlatformId(IdGenerate.uuid());
 					}
@@ -247,9 +259,9 @@ public class GjkTestServiceImpl extends ServiceImpl<GjkTestMapper, GjkTest> impl
 				Integer num = gjkAlgorithmMapper.selectCount(wrapper);
 				if(num == 0){
 					// 判断id 如果存在则重置id
-					wrapper = new QueryWrapper<>();
-					wrapper.eq("algorithm_id", gjkAlgorithm.getAlgorithmId());
-					num = gjkAlgorithmMapper.selectCount(wrapper);
+//					wrapper = new QueryWrapper<>();
+//					wrapper.eq("algorithm_id", gjkAlgorithm.getAlgorithmId());
+					num = gjkAlgorithmMapper.selectCountById(gjkAlgorithm.getAlgorithmId());
 					if(num > 0){
 						gjkAlgorithm.setAlgorithmId(IdGenerate.uuid());
 					}

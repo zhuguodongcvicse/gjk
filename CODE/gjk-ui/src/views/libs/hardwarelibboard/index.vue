@@ -197,10 +197,18 @@
             handleDisable(){
                 return this.clickCopyOrEdit === 'copy'
             },
+            sortKey(array, key) {
+                return array.sort(function (a, b) {
+                    let x = Date.parse(a[key])
+                    let y = Date.parse(b[key])
+                    return ((y < x) ? -1 : (y > x) ? 1 : 0)
+                })
+            },
             getList() {
                 this.tableLoading = true;
                 fetchList(this.listQuery).then(response => {
                     this.tableData = response.data.data.records;
+                    this.tableData = this.sortKey(this.tableData, 'createTime')
                     //判断板卡数据是否为空
                     if (this.allBoards.length !== 0) {
                         //清空数据
