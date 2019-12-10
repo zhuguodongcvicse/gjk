@@ -1564,7 +1564,7 @@ document.onkeydown = function () {
 			nodePosition.left = div.offsetLeft
 			nodePosition.id = idList[i]
 			oldPosition.push(nodePosition)
-			div.style.left = Math.max(0, div.offsetLeft - 20) + "px"
+			div.style.left = Math.max(0, div.offsetLeft - 10) + "px"
 		}
 		dragNode.oldPosition = oldPosition;
 		jsPlumb.setSuspendDrawing(false, true);
@@ -1590,7 +1590,7 @@ document.onkeydown = function () {
 			nodePosition.id = idList[i]
 			oldPosition.push(nodePosition)
 			//div.style.left = Math.min($(".div_right").width(), div.offsetLeft + 10) + "px"
-			div.style.left = div.offsetLeft + 10
+			div.style.left = div.offsetLeft + 10 + "px"
 		}
 		dragNode.oldPosition = oldPosition;
 		jsPlumb.setSuspendDrawing(false, true);
@@ -1642,7 +1642,7 @@ document.onkeydown = function () {
 			nodePosition.id = idList[i]
 			oldPosition.push(nodePosition)
 			//div.style.top = Math.min($(".div_right").height(), div.offsetTop + 10) + "px"
-			//div.style.top = div.offsetTop + 10 +"px"
+			div.style.top = div.offsetTop + 10 +"px"
 			//if(div.style.top + div.style.height >= $(".div_right").height()){
 			//div1.scrollTop = 10
 			//}
