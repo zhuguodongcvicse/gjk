@@ -197,4 +197,10 @@
 	<delete id="deleteAll">
 		DELETE FROM gjk_platform
 	</delete>
+
+	<select id="selectCountById" parameterType="String" resultType="Integer">
+		SELECT count(1)
+		FROM gjk_platform
+		WHERE platform_id = #{id}
+    </select>
 </mapper>

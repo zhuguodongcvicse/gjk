@@ -106,4 +106,11 @@ public interface GjkPlatformMapper extends BaseMapper<GjkPlatform> {
 	 * 删除所有数据
 	 */
 	void deleteAll();
+
+	/**
+	 * 查询数据条数
+	 * @param id
+	 * @return
+	 */
+	int selectCountById(@Param("id") String id);
 }
