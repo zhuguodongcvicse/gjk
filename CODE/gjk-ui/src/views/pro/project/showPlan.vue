@@ -180,7 +180,7 @@ export default {
 
     //保存
     handleSavePro() {
-      if(this.tableDate || this.tableDate.length == 0){
+      if(!this.tableDate || this.tableDate.length == 0){
           console.log('没有数据结束保存操作')
           return
       }

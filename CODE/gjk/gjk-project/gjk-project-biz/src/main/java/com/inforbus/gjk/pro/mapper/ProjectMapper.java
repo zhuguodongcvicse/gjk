@@ -129,4 +129,6 @@ public interface ProjectMapper extends BaseMapper<Project> {
 
 	void removeCompProject(@Param("compId")String compId, @Param("projectId")String projectId);
 
+	int updateCompProjectByCompIdAndProId(@Param("compId")String compId, @Param("projectId")String projectId, @Param("canUse")String canUse);
+
 }

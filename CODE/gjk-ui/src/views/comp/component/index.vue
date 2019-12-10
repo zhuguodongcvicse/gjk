@@ -31,7 +31,8 @@
             size="small"
             @click="batchStorageApply()"
           >批量入库</el-button>
-          <!-- @click="templateData.templateVisible = true" --> <!-- @click="goToAddCompPage()" -->
+          <!-- @click="templateData.templateVisible = true" -->
+          <!-- @click="goToAddCompPage()" -->
           <!-- <el-button size="small">
             <i class="el-icon-download el-icon--left"></i>导出
           </el-button>-->
@@ -138,9 +139,9 @@
       @setImportCompDialog="setImportCompDialog"
     />
     <batch-storage-apply
-    :dialog="batchStorageApplyDialog"
-    @storageApplyDialogState="batchStorageApplyDialogState"
-    :component="batchStorageList"
+      :dialog="batchStorageApplyDialog"
+      @storageApplyDialogState="batchStorageApplyDialogState"
+      :component="batchStorageList"
     ></batch-storage-apply>
   </div>
 </template>
@@ -172,7 +173,7 @@ export default {
     "comp-template": compTemplate,
     "storage-apply": storageApply,
     "import-storage-apply": importCompStorageApply,
-    "batch-storage-apply":batchStorageApply
+    "batch-storage-apply": batchStorageApply
   },
   name: "component",
   inject: ["reload"],
@@ -214,7 +215,7 @@ export default {
   },
   mounted: function() {},
   computed: {
-    ...mapGetters(["permissions"])
+    ...mapGetters(["permissions", "userInfo"])
   },
   watch: {
     importCompFileList: {
@@ -347,6 +348,7 @@ export default {
       } else {
         let params = new FormData();
         params.append("file", this.importCompFileList[0]);
+        params.append("userId", this.userInfo.userId);
         importCompZipUpload(params).then(Response => {
           if (Response.data.data == null) {
             this.$message.warning("上传的压缩包内容错误，请重新选择文件上传。");
@@ -363,20 +365,22 @@ export default {
     selectionChange(list) {
       // this.$message.success("选中的数据" + JSON.stringify(list));
       this.selectList = list;
-      this.handleExportCompList()
+      this.handleExportCompList();
     },
-    handleExportCompList(){
-        this.batchStorageList = []
-        this.batchStorageList = this.batchStorageList.concat(
-            this.selectList
-        );
-        // 去重
-        let tmpArr = []
-        this.batchStorageList = this.batchStorageList.reduce(function(item, next) {
-            tmpArr[next.id] ? '' : tmpArr[next.id] = true && item.push(next);
-            return item;
-        }, []);
-        console.log(this.batchStorageList)
+    handleExportCompList() {
+      this.batchStorageList = [];
+      this.batchStorageList = this.batchStorageList.concat(this.selectList);
+      // 去重
+      let tmpArr = [];
+      this.batchStorageList = this.batchStorageList.reduce(function(
+        item,
+        next
+      ) {
+        tmpArr[next.id] ? "" : (tmpArr[next.id] = true && item.push(next));
+        return item;
+      },
+      []);
+      console.log(this.batchStorageList);
     },
     getStructTrees() {
       let struct = {};
@@ -470,15 +474,15 @@ export default {
       this.$refs.crud.rowDel(row, index);
     },
     storageApply(row, index) {
-        isSelectLibs(row.id).then(response => {
-            let res = response.data.data;
-            if(res){
-                this.$message.warning(res)
-                return
-            }
-            this.storageApplyDialog = true;
-            this.compItemMsg = row;
-        });
+      isSelectLibs(row.id).then(response => {
+        let res = response.data.data;
+        if (res) {
+          this.$message.warning(res);
+          return;
+        }
+        this.storageApplyDialog = true;
+        this.compItemMsg = row;
+      });
     },
     rowDel: function(row, index) {
       var _this = this;
@@ -545,41 +549,41 @@ export default {
     refreshChange() {
       this.getList();
     },
-    batchStorageApply(){
-   if(this.batchStorageList.length > 0){
-     var flag = false
+    batchStorageApply() {
+      if (this.batchStorageList.length > 0) {
+        var flag = false;
         for (let i = 0; i < this.batchStorageList.length; i++) {
           const element = this.batchStorageList[i];
-          if(element.applyState=='2'){
-              flag = true
+          if (element.applyState == "2") {
+            flag = true;
           }
         }
-        if(flag){
+        if (flag) {
           this.$message({
             showClose: true,
             message: "请勿选择已入库的构件",
             type: "warning"
           });
-        }else{
+        } else {
           this.batchStorageApplyDialog = true;
         }
-      }else{
+      } else {
         this.$message({
-            showClose: true,
-            message: "请至少选择一个未入库的构件",
-            type: "warning"
-          });
+          showClose: true,
+          message: "请至少选择一个未入库的构件",
+          type: "warning"
+        });
       }
-  },
-  batchStorageApplyDialogState(){
-    this.batchStorageApplyDialog = false;
-  }
+    },
+    batchStorageApplyDialogState() {
+      this.batchStorageApplyDialog = false;
+    }
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.refreshChange();
     });
-  },
+  }
 };
 </script>
 

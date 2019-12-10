@@ -25,12 +25,8 @@ export const tableOption = {
   delBtn: false,
   addBtn: false,
   selection: true,
-  labelWidth:120,
-  column: [{
-      hide: true,
-      label: '',
-      prop: 'id'
-    },
+  labelWidth: 120,
+  column: [
     {
       label: '构件编号',
       prop: 'compId'
@@ -68,18 +64,8 @@ export const tableOption = {
       prop: 'createTime'
     },
     {
-      hide: true,
-      label: '修改时间',
-      prop: 'updateTime'
-    },
-    {
       label: '描述',
       prop: 'description'
-    },
-    {
-      hide: true,
-      label: '0-正常，1-删除',
-      prop: 'delFlag'
-    },
+    }
   ]
 }

@@ -299,4 +299,11 @@
 		project_id = #{projectId}
 	</update>
 
+	<update id="updateCompProjectByCompIdAndProId">
+		UPDATE gjk_project_comp SET can_use = #{canUse}
+		where comp_id = #{compId}
+		AND
+		project_id = #{projectId}
+	</update>
+
 </mapper>

@@ -19,7 +19,7 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="dialogStateShow(false)">取 消</el-button>
-      <el-button type="primary" @click="storageApplySoftware('form')">入库</el-button>
+      <el-button type="primary" @click="storageApplySoftware('form')">确定</el-button>
     </span>
   </el-dialog>
 </template>

@@ -181,7 +181,7 @@ public class BSPController {
 			if (file != null) {
 				String p = path + "gjk/bsp/" + versionDisc + ".0" + File.separator + file.getOriginalFilename();
 				String bb = p.replaceAll("\\\\", "/");
-				String ss = p.substring(0, bb.lastIndexOf("/"));
+				String ss = p.substring(0, bb.lastIndexOf("/")) + File.separator;
 				File zipfile = new File(bb);
 				File ff = new File(ss);
 				if (ff.exists()) {

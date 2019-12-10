@@ -820,6 +820,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			}
 
 			app.setPartnamePlatform(JSONArray.toJSONString(partnamePlatformMap));
+			app.setLocalDeploymentPlan(messageMap.get("localDeploymentPlan"));
 			app.setFileName(new File(appFilePath).getName());
 			app.setFilePath(new File(appFilePath).getParent().substring(proDetailPath.length()));
 			app.setSysconfigFilePath(sysConfigFilePath);
@@ -1924,8 +1925,11 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		List<CommonComponentDetail> compDetailList = new ArrayList<>();
 		List<CompStruct> compStructList = new ArrayList<>();
 		List<Structlibs> structlibsList = new ArrayList<>();
+		List<Hardwarelibs> hardwarelibsList = new ArrayList<>();
+		List<Chipsfromhardwarelibs> chipsfromhardwarelibsList = new ArrayList<>();
+		List<SysDict> sysDictList = new ArrayList<>();
 
-		// 获取所有sheet对象
+				// 获取所有sheet对象
 		Iterator<Sheet> sheetIterator = workbook.sheetIterator();
 		while (sheetIterator.hasNext()) {
 			Sheet sheet = sheetIterator.next();
@@ -2050,6 +2054,27 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 					structlibsList.add((Structlibs) obj);
 				}
 			}
+			// 硬件建模表
+			else if("gjk_hardwarelibs".equals(tableName)){
+				className = "com.inforbus.gjk.pro.api.entity.Hardwarelibs";
+				for (Object obj : parseSheet(sheet, className)) {
+					hardwarelibsList.add((Hardwarelibs) obj);
+				}
+			}
+			// 芯片表
+			else if("gjk_chipsfromhardwarelibs".equals(tableName)){
+				className = "com.inforbus.gjk.pro.api.entity.Chipsfromhardwarelibs";
+				for (Object obj : parseSheet(sheet, className)) {
+					chipsfromhardwarelibsList.add((Chipsfromhardwarelibs) obj);
+				}
+			}
+			// 字典表
+			else if("sys_dict".equals(tableName)){
+				className = "com.inforbus.gjk.admin.api.entity.SysDict";
+				for (Object obj : parseSheet(sheet, className)) {
+					sysDictList.add((SysDict) obj);
+				}
+			}
 		}
 		workbook.close();
 
@@ -2142,34 +2167,84 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		// BSP文件表
 		for (BSPFile bspFile : bspFileList) {
-			baseMapper.saveBSPFile(bspFile);
+		    if(baseMapper.getBSPFileByBSPIdAndFileNameAndFilePath(bspFile.getBspId(), bspFile.getFileName(), bspFile.getFilePath()) == null){
+                baseMapper.saveBSPFile(bspFile);
+            }
 		}
 
-		// 项目和构件关系表
+		// 项目和构件关系表  存在则更新 不存在则新增
 		for (ProComp proComp : proCompList) {
-			// 项目id替换成导入项目的id
-			proComp.setProjectId(projectId);
-			projectMapper.saveProComp(proComp);
+		    if(projectMapper.getIdByProIdCompId(proComp) == null){
+                // 项目id替换成导入项目的id
+                proComp.setProjectId(projectId);
+                projectMapper.saveProComp(proComp);
+            }else {
+                projectMapper.updateCompProjectByCompIdAndProId(proComp.getCompId(), proComp.getProjectId(), proComp.getCanUse());
+            }
 		}
 
-		// 构件库表
+		// 构件库表 id存在则更新 不存在则新增
 		for (CommonComponent commonComponent : compList) {
-			baseMapper.saveCommonComp(commonComponent);
+		    if(baseMapper.getCommonComponentByIdIn(commonComponent.getId()) == null){
+                baseMapper.saveCommonComp(commonComponent);
+            }else{
+		        commonComponent.setUpdateTime(LocalDateTime.now());
+                baseMapper.updateCommonComp(commonComponent);
+            }
 		}
 
-		// 结构库详细表
+		// 结构库详细表 id存在则更新 不存在则新增
 		for (CommonComponentDetail commonComponentDetail : compDetailList) {
-			baseMapper.saveCommonCompDetail(commonComponentDetail);
+		    if(baseMapper.getCommonComponentDetailByCompIdIn(commonComponentDetail.getId()) == null){
+                baseMapper.saveCommonCompDetail(commonComponentDetail);
+            }else{
+                baseMapper.updateCommonCompDetail(commonComponentDetail);
+            }
 		}
 
 		// 构件库和结构体表关系表
 		for (CompStruct compStruct : compStructList) {
-			baseMapper.saveCompAndStruct(compStruct);
+		    if(baseMapper.getCompStructById(compStruct.getId()) == null){
+                baseMapper.saveCompAndStruct(compStruct);
+            }
 		}
 
 		// 结构体表
 		for (Structlibs structlibs : structlibsList) {
-			baseMapper.saveStructlibs(structlibs);
+            if(baseMapper.getStructlibsById(structlibs.getId()) == null){
+                baseMapper.saveStructlibs(structlibs);
+            }else{
+                baseMapper.updateStructlibs(structlibs);
+            }
+		}
+
+		// 硬件建模表
+		for (Hardwarelibs hardwarelibs : hardwarelibsList) {
+			hardwarelibs.setProjectId(projectId);
+			if(baseMapper.getHardwarelibsById(hardwarelibs.getId()) == null){
+				baseMapper.saveHardwarelibs(hardwarelibs);
+			}else{
+				baseMapper.updateHardwarelibById(hardwarelibs);
+			}
+		}
+
+		// 芯片表
+		for (Chipsfromhardwarelibs chipsfromhardwarelibs : chipsfromhardwarelibsList) {
+			chipsfromhardwarelibs.setProjectId(projectId);
+			if(baseMapper.getChipsfromhardwarelibsById(chipsfromhardwarelibs.getId()) == null){
+				baseMapper.saveChipsfromhardwarelibs(chipsfromhardwarelibs);
+			}else{
+				baseMapper.updateChipsfromhardwarelibsById(chipsfromhardwarelibs);
+			}
+		}
+
+		// 字典表
+		for (SysDict sysDict : sysDictList) {
+			if(baseMapper.getSysDictById(sysDict.getId()) == null){
+				baseMapper.saveSysDict(sysDict);
+			}else{
+				baseMapper.updateSysDict(sysDict);
+			}
 		}
 
 		return 1;
@@ -2476,8 +2551,24 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		findStructlibsRecursion(structlibsListSub, structlibsList);
 		createSheet(workbook, structlibsList, "gjk_structlibs");
 
+		// 硬件建模表
+        Hardwarelibs hardwarelibs = baseMapper.getHardwarelibsByFlowId(processId);
+        List<Hardwarelibs> hardwarelibsList = new ArrayList<>();
+        hardwarelibsList.add(hardwarelibs);
+        createSheet(workbook, hardwarelibsList, "gjk_hardwarelibs");
 
-		// 创建Excel文件保存的临时地址
+        //芯片表
+        Chipsfromhardwarelibs chipsfromhardwarelibs = baseMapper.getChipsByFlowId(processId);
+        List<Chipsfromhardwarelibs> chipsfromhardwarelibsList = new ArrayList<>();
+        chipsfromhardwarelibsList.add(chipsfromhardwarelibs);
+        createSheet(workbook, chipsfromhardwarelibsList, "gjk_chipsfromhardwarelibs");
+
+        // 字典表
+		List<SysDict> sysDictList = baseMapper.getSysDictByRemarksIn("'mapperType','selectType'");
+        createSheet(workbook, sysDictList, "sys_dict");
+
+
+        // 创建Excel文件保存的临时地址
 		File file = new File(serverPath + "gjk" + File.separator + "testExcel" + File.separator + "MySQL.xls");
 		if (!file.getParentFile().exists()) {
 			file.getParentFile().mkdirs();

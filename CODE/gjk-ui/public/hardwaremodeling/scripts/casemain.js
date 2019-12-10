@@ -17,6 +17,7 @@ var linkList = []
 var linkGraphList = {datas: []}
 var clickCheckedChip
 var ChipsWithIPs = []
+var caseID = -1
 
 Q.registerImage('rack', 'images/Crate.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
 Q.registerImage('card', 'images/BeforeTheBoard.svg');
@@ -119,7 +120,7 @@ function init() {
 }
 
 var EVENT_CREATE_ELEMENT_BY_JSON = 'create.element.by.json';
-var caseID = 0
+
 
 //拖拽触发的方法
 function ondropLoadJSON(evt, graph, center, options) {
@@ -132,6 +133,7 @@ function ondropLoadJSON(evt, graph, center, options) {
   let bJsonObj = JSON.parse(options.json.backCase);
   //机箱赋值唯一标识
   frontjson.datas[0].json.properties.uniqueId = uuidRandom
+  frontjson.datas[0].json.properties.id = caseID
   //找到机箱中前板卡
   for (const i in frontjson.datas[0].json.properties.frontBoardList) {
     //找到前板卡中的芯片
@@ -186,6 +188,7 @@ function ondropLoadJSON(evt, graph, center, options) {
   //后板卡和后板卡的接口拼接机箱的唯一标识
   //机箱背面赋值唯一标识
   bJsonObj.datas[0].json.properties.uniqueId = uuidRandom
+  bJsonObj.datas[0].json.properties.id = caseID
   for (const i in bJsonObj.datas[0].json.properties.backBoardList) {
     //判断后板卡是否已经拼接机箱唯一标识
     if (bJsonObj.datas[0].json.properties.backBoardList[i].uniqueId.indexOf(uuidRandom) === -1) {
@@ -236,7 +239,7 @@ function ondropLoadJSON(evt, graph, center, options) {
   //给前板卡、芯片、接口拼接机箱唯一标识
   roots[0].properties.uniqueId = uuidRandom
   result[0].properties.uniqueId = uuidRandom
-  result[0].properties.ID = caseID
+  result[0].properties.id = caseID
   /* for (const i in result[0].properties.frontBoardList) {
      if (result[0].properties.frontBoardList[i].uniqueId.indexOf(uuidRandom) === -1) {
        result[0].properties.frontBoardList[i].uniqueId = uuidRandom + '_' + result[0].properties.frontBoardList[i].uniqueId
@@ -263,6 +266,7 @@ function ondropLoadJSON(evt, graph, center, options) {
        }
      }
    }*/
+  console.log("options",options)
   //放到数组中
   caseList.push(options.json)
   graphList.fJson.push(JSON.parse(caseList[caseList.length - 1].frontCase))
@@ -1024,6 +1028,7 @@ function initEditor(editor) {
               }
             }
           }
+          caseID--
           // console.log("backAllCaseJsonTemp", backAllCaseJsonTemp)
           // console.log("caseList", caseList)
           // console.log("graphList", graphList)

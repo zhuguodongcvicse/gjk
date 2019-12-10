@@ -332,6 +332,19 @@
 		a.modelId = #{modelId}
 	</select>
 
+	<select id="getChipsByFlowId" resultMap="chipsfromhardwarelibs">
+		SELECT
+		<include refid="chips" />
+		FROM gjk_chipsfromhardwarelibs
+		where flowId = #{flowId}
+	</select>
+	<select id="getChipsfromhardwarelibsById" resultMap="chipsfromhardwarelibs">
+		SELECT
+		<include refid="chips" />
+		FROM gjk_chipsfromhardwarelibs
+		where id = #{id}
+	</select>
+
 	<select id="listProjectFileByProjectId"
 		resultMap="projectFileMap">
 		select
@@ -530,6 +543,19 @@
 		FROM gjk_hardwarelibs h
 		WHERE h.model_id = #{modelId}
 	</select>
+	<!-- 拿到硬件建模 -->
+	<select id="getHardwarelibsByFlowId" resultMap="hardwarelibs">
+		SELECT
+		<include refid="hardwarelibs" />
+		FROM gjk_hardwarelibs
+		WHERE flow_id = #{flowId}
+	</select>
+	<select id="getHardwarelibsById" resultMap="hardwarelibs">
+		SELECT
+		<include refid="hardwarelibs" />
+		FROM gjk_hardwarelibs
+		WHERE id = #{id}
+	</select>
 
 	<!-- 保存硬件建模 -->
 	<insert id="saveHardwarelibs"
@@ -573,11 +599,32 @@
 		`link_relation` = #{linkRelation}
 		WHERE `id` = #{id}
 	</update>
+	<update id="updateHardwarelibById">
+		UPDATE `gjk_hardwarelibs` SET
+		`hardware_name` = #{hardware.hardwareName},
+		`flow_id` = #{hardware.flowId},
+		`model_id` = #{hardware.modelId},
+		`project_Id` = #{hardware.projectId},
+		`front_json` = #{hardware.frontJson},
+		`back_json` = #{hardware.backJson},
+		`link` = #{hardware.link},
+		`frontCaseForDeployment` = #{hardware.frontCaseForDeployment},
+		`link_relation` = #{hardware.linkRelation}
+		WHERE `id` = #{hardware.id}
+	</update>
 
 	<update id="updateChipsfromhardwarelibs">
 		UPDATE `gjk_chipsfromhardwarelibs` SET
 		`chips` =
 		#{chips}
+		WHERE `id` = #{id}
+	</update>
+	<update id="updateChipsfromhardwarelibsById">
+		UPDATE `gjk_chipsfromhardwarelibs` SET
+		`chips` = #{chips.chips},
+		`projectId` = #{chips.projectId},
+		`flowId` = #{chips.flowId},
+		`modelId` = #{chips.modelId}
 		WHERE `id` = #{id}
 	</update>
 
@@ -617,7 +664,7 @@
 	<select id="getSoftwareById" resultMap="softwareMap">
         SELECT *
         FROM gjk_software as gs
-        where gs.id = ${id}
+        where gs.id = #{id}
     </select>
 	<select id="getSoftwareDetailBySoftwareIdIn" resultMap="softwareDetailMap">
 		SELECT * FROM gjk_software_detail
@@ -625,7 +672,7 @@
 	</select>
 	<select id="getSoftwareDetailBySoftwareIdAndPlatformId" resultMap="softwareDetailMap">
 		SELECT * FROM gjk_software_detail
-		WHERE software_id = ${softwareId} and platform_id = ${platformId}
+		WHERE software_id = #{softwareId} and platform_id = #{platformId}
 	</select>
 	<select id="getSoftwareFileBySoftwareIdIn" resultMap="softwareFileMap">
 		SELECT * FROM gjk_software_file
@@ -633,7 +680,7 @@
 	</select>
 	<select id="getSoftwareFileBySoftwareIdAndFileName" resultMap="softwareFileMap">
 		SELECT * FROM gjk_software_file
-		WHERE software_id = ${id} and file_name = ${fileName}
+		WHERE software_id = #{id} and file_name = #{fileName}
 	</select>
     <!--根据软件框架库ID得到平台库列表-->
     <select id="getAllPlatformListBySoftwareId" resultMap="platformMap">
@@ -702,7 +749,7 @@
 	<select id="getBSPById" resultMap="BSPMap">
         SELECT *
         FROM gjk_bsp as gs
-        where gs.id = ${id}
+        where gs.id = #{id}
     </select>
 	<select id="getBSPDetailByBSPIdIn" resultMap="bspDetailMap">
 		SELECT * FROM gjk_bsp_detail
@@ -710,11 +757,15 @@
 	</select>
 	<select id="getBSPDetailByBSPIdAndPlatformId" resultMap="bspDetailMap">
 		SELECT * FROM gjk_bsp_detail
-		WHERE bsp_id = ${bspId} and platform_id = ${platformId}
+		WHERE bsp_id = #{bspId} and platform_id = #{platformId}
 	</select>
 	<select id="getBSPFileByBSPIdIn" resultMap="bspFileMap">
 		SELECT * FROM gjk_bsp_file
 		WHERE bsp_id IN (${ids})
+	</select>
+	<select id="getBSPFileByBSPIdAndFileNameAndFilePath" resultMap="bspFileMap">
+		SELECT * FROM gjk_bsp_file
+		WHERE bsp_id = #{bspId} and file_name = #{fileName} and file_path = #{filePath}
 	</select>
 
 	<select id="queryColumns" resultType="map">
@@ -740,6 +791,19 @@
 		#{comp.compImg},
 		#{comp.description})
 	</insert>
+	<!-- 更新公共构件 -->
+	<update id="updateCommonComp">
+		UPDATE `gjk_common_component` SET
+		`comp_id` = #{comp.compId},
+		`comp_name` = #{comp.compName},
+		`comp_funcname` = #{comp.compFuncname},
+		`user_Id` = #{comp.userId},
+		`comp_img` = #{comp.compImg},
+		`description` = #{comp.description},
+		`update_time` = #{comp.updateTime},
+		`version` = #{comp.version}
+		WHERE `id` = #{comp.id}
+	</update>
 	<!-- 根据多个id查询构件库数据 -->
 	<select id="getCommonComponentByIdIn" resultMap="commonComponentMap">
 		SELECT * FROM gjk_common_component
@@ -761,6 +825,19 @@
 		#{compDetail.paraentIds},
 		#{compDetail.libsId})
 	</insert>
+	<!-- 更新公共构件 -->
+	<update id="updateCommonCompDetail">
+		UPDATE `gjk_common_component_detail` SET
+		`comp_id` = #{comp.compId},
+		`file_name` = #{comp.fileName},
+		`file_type` = #{comp.fileType},
+		`file_path` = #{comp.filePath},
+		`paraent_id` = #{comp.paraentId},
+		`paraent_ids` = #{comp.paraentIds},
+		`libs_id` = #{comp.libsId},
+		`version` = #{comp.version}
+		WHERE `id` = #{comp.id}
+	</update>
 	<!-- 根据多个id查询构件库详情数据 -->
 	<select id="getCommonComponentDetailByCompIdIn" resultMap="commonComponentDetailMap">
 		SELECT * FROM gjk_common_component_detail
@@ -782,6 +859,11 @@
 			#{item}
 		</foreach>
 	</select>
+	<select id="getCompStructById" resultMap="compStructMap">
+		select id, comp_id, struct_id
+		from gjk_comp_struct
+		where id = #{id}
+	</select>
 	<!-- 根据多个id查询结构体数据 -->
 	<select id="getStructlibsByIdList" resultMap="structlibsMap">
 		select *
@@ -791,6 +873,11 @@
 				 open="(" separator="," close=")">
 			#{item}
 		</foreach>
+	</select>
+	<select id="getStructlibsById" resultMap="structlibsMap">
+		select *
+		from gjk_structlibs
+		where id = #{id}
 	</select>
 	<!-- 保存结构体 -->
 	<insert id="saveStructlibs"
@@ -813,4 +900,59 @@
 		#{structlibs.dataLength},
 		#{structlibs.permission})
 	</insert>
+	<!-- 更新结构体 -->
+	<update id="updateStructlibs">
+		UPDATE `gjk_structlibs` SET
+		`parent_id` = #{structlibs.parentId},
+		`children_ids` = #{structlibs.childrenIds},
+		`name` = #{structlibs.name},
+		`sort` = #{structlibs.sort},
+		`version` = #{structlibs.version},
+		`type` = #{structlibs.type},
+		`data_type` = #{structlibs.dataType},
+		`struct_type` = #{structlibs.structType},
+		`data_length` = #{structlibs.dataLength},
+		`permission` = #{structlibs.permission})
+		WHERE `id` = #{structlibs.id}
+	</update>
+
+	<select id="getSysDictByRemarksIn" resultMap="sysDictMap">
+		select *
+		from sys_dict
+		where remarks in #{remarks} and del_Flag != 1
+	</select>
+	<select id="getSysDictById" resultMap="sysDictMap">
+		select *
+		from sys_dict
+		where id = #{id}
+	</select>
+	<!-- 保存字典 -->
+	<insert id="saveSysDict"
+			parameterType="com.inforbus.gjk.admin.api.entity.SysDict">
+		INSERT INTO sys_dict (
+		id, value, label, type, description,
+		sort, remarks, del_flag
+		)
+		VALUES (
+		#{sysDict.id},
+		#{sysDict.value},
+		#{sysDict.label},
+		#{sysDict.type},
+		#{sysDict.description},
+		#{sysDict.sort},
+		#{sysDict.remarks},
+		#{sysDict.delFlag})
+	</insert>
+	<!-- 更新字典 -->
+	<update id="updateSysDict">
+		UPDATE `sys_dict` SET
+		`value` = #{sysDict.value},
+		`label` = #{sysDict.label},
+		`type` = #{sysDict.type},
+		`description` = #{sysDict.description},
+		`sort` = #{sysDict.sort},
+		`remarks` = #{sysDict.remarks},
+		`del_flag` = #{sysDict.delFlag})
+		WHERE `id` = #{sysDict.id}
+	</update>
 </mapper>

@@ -29,16 +29,14 @@
           <el-form :inline="true">
             <el-form-item label="筛选:">
               <select-tree :treeData="screenLibsTreeData" multiple :id.sync="screenLibsSelectArray"></select-tree>
-            </el-form-item>
-           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </el-form-item>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <el-form-item label="搜索:">
               <el-input v-model="selectString" size="mini"></el-input>
-            </el-form-item>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-             <el-form-item label>
+            </el-form-item>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <el-form-item label>
               <el-button type="primary" @click="exportCompFunc">导出申请</el-button>
             </el-form-item>
-             <el-form-item label>
+            <el-form-item label>
               <el-button type="primary" @click="vatchExportList">申请列表</el-button>
             </el-form-item>
           </el-form>
@@ -91,14 +89,22 @@
             <template slot="version" slot-scope="scope">
               <el-tag>v{{scope.row.version}}</el-tag>
             </template>
+            <template slot-scope="scope" slot="menu">
+              <el-button
+                type="primary"
+                size="small"
+                plain
+                @click="handleEdit(scope.row,scope.index)"
+              >查看</el-button>
+            </template>
           </avue-crud>
         </div>
       </el-dialog>
       <storage-apply
-      :dialog="storageApplyDialog"
-      @storageApplyDialogState="storageApplyDialogState"
-      :component="exportCompList">
-      </storage-apply>
+        :dialog="storageApplyDialog"
+        @storageApplyDialogState="storageApplyDialogState"
+        :component="exportCompList"
+      ></storage-apply>
     </basic-container>
     <!-- <el-dialog title="筛选" :visible.sync="screenDia" width="width" :before-close="dialogBeforeClose">
       <div>
@@ -136,6 +142,7 @@ import {
 } from "@/api/libs/commoncomponent";
 import { fetchAlgorithmTree } from "@/api/admin/algorithm";
 import { fetchTestTree } from "@/api/admin/test";
+import { fetchPlatformTrees } from "@/api/admin/platform";
 import { tableOption } from "@/const/crud/libs/commoncomponent";
 // import { screenCompOption } from "@/const/crud/libs/screenComp";
 import { mapGetters } from "vuex";
@@ -172,7 +179,7 @@ export default {
       exportCompList: [],
       selectCompList: [],
       selectVersionCompMap: new Map(),
-      currDialogId: '',
+      currDialogId: "",
 
       selectString: ""
 
@@ -202,8 +209,8 @@ export default {
     this.getList();
     this.getLibsTree();
     this.loading = false;
-    this.tableHisOption = JSON.parse(JSON.stringify(this.tableOption))
-    this.tableHisOption. menu = false
+    this.tableHisOption = JSON.parse(JSON.stringify(this.tableOption));
+    this.tableHisOption.menu = false;
   },
   mounted: function() {},
   watch: {
@@ -223,42 +230,38 @@ export default {
       // if (this.exportCompList.length > 0) {
       //   createZipFile(this.exportCompList);
       // }
-      if(this.exportCompList.length > 0){
+      if (this.exportCompList.length > 0) {
         this.storageApplyDialog = true;
-      }else{
+      } else {
         this.$message({
-            showClose: true,
-            message: "请至少选择一个构件",
-            type: "warning"
-          });
+          showClose: true,
+          message: "请至少选择一个构件",
+          type: "warning"
+        });
       }
     },
     selectionChange(list) {
       // console.log("selectionChange", list);
       this.selectCompList = list;
-      this.handleExportCompList()
+      this.handleExportCompList();
     },
     versionSelectionChange(list) {
-        this.selectVersionCompMap.set(this.currDialogId, list)
-        this.handleExportCompList()
+      this.selectVersionCompMap.set(this.currDialogId, list);
+      this.handleExportCompList();
     },
-      // 将勾选的数据放到一块
-    handleExportCompList(){
-        this.exportCompList = []
-        this.exportCompList = this.exportCompList.concat(
-            this.selectCompList
-        );
-        for(let [key, value] of this.selectVersionCompMap){
-            this.exportCompList = this.exportCompList.concat(
-                value
-            );
-        }
-        // 去重
-        let tmpArr = []
-        this.exportCompList = this.exportCompList.reduce(function(item, next) {
-            tmpArr[next.id] ? '' : tmpArr[next.id] = true && item.push(next);
-            return item;
-        }, []);
+    // 将勾选的数据放到一块
+    handleExportCompList() {
+      this.exportCompList = [];
+      this.exportCompList = this.exportCompList.concat(this.selectCompList);
+      for (let [key, value] of this.selectVersionCompMap) {
+        this.exportCompList = this.exportCompList.concat(value);
+      }
+      // 去重
+      let tmpArr = [];
+      this.exportCompList = this.exportCompList.reduce(function(item, next) {
+        tmpArr[next.id] ? "" : (tmpArr[next.id] = true && item.push(next));
+        return item;
+      }, []);
     },
     getLibsTree() {
       fetchAlgorithmTree(this.listQuery).then(response => {
@@ -267,6 +270,11 @@ export default {
           for (let item of testTree.data.data) {
             this.screenLibsTreeData.push(item);
           }
+          fetchPlatformTrees(this.listQuery).then(platformTree => {
+            for (let platformItem of platformTree.data.data) {
+              this.screenLibsTreeData.push(platformItem);
+            }
+          });
         });
       });
     },
@@ -277,27 +285,26 @@ export default {
       done();
     },
     showAllVersion(row) {
-      this.currDialogId = row.id
+      this.currDialogId = row.id;
       this.showAllVersionDia = true;
       getAllVersionByCompId({ compId: row.compId }).then(Response => {
         // console.log(Response.data.data);
         this.allVersionTableData = Response.data.data;
 
         // 默认勾选之前选择的行
-        let selectData = JSON.parse(JSON.stringify(this.exportCompList))
-        let selecctRow = []
-        for(let item of this.allVersionTableData){
-            for(let obj of selectData){
-                if(item.id == obj.id){
-                    selecctRow.push(item)
-                }
+        let selectData = JSON.parse(JSON.stringify(this.exportCompList));
+        let selecctRow = [];
+        for (let item of this.allVersionTableData) {
+          for (let obj of selectData) {
+            if (item.id == obj.id) {
+              selecctRow.push(item);
             }
+          }
         }
-        let thiz = this
-        setTimeout(function(){
-            thiz.$refs.versionCrud.toggleSelection(selecctRow);
-        }, 400)
-
+        let thiz = this;
+        setTimeout(function() {
+          thiz.$refs.versionCrud.toggleSelection(selecctRow);
+        }, 400);
       });
     },
     getTableData() {
@@ -337,11 +344,13 @@ export default {
     },
     getCompListBySelectString() {
       this.tableLoading = true;
+      let select = "";
+      select = this.selectString.trim();
       let list = [];
-      if (this.selectString.indexOf(" ") >= 0) {
-        list = this.selectString.split(" ");
+      if (select.indexOf(" ") >= 0) {
+        list = select.split(" ");
       } else {
-        list.push(this.selectString);
+        list.push(select);
       }
       console.log("11111111111111111", list);
       getCompListByString(this.listQuery, list).then(Response => {
@@ -388,19 +397,21 @@ export default {
     },
     handleEdit(row, index) {
       getCompView(row).then(res => {
-        this.$store.dispatch("setSaveXmlMaps", res.data.data.compBasicMap).then(() => {
-          this.$store
-            .dispatch("setChineseMapping", "comp_param_type")
-            .then(() => {
-              //加载结构体
-              this.$store.dispatch("setStruceType").then(() => {
-                this.$router.push({
-                  path: "/comp/showComp/commView",
-                  query: { compId: row.id, type: "view" }
+        this.$store
+          .dispatch("setSaveXmlMaps", res.data.data.compBasicMap)
+          .then(() => {
+            this.$store
+              .dispatch("setChineseMapping", "comp_param_type")
+              .then(() => {
+                //加载结构体
+                this.$store.dispatch("setStruceType").then(() => {
+                  this.$router.push({
+                    path: "/comp/showComp/commView",
+                    query: { compId: row.id, type: "view" }
+                  });
                 });
               });
-            });
-        });
+          });
       });
     },
     handleDel(row, index) {
@@ -467,12 +478,12 @@ export default {
     refreshChange() {
       this.getTableData();
     },
-    storageApplyDialogState(){
+    storageApplyDialogState() {
       this.storageApplyDialog = false;
     },
-    vatchExportList(){
+    vatchExportList() {
       this.$router.push({
-        path: "/libs/commoncomponent/batchExportList",
+        path: "/libs/commoncomponent/batchExportList"
       });
     }
   }
