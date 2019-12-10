@@ -512,14 +512,14 @@ export default {
                   //   this.checkoutPlatform();
                   // })
                   if (
-                    this.compSelectArray == null ||
-                    this.compSelectArray.length <= 0
+                    this.compSelectArray != null &&
+                    this.compSelectArray.length >= 0
                   ) {
                     saveProCompList(this.project.id, this.compSelectArray).then(
                       Response => {
                         if (
-                          this.compSelectArray == null ||
-                          this.compSelectArray.length <= 0
+                          this.compSelectArray != null &&
+                          this.compSelectArray.length >= 0
                         ) {
                           let approval = {};
                           approval.userId = this.userInfo.userId;
