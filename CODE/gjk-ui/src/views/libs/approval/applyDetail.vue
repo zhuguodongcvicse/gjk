@@ -517,6 +517,7 @@
                                     modifyComp(modifyComponent)
                                 }
                             }
+                            break;
                         case "2-1":
                             let infTemp = {};
                             infTemp.id = this.applyItemMsg.applyId;
