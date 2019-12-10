@@ -38,6 +38,12 @@
 			gjk_algorithm.sort DESC
     </select>
 
+	<select id="selectCountById" parameterType="String" resultType="Integer">
+		SELECT count(1)
+		FROM gjk_algorithm
+		WHERE algorithm_id = #{id}
+    </select>
+
 	<delete id="deleteAll">
 		DELETE FROM gjk_algorithm
 	</delete>

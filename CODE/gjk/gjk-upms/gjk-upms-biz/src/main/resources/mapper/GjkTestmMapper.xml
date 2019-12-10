@@ -48,6 +48,12 @@
 		by ordinal_position
 	</select>
 
+	<select id="selectCountById" parameterType="String" resultType="Integer">
+		SELECT count(1)
+		FROM gjk_test
+		WHERE test_id = #{id}
+    </select>
+
 	<delete id="deleteAll">
 		DELETE FROM gjk_test
 	</delete>

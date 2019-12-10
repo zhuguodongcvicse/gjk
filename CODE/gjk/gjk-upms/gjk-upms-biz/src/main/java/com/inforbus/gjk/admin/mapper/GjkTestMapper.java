@@ -4,6 +4,7 @@ package com.inforbus.gjk.admin.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.inforbus.gjk.admin.api.entity.GjkTest;
 import com.inforbus.gjk.admin.api.vo.TestVO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -37,4 +38,11 @@ public interface GjkTestMapper extends BaseMapper<GjkTest> {
 	 * 删除所有数据
 	 */
 	void deleteAll();
+
+	/**
+	 * 查询数据条数
+	 * @param id
+	 * @return
+	 */
+	int selectCountById(@Param("id") String id);
 }
