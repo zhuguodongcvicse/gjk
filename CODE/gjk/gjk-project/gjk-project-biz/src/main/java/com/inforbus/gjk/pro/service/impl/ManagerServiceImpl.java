@@ -2551,17 +2551,18 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		findStructlibsRecursion(structlibsListSub, structlibsList);
 		createSheet(workbook, structlibsList, "gjk_structlibs");
 
-		// 硬件建模表
-        Hardwarelibs hardwarelibs = baseMapper.getHardwarelibsByFlowId(processId);
-        List<Hardwarelibs> hardwarelibsList = new ArrayList<>();
-        hardwarelibsList.add(hardwarelibs);
-        createSheet(workbook, hardwarelibsList, "gjk_hardwarelibs");
-
-        //芯片表
-        Chipsfromhardwarelibs chipsfromhardwarelibs = baseMapper.getChipsByFlowId(processId);
-        List<Chipsfromhardwarelibs> chipsfromhardwarelibsList = new ArrayList<>();
-        chipsfromhardwarelibsList.add(chipsfromhardwarelibs);
-        createSheet(workbook, chipsfromhardwarelibsList, "gjk_chipsfromhardwarelibs");
+		// TODO 临时注释 等待 超 改造完后 处理
+//		// 硬件建模表
+//        Hardwarelibs hardwarelibs = baseMapper.getHardwarelibsByFlowId(processId);
+//        List<Hardwarelibs> hardwarelibsList = new ArrayList<>();
+//        hardwarelibsList.add(hardwarelibs);
+//        createSheet(workbook, hardwarelibsList, "gjk_hardwarelibs");
+//
+//        //芯片表
+//        Chipsfromhardwarelibs chipsfromhardwarelibs = baseMapper.getChipsByFlowId(processId);
+//        List<Chipsfromhardwarelibs> chipsfromhardwarelibsList = new ArrayList<>();
+//        chipsfromhardwarelibsList.add(chipsfromhardwarelibs);
+//        createSheet(workbook, chipsfromhardwarelibsList, "gjk_chipsfromhardwarelibs");
 
         // 字典表
 		List<SysDict> sysDictList = baseMapper.getSysDictByRemarksIn("'mapperType','selectType'");
