@@ -147,7 +147,7 @@ public class HeaderFileAndStructUtils {
 			StringBuilder sName = new StringBuilder();
 			StringBuilder sType = new StringBuilder();
 			StringBuilder sRemarks = new StringBuilder();
-			if (splitParamTypeAndName(strItem, sName, sType, sRemarks)) {
+			if (splitParamTypeAndName(strItem, sType,sName, sRemarks)) {
 				ParamTreeVO structChild = new ParamTreeVO(IdGenerate.millsAndRandomId(), IdGenerate.millsAndRandomId(),
 						fatherParam.getDbId(), "", sName.toString(), sType.toString(), sRemarks.toString(), i + 1, 0.0,
 						"1", "");

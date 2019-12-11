@@ -1,6 +1,7 @@
 package com.inforbus.gjk.libs.api.dto;
 
 import java.io.File;
+import java.io.Serializable;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
@@ -13,7 +14,10 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class CompframeTree extends TreeNode {
+public class CompframeTree extends TreeNode  {
+
+
+	private static final long serialVersionUID = 1L;
 
 	private String label;
 

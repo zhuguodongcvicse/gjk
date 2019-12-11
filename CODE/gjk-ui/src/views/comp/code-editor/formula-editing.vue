@@ -66,20 +66,7 @@
             ref="crud"
             @row-dblclick="handleRowClick"
           >
-            <!-- <template slot-scope="scope" slot="menu" menuWidth="10px">
-              <el-button type="primary" size="small">000</el-button>
-            </template>-->
           </avue-crud>
-          <!-- <el-table :data="structTable" border style="width: 100%">
-            <el-table-column prop="fparamName" label="名称"></el-table-column>
-            <el-table-column prop="fparamType" label="类型"></el-table-column>
-            <el-table-column fixed="right" label="操作" width="82px">
-              <template slot-scope="scope">
-                {{scope.row.paramName}}
-                <el-button size="small" type="primary" icon="el-icon-back"></el-button>
-              </template>
-            </el-table-column>
-          </el-table>-->
         </el-col>
       </el-row>
       <div slot="footer" class="dialog-footer">
