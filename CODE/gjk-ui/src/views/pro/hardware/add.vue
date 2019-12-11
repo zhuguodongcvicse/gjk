@@ -83,9 +83,9 @@ export default {
   },
   created() {
     NProgress.configure({ showSpinner: false });
-    var hardwareObj = this.$route.query.hardwarelibs;
-    this.params = hardwareObj;
-    console.log("this.params", this.params);
+    // var hardwareObj = this.$route.query.hardwarelibs;
+    this.params = this.hardwarelibObj;
+    // console.log("this.params", this.params);
     //this.sendMessage()
   },
   async mounted() {
@@ -103,16 +103,8 @@ export default {
       this.load();
     }
   },
-  computed: { ...mapGetters(["tagWel", "tagList", "tag", "website"]) },
+  computed: { ...mapGetters(["tagWel", "tagList", "tag", "website", "hardwarelibObj"]) },
   methods: {
-    test() {
-      var start = new Date().getTime();
-      getChipsfromhardwarelibs("cc2b5fc680ed4d9ebac6880cfb7da30b").then(res => {
-        console.log("res", res);
-        var end = new Date().getTime();
-        console.log("time", end - start);
-      });
-    },
     sendMessage() {
       let iframeWin = this.$refs.iframe.contentWindow;
       getCaseData().then(response => {
@@ -124,8 +116,8 @@ export default {
     },
     // 接受子页面发来的信息
     handleMessage(event) {
-      console.log("this.params", this.params);
-      console.log("event.data", event.data);
+      // console.log("this.params", this.params);
+      // console.log("event.data", event.data);
       if (event.data.params == null) {
         return;
       }
@@ -180,7 +172,7 @@ export default {
         this.params.linkRelation
       ];
       this.hrConfigXmlEntityMap = createXmlEntityMap(paramsList);
-      console.log("this.hrConfigXmlEntityMap",this.hrConfigXmlEntityMap)
+      // console.log("this.hrConfigXmlEntityMap",this.hrConfigXmlEntityMap)
       createHardwarelibXML(this.hrConfigXmlEntityMap, this.params.id).then(
         response => {
           // console.log("this.params",this.params)
@@ -233,7 +225,6 @@ export default {
     }
   },
   destroyed() {
-    console.log("destroyed");
   }
 };
 </script>

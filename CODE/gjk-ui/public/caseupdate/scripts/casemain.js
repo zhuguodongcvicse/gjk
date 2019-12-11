@@ -1089,30 +1089,30 @@ function initEditor(editor) {
         }
         // console.log("点击",data.properties)
 
-        data.set('chipName', data._mn3.chipName);
-        data.set('coreNum', data._mn3.coreNum);
-        data.set('memSize', data._mn3.memSize);
-        data.set('boardName', data._mn3.boardName);
-        data.set('recvRate', data._mn3.recvRate);
-        data.set('hrTypeName', data._mn3.hrTypeName);
-        if (data._mn3.boardType == 0) {
+        data.set('chipName', data.properties.chipName);
+        data.set('coreNum', data.properties.coreNum);
+        data.set('memSize', data.properties.memSize);
+        data.set('boardName', data.properties.boardName);
+        data.set('recvRate', data.properties.recvRate);
+        data.set('hrTypeName', data.properties.hrTypeName);
+        if (data.properties.boardType == 0) {
           data.set('showBoardType', 'calculateBoard');
         }
-        if (data._mn3.boardType == 1) {
+        if (data.properties.boardType == 1) {
           data.set('showBoardType', 'FpgaBoard');
         }
-        if (data._mn3.boardType == 2) {
+        if (data.properties.boardType == 2) {
           console.log("data*****", data)
           data.set('showBoardType', 'exchangeBoard');
         }
-        if (data._mn3.boardType == 3) {
+        if (data.properties.boardType == 3) {
           data.set('showBoardType', 'interfaceBoard');
         }
-        data.set('infName', data._mn3.infName);
-        data.set('infRate', data._mn3.infRate);
-        data.set('opticalNum', data._mn3.opticalNum);
-        data.set('caseName', data._mn3.caseName);
-        // data.set('boardnum',data._mn3.bdnum);
+        data.set('infName', data.properties.infName);
+        data.set('infRate', data.properties.infRate);
+        data.set('opticalNum', data.properties.opticalNum);
+        data.set('caseName', data.properties.caseName);
+        // data.set('boardnum',data.properties.bdnum);
         // console.log("data", data)
       }
     }
