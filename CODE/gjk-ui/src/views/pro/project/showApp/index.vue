@@ -28,8 +28,10 @@
           <div class="child showapp_child_14s">
             <div class="showapp_child_tit_14s">
               <strong>
-                <span>{{dynamicValidateForm.domains[0][index].fileName}}</span>
+                <!-- <span>{{dynamicValidateForm.domains[0][index].fileName}}</span> -->
+                <span>{{dynamicValidateForm.domains[0][index].filePath.split("\\")[2] + "_" + dynamicValidateForm.domains[0][index].filePath.split("\\")[3]}}</span>
               </strong>
+              
               <!-- <span >计算数据</span><br/> -->
               <div class="child_line_14s">
                 <span>运行状态：</span>

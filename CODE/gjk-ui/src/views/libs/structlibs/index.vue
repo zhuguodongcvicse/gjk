@@ -82,6 +82,8 @@ import storageApply from "@/views/libs/structlibs/storageApply";
 import { constants } from "crypto";
 
 export default {
+  //注入依赖，调用this.reload();用于刷新页面
+  inject: ["reload"],
   name: "structlibs",
   components: { configStruct, storageApply },
   data() {
@@ -142,9 +144,9 @@ export default {
       // });
       this.$refs.pram.getPram(row);
     },
-    storageApplyDialogStates() {
-      this.storageApplyDialog = false;
-      this.getList(this.page);
+    storageApplyDialogStates(state) {
+      this.storageApplyDialog = state;
+      this.reload();
     },
     getList(page, params) {
       this.tableLoading = true;

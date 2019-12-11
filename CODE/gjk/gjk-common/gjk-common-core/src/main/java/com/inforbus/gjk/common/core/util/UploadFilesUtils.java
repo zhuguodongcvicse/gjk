@@ -1,19 +1,29 @@
 package com.inforbus.gjk.common.core.util;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipInputStream;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.junit.Test;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -214,7 +224,7 @@ public class UploadFilesUtils {
 //				delAllFile(path + "/" + tempList[i]);// 先删除文件夹里面的文件
 				delFolder(path + "/" + tempList[i]);// 再删除空文件夹
 				flag = true;
-			}else {
+			} else {
 				flag = false;
 			}
 		}
@@ -366,4 +376,33 @@ public class UploadFilesUtils {
 		delAllFile(source);
 	}
 
+	/**
+	 * @Title: decompression
+	 * @Description: 解压压缩包文件
+	 * @Author xiaohe
+	 * @DateTime 2019年12月10日 下午8:46:20
+	 * @param InputStream   接收的文件流
+	 * @param targetPathStr 解压目录(D:/xxx)
+	 * @throws IOException
+	 */
+	public static void decompression(InputStream file, String targetPathStr) throws IOException {
+		ZipArchiveInputStream inputStream = new ZipArchiveInputStream(
+				new BufferedInputStream(file));
+		Files.createDirectories(Paths.get(targetPathStr));
+		ZipArchiveEntry entry = null;
+		while ((entry = inputStream.getNextZipEntry()) != null) {
+			if (entry.isDirectory()) {
+				Files.createDirectories(Paths.get(targetPathStr, entry.getName()));
+			} else {
+				OutputStream outputStream = null;
+				try {
+					outputStream = new BufferedOutputStream(new FileOutputStream(new File(targetPathStr, entry.getName())));
+					// 输出文件路径信息
+					IOUtils.copy(inputStream, outputStream);
+				} finally {
+					IOUtils.closeQuietly(outputStream);
+				}
+			}
+		}
+	}
 }

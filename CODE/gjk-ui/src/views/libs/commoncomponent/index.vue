@@ -149,6 +149,8 @@ import { mapGetters } from "vuex";
 import selectTree from "@/views/pro/project/selectTree";
 import storageApply from "@/views/libs/commoncomponent/storageApply";
 export default {
+  //注入依赖，调用this.reload();用于刷新页面
+  inject: ["reload"],
   name: "commoncomponent",
   data() {
     return {
@@ -195,8 +197,7 @@ export default {
       // screenCompOption: screenCompOption
     };
   },
-  //注入依赖，调用this.reload();用于刷新页面
-  inject: ["reload"],
+
   components: {
     "select-tree": selectTree,
     "storage-apply": storageApply
@@ -478,8 +479,9 @@ export default {
     refreshChange() {
       this.getTableData();
     },
-    storageApplyDialogState() {
-      this.storageApplyDialog = false;
+    storageApplyDialogState(state) {
+      this.storageApplyDialog = state;
+      this.reload();
     },
     vatchExportList() {
       this.$router.push({

@@ -75,9 +75,9 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 	public boolean saveCommonCompDetailList(List<CommonComponentDetail> commonComponentDetailList,
 			CommonComponent component, String userCurrent) {
 		try {
-			// 格式：gjk/common/component/构件名/构件版本/
+			// 格式：gjk/common/component/构件名/构件版本/ createTime.replaceAll("[[\\s-T:punct:]]", "") 
 			String compPath = "gjk" + File.separator + "common" + File.separator + "component" + File.separator
-					+ component.getCompId() + File.separator + component.getVersion() + File.separator;
+					+ component.getCompId() + File.separator + component.getCreateTime().toString().replaceAll("[[\\s-T:punct:]]", "") + File.separator;
 			String subStr = null;
 			for (CommonComponentDetail detail : commonComponentDetailList) {
 				if ("xml".equals(detail.getFileType())) {

@@ -575,8 +575,9 @@ export default {
         });
       }
     },
-    batchStorageApplyDialogState() {
-      this.batchStorageApplyDialog = false;
+    batchStorageApplyDialogState(state) {
+      this.batchStorageApplyDialog = state;
+      this.reload();
     }
   },
   beforeRouteEnter(to, from, next) {
