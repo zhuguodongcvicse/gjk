@@ -14,6 +14,7 @@ import SpbModel.HeadFile;
 import SpbModel.Performance;
 import SpbModel.Struc;
 import appcontrol.AppControl;
+import flowModel.BackNodeInfoForSpb;
 import flowModel.SimpleScheme;
 import flowModel.SpbFrameAutoGen;
 import flowModel.SystemConfig;
@@ -80,6 +81,20 @@ public class ExternalIOTransUtils {
 //        schemeFileList.add("D:\\14S_GJK_GIT\\gjk\\gjk\\project\\gengTest\\geng流程\\模型\\软硬件映射配置.xml");
 		try {
 			SimpleScheme.createSimpleScheme(schemeFileList, simplePlanFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	/**
+	 * 调回写部署方案接口
+	 *
+	 * @param schemeFileList
+	 */
+	public static void writeBackDeployScheme(String workModeFilePath, String schemeFile ) {
+		try {
+			BackNodeInfoForSpb.writeBackDeployScheme(workModeFilePath, schemeFile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

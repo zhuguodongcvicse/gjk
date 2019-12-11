@@ -29,20 +29,20 @@
           <div class="pro_project_custom_networkoutparam_14s" >
             <el-form :label-position="labelPosition" label-width="160px" :model="formLabelAlign" size="mini">
               <el-form-item v-for="(item,index) in funcConfigParams" :key= index :label="item.attrMapping?item.attrMappingName:item.attrName">
-                <form-item-type 
+                <form-item-type
                 v-model="formLabelAlign[item.attrName]"
-                :itemValue="formLabelAlign[item.attrName]" 
-                :lableType="item.attrConfigType" 
+                :itemValue="formLabelAlign[item.attrName]"
+                :lableType="item.attrConfigType"
                 :dictKey="item.dataKey"
-                @change="updateData" 
+                @change="updateData"
                 @selectChangeData="selectChangeData">
                 </form-item-type>
               </el-form-item>
                 <el-form-item v-for="(item,index) in entityParams" :key=index :label="item.attrMapping?item.upNode+'_'+item.attrMappingName:item.upNode+'_'+item.attrName">
                 <form-item-type
-                v-model="formLabelAlign[item.upNode+'_'+item.attrName]" 
-                :itemValue="formLabelAlign[item.upNode+'_'+item.attrName]" 
-                :lableType="item.attrConfigType" 
+                v-model="formLabelAlign[item.upNode+'_'+item.attrName]"
+                :itemValue="formLabelAlign[item.upNode+'_'+item.attrName]"
+                :lableType="item.attrConfigType"
                 :dictKey="item.dataKey"
                 @change="updateData"
                 @selectChangeData="selectChangeData" >
@@ -132,6 +132,7 @@ export default {
       // this.$refs.networkParam.echo(netWorkIn)
     },
     handleClick(node){
+        console.log(node)
       for (let key in node.data.attributeMap) {
         if('configureType'!==key){
           if(key == 'name'){
@@ -168,7 +169,7 @@ export default {
            if(element.isShow){
             if(element.lableName = 'name'){
               console.log(element)
-              element.dataKey = this.nameOptions       
+              element.dataKey = this.nameOptions
             }
               this.funcConfigParams.push(element)
            }
@@ -197,9 +198,10 @@ export default {
     updateData(data){
       let index = this.xmlEntityMaps.indexOf(this.node);
       //取出改变的对象
-      let entity = this.xmlEntityMaps[index].data
-      var object = new Object();
-      object = entity
+      let test = JSON.parse(JSON.stringify(this.xmlEntityMaps[index].data));
+      console.log(1111,test)
+      let entity = JSON.parse(JSON.stringify(this.xmlEntityMaps[index].data));
+
       for (let key in this.formLabelAlign) {
         if(key.indexOf("_")!=-1){
           let keys = key.split("_")
@@ -209,6 +211,7 @@ export default {
               for (let k = 0; k < configureType.attrs.length; k++) {
                 const element = configureType.attrs[k];
                 if(keys[1]==element.attrName||keys[1]==element.attrMappingName){
+                  console.log(JSON.parse(JSON.stringify(entity)));
                   entity.xmlEntityMaps[i].attributeMap[keys[1]] = this.formLabelAlign[key]
                 }
               }
@@ -216,10 +219,9 @@ export default {
           }
         }else{
           if(key != 'name'){
-            entity.attributeMap[key] = this.formLabelAlign[key]
+            // entity.attributeMap[key] = this.formLabelAlign[key]
           }else{
             if(this.nameSelectOptions != undefined){
-              console.log(data)
               entity.attributeMap.compId = data
               var params
               for (let i = 0; i < this.nameOptions.length; i++) {
@@ -229,16 +231,18 @@ export default {
                   params = element.data
                 }
               }
-              for(let key in params){
-                entity.attributeMap[key] = params[key]
+              for(let key1 in params){
+                entity.attributeMap[key1] = params[key1]
               }
               this.nameSelectOptions = undefined
               break
             }
           }
         }
-      }    
+      }
+      console.log(111,entity)
       this.xmlEntityMaps[index].data = entity
+      console.log(222,JSON.parse(JSON.stringify(this.xmlEntityMaps[index].data)))
       let xmlEntityMaps = this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps
       for (let i = 0; i < xmlEntityMaps.length; i++) {
         const element = xmlEntityMaps[i];
@@ -250,6 +254,7 @@ export default {
           }
           element.xmlEntityMaps = entityMaps
           this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps[i] = element
+            console.log(this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps[i])
         }
       }
       // for (let key in this.formLabelAlign) {
@@ -265,7 +270,7 @@ export default {
       //     }
       //   }else{
       //     this.node.data.attributeMap[key] = this.formLabelAlign[key]
-      //   }     
+      //   }
       // }
       // let index = this.xmlEntityMaps.indexOf(this.node)
       // this.xmlEntityMaps[index] = this.node
@@ -305,15 +310,15 @@ export default {
         console.log(this.partList)
         var data = {
           cmpName: element.partName,
-          name: element1.functionName,   
+          name: element1.functionName,
           compName: element1.compName
         }
         this.nameOptions.push({ label : element1.compName , value: element1.compId, data: data})
       }
     }
     remote("netWork_protocolName").then(res => {
-      // this.protocolNameOptions = res.data.data
-      this.protocolNameOptions = [{label: '1', value: '1'}]
+      this.protocolNameOptions = res.data.data
+      // this.protocolNameOptions = [{label: '1', value: '1'}]
     })
     let xmlEntityMaps = this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps
     let index = 0;
@@ -358,7 +363,7 @@ export default {
     //     this.$refs.networkParam.getFuncConfigKey(this.data[0].label+"*"+this.data[0].id);
     //   })
     // }
-    
+
   },
   beforeCreate() {}, //生命周期 - 创建之前
   beforeMount() {}, //生命周期 - 挂载之前

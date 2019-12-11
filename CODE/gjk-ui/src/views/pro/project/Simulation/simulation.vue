@@ -2,106 +2,116 @@
   <div>
     <el-row>
       <el-col>
-        <el-form :inline="true" size="mini" label-width="80px">
-          <el-form-item label="区域一">
-            <el-select placeholder="请选择展示帧号" v-model="myChartsSelectValue">
-              <el-option
-                v-for="(attribute,index) in myChartsSelectData"
-                :key="index"
-                :label="attribute.label"
-                :value="attribute.value"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="区域二">
-            <el-select placeholder="请选择展示帧号" v-model="myChartsSelectValue">
-              <el-option
-                v-for="(attribute,index) in myChartsSelectData"
-                :key="index"
-                :label="attribute.label"
-                :value="attribute.value"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="start">
-              开始
-            </el-button>
-          </el-form-item>
-          <el-form-item >
-            <el-button type="primary" @click="stop">
-              暂停
-            </el-button>
-          </el-form-item>
-        </el-form>
+        <div style="margin-top: 8px">
+          <el-form :inline="true" size="mini" label-width="80px">
+            <el-form-item label="区域一">
+              <el-select placeholder="请选择展示帧号" v-model="myChartsSelectValue">
+                <el-option
+                  v-for="(attribute,index) in myChartsSelectData"
+                  :key="index"
+                  :label="attribute.label"
+                  :value="attribute.value"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="区域二">
+              <el-select placeholder="请选择展示帧号" v-model="myChartsSelectValue">
+                <el-option
+                  v-for="(attribute,index) in myChartsSelectData"
+                  :key="index"
+                  :label="attribute.label"
+                  :value="attribute.value"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="start">
+                开始
+              </el-button>
+            </el-form-item>
+            <el-form-item >
+              <el-button type="primary" @click="stop">
+                暂停
+              </el-button>
+            </el-form-item>
+          </el-form>
+        </div>
       </el-col>
     </el-row>
     <el-row :gutter="20">
       <el-col :span="5">
-        <el-card shadow="always" style="border: 1px solid #EBEEF5;height: 100%" class="box-card">
-          <div slot="header">
-            <span>数据源</span>
-          </div>
-          <div style="height: 540px">
-            <el-form label-position="right" label-width="80px" size="mini" :model="formData">
-              <el-form-item label="数据源:">
-                <el-select placeholder="请选择" v-model="formData.symbol">
-                  <el-option
-                  v-for="(attribute,index) in datasource"
-                  :key="index"
-                  :label="attribute.label"
-                  :value="attribute.value"></el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="参数1:">
-                <el-input v-model="formData.attr1"></el-input>
-              </el-form-item>
-              <el-form-item label="参数2:">
-                <el-input v-model="formData.attr2"></el-input>
-              </el-form-item>
-              <el-form-item label="参数3:">
-                <el-input v-model="formData.attr3"></el-input>
-              </el-form-item>
-              <el-form-item label="数据展示:">
-                <el-select v-model="formData.select">
-                  <el-option
-                  v-for="(attribute,index) in selectData"
-                  :key="index"
-                  :label="attribute.label"
-                  :value="attribute.value"></el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item>
-                <el-button type="primary" @click="onSubmit">开始</el-button>
-              </el-form-item>
-            </el-form>
-          </div>
-        </el-card>
+        <div style="margin-left: 2px;border: 1px solid rgb(235, 238, 245); height: 568px">
+          <el-card shadow="always" style="border: 1px solid #EBEEF5;height: 90%" class="box-card">
+            <div slot="header">
+              <span>数据源</span>
+            </div>
+            <div style="height: 100%">
+              <el-form label-position="right" label-width="80px" size="mini" :model="formData">
+                <el-form-item label="数据源:">
+                  <el-select placeholder="请选择" v-model="formData.symbol">
+                    <el-option
+                    v-for="(attribute,index) in datasource"
+                    :key="index"
+                    :label="attribute.label"
+                    :value="attribute.value"></el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="参数1:">
+                  <el-input v-model="formData.attr1"></el-input>
+                </el-form-item>
+                <el-form-item label="参数2:">
+                  <el-input v-model="formData.attr2"></el-input>
+                </el-form-item>
+                <el-form-item label="参数3:">
+                  <el-input v-model="formData.attr3"></el-input>
+                </el-form-item>
+                <el-form-item label="数据展示:">
+                  <el-select v-model="formData.select">
+                    <el-option
+                    v-for="(attribute,index) in selectData"
+                    :key="index"
+                    :label="attribute.label"
+                    :value="attribute.value"></el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item>
+                  <el-button type="primary" @click="onSubmit">开始</el-button>
+                </el-form-item>
+              </el-form>
+            </div>
+          </el-card>
+        </div>
       </el-col>
       <el-col :span="7">
-        <el-card shadow="always" style="height: 100%" class="box-card">
-          <div slot="header">
-            <span>结构体数据</span>
-          </div>
-          <avue-crud
-          ref="crud"
-          :data="tableData"
-          :option="tableOption"
-          >
-          </avue-crud>
-        </el-card>
+        <div style="margin-left: 2px;border: 1px solid rgb(235, 238, 245); height: 568px">
+          <el-card shadow="always" style="height: 100%" class="box-card">
+            <div slot="header">
+              <span>结构体数据</span>
+            </div>
+            <avue-crud
+            ref="crud"
+            :data="tableData"
+            :option="tableOption"
+            >
+            </avue-crud>
+          </el-card>
+        </div>
       </el-col>
       <el-col :span="12">
-        <el-card>
-          <div slot="header" v-if="!myChartsShow" :style="{width: '500px', height: '265px'}">
-            <span>数据展示区域一</span>
+        <div style="height: 569px;margin-right: 3px">
+          <div style="margin-left: 2px;border: 1px solid rgb(235, 238, 245);height: 50%;">
+              <div style="width: 100%; height: 100%">
+                <div v-if="!myChartsShow" :style="{width: '100%', height: '100%'}">
+                  <span>数据展示区域一</span>
+                </div>
+                <div v-if="myChartsShow" id="myChart" :style="{width: '100%', height: '100%'}"></div>
+              </div>
           </div>
-          <div v-if="myChartsShow" id="myChart" :style="{width: '500px', height: '265px'}"></div>
-        </el-card>
-        <el-card>
-          <div slot="header" v-if="!myCharts1Show" :style="{width: '500px', height: '265px'}">
-            <span>数据展示区域二</span>
+          <div style="margin-left: 2px;border: 1px solid rgb(235, 238, 245); height: 50%">
+              <div v-if="!myCharts1Show" :style="{width: '100%', height: '100%'}">
+                <span>数据展示区域二</span>
+              </div>
+              <div v-if="myCharts1Show" id="myChart1" :style="{width: '100%', height: '100%'}"></div>
           </div>
-          <div v-if="myCharts1Show" id="myChart1" :style="{width: '500px', height: '265px'}"></div>
-        </el-card>
+        </div>
       </el-col>
     </el-row>
   </div>
@@ -138,7 +148,7 @@ export default {
       myCharts1SelectValue: '',
       tableData: [],
       datasource:[],
-      tableHeight: "400px",//表格显示区域固定高度
+      tableHeight: "100%",//表格显示区域固定高度
       myCharts: null,//定时器执行次数变量
       myCharts1: null,
       myChartsShow: false,

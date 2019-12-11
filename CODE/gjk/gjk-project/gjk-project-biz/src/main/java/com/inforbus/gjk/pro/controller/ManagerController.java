@@ -37,6 +37,7 @@ import com.inforbus.gjk.common.core.entity.XmlEntity;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
+import com.inforbus.gjk.common.core.util.ExternalIOTransUtils;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
 import com.inforbus.gjk.pro.api.dto.AppDataDTO;
@@ -520,14 +521,13 @@ public class ManagerController {
 			schemeFile = (String) map.get("path");
 			// 报错
 			// 输入：流程模型文件、部署方案文件（选择的方案路径）
-			BackNodeInfoForSpb.writeBackDeployScheme(workModeFilePath, schemeFile);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
+			try {
+				ExternalIOTransUtils.writeBackDeployScheme(workModeFilePath, schemeFile);
+			} catch (Exception e) {
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		System.out.println("0000000::");
 
 	}
 
@@ -897,6 +897,7 @@ public class ManagerController {
 
 	/**
 	 * 获取修改BSP下拉列表内容
+	 * 
 	 * @return
 	 */
 	@ResponseBody
@@ -924,32 +925,32 @@ public class ManagerController {
 
 	/**
 	 * 项目流程导出
+	 * 
 	 * @param request
 	 * @param response
 	 * @param params
 	 */
-    @PostMapping("/createZipFile")
-    public void createZipFile(HttpServletRequest request,
-                              HttpServletResponse response,
-							  @RequestBody Map<String, Object> params) {
-        try {
-        	String projectId = (String) params.get("projectId");
+	@PostMapping("/createZipFile")
+	public void createZipFile(HttpServletRequest request, HttpServletResponse response,
+			@RequestBody Map<String, Object> params) {
+		try {
+			String projectId = (String) params.get("projectId");
 			String processId = (String) params.get("processId");
 
-            byte[] data = managerService.createZip(projectId, processId);
+			byte[] data = managerService.createZip(projectId, processId);
 
-            String zipFileName = (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date()) + ".zip";
-            response.reset();
-            response.setHeader("Content-Disposition", String.format("attachment; filename=%s.zip", zipFileName));
-            response.setHeader("FileName", zipFileName);
-            response.setHeader("Content-Length", "" + data.length);
-            response.setContentType("application/octet-stream; charset=UTF-8");
+			String zipFileName = (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date()) + ".zip";
+			response.reset();
+			response.setHeader("Content-Disposition", String.format("attachment; filename=%s.zip", zipFileName));
+			response.setHeader("FileName", zipFileName);
+			response.setHeader("Content-Length", "" + data.length);
+			response.setContentType("application/octet-stream; charset=UTF-8");
 
-            IoUtil.write(response.getOutputStream(), Boolean.TRUE, data);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+			IoUtil.write(response.getOutputStream(), Boolean.TRUE, data);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * @Title: importProjectZipUpload
@@ -962,7 +963,7 @@ public class ManagerController {
 	@ResponseBody
 	@PostMapping(path = "/importProjectZipUpload", consumes = { "multipart/mixed", "multipart/form-data" })
 	public R importProjectZipUpload(@RequestParam(value = "file", required = false) MultipartFile ufile,
-							@RequestParam(value = "projectId", required = false) String projectId) {
+			@RequestParam(value = "projectId", required = false) String projectId) {
 		return new R<>(managerService.analysisZipFile(ufile, projectId));
 	}
 }
