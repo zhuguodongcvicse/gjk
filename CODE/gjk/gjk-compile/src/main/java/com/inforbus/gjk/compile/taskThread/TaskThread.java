@@ -40,7 +40,7 @@ public class TaskThread extends Thread {
     @Override
     public void run() {
         synchronized (compileQueue) {
-            while (!stop) {
+            while (!Thread.currentThread().isInterrupted() && !stop) {
                 Task task = compileQueue.poll();//拿出任务
                 if (task != null) {
                     try {
