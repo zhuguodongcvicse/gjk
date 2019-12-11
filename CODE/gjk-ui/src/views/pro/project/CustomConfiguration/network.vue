@@ -132,6 +132,7 @@ export default {
       // this.$refs.networkParam.echo(netWorkIn)
     },
     handleClick(node){
+        console.log(node)
       for (let key in node.data.attributeMap) {
         if('configureType'!==key){
           if(key == 'name'){
@@ -197,9 +198,10 @@ export default {
     updateData(data){
       let index = this.xmlEntityMaps.indexOf(this.node);
       //取出改变的对象
-      let entity = this.xmlEntityMaps[index].data
-      var object = new Object();
-      object = entity
+      let test = JSON.parse(JSON.stringify(this.xmlEntityMaps[index].data));
+      console.log(1111,test)
+      let entity = JSON.parse(JSON.stringify(this.xmlEntityMaps[index].data));
+
       for (let key in this.formLabelAlign) {
         if(key.indexOf("_")!=-1){
           let keys = key.split("_")
@@ -209,6 +211,7 @@ export default {
               for (let k = 0; k < configureType.attrs.length; k++) {
                 const element = configureType.attrs[k];
                 if(keys[1]==element.attrName||keys[1]==element.attrMappingName){
+                  console.log(JSON.parse(JSON.stringify(entity)));
                   entity.xmlEntityMaps[i].attributeMap[keys[1]] = this.formLabelAlign[key]
                 }
               }
@@ -216,10 +219,9 @@ export default {
           }
         }else{
           if(key != 'name'){
-            entity.attributeMap[key] = this.formLabelAlign[key]
+            // entity.attributeMap[key] = this.formLabelAlign[key]
           }else{
             if(this.nameSelectOptions != undefined){
-              console.log(data)
               entity.attributeMap.compId = data
               var params
               for (let i = 0; i < this.nameOptions.length; i++) {
@@ -229,8 +231,8 @@ export default {
                   params = element.data
                 }
               }
-              for(let key in params){
-                entity.attributeMap[key] = params[key]
+              for(let key1 in params){
+                entity.attributeMap[key1] = params[key1]
               }
               this.nameSelectOptions = undefined
               break
@@ -238,7 +240,9 @@ export default {
           }
         }
       }
+      console.log(111,entity)
       this.xmlEntityMaps[index].data = entity
+      console.log(222,JSON.parse(JSON.stringify(this.xmlEntityMaps[index].data)))
       let xmlEntityMaps = this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps
       for (let i = 0; i < xmlEntityMaps.length; i++) {
         const element = xmlEntityMaps[i];
@@ -250,6 +254,7 @@ export default {
           }
           element.xmlEntityMaps = entityMaps
           this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps[i] = element
+            console.log(this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps[i])
         }
       }
       // for (let key in this.formLabelAlign) {
