@@ -58,5 +58,6 @@ const getters = {
   closeRouter : state => state.closeRouter,
   projectTreeShow : state => state.projectTreeShow.projectTreeShow,
   cacheHeaderValueParams : state => state.comp.cacheHeaderValueParams,
+  hardwarelibObj : state => state.hardwarelibObj.hardwarelibObj,
 }
 export default getters

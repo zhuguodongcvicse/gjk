@@ -602,6 +602,8 @@
     }
 
     Q.Graph.prototype.toJSON = Q.Graph.prototype.exportJSON = function (toString, options) {
+      // console.log("toString",toString)
+      // console.log("options",options)
         options = options || {};
         var json = this.graphModel.toJSON(options.filter);
         json.scale = this.scale;

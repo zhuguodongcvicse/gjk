@@ -4,10 +4,10 @@ import router from '@/router/router.js'
  * 组件computed: { ...mapGetters(["tagWel", "tagList", "tag", "website"]) },
  * 声明var tag1 = this.tag
  * 调用menuTag(this.$route.path, "remove", this.tagList, tag1);
- * @param {当前路由的url} value 
- * @param {"remove"} action 
- * @param {store中取} tagList 
- * @param {store中取} tag1 
+ * @param {当前路由的url} value
+ * @param {"remove"} action
+ * @param {store中取} tagList
+ * @param {store中取} tag1
  */
 export function menuTag(value, action, tagList, tag1) {
   let tagUrl = urlStr(tag1.value)
@@ -39,7 +39,13 @@ function findTag(value, tagList) {
   return { tag: tag, key: key };
 }
 function urlStr(oldUrl) {
-  let newUrl = oldUrl.slice(0, oldUrl.indexOf('?'))
+  let ifHaveArgs = oldUrl.indexOf('?')
+  let newUrl
+  if (ifHaveArgs === -1) {
+    newUrl = oldUrl.slice(0, oldUrl.length)
+  } else {
+    newUrl = oldUrl.slice(0, oldUrl.indexOf('?'))
+  }
   return newUrl
 }
 function openTag(item) {

@@ -635,7 +635,7 @@ public class ManagerController {
 	}
 
 	/**
-	 * 保存硬件建模
+	 * 保存硬件建模芯片
 	 *
 	 * @param chipsfromhardwarelibs
 	 */
