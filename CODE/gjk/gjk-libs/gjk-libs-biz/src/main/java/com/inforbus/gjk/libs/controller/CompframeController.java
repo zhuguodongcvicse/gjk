@@ -30,6 +30,10 @@ import lombok.AllArgsConstructor;
 
 import java.util.Map;
 
+import javax.validation.Valid;
+
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -119,7 +123,7 @@ public class CompframeController {
 	 */
 	@ResponseBody
 	@PostMapping(path = "/saveCompFrame", consumes = { "multipart/mixed", "multipart/form-data" })
-	public R saveCompFrame(@RequestParam(value = "files", required = false) MultipartFile[] ufile,
+	public R saveCompFrame(@RequestParam(value = "files", required = false) MultipartFile ufile,
 			@RequestParam(value = "dataParams", required = false) String dataParams) {
 		Map<String, Object> resMap = Maps.newHashMap();
 		resMap.putAll(JSONUtil.parseObj(dataParams));
@@ -127,7 +131,8 @@ public class CompframeController {
 	}
 	@SysLog("修改构件框架库")
 	@PostMapping("/compframeToTree")
-	public R compframeToTree(@RequestBody Compframe compframe) {
+	@Cacheable(value = "compframe_tree", key = "#compframe.id")
+	public R compframeToTree(@Valid @RequestBody Compframe compframe) {
 		return new R<>(TreeUtil.buildByLoop(compframeService.compframeToTree(compframe), "-1"));
 	}
 }

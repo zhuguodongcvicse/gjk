@@ -663,7 +663,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		detdirs.setFileName("图标文件");
 		detdirs.setFileType("imgfile");
 		detdirs.setFilePath(compUserFilePath + File.separator + userName + File.separator + comp.getCompId()
-				+ File.separator + comp.getVersion() + File.separator);
+				+ File.separator + createTime.replaceAll("[[\\s-T:punct:]]", "")  + File.separator);
 		detdirs.setParaentId(comp.getId());
 		detdirs.setVersion(comp.getVersion());
 		// 保存文件数据
@@ -1051,7 +1051,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 					return new R<>(new NullPointerException("构件模型XML文件 does not exist"));
 				}
 			}
-			UploadFilesUtils.NioToCopyFile(framePath, saveDir);
+			UploadFilesUtils.NioToCopyFile(framePath, saveDir + File.separator + frameName);
 			if (StringUtils.isEmpty(saveDir)) {
 				logger.error("saveDir is null");
 				return new R<>(new NullPointerException("saveDir is null"));
