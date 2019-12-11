@@ -228,8 +228,42 @@ export default {
       .then(val => {
         this.processName = val.data.data.fileName;
         this.flowId = val.data.data.flowId;
+        console.log("获取流程名获取流程名获取流程名获取流程名")
       })
       .then(Response => {
+                  getProcessFilePathById(this.$route.query.proId).then(val => {
+                    let selectComponent = [];
+                    if (val.data.data != null) {
+                    for (let item of val.data.data) {
+                        let selectComp = {};
+                        selectComp.label = item.compName;
+                        selectComp.value = item.functionName;
+                        selectComp.rightShowName = item.compId;
+                        selectComp.rightName = item.compId;
+                        selectComp.functionName = item.functionName;
+                        selectComp.compId = item.compId;
+                        selectComponent.push(selectComp);
+                        //给起始构件下拉选赋值
+                        this.selectComponent = selectComponent;
+                      }
+                    console.log("11111111111111111111111111111",this.selectComponent)
+                    //处理处理属性是否显示及中英文映射
+                    let vals = this.analysisAttrConfigType(items.xmlEntityMaps);
+                    //处理多个属性名的值
+                    let a = [];
+                    for (let val of vals) {
+                      tmpVal = JSON.parse(JSON.stringify(val));
+                      a.push(val.lableName);
+                    }
+                      //设置下拉框的值
+                      tmpVal.dataKey = selectComponent;
+                      tmpVal.lableName = a;
+                      //设置特殊处理的值
+                      this.$set(selectVal, items.lableName, tmpVal);
+                    } else {
+                      this.$message.error("缺少流程配置文件，请先配置流程。");
+                    }
+                  });
         //map
         // getSysConfigXmlEntityMap(this.$route.query.proId).then(Response => {
           rollbackDispose(this.$route.query.proId).then(Response => {
@@ -272,38 +306,7 @@ export default {
                   this.baseSpecalHandle = items.xmlEntityMaps[0];
                   this.baseSpecalHandles.push(items);
 
-                  getProcessFilePathById(this.$route.query.proId).then(val => {
-                    let selectComponent = [];
-                    if (val.data.data != null) {
-                    for (let item of val.data.data) {
-                        let selectComp = {};
-                        selectComp.label = item.compName;
-                        selectComp.value = item.functionName;
-                        selectComp.rightShowName = item.compId;
-                        selectComp.rightName = item.compId;
-                        selectComp.functionName = item.functionName;
-                        selectComp.compId = item.compId;
-                        selectComponent.push(selectComp);
-                        //给起始构件下拉选赋值
-                        this.selectComponent = selectComponent;
-                      }
-                    //处理处理属性是否显示及中英文映射
-                    let vals = this.analysisAttrConfigType(items.xmlEntityMaps);
-                    //处理多个属性名的值
-                    let a = [];
-                    for (let val of vals) {
-                      tmpVal = JSON.parse(JSON.stringify(val));
-                      a.push(val.lableName);
-                    }
-                      //设置下拉框的值
-                      tmpVal.dataKey = selectComponent;
-                      tmpVal.lableName = a;
-                      //设置特殊处理的值
-                      this.$set(selectVal, items.lableName, tmpVal);
-                    } else {
-                      this.$message.error("缺少流程配置文件，请先配置流程。");
-                    }
-                  });
+
                 }
               }
             }
@@ -438,18 +441,6 @@ export default {
 
     //存软硬件映射信息
     handleSavePro() {
-        // 判断页面上是否有显示的内容 没有的话结束保存处理
-        let bool = true
-        for(let item of this.form.xmlEntityMaps){
-            if(this.analysisConfigureType(item).lableType === 'form'){
-                bool = false
-            }
-        }
-        if(bool){
-            return
-        }
-
-        // 保存处理中...
       const loading = this.$loading({
         lock: true,
         text: "保存软硬件映射信息中。。。",
