@@ -1,5 +1,5 @@
 <template>
-  <div id="container" class="pro_project_tree_14s">
+  <div id="container" class="">
     <!-- 当前项目 -->
     <div class="project_tree_14s">
       <img src="/img/theme/night/logo/proImg.png" ondragstart="return false;" />
@@ -31,7 +31,7 @@
       ></el-tree>
 
       <!-- 右键菜单 -->
-      <div class="rightmenu" id="projectRightMenu" @mouseleave="changeCount()" style="width: 130px">
+      <!-- <div class="rightmenu" id="projectRightMenu" @mouseleave="changeCount()" style="width: 130px">
         <div class="menu">
           <a v-for="item in menus" :key="item" @click="nodeContextmenuClick(item)">
             <div class="command">
@@ -39,9 +39,22 @@
             </div>
           </a>
         </div>
-      </div>
+      </div>-->
     </div>
-
+    <!-- 右键菜单 -->
+    <div
+      v-if="contextmenuFlag"
+      class="avue-tags__contentmenu rightmenu"
+      :style="{left:contentmenuX+'px',top:contentmenuY+'px'}"
+      @mouseleave="changeCount()"
+    >
+      <div
+        class="item"
+        v-for="item in menus"
+        :key="item"
+        @click="nodeContextmenuClick(item)"
+      >{{item}}</div>
+    </div>
     <!-- 添加流程 -->
     <add-procedure
       :temp_currProject="temp_currProject"
@@ -144,7 +157,6 @@
   </div>
 </template>
 <script>
-import $ from "jquery";
 import { mapGetters } from "vuex";
 import {
   updateBaseTemplateIDs,
@@ -192,6 +204,10 @@ export default {
         networkTempId: "",
         hsmTempId: ""
       },
+
+      contentmenuX: "",
+      contentmenuY: "",
+      contextmenuFlag: false,
 
       isUpdataTemp: false,
       isUploadBTN: false, //上传文件夹弹窗
@@ -249,7 +265,8 @@ export default {
   methods: {
     changeCount() {
       setTimeout(() => {
-        $("#projectRightMenu").hide();
+        this.contextmenuFlag = false;
+        // $("#projectRightMenu").hide();
       }, 500);
     },
 
@@ -286,11 +303,11 @@ export default {
           // console.log("err: ", err);
         });
     },
-    changeHeight() {
-      let height = document.body.clientHeight;
-      $("#container").css({ height: height - 50 + "px" });
-      $(".tree-container").css({ height: height - 220 + "px" });
-    },
+    // changeHeight() {
+    //   let height = document.body.clientHeight;
+    //   $("#container").css({ height: height - 50 + "px" });
+    //   $(".tree-container").css({ height: height - 220 + "px" });
+    // },
     initTreeCard() {
       // let that = this
       // let container = document.getElementById('container')
@@ -367,10 +384,12 @@ export default {
         setTimeout(() => {
           loading.close();
         }, 2000);
-        $("#projectRightMenu").hide();
+        // $("#projectRightMenu").hide();
+         this.contextmenuFlag = false;
       } else if (item == "修改软件框架") {
         this.softwareDialogVisible = true;
-        $("#projectRightMenu").hide();
+        // $("#projectRightMenu").hide();
+         this.contextmenuFlag = false;
       } else if (item == "修改BSP") {
         this.bspDialogVisible = true;
       } else if (item == "APP组件工程生成") {
@@ -442,7 +461,8 @@ export default {
             });
           });
         }
-        $("#projectRightMenu").hide();
+        // $("#projectRightMenu").hide();
+         this.contextmenuFlag = false;
       } else if (item == "添加流程") {
         this.addProcedureDialogVisible = true;
       } else if (item == "申请构件") {
@@ -523,7 +543,8 @@ export default {
           processId: this.currentNodeData.id
         };
         createZipFile(param);
-        $("#projectRightMenu").hide();
+        // $("#projectRightMenu").hide();
+         this.contextmenuFlag = false;
       }
     },
     findTargetNode(currentNodeObj, targetNodeObj) {
@@ -608,12 +629,16 @@ export default {
       } else {
         this.menus = [];
       }
-      $("#projectRightMenu")
-        .css({
-          top: event.y - 248
-        })
-        .show();
-      // }
+      // $("#projectRightMenu")
+      //   .css({
+      //     top: event.y - 248
+      //   })
+      //   .show();
+      // // }
+      this.contentmenuX = event.clientX;
+      this.contentmenuY = event.clientY;
+      this.contextmenuFlag = true;
+      console.log("");
     },
     handleNodeClick(data) {
       //根据 . 判断是否是文件 待确认
@@ -663,7 +688,8 @@ export default {
             });
           }
         }
-        $("#projectRightMenu").hide();
+        // $("#projectRightMenu").hide();
+         this.contextmenuFlag = false;
         // this.showProjects = false
       }
       this.$emit(
@@ -891,36 +917,42 @@ export default {
           if (Response.data.data == -1) {
             this.$message.warning("上传的压缩包内容错误，请重新选择文件上传。");
           } else {
-              this.$confirm("导入流程可能会产生以下结果：<br>" +
-                  "&nbsp;&nbsp;&nbsp;&nbsp;1. 替换项目引用的模板<br>" +
-                  "&nbsp;&nbsp;&nbsp;&nbsp;2. 可能会覆盖构件库文件<br>" +
-                  "&nbsp;&nbsp;&nbsp;&nbsp;3. 可能会覆盖BSP库文件<br>" +
-                  "&nbsp;&nbsp;&nbsp;&nbsp;4. 可能会覆盖软件框架文件<br>" +
-                  "&nbsp;&nbsp;&nbsp;&nbsp;5. 构件库版本可能会有重复<br>" +
-                  "&nbsp;&nbsp;&nbsp;&nbsp;6. 构件库数据可能会被覆盖<br>" +
-                  "&nbsp;&nbsp;&nbsp;&nbsp;7. 结构体数据可能会被覆盖<br>" +
-                  "&nbsp;&nbsp;&nbsp;&nbsp;8. 字典数据可能会被覆盖<br>" +
-                  "&nbsp;&nbsp;&nbsp;&nbsp;9. 芯片数据可能会被覆盖<br>" +
-                  "&nbsp;&nbsp;&nbsp;&nbsp;10.硬件建模数据可能会被覆盖<br><br>" +
-                  "是否确认导入?", "提示", {
-                  dangerouslyUseHTMLString: true,
-                  confirmButtonText: "确定",
-                  cancelButtonText: "取消",
-                  type: "warning"
-              }).then(data => {
-                  let params = new FormData();
-                  params.append("file", this.importProjectFileList[0]);
-                  params.append("projectId", this.currentNodeData.id);
-                  importProjectZipUpload(params).then(Response => {
-                      if (Response.data.data == -1) {
-                          this.$message.warning("上传的压缩包内容错误，请重新选择文件上传。");
-                      } else {
-                          this.$message.success("导入成功。");
-                          this.getProjects();
-                          this.closeImportProjectDialog();
-                      }
-                  });
+            this.$confirm(
+              "导入流程可能会产生以下结果：<br>" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;1. 替换项目引用的模板<br>" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;2. 可能会覆盖构件库文件<br>" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;3. 可能会覆盖BSP库文件<br>" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;4. 可能会覆盖软件框架文件<br>" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;5. 构件库版本可能会有重复<br>" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;6. 构件库数据可能会被覆盖<br>" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;7. 结构体数据可能会被覆盖<br>" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;8. 字典数据可能会被覆盖<br>" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;9. 芯片数据可能会被覆盖<br>" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;10.硬件建模数据可能会被覆盖<br><br>" +
+                "是否确认导入?",
+              "提示",
+              {
+                dangerouslyUseHTMLString: true,
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning"
+              }
+            ).then(data => {
+              let params = new FormData();
+              params.append("file", this.importProjectFileList[0]);
+              params.append("projectId", this.currentNodeData.id);
+              importProjectZipUpload(params).then(Response => {
+                if (Response.data.data == -1) {
+                  this.$message.warning(
+                    "上传的压缩包内容错误，请重新选择文件上传。"
+                  );
+                } else {
+                  this.$message.success("导入成功。");
+                  this.getProjects();
+                  this.closeImportProjectDialog();
+                }
               });
+            });
           }
         });
       }

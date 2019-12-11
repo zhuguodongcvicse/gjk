@@ -1,11 +1,24 @@
 <template>
-  <el-dialog class="libs_bsp_storageapply_14s" title="bsp入库" :visible.sync="dialog" width="30%" :before-close="handleClose">
+  <el-dialog
+    class="libs_bsp_storageapply_14s"
+    title="bsp入库"
+    :visible.sync="dialog"
+    width="30%"
+    :before-close="handleClose"
+  >
     <el-container>
       <el-header style="font-size:16px;text-align:center">
         <span>是否将以下bsp入库及相关文件提交入库？</span>
       </el-header>
       <el-main>
-        <el-form size="mini" label-position="right" label-width="120px" ref="form" :model="form" :rules="projectRules">
+        <el-form
+          size="mini"
+          label-position="right"
+          label-width="120px"
+          ref="form"
+          :model="form"
+          :rules="projectRules"
+        >
           <el-form-item label="请选择审批人" prop="applyUser">
             <el-select v-model="form.applyUser" placeholder="请选择">
               <el-option
@@ -71,11 +84,11 @@ export default {
       //具有审批权限的用户，用于选择审批人
       applyUserSelect: [],
       form: {
-          //所选择的的审批人
-          applyUser: "",
-      }  ,
+        //所选择的的审批人
+        applyUser: ""
+      },
       projectRules: {
-          applyUser: [{ required: true, message: "请选择", trigger: "change" }],
+        applyUser: [{ required: true, message: "请选择", trigger: "change" }]
       }
     };
   },
@@ -120,76 +133,78 @@ export default {
     },
     //提交入库的方法
     storageApplyBsp() {
-        this.$refs.form.validate((valid, object) => {
-            if (valid) {
-                let approval = {};
-                approval.userId = this.userInfo.userId;
-                approval.applyId = this.bspItemMsg.id;
-                approval.applyType = "1";
-                approval.libraryType = "5";
-                approval.approvalState = "0";
-                if (this.form.applyUser != "") {
-                    approval.applyUserId = this.form.applyUser;
-                }
-                //如果审批状态是未提交或为空，提交审批记录
-                if (
-                    this.bspItemMsg.applyState == "0" ||
-                    this.bspItemMsg.applyState == null
-                ) {
-                    //提交记录到审批管理库
-                    saveApproval(approval).then(Response => {
-                        let bsp = {};
-                        bsp.id = this.bspItemMsg.id;
-                        bsp.applyState = "1";
-                        bsp.applyDesc = "已提交申请，请等待库管理员审批";
-                        //修改bsp审批状态成已提交申请
-                        putObj(bsp).then(Response => {
-                            this.$message({
-                                message: "已提交申请，请等待库管理员审批",
-                                type: "success"
-                            });
-                        });
-                    });
-                    //如果申请状态为被驳回，可以再次提交审批
-                } else if (this.bspItemMsg.applyState == "3") {
-                    let bsp = {};
-                    bsp.id = this.bspItemMsg.id;
-                    bsp.applyState = "4";
-                    bsp.applyDesc = "已提交申请，请等待库管理员审批";
-                    //修改状态成被驳回后提交申请
-                    putObj(bsp).then(Response => {
-                        getIdByApplyId(this.bspItemMsg.id).then(Response => {
-                            let modifyApply = {};
-                            modifyApply.id = Response.data.data.id;
-                            modifyApply.approvalState = "4";
-                            modifyApply.description =
-                                "前次申请被驳回理由：" + this.bspItemMsg.applyDesc;
-                            //将前次被驳回理由当做审批备注，修改审批记录
-                            approvalPutObj(modifyApply).then(Response => {
-                                this.$message({
-                                    message: "已提交申请，请等待库管理员审批",
-                                    type: "success"
-                                });
-                            });
-                        });
-                    });
-                    //如果申请状态为已提交，不可以提交审批
-                } else if (this.bspItemMsg.applyState == "1") {
-                    this.$message({
-                        message: "该bsp已提交审批，请勿重复提交！",
-                        type: "warning"
-                    });
-                    //如果申请状态为审批已通过，不可以提交审批
-                } else if (this.bspItemMsg.applyState == "2") {
-                    this.$message({
-                        message: "该bsp已通过审批！",
-                        type: "warning"
-                    });
-                }
-                this.reload();
+      this.$refs.form.validate((valid, object) => {
+        if (valid) {
+          let approval = {};
+          approval.userId = this.userInfo.userId;
+          approval.applyId = this.bspItemMsg.id;
+          approval.applyType = "1";
+          approval.libraryType = "5";
+          approval.approvalState = "0";
+          if (this.form.applyUser != "") {
+            approval.applyUserId = this.form.applyUser;
+          }
+          //如果审批状态是未提交或为空，提交审批记录
+          if (
+            this.bspItemMsg.applyState == "0" ||
+            this.bspItemMsg.applyState == null
+          ) {
+            //提交记录到审批管理库
+            saveApproval(approval).then(Response => {
+              let bsp = {};
+              bsp.id = this.bspItemMsg.id;
+              bsp.applyState = "1";
+              bsp.applyDesc = "已提交申请，请等待库管理员审批";
+              //修改bsp审批状态成已提交申请
+              putObj(bsp).then(Response => {
+                this.$message({
+                  message: "已提交申请，请等待库管理员审批",
+                  type: "success"
+                });
                 this.dialogStateShow(false);
-            }
-        })
+              });
+            });
+            //如果申请状态为被驳回，可以再次提交审批
+          } else if (this.bspItemMsg.applyState == "3") {
+            let bsp = {};
+            bsp.id = this.bspItemMsg.id;
+            bsp.applyState = "4";
+            bsp.applyDesc = "已提交申请，请等待库管理员审批";
+            //修改状态成被驳回后提交申请
+            putObj(bsp).then(Response => {
+              getIdByApplyId(this.bspItemMsg.id).then(Response => {
+                let modifyApply = {};
+                modifyApply.id = Response.data.data.id;
+                modifyApply.approvalState = "4";
+                modifyApply.description =
+                  "前次申请被驳回理由：" + this.bspItemMsg.applyDesc;
+                //将前次被驳回理由当做审批备注，修改审批记录
+                approvalPutObj(modifyApply).then(Response => {
+                  this.$message({
+                    message: "已提交申请，请等待库管理员审批",
+                    type: "success"
+                  });
+                  this.dialogStateShow(false);
+                });
+              });
+            });
+            //如果申请状态为已提交，不可以提交审批
+          } else if (this.bspItemMsg.applyState == "1") {
+            this.$message({
+              message: "该bsp已提交审批，请勿重复提交！",
+              type: "warning"
+            });
+            this.dialogStateShow(false);
+            //如果申请状态为审批已通过，不可以提交审批
+          } else if (this.bspItemMsg.applyState == "2") {
+            this.$message({
+              message: "该bsp已通过审批！",
+              type: "warning"
+            });
+            this.dialogStateShow(false);
+          }
+        }
+      });
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）

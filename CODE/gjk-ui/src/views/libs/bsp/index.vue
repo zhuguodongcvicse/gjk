@@ -148,8 +148,8 @@
               </el-form-item>
             </el-form>
           </el-dialog>
-          <br>
-          <br>
+          <br />
+          <br />
         </template>
         <template slot-scope="scope" slot="menu">
           <!-- <el-button
@@ -572,8 +572,8 @@ export default {
       this.getList();
     },
 
-    storageApplyDialogState() {
-      this.storageApplyDialog = false;
+    storageApplyDialogState(state) {
+      this.storageApplyDialog = state;
       this.reload();
     },
 
