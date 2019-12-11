@@ -93,22 +93,24 @@
 
             </el-table>
             <div v-if="hardwareLibData.length === 0">
-              <el-scrollbar
-                wrapClass="scrollbar-wrap"
-                :style="{height: '100%'}"
-                ref="scrollbarContainer">
-                <div style="height:570px;overflow-y:auto">
-                  <el-tree
-                    v-if="isComp===true"
-                    ref="tree"
-                    :data="compTreeData"
-                    :default-expand-all="true"
-                    :check-on-click-node="true"
-                    @check-change="handleCheckChange"
-                  ></el-tree>
+                <div v-if="isComp">
+                    <el-scrollbar
+                        wrapClass="scrollbar-wrap"
+                        :style="{height: '100%'}"
+                        ref="scrollbarContainer">
+                        <div style="height:570px;overflow-y:auto">
+                        <el-tree
+                            v-if="isComp===true"
+                            ref="tree"
+                            :data="compTreeData"
+                            :default-expand-all="true"
+                            :check-on-click-node="true"
+                            @check-change="handleCheckChange"
+                        ></el-tree>
+                        </div>
+                    </el-scrollbar>
                 </div>
-              </el-scrollbar>
-              <span v-if="isComp===false">
+              <span v-if="!isComp">
               {{proCompIdListMsg}}
               <span v-for="(item,index) in proCompIdList" :key="index">
                 <el-tag>{{item.compName}}</el-tag>&nbsp;

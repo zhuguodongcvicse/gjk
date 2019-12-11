@@ -82,6 +82,7 @@
 				AND del_flag = #{compframe.delFlag}
 			</if>
 		</where>
+		ORDER BY version DESC
 	</select>
 	<!-- 保存关系 -->
 	<insert id="insertCompframePlatform">

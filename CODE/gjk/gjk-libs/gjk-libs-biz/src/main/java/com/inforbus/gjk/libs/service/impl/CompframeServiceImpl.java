@@ -26,11 +26,11 @@ import com.google.common.collect.Lists;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.R;
+import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.libs.api.dto.CompframeTree;
 import com.inforbus.gjk.libs.api.entity.Compframe;
 import com.inforbus.gjk.libs.mapper.CompframeMapper;
 import com.inforbus.gjk.libs.service.CompframeService;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -76,9 +76,9 @@ public class CompframeServiceImpl extends ServiceImpl<CompframeMapper, Compframe
 	 *      java.util.Map)
 	 */
 	@Override
-	public R<?> saveCompFrame(MultipartFile[] ufile, Map<String, Object> resMap) {
+	public R<?> saveCompFrame(MultipartFile ufile, Map<String, Object> resMap) {
 		R retR = new R();
-		Double version = 1.0;
+		double version = 1.0;
 		// 新增
 		if (StringUtils.isEmpty(resMap.get("frameId").toString())) {
 			List<Compframe> listsVersion = baseMapper
@@ -86,46 +86,38 @@ public class CompframeServiceImpl extends ServiceImpl<CompframeMapper, Compframe
 			version = listsVersion.size() == 0 ? version : listsVersion.get(0).getVersion() + 1.0;
 		} else {// 修改
 		}
-		List<String> lists = (List<String>) resMap.get("compSelectArray");
+		String fileName = "构件框架库_" + version;
+		String targetPathStr = new String(
+				(compframePath + resMap.get("filePath") + File.separator + version + File.separator + fileName)
+						.replace("/", File.separator));
 		if (ObjectUtils.isNotEmpty(ufile)) {
-			try {
-				String fileName = "构件框架库_" + version;
-				for (MultipartFile mfile : ufile) {
-
-					String fileShowName = fileName
-							+ mfile.getOriginalFilename().substring(mfile.getOriginalFilename().indexOf("/"));
-
-					String path = new String((compframePath + resMap.get("filePath") + File.separator + version
-							+ File.separator + fileShowName).replace("/", File.separator));
-					File uploadFile = null;
-					if (StringUtils.isNotEmpty(path)) {
-						uploadFile = new File(path);
-						if (!uploadFile.getParentFile().exists()) {
-							uploadFile.getParentFile().mkdirs();
-						}
-						uploadFile.createNewFile();
-					}
-					// 将上传文件保存到路径
-					if (uploadFile.exists()) {
-						uploadFile.delete();
-					}
-					mfile.transferTo(uploadFile);
-					JGitUtil.commitAndPush(path, "多个文件上传");
+			File uploadFile = null;
+			if (StringUtils.isNotEmpty(targetPathStr)) {
+				uploadFile = new File(targetPathStr);
+				if (!uploadFile.getParentFile().exists()) {
+					uploadFile.getParentFile().mkdirs();
 				}
-				Compframe frame = new Compframe(IdGenerate.uuid(), fileName, version,
-						resMap.get("filePath") + "/" + version + "/" + fileName, resMap.get("description").toString());
-				baseMapper.insertCompframe(frame);
-				for (String strpt : lists) {
-					baseMapper.insertCompframePlatform(frame.getId(), strpt);
-				}
-			} catch (IllegalStateException e) {
-				e.printStackTrace();
-				return new R<>(e);
-			} catch (IOException e) {
-				e.printStackTrace();
-				return new R<>(e);
 			}
-
+		}
+		Thread fileThread = new Thread() {
+			@Override
+			public void run() {
+				try {
+					UploadFilesUtils.decompression(ufile.getInputStream(), targetPathStr);
+					JGitUtil.commitAndPush(targetPathStr, "多个文件上传");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		fileThread.start();
+		Compframe frame = new Compframe(IdGenerate.uuid(), fileName, version,
+				resMap.get("filePath") + "/" + version + "/" + fileName, resMap.get("description").toString());
+		baseMapper.insertCompframe(frame);
+		@SuppressWarnings("unchecked")
+		List<String> lists = (List<String>) resMap.get("compSelectArray");
+		for (String strpt : lists) {
+			baseMapper.insertCompframePlatform(frame.getId(), strpt);
 		}
 		return retR;
 	}

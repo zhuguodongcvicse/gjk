@@ -141,14 +141,14 @@ export default {
                 if (this.form.applyUser != "") {
                     approval.applyUserId = this.form.applyUser;
                 }
-                console.log("2222222222222222222222222", this.compItemMsg, approval);
+                // console.log("2222222222222222222222222", this.compItemMsg, approval);
                 //如果审批状态是未提交或为空，提交审批记录
                 if (
                     this.compItemMsg.storageFlag == "0" ||
                     this.compItemMsg.storageFlag == null ||
                     this.compItemMsg.storageFlag == ""
                 ) {
-                    console.log("111111111111111111111111", approval);
+                    // console.log("111111111111111111111111", approval);
                     //提交记录到审批管理库
                     saveApproval(approval).then(Response => {
                         let comp = {};
@@ -161,6 +161,7 @@ export default {
                                 message: "已提交申请，请等待库管理员审批",
                                 type: "success"
                             });
+                            this.dialogStateShow(false);
                         });
                     });
                     //如果申请状态为被驳回，可以再次提交审批
@@ -183,6 +184,7 @@ export default {
                                     message: "已提交申请，请等待库管理员审批",
                                     type: "success"
                                 });
+                                this.dialogStateShow(false);
                             });
                         });
                     });
@@ -192,15 +194,15 @@ export default {
                         message: "该结构体已提交审批，请勿重复提交！",
                         type: "warning"
                     });
+                    this.dialogStateShow(false);
                     //如果申请状态为审批已通过，不可以提交审批
                 } else if (this.compItemMsg.storageFlag == "2") {
                     this.$message({
                         message: "该结构体已通过审批！",
                         type: "warning"
                     });
+                    this.dialogStateShow(false);
                 }
-                this.reload();
-                this.dialogStateShow(false);
             }
         })
     }

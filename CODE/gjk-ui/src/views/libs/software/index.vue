@@ -137,8 +137,8 @@
               </el-form-item>
             </el-form>
           </el-dialog>
-          <br>
-          <br>
+          <br />
+          <br />
         </template>
         <template slot-scope="scope" slot="menu">
           <!-- <el-button
@@ -320,7 +320,6 @@ export default {
     },
     //上传
     resumes(files) {
-      // console.log("files:", files);
       if (files.length == 0) {
         alert("请选择一个压缩文件（.zip）！！！");
       } else {
@@ -563,8 +562,8 @@ export default {
       this.getList();
     },
 
-    storageApplyDialogState() {
-      this.storageApplyDialog = false;
+    storageApplyDialogState(state) {
+      this.storageApplyDialog = state;
       this.reload();
     },
 

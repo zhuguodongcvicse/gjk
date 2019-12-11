@@ -36,9 +36,9 @@
           <!-- <el-button size="small">
             <i class="el-icon-download el-icon--left"></i>导出
           </el-button>-->
-          <!--<el-button size="small" @click="importComp" type="primary">
-            <i class="el-icon-upload el-icon&#45;&#45;left"></i>导入
-          </el-button>-->
+          <el-button size="small" @click="importComp" type="primary">
+            <i class="el-icon-upload el-icon--left"></i>导入
+          </el-button>
         </template>
         <template slot="version" slot-scope="scope">
           <el-tag>V{{parseFloat(scope.row.version).toFixed(1)}}</el-tag>
@@ -575,8 +575,9 @@ export default {
         });
       }
     },
-    batchStorageApplyDialogState() {
-      this.batchStorageApplyDialog = false;
+    batchStorageApplyDialogState(state) {
+      this.batchStorageApplyDialog = state;
+      this.reload();
     }
   },
   beforeRouteEnter(to, from, next) {

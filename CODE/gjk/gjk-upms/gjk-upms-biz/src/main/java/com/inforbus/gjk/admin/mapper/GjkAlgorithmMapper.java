@@ -4,6 +4,7 @@ package com.inforbus.gjk.admin.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.inforbus.gjk.admin.api.entity.GjkAlgorithm;
 import com.inforbus.gjk.admin.api.vo.AlgorithmVO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -29,4 +30,11 @@ public interface GjkAlgorithmMapper extends BaseMapper<GjkAlgorithm> {
 	 * 删除所有数据
 	 */
 	void deleteAll();
+
+	/**
+	 * 查询数据条数
+	 * @param id
+	 * @return
+	 */
+	int selectCountById(@Param("id") String id);
 }

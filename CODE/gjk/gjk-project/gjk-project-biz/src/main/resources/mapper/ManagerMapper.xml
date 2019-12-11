@@ -547,14 +547,14 @@
 	<select id="getHardwarelibsByFlowId" resultMap="hardwarelibs">
 		SELECT
 		<include refid="hardwarelibs" />
-		FROM gjk_hardwarelibs
-		WHERE flow_id = #{flowId}
+		FROM gjk_hardwarelibs h
+		WHERE h.flow_id = #{flowId}
 	</select>
 	<select id="getHardwarelibsById" resultMap="hardwarelibs">
 		SELECT
 		<include refid="hardwarelibs" />
-		FROM gjk_hardwarelibs
-		WHERE id = #{id}
+		FROM gjk_hardwarelibs h
+		WHERE h.id = #{id}
 	</select>
 
 	<!-- 保存硬件建模 -->

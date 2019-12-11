@@ -50,7 +50,9 @@
 		user_id,
 		backup_info,
 		apply_state,
-		apply_desc
+		apply_desc,
+		create_time,
+		update_time
 	</sql>
     <!-- 保存接口 -->
     <insert id="saveInf"
@@ -70,7 +72,9 @@
         #{hardwarelibInf.userId},
         #{hardwarelibInf.backupInfo},
         #{hardwarelibInf.applyState},
-        #{hardwarelibInf.applyDesc})
+        #{hardwarelibInf.applyDesc},
+        #{hardwarelibInf.createTime},
+        #{hardwarelibInf.updateTime})
     </insert>
     <!--hardwarelibInf简单分页查询-->
     <select id="getHardwarelibInfPage" resultMap="hardwarelibInfMap">
