@@ -722,6 +722,12 @@ export default {
         } else {
           toParam.attributeMap.configureType =
             formParam.attributeMap.configureType;
+          let params = deepClone(formParam.attributeMap);
+          for (let key in params) {
+            if (!toParam.attributeMap[key]) {
+              this.$set(toParam.attributeMap,key,formParam.attributeMap[key])
+            }
+          }
         }
         if (toParam.xmlEntityMaps.length > 0) {
           if (formParam.xmlEntityMaps.length === 1) {

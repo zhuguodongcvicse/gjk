@@ -56,7 +56,14 @@
         </uploader-files>
       </uploader>-->
       <el-form-item label="平台选择" label-width="90px" prop="compSelectArray">
-        <select-tree :treeData="compTreeData" multiple :id.sync="compFormParam.compSelectArray" />
+        <el-select v-model="compFormParam.compSelectArray" placeholder="请选择平台。。" multiple>
+          <el-option
+            v-for="item in compTreeData"
+            :key="item.id"
+            :label="item.label"
+            :value="item.id"
+          ></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="构件描述" label-width="90px">
         <el-input type="textarea" v-model="compFormParam.description" rows="3" placeholder="请添加描述"></el-input>
@@ -83,8 +90,8 @@ export default {
   name: "compAddframe",
   props: {
     itemValue: { type: Boolean, default: false }, //组件的值
-    uploaderkey: { type: Number, default: false }, //组件的值
-    frameId: { type: String, default: false } //组件的值
+    uploaderkey: { type: Number, default: 0 }, //组件的值
+    frameId: { type: String, default: "" } //组件的值
   },
   components: { "select-tree": selectTree },
   model: {

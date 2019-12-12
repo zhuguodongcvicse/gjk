@@ -47,6 +47,7 @@
 		struct_type,
 		data_length,
 		param_remarks,
+		storage_flag,
 		permission
 	</sql>
 
@@ -138,6 +139,7 @@
 		#{structlibs.structType},
 		#{structlibs.dataLength},
 		#{structlibs.paramRemarks},
+		#{structlibs.storageFlag},
 		#{structlibs.permission})
 	</insert>
 

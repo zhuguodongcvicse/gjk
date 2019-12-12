@@ -919,7 +919,7 @@
 	<select id="getSysDictByRemarksIn" resultMap="sysDictMap">
 		select *
 		from sys_dict
-		where remarks in #{remarks} and del_Flag != 1
+		where remarks in (#{remarks}) and del_Flag != 1
 	</select>
 	<select id="getSysDictById" resultMap="sysDictMap">
 		select *

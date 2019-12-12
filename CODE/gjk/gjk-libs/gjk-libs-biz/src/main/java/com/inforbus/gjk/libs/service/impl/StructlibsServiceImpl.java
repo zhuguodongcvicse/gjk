@@ -345,15 +345,11 @@ public class StructlibsServiceImpl extends ServiceImpl<StructlibsMapper, Structl
 
 		List<DictVO> dto = Lists.newArrayList();
 		for (Structlibs list : baseMapper
-				.selectList(Wrappers.<Structlibs>query().lambda().eq(Structlibs::getParentId, "0"))) {
-			DictVO vo = new DictVO();
-			vo.setValue(list.getId());
-			vo.setLabel(list.getDataType());
-			dto.add(vo);
-			DictVO vo1 = new DictVO();
-			vo1.setValue(list.getId() + "_*");
-			vo1.setLabel(list.getDataType() + "*");
-			dto.add(vo1);
+				.selectList(Wrappers.<Structlibs>query().lambda().eq(Structlibs::getParentId, "0")
+						.eq(Structlibs::getStorageFlag, "2").orderByDesc(Structlibs::getVersion))) {
+			dto.add(new DictVO(list.getId(), list.getDataType(), list.getSort().toString(), list.getVersion()));
+			dto.add(new DictVO(list.getId() + "_*", list.getDataType() + "*", list.getSort().toString(),
+					list.getVersion()));
 		}
 		return dto;
 	}

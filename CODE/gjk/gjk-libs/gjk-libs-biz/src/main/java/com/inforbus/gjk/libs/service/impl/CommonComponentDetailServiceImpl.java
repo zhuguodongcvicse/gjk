@@ -77,7 +77,7 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 		try {
 			// 格式：gjk/common/component/构件名/构件版本/ createTime.replaceAll("[[\\s-T:punct:]]", "") 
 			String compPath = "gjk" + File.separator + "common" + File.separator + "component" + File.separator
-					+ component.getCompId() + File.separator + component.getCreateTime().toString().replaceAll("[[\\s-T:punct:]]", "") + File.separator;
+					+ component.getCompId() + File.separator + component.getVersion() + File.separator;
 			String subStr = null;
 			for (CommonComponentDetail detail : commonComponentDetailList) {
 				if ("xml".equals(detail.getFileType())) {
@@ -87,13 +87,6 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 			}
 			for (CommonComponentDetail detail : commonComponentDetailList) {
 				String originalFileName = gitFilePath + detail.getFilePath() + File.separator + detail.getFileName();
-				System.out.println("originalFileName---- " + originalFileName);
-				System.out.println("compPath---- " + compPath);
-				System.out.println("detail.getFilePath()---- " + detail.getFilePath());
-				System.out.println("subStr---- " + subStr);
-				System.out.println("subStr.length()---- " + subStr.length());
-				System.out.println("detail.getFilePath().substring(subStr.length())---- "
-						+ detail.getFilePath().substring(subStr.length()));
 				detail.setFilePath(compPath + detail.getFilePath().substring(subStr.length()));
 				File originalFile = new File(originalFileName);
 				if (!originalFile.exists()) {
