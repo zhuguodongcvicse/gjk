@@ -138,10 +138,9 @@ export default {
                         putObj(element).then(Response => {})
                     }
                   }
+                  this.dialogStateShow(false);
                 })
               });
-              this.reload();
-              this.dialogStateShow(false);
             }
         })
     }

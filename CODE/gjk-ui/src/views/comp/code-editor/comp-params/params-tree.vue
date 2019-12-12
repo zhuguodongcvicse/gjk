@@ -85,7 +85,7 @@ import {
   findParent,
   getStrType
 } from "@/util/util";
-import { getStructTree, saveStructMap } from "@/api/libs/structlibs";
+import { getStructTree } from "@/api/libs/structlibs";
 import { Decipher } from "crypto";
 export default {
   //import引入的组件需要注入到对象中才能使用
@@ -705,10 +705,12 @@ export default {
         : nodeData.dbId;
       //给树赋值显示值
       attr.attributeMap.structType = nodeData.fparamType;
+      attr.attributeMap.paramRemarks = nodeData.paramRemarks;
       treeData.push(this.analysisMapping(attr));
       node["id"] = randomUuid(); //new Number(randomLenNum(5, false));
       node["lableName"] = attr.attributeMap.name;
       node["assigParamName"] = "";
+      node["paramRemarks"] = nodeData.paramRemarks;
       node["assigStructType"] = attr.attributeMap.structType;
       attr.xmlEntityMaps.forEach(xml => {
         if (xml.lableName === this.bllxParam) {
@@ -732,6 +734,7 @@ export default {
     getStructType(rows) {
       let id, name, numIndex;
       let strc = deepClone(this.structType);
+      console.log("structType", strc);
       rows.forEach(cols => {
         cols.forEach(col => {
           if (col.attrMappingName === this.nameParam) {
@@ -743,6 +746,7 @@ export default {
           }
         });
       });
+
       let struct, isok;
       isok = "shStruct";
       //去头文件中找结构体
@@ -771,6 +775,7 @@ export default {
       if (isok === "dbStruct") {
         //先去数据库找
         struct = strc.find(str => {
+          console.log("11111111111", str.dbId, id);
           return str.dbId === id.replace("_*", "");
         });
         if (struct !== undefined) {
@@ -798,14 +803,6 @@ export default {
         //TODO
         console.log("arrDataarrData", arrData);
         for (let key in arrData) {
-          // arrData[key].id = randomUuid();
-          // arrData[key].nodeData[0][0].lableName = arrData[key].lableName =
-          //   "[" + key + "]";
-          // //保存需要赋值的数据
-          // arrData[key].assigParamName = paramName.replace(
-          //   /\[[0-9]+\]/i,
-          //   "[" + key + "]"
-          // );
           dataVal.push(deepClone(arrData[key]));
         }
         // console.log("查询数据库返回表单元素", dataVal);
@@ -815,7 +812,7 @@ export default {
         this.$refs.tree.updateKeyChildren(this.aCheckedKeys[0], dataVal);
       } else {
         let typeParam = this.getStructType(params);
-        // console.log("typeParamtypeParam", typeParam);
+        console.log("测试结构体数据", typeParam);
         if (typeParam.isok === "shStruct") {
           let dataVal = [];
           //①父级结构体，
@@ -839,7 +836,7 @@ export default {
           getStructTree(typeParam.struct).then(r => {
             let nodes = {};
             nodes = this.getBaseXmlOptionDataTree(typeParam.struct);
-            // console.log("测试数据0111", nodes);
+            console.log("测试数据0111", nodes);
             this.$set(nodes, "children", []);
             //设置序号
             this.xmlTreeShowTabValues(
@@ -958,12 +955,16 @@ export default {
           //处理父级数据
           let treeParam = [];
           let variable = this.analysisMapping(deepClone(xml));
-          this.nameParam = variable[0].attrMappingName;
-          console.log("paramRemarks",variable)
-          //注釋
-          let paramRemarks =
-            variable[3] === undefined ? "" : variable[2].lableName;
           treeParam.push(variable);
+          let paramRemarks = "";
+          for (let item of variable) {
+            if (item.attrName == "name") {
+              this.nameParam = item.attrMappingName;
+            }
+            if (item.attrName == "paramRemarks") {
+              paramRemarks = item.lableName;
+            }
+          }
           // console.log("lableName", lableName,treeParam,xml);
           let regExp = /\w+\[[0-9]+\]/i;
           let xmlChild = xml.xmlEntityMaps;
@@ -1026,7 +1027,6 @@ export default {
               parent["paramRemarks"] = paramRemarks;
               parent["assigStructType"] = xml.attributeMap.structType;
               parent["tmpLength"] = Number(length);
-              parent["paramRemarks"] = paramRemarks;
               //设置children
               parent["children"] = [deepClone(parent)];
               arrayTmpMap.set(arrKey, parent);

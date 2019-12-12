@@ -151,10 +151,10 @@
                         this.dialogVisibleOfCloseRouter = false
                     }, 1000);
                 }
-                //this.$store.commit("IS_SAVE", "2");  
+                //this.$store.commit("IS_SAVE", "2");
             },
             menuTag(value, action) {
-                 console.log("value", value)
+                 // console.log("value", value)
                 // console.log("action", action)
                 if (value.split("?")[0] == "/comp/manager/process"){
                      this.$store.commit("IS_SAVE", "0");

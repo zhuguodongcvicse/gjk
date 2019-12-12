@@ -3,7 +3,28 @@
   <!--里面一层 -->
   <el-dialog title="文件选择" :visible.sync="innerVisible" width="40%">
     <el-form :model="compFormParam" ref="compForm" :rules="compFormParamRules">
-      <uploader :key="uploaderkey" ref="uploader" :autoStart="false" @file-success="onFileSuccess">
+      <el-form-item label="选择文件" label-width="90px" prop="fileName">
+        <el-input
+          v-model="compFormParam.fileName"
+          placeholder="请选择文件。。(文件编码格式为zip)"
+          readonly
+          @click.native="clickFileUploadEvent"
+        ></el-input>
+        <el-upload
+          hidden
+          action
+          :auto-upload="true"
+          :show-file-list="false"
+          :on-change="onchange"
+          :before-upload="beforeAvatarUpload"
+          :http-request="customFileUpload"
+        >
+          <el-button type="primary" ref="fileButton">
+            <i class="el-icon-folder"></i>
+          </el-button>
+        </el-upload>
+      </el-form-item>
+      <!-- <uploader :key="uploaderkey" ref="uploader" :autoStart="false" @file-success="onFileSuccess">
         <el-form-item
           label="文件选择"
           label-width="90px"
@@ -18,7 +39,6 @@
           <template slot-scope="filess">
             <avue-crud :data="filess.files" :option="uploadOption">
               <template slot="formatedSize" slot-scope="scope">{{printSize(scope.row.size)}}</template>
-              <!-- <template slot="status" slot-scope="scope">{{ scope.row.paused===true?"暂停":"还不知道"}}</template> -->
               <template slot-scope="scope" slot="menu">
                 <el-button
                   size="mini"
@@ -34,7 +54,7 @@
             </div>
           </template>
         </uploader-files>
-      </uploader>
+      </uploader>-->
       <el-form-item label="平台选择" label-width="90px" prop="compSelectArray">
         <select-tree :treeData="compTreeData" multiple :id.sync="compFormParam.compSelectArray" />
       </el-form-item>
@@ -72,16 +92,37 @@ export default {
     event: "change" //事件名随便定义。
   },
   data() {
+    var valiaFilePath = (rule, value, callback) => {
+      if (!this.isZIP) {
+        callback(new Error("上传文件格式只能是(ZIP)压缩文件。。。"));
+      } else {
+        callback();
+      }
+    };
     //这里存放数据
     return {
       uploadOption: uploadOption,
       innerVisible: false,
-      compFormParam: {},
+      isZIP: false,
+      uploadFile: {},
+      compFormParam: {
+        fileName: "",
+        compSelectArray: [],
+        description: ""
+      },
       compTreeData: [],
       //所选择的的审批人
       compFormParamRules: {
         compSelectArray: [
-          { required: true, message: "请选择所属平台", trigger: "change" }
+          { required: true, message: "请选择所属平台。。。", trigger: "change" }
+        ],
+        fileName: [
+          {
+            required: true,
+            message: "请选择文件压缩包。。。",
+            trigger: "change"
+          },
+          { validator: valiaFilePath, trigger: "change" }
         ]
       }
     };
@@ -104,13 +145,61 @@ export default {
   },
   //方法集合
   methods: {
+    //当上传图片后，调用onchange方法，获取图片本地路径
+    onchange(file, fileList) {
+      console.log("description", file.raw.name);
+      this.compFormParam.fileName = file.raw.name;
+    },
+    beforeAvatarUpload(file) {
+      const isZIP =
+        file.type === "application/x-zip-compressed" ||
+        file.type === "application/zip";
+      //设置名字
+      this.compFormParam.fileName = file.name;
+      //用于校验
+      this.isZIP = isZIP;
+      console.log("description", isZIP);
+      return isZIP;
+    },
+    customFileUpload(fileList) {
+      console.log("设置行文件（file）设置行文件（file）", fileList);
+      this.uploadFile = fileList.file; //设置行文件（file）
+    },
+    clickFileUploadEvent() {
+      this.$refs.fileButton.$el.click();
+    },
     //调用上传按钮
     clickFileUpload(formName) {
       this.$refs[formName].validate((valid, object) => {
         if (valid) {
           //调用fileUpload的click()事件
-          console.log(" this.$refs.fileUpload.$el", this.$refs.fileUpload)
-          this.$refs.fileUpload.$el.click();
+          let loading = this.$loading({
+            lock: true,
+            text: "正在保存构件框架。。。",
+            spinner: "el-icon-loading",
+            background: "rgba(0, 0, 0, 0.7)"
+          });
+          console.log("this.uploadFile", this.uploadFile);
+          let formData = new FormData();
+          formData.append("files", this.uploadFile);
+          this.$set(this.compFormParam, "filePath", "gjk/compframe");
+          if (!this.compFormParam.description) {
+            this.$set(this.compFormParam, "description", "");
+          }
+          if (!this.compFormParam.idle) {
+            this.$set(this.compFormParam, "frameId", "");
+          }
+          formData.append("dataParams", JSON.stringify(this.compFormParam));
+          saveCompFrame(formData).then(res => {
+            loading.close();
+            this.$message({
+              showClose: true,
+              message: "保存成功",
+              type: "success"
+            });
+            this.innerVisible = false;
+          });
+          // this.$refs.fileUpload.$el.click();
         }
       });
     },

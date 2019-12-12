@@ -35,7 +35,7 @@ Q.registerImage('ePort', 'images/InternetAccess.svg');
 
 // 子接收父参数
 function handleMessageFromParent(event) {
-	console.log("event.data.params", event.data)
+	// console.log("event.data.params", event.data)
 	switch (event.data.cmd) {
 		case 'getHardwarelibs':
 			caseArr = event.data.params[1];
@@ -70,8 +70,8 @@ function handleMessageFromParent(event) {
 					}
 				}
 			}
-			console.log("graphList", graphList)
-			console.log("linkGraphList", linkGraphList)
+			// console.log("graphList", graphList)
+			// console.log("linkGraphList", linkGraphList)
 			graphList.fJson = JSON.parse(JSON.stringify(graphList.fJson))
 			graphList.bJson = JSON.parse(JSON.stringify(graphList.bJson))
 			for (const i in caseArr) {
@@ -341,7 +341,7 @@ function ondropLoadJSON(evt, graph, center, options) {
   // graphList.fJson.push(frontjson)
   // graphList.bJson.push(bJsonObj)
   // console.log("caseList", caseList)
-  console.log("graphList", graphList)
+  // console.log("graphList", graphList)
   // console.log("graphList", graphList)
   //console.log('roots',roots)
   // console.log("result", result)
@@ -541,13 +541,33 @@ function initEditor(editor) {
   //保存
   var linkMap = new Map()
   var toolbarDiv = editor.toolbar;
-  var button = document.createElement('button');
+  var buttonOfSave = document.createElement('button');
+  var buttonOfDelete = document.createElement('button');
   var cpuNodeID = 0
   var frontCaseForDeployment
-  button.textContent = '机箱保存';
-  button.className = 'boarddesign_board_14s';
-  toolbarDiv.appendChild(button)
-  button.onclick = function (evt) {
+  buttonOfSave.textContent = '更新硬件建模';
+  buttonOfDelete.textContent = '清空硬件建模';
+  buttonOfSave.className = 'boarddesign_board_14s';
+  buttonOfDelete.className = 'boarddesign_board_14s';
+  toolbarDiv.appendChild(buttonOfDelete)
+  toolbarDiv.appendChild(buttonOfSave)
+  buttonOfDelete.onclick = function (evt) {
+    if (graph.name !== '正面视图') {
+      graph.name = '正面视图'
+      setEditable(true);
+    }
+    graphList.fJson = []
+    graphList.bJson = []
+    caseList = []
+    allChipToFlow = []
+    backAllCaseJsonTemp = undefined
+    linkList = []
+    linkGraphList = {datas: []}
+    ChipsWithIPs = []
+    caseID = -1
+    graph.clear()
+  }
+  buttonOfSave.onclick = function (evt) {
     var graphName = graph.name
     // console.log("graphName", graphName)
     if (graphName == null) {
@@ -563,6 +583,7 @@ function initEditor(editor) {
       //连线关系
       createLinkData()
       graphList.fJson = JSON.parse(JSON.stringify(graphList.fJson))
+      // console.log("graphList", graphList)
       var linkArr = Array.from(linkMap)
       var linkStr = JSON.stringify(linkArr)
       if (graphList.link === undefined) {
@@ -593,15 +614,15 @@ function initEditor(editor) {
         }
       }
       //创建连线
-      let edgejson = createEdgejson()
       for (const i in linkList) {
+        let edgejson = createEdgejson()
         linkList[i][0]._refId = '1' + parseInt(1500 * Math.random())
         linkList[i][1]._refId = '1' + parseInt(1500 * Math.random())
         edgejson.json.from._ref = parseInt(linkList[i][0]._refId)
         edgejson.json.to._ref = parseInt(linkList[i][1]._refId)
         // console.log("edgejson",edgejson)
         var linkGraphListStr = JSON.stringify(linkGraphList)
-        if (linkGraphListStr.indexOf(linkList[i][0].json.properties.uniqueId) == -1) {
+        if (linkGraphListStr.indexOf(linkList[i][0].json.properties.uniqueId) === -1) {
           linkGraphList.datas.push(linkList[i][0])
           linkGraphList.datas.push(linkList[i][1])
           linkGraphList.datas.push(edgejson)
@@ -629,23 +650,25 @@ function initEditor(editor) {
         setLinkList()
         // console.log("linkList", linkList)
         //删除连线
-        for (let i = 0; i < backAllCaseJsonTemp.datas.length; i++) {
-          if (backAllCaseJsonTemp.datas[i].json.properties == null) {
-            removeByValue(backAllCaseJsonTemp.datas, backAllCaseJsonTemp.datas[i])
-            i--
+        if (backAllCaseJsonTemp !== undefined) {
+          for (let i = 0; i < backAllCaseJsonTemp.datas.length; i++) {
+            if (backAllCaseJsonTemp.datas[i].json.properties == null) {
+              removeByValue(backAllCaseJsonTemp.datas, backAllCaseJsonTemp.datas[i])
+              i--
+            }
           }
         }
         //创建连线
-        let edgejson = createEdgejson()
         if (linkList.length != 0) {
           for (const i in linkList) {
+            let edgejson = createEdgejson()
             linkList[i][0]._refId = '1' + parseInt(1500 * Math.random())
             linkList[i][1]._refId = '1' + parseInt(1500 * Math.random())
             edgejson.json.from._ref = parseInt(linkList[i][0]._refId)
             edgejson.json.to._ref = parseInt(linkList[i][1]._refId)
             // console.log("edgejson",edgejson)
             var linkGraphListStr = JSON.stringify(linkGraphList)
-            if (linkGraphListStr.indexOf(linkList[i][0].json.properties.uniqueId) == -1) {
+            if (linkGraphListStr.indexOf(linkList[i][0].json.properties.uniqueId) === -1) {
               linkGraphList.datas.push(linkList[i][0])
               linkGraphList.datas.push(linkList[i][1])
               linkGraphList.datas.push(edgejson)
@@ -656,7 +679,7 @@ function initEditor(editor) {
         }
         //连线关系
         createLinkData()
-        console.log("linkMap", linkMap)
+        // console.log("linkMap", linkMap)
       }
       postMessageToVue()
       return
@@ -703,7 +726,7 @@ function initEditor(editor) {
                 //给部署图所需数据赋nodeid
                 for (const p in frontCaseForDeployment.datas) {
                   if (frontCaseForDeployment.datas[p].json.properties.chipName != null
-                    && frontCaseForDeployment.datas[p].json.properties.uniqueId == graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].uniqueId) {
+                    && frontCaseForDeployment.datas[p].json.properties.uniqueId === graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].uniqueId) {
                     frontCaseForDeployment.datas[p].json.properties.nodeID = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].nodeID
                     frontCaseForDeployment.datas[p].json.properties.IP = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].IP
                   }
@@ -729,8 +752,8 @@ function initEditor(editor) {
               for (const m in graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList) {
                 //如果存在未配置IP的芯片则弹出提示
                 if (graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList[m].IP == null || graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList[m].IP == '') {
-                  console.log("frontBoardList[k].chipList[m].IP", graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList[m].IP)
-                  console.log("graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList", graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList)
+                  // console.log("frontBoardList[k].chipList[m].IP", graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList[m].IP)
+                  // console.log("graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList", graphList.fJson[i].datas[j].json.properties.frontBoardList[k].chipList)
                   alert("存在未配置IP的芯片")
                   return false
                 }
@@ -745,27 +768,29 @@ function initEditor(editor) {
 
   //连线的接口放到数组，为绘画准备数据，同时放到map
   function setLinkList() {
-    for (const i in backAllCaseJsonTemp.datas) {
-      if (backAllCaseJsonTemp.datas[i].json.properties == null) {
-        for (const j in backAllCaseJsonTemp.datas) {
-          if (backAllCaseJsonTemp.datas[i].json.from._ref == backAllCaseJsonTemp.datas[j]._refId) {
-            // console.log("起始接口-机箱外部", backAllCaseJsonTemp.datas[j])
-            for (const k in backAllCaseJsonTemp.datas) {
-              if (backAllCaseJsonTemp.datas[k].json.properties != null && backAllCaseJsonTemp.datas[i].json.to._ref == backAllCaseJsonTemp.datas[k]._refId) {
-                // console.log("末端接口-机箱外部", backAllCaseJsonTemp.datas[k])
-                var startStr = backAllCaseJsonTemp.datas[j].json.properties.uniqueId.slice(0, 15)
-                var endStr = backAllCaseJsonTemp.datas[k].json.properties.uniqueId.slice(0, 15)
-                if (startStr != endStr) {
-                  var linkListStr = JSON.stringify(linkList)
-                  if (linkListStr.indexOf(backAllCaseJsonTemp.datas[j].json.properties.uniqueId) == -1) {
-                    linkList.push([backAllCaseJsonTemp.datas[j], backAllCaseJsonTemp.datas[k]])
-                    linkMap.set(backAllCaseJsonTemp.datas[j].json.properties, backAllCaseJsonTemp.datas[k].json.properties)
-                    break
+    if (backAllCaseJsonTemp !== undefined) {
+      for (const i in backAllCaseJsonTemp.datas) {
+        if (backAllCaseJsonTemp.datas[i].json.properties == null) {
+          for (const j in backAllCaseJsonTemp.datas) {
+            if (backAllCaseJsonTemp.datas[i].json.from._ref == backAllCaseJsonTemp.datas[j]._refId) {
+              // console.log("起始接口-机箱外部", backAllCaseJsonTemp.datas[j])
+              for (const k in backAllCaseJsonTemp.datas) {
+                if (backAllCaseJsonTemp.datas[k].json.properties != null && backAllCaseJsonTemp.datas[i].json.to._ref == backAllCaseJsonTemp.datas[k]._refId) {
+                  // console.log("末端接口-机箱外部", backAllCaseJsonTemp.datas[k])
+                  var startStr = backAllCaseJsonTemp.datas[j].json.properties.uniqueId.slice(0, 15)
+                  var endStr = backAllCaseJsonTemp.datas[k].json.properties.uniqueId.slice(0, 15)
+                  if (startStr != endStr) {
+                    var linkListStr = JSON.stringify(linkList)
+                    if (linkListStr.indexOf(backAllCaseJsonTemp.datas[j].json.properties.uniqueId) == -1) {
+                      linkList.push([backAllCaseJsonTemp.datas[j], backAllCaseJsonTemp.datas[k]])
+                      linkMap.set(backAllCaseJsonTemp.datas[j].json.properties, backAllCaseJsonTemp.datas[k].json.properties)
+                      break
+                    }
                   }
                 }
               }
+              break
             }
-            break
           }
         }
       }
@@ -802,7 +827,6 @@ function initEditor(editor) {
   //发送数据到vue
   function postMessageToVue() {
     graphList.fJson = JSON.parse(JSON.stringify(graphList.fJson))
-    // console.log("graphList",graphList)
     var linkArr = Array.from(linkMap)
     var linkStr = JSON.stringify(linkArr)
     // console.log("allChipToFlow", allChipToFlow)
@@ -815,6 +839,7 @@ function initEditor(editor) {
     } */
     graphList.link = linkGraphList
     graphList.link = JSON.stringify(graphList.link)
+    // console.log("graphList",graphList)
     frontCaseForDeployment = JSON.stringify(frontCaseForDeployment)
     postMessageParentData.cmd = "submitCaseJSON";
     postMessageParentData.params = [graphList, linkStr, allChipToFlow, frontCaseForDeployment]
@@ -854,15 +879,6 @@ function initEditor(editor) {
         graph.name = '背部视图'
         //找到连线的两个接口放到数组
         // setLinkList()
-        //删除qunee自己生成的连线数据
-        if (backAllCaseJsonTemp !== undefined) {
-          for (let i = 0; i < backAllCaseJsonTemp.datas.length; i++) {
-            if (backAllCaseJsonTemp.datas[i].json.properties == null) {
-              removeByValue(backAllCaseJsonTemp.datas, backAllCaseJsonTemp.datas[i])
-              i--
-            }
-          }
-        }
         //找到机箱内部连线，放到数组为绘画准备数据，同时放到map为生成xml准备数据
         for (const i in graphList.bJson) {
           for (const j in graphList.bJson[i].datas) {
@@ -906,10 +922,10 @@ function initEditor(editor) {
           graph.parseJSON(graphList.bJson[i], {transform: false});
         }
         //创建自己的连线
-        let edgejson = createEdgejson()
         //赋值连线的refid，将连线和两个重新画出的接口放到数组
         // console.log("linkList",linkList)
         for (const i in linkList) {
+          let edgejson = createEdgejson()
           linkList[i][0]._refId = '1' + parseInt(1500 * Math.random())
           linkList[i][1]._refId = '1' + parseInt(1500 * Math.random())
           edgejson.json.from._ref = parseInt(linkList[i][0]._refId)
@@ -986,10 +1002,10 @@ function initEditor(editor) {
         }
         // graph.parseJSON(backAllCaseJsonTemp)
         //创建自己的连线
-        let edgejson = createEdgejson()
         //赋值连线的refid，将连线和两个重新画出的接口放到数组
         // console.log("linkList",linkList)
         for (const i in linkList) {
+          let edgejson = createEdgejson()
           linkList[i][0]._refId = '1' + parseInt(1500 * Math.random())
           linkList[i][1]._refId = '1' + parseInt(1500 * Math.random())
           edgejson.json.from._ref = parseInt(linkList[i][0]._refId)
@@ -1040,13 +1056,19 @@ function initEditor(editor) {
 
 	graph.popupmenu.getMenuItems = function (graph, data, evt) {
 		if (data) {
-			console.log("2626", data.from)
+			// console.log("2626", data.from)
 			if (data.from != null) {
 				return [
 					{
 						text: '删除连线', action: function () {
 							var data = graph.getElement(evt);
-							graph.removeSelectionByInteraction(data);
+							// graph.removeSelectionByInteraction(data);
+              let fromInfStr = data.from.properties.uniqueId.slice(0, 15)
+              let toInfStr = data.to.properties.uniqueId.slice(0, 15)
+              if (fromInfStr === toInfStr) {
+                return
+              }
+              graph.removeElement(data);
 						}
 
 					},
@@ -1216,37 +1238,37 @@ function initEditor(editor) {
         return
       }
       if (data.properties.chipName != null) {
-        data.set('chipName', data._mn3.chipName);
-        data.set('coreNum', data._mn3.coreNum);
-        data.set('memSize', data._mn3.memSize);
-        data.set('hrTypeName', data._mn3.hrTypeName);
-        data.set('recvRate', data._mn3.recvRate);
+        data.set('chipName', data.properties.chipName);
+        data.set('coreNum', data.properties.coreNum);
+        data.set('memSize', data.properties.memSize);
+        data.set('hrTypeName', data.properties.hrTypeName);
+        data.set('recvRate', data.properties.recvRate);
       }
       if (data.properties.infName != null) {
-        data.set('infName', data._mn3.infName);
-        data.set('infRate', data._mn3.infRate);
-        data.set('opticalNum', data._mn3.opticalNum);
+        data.set('infName', data.properties.infName);
+        data.set('infRate', data.properties.infRate);
+        data.set('opticalNum', data.properties.opticalNum);
       }
       if (data.properties.boardType != null) {
-        if (data._mn3.boardType == 0) {
+        if (data.properties.boardType == 0) {
           data.set('showBoardType', 'calculateBoard');
         }
-        if (data._mn3.boardType == 1) {
+        if (data.properties.boardType == 1) {
           data.set('showBoardType', 'FpgaBoard');
         }
-        if (data._mn3.boardType == 2) {
+        if (data.properties.boardType == 2) {
           data.set('showBoardType', 'exchangeBoard');
         }
-        if (data._mn3.boardType == 3) {
+        if (data.properties.boardType == 3) {
           data.set('showBoardType', 'interfaceBoard');
         }
-        data.set('boardName', data._mn3.boardName);
+        data.set('boardName', data.properties.boardName);
       }
       if (data.properties.caseName != null) {
         // console.log("casePropertyList",casePropertyList)
       }
-      // data.set('rackname', data._mn3.caseName);
-      // data.set('boardnum', data._mn3.bdnum);
+      // data.set('rackname', data.properties.caseName);
+      // data.set('boardnum', data.properties.bdnum);
     }
     if (image === 'images/Chip.svg') {
       return {
@@ -1332,11 +1354,11 @@ function initEditor(editor) {
 					properties: [{
 						client: 'caseName',
 						displayName: '机箱名称'
-					},
+					}/*,
 					{
 						client: 'bdNum',
 						displayName: '主板数量'
-					}
+					}*/
 					]
 				}
 

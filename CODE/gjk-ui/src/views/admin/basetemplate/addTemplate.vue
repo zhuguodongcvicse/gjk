@@ -1212,7 +1212,11 @@ export default {
             Vue.set(i, "attrMappingName", i.attrName);
           }
 
-          Vue.set(this.currentXmlMap.attributeMap, i.attrName, currentAttrMap[i.attrName]); //遍历添加属性
+          Vue.set(
+            this.currentXmlMap.attributeMap,
+            i.attrName,
+            currentAttrMap[i.attrName]
+          ); //遍历添加属性
         }
         if (attrs.length > 0) {
           await getDictMappingData(this.DictVO).then(response => {
@@ -1429,12 +1433,12 @@ export default {
             label: "表单",
             value: "form"
           },
-           {
+          {
             label: "输入输出",
             value: "table"
           },
           {
-            label: "层级特殊",
+            label: "层级属性",
             value: "tabTS"
           },
           {
@@ -1444,10 +1448,6 @@ export default {
           {
             label: "选项卡",
             value: "tab"
-          },
-          {
-            label: "特殊处理",
-            value: "specalHandle"
           }
         ];
       } else if (this.template == "hsm_param_type") {
@@ -1460,26 +1460,13 @@ export default {
             label: "表单",
             value: "form"
           },
-
           {
-            label: "选项卡",
-            value: "tab"
+            label: "工作模式",
+            value: "tabTS"
           },
           {
-            label: "联级表单",
-            value: "coreDeployDiv"
-          },
-          {
-            label: "属性表格",
-            value: "attrTable"
-          },
-          {
-            label: "表格群",
-            value: "networkTable"
-          },
-          {
-            label: "树节点表格",
-            value: "treeTable"
+            label: "特殊处理",
+            value: "specalHandle"
           }
         ];
       } else if (this.template == "sysconfig_param_type") {
@@ -1539,6 +1526,62 @@ export default {
           {
             label: "无",
             value: "false"
+          }
+        ];
+      } else {
+        this.lableConfigTypeData = [
+          //标签配置方式
+          {
+            label: "无",
+            value: "false"
+          },
+          {
+            label: "表单",
+            value: "form"
+          },
+          {
+            label: "标签表格",
+            value: "table"
+          },
+          {
+            label: "层级特殊",
+            value: "tabTS"
+          },
+          {
+            label: "行表格",
+            value: "colTab"
+          },
+          {
+            label: "选项卡",
+            value: "tab"
+          },
+          {
+            label: "特殊处理",
+            value: "specalHandle"
+          },
+          {
+            label: "联级表单",
+            value: "coreDeployDiv"
+          },
+          {
+            label: "属性表格",
+            value: "attrTable"
+          },
+          {
+            label: "表格群",
+            value: "networkTable"
+          },
+          {
+            label: "树节点表格",
+            value: "treeTable"
+          },
+          {
+            label: "页面块标题",
+            value: "title"
+          },
+          {
+            label: "topic列表及dataStream列表",
+            value: "topicTree"
           }
         ];
       }

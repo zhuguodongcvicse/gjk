@@ -128,6 +128,7 @@ export default {
                         message: "已提交申请，请等待库管理员审批",
                         type: "success"
                     });
+                    this.dialogStateShow(false);
                   })
                 });
               }else{
@@ -140,10 +141,9 @@ export default {
                       message: "已提交申请，请等待库管理员审批",
                       type: "success"
                   });
+                  this.dialogStateShow(false);
                 })
               }
-              this.reload();
-              this.dialogStateShow(false);
             }
         })
     }

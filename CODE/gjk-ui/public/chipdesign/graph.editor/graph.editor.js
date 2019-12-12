@@ -192,14 +192,18 @@
             }.bind(this));
         },
         exportJSONFile: function (saveAs) {
+          console.log("saveAs",saveAs)
             if (saveAs) {
                 var name = this.graph.name || 'graph';
                 var json = this.graph.exportJSON(true);
+                console.log("json",json)
                 var blob = new Blob([json], {type: "text/plain;charset=utf-8"});
+              console.log("blob",blob)
                 saveAs(blob, name + ".json");
             }
         },
         exportJSON: function (toString) {
+          console.log("toString",toString)
             if (toString && this.jsonPane) {
                 var json = this.graph.exportJSON(true, {space: '  '});
                 return this.getJSONTextArea().value = json;

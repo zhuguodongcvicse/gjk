@@ -169,6 +169,7 @@ export default {
                                 message: "已提交申请，请等待库管理员审批",
                                 type: "success"
                             });
+                            this.dialogStateShow(false);
                         });
                     });
                     //如果申请状态为被驳回，可以再次提交审批
@@ -191,6 +192,7 @@ export default {
                                     message: "已提交申请，请等待库管理员审批",
                                     type: "success"
                                 });
+                                this.dialogStateShow(false);
                             });
                         });
                     });
@@ -200,15 +202,15 @@ export default {
                         message: "该构件已提交审批，请勿重复提交！",
                         type: "warning"
                     });
+                    this.dialogStateShow(false);
                     //如果申请状态为审批已通过，不可以提交审批
                 } else if (this.compItemMsg.applyState == "2") {
                     this.$message({
                         message: "该构件已通过审批！",
                         type: "warning"
                     });
+                    this.dialogStateShow(false);
                 }
-                this.reload();
-                this.dialogStateShow(false);
             }
         })
 

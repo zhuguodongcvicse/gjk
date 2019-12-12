@@ -384,14 +384,14 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 		BaseTemplateIDsDTO newBaseTemplateIDsDTO = JSON.parseObject(project.getBasetemplateIds(), BaseTemplateIDsDTO.class);
 
 		if(newBaseTemplateIDsDTO != null){
-			if(newBaseTemplateIDsDTO.getNetworkTempId()!=null && newBaseTemplateIDsDTO.getNetworkTempId().equals("") && oldBaseTemplateIDsDTO.getNetworkTempId().equals(newBaseTemplateIDsDTO.getNetworkTempId())){
+			if(newBaseTemplateIDsDTO.getNetworkTempId()!=null && !newBaseTemplateIDsDTO.getNetworkTempId().equals("") && !oldBaseTemplateIDsDTO.getNetworkTempId().equals(newBaseTemplateIDsDTO.getNetworkTempId())){
 				//把项目路径下的模板删除
 				File file = new File(path + "自定义配置__网络配置.xml");
 				if(file.exists()){
 					file.delete();
 				}
 			}
-			if(newBaseTemplateIDsDTO.getThemeTempId()!=null && newBaseTemplateIDsDTO.getThemeTempId().equals("") && oldBaseTemplateIDsDTO.getThemeTempId().equals(newBaseTemplateIDsDTO.getThemeTempId())){
+			if(newBaseTemplateIDsDTO.getThemeTempId()!=null && !newBaseTemplateIDsDTO.getThemeTempId().equals("") && !oldBaseTemplateIDsDTO.getThemeTempId().equals(newBaseTemplateIDsDTO.getThemeTempId())){
 				//把项目路径下的模板删除
 				File file = new File(path + "自定义配置__主题配置.xml");
 				if(file.exists()){

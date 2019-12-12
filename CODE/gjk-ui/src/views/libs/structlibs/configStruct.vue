@@ -68,18 +68,7 @@
           highlight-current-row
           @current-change="handleFTableCurrentChange"
         >
-          <el-table-column prop="fparamName" label="类型" type="scoped solt">
-            <template slot-scope="{row}" v-if="row.delFlag!='1'">
-              <el-input
-                :disabled="mappedModel.dbId===row.parentId?false:true"
-                v-model="row.fparamName"
-                size="mini"
-              ></el-input>
-              <!--<span  v-show="row.children!=''" >{{row.fparamName}}</span>-->
-              <span size="mini">{{row.fparamValue}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="fparamType" label="名称">
+          <el-table-column prop="fparamType" label="类型">
             <template slot-scope="{row}" v-if="row.delFlag!='1'">
               <el-select
                 :disabled="mappedModel.dbId===row.parentId?false:true"
@@ -107,6 +96,16 @@
                   >{{ item.version }}</span>
                 </el-option>
               </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column prop="fparamName" label="名称" type="scoped solt">
+            <template slot-scope="{row}" v-if="row.delFlag!='1'">
+              <el-input
+                :disabled="mappedModel.dbId===row.parentId?false:true"
+                v-model="row.fparamName"
+                size="mini"
+              ></el-input>
+              <span size="mini">{{row.fparamValue}}</span>
             </template>
           </el-table-column>
           <el-table-column prop="paramRemarks" label="注释" type="scoped solt">
@@ -137,7 +136,6 @@ import {
   getStructByFile,
   saveOneStruct,
   updateOneStruct,
-  saveStructMap,
   getStructTree,
   findAllStructs
 } from "@/api/libs/structlibs";
@@ -259,7 +257,9 @@ export default {
         this.mappedModel.version = row.version;
         this.mappedModel.storageFlag = row.storageFlag;
         this.tmpModelSel = row.dataType;
-        console.log("更新的tmpModelSel：" + JSON.parse(JSON.stringify(this.mappedModel)));
+        console.log(
+          "更新的tmpModelSel：" + JSON.parse(JSON.stringify(this.mappedModel))
+        );
       }
     },
     setChildrenIds(childParam, parentId) {

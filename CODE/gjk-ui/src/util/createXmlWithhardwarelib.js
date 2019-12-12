@@ -72,8 +72,8 @@ export const getChipOfCaseList = frontBoardOfCaseList => {
 export const createXmlEntityMap = paramsList => {
   paramsList[0] = JSON.parse(paramsList[0])
   paramsList[1] = JSON.parse(paramsList[1])
-  console.log("paramsList[0]", paramsList[0])
-  console.log("paramsList[1]", paramsList[1])
+  // console.log("paramsList[0]", paramsList[0])
+  // console.log("paramsList[1]", paramsList[1])
 
   /* for (const i in paramsList[0]) {
       paramsList[0][i] = JSON.parse(paramsList[0][i])
