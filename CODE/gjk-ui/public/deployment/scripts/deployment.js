@@ -1510,7 +1510,7 @@ function showchip() {
 	}
 }
 function createEdge(options) {
-	var edge = graph.createEdge(options.to, options.from);
+	var edge = graph.createEdge(options.from, options.to);
 	edge.setStyle(Q.Styles.EDGE_COLOR, '#999999');
 	edge.setStyle(Q.Styles.ARROW_TO, true);
 	edge.setStyle(Q.Styles.ARROW_TO_SIZE, 1.8);
