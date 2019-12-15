@@ -865,7 +865,7 @@ export default {
       Vue.delete(this.currentXmlMap.attributeMap, attribute.attributename);
     },
 
-    async AddLable() {
+    async AddLable() {    
       //确定添加标签
       var lableMapping = this.configureType.lableMapping;
       var lableMappingName = "";
