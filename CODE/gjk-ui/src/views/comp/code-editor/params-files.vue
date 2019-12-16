@@ -56,9 +56,9 @@ import { saveCompImg } from "@/api/comp/component";
 import iconchoose from "@/views/comp/code-editor/icon-choose";
 import filesUpload from "@/views/comp/code-editor/files-upload";
 import { fetchAlgorithmTree } from "@/api/admin/algorithm";
-import { fetchTestTree } from "@/api/admin/test";
-import { fetchPlatformTree } from "@/api/admin/platform";
-import { fetchSavefiles, getDefaultImg } from "@/api/comp/componentdetail";
+import { fetchTestTrees } from "@/api/admin/test";
+import { fetchPlatformTrees } from "@/api/admin/platform";
+import { fetchSavefiless, getDefaultImg } from "@/api/comp/componentdetail";
 import { mapGetters } from "vuex";
 import { randomLenNum, randomUuid, deepClone } from "@/util/util";
 // import axios from "axios";
@@ -329,17 +329,17 @@ export default {
       //判断为算法文件/测试文件/测试文件
       if (this.fileType == "algorithm") {
         this.tigPlaceholder = "算法文件";
-        fetchAlgorithmTree(this.listQuery).then(response => {
+        fetchAlgorithmTrees(this.listQuery).then(response => {
           this.data = response.data.data;
         });
       } else if (this.fileType == "test") {
         this.tigPlaceholder = "测试文件";
-        fetchTestTree(this.listQuery).then(response => {
+        fetchTestTrees(this.listQuery).then(response => {
           this.data = response.data.data;
         });
       } else if (this.fileType == "platform") {
         this.tigPlaceholder = "平台文件";
-        fetchPlatformTree(this.listQuery).then(response => {
+        fetchPlatformTrees(this.listQuery).then(response => {
           this.data = response.data.data;
         });
       }
