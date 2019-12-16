@@ -83,7 +83,7 @@
 		<result property="file_name" column="fileName" />
 		<result property="file_path" column="filePath" />
 	</resultMap>
-	
+
 	<resultMap id="componentDetailMap"
 		type="com.inforbus.gjk.admin.api.entity.ComponentDetail">
 		<id property="id" column="id" />
@@ -120,7 +120,8 @@
 		gjk_platform.*
 		FROM
 		gjk_platform
-		LEFT JOIN sys_role_menu ON gjk_platform.platform_id =
+		LEFT JOIN sys_role_menu ON
+		gjk_platform.platform_id =
 		sys_role_menu.menu_id
 		WHERE
 		gjk_platform.del_flag = 0
@@ -135,8 +136,10 @@
 		SELECT
 		m.permission
 		FROM
-		gjk_platform m, sys_role_menu rm WHERE m.platform_id = rm.menu_id AND m.del_flag =
-		0 AND rm.role_id IN (#{roleIds})
+		gjk_platform m, sys_role_menu rm
+		WHERE m.platform_id = rm.menu_id AND m.del_flag =
+		0 AND rm.role_id IN
+		(#{roleIds})
 	</select>
 
 	<!-- 获取软件框架库的主表信息 -->
@@ -164,43 +167,61 @@
 
 	<!-- 获取bsp平台id的副表信息 -->
 	<select id="getBSPPlatform" resultMap="bspDetailMap">
-		SELECT * FROM gjk_bsp_detail
+		SELECT * FROM
+		gjk_bsp_detail
 	</select>
 
 	<!-- 获取bsp文件夹的副表信息 -->
 	<select id="getBSPFile" resultMap="bspFileMap">
 		SELECT * FROM gjk_bsp_file
 	</select>
-	
+
 	<!-- 获取构件建模模块选择的文件夹的信息 -->
-	<select id="getLibsFile" resultMap="componentDetailMap" >
-		SELECT b.* FROM gjk_component_detail b WHERE b.paraent_id in 
+	<select id="getLibsFile" resultMap="componentDetailMap">
+		SELECT
+		b.* FROM gjk_component_detail b WHERE b.paraent_id in
 		(SELECT a.id FROM gjk_component_detail a WHERE a.libs_id = #{libsId})
 	</select>
-	
+
 	<!-- 获取构件建模模块的信息 -->
 	<select id="getLibsInfo" resultMap="componentDetailMap">
-		SELECT * FROM gjk_component_detail
+		SELECT * FROM
+		gjk_common_component_detail 
 	</select>
-	
 	<!-- 根据libs_id获取构件建模模块属于哪个库信息 -->
 	<select id="getLibsFileType" resultMap="componentDetailMap">
-		SELECT * FROM gjk_component_detail WHERE libs_id = #{libsId}
+		SELECT * FROM
+		gjk_component_detail WHERE libs_id = #{libsId}
+	</select>
+	<!-- 根据comp_id分组得到每个comp_id -->
+	<select id="getCompIdsGroupCompId" resultType="java.lang.String">
+		SELECT comp_id FROM gjk_common_component GROUP BY comp_id
+	</select>
+	<!-- 根据comp_id查询component -->
+	<select id="getCompByCompId" resultMap="componentMap">
+		SELECT * FROM gjk_common_component where comp_id = #{compId}
+	</select>
+	
+	<!-- 根据componentid查询componentDetail -->
+	<select id="getCompDetailByComponentId" resultMap="componentDetailMap">
+		SELECT * FROM gjk_common_component_detail where comp_id = #{componentId} and  file_name = '平台文件'
 	</select>
 	
 	<!-- 根据详细表的comp_id找到主表里的comp_name -->
 	<select id="getCompNameById" resultMap="componentMap">
-	SELECT b.* FROM gjk_component b WHERE b.id =
-		(SELECT a.comp_id FROM gjk_component_detail a WHERE a.id = #{id})
+		SELECT b.* FROM gjk_common_component b WHERE b.id =
+		(SELECT a.comp_id FROM
+		gjk_common_component_detail a WHERE a.id = #{id})
 	</select>
 
 	<delete id="deleteAll">
 		DELETE FROM gjk_platform
 	</delete>
 
-	<select id="selectCountById" parameterType="String" resultType="Integer">
+	<select id="selectCountById" parameterType="String"
+		resultType="Integer">
 		SELECT count(1)
 		FROM gjk_platform
 		WHERE platform_id = #{id}
-    </select>
+	</select>
 </mapper>

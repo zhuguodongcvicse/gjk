@@ -22,6 +22,7 @@ import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.TreeUtil;
 import com.inforbus.gjk.common.core.util.UnZipFilesUtils;
+import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.common.log.annotation.SysLog;
 import com.inforbus.gjk.libs.api.dto.BSPDTO;
 import com.inforbus.gjk.libs.api.entity.BSP;
@@ -32,6 +33,8 @@ import com.inforbus.gjk.libs.service.BSPService;
 import lombok.AllArgsConstructor;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -172,44 +175,30 @@ public class BSPController {
 	}
 
 	@PostMapping("/uploadFiles/{versionDisc}")
-	public String uploadFiles(@RequestParam(value = "file") MultipartFile[] files, @PathVariable String versionDisc) {
-//		String path = "E:/tmp/";
+	public String uploadFiles(@RequestParam(value = "file") MultipartFile files, @PathVariable String versionDisc) {
 		String path = softwarePath;
-		String res = path + ",";
-		for (MultipartFile file : files) {
-			System.out.println("file.getOriginalFilename():" + file.getOriginalFilename());
-			if (file != null) {
-				String p = path + "gjk/bsp/" + versionDisc + ".0" + File.separator + file.getOriginalFilename();
-				String bb = p.replaceAll("\\\\", "/");
-				String ss = p.substring(0, bb.lastIndexOf("/")) + File.separator;
-				File zipfile = new File(bb);
-				File ff = new File(ss);
-				if (ff.exists()) {
-					ff.delete();
-				}
-				// 创建文件夹
-				ff.mkdirs();
-				// 如果文件已经存在，则删除创建新文件
-				if (new File(p).exists()) {
-					new File(p).delete();
+		String res = "上传成功！！！";
+		String p = path + "gjk/bsp/" + versionDisc + ".0" + File.separator + files.getOriginalFilename();
+		String bb = p.replaceAll("\\\\", "/");
+		String ss = p.substring(0, bb.lastIndexOf("/")) ;
+		try {
+			final InputStream inputStream = files.getInputStream();
+			//启动线程，保存后，后台继续解压文件
+			new Thread(()-> {
+				File file = new File(ss);
+				if(!file.exists()) {
+					file.mkdir();
 				}
 				try {
-					// 上传文件
-					file.transferTo(new File(p));
-					//调用解压方法：zipPath 压缩文件地址（全路径）      descDir 指定目录（全路径）
-					UnZipFilesUtils.unZipFile(bb, ss);
-					//解压完删除压缩包
-					zipfile.delete();
-//					return p;
-				} catch (Exception e) {
-					res += "文件 " + file.getOriginalFilename() + " 上传失败\n";
+					UploadFilesUtils.decompression(inputStream, ss);
+					JGitUtil.commitAndPush(ss, "多个文件上传");
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				res += "文件 " + file.getOriginalFilename() + " 上传成功\n";
-			}
-
+			}).start();;
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
-
 		return res;
 	}
 
