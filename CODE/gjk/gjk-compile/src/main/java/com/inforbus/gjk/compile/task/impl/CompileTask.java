@@ -167,19 +167,18 @@ public class CompileTask implements Task {
         Process p = null;
         try {
             p = rt.exec(cmd, null, dir);//打开cmd执行make命令
-            StreamManage errorThread = new StreamManage(p.getErrorStream(), "GBK",this.rabbitmqTemplate, fileName, token);//编译错误控制台信息
-            StreamManage successThread = new StreamManage(p.getInputStream(), "GBK",this.rabbitmqTemplate, fileName, token);//编译正常控制台信息
+            StreamManage errorThread = new StreamManage(p.getErrorStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译错误控制台信息
+            StreamManage successThread = new StreamManage(p.getInputStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译正常控制台信息
             errorThread.start();//开启编译错误流线程
             successThread.start();//开启编译正常流线程
             return true;
-        } catch (IOException e) {
-            logger.error("编译失败，请检查编译进程。");
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error("vs2010平台编译失败，请检查编译进程。");
         } finally {
             try {
                 p.waitFor();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("vs2010平台编译失败，请检查编译进程。");
             }
             if (p != null)
                 p.destroy();
@@ -189,8 +188,6 @@ public class CompileTask implements Task {
 
     //编译 sylixos
     private boolean sylixos(String sylixosPath, String fileName, String token) {
-        String strCommand = "";
-        //File dir = new File(syPath);
         File dir = new File(sylixosPath);
         //拼接 cmd命令
         String str = "make all";
@@ -199,19 +196,26 @@ public class CompileTask implements Task {
         Process p = null;
         try {
             p = rt.exec(cmd, null, dir);//打开cmd执行make命令
-            StreamManage errorThread = new StreamManage(p.getErrorStream(),"GBK", this.rabbitmqTemplate, fileName, token);//编译错误控制台信息
-            StreamManage successThread = new StreamManage(p.getInputStream(),"GBK", this.rabbitmqTemplate, fileName, token);//编译正常控制台信息
+            StreamManage errorThread = new StreamManage(p.getErrorStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译错误控制台信息
+            StreamManage successThread = new StreamManage(p.getInputStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译正常控制台信息
             errorThread.start();//开启编译错误流线程
             successThread.start();//开启编译正常流线程
             return true;
-        } catch (IOException e) {
-            logger.error("编译失败，请检查编译进程。");
+        } catch (Exception e) {
+            logger.error("sylixos平台编译失败，请检查编译进程是否阻塞。");
+            str = "taskkill /f /im make";
+            cmd = new String[]{"cmd", "/c", str};
+            try {
+                p = rt.exec(cmd, null, dir);
+            } catch (IOException e1) {
+                logger.error("sylixos平台编译失败，请检查IO。");
+            }
             e.printStackTrace();
         } finally {
             try {
                 p.waitFor();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("sylixos平台编译失败，请检查IO。");
             }
             if (p != null)
                 p.destroy();
@@ -229,19 +233,18 @@ public class CompileTask implements Task {
         Process p = null;
         try {
             p = rt.exec(cmd, null, dir);//打开cmd执行make命令
-            StreamManage errorThread = new StreamManage(p.getErrorStream(), "GBK",this.rabbitmqTemplate, fileName, token);//编译错误控制台信息
-            StreamManage successThread = new StreamManage(p.getInputStream(),"GBK", this.rabbitmqTemplate, fileName, token);//编译正常控制台信息
+            StreamManage errorThread = new StreamManage(p.getErrorStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译错误控制台信息
+            StreamManage successThread = new StreamManage(p.getInputStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译正常控制台信息
             errorThread.start();//开启编译错误流线程
             successThread.start();//开启编译正常流线程
             return true;
-        } catch (IOException e) {
-            logger.error("编译失败，请检查编译进程。");
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error("workbench平台编译失败，请检查编译进程。");
         } finally {
             try {
                 p.waitFor();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("workbench平台编译失败，请检查编译进程。");
             }
             if (p != null)
                 p.destroy();
@@ -251,64 +254,28 @@ public class CompileTask implements Task {
 
     //编译 linux
     private boolean linux(String filePath, String fileName, String token) {
-        //通过filePath 截取流程名称 用来创建父级目录
-        String ProcessName = filePath.substring(0, filePath.lastIndexOf("APP"));
-        ProcessName = ProcessName.substring(ProcessName.lastIndexOf(File.separator) + 1, ProcessName.length());
-        System.out.println("流程名称====" + ProcessName);
         //执行linux命令编译 项目
         String cmd = null;
-        cmd = "mkdir " + this.linuxPath + "/" + ProcessName;
-        //先创建流程文件夹
-        boolean b = executeCommand(cmd, false);
-        cmd = "mkdir " + this.linuxPath + "/" + ProcessName + "/" + fileName;
+        cmd = "mkdir -p " + this.linuxPath + "/AppPro/" + fileName;
         //再创建工程文件夹
-        boolean b1 = executeCommand(cmd, false);
-        //String processPath = linuxPath + "/" + ProcessName;//流程路径
-        //String projectPath = this.linuxPath + "/" + ProcessName + "/" + fileName;//项目路径
-//        ChannelSftp sftp = null;
-//        try {
-//            sftp = ChannelSftpSingleton.getInstance().getChannelSftp(this.ip, this.username, this.password);
-//            SftpATTRS stat = sftp.stat(projectPath);//判断项目路径是否创建成功
-//            if (stat == null){
-//                while (true){
-//                    stat = sftp.stat(projectPath);
-//                    if (stat != null){
-//                        break;
-//                    }
-//                }
-//            }
-//        } catch (JSchException e) {
-//            e.printStackTrace();
-//        } catch (SftpException e) {
-//            e.printStackTrace();
-//        }finally {
-//            if (sftp != null) {
-//                sftp.quit();
-//                sftp.disconnect();
-//            }
-//            try {
-//                ChannelSftpSingleton.getInstance().closeChannel();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
+        boolean b = executeCommand(cmd, false);
         int i = 0;
         while (true) {
             i++;
             if (i == 500)
                 break;
         }
-        if (b && b1) {
-            String linuxAimsPath = this.linuxPath + "/" + ProcessName + "/" + fileName;
+        if (b) {
+            String linuxAimsPath = this.linuxPath + "/AppPro/" + fileName;
             //将Windows 项目文件上传到linux服务器中
             boolean isUploadSuccess = uploadFileToLinux(filePath, linuxAimsPath);
             if (isUploadSuccess) {
-                cmd = "find " + this.linuxPath + "/" + ProcessName + "/" + fileName + " -name makefile";
+                cmd = "find " + this.linuxPath + "/AppPro/" + fileName + " -name makefile";
                 //寻找makefile文件所在绝对路径
                 String makeFilePath = executeCommand2(cmd);
                 if (makeFilePath != null && !makeFilePath.equals("")) {
                     cmd = "cd " + makeFilePath + " ; make clean ; make";
-                    boolean isMakeSuccess = executeCommand(cmd, true);//执行make命令
+                    boolean isMakeSuccess = executeCommand3(cmd);//执行make命令
                     if (isMakeSuccess) {
                         cmd = "cd " + makeFilePath + " ; zip -r " + fileName + ".zip " + "*";
                         boolean isZipSuccess = executeCommand(cmd, true);//执行打包命令
@@ -360,14 +327,15 @@ public class CompileTask implements Task {
                         }
                     }
                 }
+                cmd = "rm -rf " + this.linuxPath + "/AppPro";
+                executeCommand(cmd, false);//删除流程文件夹
                 return true;
             } else {
                 this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n 文件上传至linux系统失败,请联系管理员");
             }
-            cmd = "rm -rf " + this.linuxPath + "/" + ProcessName;
-            executeCommand(cmd, false);//删除流程文件夹
         }
-
+        cmd = "rm -rf " + this.linuxPath + "/AppPro";
+        executeCommand(cmd, false);//删除流程文件夹
         return false;
     }
 
@@ -445,37 +413,6 @@ public class CompileTask implements Task {
         }
         return flag;
     }
-
-
-    //linux 系统执行cmd命令行方法,flag 为是否把执行命令失败的控制台信息推送到mq中
-//    public boolean executeCommand(String cmd, boolean flag) {
-//        Session session = null;
-//        try {
-//            if (linuxLogin()) {//连接linux服务器
-//                session = this.connection.openSession();
-//                session.execCommand(cmd);//执行cmd命令
-//                StreamManage successStream = new StreamManage(session.getStdout(), "UTF-8", this.rabbitmqTemplate, this.fileName, this.token);
-//                StreamManage errorStream = new StreamManage(session.getStderr(), "UTF-8", this.rabbitmqTemplate, this.fileName, this.token);
-//                successStream.start();
-//                errorStream.start();
-//                return true;
-//            } else {
-//                System.out.println("连接linux系统失败,请检查ip,账号,密码");
-//                logger.error("连接linux系统失败,请检查ip,账号,密码");
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            logger.error("IO异常");
-//        } finally {
-//            if (this.connection != null) {
-//                this.connection.close();
-//            }
-//            if (session != null) {
-//                session.close();
-//            }
-//        }
-//        return false;
-//    }
 
 
     //linux 系统执行cmd命令行方法,flag 为是否把执行命令失败的控制台信息推送到mq中
@@ -618,6 +555,40 @@ public class CompileTask implements Task {
         return result;
     }
 
+    //linux 系统执行cmd命令行方法,
+    public boolean executeCommand3(String cmd) {
+        Session session = null;
+        try {
+            if (linuxLogin()) {//连接linux服务器
+                session = this.connection.openSession();
+                session.execCommand(cmd);//执行cmd命令
+                StreamManage successStream = new StreamManage(session.getStdout(), "UTF-8", this.rabbitmqTemplate, this.fileName, this.token);
+                StreamManage errorStream = new StreamManage(session.getStderr(), "UTF-8", this.rabbitmqTemplate, this.fileName, this.token);
+                successStream.start();
+                errorStream.start();
+                successStream.join();
+                errorStream.join();
+                return true;
+            } else {
+                System.out.println("连接linux系统失败,请检查ip,账号,密码");
+                logger.error("连接linux系统失败,请检查ip,账号,密码");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.error("IO异常");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            if (this.connection != null) {
+                this.connection.close();
+            }
+            if (session != null) {
+                session.close();
+            }
+        }
+        return false;
+    }
+
 
     //上传文件至linux系统中,参数1为被上穿文件地址,参数2为linux系统中上传的目标地址
     public boolean uploadFileToLinux(String localFilePath, String linuxAmisPath) {
@@ -648,30 +619,4 @@ public class CompileTask implements Task {
         return false;
     }
 
-    public boolean createPathSuccess(String linuxAmisPath) {
-        ChannelSftp chSftp = null;
-        try {
-            chSftp = ChannelSftpSingleton.getInstance().getChannelSftp(this.ip, this.username, this.password);
-            if (chSftp == null) {
-                return false;
-            }
-            chSftp.cd(linuxAmisPath);
-        } catch (JSchException e) {
-            e.printStackTrace();
-        } catch (SftpException e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            if (chSftp != null) {
-                chSftp.quit();
-                chSftp.disconnect();
-            }
-            try {
-                ChannelSftpSingleton.getInstance().closeChannel();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return true;
-    }
 }

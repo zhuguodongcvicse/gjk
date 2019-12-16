@@ -31,6 +31,7 @@ import org.apache.poi.xssf.usermodel.*;
 import org.ho.yaml.Yaml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -74,6 +75,7 @@ import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
 import com.inforbus.gjk.pro.mapper.PartPlatformSoftwareMapper;
 import com.inforbus.gjk.pro.service.ManagerService;
 
+import flowModel.CheckResult;
 import lombok.AllArgsConstructor;
 
 /**
@@ -97,6 +99,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	protected PartPlatformBSPMapper partPlatformBSPMapper;
 	@Autowired
 	private AppMapper appMapper;
+	@Autowired
+	private AmqpTemplate rabbitmqTemplate;
 
 	private static final String proDetailPath = JGitUtil.getLOCAL_REPO_PATH();
 	private static final String integerCodeFileName = JGitUtil.getINTEGER_CODE_FILE_NAME();
@@ -1870,6 +1874,12 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				if(item.getName().equals("mysql")){
 					String excelFilePath = descDirPath + File.separator + "mysql" + File.separator + "MySQL.xls";
 					tag = readExcel(descDirPath, excelFilePath, projectId);
+					// 硬件建模数据
+					excelFilePath = descDirPath + File.separator + "mysql" + File.separator + "gjk_hardwarelibs.csv";
+					tag = readCvs(excelFilePath, "gjk_hardwarelibs", projectId);
+					// 芯片数据
+					excelFilePath = descDirPath + File.separator + "mysql" + File.separator + "gjk_chipsfromhardwarelibs.csv";
+					tag = readCvs(excelFilePath, "gjk_chipsfromhardwarelibs", projectId);
 				}
 
 				// 引用的资源文件拷贝到指定目录
@@ -1925,8 +1935,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		List<CommonComponentDetail> compDetailList = new ArrayList<>();
 		List<CompStruct> compStructList = new ArrayList<>();
 		List<Structlibs> structlibsList = new ArrayList<>();
-		List<Hardwarelibs> hardwarelibsList = new ArrayList<>();
-		List<Chipsfromhardwarelibs> chipsfromhardwarelibsList = new ArrayList<>();
+//		List<Hardwarelibs> hardwarelibsList = new ArrayList<>();
+//		List<Chipsfromhardwarelibs> chipsfromhardwarelibsList = new ArrayList<>();
 		List<SysDict> sysDictList = new ArrayList<>();
 
 				// 获取所有sheet对象
@@ -2054,20 +2064,20 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 					structlibsList.add((Structlibs) obj);
 				}
 			}
-			// 硬件建模表
-			else if("gjk_hardwarelibs".equals(tableName)){
-				className = "com.inforbus.gjk.pro.api.entity.Hardwarelibs";
-				for (Object obj : parseSheet(sheet, className)) {
-					hardwarelibsList.add((Hardwarelibs) obj);
-				}
-			}
-			// 芯片表
-			else if("gjk_chipsfromhardwarelibs".equals(tableName)){
-				className = "com.inforbus.gjk.pro.api.entity.Chipsfromhardwarelibs";
-				for (Object obj : parseSheet(sheet, className)) {
-					chipsfromhardwarelibsList.add((Chipsfromhardwarelibs) obj);
-				}
-			}
+//			// 硬件建模表
+//			else if("gjk_hardwarelibs".equals(tableName)){
+//				className = "com.inforbus.gjk.pro.api.entity.Hardwarelibs";
+//				for (Object obj : parseSheet(sheet, className)) {
+//					hardwarelibsList.add((Hardwarelibs) obj);
+//				}
+//			}
+//			// 芯片表
+//			else if("gjk_chipsfromhardwarelibs".equals(tableName)){
+//				className = "com.inforbus.gjk.pro.api.entity.Chipsfromhardwarelibs";
+//				for (Object obj : parseSheet(sheet, className)) {
+//					chipsfromhardwarelibsList.add((Chipsfromhardwarelibs) obj);
+//				}
+//			}
 			// 字典表
 			else if("sys_dict".equals(tableName)){
 				className = "com.inforbus.gjk.admin.api.entity.SysDict";
@@ -2185,7 +2195,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		// 构件库表 id存在则更新 不存在则新增
 		for (CommonComponent commonComponent : compList) {
-		    if(baseMapper.getCommonComponentByIdIn(commonComponent.getId()) == null){
+		    if(baseMapper.getCommonComponentByIdIn("'"+commonComponent.getId()+"'") == null){
                 baseMapper.saveCommonComp(commonComponent);
             }else{
 		        commonComponent.setUpdateTime(LocalDateTime.now());
@@ -2195,7 +2205,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		// 结构库详细表 id存在则更新 不存在则新增
 		for (CommonComponentDetail commonComponentDetail : compDetailList) {
-		    if(baseMapper.getCommonComponentDetailByCompIdIn(commonComponentDetail.getId()) == null){
+		    if(baseMapper.getCommonComponentDetailByCompIdIn("'"+commonComponentDetail.getId()+"'") == null){
                 baseMapper.saveCommonCompDetail(commonComponentDetail);
             }else{
                 baseMapper.updateCommonCompDetail(commonComponentDetail);
@@ -2218,25 +2228,25 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
             }
 		}
 
-		// 硬件建模表
-		for (Hardwarelibs hardwarelibs : hardwarelibsList) {
-			hardwarelibs.setProjectId(projectId);
-			if(baseMapper.getHardwarelibsById(hardwarelibs.getId()) == null){
-				baseMapper.saveHardwarelibs(hardwarelibs);
-			}else{
-				baseMapper.updateHardwarelibById(hardwarelibs);
-			}
-		}
-
-		// 芯片表
-		for (Chipsfromhardwarelibs chipsfromhardwarelibs : chipsfromhardwarelibsList) {
-			chipsfromhardwarelibs.setProjectId(projectId);
-			if(baseMapper.getChipsfromhardwarelibsById(chipsfromhardwarelibs.getId()) == null){
-				baseMapper.saveChipsfromhardwarelibs(chipsfromhardwarelibs);
-			}else{
-				baseMapper.updateChipsfromhardwarelibsById(chipsfromhardwarelibs);
-			}
-		}
+//		// 硬件建模表
+//		for (Hardwarelibs hardwarelibs : hardwarelibsList) {
+//			hardwarelibs.setProjectId(projectId);
+//			if(baseMapper.getHardwarelibsById(hardwarelibs.getId()) == null){
+//				baseMapper.saveHardwarelibs(hardwarelibs);
+//			}else{
+//				baseMapper.updateHardwarelibById(hardwarelibs);
+//			}
+//		}
+//
+//		// 芯片表
+//		for (Chipsfromhardwarelibs chipsfromhardwarelibs : chipsfromhardwarelibsList) {
+//			chipsfromhardwarelibs.setProjectId(projectId);
+//			if(baseMapper.getChipsfromhardwarelibsById(chipsfromhardwarelibs.getId()) == null){
+//				baseMapper.saveChipsfromhardwarelibs(chipsfromhardwarelibs);
+//			}else{
+//				baseMapper.updateChipsfromhardwarelibsById(chipsfromhardwarelibs);
+//			}
+//		}
 
 		// 字典表
 		for (SysDict sysDict : sysDictList) {
@@ -2447,7 +2457,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			}
 		}
 
-
 		// 软件框架与平台关系表
 		List<SoftwareDetail> softwareDetailList = new ArrayList<>();
 		if (ids.length() > 0) {
@@ -2484,8 +2493,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				zipDirOrFile(zip, file, "bsp" + File.separator + bsp.getVersion() + File.separator + file.getName());
 			}
 		}
-
-
 
 		// bsp和平台关系表
 		List<BSPDetail> bspDetailList = new ArrayList<>();
@@ -2532,7 +2539,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			}
 		}
 
-
 		// 构件库和结构体表关系表
 		List<CompStruct> compStructList = new ArrayList<>();
 		if (compIdList.size() > 0) {
@@ -2551,18 +2557,48 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		findStructlibsRecursion(structlibsListSub, structlibsList);
 		createSheet(workbook, structlibsList, "gjk_structlibs");
 
-		// TODO 临时注释 等待 超 改造完后 处理
 //		// 硬件建模表
 //        Hardwarelibs hardwarelibs = baseMapper.getHardwarelibsByFlowId(processId);
 //        List<Hardwarelibs> hardwarelibsList = new ArrayList<>();
 //        hardwarelibsList.add(hardwarelibs);
 //        createSheet(workbook, hardwarelibsList, "gjk_hardwarelibs");
-//
+		Hardwarelibs hardwarelibs = baseMapper.getHardwarelibsByFlowId(processId);
+		List<String> columnNames = new ArrayList<>();
+		StringBuffer columnValues = new StringBuffer();
+		List<Map<String, String>> columns = queryColumns("gjk_hardwarelibs");
+		for (Map<String, String> column : columns) {
+			String colName = columnToJava(column.get("columnName"));
+			columnNames.add(colName);
+			String cvsStr = (String) getFieldValueByName(colName, hardwarelibs);
+			cvsStr = cvsStr == null ? "" : cvsString(cvsStr);
+			columnValues.append(cvsStr).append(",");
+		}
+		List<String> cvsContent = new ArrayList<>();
+		cvsContent.add(String.join(",", columnNames));
+		cvsContent.add(columnValues.substring(0, columnValues.length() - 1));
+		String filePath = serverPath + "gjk" + File.separator + "testExcel" + File.separator + "gjk_hardwarelibs.csv";
+		File hardwarelibsFile = FileUtil.writeFileContent(filePath, cvsContent);
+
 //        //芯片表
-//        Chipsfromhardwarelibs chipsfromhardwarelibs = baseMapper.getChipsByFlowId(processId);
+        Chipsfromhardwarelibs chipsfromhardwarelibs = baseMapper.getChipsByFlowId(processId);
 //        List<Chipsfromhardwarelibs> chipsfromhardwarelibsList = new ArrayList<>();
 //        chipsfromhardwarelibsList.add(chipsfromhardwarelibs);
 //        createSheet(workbook, chipsfromhardwarelibsList, "gjk_chipsfromhardwarelibs");
+		columnNames = new ArrayList<>();
+		columnValues = new StringBuffer();
+		columns = queryColumns("gjk_chipsfromhardwarelibs");
+		for (Map<String, String> column : columns) {
+			String colName = columnToJava(column.get("columnName"));
+			columnNames.add(colName);
+			String cvsStr = (String) getFieldValueByName(colName, chipsfromhardwarelibs);
+			cvsStr = cvsStr == null ? "" : cvsString(cvsStr);
+			columnValues.append(cvsStr).append(",");
+		}
+		cvsContent = new ArrayList<>();
+		cvsContent.add(String.join(",", columnNames));
+		cvsContent.add(columnValues.substring(0, columnValues.length() - 1));
+		filePath = serverPath + "gjk" + File.separator + "testExcel" + File.separator + "gjk_chipsfromhardwarelibs.csv";
+		File chipsFile = FileUtil.writeFileContent(filePath, cvsContent);
 
         // 字典表
 		List<SysDict> sysDictList = baseMapper.getSysDictByRemarksIn("'mapperType','selectType'");
@@ -2583,8 +2619,18 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		workbook.write(op);
 		// 将Excel文件读入压缩文件流
 		zip.write(FileUtils.readFileToByteArray(file));
+		// 硬件建模数据
+		ZipEntry entryH = new ZipEntry("mysql" + File.separator + "gjk_hardwarelibs.csv");
+		zip.putNextEntry(entryH);
+		zip.write(FileUtils.readFileToByteArray(hardwarelibsFile));
+		// 芯片数据
+		ZipEntry entryC = new ZipEntry("mysql" + File.separator + "gjk_chipsfromhardwarelibs.csv");
+		zip.putNextEntry(entryC);
+		zip.write(FileUtils.readFileToByteArray(chipsFile));
 		// 将临时文件删除
 		file.delete();
+		hardwarelibsFile.delete();
+		chipsFile.delete();
 		zip.flush();
 		zip.closeEntry();
 	}
@@ -2736,7 +2782,11 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
      * 列名转换成Java属性名
      */
     private String columnToJava(String columnName) {
-        return WordUtils.capitalizeFully(columnName, new char[] { '_' }).replace("_", "");
+    	if(columnName.contains("_")){
+			return WordUtils.capitalizeFully(columnName, new char[] { '_' }).replace("_", "");
+		}else{
+			return columnName;
+		}
     }
 
 	/**
@@ -2819,5 +2869,140 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		} catch (Exception e) {
 			throw new IOException(e);
 		}
+	}
+
+	/**
+	 * 字符串中的逗号替换成@#
+	 * @param str
+	 * @return
+	 */
+	public static String cvsString(String str){
+		str = str.replaceAll(",", "@#");
+		return str;
+	}
+
+	/**
+	 * 字符串中的@#替换成逗号
+	 * @param str
+	 * @return
+	 */
+	public static String cvsStringUn(String str){
+		str = str.replaceAll("@#", ",");
+		return str;
+	}
+
+	public int readCvs(String path, String tableName, String projectId) throws Exception {
+		List<Hardwarelibs> hardwarelibsList = new ArrayList<>();
+		List<Chipsfromhardwarelibs> chipsfromhardwarelibsList = new ArrayList<>();
+		String className = "";
+		// 硬件建模表
+		if ("gjk_hardwarelibs".equals(tableName)) {
+			className = "com.inforbus.gjk.pro.api.entity.Hardwarelibs";
+			for (Object obj : parseCvsFile(path, className)) {
+				hardwarelibsList.add((Hardwarelibs) obj);
+			}
+		}
+		// 芯片表
+		else if("gjk_chipsfromhardwarelibs".equals(tableName)){
+			className = "com.inforbus.gjk.pro.api.entity.Chipsfromhardwarelibs";
+			for (Object obj : parseCvsFile(path, className)) {
+				chipsfromhardwarelibsList.add((Chipsfromhardwarelibs) obj);
+			}
+		}
+
+		// 硬件建模表
+		for (Hardwarelibs hardwarelibs : hardwarelibsList) {
+			hardwarelibs.setProjectId(projectId);
+			if(baseMapper.getHardwarelibsById(hardwarelibs.getId()) == null){
+				baseMapper.saveHardwarelibs(hardwarelibs);
+			}else{
+				baseMapper.updateHardwarelibById(hardwarelibs);
+			}
+		}
+
+		// 芯片表
+		for (Chipsfromhardwarelibs chipsfromhardwarelibs : chipsfromhardwarelibsList) {
+			chipsfromhardwarelibs.setProjectId(projectId);
+			if(baseMapper.getChipsfromhardwarelibsById(chipsfromhardwarelibs.getId()) == null){
+				baseMapper.saveChipsfromhardwarelibs(chipsfromhardwarelibs);
+			}else{
+				baseMapper.updateChipsfromhardwarelibsById(chipsfromhardwarelibs);
+			}
+		}
+
+		return 1;
+	}
+
+	/**
+	 * 解析CVS文件
+	 * @param filePath
+	 * @param className
+	 * @return
+	 * @throws Exception
+	 */
+	private List<Object> parseCvsFile(String filePath, String className) throws Exception {
+		List<Object> objects = new ArrayList<>();
+		List<String> columnList = new ArrayList<>();
+
+		List<String> fileContent = FileUtil.readFileContent(filePath);
+		for(int i = 0; i < fileContent.size(); i ++){
+			if(i == 0){
+				columnList = parseCvsRow(fileContent.get(i));
+			} else {
+				objects.add(parseCvsRow(fileContent.get(i), className, columnList));
+			}
+		}
+		return objects;
+	}
+
+	/**
+	 * 解析cvs列
+	 *
+	 * @param row
+	 */
+	private List<String> parseCvsRow(String row) {
+		List<String> list = new ArrayList<>();
+		String[] strArr = row.split(",");
+		for (String col : strArr) {
+			list.add(col);
+		}
+		return list;
+	}
+
+	/**
+	 * 解析cvs每行数据
+	 * @param row
+	 * @param calssName
+	 * @param columnList
+	 * @return
+	 * @throws Exception
+	 */
+	private Object parseCvsRow(String row, String calssName, List<String> columnList) throws Exception {
+		Class<?> cla = Class.forName(calssName);
+		Object obj = cla.newInstance();
+
+		String[] colArr = row.split(",");
+		for (int i = 0; i < colArr.length; i ++) {
+			String value = cvsStringUn(colArr[i]);
+			if(StringUtils.isNotBlank(value)){
+				if ("CreateTime".equals(columnList.get(i)) || "UpdateTime".equals(columnList.get(i))) {
+					LocalDateTime parse = LocalDateTime.parse(value);
+					setFieldValueByName(columnList.get(i), cla, obj, parse);
+				} else {
+					setFieldValueByName(columnList.get(i), cla, obj, value);
+				}
+			}
+		}
+		return obj;
+	}
+	
+	@Override
+	public R completeCheck(String id,String userId) {
+		Map<String, String> map = baseMapper.findProJSON(id);
+		String xmlFilepath = proDetailPath + map.get("filePath") + map.get("fileName") + ".xml";
+		CheckResult checkResult = ExternalIOTransUtils.completeCheck(xmlFilepath);
+		String strLog = checkResult.getM_textConsole();
+		this.rabbitmqTemplate.convertAndSend(userId, "checkLog" + "===@@@===" + strLog);
+		return new R(checkResult);
 	}
 }

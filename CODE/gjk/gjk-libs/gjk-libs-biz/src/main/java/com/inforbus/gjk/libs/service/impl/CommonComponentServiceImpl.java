@@ -108,6 +108,13 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 			commonComponent.setVersion(1.0 + "");
 		}
 		try {
+			String img = commonComponent.getCompImg();// >测试构件01-Vnull<
+			String showName=commonComponent.getCompName()+"_V"+commonComponent.getVersion();
+			System.out.println("showName:  "+showName);
+			img=img.replaceAll(">"+commonComponent.getCompName()+"([^<>]*)<", ">"+showName+"<");
+			System.out.println("img:  "+img);
+			
+			commonComponent.setCompImg(img);
 			baseMapper.saveCommonComp(commonComponent);
 			return true;
 		} catch (Exception e) {

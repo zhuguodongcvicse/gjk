@@ -15,6 +15,8 @@ import SpbModel.Performance;
 import SpbModel.Struc;
 import appcontrol.AppControl;
 import flowModel.BackNodeInfoForSpb;
+import flowModel.CheckResult;
+import flowModel.SanityCheck;
 import flowModel.SimpleScheme;
 import flowModel.SpbFrameAutoGen;
 import flowModel.SystemConfig;
@@ -75,10 +77,6 @@ public class ExternalIOTransUtils {
 	 * @param schemeFileList
 	 */
 	public static void simplePlan(ArrayList<String> schemeFileList, String simplePlanFile) {
-//        String simplePlanFile = "D:\\14S_GJK_GIT\\gjk\\gjk\\project\\gengTest\\geng流程\\模型\\方案展示.xml";
-//        ArrayList<String> schemeFileList = new ArrayList<>();
-//        schemeFileList.add("D:\\14S_GJK_GIT\\gjk\\gjk\\project\\gengTest\\geng流程\\模型\\方案评价指标.xml");
-//        schemeFileList.add("D:\\14S_GJK_GIT\\gjk\\gjk\\project\\gengTest\\geng流程\\模型\\软硬件映射配置.xml");
 		try {
 			SimpleScheme.createSimpleScheme(schemeFileList, simplePlanFile);
 		} catch (IOException e) {
@@ -168,9 +166,6 @@ public class ExternalIOTransUtils {
 
 	public static boolean appLoad(Map<String, String> cmpNameToHwType, String userName, int appID, String appName,
 			boolean existDeployConfig, String sysconfigPath, String appProPath) {
-//		AppControl appControl = new AppControl();
-//		return appControl.appLoad(cmpNameToHwType, userName, appID, appName, existDeployConfig, sysconfigPath,
-//				appProPath);
 		return AppControl.getAppControl().appLoad(cmpNameToHwType, userName, appID, appName, existDeployConfig, sysconfigPath, appProPath);
 
 	}
@@ -184,8 +179,6 @@ public class ExternalIOTransUtils {
 	 * @return
 	 */
 	public static boolean appUnload(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
-//		AppControl appControl = new AppControl();
-//		return appControl.appUnload(cmpNameToHwType, userName, appID, appName);
 		return AppControl.getAppControl().appUnload(cmpNameToHwType, userName, appID, appName);
 	}
 
@@ -198,8 +191,6 @@ public class ExternalIOTransUtils {
 	 * @return
 	 */
 	public static boolean appRestart(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
-//		AppControl appControl = new AppControl();
-//		return appControl.appRestart(cmpNameToHwType, userName, appID, appName);
 		return AppControl.getAppControl().appRestart(cmpNameToHwType, userName, appID, appName);
 	}
 
@@ -212,8 +203,6 @@ public class ExternalIOTransUtils {
 	 * @return
 	 */
 	public static boolean appStop(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
-//		AppControl appControl = new AppControl();
-//		return appControl.appStop(cmpNameToHwType, userName, appID, appName);
 		return AppControl.getAppControl().appStop(cmpNameToHwType, userName, appID, appName);
 	}
 
@@ -226,8 +215,6 @@ public class ExternalIOTransUtils {
 	 * @return
 	 */
 	public static boolean appPause(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
-//		AppControl appControl = new AppControl();
-//		return appControl.appPause(cmpNameToHwType, userName, appID, appName);
 		return AppControl.getAppControl().appPause(cmpNameToHwType, userName, appID, appName);
 	}
 
@@ -242,25 +229,10 @@ public class ExternalIOTransUtils {
 	 */
 	public static boolean appUnInstall(Map<String, String> cmpNameToHwType, String userName, int appID, String appName,
 			String packinfoPath) {
-//		AppControl appControl = new AppControl();
-//		return appControl.appUnInstall(cmpNameToHwType, userName, appID, appName, packinfoPath);
 		return AppControl.getAppControl().appUnInstall(cmpNameToHwType, userName, appID, appName, packinfoPath);
 	}
 
-	/**
-	 * 导出
-	 * 
-	 * @param workID
-	 * @param taskInfoPath
-	 * @param appPath
-	 * @param sysconfigPath
-	 * @param packinfoPath
-	 * @param cmpDeployPlanFilePath
-	 */
-//	public static void appTaskExport(int workID, String taskInfoPath, String appPath, String sysconfigPath,
-//			String packinfoPath, String cmpDeployPlanFilePath) {
-//		appInterface.appTaskExport(workID, taskInfoPath, appPath, sysconfigPath, packinfoPath, cmpDeployPlanFilePath);
-//	}
+
 	/**
 	 * 导出
 	 * 
@@ -273,7 +245,7 @@ public class ExternalIOTransUtils {
 	 */
 	public static void appTaskExport(String userName, int appId, String appName, String appPath, String sysconfigPath,
 			String packinfoPath, String cmpDeployPlanFilePath) {
-		appInterface.appTaskExport(appId, appName, appPath, sysconfigPath, packinfoPath, cmpDeployPlanFilePath);
+		AppControl.getAppControl().appTaskExport(userName,appId, appName, appPath, sysconfigPath, packinfoPath, cmpDeployPlanFilePath);
 	}
 
 	/**
@@ -302,5 +274,15 @@ public class ExternalIOTransUtils {
 	public static void createSpbFrameFile(String spbModelXmlFile, String spbModelDir) {
 		new SpbFrameAutoGen().createSpbFrameFile(spbModelXmlFile, spbModelDir);
 //		new SpbFrameAutoGen().createSpbFrameFile(spbModelXmlFile, headerTemplateFile, srcTemplateFile, saveDir);
+	}
+	
+	/**
+	 * 完备性检查
+	 * @param flowFilePath
+	 * @return
+	 */
+	public static CheckResult completeCheck(String flowFilePath) {
+		SanityCheck sanityCheck = new SanityCheck();
+		return sanityCheck.sanityChecking(flowFilePath);
 	}
 }

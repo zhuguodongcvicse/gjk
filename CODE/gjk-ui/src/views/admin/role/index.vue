@@ -139,6 +139,7 @@
         this.$refs.crud.rowAdd();
       },
       handleOpenBefore(show, type) {
+        window.boxType = type;
         show();
       },
       handleUpdate(row, index) {

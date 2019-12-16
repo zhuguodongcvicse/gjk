@@ -184,7 +184,14 @@ export default {
                 if (this.dictKey === "dbtab_structlibs") {
                   //从商店中获取对应表的数据
                   fetchStrInPointer().then(res => {
-                    this.selectOptions = res.data.data;
+                    this.selectOptions = [];
+                    for (let item of res.data.data) {
+                      this.selectOptions.push({
+                        value: item.value,
+                        label: item.label,
+                        rightName: "V"+item.version.toFixed(1)
+                      });
+                    }
                   });
                 } else if (this.dictKey === "dbtab_platform") {
                   getOwnPlatform().then(res => {

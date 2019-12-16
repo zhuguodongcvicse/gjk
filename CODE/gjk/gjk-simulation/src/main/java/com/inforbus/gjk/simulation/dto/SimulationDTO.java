@@ -2,6 +2,9 @@ package com.inforbus.gjk.simulation.dto;
 
 import lombok.Data;
 
+/**
+ * 页面参数封装
+ */
 @Data
 public class SimulationDTO {
 

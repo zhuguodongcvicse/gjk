@@ -33,6 +33,8 @@ var div_rightY = ""
 //var loadingState = true;
 //存储上一次点击的构件id
 var lastTimeId = ""
+//双击锚点状态
+var dblclickPoint = false
 
 var midpoints = [0.7, 0.5, 0.3, 0.1]
 var stub = [40, 30, 20, 10]
@@ -148,7 +150,6 @@ function handleMessageFromParent(event) {
 			//alert("1111111"+loadState)
 			break
 		case 'sendCompFzData':
-			console.log("989898989898888888888888")
 			componentMap.set(data.params.compId, data.params.compData)
 			break
 		case 'alignment':
@@ -198,13 +199,15 @@ function handleMessageFromParent(event) {
 			}
 			break;
 		case 'completeCheck':
+			console.log("998989898989889898",data.params)
+			completeCheckFun(data.params)
 			//警告
 			//let styleColor = "#F4A460"
 			//错误
-			let styleColor = "#ff0000"
+			//let styleColor = "#ff0000"
 			//$('.pa').addClass("warn")
 			//endpointCheck(styleColor);
-			connectionCheck(styleColor);
+			//connectionCheck(styleColor);
 			break;
 		case 'startSimulation':
 			getSimulationData();
@@ -312,6 +315,7 @@ function setEnterPoint(id, gj) {
 			deleteEndpointsOnEmpty: true
 		}, config);
 		inPoint.bind('dblclick', function (endpoint, originalEvent) {
+			dblclickPoint = true
 			addDiv(endpoint);
 			var endpointId = endpoint.getUuid().split("*")[2]
 			var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
@@ -321,9 +325,9 @@ function setEnterPoint(id, gj) {
 			$('.point').css("left", x - 290);
 			$('.point').css("top", y);
 		});
-		// inPoint.bind('mouseout', function (endpoint, originalEvent) {
-		// 	$('.point').remove();
-		// });
+		inPoint.bind('mouseout', function (endpoint, originalEvent) {
+			dblclickPoint = false;
+		});
 		inPoint.bind('mousedown', function (endpoint, originalEvent) {
 			mousedownState = 1;
 		});
@@ -410,6 +414,7 @@ function setExitPoint(id, gj) {
 		}, config);
 		//端点绑定鼠标移入事件
 		outPoint.bind('dblclick', function (endpoint, originalEvent) {
+			dblclickPoint = true
 			addDiv(endpoint);
 			var endpointId = endpoint.getUuid().split("*")[2]
 			var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
@@ -419,9 +424,9 @@ function setExitPoint(id, gj) {
 			$('.point').css("top", y);
 		});
 		//端点绑定鼠标移出事件
-		// outPoint.bind('mouseout', function (endpoint, originalEvent) {
-		// 	$('.point').remove();
-		// });
+		outPoint.bind('mouseout', function (endpoint, originalEvent) {
+			dblclickPoint = false
+		});
 		outPoint.bind('mousedown', function (endpoint, originalEvent) {
 			mousedownState = 1;
 		});
@@ -497,7 +502,6 @@ function addDraggable(id) {
 		},
 		//开始移动
 		start: function () {
-			//alert("开始移动")
 			dragNode = {}
 			oldPosition = []
 			//console.log("拖动时的idList数组", idList)
@@ -1074,6 +1078,7 @@ function updatePoint(proPream) {
 			}, config);
 			addInPoint.addClass("nodeStyle")
 			addInPoint.bind('dblclick', function (endpoint, originalEvent) {
+				dblclickPoint = true
 				addDiv(endpoint);
 				//addPointDiv(proPream);
 				//var mouse = mousePosition();
@@ -1088,9 +1093,9 @@ function updatePoint(proPream) {
 			addInPoint.bind('mousedown', function (endpoint, originalEvent) {
 				mousedownState = 1;
 			});
-			// addInPoint.bind('mouseout', function () {
-			// 	$('.point').remove();
-			// });
+			addInPoint.bind('mouseout', function () {
+				dblclickPoint = false
+			});
 		} else {
 			canvasData.get(proPream.compId).outputList.push(proPream.data)
 			//console.log("画布数据", canvasData);
@@ -1112,6 +1117,7 @@ function updatePoint(proPream) {
 			}, config);
 			addOutPoint.addClass("nodeStyle")
 			addOutPoint.bind('dblclick', function (endpoint, originalEvent) {
+				dblclickPoint = true
 				addDiv(endpoint);
 				//addPointDiv(proPream);
 				//var mouse = mousePosition();
@@ -1122,9 +1128,9 @@ function updatePoint(proPream) {
 				$('.point').css("left", x - 15);
 				$('.point').css("top", y);
 			});
-			// addOutPoint.bind('mouseout', function () {
-			// 	$('.point').remove();
-			// });
+			addOutPoint.bind('mouseout', function () {
+				dblclickPoint = false;
+			});
 			addOutPoint.bind('mousedown', function (endpoint, originalEvent) {
 				mousedownState = 1;
 			});
@@ -1292,32 +1298,36 @@ function getSimulationData() {
 
 //双击连线出现仿真图标
 jsPlumb.bind("dblclick", function (conn, originalEvent) {
-	connectionObjClick = {};
-	console.log("双击获取连线数据", conn)
-	let startId = conn.sourceId
-	let endId = conn.targetId
-	if (componentMap.get(startId) === componentMap.get(endId)) {
-		handleMessageToParent("returnFZInfo", "所选连线俩端构件属于同一组件");
-	} else {
-		let id = createNum()
-		conn.setLabel(function () {
-			return '<div class ="fz" id = "' + id + '" style="width:20px;height:12px;"></div>'
-		})
-		$('#' + id).attr('tabindex', 0);
-		$('#' + id).focus();
-		$("#" + id).bind("click", function () {
-			document.getElementById(id).onkeydown = function (e) {
-				if (e.keyCode == 46) {
-					$("#" + id).remove()
+	console.warn("双击连线出现仿真图标",dblclickPoint)
+	if(!dblclickPoint){
+		connectionObjClick = {};
+		console.log("双击获取连线数据", conn)
+		let startId = conn.sourceId
+		let endId = conn.targetId
+		if (componentMap.get(startId) === componentMap.get(endId)) {
+			handleMessageToParent("returnFZInfo", "所选连线俩端构件属于同一组件");
+		} else {
+			let id = createNum()
+			conn.setLabel(function () {
+				return '<div class ="fz" id = "' + id + '" style="width:20px;height:12px;"></div>'
+			})
+			$('#' + id).attr('tabindex', 0);
+			$('#' + id).focus();
+			$("#" + id).bind("click", function () {
+				document.getElementById(id).onkeydown = function (e) {
+					if (e.keyCode == 46) {
+						$("#" + id).remove()
+					}
 				}
-			}
-			return false
-		})
-		$("#" + id).bind("dblclick", function () {
-			handleMessageToParent("returnFZ", { startId: startId, endId: endId });
-		})
-	}
+				return false
+			})
+			$("#" + id).bind("dblclick", function () {
+				handleMessageToParent("returnFZ", { startId: startId, endId: endId });
+			})
+		}
 
+	}
+	
 })
 //var removeConnection; //点击连线所获取的对象
 var connectionObj = {};//连线关系
@@ -1462,6 +1472,11 @@ jsPlumb.bind("connectionDragStop", function (info) {
 		// console.log("目标节点类型",targetType);
 		// console.log("连线关系",connectionData)
 		var isConnect = false
+	
+		sourceType = sourceType.replace("*","")
+		targetType = targetType.replace("*","")
+		console.log("源锚点数据类型",sourceType)
+		console.log("目标锚点数据类型",targetType)
 		if (sourceType == targetType) {
 			isConnect = true
 		}
@@ -2191,6 +2206,7 @@ function pasteJson(pasteDataJson) {
 						endpoint.uuid.split("*")[0] + "*" + endpoint.uuid.split("*")[1] + "*" + elem.blockId
 					))))
 				inPoint.bind('dblclick', function (endpoint, originalEvent) {
+					dblclickPoint = true
 					addDiv(endpoint);
 					//addTemDiv(endpoint, canvasData.get(newId).inputList);
 					var endpointId = endpoint.getUuid().split("*")[2]
@@ -2200,9 +2216,9 @@ function pasteJson(pasteDataJson) {
 					$('.point').css("left", x - 290);
 					$('.point').css("top", y);
 				});
-				// inPoint.bind('mouseout', function (endpoint, originalEvent) {
-				// 	$('.point').remove();
-				// });
+				inPoint.bind('mouseout', function (endpoint, originalEvent) {
+					dblclickPoint = false
+				});
 				inPoint.bind('mousedown', function (endpoint, originalEvent) {
 					mousedownState = 1;
 				});
@@ -2224,6 +2240,7 @@ function pasteJson(pasteDataJson) {
 						endpoint.uuid.split("*")[0] + "*" + endpoint.uuid.split("*")[1] + "*" + elem.blockId
 					))))
 				outPoint.bind('dblclick', function (endpoint, originalEvent) {
+					dblclickPoint = true
 					//addTemDiv(endpoint, canvasData.get(newId).outputList);
 					addDiv(endpoint);
 					var endpointId = endpoint.getUuid().split("*")[2]
@@ -2233,9 +2250,9 @@ function pasteJson(pasteDataJson) {
 					$('.point').css("left", x - 15);
 					$('.point').css("top", y);
 				});
-				// outPoint.bind('mouseout', function (endpoint, originalEvent) {
-				// 	$('.point').remove();
-				// });
+				outPoint.bind('mouseout', function (endpoint, originalEvent) {
+					dblclickPoint = false
+				});
 				outPoint.bind('mousedown', function (endpoint, originalEvent) {
 					mousedownState = 1;
 				});
@@ -2319,6 +2336,10 @@ function save() {
 		var sourLength = "";
 		sourDataTypeName = endpointMap.get(sourceuid).dataTypeName
 		sourVariableName = endpointMap.get(sourceuid).variableName
+		// if (!reg.test(sourVariableName)) {
+		// 	let strTemp = sourVariableName.replace("*")
+		// 	console.log("临时数据",strTemp)
+		// }
 		sourLength = endpointMap.get(sourceuid).lengthName
 		// if (addsourcePointState) {
 		// 	sourDataTypeName = addPointParam[addSPointParamindex].data.dataTypeName;
@@ -2342,12 +2363,8 @@ function save() {
 		// console.log("数据比较",sourCompName)
 		var sourCompName = canvasData.get(source).functionName;
 		//console.log("数据比较+++++++++",sourCompName)
-		let reg = /\w+\[[0-9]+\]/i; //
-		if (!reg.test(sourVariableName)) {
-
-		}
 		var sourcePrame = sourDataTypeName + " " + sourVariableName + "_" + sourCompName
-
+		
 		//获取画布目标节点id
 		var target = connection.targetId;
 		//获取目标构件中数据id
@@ -2388,7 +2405,12 @@ function save() {
 		//var tarCompName = dat[targetGj].functionName;
 		var tarCompName = canvasData.get(target).functionName
 		var targetPrame = tarDataTypeName + " " + tarVariableName + "_" + tarCompName
-
+		let reg = /\w+\[[0-9]+\]/i; //
+		if (reg.test(tarVariableName)) {
+			let strTemp = tarVariableName.split("[")
+			console.log(strTemp)
+			targetPrame = tarDataTypeName + " " + strTemp[0] + "_"+ tarCompName + "[" + strTemp[1]
+		}
 		//拼接source与target
 		var st = source + target;
 		map.set(id, st);
@@ -2509,8 +2531,8 @@ function saveFlowchart() {
 	//flowChart.outPointsData = outPointsData;
 	//flowChart.inPointsData = inPointsData;
 	var flowChartJson = JSON.stringify(flowChart);
-	console.log("锚点map", flowChart, endpointMap)
-	console.log("流程图数据", flowChartJson);
+	// console.log("锚点map", flowChart, endpointMap)
+	// console.log("流程图数据", flowChartJson);
 	return flowChartJson;
 }
 
@@ -2728,6 +2750,7 @@ function loadJson(loadJson) {
 						// } else {
 						// 	addTemDiv(endpoint, elem.inPointsData);
 						// }
+						dblclickPoint = true
 						//锚点悬浮框显示
 						addDiv(endpoint);
 						// var mouse = mousePosition();
@@ -2739,9 +2762,9 @@ function loadJson(loadJson) {
 						$('.point').css("left", x - 290);
 						$('.point').css("top", y);
 					});
-					// inPoint.bind('mouseout', function (endpoint, originalEvent) {
-					// 	$('.point').remove();
-					// });
+					inPoint.bind('mouseout', function (endpoint, originalEvent) {
+						dblclickPoint = false
+					});
 					inPoint.bind('mousedown', function (endpoint, originalEvent) {
 						mousedownState = 1;
 					});
@@ -2772,6 +2795,7 @@ function loadJson(loadJson) {
 						// 	addTemDiv(endpoint, elem.outPointsData);
 						// }
 						//var mouse = mousePosition();
+						dblclickPoint = true
 						addDiv(endpoint);
 						var endpointId = endpoint.getUuid().split("*")[2]
 						var y = $("#" + endpointId).offset().top + $(areaId).scrollTop();
@@ -2780,9 +2804,9 @@ function loadJson(loadJson) {
 						$('.point').css("left", x - 15);
 						$('.point').css("top", y);
 					});
-					// outPoint.bind('mouseout', function (endpoint, originalEvent) {
-					// 	$('.point').remove();
-					// });
+					outPoint.bind('mouseout', function (endpoint, originalEvent) {
+						dblclickPoint = false
+					});
 					outPoint.bind('mousedown', function (endpoint, originalEvent) {
 						mousedownState = 1;
 					});
@@ -2922,7 +2946,6 @@ $('.div_right').bind({
 		//console.log(removeTemp);
 		handleMessageToParent("returnFormJson", removeTemp);
 		if (key) {
-			//alert(idList.length)
 			key = false;
 			for (var i = 0; i < idList.length; i++) {
 				//$("#"+idList[i]+"-heading").css({"box-shadow":"none"})
@@ -3277,24 +3300,22 @@ function toggleFullScreen() {
 }
 
 //完备性检查修改锚点样式
-function endpointCheck(styleColor) {
-	$(".pa").each(function (idx, elem) {
-		var $elem = $(elem);
-		//i用于定位使用什么数据
-		//var i = $elem.find("div").find("div")[0].dataset.id;
-		var endpoints = jsPlumb.getEndpoints($elem.attr('id'));
-		//console.log(endpoints);
+function endpointCheck(endpointId,styleColor) {
+	//$(".pa").each(function (idx, elem) {
+		//var $elem = $(elem);
+		var endpoints = jsPlumb.getEndpoints(endpointId.split("*")[2]);
 		//循环构件上的锚点
 		$.map(endpoints, function (endpoint) {
-			//console.log("锚点",endpoint.getPaintStyle())
-			if (endpoint.anchor.x == 0) {
-				endpoint.getPaintStyle().strokeStyle = styleColor
-			} else {
-				endpoint.getPaintStyle().strokeStyle = styleColor
-				endpoint.getPaintStyle().fillStyle = styleColor
+			if(endpointId == endpoint.getUuid()){
+				if(endpointId.split("*")[1] == "input"){
+					endpoint.getPaintStyle().strokeStyle = styleColor
+				}else{
+					endpoint.getPaintStyle().strokeStyle = styleColor
+					endpoint.getPaintStyle().fillStyle = styleColor
+				}
 			}
 		});
-	});
+	//});
 	jsPlumb.setSuspendDrawing(false, true);
 }
 
@@ -3306,13 +3327,63 @@ function connectionCheck(styleColor) {
 		connection.getPaintStyle().lineWidth = "3"
 		connection.getPaintStyle().stroke = styleColor
 		connection.getPaintStyle().strokeStyle = styleColor
-
 	});
 	jsPlumb.setSuspendDrawing(false, true);
 }
 
-$(".fz").bind('dbclick', function (event) {
-	console.log("仿真数据", event)
-})
+//完备性检查
+function completeCheckFun(val){
+	switch (val.m_checkType) {
+		case '0': //检查流程建模xml文件(完备性检查)
+			$.each(val.m_checkInfoList,function(index,checkResult){
+				//console.log("检查结果",checkResult)
+				switch (checkResult.m_checkType) {
+					case '0': //修改构件
+						if(checkResult.m_modifyState == '0'){ //正常
+
+						}else if(checkResult.m_modifyState == '1'){ //警告
+							$('#'+checkResult.m_spbId).addClass("warn")
+						}else if(checkResult.m_modifyState == '2'){ //错误
+							$('#'+checkResult.m_spbId).addClass("error")
+						}
+						break;
+					case '1': //修改连线
+
+						break;
+					case '2': //修改锚点
+						if(checkResult.m_modifyState == '0'){ //正常
+
+						}else if(checkResult.m_modifyState == '1'){ //警告
+							endpointCheck(endPoint(checkResult),"#F4A460")
+						}else if(checkResult.m_modifyState == '2'){ //错误
+							endpointCheck(endPoint(checkResult),"#ff0000")
+						}
+						break;
+					default:
+						break;
+				}
+			})
+			break;
+	
+		case '1':
+			break;
+	}
+}
+
+//完备性检查确认锚点id
+function endPoint(checkResult){
+	let endpointUUid = ""
+	console.log("99999",endpointMap)
+	for (let [k, v] of endpointMap) {
+		
+		if(k.split("*")[2] == checkResult.m_spbId && k.split("*")[1] == "input" && checkResult.m_paramType =="输入" && v.variableName == checkResult.m_paramName){
+			endpointUUid = k
+		}else if(k.split("*")[2] == checkResult.m_spbId && k.split("*")[1] == "output" && checkResult.m_paramType =="输出" && v.variableName == checkResult.m_paramName){
+			endpointUUid = k
+		}
+	}
+	console.log("endpointUUid",endpointUUid)
+	return endpointUUid
+}
 
 //})();

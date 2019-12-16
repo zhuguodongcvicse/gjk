@@ -243,7 +243,6 @@ public class ProjectController {
 	@GetMapping
 	@RequestMapping("/removeCompProject/{compId}/{projectId}")
 	public void removeCompProject(@PathVariable("compId") String compId, @PathVariable("projectId") String projectId) {
-		System.out.println("444444444444");
 		projectService.removeCompProject(compId, projectId);
 	}
 

@@ -2,6 +2,9 @@ package com.inforbus.gjk.simulation.task;
 
 import redis.clients.jedis.Jedis;
 
+/**
+ * 监听redis通道线程
+ */
 public class SubscriberThread extends Thread {
 
     private Subscriber subscriber;

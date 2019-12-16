@@ -131,7 +131,7 @@ public class CompframeController {
 	}
 	@SysLog("修改构件框架库")
 	@PostMapping("/compframeToTree")
-	@Cacheable(value = "compframe_tree", key = "#compframe.id")
+//	@Cacheable(value = "compframe_tree", key = "#compframe.id")
 	public R compframeToTree(@Valid @RequestBody Compframe compframe) {
 		return new R<>(TreeUtil.buildByLoop(compframeService.compframeToTree(compframe), "-1"));
 	}

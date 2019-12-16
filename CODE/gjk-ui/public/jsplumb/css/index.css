@@ -298,6 +298,10 @@ div.desc {
   background:#ddd;
 }
 
-.warn{
+.error{
   box-shadow:0px 0px 15px 8px #ff0000
+}
+
+.warn{
+  box-shadow:0px 0px 15px 8px #F4A460
 }

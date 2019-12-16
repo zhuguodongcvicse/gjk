@@ -60,7 +60,7 @@ public class DictVO implements Serializable {
 	 * 备注
 	 */
 	private String remarks;
-	
+
 	/**
 	 * 创建时间
 	 */
@@ -73,5 +73,21 @@ public class DictVO implements Serializable {
 	 * 0-正常，1-删除
 	 */
 	private String delFlag;
+	/**
+	 * 版本
+	 */
+	private Double version;
+
+	public DictVO(String value, String label, String sort, Double version) {
+		super();
+		this.value = value;
+		this.label = label;
+		this.sort = sort;
+		this.version = version;
+	}
+
+	public DictVO() {
+		super();
+	}
 
 }

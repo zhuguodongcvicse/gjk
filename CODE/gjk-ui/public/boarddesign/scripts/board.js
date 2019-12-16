@@ -740,11 +740,13 @@ function initEditor(editor) {
 					return
 				}
 				var currentElement = graph.getElement(evt.event);
-				// console.log("currentElement", currentElement)
+				 console.log("currentElement", node)
 				if (currentElement && currentElement.image === 'images/BeforeTheBoard.svg') {
-					//	node.host = currentElement;
+						node.host = currentElement;
+						node.zIndex = '500';
 				} else if (currentElement && currentElement.image === 'images/AfterTheBoard.svg') {
-					//	node.host = currentElement;
+						node.host = currentElement;
+						node.zIndex = '500';
 				} else if (currentElement && currentElement.image === 'images/Chip.svg') {
 					graph.removeElement(node);
 					return

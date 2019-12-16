@@ -443,7 +443,7 @@ public class AppController {
 		// 组件划分方案路径（自存自取）
 		String selfGenerateCodeResult = gitFilePath + aa + File.separator + softToHardResult + File.separator
 				+ "组件划分方案.xml";
-		String appPath = gitFilePath + aa + File.separator + appDataDTO.getAppProPath();
+		String appPath = gitFilePath + File.separator + appDataDTO.getAppProPath();
 		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
 				boolean returnVal;
 				try {

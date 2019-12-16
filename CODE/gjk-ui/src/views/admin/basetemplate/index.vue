@@ -115,7 +115,7 @@
         </el-form-item>
 
         <!--备注-->
-        <el-form-item label="备注">
+        <el-form-item label="备注" prop="remarks">
           <el-input v-model="BaseTemplate.remarks" placeholder="备注"></el-input>
         </el-form-item>
       </el-form>
@@ -211,6 +211,16 @@ export default {
         callback(
           "模板类型错误,模板类型1-32个字符,可包含汉字、字母、数字、—、_、()"
         );
+       "/^[0-9a-zA-Z+-?()\u4e00-\u9fa5]+\.[x|X][m|M][l|L]$/"
+      } else {
+        callback();
+      }
+    };
+    var validateFileName = (rule, value, callback) => {
+      if (/^[0-9a-zA-Z+-?()-_\u4e00-\u9fa5]+\.[x|X][m|M][l|L]$/.test(value) == false) {
+        callback(
+          "文件选择错误,请选择xml文件"
+        );
        
       } else {
         callback();
@@ -275,7 +285,12 @@ export default {
           { validator: validateTempType, trigger: "change" }
         ],
         fileName: [
-          { required: true, message: "请选择模板文件", trigger: "blur" }
+          { required: true, message: "请选择模板文件", trigger: "change" },
+          { validator: validateFileName, trigger: "change" }
+        ],
+         remarks: [
+          { required: true, message: "请填写备注信息", trigger: "blur" },
+      
         ]
         // tempVersion: [
         //   { required: true, message: "请输入版本号", trigger: "blur" }
@@ -556,7 +571,16 @@ export default {
       });
     },
     cancelAdd(){
-      this.BaseTemplate = {};
+      //this.BaseTemplate = {};
+      this.BaseTemplate =  {
+        //模板对象
+        tempName: "",
+        tempType: "",
+        tempVersion: "",
+        remarks: "",
+        fileName: "",
+        baseTemplatePath: ""
+      },
       this.isAddTemplate = false;
       this.refreshChange();
     },

@@ -283,12 +283,12 @@ export default {
       let imgretStr = deepClone(this.imgValue.saveCompImgStr);
 
       imgretStr.compParam.comp = param;
-      let imgHtml = deepClone(this.compImg.imgHtml);
-      //设置构件图标中的版本
-      this.compImg.imgHtml = imgHtml.replace(
-        this.compImg.imgShowName,
-        this.compImg.imgShowName + "-V" + param.version
-      );
+      // let imgHtml = deepClone(this.compImg.imgHtml);
+      // //设置构件图标中的版本
+      // this.compImg.imgHtml = imgHtml.replace(
+      //   this.compImg.imgShowName,
+      //   this.compImg.imgShowName + "-V" + param.version
+      // );
       imgretStr.compParam.compImg = this.compImg;
       imgretStr.compParam.username = this.userInfo.username
       // imgretStr.compParam.createTime = param.createTime

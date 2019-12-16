@@ -1,7 +1,6 @@
 import { getRole } from "@/api/admin/role"
 
 var validateRoleCodeOrRoleName = (rule, value, callback) => {
-  console.log(rule)
   var parmsName;
   var sysRole;
   if(rule.field == 'roleName'){
@@ -17,9 +16,8 @@ var validateRoleCodeOrRoleName = (rule, value, callback) => {
     }
     parmsName = '标识'
   }
-  console.log(sysRole)
   getRole(sysRole).then(response => {
-    if (window.boxType === 'edit') callback()
+    if (window.boxType === 'edit')callback()
     let result = response.data.data
     if (result) {
       callback(new Error('角色'+parmsName+'已经存在'))

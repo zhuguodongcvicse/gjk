@@ -6,6 +6,9 @@ import com.inforbus.gjk.simulation.dto.SimulationDTO;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 仿真业务接口
+ */
 public interface SimulatorService {
     /**
      * 开始仿真
