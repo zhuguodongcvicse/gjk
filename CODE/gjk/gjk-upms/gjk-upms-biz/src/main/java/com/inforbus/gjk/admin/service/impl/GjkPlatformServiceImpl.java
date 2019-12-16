@@ -5,6 +5,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -15,6 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.inforbus.gjk.admin.api.entity.BSP;
 import com.inforbus.gjk.admin.api.entity.BSPDetail;
 import com.inforbus.gjk.admin.api.entity.BSPFile;
@@ -83,10 +88,31 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 	 * 
 	 * @return
 	 */
-	public List<GjkPlatform> getPlatformTree() {
+	public List<GjkPlatform> getPlatformTree(List<GjkPlatform> libsList) {
 		List<GjkPlatform> gjkPlatforms = null;
 
 		try {
+			// 将软件框架库数据组装成 平台库可挂接的数据
+			gjkPlatforms = new ArrayList<GjkPlatform>();
+			List<GjkPlatform> platforms = Lists.newArrayList();
+			for (GjkPlatform gjkPlatform : libsList) {
+				GjkPlatform platform = new GjkPlatform();
+				platform.setParentId(gjkPlatform.getPlatformId());
+				platform.setPlatformId("BSP"+gjkPlatform.getPlatformId());
+				platform.setName("BSP库");
+				platforms.add(platform);
+				GjkPlatform platform1 = new GjkPlatform();
+				platform1.setParentId(gjkPlatform.getPlatformId());
+				platform1.setPlatformId("software"+gjkPlatform.getPlatformId());
+				platform1.setName("软件框架库");
+				platforms.add(platform1);
+				GjkPlatform platform2 = new GjkPlatform();
+				platform2.setParentId(gjkPlatform.getPlatformId());
+				platform2.setPlatformId("component"+gjkPlatform.getPlatformId());
+				platform2.setName("构件库");
+				platforms.add(platform2);
+			}
+			gjkPlatforms.addAll(platforms);
 			// 软件框架库主表信息
 			List<Software> softList = baseMapper.getSoftware();
 			// 软件框架库文件表信息
@@ -130,11 +156,9 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 				}
 			}
 
-			// 将软件框架库数据组装成 平台库可挂接的数据
-			gjkPlatforms = new ArrayList<GjkPlatform>();
-
+			
+			gjkPlatforms.addAll(this.getPlatformTrees());
 			if (CollectionUtils.isNotEmpty(softdetailList)) {
-				gjkPlatforms.addAll(this.getPlatformTrees());
 				for (SoftwareDetail softwareDetail : softdetailList) {
 					Software software = this.getSoftware(softwareDetail.getSoftwareId(), softList);
 					gjkPlatforms.addAll(this.getPlatforms(softwareDetail, software, fileMap));
@@ -165,7 +189,7 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 	private List<GjkPlatform> getPlatforms(SoftwareDetail softwareDetail, Software software,
 			HashMap<String, List<SoftwareFile>> fileMap) {
 		List<GjkPlatform> gjkPlatforms = new ArrayList<GjkPlatform>();
-//		if (software.getApplyState().equals("2")) {
+		if ("2".equals(software.getApplyState())) {
 			GjkPlatform gjkPlatform = new GjkPlatform();
 			// 组装第一层 软件框架库
 			String firstId = IdGenerate.uuid();
@@ -183,7 +207,7 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 					addGjkPlatformTree(gjkPlatforms, firstId, childFile);
 				}
 			}
-//		}
+		}
 		return gjkPlatforms;
 	}
 
@@ -198,7 +222,7 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 	private List<GjkPlatform> getBSPs(BSPDetail softwareDetail, BSP software, HashMap<String, List<BSPFile>> fileMap) {
 
 		List<GjkPlatform> gjkPlatforms = new ArrayList<GjkPlatform>();
-//		if (software.getApplyState().equals("2")) {
+		if ("2".equals(software.getApplyState())) {
 			GjkPlatform gjkPlatform = new GjkPlatform();
 			// 组装第一层 软件框架库
 			String firstId = IdGenerate.uuid();
@@ -216,49 +240,7 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 					addGjkPlatformTree(gjkPlatforms, firstId, childFile);
 				}
 			}
-//		}
-		// 组装第二层 软件框架库 版本
-//		gjkPlatform = new GjkPlatform();
-//		String secondId = IdGenerate.uuid();
-//		gjkPlatform.setPlatformId(secondId);
-//		gjkPlatform.setParentId(firstId);
-//		gjkPlatform.setName(String.valueOf(software.getVersion()));
-//		gjkPlatforms.add(gjkPlatform);
-
-		// 解析文件夹
-//		List<BSPFile> softwareFiles = fileMap.get(softwareDetail.getBspId());
-//		for (BSPFile sofware : softwareFiles) {
-//			// 如果是-1，无文件夹，直接组装数据；否则，解析文件夹
-//			if (sofware.getFileName().indexOf("/") == -1) {
-//				gjkPlatform = new GjkPlatform();
-//				gjkPlatform.setPlatformId(IdGenerate.uuid());
-//				gjkPlatform.setParentId(secondId);
-//				gjkPlatform.setName(sofware.getFileName());
-//				gjkPlatform.setPermission(libsPath + File.separator + sofware.getFilePath());
-//				gjkPlatforms.add(gjkPlatform);
-//			} else {
-//				// 分解文件夹
-//				String[] strs = sofware.getFileName().split("/");
-//				String parentId = secondId;
-//				for (String str : strs) {
-//					// 如果文件夹实体类已经建立，则修改 parentID
-//					GjkPlatform isExist = this.isExist(str, gjkPlatforms);
-//					if (null != isExist) {
-//						parentId = isExist.getPlatformId();
-//					} else {
-//						gjkPlatform = new GjkPlatform();
-//						gjkPlatform.setPlatformId(IdGenerate.uuid());
-//						gjkPlatform.setParentId(parentId);
-//						// 重置parentID
-//						parentId = gjkPlatform.getPlatformId();
-//						gjkPlatform.setName(str);
-//						gjkPlatform.setPermission(libsPath + File.separator + sofware.getFilePath());
-//						gjkPlatforms.add(gjkPlatform);
-//					}
-//				}
-//			}
-//		}
-
+		}
 		return gjkPlatforms;
 	}
 
@@ -521,22 +503,46 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 	 */
 	public List<GjkPlatform> getPlatformTrees() {
 		List<GjkPlatform> gjkPlatforms = new ArrayList<GjkPlatform>();
+		//分组查询，查出构建类型id，便利构建类型id
 		List<String> compIds = baseMapper.getCompIdsGroupCompId();
 		compIds.stream().forEach(compId -> {
-			GjkPlatform gjkPlatform = new GjkPlatform();
-			String compIdUUID = IdGenerate.uuid();
-			gjkPlatform.setPlatformId(compIdUUID);
-			gjkPlatform.setName(compId);
+			//定义一个去重集合
+			Set<String> parentIds = Sets.newHashSet();
+			//定义一个父级id的map
+			Map<String,String> uuidMap = Maps.newHashMap();
+			//通过构件类型id获取所有的同一类型的构件对象，遍历
 			List<Component> Components = baseMapper.getCompByCompId(compId);
 			Components.stream().forEach(component -> {
+				//根据构件id获取构件（平台文件）详情信息
 				ComponentDetail componentDetail = baseMapper.getCompDetailByComponentId(component.getId());
-				gjkPlatform.setParentId("component" + componentDetail.getLibsId());
+				//找到平台id下的“构件库”id
+				String parentId = "component" + componentDetail.getLibsId();
+				//获取到去重集合的长度
+				int size = parentIds.size();
+				//把“构件库”id 添加到去重集合里
+				parentIds.add(parentId);
+				//判断是否为新的平台
+				if(size < parentIds.size()) {
+					String compIdUUID = IdGenerate.uuid();
+					//判断存放父级id的map是否存在
+					if(!uuidMap.containsKey(parentId)) {
+						uuidMap.put(parentId, compIdUUID);
+					}
+					//设置构件编号节点
+					GjkPlatform gjkPlatform = new GjkPlatform();
+					gjkPlatform.setPlatformId(compIdUUID);
+					gjkPlatform.setName(compId);
+					gjkPlatform.setParentId(parentId);
+					gjkPlatforms.add(gjkPlatform);
+				}
+				//设置构件名_版本号节点
 				GjkPlatform detail = new GjkPlatform();
 				String detailUUID = IdGenerate.uuid();
 				detail.setPlatformId(detailUUID);
-				detail.setParentId(compIdUUID);
+				detail.setParentId(uuidMap.get(parentId));
 				detail.setName(component.getCompName() + "_" + component.getVersion());
 				gjkPlatforms.add(detail);
+				//读取文件，生成文件节点
 				File file = new File(libsPath + componentDetail.getFilePath() + File.separator + "平台文件");
 				if (file.isDirectory()) {
 					File[] childFileList = file.listFiles();
@@ -545,7 +551,6 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 					}
 				}
 			});
-			gjkPlatforms.add(gjkPlatform);
 		});
 		return gjkPlatforms;
 	}
