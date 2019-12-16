@@ -565,12 +565,12 @@ export default {
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
         //exportFile(this.$route.query.processId);
       } else if (state === "completeCheck") {
-        completeCheck(this.$route.query.processId).then(res => {
-          console.log("返回数据", res.data.data);
+        completeCheck(this.$route.query.processId,this.$store.getters.access_token).then(res => {
+          //console.log("返回数据", res.data.data);
+          this.postMessageData.cmd = "completeCheck";
+          this.postMessageData.params = res.data.data;
+          this.$refs.gjkIframe.sendMessage(this.postMessageData);
         });
-
-        // this.postMessageData.cmd = "completeCheck";
-        // this.$refs.gjkIframe.sendMessage(this.postMessageData);
       } else if(state === "startSimulation"){  //开始仿真
         this.postMessageData.cmd = "startSimulation";
         this.postMessageData.params = "";
@@ -618,6 +618,7 @@ export default {
           this.postMessageData.connectionData = val.data.data;
           // console.log("连线关系数据", this.postMessageData);
           this.$refs.gjkIframe.sendMessage(this.postMessageData);
+          console.log("构件列表",this.dtos)
         });
         this.index++;
         if (this.index == 1) {
@@ -894,70 +895,70 @@ export default {
   //     // }
   //   });
   // },
-  beforeRouteUpdate(to, from, next) {
-    //alert(this.isSave)
-    if (this.isSave == "") {
-      // alert("update")
-      var _this = this;
-      _this.postMessageData.cmd = "clickCompSave";
-      _this.postMessageData.params = "save";
-      _this.$refs.gjkIframe.sendMessage(_this.postMessageData);
-      setTimeout(() => {
-        next();
-      }, 1000);
-    }
-  },
-  beforeRouteLeave(to, from, next) {
-    //alert("99999-----",this.isSave)
-    switch (this.isSave) {
-      case "0":
-        next(false);
-        break;
-      case "1":
-        next();
-        break;
-      case "2":
-        next();
-        break;
-      case "3":
-        next();
-        break;
-      case "":
-        // this.dialogVisibleOfCloseRouter = true
-        // this.dialogNext = next
-        console.log("跳转的路由", to);
-        if (to.path != "/comp/manager/simulator") {
-          var _this = this;
-          _this.postMessageData.cmd = "clickCompSave";
-          _this.postMessageData.params = "save";
-          _this.$refs.gjkIframe.sendMessage(_this.postMessageData);
-          setTimeout(() => {
-            next();
-          }, 1000);
-        } else {
-          next();
-        }
-        break;
-    }
-    this.$store.commit("IS_SAVE", "");
-    // var _this = this;
-    // this.$confirm("是否保存当前流程模型?", "提示", {
-    //   confirmButtonText: "确定",
-    //   cancelButtonText: "取消",
-    //   type: "warning"
-    // })
-    //   .then(data => {
-    //     _this.postMessageData.cmd = "clickCompSave";
-    //     _this.postMessageData.params = "save";
-    //     _this.$refs.gjkIframe.sendMessage(_this.postMessageData);
-    //     setTimeout(() => {
-    //       next();
-    //     }, 1000);
-    //   })
-    //   .catch(function(err) {
-    //     next();
-    //   });
-  },
+  // beforeRouteUpdate(to, from, next) {
+  //   //alert(this.isSave)
+  //   if (this.isSave == "") {
+  //     // alert("update")
+  //     var _this = this;
+  //     _this.postMessageData.cmd = "clickCompSave";
+  //     _this.postMessageData.params = "save";
+  //     _this.$refs.gjkIframe.sendMessage(_this.postMessageData);
+  //     setTimeout(() => {
+  //       next();
+  //     }, 1000);
+  //   }
+  // },
+  // beforeRouteLeave(to, from, next) {
+  //   //alert("99999-----",this.isSave)
+  //   switch (this.isSave) {
+  //     case "0":
+  //       next(false);
+  //       break;
+  //     case "1":
+  //       next();
+  //       break;
+  //     case "2":
+  //       next();
+  //       break;
+  //     case "3":
+  //       next();
+  //       break;
+  //     case "":
+  //       // this.dialogVisibleOfCloseRouter = true
+  //       // this.dialogNext = next
+  //       console.log("跳转的路由", to);
+  //       if (to.path != "/comp/manager/simulator") {
+  //         var _this = this;
+  //         _this.postMessageData.cmd = "clickCompSave";
+  //         _this.postMessageData.params = "save";
+  //         _this.$refs.gjkIframe.sendMessage(_this.postMessageData);
+  //         setTimeout(() => {
+  //           next();
+  //         }, 1000);
+  //       } else {
+  //         next();
+  //       }
+  //       break;
+  //   }
+  //   this.$store.commit("IS_SAVE", "");
+  //   // var _this = this;
+  //   // this.$confirm("是否保存当前流程模型?", "提示", {
+  //   //   confirmButtonText: "确定",
+  //   //   cancelButtonText: "取消",
+  //   //   type: "warning"
+  //   // })
+  //   //   .then(data => {
+  //   //     _this.postMessageData.cmd = "clickCompSave";
+  //   //     _this.postMessageData.params = "save";
+  //   //     _this.$refs.gjkIframe.sendMessage(_this.postMessageData);
+  //   //     setTimeout(() => {
+  //   //       next();
+  //   //     }, 1000);
+  //   //   })
+  //   //   .catch(function(err) {
+  //   //     next();
+  //   //   });
+  // },
   beforeUpdate() {}, //生命周期 - 更新之前
   updated() {}, //生命周期 - 更新之后
   beforeDestroy() {}, //生命周期 - 销毁之前

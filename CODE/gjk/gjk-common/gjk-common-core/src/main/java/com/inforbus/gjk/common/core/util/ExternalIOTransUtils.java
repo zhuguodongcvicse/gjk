@@ -15,6 +15,8 @@ import SpbModel.Performance;
 import SpbModel.Struc;
 import appcontrol.AppControl;
 import flowModel.BackNodeInfoForSpb;
+import flowModel.CheckResult;
+import flowModel.SanityCheck;
 import flowModel.SimpleScheme;
 import flowModel.SpbFrameAutoGen;
 import flowModel.SystemConfig;
@@ -272,5 +274,15 @@ public class ExternalIOTransUtils {
 	public static void createSpbFrameFile(String spbModelXmlFile, String spbModelDir) {
 		new SpbFrameAutoGen().createSpbFrameFile(spbModelXmlFile, spbModelDir);
 //		new SpbFrameAutoGen().createSpbFrameFile(spbModelXmlFile, headerTemplateFile, srcTemplateFile, saveDir);
+	}
+	
+	/**
+	 * 完备性检查
+	 * @param flowFilePath
+	 * @return
+	 */
+	public static CheckResult completeCheck(String flowFilePath) {
+		SanityCheck sanityCheck = new SanityCheck();
+		return sanityCheck.sanityChecking(flowFilePath);
 	}
 }
