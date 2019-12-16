@@ -8,21 +8,28 @@
     :modal-append-to-body="false"
     custom-class="dialog_selectPhotoDialogVisible_14s"
   >
-    <el-upload
-      ref="appImage"
-      class="avatar-uploader"
-      action="/pro/manager/appAssemblyProjectCreate"
-      :show-file-list="false"
-      :on-success="handleAvatarSuccess"
-      :before-upload="beforeAvatarUpload"
-      :http-request="appAssemblyProCreateFunc"
-      :on-change="onchange"
-      accept="image/jpeg, image/jpg, image/png"
-    >
-      <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-      <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-    </el-upload>
-    <el-checkbox v-model="localDeploymentPlan">本地部署方案</el-checkbox>
+    <div style="text-align:center;">
+      <el-upload
+        ref="appImage"
+        class="avatar-uploader"
+        action="/pro/manager/appAssemblyProjectCreate"
+        :show-file-list="false"
+        :on-success="handleAvatarSuccess"
+        :before-upload="beforeAvatarUpload"
+        :http-request="appAssemblyProCreateFunc"
+        :on-change="onchange"
+        accept="image/jpeg, image/jpg, image/png"
+      >
+        <img
+          v-if="imageUrl"
+          :src="imageUrl"
+          class="avatar"
+          style="height:300px;width:300px;overflow:hidden"
+        />
+        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+      </el-upload>
+      <el-checkbox v-model="localDeploymentPlan">本地部署方案</el-checkbox>
+    </div>
     <div slot="footer">
       <el-button @click="closeDialog">取 消</el-button>
       <el-button type="primary" @click="createAppPro">确 定</el-button>
