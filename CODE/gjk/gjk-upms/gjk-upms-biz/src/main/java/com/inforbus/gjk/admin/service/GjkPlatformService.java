@@ -58,7 +58,7 @@ public interface GjkPlatformService extends IService<GjkPlatform> {
 	 * 
 	 * @return
 	 */
-	public List<GjkPlatform> getPlatformTree();
+	public List<GjkPlatform> getPlatformTree(List<GjkPlatform> libsList);
 
 	/**
 	 * 获取软件框架库的主表信息
