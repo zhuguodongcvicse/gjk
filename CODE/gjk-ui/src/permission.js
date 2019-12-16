@@ -29,6 +29,11 @@ router.beforeEach((to, from, next) => {
       to.meta.$keepAlive = false
     }
   }
+  //移除硬件的缓存
+  if (to.path.indexOf("hardwarelib") !== -1) {
+    to.meta.$keepAlive = false
+    to.meta.keepAlive = false
+  }
   const meta = to.meta || {}
   if (store.getters.access_token) {
     if (to.path === '/login') {

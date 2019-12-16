@@ -540,7 +540,7 @@ function initEditor(editor) {
       //给板卡赋ID
       setBoardsID()
     }
-    // console.log("fJson", fJson)
+    console.log("fJson", fJson)
     // console.log("bJson", bJson)
     let fJsonStr = JSON.stringify(fJson)
     let bJsonStr = JSON.stringify(bJson)

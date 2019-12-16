@@ -194,7 +194,7 @@ export default [{
         meta: {
             // $keepAlive: true,
             title: '芯片编辑',
-            chipDataTemp: ''
+            // chipDataTemp: ''
         },
     }, {
         path: 'chipList',

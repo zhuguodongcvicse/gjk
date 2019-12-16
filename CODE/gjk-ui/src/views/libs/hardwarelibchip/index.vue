@@ -201,7 +201,7 @@
             this.getAllUsers();
             this.getPlatformSelectTree();
         },
-        mounted: function () {
+        mounted() {
         },
         computed: {
             ...mapGetters(["permissions", "refreshListFlag", "userInfo"])
@@ -226,7 +226,7 @@
         },
         methods: {
             handleDisable(){
-                return this.clickCopyOrEdit === 'copy'
+                // return this.clickCopyOrEdit === 'copy'
             },
             showdialog() {
                 this.showInf.dialogFormVisible = true;

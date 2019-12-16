@@ -173,7 +173,6 @@
                 }
             },
             openTag(item) {
-                // console.log("item", item);
                 //直接点击标签跳到路由则关闭以下路由标签
                 /* if (item.$parent != null) {
                   var closeLastTag = item.$parent.$children;
@@ -195,12 +194,14 @@
                 // if (item.$options !== undefined && item.$options.propsData.label === "机箱新增") {
                 //     this.saveDataIsFirstFlag = 0
                 // }
+                // console.log("item", item);
                 let tag;
                 if (item.name) {
                     tag = this.findTag(item.name).tag;
                 } else {
                     tag = item;
                 }
+                // console.log("tag",tag)
                 this.$router.push({
                     path: this.$router.$avueRouter.getPath({
                         name: tag.label,
