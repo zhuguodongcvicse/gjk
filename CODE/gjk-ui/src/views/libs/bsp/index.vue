@@ -25,7 +25,7 @@
 
           <el-dialog
             class="libs_bsp_dialog_14s libs_bsp_index_dialog_14s"
-            title="新增"
+            title="新增BSP库"
             width="40%"
             :visible.sync="dialogTableVisible"
           >
@@ -54,7 +54,7 @@
                   :action="action"
                   :before-upload="beforeAvatarUpload"
                   :http-request="importCompFileUploadFunc"
-                  :file-list="importCompFileList"
+                  :show-file-list="false"
                   :on-change="onchange"
                 >
                   <el-button type="primary" ref="fileButton">
@@ -108,8 +108,8 @@
               </div>
             </el-form>
           </el-dialog>
-          <br />
-          <br />
+          <br>
+          <br>
         </template>
         <template slot-scope="scope" slot="menu">
           <!-- <el-button
@@ -165,7 +165,7 @@ import {
 } from "@/api/libs/bsp";
 import { tableOption } from "@/const/crud/libs/bsp";
 import { mapGetters } from "vuex";
-import { fetchPlatformTree } from "@/api/admin/platform";
+import { fetchPlatformTrees } from "@/api/admin/platform";
 import Vue from "vue";
 import uploader from "vue-simple-uploader";
 import storageApply from "@/views/libs/bsp/storageApply";
@@ -227,7 +227,7 @@ export default {
       storageApplyDialog: false,
       bspItemMsg: {},
       //文件
-      importCompFileList: [],
+      importCompFileList: {},
       action: "",
       //校验
       compFormParamRules: {
@@ -247,6 +247,7 @@ export default {
   },
   created() {
     this.getList();
+
     this.getPlatformSelectTree();
   },
   mounted: function() {},
@@ -286,7 +287,8 @@ export default {
     },
 
     importCompFileUploadFunc(param) {
-      this.importCompFileList = [param.file];
+      // this.importCompFileList = [param.file];
+      this.importCompFileList = param.file; //设置行文件（file）
     },
 
     //递归查找并挂上
@@ -309,118 +311,106 @@ export default {
     resumes(compForm) {
       this.$refs[compForm].validate((valid, object) => {
         if (valid) {
-          if (this.importCompFileList.length == 0) {
-            this.$message.warning("请选择文件上传。");
-          } else {
-            let params = new FormData();
-            params.append("file", this.importCompFileList[0]);
-            const loading = this.$loading({
-              lock: true,
-              text: "上传文件中。。。",
-              spinner: "el-icon-loading",
-              background: "rgba(0, 0, 0, 0.7)"
-            });
-            let formData = new FormData();
-            this.importCompFileList.forEach((e, index) => {
-              //每个文件的路径
-              //截取文件夹的第一个"/"前的内容，作为文件夹的名字
-              this.folderName = e.name;
-              let fileEntity = {};
-              fileEntity.fileName = e.name;
-              formData.append("file", e);
-            });
-            //平台的选择的id
-            this.platfoemId = "";
-            let softId = "";
-            //设置版本号
-            setVersionSize()
-              .then(response => {
-                if (response.data.data == null) {
-                  this.versionSize = 1.0;
-                } else {
-                  this.versionSize = response.data.data.version + 1.0;
-                }
-              })
-              .then(() => {
-                if (
-                  this.folderName.substring(0, this.folderName.lastIndexOf("."))
-                ) {
-                  this.software.filePath =
-                    "gjk/bsp/" +
-                    parseFloat(this.versionSize).toFixed(1) +
-                    "/" +
-                    this.folderName.substring(
-                      0,
-                      this.folderName.lastIndexOf(".")
-                    ) +
-                    "/";
-                } else {
-                  this.software.filePath =
-                    "gjk/bsp/" +
-                    parseFloat(this.versionSize).toFixed(1) +
-                    "/" +
-                    this.folderName +
-                    "/";
-                }
-                //保持软件框架库信息
-                this.software.version = this.versionSize;
-                this.software.description = this.description;
-                //软件框架库名
-                this.software.bspName =
-                  "BSP" + "_" + parseFloat(this.versionSize).toFixed(1);
-                //保存软件框架库信息
-                saveBSP(this.software).then(response => {
-                  softId = response.data.data.id;
-                  this.software.id = response.data.data.id;
-                  for (let items of this.options) {
-                    for (let item of this.formLabelAlign.values) {
-                      if (items.value === item) {
-                        let tmpSoft = JSON.parse(
-                          JSON.stringify(this.softwareDetail)
-                        );
-                        //对象深拷贝，对象存值
-                        // tmpSoft = JSON.parse(JSON.stringify(this.softwareDetail));
-                        let platId = "";
-                        platId = items.id;
-                        tmpSoft.bspId = softId;
-                        //平台id
-                        tmpSoft.platformId = platId;
-                        //保持软件构件库详细信息
-                        saveBSPDetail(tmpSoft).then(response => {});
-                      }
+          // if (this.importCompFileList.length == 0) {
+          //   this.$message.warning("请选择文件上传。");
+          // } else {
+          const loading = this.$loading({
+            lock: true,
+            text: "上传文件中。。。",
+            spinner: "el-icon-loading",
+            background: "rgba(0, 0, 0, 0.7)"
+          });
+          let formData = new FormData();
+          formData.append("file", this.importCompFileList);
+          //平台的选择的id
+          this.platfoemId = "";
+          let softId = "";
+          //设置版本号
+          setVersionSize()
+            .then(response => {
+              if (response.data.data == null) {
+                this.versionSize = 1.0;
+              } else {
+                this.versionSize = response.data.data.version + 1.0;
+              }
+            })
+            .then(() => {
+              if (
+                this.folderName.substring(0, this.folderName.lastIndexOf("."))
+              ) {
+                this.software.filePath =
+                  "gjk/bsp/" +
+                  parseFloat(this.versionSize).toFixed(1) +
+                  "/" +
+                  this.folderName.substring(
+                    0,
+                    this.folderName.lastIndexOf(".")
+                  ) +
+                  "/";
+              } else {
+                this.software.filePath =
+                  "gjk/bsp/" +
+                  parseFloat(this.versionSize).toFixed(1) +
+                  "/" +
+                  this.folderName +
+                  "/";
+              }
+              //保持软件框架库信息
+              this.software.version = this.versionSize;
+              this.software.description = this.description;
+              //软件框架库名
+              this.software.bspName =
+                "BSP" + "_" + parseFloat(this.versionSize).toFixed(1);
+              //保存软件框架库信息
+              saveBSP(this.software).then(response => {
+                softId = response.data.data.id;
+                this.software.id = response.data.data.id;
+                for (let items of this.options) {
+                  for (let item of this.formLabelAlign.values) {
+                    if (items.value === item) {
+                      let tmpSoft = JSON.parse(
+                        JSON.stringify(this.softwareDetail)
+                      );
+                      //对象深拷贝，对象存值
+                      // tmpSoft = JSON.parse(JSON.stringify(this.softwareDetail));
+                      let platId = "";
+                      platId = items.id;
+                      tmpSoft.bspId = softId;
+                      //平台id
+                      tmpSoft.platformId = platId;
+                      //保持软件构件库详细信息
+                      saveBSPDetail(tmpSoft).then(response => {});
                     }
                   }
-                });
-              })
-              .then(() => {
-                uploadFiles(
-                  formData,
-                  Object.assign(this.software.version)
-                ).then(response => {
-                  let resData = response.data.split(",");
+                }
+              });
+            })
+            .then(() => {
+              uploadFiles(formData, Object.assign(this.software.version)).then(
+                response => {
+                  // let resData = response.data.split(",");
                   setTimeout(() => {
                     loading.close();
-                    alert(resData[1]);
-                    //保存到数据库中的文件路径
-                    this.softFilePath = resData[0];
-                    //显示在页面上的文件路径
-                    this.frameFilePath = resData[0] + this.folderName + "/";
+                    this.$message({
+                      showClose: true,
+                      message: "保存成功",
+                      type: "success"
+                    });
                     this.dialogTableVisible = false;
                   }, 500);
                   this.reload();
-                });
-                this.isAble = true;
-              });
-          }
+                }
+              );
+              this.isAble = true;
+            });
+          // }
         }
       });
     },
 
     getPlatformSelectTree() {
-      fetchPlatformTree().then(response => {
+      fetchPlatformTrees().then(response => {
         //平台库树结构只展示根节点数据
-        // console.log("this.listQuery", response);
-
         for (let item of response.data.data) {
           let index = response.data.data.indexOf(item);
           let plaTreeData = {};
@@ -531,7 +521,7 @@ export default {
     //取消保存软件构件信息
     handleCancleBSP() {
       this.$refs.importComp.clearFiles();
-      this.importCompFileList = [];
+      this.importCompFileList = {};
       this.dialogTableVisible = false;
       this.reload();
     },
