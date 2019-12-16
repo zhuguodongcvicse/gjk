@@ -5,7 +5,7 @@ import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.inforbus.gjk.simulation.dto.SimulationDTO;
-import com.inforbus.gjk.simulation.global.Global;
+import com.inforbus.gjk.simulation.core.Global;
 import com.inforbus.gjk.simulation.service.SimulatorService;
 import com.inforbus.gjk.simulation.task.SimulatorQueue;
 import com.inforbus.gjk.simulation.task.Subscriber;
@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * 仿真业务实现
+ */
 @Service
 public class SimulatorServiceImpl implements SimulatorService {
 
@@ -42,6 +45,8 @@ public class SimulatorServiceImpl implements SimulatorService {
         subscriber.setQueueSize(Integer.parseInt(queueSize));
         subscriber.setUsername(username);
         subscriber.setRedisTemplate(redisTemplate);
+        //根据标识放入不同队列
+        Global.USERS_SIMULATOR_SUBSCRIBER.put(username,subscriber);
         new SubscriberThread(subscriber,channelName,host).start();
         return true;
     }
@@ -63,6 +68,9 @@ public class SimulatorServiceImpl implements SimulatorService {
 
     @Override
     public Map<String,Object> getData(String username, SimulationDTO simulationDTO) {
+        Subscriber subscriber = Global.USERS_SIMULATOR_SUBSCRIBER.get(username);
+        //修改初始化状态
+        subscriber.initState();
         String key = "Simulator:" + username+ ":" + simulationDTO.getSymbol();
         String str = redisTemplate.opsForList().rightPop(key);
         //调用客户接口解析
