@@ -72,16 +72,16 @@ public class StructlibsServiceImpl extends ServiceImpl<StructlibsMapper, Structl
 	 */
 	@Override
 	public Map<String, ParamTreeVO> parseStructFile(String filePath) {
-//		String url = new String(JGitUtil.getLOCAL_REPO_PATH() + File.separator + filePath);
 		String url = new String(filePath);
+		//判断路径是否为空
 		if (StringUtils.isNotEmpty(url)) {
 			File file = new File(url);
 			if (!file.exists()) {
 				return null;
 			}
 		}
+		//调用结构体转换方法，解析结构体数据
 		return HeaderFileAndStructUtils.convertStruct(ExternalIOTransUtils.parseStruct(url));
-		// return null;
 	}
 
 	/**

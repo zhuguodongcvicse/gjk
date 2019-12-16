@@ -657,8 +657,8 @@ export default {
           });
           if (mcParam) {
             //循环给名称中的ID struct赋值
-            row[key][1].lableName = this.structChange.dbId; //"structId"
-            row[key][2].lableName = this.structChange.fparamType; //"structType"
+            //row[key][1].lableName = this.structChange.dbId; //"structId"
+            //row[key][2].lableName = this.structChange.fparamType; //"structType"
           }
         }
       } else {
@@ -1110,10 +1110,10 @@ export default {
         });
         let child = deepClone(params);
         child.assigParamName = parentKey === "" ? params.lableName : parentKey;
-        console.log(
-          "//递归返回树形数据child.assigParamName",
-          child.assigParamName
-        );
+        // console.log(
+        //   "//递归返回树形数据child.assigParamName",
+        //   child.assigParamName
+        // );
         child.lableName = endKey;
         //处理树上所带参数
         child.nodeData.forEach(nodes => {
@@ -1159,7 +1159,11 @@ export default {
           if (endKey.includes(".")) {
             this.handleDialogParam(deepClone(child), arr.children, key);
           } else {
-            arr.children.push(deepClone(child));
+            if (arr.children === undefined) {
+              this.$set(arr, "children", [deepClone(child)]);
+            } else {
+              arr.children.push(deepClone(child));
+            }
           }
         }
       } else {

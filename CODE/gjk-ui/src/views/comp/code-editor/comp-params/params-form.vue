@@ -179,7 +179,7 @@ import paramsTable from "./params-table";
 import paramsTree from "./params-tree";
 import formItemType from "./form-item-type";
 import { getPerformanceTable } from "@/api/comp/compParams";
-import { getObjType, deepClone, isObjectEquals } from "@/util/util";
+import { getObjType, deepClone } from "@/util/util";
 import { delFilePath } from "@/api/comp/componentdetail";
 import { compByUserId } from "@/api/comp/component";
 import { mapGetters } from "vuex";
@@ -291,7 +291,9 @@ export default {
             //预处理性能表格
             this.analysisXnTableParam(deepClone(params), xnShowTable);
           } else if (type === "table") {
+            // console.log("111111111111111111111111", deepClone(params));
           } else {
+            // console.log("222222222222222222222222", deepClone(params));
           }
         }
         baseData.forEach(item => {
@@ -315,6 +317,19 @@ export default {
             this.$set(this.compParamsFormRules, item.lableName, mes);
           } else if (item.lableName === "函数名") {
             this.$set(this.compParamsFormRules, item.lableName, mes);
+          } else if (item.lableName === "函数路径") {
+            if (["edit", "copy"].includes(this.$route.query.type)) {
+              let name = item.attributeMap.name;
+              let headerKey = name.substring(name.lastIndexOf("\\") + 1);
+              let headerValue = {
+                输入: {},
+                输出: {}
+              };
+              this.$store.dispatch("setCacheHeaderValueParams", {
+                headerKey,
+                headerValue
+              });
+            }
           }
           //設置表單值 设置表单值
           this.$set(this.compSpbParam, item.lableName, item.attributeMap.name);
@@ -587,24 +602,23 @@ export default {
                     });
                     //文件名字是否箱相同，决定是否需要获取数据
                     if (headerKey === this.cacheHeaderValueParams.headerKey) {
+                      console.log("文件名字是否箱相同", headerKey);
                       let tmpParams = deepClone(tmpParam);
                       //合并数据
 
                       let cacheParams = this.cacheHeaderValueParams.headerValue[
                         param.lableName
                       ];
-                      // console.log(
-                      //   "文件名字是否箱相同",
-                      //   isObjectEquals(fromParam, cacheParams)
-                      // );
                       //判断cacheParams中的数据是不是跟模板一样，一样就不赋值
-                      if (!isObjectEquals(fromParam, cacheParams)) {
+                      if (!this.isObjectEquals(fromParam, cacheParams)) {
                         this.itemTypeChangeHeaderValueParams(
                           tmpParam,
                           cacheParams
                         );
+                      } else {
                       }
                     }
+                    console.log("设置值：***************", deepClone(tmpParam));
                     this.itemTypeChangeAssignmenDataParam(tmpParam, fromParam);
                     param = tmpParam;
                     headerValue[param.lableName] = param;
@@ -671,11 +685,6 @@ export default {
     },
     //将缓存头文件中的配置方式写到解析后的参数中数据
     itemTypeChangeHeaderValueParams(toParam, formParam) {
-      // console.log(
-      //   "将缓存头文件中的配置方式写到解析后的参数中数据000000",
-      //   toParam,
-      //   formParam
-      // );
       if (toParam.lableName === formParam.lableName) {
         if (toParam.attributeMap === null) {
           toParam.attributeMap = formParam.attributeMap;
@@ -683,36 +692,52 @@ export default {
           // console.log( "将缓存头文件中的配置方式写到解析后的参数中数据000000",toParam.lableName,formParam.attributeMap)
           toParam.attributeMap = formParam.attributeMap;
         }
-        console.log(
-          "将缓存头文件中的配置方式写到解析后的参数中数据22222",
-          toParam
-        );
-        if (toParam.xmlEntityMaps.length > 0) {
-          if (formParam.xmlEntityMaps.length === 1) {
-            toParam.xmlEntityMaps.forEach(topm => {
-              this.itemTypeChangeHeaderValueParams(
-                topm,
-                formParam.xmlEntityMaps[0]
-              );
-            });
-          } else {
-            formParam.xmlEntityMaps.forEach((form, index) => {
-              if (toParam.xmlEntityMaps[index] !== undefined) {
-                if (form.lableName === toParam.xmlEntityMaps[index].lableName) {
-                  this.itemTypeChangeHeaderValueParams(
-                    toParam.xmlEntityMaps[index],
-                    form
-                  );
+        if (formParam.xmlEntityMaps == null) {
+          formParam.xmlEntityMaps = [];
+        }
+        if (formParam.xmlEntityMaps.length > 0) {
+          //循环父级
+          formParam.xmlEntityMaps.forEach(form => {
+            let retParam;
+            for (let to of toParam.xmlEntityMaps) {
+              let formName = form.attributeMap.name;
+              let toName = to.attributeMap.name;
+              //完全相等时进入递归
+              if (formName === toName) {
+                if (form.lableName === "variable") {
+                  to.xmlEntityMaps.concat(this.getParamChaYi(form, to));
                 }
-              } else {
-                //设置默认值
-                // let data = deepClone(form);
-                // this.$set(toParam.xmlEntityMaps, index, data);
+                this.itemTypeChangeHeaderValueParams(to, form);
+              } else if (
+                ////完全包含时进入直接添加给toParam
+                form.lableName === "variable" &&
+                formName.includes(toName)
+              ) {
+                toParam.xmlEntityMaps.push(form);
+                continue;
               }
-            });
-          }
+            }
+          });
         }
       }
+    },
+    //得到variable下的多余的属性
+    getParamChaYi(form, to) {
+      let retParam = [];
+      form.xmlEntityMaps.forEach(tform => {
+        let isForm = false;
+        for (let tto of to.xmlEntityMaps) {
+          if (tform.attributeMap.name === tto.attributeMap.name) {
+            isForm = true;
+            continue;
+          }
+        }
+        if (!isForm) {
+          retParam.push(tform);
+          // console.log("设置值: 55555555555555", tform);
+        }
+      });
+      return retParam;
     },
     //将基础模板的配置方式写到解析后的参数中
     itemTypeChangeAssignmenDataParam(toParam, formParam) {
@@ -725,7 +750,7 @@ export default {
           let params = deepClone(formParam.attributeMap);
           for (let key in params) {
             if (!toParam.attributeMap[key]) {
-              this.$set(toParam.attributeMap,key,formParam.attributeMap[key])
+              this.$set(toParam.attributeMap, key, formParam.attributeMap[key]);
             }
           }
         }
@@ -1011,7 +1036,7 @@ export default {
         hash[next[name]] ? "" : (hash[next[name]] = true && item.push(next));
         return item;
       }, []));
-    }
+    },
     //给属性赋值---回写
     // attributeAssignmenTwo(tabParam, formParam, tabs) {
     //   formParam.forEach(form => {
@@ -1028,6 +1053,30 @@ export default {
     //     // });
     //   });
     // }
+    isObjectEquals(obja, objb) {
+      if (!obja || !objb) {
+        return false;
+      }
+      let akeys = Object.keys(obja);
+      let bkeys = Object.keys(objb);
+      if (akeys.length != bkeys.length) {
+        return false;
+      }
+      for (let item of akeys) {
+        let propA = obja[item];
+        let propB = objb[item];
+        if (typeof propA === "object") {
+          if (this.isObjectEquals(propA, propB)) {
+            return true;
+          } else {
+            return false;
+          }
+        } else if (propA !== propB) {
+          return false;
+        }
+      }
+      return true;
+    }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   async created() {

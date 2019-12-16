@@ -405,29 +405,3 @@ export const getTreeDefaultExpandIds = (tree, treeIds, cLen, index) => {//替换
     }
   });
 }
-/**
- * @description 判断对象是否相等 isObjectEquals(obja, obja)
- */
-export const isObjectEquals = (obja, objb)=> {
-  var aProps = Object.getOwnPropertyNames(obja);
-  var bProps = Object.getOwnPropertyNames(objb);
-  if (aProps.length != bProps.length) {
-    return false;
-  }
-  for (let i = 0; i < aProps.length; i++) {
-    const propName = aProps[i];
-    var propA = obja[propName];
-    var propB = objb[propName];
-    if (typeof propA === "object") {
-      if (this.isObjectEquals(propA, propB)) {
-        return true;
-      } else {
-        return false;
-      }
-    } else if (propA !== propB) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-}

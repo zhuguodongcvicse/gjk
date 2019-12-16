@@ -209,6 +209,7 @@ export default {
     };
     //这里存放数据
     return {
+      functionPathName: "",
       compListData: [],
       structBaseTemplate: [],
       dialogVisibleOfComBackup: false,
@@ -271,6 +272,8 @@ export default {
             } else if (baseParam.lableName === "函数名") {
               tmpComponent.compFuncname = baseParam.attributeMap.name;
             } else if (baseParam.lableName === "函数路径") {
+              let name = baseParam.attributeMap.name;
+              this.functionPathName = name.substring(name.lastIndexOf("/")+1);
               // tmpComponent.compName = config.attributeMap.name;
             } else if (baseParam.lableName === "系数文件") {
               // tmpComponent.compName = config.attributeMap.name;
@@ -372,14 +375,15 @@ export default {
           this.$refs.saveTestFiles.fetchSavefiles(comp).then(() => {
             this.$refs.savePlatformFiles.fetchSavefiles(comp).then(resFiles => {
               //保存构件文件//保存图标文件
-              // console.log("this.userInfo.username",this.userInfo.username)
+              console.log("函数路径", resFiles.data.data);
               this.$refs.saveCompImg.saveCompImg(comp);
               let saveComp = deepClone(this.saveDBXmlMaps);
               // console.log("saveComp", saveComp);
               // 需要更改函数路径
               saveComp.xmlEntityMaps[0].xmlEntityMaps.forEach(item => {
                 if (item.lableName === "函数路径") {
-                  item.attributeMap.name = resFiles.data.data;
+                  item.attributeMap.name =
+                    resFiles.data.data +"\\"+this.functionPathName;
                 }
               });
               if (this.headerFile.structParams) {
@@ -399,7 +403,7 @@ export default {
                   this.compSpbParam.spbModelXmlFile = resComp.data.data;
                   this.compSpbParam.saveDir = resFiles.data.data;
                   // this.compSpbForm.frameId = ;
-                  console.log("createSpbFrameFile",this.compSpbParam)
+                  console.log("createSpbFrameFile", this.compSpbParam);
                   createSpbFrameFile(this.compSpbParam)
                     .then(res => {
                       this.reload();
