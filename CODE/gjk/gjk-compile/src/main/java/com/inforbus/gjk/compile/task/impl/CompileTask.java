@@ -171,8 +171,6 @@ public class CompileTask implements Task {
             StreamManage successThread = new StreamManage(p.getInputStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译正常控制台信息
             errorThread.start();//开启编译错误流线程
             successThread.start();//开启编译正常流线程
-            errorThread.join();
-            successThread.join();
             return true;
         } catch (Exception e) {
             logger.error("vs2010平台编译失败，请检查编译进程。");
@@ -202,8 +200,6 @@ public class CompileTask implements Task {
             StreamManage successThread = new StreamManage(p.getInputStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译正常控制台信息
             errorThread.start();//开启编译错误流线程
             successThread.start();//开启编译正常流线程
-            errorThread.join();
-            successThread.join();
             return true;
         } catch (Exception e) {
             logger.error("sylixos平台编译失败，请检查编译进程是否阻塞。");
@@ -241,8 +237,6 @@ public class CompileTask implements Task {
             StreamManage successThread = new StreamManage(p.getInputStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译正常控制台信息
             errorThread.start();//开启编译错误流线程
             successThread.start();//开启编译正常流线程
-            errorThread.join();
-            successThread.join();
             return true;
         } catch (Exception e) {
             logger.error("workbench平台编译失败，请检查编译进程。");
@@ -262,19 +256,16 @@ public class CompileTask implements Task {
     private boolean linux(String filePath, String fileName, String token) {
         //执行linux命令编译 项目
         String cmd = null;
-        cmd = "mkdir " + this.linuxPath + "/AppPro/";
-        //先创建流程文件夹
-        boolean b = executeCommand(cmd, false);
-        cmd = "mkdir " + this.linuxPath + "/AppPro/" + fileName;
+        cmd = "mkdir -p " + this.linuxPath + "/AppPro/" + fileName;
         //再创建工程文件夹
-        boolean b1 = executeCommand(cmd, false);
+        boolean b = executeCommand(cmd, false);
         int i = 0;
         while (true) {
             i++;
             if (i == 500)
                 break;
         }
-        if (b && b1) {
+        if (b) {
             String linuxAimsPath = this.linuxPath + "/AppPro/" + fileName;
             //将Windows 项目文件上传到linux服务器中
             boolean isUploadSuccess = uploadFileToLinux(filePath, linuxAimsPath);
@@ -564,7 +555,7 @@ public class CompileTask implements Task {
         return result;
     }
 
-    //linux 系统执行cmd命令行方法,flag 为是否把执行命令失败的控制台信息推送到mq中
+    //linux 系统执行cmd命令行方法,
     public boolean executeCommand3(String cmd) {
         Session session = null;
         try {

@@ -1,57 +1,55 @@
 <template>
-  <div
-    class="app-container calendar-list-container libs_platformlib_index_14s"
-  >
+  <div class="app-container calendar-list-container libs_platformlib_index_14s">
     <!-- <basic-container> -->
-      <el-row class="admin_menu_index_main_14s">
-        <div class="split-pane-page-wrapper">
-          <split-pane v-model="offset" @on-moving="handleMoving" min="150px">
-            <div slot="left">
-              <el-col :span="24" class="menu_main_left_14s">
-                <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
-                <el-tree
-                  class="filter-tree"
-                  ref="tree"
-                  node-key="id"
-                  highlight-current
-                  :data="treeData"
-                  :default-expanded-keys="aExpandedKeys"
-                  :filter-node-method="filterNode"
-                  :props="defaultProps"
-                  :render-content="renderContent"
-                  @node-click="getNodeData"
-                  @node-expand="nodeExpand"
-                  @node-collapse="nodeCollapse"
-                ></el-tree>
-              </el-col>
-            </div>
-            <div slot="right">
-              <el-col :span="24" class="menu_main_right_14s">
-                <el-card class="box-card">
-                  <el-form>
-                    <el-form-item label="平台文件名：">
-                      <label>{{filePath}}</label>
-                      <!-- <el-input v-model="filePath" placeholder="平台文件名" style="width: 500px"></el-input> -->
-                    </el-form-item>
-                    <el-form-item>
-                      <!-- <show-child
+    <el-row class="admin_menu_index_main_14s">
+      <div class="split-pane-page-wrapper">
+        <split-pane v-model="offset" @on-moving="handleMoving" min="150px">
+          <div slot="left">
+            <el-col :span="24" class="menu_main_left_14s">
+              <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
+              <el-tree
+                class="filter-tree"
+                ref="tree"
+                node-key="id"
+                highlight-current
+                :data="treeData"
+                :default-expanded-keys="aExpandedKeys"
+                :filter-node-method="filterNode"
+                :props="defaultProps"
+                :render-content="renderContent"
+                @node-click="getNodeData"
+                @node-expand="nodeExpand"
+                @node-collapse="nodeCollapse"
+              ></el-tree>
+            </el-col>
+          </div>
+          <div slot="right">
+            <el-col :span="24" class="menu_main_right_14s">
+              <el-card class="box-card">
+                <el-form>
+                  <el-form-item label="平台文件名：">
+                    <label>{{filePath}}</label>
+                    <!-- <el-input v-model="filePath" placeholder="平台文件名" style="width: 500px"></el-input> -->
+                  </el-form-item>
+                  <el-form-item>
+                    <!-- <show-child
                         v-if="isShowChild === true"
                         :filePath="filePath"
                         :textContext="textContext"
-                      ></show-child> -->
-                      <monaco-editor
-                        v-if="isShowEditor === true"
-                        :textContext="textContext"
-                        :tFilePath="tFilePath"
-                      ></monaco-editor>
-                    </el-form-item>
-                  </el-form>
-                </el-card>
-              </el-col>
-            </div>
-          </split-pane>
-        </div>
-      </el-row>
+                    ></show-child>-->
+                    <monaco-editor
+                      v-if="isShowEditor === true"
+                      :textContext="textContext"
+                      :tFilePath="tFilePath"
+                    ></monaco-editor>
+                  </el-form-item>
+                </el-form>
+              </el-card>
+            </el-col>
+          </div>
+        </split-pane>
+      </div>
+    </el-row>
     <!-- </basic-container> -->
   </div>
 </template>
@@ -135,7 +133,6 @@ export default {
   },
   watch: {
     filterText(val) {
-      // console.log("val: ", this.$refs);
       this.$refs.tree.filter(val);
     }
   },
@@ -147,7 +144,7 @@ export default {
     this.platformManager_btn_del = this.permissions["sys_platform_del"];
   },
   computed: {
-    ...mapGetters(["elements", "permissions","website"])
+    ...mapGetters(["elements", "permissions", "website"])
   },
   methods: {
     handleMoving(e) {
@@ -169,15 +166,12 @@ export default {
       return tree;
     },
     testlist() {
-      getSoftwarePlatformTree(this.listQuery).then(response => {
-        // console.log("response::::|||",response);
-      });
+      getSoftwarePlatformTree(this.listQuery).then(response => {});
     },
 
     getList() {
       fetchPlatformTree(this.listQuery).then(response => {
         this.treeData = response.data.data;
-        // console.log("this.treeData", this.treeData);
       });
       //文件夹名
       platformLib().then(val => {
@@ -216,10 +210,13 @@ export default {
       return data.label.indexOf(value) !== -1;
     },
 
-    nodeExpand(data,node,val) {
+    nodeExpand(data, node, val) {
       //替换svg
       var el = val.$el;
-      $(el).find("img").eq(0).attr("src",this.website.publicSvg+"icon-svg/folder.svg");
+      $(el)
+        .find("img")
+        .eq(0)
+        .attr("src", this.website.publicSvg + "icon-svg/folder.svg");
 
       let aChildren = data.children;
       if (aChildren.length > 0) {
@@ -228,10 +225,13 @@ export default {
       }
       this.setExpandedKeys();
     },
-    nodeCollapse(data,node,val) {
+    nodeCollapse(data, node, val) {
       //替换svg
       var el = val.$el;
-      $(el).find("img").eq(0).attr("src",this.website.publicSvg+"icon-svg/folderPackup.svg");
+      $(el)
+        .find("img")
+        .eq(0)
+        .attr("src", this.website.publicSvg + "icon-svg/folderPackup.svg");
 
       this.oExpandedKey[data.id] = false;
       // 如果有子节点
@@ -280,16 +280,19 @@ export default {
       });
       if (data.filePath != null) {
         this.tFilePath = data.filePath;
-        console.log("lllll::", this.tFilePath);
         //显示文件内容
         this.threeLibsFilePathDTO.filePathName = data.filePath;
         readAlgorithmfile(this.threeLibsFilePathDTO).then(response => {
           //文件内容
-          this.textContext = response.data.data.textContext.split("@%#@*+-+@")[1];
+          this.textContext = response.data.data.textContext.split(
+            "@%#@*+-+@"
+          )[1];
           //文件后缀名，用于判断区分文件后缀名，使用文本编辑器还是什么
-          this.fileSuffix = response.data.data.textContext.split("@%#@*+-+@")[0];
+          this.fileSuffix = response.data.data.textContext.split(
+            "@%#@*+-+@"
+          )[0];
         });
-      }else{
+      } else {
         this.tFilePath = "";
         this.textContext = "";
         this.filePath = "";
@@ -305,51 +308,69 @@ export default {
       let test = "";
       let css = "padding:0 5px 0 0;width:15px;height:15px;";
       //.h/.hpp
-      if(this.endWidth(node.label,".h") || this.endWidth(node.label,".hpp")){
-        test = this.website.publicSvg+"icon-svg/h.svg";
-      //.cpp/.c
-      }else if(this.endWidth(node.label,".cpp") || this.endWidth(node.label,".c")){
-        test = this.website.publicSvg+"icon-svg/C++.svg";
-      //.java
-      }else if(this.endWidth(node.label,".java")){
-        test = this.website.publicSvg+"icon-svg/java.svg";
-      //.m
-      }else if(this.endWidth(node.label,".m")){
-        test = this.website.publicSvg+"icon-svg/m.svg";
-      //图片（png\jpg等）
-      }else if(this.endWidth(node.label,".jpg") || this.endWidth(node.label,".png")){
-        test = this.website.publicSvg+"icon-svg/JPG.svg";
-      //doc/docx
-      }else if(this.endWidth(node.label,".doc") || this.endWidth(node.label,".docx")){
-        test = this.website.publicSvg+"icon-svg/doc.svg";
-      //xls/xlsx
-      }else if(this.endWidth(node.label,".xls") || this.endWidth(node.label,".xlsx")){
-        test = this.website.publicSvg+"icon-svg/xlsx.svg";
-      //xml/yml
-      }else if(this.endWidth(node.label,".xml") || this.endWidth(node.label,".yml")){
-        test = this.website.publicSvg+"icon-svg/xml.svg";
-      //txt
-      }else if(this.endWidth(node.label,".txt")){
-        test = this.website.publicSvg+"icon-svg/txt.svg";
-      //文件夹
-      }else if(node.childNodes.length > 0){
-        test = this.website.publicSvg+"icon-svg/folderPackup.svg";
-      //其他
-      }else{
-        test = this.website.publicSvg+"icon-svg/empty.svg";
+      if (
+        this.endWidth(node.label, ".h") ||
+        this.endWidth(node.label, ".hpp")
+      ) {
+        test = this.website.publicSvg + "icon-svg/h.svg";
+        //.cpp/.c
+      } else if (
+        this.endWidth(node.label, ".cpp") ||
+        this.endWidth(node.label, ".c")
+      ) {
+        test = this.website.publicSvg + "icon-svg/C++.svg";
+        //.java
+      } else if (this.endWidth(node.label, ".java")) {
+        test = this.website.publicSvg + "icon-svg/java.svg";
+        //.m
+      } else if (this.endWidth(node.label, ".m")) {
+        test = this.website.publicSvg + "icon-svg/m.svg";
+        //图片（png\jpg等）
+      } else if (
+        this.endWidth(node.label, ".jpg") ||
+        this.endWidth(node.label, ".png")
+      ) {
+        test = this.website.publicSvg + "icon-svg/JPG.svg";
+        //doc/docx
+      } else if (
+        this.endWidth(node.label, ".doc") ||
+        this.endWidth(node.label, ".docx")
+      ) {
+        test = this.website.publicSvg + "icon-svg/doc.svg";
+        //xls/xlsx
+      } else if (
+        this.endWidth(node.label, ".xls") ||
+        this.endWidth(node.label, ".xlsx")
+      ) {
+        test = this.website.publicSvg + "icon-svg/xlsx.svg";
+        //xml/yml
+      } else if (
+        this.endWidth(node.label, ".xml") ||
+        this.endWidth(node.label, ".yml")
+      ) {
+        test = this.website.publicSvg + "icon-svg/xml.svg";
+        //txt
+      } else if (this.endWidth(node.label, ".txt")) {
+        test = this.website.publicSvg + "icon-svg/txt.svg";
+        //文件夹
+      } else if (node.childNodes.length > 0) {
+        test = this.website.publicSvg + "icon-svg/folderPackup.svg";
+        //其他
+      } else {
+        test = this.website.publicSvg + "icon-svg/empty.svg";
       }
       return (
         <span class="custom-tree-node">
-          <img src={test} style={css}/>
+          <img src={test} style={css} />
           <span>{node.label}</span>
         </span>
       );
     },
     //判断结尾和预设类型是否匹配
-    endWidth(val,endval){
-      let d = val.length-endval.length;
-      return (d>=0 && val.lastIndexOf(endval) == d)
-    },
+    endWidth(val, endval) {
+      let d = val.length - endval.length;
+      return d >= 0 && val.lastIndexOf(endval) == d;
+    }
   }
 };
 </script>

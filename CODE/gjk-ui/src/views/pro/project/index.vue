@@ -396,14 +396,14 @@ export default {
         // console.log("proNameListByUserId:", Response.data.data);
         this.proNameList = Response.data.data;
       });
-      getSoftwareTree().then(Response => {
-        this.softwareTreeData = Response.data.data;
-        // console.log("softwareTreeData:", this.softwareTreeData);
-      });
-      getBSPTree().then(Response => {
-        this.bspTreeData = Response.data.data;
-        // console.log("bspTreeData：", this.bspTreeData);
-      });
+      // getSoftwareTree().then(Response => {
+      //   this.softwareTreeData = Response.data.data;
+      //   // console.log("softwareTreeData:", this.softwareTreeData);
+      // });
+      // getBSPTree().then(Response => {
+      //   this.bspTreeData = Response.data.data;
+      //   // console.log("bspTreeData：", this.bspTreeData);
+      // });
       // this.foundChild(this.compTreeData, this.compHaveChildArray);
       // console.log(this.compHaveChildArray, "+++++++++++++");
       getUserhasApplyAuto().then(Response => {

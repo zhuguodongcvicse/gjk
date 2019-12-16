@@ -1,10 +1,11 @@
 package com.inforbus.gjk.common.core.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -195,6 +196,78 @@ public class FileUtil {
 			System.out.println("传入路径错误，请联系管理员。");
 			return null;
 		}
+	}
+
+	/**
+	 * 内容写入文件
+	 * @param fileFullPath
+	 * @param content
+	 * @return
+	 * @throws IOException
+	 */
+	public static File writeFileContent(String fileFullPath, List<String> content) throws IOException {
+//		File file = new File(fileFullPath);
+//		// 判断路径 不存在就创建
+//		if(!file.getParentFile().exists()){
+//			file.getParentFile().mkdirs();
+//		}
+//		// 判断文件是否存在 不存在则创建
+//		if(!file.exists()){
+//			file.createNewFile();
+//		}
+//
+//		Path path = Paths.get(fileFullPath);
+//		if(!Files.exists(path)){
+//			Files.createFile(path);
+//		}
+//
+//		FileOutputStream fos = new FileOutputStream(file);
+//		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos));
+//		// 内容写入文件
+//		for (String s : content) {
+//			writer.write(s);
+//			writer.newLine();
+//		}
+//		writer.close();
+//		fos.close();
+		File file = new File(fileFullPath);
+		Path path = Paths.get(fileFullPath);
+		// 不存在就创建
+		if(!Files.exists(path)){
+			Files.createFile(path);
+		}
+
+		BufferedWriter writer = Files.newBufferedWriter(path);
+		// 内容写入文件
+		for (String s : content) {
+			writer.write(s);
+			writer.newLine();
+		}
+		writer.flush();
+		writer.close();
+		return file;
+	}
+
+	/**
+	 * 读取文件内容
+	 * @param fileFullPath
+	 * @return
+	 * @throws IOException
+	 */
+	public static List<String> readFileContent(String fileFullPath) throws IOException {
+//		List<String> list = new ArrayList<>();
+//		File file = new File(fileFullPath);
+//		InputStreamReader reader = new InputStreamReader(new FileInputStream(file));
+//		BufferedReader br = new BufferedReader(reader);
+//		String line = "";
+//		while ((line = br.readLine()) != null){
+//			list.add(line);
+//		}
+		List<String> list = new ArrayList<>();
+		Files.lines(Paths.get(fileFullPath)).forEach(line -> {
+			list.add(line);
+		});
+		return list;
 	}
 
 }

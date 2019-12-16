@@ -477,7 +477,7 @@ export default {
       console.log(domain);
       this.appName = domain.fileName;
       this.isAble = false;
-      this.appFilePath = domain.filePath + "/" + domain.fileName + "/";
+      this.appFilePath = domain.filePath + "/";
       //无用
       // this.appFile = "D:/14S_GJK_GIT/gjk/gjk/APPDownload/" + domain.fileName;
       //用户名
@@ -490,17 +490,15 @@ export default {
       this.appDataDTO.appProPath = domain.filePath + "/" + domain.fileName;
       //系统配置模块xml路径
       this.appDataDTO.sysconfigPath = domain.sysconfigFilePath;
-      let mm = {};
-            mm.oriFilePath = this.appFilePath;
-            mm.downloadAPPFileName = this.appName;
-            handleDown(mm).then(res => {});
+      //appName
+      this.appDataDTO.appName = domain.filePath.split("\\")[3];
       //导出接口
       appTaskExport(this.appDataDTO)
         .then(res => {
           if(res){
             let mm = {};
             mm.oriFilePath = this.appFilePath;
-            mm.downloadAPPFileName = this.appName;
+            mm.downloadAPPFileName = this.appFilePath.split("\\")[2] + "\\" + this.appFilePath.split("\\")[3]
             handleDown(mm).then(res => {});
           }else{
             this.$notify.error({

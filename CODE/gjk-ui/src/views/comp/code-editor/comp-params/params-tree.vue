@@ -657,8 +657,8 @@ export default {
           });
           if (mcParam) {
             //循环给名称中的ID struct赋值
-            row[key][1].lableName = this.structChange.dbId; //"structId"
-            row[key][2].lableName = this.structChange.fparamType; //"structType"
+            //row[key][1].lableName = this.structChange.dbId; //"structId"
+            //row[key][2].lableName = this.structChange.fparamType; //"structType"
           }
         }
       } else {
