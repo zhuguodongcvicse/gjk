@@ -317,5 +317,12 @@ public interface ManagerService extends IService<ProjectFile> {
 	 * @param projectId
 	 */
 	int analysisZipFile(MultipartFile ufile, String projectId);
+	
+	/**
+	 * 流程建模完备性检查
+	 * @param id
+	 * @return
+	 */
+	R completeCheck(String id,String userId);
 
 }

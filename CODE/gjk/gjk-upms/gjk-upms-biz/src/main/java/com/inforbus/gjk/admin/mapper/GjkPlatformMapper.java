@@ -101,7 +101,16 @@ public interface GjkPlatformMapper extends BaseMapper<GjkPlatform> {
 	 * @return
 	 */
 	Component getCompNameById(@Param("id") String id);
+	/**
+	 * 获取所有构件
+	 * @param id
+	 * @return
+	 */
+	List<String> getCompIdsGroupCompId();
 
+	ComponentDetail getCompDetailByComponentId(@Param("componentId")String componentId);
+	
+	List<Component> getCompByCompId(@Param("compId")String compId);
 	/**
 	 * 删除所有数据
 	 */

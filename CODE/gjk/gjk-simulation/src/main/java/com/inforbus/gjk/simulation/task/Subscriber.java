@@ -7,7 +7,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import redis.clients.jedis.JedisPubSub;
 
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * redis监听对象
+ */
 public class Subscriber extends JedisPubSub {
 
     private String username;
@@ -16,7 +20,10 @@ public class Subscriber extends JedisPubSub {
 
     private Integer queueSize;
 
+    private volatile boolean initState;
+
     public Subscriber() {
+        this.initState = true;
     }
 
     public void setUsername(String username) {
@@ -43,6 +50,11 @@ public class Subscriber extends JedisPubSub {
         Long size = operations.size(key);
         if(size == null || size < queueSize){
             operations.leftPush(key,message);
+        }else{
+            if(initState){
+                operations.rightPop(key);
+                operations.leftPush(key,message);
+            }
         }
     }
 
@@ -54,7 +66,10 @@ public class Subscriber extends JedisPubSub {
     public void onUnsubscribe(String channel, int subscribedChannels) {
         System.out.println(String.format("unsubscribe redis channel, channel %s, subscribedChannels %d",
                 channel, subscribedChannels));
+    }
 
+    public void initState(){
+        this.initState = false;
     }
 
 }

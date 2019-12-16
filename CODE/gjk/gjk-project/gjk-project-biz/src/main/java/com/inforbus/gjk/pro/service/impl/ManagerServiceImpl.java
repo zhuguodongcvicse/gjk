@@ -31,6 +31,7 @@ import org.apache.poi.xssf.usermodel.*;
 import org.ho.yaml.Yaml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -74,6 +75,7 @@ import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
 import com.inforbus.gjk.pro.mapper.PartPlatformSoftwareMapper;
 import com.inforbus.gjk.pro.service.ManagerService;
 
+import flowModel.CheckResult;
 import lombok.AllArgsConstructor;
 
 /**
@@ -97,6 +99,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	protected PartPlatformBSPMapper partPlatformBSPMapper;
 	@Autowired
 	private AppMapper appMapper;
+	@Autowired
+	private AmqpTemplate rabbitmqTemplate;
 
 	private static final String proDetailPath = JGitUtil.getLOCAL_REPO_PATH();
 	private static final String integerCodeFileName = JGitUtil.getINTEGER_CODE_FILE_NAME();
@@ -2990,5 +2994,15 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			}
 		}
 		return obj;
+	}
+	
+	@Override
+	public R completeCheck(String id,String userId) {
+		Map<String, String> map = baseMapper.findProJSON(id);
+		String xmlFilepath = proDetailPath + map.get("filePath") + map.get("fileName") + ".xml";
+		CheckResult checkResult = ExternalIOTransUtils.completeCheck(xmlFilepath);
+		String strLog = checkResult.getM_textConsole();
+		this.rabbitmqTemplate.convertAndSend(userId, "checkLog" + "===@@@===" + strLog);
+		return new R(checkResult);
 	}
 }

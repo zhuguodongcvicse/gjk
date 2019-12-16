@@ -718,6 +718,17 @@ public class ManagerController {
 	public void deleteChipsFromHardwarelibs(@PathVariable String id) {
 		managerService.deleteChipsFromHardwarelibs(id);
 	}
+	
+	/**
+	 * 流程建模完备性检查
+	 * @param id
+	 * @return
+	 */
+	@GetMapping
+	@RequestMapping("/completeCheck/{id}/{userId}")
+	public R completeCheck(@PathVariable("id") String id,@PathVariable("userId") String userId) {
+		return managerService.completeCheck(id,userId);
+	}
 
 	/**
 	 * 流程建模导出

@@ -14,9 +14,9 @@
               </el-select>
             </el-form-item>
             <el-form-item label="区域二">
-              <el-select placeholder="请选择展示帧号" v-model="myChartsSelectValue">
+              <el-select placeholder="请选择展示帧号" v-model="myCharts1SelectValue">
                 <el-option
-                  v-for="(attribute,index) in myChartsSelectData"
+                  v-for="(attribute,index) in myCharts1SelectData"
                   :key="index"
                   :label="attribute.label"
                   :value="attribute.value"></el-option>
@@ -82,17 +82,28 @@
       </el-col>
       <el-col :span="7">
         <div style="margin-left: 2px;border: 1px solid rgb(235, 238, 245); height: 568px">
-          <el-card shadow="always" style="height: 100%" class="box-card">
-            <div slot="header">
-              <span>结构体数据</span>
+          <div style="height: 50%">
+            <div style="padding: 3px;height: 30px; width: 30%; margin:auto">
+              <span style="margin: auto;font-weight: bold;font-size: 16px;">结构体数据</span>
             </div>
-            <avue-crud
-            ref="crud"
-            :data="tableData"
-            :option="tableOption"
-            >
-            </avue-crud>
-          </el-card>
+            <el-table border :data="tableData">
+              <el-table-column type="index" width="50px" label="序号"></el-table-column>
+              <el-table-column label="名称" prop="name"></el-table-column>
+              <el-table-column label="值" prop="value"></el-table-column>
+              <el-table-column label="备注" prop="remake"></el-table-column>
+            </el-table>
+          </div>
+          <div style=" height: 50%">
+            <div style="padding: 3px;height: 30px; width: 30%; margin:auto">
+              <span style="font-weight: bold;font-size: 16px;">结构体数据</span>
+            </div>
+            <el-table border :data="tableData">
+              <el-table-column type="index" width="50px" label="序号"></el-table-column>
+              <el-table-column label="名称" prop="name"></el-table-column>
+              <el-table-column label="值" prop="value"></el-table-column>
+              <el-table-column label="备注" prop="remake"></el-table-column>
+            </el-table>
+          </div>
         </div>
       </el-col>
       <el-col :span="12">
@@ -100,14 +111,14 @@
           <div style="margin-left: 2px;border: 1px solid rgb(235, 238, 245);height: 50%;">
               <div style="width: 100%; height: 100%">
                 <div v-if="!myChartsShow" :style="{width: '100%', height: '100%'}">
-                  <span>数据展示区域一</span>
+                  <span style="font-weight: bold;font-size: 16px;">数据展示区域一</span>
                 </div>
                 <div v-if="myChartsShow" id="myChart" :style="{width: '100%', height: '100%'}"></div>
               </div>
           </div>
           <div style="margin-left: 2px;border: 1px solid rgb(235, 238, 245); height: 50%">
               <div v-if="!myCharts1Show" :style="{width: '100%', height: '100%'}">
-                <span>数据展示区域二</span>
+                <span style="font-weight: bold;font-size: 16px;">数据展示区域二</span>
               </div>
               <div v-if="myCharts1Show" id="myChart1" :style="{width: '100%', height: '100%'}"></div>
           </div>
@@ -142,8 +153,8 @@ export default {
         yaxisData: []
       },
       flag: false,
-      myChartsSelectData: [],
-      myCharts1SelectData: [],
+      myChartsSelectData: [{label: '156',value: '156'}],
+      myCharts1SelectData: [{label: '178',value: '178'}],
       myChartsSelectValue: '',
       myCharts1SelectValue: '',
       tableData: [],
@@ -174,7 +185,10 @@ export default {
           {
             label: '值',
             prop: 'value'
-          }
+          },{
+            label: '备注',
+            prop: 'remark'
+            }
         ]
       }
     };
@@ -191,12 +205,12 @@ export default {
         if(this.flag){
           return;
         }
-        this.tableData = [{name:"test1",value: "test1"},{name: "test2",value: "test2"}]
+        this.tableData = [{name:"test1",value: "test1",remark: "test1"},{name: "test2",value: "test2",remark: "test1"}]
         let self = this;
         if (self && !self._isDestroyed) {//循环发送请求解决路由页面依旧发请求问题
           this.myCharts = setTimeout(() => {
             self.drawLine1(data);
-          }, 1000);
+          }, 1);
         }
         this.simulationData = response.data.data;
         var option = {
@@ -289,7 +303,7 @@ export default {
         if (self && !self._isDestroyed) {//循环发送请求解决路由页面依旧发请求问题
           this.myCharts1 = setTimeout(() => {
             self.drawLine2(data);
-          }, 1000);
+          }, 1);
         }
         this.simulationData = response.data.data;
         var option = {
@@ -344,7 +358,7 @@ export default {
             {
               name: "数据",
               type: "category",
-              boundaryGap: false,
+              boundaryGap: true,
               // axisLine: {onZero: true},
               data: this.simulationData.xaxisData
             }

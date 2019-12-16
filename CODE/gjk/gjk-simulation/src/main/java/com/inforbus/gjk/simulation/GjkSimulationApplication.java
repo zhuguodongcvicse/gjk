@@ -8,7 +8,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * @author dong
- * @date 2019年05月21日 数据中心系统
+ * @date 2019年05月21日 仿真数据监测展示系统
  */
 @EnableGjkResourceServer
 @EnableGjkFeignClients

@@ -274,3 +274,10 @@ export function staticInspect(obj) {
     params: obj,
   })
 }
+
+export function completeCheck(id,userId) {
+  return request({
+    url: '/pro/manager/completeCheck/'+id + '/' + userId,
+    method: 'get'
+  })
+}
