@@ -97,7 +97,7 @@
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" v-if="clickCopyOrEdit === 'copy'" @click="copyOneChip('form', form)">确 定</el-button>
         <el-button type="primary" v-if="clickCopyOrEdit === 'edit'" @click="updateChip('form', form)">确 定</el-button>
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button @click="closeDialog()">取 消</el-button>
       </div>
     </el-dialog>
     <addChip :showInf="showInf" :allChips="allChips" ref="pram"></addChip>
@@ -228,6 +228,10 @@
             handleDisable(){
                 // return this.clickCopyOrEdit === 'copy'
             },
+            closeDialog() {
+                // this.getList()
+                this.dialogFormVisible = false;
+            },
             showdialog() {
                 this.showInf.dialogFormVisible = true;
             },
@@ -270,7 +274,7 @@
                 //复制不能与本用户的芯片库同名
                 for (const i in this.allChips) {
                     if (this.allChips[i].chipName === this.form.chipName) {
-                        alert("接口名称不能相同")
+                        alert("芯片名称不能相同")
                         return
                     }
                 }

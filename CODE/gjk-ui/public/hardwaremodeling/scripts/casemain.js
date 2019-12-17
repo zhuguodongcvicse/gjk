@@ -18,6 +18,8 @@ var linkGraphList = {datas: []}
 var clickCheckedChip
 var ChipsWithIPs = []
 var caseID = -1
+var checkIPMap= new Map()
+var clickChipsList = [] //记录点击的芯片次序
 
 Q.registerImage('rack', 'images/Crate.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
 Q.registerImage('card', 'images/BeforeTheBoard.svg');
@@ -1124,6 +1126,15 @@ function initEditor(editor) {
     // console.log("data", data)
     if (data.properties.chipName != null) {
       clickCheckedChip = data.properties
+      if (clickChipsList.length === 2) {
+        clickChipsList.splice(0,1)
+      }
+      clickChipsList.push(data.properties)
+      checkIPMap.forEach((value, key) => {
+        if (key === data.properties.uniqueId) {
+          data.set('IP', value);
+        }
+      })
     }
     // console.log("type",type)
     //这里可以获得当前点击的图元对象

@@ -39,7 +39,7 @@
           :prop="domains"
         ></el-table-column>
       </el-table>
-      <br>
+      <br />
     </div>
   </el-row>
 </template>
@@ -124,7 +124,13 @@ export default {
           let ffff = {};
           // ffff.方案 = Response.data.data.xmlEntityMaps[i].attributeMap.name;
           //展示方案名时，只展示文件名
-          let stri = (Response.data.data.xmlEntityMaps[i].attributeMap.name).substring((Response.data.data.xmlEntityMaps[i].attributeMap.name).lastIndexOf("\\")+1);
+          let stri = Response.data.data.xmlEntityMaps[
+            i
+          ].attributeMap.name.substring(
+            Response.data.data.xmlEntityMaps[i].attributeMap.name.lastIndexOf(
+              "\\"
+            ) + 1
+          );
           ffff.方案 = stri;
           for (var j = 0; j < ooooo.length; j++) {
             for (
@@ -161,17 +167,21 @@ export default {
         if (item.方案 != row.方案) {
           item.checked = false;
         } else {
-          let str = '';
+          let str = "";
           //获取当前选择的路径
           for (var j = 0; j < this.planSelected.xmlEntityMaps.length; j++) {
-             str = (this.planSelected.xmlEntityMaps[j].attributeMap.name).substring((this.planSelected.xmlEntityMaps[j].attributeMap.name).lastIndexOf("\\")+1);
-            if (
-              row.方案 === str
-            ) {
+            str = this.planSelected.xmlEntityMaps[
+              j
+            ].attributeMap.name.substring(
+              this.planSelected.xmlEntityMaps[j].attributeMap.name.lastIndexOf(
+                "\\"
+              ) + 1
+            );
+            if (row.方案 === str) {
               this.filePath = this.planSelected.xmlEntityMaps[
                 j
               ].attributeMap.filepath;
-              console.log("pppppppp:::",this.filePath);
+              console.log("pppppppp:::", this.filePath);
             }
           }
         }
@@ -180,9 +190,9 @@ export default {
 
     //保存
     handleSavePro() {
-      if(!this.tableDate || this.tableDate.length == 0){
-          console.log('没有数据结束保存操作')
-          return
+      if (!this.tableDate || this.tableDate.length == 0) {
+        console.log("没有数据结束保存操作");
+        return;
       }
       //存方案信息
       const loading = this.$loading({
@@ -192,26 +202,31 @@ export default {
         background: "rgba(0, 0, 0, 0.7)"
       });
       //传对象
-      writeBackDeployScheme({id:this.$route.query.proIds, path:this.filePath}).then(Response => {
+      writeBackDeployScheme({
+        id: this.$route.query.proIds,
+        path: this.filePath
+      }).then(Response => {
         console.log("response:::", Response);
-      })
+      });
       console.log("this.filePath:::", this.filePath);
       //模拟保存方案，方法要换
       getSysConfigXmlEntityMap(this.$route.query.proIds).then(Response => {
-        setTimeout(()=>{
+        setTimeout(() => {
           loading.close();
-          this.$message({
-          showClose: true,
-          message: "保存成功",
-          type: "success"
-        });
-        }, 500)
-
-
+          this.$notify({
+            title: "成功",
+            message: "保存成功",
+            type: "success",
+            duration: 2000
+          });
+          // this.$message({
+          //   showClose: true,
+          //   message: "保存成功",
+          //   type: "success"
+          // });
+        }, 500);
       });
-    },
-
-
+    }
   }
 };
 </script>

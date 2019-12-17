@@ -3,8 +3,10 @@ package com.inforbus.gjk.admin.controller;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.google.common.collect.Lists;
 import com.inforbus.gjk.admin.api.entity.GjkAlgorithm;
 import com.inforbus.gjk.admin.api.entity.GjkPlatform;
+import com.inforbus.gjk.admin.api.entity.GjkTest;
 import com.inforbus.gjk.admin.api.vo.AlgorithmVO;
 import com.inforbus.gjk.admin.api.vo.TreeUtilAl;
 import com.inforbus.gjk.admin.api.vo.TreeUtilPl;
@@ -48,13 +50,22 @@ public class GjkAlgorithmController {
 	 */
 	@GetMapping(value = "/trees")
 	public R getTrees() {
-		List<GjkAlgorithm> platformList = gjkAlgorithmService.list(Wrappers.emptyWrapper());
+		List<GjkAlgorithm> algorithmList = gjkAlgorithmService.list(Wrappers.emptyWrapper());
+		List<GjkAlgorithm> gjkAlgorithms = Lists.newArrayList();
+		for (GjkAlgorithm gjkAlgorithm : algorithmList) {
+			GjkAlgorithm gjkAlgorithm1 = new GjkAlgorithm();
+			gjkAlgorithm1.setParentId(gjkAlgorithm.getAlgorithmId());
+			gjkAlgorithm1.setAlgorithmId("component"+gjkAlgorithm.getAlgorithmId());
+			gjkAlgorithm1.setName("构件库");
+			gjkAlgorithms.add(gjkAlgorithm1);
+		}
+		algorithmList.addAll(gjkAlgorithms);
 		List<GjkAlgorithm> softwareList = gjkPlatformService.getAlgorithmTree();
-		if (CollectionUtils.isNotEmpty(platformList) && CollectionUtils.isNotEmpty(softwareList)) {
-			platformList.addAll(softwareList);
+		if (CollectionUtils.isNotEmpty(algorithmList) && CollectionUtils.isNotEmpty(softwareList)) {
+			algorithmList.addAll(softwareList);
 		}
 
-		return new R<>(TreeUtilAl.buildTreesss(platformList, "-1"));
+		return new R<>(TreeUtilAl.buildTreesss(algorithmList, "-1"));
 	}
 
 	/**

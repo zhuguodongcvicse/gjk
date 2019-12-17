@@ -204,7 +204,7 @@
 	
 	<!-- 根据componentid查询componentDetail -->
 	<select id="getCompDetailByComponentId" resultMap="componentDetailMap">
-		SELECT * FROM gjk_common_component_detail where comp_id = #{componentId} and  file_name = '平台文件'
+		SELECT * FROM gjk_common_component_detail where comp_id = #{componentId} and  file_name = #{fileName}
 	</select>
 	
 	<!-- 根据详细表的comp_id找到主表里的comp_name -->

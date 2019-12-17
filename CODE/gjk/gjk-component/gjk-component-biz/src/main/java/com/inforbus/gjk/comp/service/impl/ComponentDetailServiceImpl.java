@@ -836,14 +836,15 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		List<File> files = Lists.newArrayList();
 		Boolean isUpdate = false;
 		String oldPath = "";
+		String libsId=StringUtils.isEmpty(maps.get("libsID").toString())?"-1":maps.get("libsID").toString();
 		if (null == detdirs) {
 			isUpdate = false;
 			// 保存根目录对象
 			detdirs = new ComponentDetail(IdGenerate.uuid(), maps.get("compValue").toString(), fileType, strType,
-					newPath, createTime, maps.get("compValue").toString(), maps.get("libsID").toString());
+					newPath, createTime, maps.get("compValue").toString(), libsId);
 		} else {
 			isUpdate = true;
-			detdirs.setLibsId(maps.get("libsID").toString());
+			detdirs.setLibsId(libsId);
 			oldPath = detdirs.getFilePath() + detdirs.getFileName();
 			File file = new File(compDetailPath + oldPath);
 			if (!file.exists()) {

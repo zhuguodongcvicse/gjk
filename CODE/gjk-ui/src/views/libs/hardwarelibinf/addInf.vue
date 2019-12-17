@@ -76,7 +76,7 @@
                     infRate: [
                         {required: true, message: "接口速率不能为空", trigger: "blur"},
                         {
-                            pattern: /^[0-9]*[1-9][0-9]*$/,
+                            pattern: /^[0-9]{1,10}$/,
                             message: "请输入整数",
                             trigger: "blur"
                         }

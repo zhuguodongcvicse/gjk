@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
@@ -96,21 +97,23 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 			gjkPlatforms = new ArrayList<GjkPlatform>();
 			List<GjkPlatform> platforms = Lists.newArrayList();
 			for (GjkPlatform gjkPlatform : libsList) {
+//				if ("-1".equals(gjkPlatform.getParentId())) {
 				GjkPlatform platform = new GjkPlatform();
 				platform.setParentId(gjkPlatform.getPlatformId());
-				platform.setPlatformId("BSP"+gjkPlatform.getPlatformId());
+				platform.setPlatformId("BSP" + gjkPlatform.getPlatformId());
 				platform.setName("BSP库");
 				platforms.add(platform);
 				GjkPlatform platform1 = new GjkPlatform();
 				platform1.setParentId(gjkPlatform.getPlatformId());
-				platform1.setPlatformId("software"+gjkPlatform.getPlatformId());
+				platform1.setPlatformId("software" + gjkPlatform.getPlatformId());
 				platform1.setName("软件框架库");
 				platforms.add(platform1);
 				GjkPlatform platform2 = new GjkPlatform();
 				platform2.setParentId(gjkPlatform.getPlatformId());
-				platform2.setPlatformId("component"+gjkPlatform.getPlatformId());
+				platform2.setPlatformId("component" + gjkPlatform.getPlatformId());
 				platform2.setName("构件库");
 				platforms.add(platform2);
+//				}
 			}
 			gjkPlatforms.addAll(platforms);
 			// 软件框架库主表信息
@@ -156,7 +159,6 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 				}
 			}
 
-			
 			gjkPlatforms.addAll(this.getPlatformTrees());
 			if (CollectionUtils.isNotEmpty(softdetailList)) {
 				for (SoftwareDetail softwareDetail : softdetailList) {
@@ -365,49 +367,66 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 	}
 
 	/**
-	 * 组装测试树
+	 * 组装算法树
 	 * 
 	 * @return
 	 */
 	public List<GjkAlgorithm> getAlgorithmTree() {
-		List<GjkAlgorithm> gjkAlgorithms = new ArrayList<GjkAlgorithm>();
-		List<ComponentDetail> commInfo = baseMapper.getLibsInfo();
-		String firstId = "";
-		String parId = "";
-		String libsFilePath = "";
-		for (ComponentDetail commInfos : commInfo) {
-//			List<ComponentDetail> libsFile = new ArrayList<>();
-			GjkAlgorithm gjkAlgorithm = new GjkAlgorithm();
-			Component compName = baseMapper.getCompNameById(commInfos.getId());
-			if (compName != null) {
-				firstId = commInfos.getId();
-				String sssId = IdGenerate.uuid();
-				gjkAlgorithm.setAlgorithmId(commInfos.getId());
-				gjkAlgorithm.setParentId("component" + commInfos.getLibsId());
-				gjkAlgorithm.setName(compName.getCompName() + "_" + compName.getVersion());
-				gjkAlgorithms.add(gjkAlgorithm);
-				// 展示构件名
-				if (commInfos.getFileName().equals("算法文件")) {
-					gjkAlgorithm = new GjkAlgorithm();
-					gjkAlgorithm.setAlgorithmId(sssId);
-					gjkAlgorithm.setParentId(firstId);
-					// 重置parentID
-					parId = gjkAlgorithm.getAlgorithmId();
-					gjkAlgorithm.setName(commInfos.getFileName());
-					gjkAlgorithms.add(gjkAlgorithm);
 
-					// 解析文件夹
-					libsFilePath = commInfos.getFilePath();
-					File file = new File(libsPath + libsFilePath + File.separator + "算法文件");
+		List<GjkAlgorithm> gjkAlgorithms = new ArrayList<GjkAlgorithm>();
+		// 分组查询，查出构建类型id，便利构建类型id
+		List<String> compIds = baseMapper.getCompIdsGroupCompId();
+		compIds.stream().forEach(compId -> {
+
+			// 定义一个去重集合
+			Set<String> parentIds = Sets.newHashSet();
+			// 定义一个父级id的map
+			Map<String, String> uuidMap = Maps.newHashMap();
+			// 通过构件类型id获取所有的同一类型的构件对象，遍历
+			List<Component> Components = baseMapper.getCompByCompId(compId);
+			Components.stream().forEach(component -> {
+				// 根据构件id获取构件（算法文件）详情信息
+				ComponentDetail componentDetail = baseMapper.getCompDetailByComponentId(component.getId(), "算法文件");
+				// 找到平台id下的“构件库”id
+				if (ObjectUtils.isNotEmpty(componentDetail)) {
+
+					String parentId = "component" + componentDetail.getLibsId();
+					// 获取到去重集合的长度
+					int size = parentIds.size();
+					// 把“构件库”id 添加到去重集合里
+					parentIds.add(parentId);
+					// 判断是否为新的算法
+					if (size < parentIds.size()) {
+						String compIdUUID = IdGenerate.uuid();
+						// 判断存放父级id的map是否存在
+						if (!uuidMap.containsKey(parentId)) {
+							uuidMap.put(parentId, compIdUUID);
+						}
+						// 设置构件编号节点
+						GjkAlgorithm gjkAlgorithm = new GjkAlgorithm();
+						gjkAlgorithm.setAlgorithmId(compIdUUID);
+						gjkAlgorithm.setName(compId);
+						gjkAlgorithm.setParentId(parentId);
+						gjkAlgorithms.add(gjkAlgorithm);
+					}
+					// 设置构件名_版本号节点
+					GjkAlgorithm detail = new GjkAlgorithm();
+					String detailUUID = IdGenerate.uuid();
+					detail.setAlgorithmId(detailUUID);
+					detail.setParentId(uuidMap.get(parentId));
+					detail.setName(component.getCompName() + "_" + component.getVersion());
+					gjkAlgorithms.add(detail);
+					// 读取文件，生成文件节点
+					File file = new File(libsPath + componentDetail.getFilePath() + File.separator + "算法文件");
 					if (file.isDirectory()) {
 						File[] childFileList = file.listFiles();
 						for (File childFile : childFileList) {
-							addGjkAlgorithmTree(gjkAlgorithms, parId, childFile);
+							addGjkAlgorithmTree(gjkAlgorithms, detailUUID, childFile);
 						}
 					}
 				}
-			}
-		}
+			});
+		});
 		return gjkAlgorithms;
 	}
 
@@ -436,45 +455,59 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 	 * @return
 	 */
 	public List<GjkTest> getTestTree() {
-		List<GjkTest> gjkTests = new ArrayList<GjkTest>();
-		List<ComponentDetail> commInfo = baseMapper.getLibsInfo();
-		String firstId = "";
-		String parId = "";
-		String libsFilePath = "";
-		for (ComponentDetail commInfos : commInfo) {
-			GjkTest gjkTest = new GjkTest();
-			Component compName = baseMapper.getCompNameById(commInfos.getId());
-			if (compName != null) {
-				firstId = commInfos.getId();
-				String sssId = IdGenerate.uuid();
-				gjkTest.setTestId(commInfos.getId());
-				gjkTest.setParentId(commInfos.getLibsId());
-				gjkTest.setName(compName.getCompName() + "_" + compName.getVersion());
-				gjkTests.add(gjkTest);
-				// 展示构件名
-				if (commInfos.getFileName().equals("测试文件")) {
-					gjkTest = new GjkTest();
-					gjkTest.setTestId(sssId);
-					gjkTest.setParentId(firstId);
-					// 重置parentID
-					parId = gjkTest.getTestId();
-					gjkTest.setName(commInfos.getFileName());
-					gjkTests.add(gjkTest);
 
-					// 解析文件夹
-					libsFilePath = commInfos.getFilePath();
-					File file = new File(libsPath + libsFilePath + File.separator + "测试文件");
+		List<GjkTest> gjkTests = new ArrayList<GjkTest>();
+		// 分组查询，查出构建类型id，便利构建类型id
+		List<String> compIds = baseMapper.getCompIdsGroupCompId();
+		compIds.stream().forEach(compId -> {
+			// 定义一个去重集合
+			Set<String> parentIds = Sets.newHashSet();
+			// 定义一个父级id的map
+			Map<String, String> uuidMap = Maps.newHashMap();
+			// 通过构件类型id获取所有的同一类型的构件对象，遍历
+			List<Component> Components = baseMapper.getCompByCompId(compId);
+			Components.stream().forEach(component -> {
+				// 根据构件id获取构件（测试文件）详情信息
+				ComponentDetail componentDetail = baseMapper.getCompDetailByComponentId(component.getId(), "测试文件");
+				// 找到测试id下的“构件库”id
+				if (ObjectUtils.isNotEmpty(componentDetail)) {
+					String parentId = "component" + componentDetail.getLibsId();
+					// 获取到去重集合的长度
+					int size = parentIds.size();
+					// 把“构件库”id 添加到去重集合里
+					parentIds.add(parentId);
+					// 判断是否为新的测试
+					if (size < parentIds.size()) {
+						String compIdUUID = IdGenerate.uuid();
+						// 判断存放父级id的map是否存在
+						if (!uuidMap.containsKey(parentId)) {
+							uuidMap.put(parentId, compIdUUID);
+						}
+						// 设置构件编号节点
+						GjkTest gjkTest = new GjkTest();
+						gjkTest.setTestId(compIdUUID);
+						gjkTest.setName(compId);
+						gjkTest.setParentId(parentId);
+						gjkTests.add(gjkTest);
+					}
+					// 设置构件名_版本号节点
+					GjkTest detail = new GjkTest();
+					String detailUUID = IdGenerate.uuid();
+					detail.setTestId(detailUUID);
+					detail.setParentId(uuidMap.get(parentId));
+					detail.setName(component.getCompName() + "_" + component.getVersion());
+					gjkTests.add(detail);
+					// 读取文件，生成文件节点
+					File file = new File(libsPath + componentDetail.getFilePath() + File.separator + "测试文件");
 					if (file.isDirectory()) {
 						File[] childFileList = file.listFiles();
 						for (File childFile : childFileList) {
-							addGjkTestTree(gjkTests, parId, childFile);
+							addGjkTestTree(gjkTests, detailUUID, childFile);
 						}
-
 					}
 				}
-			}
-
-		}
+			});
+		});
 		return gjkTests;
 	}
 
@@ -503,51 +536,53 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 	 */
 	public List<GjkPlatform> getPlatformTrees() {
 		List<GjkPlatform> gjkPlatforms = new ArrayList<GjkPlatform>();
-		//分组查询，查出构建类型id，便利构建类型id
+		// 分组查询，查出构建类型id，便利构建类型id
 		List<String> compIds = baseMapper.getCompIdsGroupCompId();
 		compIds.stream().forEach(compId -> {
-			//定义一个去重集合
+			// 定义一个去重集合
 			Set<String> parentIds = Sets.newHashSet();
-			//定义一个父级id的map
-			Map<String,String> uuidMap = Maps.newHashMap();
-			//通过构件类型id获取所有的同一类型的构件对象，遍历
+			// 定义一个父级id的map
+			Map<String, String> uuidMap = Maps.newHashMap();
+			// 通过构件类型id获取所有的同一类型的构件对象，遍历
 			List<Component> Components = baseMapper.getCompByCompId(compId);
 			Components.stream().forEach(component -> {
-				//根据构件id获取构件（平台文件）详情信息
-				ComponentDetail componentDetail = baseMapper.getCompDetailByComponentId(component.getId());
-				//找到平台id下的“构件库”id
-				String parentId = "component" + componentDetail.getLibsId();
-				//获取到去重集合的长度
-				int size = parentIds.size();
-				//把“构件库”id 添加到去重集合里
-				parentIds.add(parentId);
-				//判断是否为新的平台
-				if(size < parentIds.size()) {
-					String compIdUUID = IdGenerate.uuid();
-					//判断存放父级id的map是否存在
-					if(!uuidMap.containsKey(parentId)) {
-						uuidMap.put(parentId, compIdUUID);
+				// 根据构件id获取构件（平台文件）详情信息
+				ComponentDetail componentDetail = baseMapper.getCompDetailByComponentId(component.getId(), "平台文件");
+				// 找到平台id下的“构件库”id
+				if (ObjectUtils.isNotEmpty(componentDetail)) {
+					String parentId = "component" + componentDetail.getLibsId();
+					// 获取到去重集合的长度
+					int size = parentIds.size();
+					// 把“构件库”id 添加到去重集合里
+					parentIds.add(parentId);
+					// 判断是否为新的平台
+					if (size < parentIds.size()) {
+						String compIdUUID = IdGenerate.uuid();
+						// 判断存放父级id的map是否存在
+						if (!uuidMap.containsKey(parentId)) {
+							uuidMap.put(parentId, compIdUUID);
+						}
+						// 设置构件编号节点
+						GjkPlatform gjkPlatform = new GjkPlatform();
+						gjkPlatform.setPlatformId(compIdUUID);
+						gjkPlatform.setName(compId);
+						gjkPlatform.setParentId(parentId);
+						gjkPlatforms.add(gjkPlatform);
 					}
-					//设置构件编号节点
-					GjkPlatform gjkPlatform = new GjkPlatform();
-					gjkPlatform.setPlatformId(compIdUUID);
-					gjkPlatform.setName(compId);
-					gjkPlatform.setParentId(parentId);
-					gjkPlatforms.add(gjkPlatform);
-				}
-				//设置构件名_版本号节点
-				GjkPlatform detail = new GjkPlatform();
-				String detailUUID = IdGenerate.uuid();
-				detail.setPlatformId(detailUUID);
-				detail.setParentId(uuidMap.get(parentId));
-				detail.setName(component.getCompName() + "_" + component.getVersion());
-				gjkPlatforms.add(detail);
-				//读取文件，生成文件节点
-				File file = new File(libsPath + componentDetail.getFilePath() + File.separator + "平台文件");
-				if (file.isDirectory()) {
-					File[] childFileList = file.listFiles();
-					for (File childFile : childFileList) {
-						addGjkPlatformTree(gjkPlatforms, detailUUID, childFile);
+					// 设置构件名_版本号节点
+					GjkPlatform detail = new GjkPlatform();
+					String detailUUID = IdGenerate.uuid();
+					detail.setPlatformId(detailUUID);
+					detail.setParentId(uuidMap.get(parentId));
+					detail.setName(component.getCompName() + "_" + component.getVersion());
+					gjkPlatforms.add(detail);
+					// 读取文件，生成文件节点
+					File file = new File(libsPath + componentDetail.getFilePath() + File.separator + "平台文件");
+					if (file.isDirectory()) {
+						File[] childFileList = file.listFiles();
+						for (File childFile : childFileList) {
+							addGjkPlatformTree(gjkPlatforms, detailUUID, childFile);
+						}
 					}
 				}
 			});

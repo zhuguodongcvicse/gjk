@@ -158,7 +158,7 @@ import {
   analysisXmlFile,
   isSelectLibs
 } from "@/api/comp/component";
-import { getBaseTemplate } from "@/api/admin/basetemplate";
+import { getBaseTemplates } from "@/api/admin/basetemplate";
 import { getStructTree } from "@/api/libs/structlibs";
 import { tableOption } from "@/const/crud/comp/component";
 import { mapGetters } from "vuex";
@@ -226,72 +226,85 @@ export default {
     }
   },
   methods: {
-    goToAddCompPage() {
-      getBaseTemplate().then(response => {
-        console.log("getBaseTemplate - response", response);
-        let defauleBaseTemplate = [];
-        for (let i in response.data) {
-          if (response.data[i].tempType === "构件模型") {
-            defauleBaseTemplate.push(response.data[i]);
+    async goToAddCompPage() {
+      let baseTemplate = (await getBaseTemplates("构件模型")).data.data;
+      console.log("构件模型", baseTemplate);
+      if (baseTemplate.length === 0) {
+        this.$message({
+          type: "warning",
+          message: "尚未添加构件建模基础模板，请先添加基础模板。"
+        });
+      } else {
+        this.$store.dispatch("setAllBaseTemplate", baseTemplate);
+        let saveXmlMaps;
+        let templateData = {};
+        let errVersion = [];
+        let useVersion = "";
+        for (let item of baseTemplate) {
+          const path = item.tempPath;
+          saveXmlMaps = (await analysisXmlFile(path)).data.data;
+          if (saveXmlMaps !== null) {
+            templateData = item;
+            useVersion = "V" + parseFloat(item.tempVersion).toFixed(1);
+            break;
+          } else {
+            errVersion.push("V" + parseFloat(item.tempVersion).toFixed(1));
+            continue;
           }
         }
-        defauleBaseTemplate = JSON.parse(JSON.stringify(defauleBaseTemplate));
-        if (defauleBaseTemplate.length === 0) {
-          this.$alert(
-            "尚未添加构件建模基础模板，请先添加基础模板。",
-            "友情提示",
-            {
-              confirmButtonText: "确定"
-            }
-          );
-          return;
-        }
-        this.$store.dispatch("setAllBaseTemplate", response.data);
-        analysisXmlFile(defauleBaseTemplate[0].tempPath).then(response => {
-          this.$store.dispatch("setFetchStrInPointer");
+        if (useVersion == "") {
+          this.$message({
+            message: "没有配置正确的构件基础模板，请先配置基础模板。。。",
+            type: "error",
+            duration: 4000
+          });
+        } else {
+          console.log("构件模型---saveXmlMaps", saveXmlMaps);
           //保存加载的数据
-          this.$store
-            .dispatch("setSaveXmlMaps", response.data.data)
-            .then(() => {
-              //加载中英文映射
-              this.$store
-                .dispatch("setChineseMapping", "comp_param_type")
-                .then(() => {
-                  //加载结构体
-                  this.$store
-                    .dispatch("setStruceType")
-                    .then(() => {
-                      this.$router.push({
-                        path: "/comp/showComp/addAndEditComp",
-                        query: {
-                          type: "add",
-                          proFloName: "添加构件",
-                          defauleBaseTemplate: defauleBaseTemplate
-                        }
-                      });
-                    })
-                    .catch(() => {
-                      this.$message({
-                        message: "保存加载的数据出错",
-                        type: "error"
-                      });
-                    });
-                })
-                .catch(() => {
-                  this.$message({
-                    message: "保存加载的数据出错",
-                    type: "error"
-                  });
-                });
-            })
-            .catch(() => {
+          await this.$store.dispatch("setSaveXmlMaps", saveXmlMaps).catch(c => {
+            this.$message({
+              message: "保存加载的数据出错!!!!!",
+              type: "error"
+            });
+          });
+          //加载中英文映射
+          await this.$store
+            .dispatch("setChineseMapping", "comp_param_type")
+            .catch(c => {
               this.$message({
-                message: "保存加载的数据出错",
+                message: "加载中英文映射配置出错!!!!!",
                 type: "error"
               });
             });
-        });
-      });
+          //加载结构体
+          await this.$store.dispatch("setStruceType").catch(c => {
+            this.$message({
+              message: "加载结构体出错!!!!!",
+              type: "error"
+            });
+          });
+          await this.$router.push({
+            path: "/comp/showComp/addAndEditComp",
+            query: {
+              type: "add",
+              proFloName: "添加构件",
+              tempId: templateData.tempId
+            }
+          });
+          let meg =
+            errVersion.length == 0
+              ? "已使用版本为" + useVersion + "的构件基础模板"
+              : "未找到版本为 " +
+                errVersion +
+                "构件基础模板文件,已使用版本为" +
+                useVersion +
+                "的构件基础模板";
+          this.$message({
+            message: meg,
+            type: "success"
+          });
+        }
+      }
     },
     onExceed(file, fileList) {
       this.$message.warning(

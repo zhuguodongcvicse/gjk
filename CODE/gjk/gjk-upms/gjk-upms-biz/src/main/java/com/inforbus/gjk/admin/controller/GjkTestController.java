@@ -4,7 +4,9 @@ package com.inforbus.gjk.admin.controller;
 import cn.hutool.core.io.IoUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.google.common.collect.Lists;
 import com.inforbus.gjk.admin.api.entity.GjkAlgorithm;
+import com.inforbus.gjk.admin.api.entity.GjkPlatform;
 import com.inforbus.gjk.admin.api.entity.GjkTest;
 import com.inforbus.gjk.admin.api.vo.TestVO;
 import com.inforbus.gjk.admin.api.vo.TreeUtil;
@@ -56,6 +58,15 @@ public class GjkTestController {
 	@GetMapping(value = "/trees")
 	public R getTrees() {
 		List<GjkTest> testList = gjkTestService.list(Wrappers.emptyWrapper());
+		List<GjkTest> gjkTests = Lists.newArrayList();
+		for (GjkTest gjkTest : testList) {
+			GjkTest gjkTest1 = new GjkTest();
+			gjkTest1.setParentId(gjkTest.getTestId());
+			gjkTest1.setTestId("component"+gjkTest.getTestId());
+			gjkTest1.setName("构件库");
+			gjkTests.add(gjkTest1);
+		}
+		testList.addAll(gjkTests);
 		List<GjkTest> softwareList = gjkPlatformService.getTestTree();
 		if (CollectionUtils.isNotEmpty(testList) && CollectionUtils.isNotEmpty(softwareList)) {
 			testList.addAll(softwareList);

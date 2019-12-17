@@ -50,21 +50,39 @@
         console.log("aa",aa)
     } */
     function upperCase() {
+        let ifReturn = false
         // var x = document.getElementById("IP").childNodes.item(0).value
         let IP = document.getElementById("IP").value
-        // console.log("IP", IP)
-        //直接点击图元获取芯片数据会丢失芯片中接口的数据，懒得找框架代码，就从所有数据里直接赋值了
-        /*console.log("clickCheckedChip",clickCheckedChip)
-        clickCheckedChip.IP = IP
-        for (const i in ChipsWithIPs) {
-            if (ChipsWithIPs[i].uniqueId === clickCheckedChip.uniqueId) {
-                ChipsWithIPs[i] = clickCheckedChip
-                return
-            }
+        if (clickChipsList[clickChipsList.length - 1].uniqueId === clickCheckedChip.uniqueId) {
+            // console.log("checkIPMap",checkIPMap)
+            checkIPMap.forEach((value, key) => {
+                if (key === clickCheckedChip.uniqueId && value === IP) {
+                    ifReturn = !ifReturn
+                    return
+                }
+            })
         }
-        ChipsWithIPs.push(clickCheckedChip)
-        ChipsWithIPs = JSON.parse(JSON.stringify(ChipsWithIPs))
-        console.log("ChipsWithIPs",ChipsWithIPs)*/
+        if (ifReturn) {
+            return
+        }
+        if(checkIPMap.size === 0) {
+            checkIPMap.set(clickCheckedChip.uniqueId, IP)
+        } else {
+            checkIPMap.forEach((value, key) => {
+                if (value === clickCheckedChip.IP) {
+                    document.getElementById("IP").value = ''
+                    ifReturn = !ifReturn
+                    clickCheckedChip.IP = ''
+                    alert("IP不能相同")
+                    return
+                }
+            })
+        }
+        if (ifReturn) {
+            return
+        }
+        checkIPMap.set(clickCheckedChip.uniqueId, IP)
+        // clickCheckedChip.IP = IP
         for (const n in graphList.fJson) {
             for (const i in graphList.fJson[n].datas) {
                 if (graphList.fJson[n].datas[i].json.properties != null && graphList.fJson[n].datas[i].json.properties.caseName != null) {

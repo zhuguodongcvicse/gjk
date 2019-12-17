@@ -22,10 +22,10 @@
           @click.native="compSpbShowDialogChecked"
         >生成构件框架</el-button>
       </el-col>
-      <el-col :span="4">
+      <el-col :span="6">
         <label class="showlabel">构件建模</label>
       </el-col>
-      <el-col :span="10">
+      <el-col :span="8" class="showButton">
         <el-select
           v-model="selectBaseTemplateValue"
           placeholder="请选择"
@@ -34,10 +34,10 @@
           <el-option
             v-for="item in structBaseTemplate"
             :key="item.tempPath"
-            :label="item.tempName"
+            :label="item.tempName+'('+item.tempVersion+')'"
             :value="item.tempPath"
           >
-            <span style="float: left">{{ item.tempName }}</span>
+            <span style="float: left">{{ item.tempName+'('+item.tempVersion+')' }}</span>
             <span style="float: right; color: #8492a6; font-size: 13px">{{ item.tempPath }}</span>
           </el-option>
         </el-select>
@@ -273,7 +273,7 @@ export default {
               tmpComponent.compFuncname = baseParam.attributeMap.name;
             } else if (baseParam.lableName === "函数路径") {
               let name = baseParam.attributeMap.name;
-              this.functionPathName = name.substring(name.lastIndexOf("/")+1);
+              this.functionPathName = name.substring(name.lastIndexOf("/") + 1);
               // tmpComponent.compName = config.attributeMap.name;
             } else if (baseParam.lableName === "系数文件") {
               // tmpComponent.compName = config.attributeMap.name;
@@ -286,15 +286,25 @@ export default {
     },
     selectBaseTemplateValue: {
       handler: function(params) {
-        for (let i in this.structBaseTemplate) {
-          if (
-            this.structBaseTemplate[i].tempPath === params.tempPath ||
-            this.structBaseTemplate[i].tempPath === params
-          ) {
-            this.changeBaseTemplate(this.structBaseTemplate[i].tempPath);
+        analysisXmlFile(params).then(response => {
+          if (response.data.data == null) {
+            this.$message({
+              message: "当前模板文件未找到",
+              type: "error"
+            });
+          } else {
+            this.$store.dispatch("setFetchStrInPointer");
+            //保存加载的数据
+            this.$store
+              .dispatch("setSaveXmlMaps", response.data.data)
+              .catch(() => {
+                this.$message({
+                  message: "保存加载的数据出错!!!!",
+                  type: "error"
+                });
+              });
           }
-        }
-        // this.changeBaseTemplate(selectBaseTemplateValue);
+        });
       },
       deep: true
     }
@@ -383,7 +393,7 @@ export default {
               saveComp.xmlEntityMaps[0].xmlEntityMaps.forEach(item => {
                 if (item.lableName === "函数路径") {
                   item.attributeMap.name =
-                    resFiles.data.data +"\\"+this.functionPathName;
+                    resFiles.data.data + "\\" + this.functionPathName;
                 }
               });
               if (this.headerFile.structParams) {
@@ -474,23 +484,18 @@ export default {
     });
     //如果是新增构件
     if (this.$route.query.type === "add") {
-      // this.selectBaseTemplateValue = this.$route.query.defauleBaseTemplate[0].tempName
-      let allBaseTemplateTemp = JSON.parse(
-        JSON.stringify(this.allBaseTemplate)
-      );
-      for (const i in allBaseTemplateTemp) {
-        //筛选出构件模板
-        if (allBaseTemplateTemp[i].tempType === "构件模型") {
-          this.structBaseTemplate.push(allBaseTemplateTemp[i]);
+      this.structBaseTemplate = [];
+      let tempId = this.$route.query.tempId;
+      for (let item of deepClone(this.allBaseTemplate)) {
+        //处理版本
+        let version = parseFloat(item.tempVersion).toFixed(1);
+        //设置版本
+        item.tempVersion = "V" + version;
+        this.structBaseTemplate.push(item);
+        if (tempId === item.tempId) {
+          this.selectBaseTemplateValue = item.tempPath;
         }
       }
-      this.structBaseTemplate = JSON.parse(
-        JSON.stringify(this.structBaseTemplate)
-      );
-      //默认显示模板的最后一条
-      this.selectBaseTemplateValue = this.structBaseTemplate[
-        this.structBaseTemplate.length - 1
-      ];
     }
     //如果是编辑或者复制
     if (this.$route.query.compId != undefined) {
