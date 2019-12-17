@@ -625,7 +625,7 @@
 		`projectId` = #{chips.projectId},
 		`flowId` = #{chips.flowId},
 		`modelId` = #{chips.modelId}
-		WHERE `id` = #{id}
+		WHERE `id` = #{chips.id}
 	</update>
 
     <!-- DELETE FROM table_name [WHERE Clause] -->
