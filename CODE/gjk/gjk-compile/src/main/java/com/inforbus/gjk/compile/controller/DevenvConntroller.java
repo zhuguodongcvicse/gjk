@@ -42,8 +42,7 @@ public class DevenvConntroller {
         ConcurrentLinkedQueue<Task> compileQueue = taskThread.getCompileQueue();
         int count = compileQueue.size();//获取到排队人数
         taskThread.addTask(compileTask);//使用另一条线程执行编译功能
-        String str = "";
-        str = "正在编译...请稍候";
+        String str = "正在编译...请稍候";
         if (count > 0)
             str = "前面有" + count + "个组件工程在编译......请等候一会";
         return new R<>(str);

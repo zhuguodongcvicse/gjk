@@ -40,7 +40,6 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
    */
   @Override
   public IPage<Project> getProjectPage(Page<Project> page, Project project){
-	 // baseMapper.getProjectPage(page,project);
       return baseMapper.getProjectPage(page,project);
   }
 

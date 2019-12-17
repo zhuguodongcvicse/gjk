@@ -65,7 +65,7 @@ public class DictController {
 	 * @return 字典信息
 	 */
 	@GetMapping("/{id}")
-	public R getById(@PathVariable Integer id) {
+	public R getById(@PathVariable String id) {
 		return new R<>(sysDictService.getById(id));
 	}
 
@@ -129,7 +129,7 @@ public class DictController {
 	@DeleteMapping("/{id}/{type}")
 	@CacheEvict(value = "dict_details", key = "#type")
 	@PreAuthorize("@pms.hasPermission('sys_dict_del')")
-	public R removeById(@PathVariable Integer id, @PathVariable String type) {
+	public R removeById(@PathVariable String id, @PathVariable String type) {
 		return new R<>(sysDictService.removeById(id));
 	}
 

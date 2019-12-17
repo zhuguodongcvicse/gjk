@@ -20,8 +20,6 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class SylixosUtil {
 
-	private Map<String, String> map = new HashMap<String, String>();
-
 	/*
 	 * 修改 sylixos文件
 	 *
@@ -34,8 +32,6 @@ public class SylixosUtil {
 		// 修改sylixos相关文件
 		// 遍历sylixos文件夹
 		File sylixosFile = new File(sylixosPath);
-		// modifyCProjectFile(sylixosPath);//先修改base与bsp依赖工程中的.cproject文件
-
 		File[] childFiles = sylixosFile.listFiles();
 		for (File childFile : childFiles) {
 			if (childFile.getName().equals(historyName + ".mk")) {// 修改historyName.mk文件
@@ -49,15 +45,10 @@ public class SylixosUtil {
 
 			} else if (childFile.getName().equals("config.mk")) {
 				String parent = sylixosFile.getParent();
-				String bspPath = parent + File.separator + "bsp";
-				if (map != null && map.size() > 0)
-					map.clear();
-				findBaseAndBspFile(bspFilePath, "SYLIXOS_BASE_PATH.xml");// 获取到依赖工程base与bsphr2的绝对路径
-				findBaseAndBspFile(bspFilePath, "SYLIXOS_BSP_HR2_PATH.xml");// 获取到依赖工程base与bsphr2的绝对路径
-				if (map == null || map.size() <= 0) {
-					return false;
-				}
-				modifuConfigMk(childFile.getAbsolutePath(), map);// 修改config.mk文件
+                HashMap<String, String> map = new HashMap<>();
+                findBaseAndBspFile(bspFilePath, "SYLIXOS_BASE_PATH.xml",map);// 获取到依赖工程base与bsphr2的绝对路径
+				findBaseAndBspFile(bspFilePath, "SYLIXOS_BSP_HR2_PATH.xml",map);// 获取到依赖工程base与bsphr2的绝对路径
+				modifuConfigMk(childFile.getAbsolutePath(),map);// 修改config.mk文件
 			} else if (childFile.getName().equals("Makefile")) {
 				// 2019年11月27日 18:45:14 暂时不需要更改
 				// replaceFileStr(childFile.getAbsolutePath(), historyName,
@@ -115,15 +106,6 @@ public class SylixosUtil {
 //
 //                //修改.mk文件名为目标文件名
 //                childFile.renameTo(new File(sylixosFile.getAbsolutePath() + "\\" + sylixosFile.getName() + ".mk"));
-//            } else if (childFile.getName().endsWith(".cproject")) {
-//                xmlEntityMap = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(childFile.getAbsoluteFile());//解析.cproject文件
-//                addPath(xmlEntityMap,childFile.getParent());//①添加项目路径至pathentry标签的include属性
-//                //todo ①再添加build.xml文件中的标签;
-//
-//                addLable(xmlEntityMap);//②添加俩条编译器路径给app工程中的.cproject文件中
-//                modifyProjectName(xmlEntityMap,childFile.getParentFile().getName());//③更改base-ref的值为当前项目名称
-//                XmlFileHandleUtil.createXmlFile(xmlEntityMap,childFile.getAbsoluteFile());//重新生成.cproject文件
-//
 //            }
 		}
 		return true;
@@ -331,8 +313,11 @@ public class SylixosUtil {
 
     /*
      * 查找base与bsp工程下的特定xml文件,参数为bsp文件夹的绝对路径
+     * 参数1:查找文件的父路径,
+     * 参数2:文件名,
+     * 参数3:map
      * */
-    public void findBaseAndBspFile(String bspPath, String fileName) {
+    public void findBaseAndBspFile(String bspPath, String fileName,Map<String,String> map) {
         File bspFile = new File(bspPath);
         File[] files = bspFile.listFiles();
         if (files != null && files.length > 0) {
@@ -341,7 +326,7 @@ public class SylixosUtil {
                     map.put(fileName, file.getParentFile().getAbsolutePath());//找到文件的绝对路径,添加到map中
                 }
                 if (file.listFiles() != null && file.listFiles().length > 0) {
-                    findBaseAndBspFile(file.getAbsolutePath(), fileName);
+                    findBaseAndBspFile(file.getAbsolutePath(), fileName,map);
                 }
             }
         }
@@ -413,5 +398,9 @@ public class SylixosUtil {
 
     public static void main(String[] args) {
         //updateSylixos("D:\\14S_GJK_GIT\\gjk\\gjk\\project\\测试sylixos2_0\\test\\admin_测试sylixos2_0_testAPP\\s1", "716");
+        //HashMap<String, String> hMap = new HashMap<>();
+        //findBaseAndBspFile("D:\\14S_GJK_GIT\\gjk\\gjk\\bsp\\11.0\\Bsp","SYLIXOS_BASE_PATH.xml",hMap);
+        //findBaseAndBspFile("D:\\14S_GJK_GIT\\gjk\\gjk\\bsp\\11.0\\Bsp","SYLIXOS_BSP_HR2_PATH.xml",hMap);
+
     }
 }

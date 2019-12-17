@@ -1,5 +1,5 @@
 <template>
-  <div id="container" class="">
+  <div ref="container" class>
     <!-- 当前项目 -->
     <div class="project_tree_14s">
       <img src="/img/theme/night/logo/proImg.png" ondragstart="return false;" />
@@ -17,7 +17,7 @@
       </el-dropdown>
     </div>
     <!-- 树 -->
-    <div class="tree-container">
+    <div class="tree-container" ref="tree-container">
       <el-tree
         ref="tree"
         :data="treeData"
@@ -279,9 +279,29 @@ export default {
           if (this.$store.state.projectTreeShow.projectTreeShow.length != 0) {
             this.projects = this.$store.state.projectTreeShow.projectTreeShow;
             // console.log("this.projects",this.projects)
-            for (const i in this.projects) {
-              if (this.projects[i].showFlag == 0) {
-                this.temp_currProject = this.projects[i];
+            if (JSON.stringify(this.temp_currProject) != "{}") {
+              let pro = response.data.data.find(item => {
+                return item.id === this.temp_currProject.id;
+              });
+              if (pro != undefined) {
+                let index = response.data.data.indexOf(pro);
+                let proItem = this.projects.find(item => {
+                  return item.id === this.temp_currProject.id;
+                });
+                this.$set(pro, "showFlag", 0);
+                if (proItem != undefined) {
+                  let i = this.projects.indexOf(proItem);
+                  this.projects[i] = pro;
+                }
+                projectList[index] = this.temp_currProject;
+                this.$store.dispatch("setProjectTreeShow", this.projects);
+              }
+            } else {
+              console.log("11111111111111111", this.projects);
+              for (const i in this.projects) {
+                if (this.projects[i].showFlag == 0) {
+                  this.temp_currProject = this.projects[i];
+                }
               }
             }
           } else {
@@ -303,11 +323,11 @@ export default {
           // console.log("err: ", err);
         });
     },
-    // changeHeight() {
-    //   let height = document.body.clientHeight;
-    //   $("#container").css({ height: height - 50 + "px" });
-    //   $(".tree-container").css({ height: height - 220 + "px" });
-    // },
+    changeHeight() {
+      let height = document.body.clientHeight;
+      this.$refs.container.style.height = height - 50 + "px";
+      this.$refs["tree-container"].style.height = height - 220 + "px";
+    },
     initTreeCard() {
       // let that = this
       // let container = document.getElementById('container')
@@ -385,11 +405,11 @@ export default {
           loading.close();
         }, 2000);
         // $("#projectRightMenu").hide();
-         this.contextmenuFlag = false;
+        this.contextmenuFlag = false;
       } else if (item == "修改软件框架") {
         this.softwareDialogVisible = true;
         // $("#projectRightMenu").hide();
-         this.contextmenuFlag = false;
+        this.contextmenuFlag = false;
       } else if (item == "修改BSP") {
         this.bspDialogVisible = true;
       } else if (item == "APP组件工程生成") {
@@ -462,7 +482,7 @@ export default {
           });
         }
         // $("#projectRightMenu").hide();
-         this.contextmenuFlag = false;
+        this.contextmenuFlag = false;
       } else if (item == "添加流程") {
         this.addProcedureDialogVisible = true;
       } else if (item == "申请构件") {
@@ -544,7 +564,7 @@ export default {
         };
         createZipFile(param);
         // $("#projectRightMenu").hide();
-         this.contextmenuFlag = false;
+        this.contextmenuFlag = false;
       }
     },
     findTargetNode(currentNodeObj, targetNodeObj) {
@@ -689,7 +709,7 @@ export default {
           }
         }
         // $("#projectRightMenu").hide();
-         this.contextmenuFlag = false;
+        this.contextmenuFlag = false;
         // this.showProjects = false
       }
       this.$emit(

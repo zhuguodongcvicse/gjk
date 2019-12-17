@@ -10,7 +10,7 @@
                           v-model="ruleForm1.password"
                           auto-complete="off"></el-input>
               </el-form-item>
-              <el-form-item label="密码"
+              <el-form-item label="新密码"
                             prop="newpassword1">
                 <el-input type="password"
                           v-model="ruleForm1.newpassword1"
