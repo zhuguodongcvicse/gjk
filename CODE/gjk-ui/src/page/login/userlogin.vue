@@ -115,6 +115,7 @@ import { randomLenNum } from "@/util/util";
 import { registered } from "@/api/admin/user";
 import { fetchTree } from "@/api/admin/dept";
 import { getDetails } from "@/api/admin/user";
+import { validatePhone,checkGongGao } from "@/util/rules"
 import { mapGetters } from "vuex";
 export default {
   name: "userlogin",
@@ -204,12 +205,14 @@ export default {
         username: [
           { required: true, message: "请输入用户名", trigger: "blur" },
           { min: 6, message: "工号最少为6位", trigger: "blur" },
-          { validator: validateUsername, trigger: "blur" }
+          { validator: validateUsername, trigger: "blur" },
+          { validator: checkGongGao, trigger: 'blur'}
         ],
-        deptId: [{ required: true, message: "请选择部门", trigger: "blur" }],
+        deptId: [{ required: true, message: "请选择部门", trigger: ["blur","change"] }],
         phone: [
           { min: 11, max: 20, message: "长度在 11 个字符", trigger: "blur" },
-          { required: true, message: "请输入手机号", trigger: "blur" }
+          { required: true, message: "请输入手机号", trigger: "blur" },
+          { validator: validatePhone, trigger:"blur"}
         ],
         name: [{ message: "请输入姓名", trigger: "blur" }]
       },

@@ -42,13 +42,13 @@
                      label-width="80px"
                      :rules="rules"
                      :model="form"
-                     ref="form">            
+                     ref="form">
               <el-form-item label="部门名称"
                             prop="name">
                 <el-input v-model="form.name"
                           :disabled="formEdit"
                           placeholder="请输入名称"></el-input>
-              </el-form-item>         
+              </el-form-item>
               <el-form-item v-if="formStatus == 'update'">
                 <el-button type="primary"
                            @click="update">更新
@@ -130,7 +130,7 @@
             var parentId = dropNode.data.id;
             var deptId = dropNode.data.children[dropNode.data.children.length-1].id;
             var name = dropNode.data.children[dropNode.data.children.length-1].name;
-           
+
         }else if(dropType==="before"){
             var parentId = dropNode.data.parentId;
             var deptId = draggingNode.data.id;
@@ -186,9 +186,18 @@
         this.formStatus = 'create'
       },
       handleDelete() {
+        if(this.currentId == '0'){
+            this.$notify({
+                title: '警告',
+                message: '请选择一个菜单',
+                type: 'warning',
+                duration: 2000
+            })
+            return;
+        }
         deptCheck(this.currentId).then((req) => {
           if(!req.data.data){
-            this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+            this.$confirm('此操作将永久删除"'+this.form.name+'", 是否继续?', '提示', {
               confirmButtonText: '确定',
               cancelButtonText: '取消',
               type: 'warning'

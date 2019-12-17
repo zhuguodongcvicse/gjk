@@ -272,7 +272,16 @@
         this.formStatus = 'create'
       },
       handleDelete() {
-        this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+        if(this.currentId == '-1'){
+            this.$notify({
+                title: '警告',
+                message: '请选择一个菜单',
+                type: 'warning',
+                duration: 2000
+            })
+            return;
+        }
+        this.$confirm('此操作将永久删除"'+this.form.name+'", 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'

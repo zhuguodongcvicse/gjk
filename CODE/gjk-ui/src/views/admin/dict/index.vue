@@ -155,7 +155,7 @@ export default {
           message: "添加成功",
           type: "success"
         });
-        this.getList(this.page);
+        this.getList(this.page,this.searchData);
         done();
       });
     },
