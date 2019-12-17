@@ -493,10 +493,10 @@ function initEditor(editor) {
   propertySheet.getCustomPropertyDefinitions = function (data) {
     console.log("data", data)
     var type = data.get('type');
+    selectCurrentChip = data
     //这里可以获得当前点击的图元对象
     graph.onclick = function (evt) {
       var data = graph.getElement(evt);
-      selectCurrentChip = data
       // let ioTypeSelect = document.getElementById("ioType")
       // console.log("ioTypeSelect",ioTypeSelect)
       /*var parent = document.getElementsByClassName('graph-editor__property')

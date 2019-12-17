@@ -524,7 +524,7 @@
                             let infTemp = {};
                             infTemp.id = this.applyItemMsg.applyId;
                             infTemp.applyState = "3";
-                            infTemp.applyDesc = "被驳回，驳回原因： " + this.rejectMassage;
+                            infTemp.applyDesc = "驳回原因： " + this.rejectMassage;
                             updateInf(infTemp).then(Response => {
                                 this.rejectDialog = false;
                                 this.dialogStateShow(false);
@@ -538,7 +538,7 @@
                             let chipTemp = {};
                             chipTemp.id = this.applyItemMsg.applyId;
                             chipTemp.applyState = "3";
-                            chipTemp.applyDesc = "被驳回，驳回原因： " + this.rejectMassage;
+                            chipTemp.applyDesc = "驳回原因： " + this.rejectMassage;
                             updateChip(chipTemp).then(Response => {
                                 this.rejectDialog = false;
                                 this.dialogStateShow(false);
@@ -552,7 +552,7 @@
                             let boardTemp = {};
                             boardTemp.id = this.applyItemMsg.applyId;
                             boardTemp.applyState = "3";
-                            boardTemp.applyDesc = "被驳回，驳回原因： " + this.rejectMassage;
+                            boardTemp.applyDesc = "驳回原因： " + this.rejectMassage;
                             updateBoard(boardTemp).then(Response => {
                                 this.rejectDialog = false;
                                 this.dialogStateShow(false);
@@ -693,7 +693,7 @@
                         this.libsName = "硬件名称：";
                         this.libsType = "接口库";
                         getInfObj(this.applyItemMsg.applyId).then(response => {
-                            console.log("response.data.data", response.data.data)
+                            // console.log("response.data.data", response.data.data)
                             this.libsNameValue = response.data.data.infName
                             this.hardwareLibData.push(response.data.data)
                         })
