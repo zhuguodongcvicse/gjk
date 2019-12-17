@@ -374,7 +374,7 @@ export default {
     },
     async nodeContextmenuClick(item) {
       if (item == "集成代码生成") {
-        codeGeneration(this.procedureId, this.userInfo.name).then(res => {});
+        codeGeneration(this.procedureId, this.userInfo.username).then(res => {});
         const loading = this.$loading({
           lock: true,
           text: "集成代码生成中。。。",

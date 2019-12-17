@@ -70,7 +70,7 @@
       </el-form-item>
       <div class="control-container bsp_footer_btn_14s text_align_right_14s">
         <el-button type="primary" @click.native="clickFileUpload('compForm')">保存</el-button>
-        <el-button>取消</el-button>
+        <el-button @click.native="cilckCancelBtn">取消</el-button>
       </div>
     </el-form>
   </el-dialog>
@@ -152,6 +152,10 @@ export default {
   },
   //方法集合
   methods: {
+    cilckCancelBtn() {
+      Object.assign(this.$data, this.$options.data());
+      this.innerVisible = false;
+    },
     //当上传图片后，调用onchange方法，获取图片本地路径
     onchange(file, fileList) {
       console.log("description", file.raw.name);

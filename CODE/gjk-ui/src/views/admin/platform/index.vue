@@ -231,7 +231,11 @@ export default {
         this.formEdit = false;
         this.formStatus = "update";
       }else{
-        alert("请选择一个节点进行编辑！！！");
+        this.$message({
+          showClose: true,
+          message: "请选择一个节点进行编辑！！！",
+          type: "error"
+        });
       }
     },
     handlerAdd() {
@@ -240,7 +244,11 @@ export default {
     },
     handleDelete() {
       if (this.currentId === -1) {
-        alert("请选择一个节点进行删除！！！");
+        this.$message({
+          showClose: true,
+          message: "请选择一个节点进行删除！！！",
+          type: "error"
+        });
         this.reload();
       } else {
         this.$confirm("此操作将永久删除, 是否继续?", "提示", {
@@ -276,37 +284,28 @@ export default {
       });
     },
     create() {
-      if (this.form.platformId == undefined) {
-        if (this.treeData.length == 0) {
-          Vue.set(this.form, "parentId", "-1");
-          addObj(this.form).then(() => {
-            this.getList();
-            this.$notify({
-              title: "成功",
-              message: "创建成功",
-              type: "success",
-              duration: 2000
-            });
-          });
-        } else {
-          alert("请先选择一个节点！！！");
-          this.reload();
-        }
+      var parentId = JSON.parse(JSON.stringify(this.form)).parentId;
+      console.log("xswe", parentId, this.currentId);
+      //新添加一个根节点
+      if (parentId === undefined) {
+        Vue.set(this.form, "parentId", "-1");
       } else {
-        var parentId =  JSON.parse(JSON.stringify(this.form)).parentId
         Vue.set(this.form, "parentId", this.currentId);
-        addObj(this.form).then(() => {
-          this.getList();
-          this.$notify({
-            title: "成功",
-            message: "创建成功",
-            type: "success",
-            duration: 2000
-          });
-          this.onCancel()
-          Vue.set(this.form, "parentId", parentId);
-        });
       }
+      addObj(this.form).then(res => {
+        this.getList();
+        this.$notify({
+          title: "成功",
+          message: "创建成功",
+          type: "success",
+          duration: 2000
+        });
+        this.onCancel();
+        //清空this.form的值
+        Object.assign(this.form,this.$options.data().form)
+        //展开当前节点节点。。
+        this.aExpandedKeys = [this.currentId];
+      });
     },
     onCancel() {
       this.formEdit = true;

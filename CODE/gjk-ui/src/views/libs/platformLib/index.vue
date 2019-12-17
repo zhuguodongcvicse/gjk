@@ -172,37 +172,38 @@ export default {
     getList() {
       fetchPlatformTree(this.listQuery).then(response => {
         this.treeData = response.data.data;
+        console.log("hhhh",response);
       });
       //文件夹名
-      platformLib().then(val => {
-        val.data.data.forEach(child => {
-          let newc = {
-            id: child.id,
-            label: child.fileName,
-            parentId: child.libsId,
-            name: child.fileName,
-            children: []
-          };
-          this.treeData = JSON.parse(
-            JSON.stringify(this.addChild(this.treeData, newc))
-          );
-        });
-      });
+      // platformLib().then(val => {
+      //   val.data.data.forEach(child => {
+      //     let newc = {
+      //       id: child.id,
+      //       label: child.fileName,
+      //       parentId: child.libsId,
+      //       name: child.fileName,
+      //       children: []
+      //     };
+      //     this.treeData = JSON.parse(
+      //       JSON.stringify(this.addChild(this.treeData, newc))
+      //     );
+      //   });
+      // });
       //文件名
-      platformfile().then(val => {
-        val.data.data.forEach(child => {
-          let newc = {
-            id: child.id,
-            label: child.fileName,
-            parentId: child.libsId,
-            name: child.fileName,
-            children: []
-          };
-          this.treeData = JSON.parse(
-            JSON.stringify(this.addChild(this.treeData, newc))
-          );
-        });
-      });
+      // platformfile().then(val => {
+      //   val.data.data.forEach(child => {
+      //     let newc = {
+      //       id: child.id,
+      //       label: child.fileName,
+      //       parentId: child.libsId,
+      //       name: child.fileName,
+      //       children: []
+      //     };
+      //     this.treeData = JSON.parse(
+      //       JSON.stringify(this.addChild(this.treeData, newc))
+      //     );
+      //   });
+      // });
     },
 
     filterNode(value, data) {

@@ -23,7 +23,7 @@
                           disabled></el-input>
               </el-form-item>
               <el-form-item label="手机号" prop="phone">
-                <el-input v-model="ruleForm2.phone" placeholder="验证码登录使用"></el-input>
+                <el-input v-model="ruleForm2.phone" placeholder="请输入手机号"></el-input>
               </el-form-item>
               <el-form-item>
                 <el-button type="primary"

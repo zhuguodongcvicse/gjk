@@ -18,6 +18,7 @@
                   :default-expanded-keys="aExpandedKeys"
                   :filter-node-method="filterNode"
                   :props="defaultProps"
+                  :render-content="renderContent"
                   @node-click="getNodeData"
                   @node-expand="nodeExpand"
                   @node-collapse="nodeCollapse"
@@ -140,10 +141,10 @@ export default {
     this.getList();
     this.testManager_btn_add = this.permissions["sys_test_add"];
     this.testManager_btn_edit = this.permissions["sys_test_edit"];
-    this.testManager_btn_del = this.permissions["sys_algorithm_del"];
+    this.testManager_btn_del = this.permissions["sys_test_del"];
   },
   computed: {
-    ...mapGetters(["elements", "permissions"])
+    ...mapGetters(["elements", "permissions","website"])
   },
   methods: {
     handleMoving(e) {
@@ -178,6 +179,13 @@ export default {
     },
 
     nodeExpand(data) {
+       //替换svg
+      var el = val.$el;
+      $(el)
+        .find("img")
+        .eq(0)
+        .attr("src", this.website.publicSvg + "icon-svg/folder.svg");
+
       let aChildren = data.children;
       if (aChildren.length > 0) {
         this.oExpandedKey[data.id] = true;
@@ -186,6 +194,13 @@ export default {
       this.setExpandedKeys();
     },
     nodeCollapse(data) {
+       //替换svg
+      var el = val.$el;
+      $(el)
+        .find("img")
+        .eq(0)
+        .attr("src", this.website.publicSvg + "icon-svg/folderPackup.svg");
+
       this.oExpandedKey[data.id] = false;
       // 如果有子节点
       this.treeRecursion(this.oTreeNodeChildren[data.id], oNode => {
@@ -263,6 +278,74 @@ export default {
       this.form = {
         parentId: this.currentId
       };
+    },
+    //自定义树
+    renderContent(h, { node, data, store }) {
+      let test = "";
+      let css = "padding:0 5px 0 0;width:15px;height:15px;";
+      //.h/.hpp
+      if (
+        this.endWidth(node.label, ".h") ||
+        this.endWidth(node.label, ".hpp")
+      ) {
+        test = this.website.publicSvg + "icon-svg/h.svg";
+        //.cpp/.c
+      } else if (
+        this.endWidth(node.label, ".cpp") ||
+        this.endWidth(node.label, ".c")
+      ) {
+        test = this.website.publicSvg + "icon-svg/C++.svg";
+        //.java
+      } else if (this.endWidth(node.label, ".java")) {
+        test = this.website.publicSvg + "icon-svg/java.svg";
+        //.m
+      } else if (this.endWidth(node.label, ".m")) {
+        test = this.website.publicSvg + "icon-svg/m.svg";
+        //图片（png\jpg等）
+      } else if (
+        this.endWidth(node.label, ".jpg") ||
+        this.endWidth(node.label, ".png")
+      ) {
+        test = this.website.publicSvg + "icon-svg/JPG.svg";
+        //doc/docx
+      } else if (
+        this.endWidth(node.label, ".doc") ||
+        this.endWidth(node.label, ".docx")
+      ) {
+        test = this.website.publicSvg + "icon-svg/doc.svg";
+        //xls/xlsx
+      } else if (
+        this.endWidth(node.label, ".xls") ||
+        this.endWidth(node.label, ".xlsx")
+      ) {
+        test = this.website.publicSvg + "icon-svg/xlsx.svg";
+        //xml/yml
+      } else if (
+        this.endWidth(node.label, ".xml") ||
+        this.endWidth(node.label, ".yml")
+      ) {
+        test = this.website.publicSvg + "icon-svg/xml.svg";
+        //txt
+      } else if (this.endWidth(node.label, ".txt")) {
+        test = this.website.publicSvg + "icon-svg/txt.svg";
+        //文件夹
+      } else if (node.childNodes.length > 0) {
+        test = this.website.publicSvg + "icon-svg/folderPackup.svg";
+        //其他
+      } else {
+        test = this.website.publicSvg + "icon-svg/empty.svg";
+      }
+      return (
+        <span class="custom-tree-node">
+          <img src={test} style={css} />
+          <span>{node.label}</span>
+        </span>
+      );
+    },
+    //判断结尾和预设类型是否匹配
+    endWidth(val, endval) {
+      let d = val.length - endval.length;
+      return d >= 0 && val.lastIndexOf(endval) == d;
     }
   }
 };

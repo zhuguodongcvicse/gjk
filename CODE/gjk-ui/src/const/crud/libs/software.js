@@ -39,7 +39,7 @@ export const tableOption = {
 	  {
       label: '版本',
       prop: 'version',
-      // slot: true,
+      slot: true,
     },
 	  {
       label: '文件路径',
