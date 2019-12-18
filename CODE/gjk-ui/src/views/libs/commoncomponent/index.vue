@@ -211,7 +211,7 @@ export default {
     this.getLibsTree();
     this.loading = false;
     this.tableHisOption = JSON.parse(JSON.stringify(this.tableOption));
-    this.tableHisOption.menu = false;
+    // this.tableHisOption.menu = false;
   },
   mounted: function() {},
   watch: {

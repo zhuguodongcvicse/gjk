@@ -71,6 +71,7 @@
 
     <!-- 再次申请构件 -->
     <add-pro-comp
+      v-if="addProCompDialogVisible"
       :temp_currProject="temp_currProject"
       :dialog="addProCompDialogVisible"
       @closeDialog="closeAddProCompDialog"
