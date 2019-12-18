@@ -10,10 +10,14 @@ export function getDataSource(query) {
 }
 
 export function startSimulator(query) {
+  let params = {
+    componentLinks: query.componentLinks,
+    filePath: query.filePath
+  }
   return request({
     url: '/simula/simulation/startSimulator/'+query.username,
     method: 'post',
-    data: query
+    data: params
   })
 }
 

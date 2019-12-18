@@ -161,6 +161,7 @@ export default {
       xmlMaps: [], //所有基础构件xmlEntityMap
       ctrlXmlParam: new Map(), //存储Ctrl+C 的数据
       dtos: [], //传值给iframe
+      tempDtos:[], //临时存放构件列表数据用于检查更新功能
       iframeParams: "", //iframe返回的信息及状态
       tmp: new Map(), //tmp xmlEntity临时值
       tmpMaps: new Map(), //tmpMaps xmlEntityMaps临时值
@@ -203,7 +204,7 @@ export default {
     },
     simulationData:{
       handler:function(){
-        startSimulator({username:this.userInfo.username,connectionList:this.simulationData,filePath:this.flowFilePath})
+        startSimulator({username:this.userInfo.username,componentLinks:this.simulationData,filePath:this.flowFilePath})
       }
     },
 
@@ -218,12 +219,13 @@ export default {
     },
     bottonCheckComp: {
       handler: function() {
-        //console.log(this.bottonCheckComp)
+        console.log(this.bottonCheckComp)
+        console.log(this.bottonCheckComp)
         if (!this.bottonCheckComp) {
           //  console.log(this.dtos)
           let checkList = [];
           let compList = {};
-          for (var value of this.dtos) {
+          for (var value of this.tempDtos) {
             compList = {};
             compList.id = value.id;
             compList.compId = value.compId;
@@ -233,14 +235,19 @@ export default {
             checkList.push(compList);
           }
           checkComp(checkList).then(response => {
-            // console.log("111111111111111111",response.data.data)
-            this.compUpdateState = response.data.data;
+            this.compUpdateState = response.data.data.compUpdate;
+            this.postMessageData.cmd = "bottonCheckComp";
+            this.postMessageData.params = this.bottonCheckComp;
+            this.postMessageData.compUpdateState = this.compUpdateState;
+            this.$refs.gjkIframe.sendMessage(this.postMessageData);
           });
+        }else{
+            this.postMessageData.cmd = "bottonCheckComp";
+            this.postMessageData.params = this.bottonCheckComp;
+            this.postMessageData.compUpdateState = this.compUpdateState;
+            this.$refs.gjkIframe.sendMessage(this.postMessageData);
         }
-        this.postMessageData.cmd = "bottonCheckComp";
-        this.postMessageData.params = this.bottonCheckComp;
-        this.postMessageData.compUpdateState = this.compUpdateState;
-        this.$refs.gjkIframe.sendMessage(this.postMessageData);
+       
       }
     },
     /* 监听iframeParams数据 */
@@ -491,9 +498,10 @@ export default {
       getCompList(this.$route.query.proId).then(response => {
         // console.log("// 根据用户编号查询构件及文件列表");
         //所有构件已更新未更新状态
-        this.compUpdateState = response.data.data.compUpdate;
+       // this.compUpdateState = response.data.data.compUpdate;
         // 所有文件DTO
         this.dtos = response.data.data.dtos;
+        this.tempDtos = deepClone(response.data.data.dtos)
         console.log("dtos列表", this.dtos);
         // 设置所有构件XML
         this.xmls = response.data.data.xmls;
@@ -681,11 +689,30 @@ export default {
           }
           break;
         case "removeComp":
-          let compId = data.params;
-          let projectId = this.$route.query.proId;
-          removeCompApproval(compId, projectId).then(res => {
-            removeCompProject(compId, projectId);
-          });
+           this.$confirm("是否删除此构件?", "提示", {
+              confirmButtonText: "确定",
+              cancelButtonText: "取消",
+              type: "warning"
+            })
+              .then(() => {
+                let compId = data.params;
+              // console.log("id",compId)
+                let projectId = this.$route.query.proId;
+                removeCompApproval(compId, projectId).then(res => {
+                  removeCompProject(compId, projectId);
+                });
+
+                this.postMessageData.cmd = "returnRemoveComp";
+                this.postMessageData.params = compId;
+                this.$refs.gjkIframe.sendMessage(this.postMessageData);
+
+                for(let index in this.tempDtos){
+                    if(this.tempDtos[index].id == compId){
+                      this.tempDtos.splice(index,1)
+                    }
+                }
+              })
+          //console.log("构件列表",this.tempDtos)
           break;
         case "nodeTypeNotMatch":
           this.$message({

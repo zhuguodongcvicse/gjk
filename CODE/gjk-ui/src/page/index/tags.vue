@@ -131,7 +131,11 @@
                     this.$store.commit("IS_SAVE", "1");
                     let {tag, key} = this.findTag(this.routerPathValue);
                     this.$store.commit("DEL_TAG", tag);
-                    if (tag.value === this.tag.value) {
+                    let temp = tag.value
+                    if(tag.value.indexOf("?")!=-1){
+                        temp = tag.value.split("?")[0]
+                    }
+                    if (temp === this.tag.value.split("?")[0]) {
                         tag = this.tagList[key === 0 ? key : key - 1]; //如果关闭本标签让前推一个
                         this.openTag(tag);
                     }
@@ -157,7 +161,7 @@
                  // console.log("value", value)
                 // console.log("action", action)
                 if (value.split("?")[0] == "/comp/manager/process"){
-                     this.$store.commit("IS_SAVE", "0");
+                    this.$store.commit("IS_SAVE", "0");
                     this.routerPathValue = value
                     this.routerPathAction = "remove"
                     this.dialogVisibleOfCloseRouter = true
