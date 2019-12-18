@@ -119,6 +119,8 @@
                     this.contentmenuX = event.clientX;
                     this.contentmenuY = event.clientY;
                     this.tagName = target.getAttribute("aria-controls").slice(5);
+                    let {tag, key} = this.findTag(this.tagName)
+                    this.openTag(tag);
                     this.contextmenuFlag = true;
                 }
             },

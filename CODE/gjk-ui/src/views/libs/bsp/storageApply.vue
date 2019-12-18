@@ -3,7 +3,7 @@
     class="libs_bsp_storageapply_14s"
     title="bsp入库"
     :visible.sync="dialog"
-    width="30%"
+    width="40%"
     :before-close="handleClose"
   >
     <el-container>
@@ -35,13 +35,17 @@
         </el-form>
         <!-- 如果需要选择文件进行提交，树加上 show-checkbox 属性，
         selectNodeArray中保存了所有已选择的节点信息-->
-        <el-tree
-          ref="tree"
-          :data="bspTreeData"
-          :default-expand-all="true"
-          :check-on-click-node="true"
-          @check-change="handleCheckChange"
-        ></el-tree>
+        <div class="compframeDiv">
+          <el-tree
+            ref="tree"
+            node-key="id"
+            :data="bspTreeData"
+            :auto-expand-parent="true"
+            :check-on-click-node="true"
+            :default-expanded-keys="defaultExpandIds"
+            @check-change="handleCheckChange"
+          ></el-tree>
+        </div>
       </el-main>
     </el-container>
 
@@ -56,12 +60,14 @@
 import { mapGetters } from "vuex";
 import { getTreeById, putObj } from "@/api/libs/bsp";
 import { getUserhasApplyAuto } from "@/api/admin/user";
+import { getTreeDefaultExpandIds } from "@/util/util";
 //当引用的方法重名时，使用as取别名区分
 import {
   saveApproval,
   getIdByApplyId,
   putObj as approvalPutObj
 } from "@/api/libs/approval";
+import { deepClone } from "../../../util/util";
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
 export default {
@@ -79,6 +85,7 @@ export default {
     return {
       bspName: "",
       bspTreeData: [],
+      defaultExpandIds: [],
       selectNodeArray: [],
 
       //具有审批权限的用户，用于选择审批人
@@ -95,7 +102,6 @@ export default {
   //监控data中的数据变化
   watch: {
     bspItemMsg: function() {
-      console.log("11111111111111", this.bspItemMsg);
       this.bspName = this.bspItemMsg.bspName;
 
       getUserhasApplyAuto().then(Response => {
@@ -109,6 +115,9 @@ export default {
         }
 
         getTreeById(this.bspItemMsg.id).then(Response => {
+          let defaultExpandIds = [];
+          getTreeDefaultExpandIds(Response.data.data, defaultExpandIds, 0, 1);
+          this.defaultExpandIds = deepClone(defaultExpandIds);
           this.bspTreeData = Response.data.data;
         });
       });
@@ -221,4 +230,10 @@ export default {
 };
 </script>
 <style lang='scss' scoped>
+.compframeDiv {
+  height: 40vh;
+  word-wrap: break-word;
+  word-break: break-all;
+  overflow-y: auto;
+}
 </style>

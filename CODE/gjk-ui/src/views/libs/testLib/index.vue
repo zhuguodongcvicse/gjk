@@ -1,13 +1,11 @@
 <template>
-  <div
-    class="app-container calendar-list-container libs_testlib_index_14s"
-  >
+  <div class="app-container calendar-list-container libs_testlib_index_14s">
     <basic-container>
       <el-row class="admin_menu_index_main_14s">
         <div class="split-pane-page-wrapper">
-          <split-pane v-model="offset" @on-moving="handleMoving" min="150px">
-            <div slot="left">
-              <el-col :span="24" class="menu_main_left_14s">
+          <split-pane v-model="offset" @on-moving="handleMoving" min="150px" max="250px">
+            <div slot="left" class="testSlotDiv">
+              <el-col :span="24">
                 <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
                 <el-tree
                   class="filter-tree"
@@ -26,7 +24,7 @@
               </el-col>
             </div>
             <div slot="right">
-              <el-col :span="24" class="menu_main_right_14s">
+              <el-col :span="24">
                 <el-card class="box-card">
                   <el-form>
                     <el-form-item label="测试文件名：">
@@ -38,7 +36,7 @@
                         v-if="isShowChild === true"
                         :filePath="filePath"
                         :textContext="textContext"
-                      ></show-child> -->
+                      ></show-child>-->
                       <monaco-editor
                         v-if="isShowEditor === true"
                         :textContext="textContext"
@@ -144,7 +142,7 @@ export default {
     this.testManager_btn_del = this.permissions["sys_test_del"];
   },
   computed: {
-    ...mapGetters(["elements", "permissions","website"])
+    ...mapGetters(["elements", "permissions", "website"])
   },
   methods: {
     handleMoving(e) {
@@ -168,6 +166,7 @@ export default {
     },
 
     getList() {
+      console.log("cccccccccc", this.$refs);
       fetchTestTrees(this.listQuery).then(response => {
         this.treeData = response.data.data;
       });
@@ -179,7 +178,7 @@ export default {
     },
 
     nodeExpand(data) {
-       //替换svg
+      //替换svg
       var el = val.$el;
       $(el)
         .find("img")
@@ -194,7 +193,7 @@ export default {
       this.setExpandedKeys();
     },
     nodeCollapse(data) {
-       //替换svg
+      //替换svg
       var el = val.$el;
       $(el)
         .find("img")
@@ -265,10 +264,12 @@ export default {
               "@%#@*+-+@"
             )[1];
             //文件后缀名，用于判断区分文件后缀名，使用文本编辑器还是什么
-            this.fileSuffix = response.data.data.textContext.split("@%#@*+-+@")[0];
+            this.fileSuffix = response.data.data.textContext.split(
+              "@%#@*+-+@"
+            )[0];
           }
         });
-      }else{
+      } else {
         this.tFilePath = "";
         this.textContext = "";
         this.filePath = "";
@@ -352,6 +353,24 @@ export default {
 </script>
 
 <style lang="less">
+.testSlotDiv {
+  height: 100%;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  word-break: break-all;
+  overflow-y: auto;
+}
+.testSlotDiv::-webkit-scrollbar {
+  width: 7px;
+}
+.testSlotDiv::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: #a1a1a1;
+}
+.testSlotDiv::-webkit-scrollbar-track {
+  border-radius: 3px;
+  background: #ddd;
+}
 .center-middle {
   position: absolute;
   left: 50%;

@@ -4,8 +4,8 @@
     <el-row class="admin_menu_index_main_14s">
       <div class="split-pane-page-wrapper">
         <split-pane v-model="offset" @on-moving="handleMoving" min="150px">
-          <div slot="left">
-            <el-col :span="24" class="menu_main_left_14s">
+          <div slot="left" class="platformSlotDiv">
+            <el-col :span="24">
               <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
               <el-tree
                 class="filter-tree"
@@ -24,7 +24,7 @@
             </el-col>
           </div>
           <div slot="right">
-            <el-col :span="24" class="menu_main_right_14s">
+            <el-col :span="24" class>
               <el-card class="box-card">
                 <el-form>
                   <el-form-item label="平台文件名：">
@@ -172,7 +172,7 @@ export default {
     getList() {
       fetchPlatformTree(this.listQuery).then(response => {
         this.treeData = response.data.data;
-        console.log("hhhh",response);
+        console.log("hhhh", response);
       });
       //文件夹名
       // platformLib().then(val => {
@@ -377,6 +377,24 @@ export default {
 </script>
 
 <style lang="less">
+.platformSlotDiv {
+  height: 100%;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  word-break: break-all;
+  overflow-y: auto;
+}
+.platformSlotDiv::-webkit-scrollbar {
+  width: 7px;
+}
+.platformSlotDiv::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: #a1a1a1;
+}
+.platformSlotDiv::-webkit-scrollbar-track {
+  border-radius: 3px;
+  background: #ddd;
+}
 .center-middle {
   position: absolute;
   left: 50%;
