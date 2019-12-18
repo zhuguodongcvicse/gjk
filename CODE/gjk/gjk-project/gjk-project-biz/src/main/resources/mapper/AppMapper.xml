@@ -167,7 +167,7 @@
 		gjk_app AS r
 		<where>
 			<if test="fileName != null and fileName != ''">
-				and r.file_name LIKE CONCAT('%',#{fileName},'%')
+				and r.file_path LIKE CONCAT('%',#{fileName},'%')
 			</if>
 			and r.del_flag = '0'
 		</where>

@@ -14,6 +14,9 @@
         @row-save="handleSave"
         @row-del="rowDel"
       >
+        <template slot="version" slot-scope="scope">
+          <el-tag>V{{parseFloat(scope.row.version).toFixed(1)}}</el-tag>
+        </template>
         <template slot="menuLeft">
           <el-button
             type="primary"
@@ -63,7 +66,7 @@
                 </el-upload>
               </el-form-item>
               <el-form-item
-                label="平台选择: "
+                label="平台选择 "
                 label-width="90px"
                 prop="values"
                 style="margin-bottom: 25px;"
@@ -94,8 +97,8 @@
                   :props="defaultProps"
                 ></el-tree>
               </el-form-item>
-              <el-form-item label="描述: " label-width="90px">
-                <textarea v-model="description" rows="3" cols="70" placeholder="请添加描述"></textarea>
+              <el-form-item label="描述 " label-width="90px">
+                <el-input type="textarea" v-model="description" rows="3" placeholder="请添加描述"></el-input>
               </el-form-item>
               <div class="control-container software_footer_btn_14s text_align_right_14s">
                 <el-button
@@ -104,12 +107,12 @@
                   @click="resumes('compForm')"
                   :disabled="isAble"
                 >全部上传</el-button>
-                <el-button type @click="handleCanclesoftware">取消</el-button>
+                <el-button type @click="handleCancleSoftware">取消</el-button>
               </div>
             </el-form>
           </el-dialog>
-          <br>
-          <br>
+          <br />
+          <br />
         </template>
         <template slot-scope="scope" slot="menu">
           <el-button
@@ -389,11 +392,17 @@ export default {
                     // this.softFilePath = resData[0];
                     //显示在页面上的文件路径
                     // this.frameFilePath = resData[0] + this.folderName + "/";
-                    this.$message({
-                      showClose: true,
+                    this.$notify({
+                      title: "成功",
                       message: "保存成功",
-                      type: "success"
+                      type: "success",
+                      duration: 2000
                     });
+                    // this.$message({
+                    //   showClose: true,
+                    //   message: "保存成功",
+                    //   type: "success"
+                    // });
                     this.dialogTableVisible = false;
                   }, 500);
                   this.reload();
@@ -518,7 +527,7 @@ export default {
     // handleSavesoftware() {},
     //取消保存软件构件信息
     handleCancleSoftware() {
-      this.$refs.importComp.clearFiles();
+      // this.$refs.importComp.clearFiles();
       this.importCompFileList = {};
       this.dialogTableVisible = false;
       this.reload();

@@ -110,6 +110,26 @@ export const tableOption = {
     },
     {
       label: '审批状态',
+      prop: 'applyState',
+      dicData: [{
+        label: '未提交',
+        value: "0"
+      }, {
+        label: '已申请',
+        value: "1"
+      }, {
+        label: '已通过',
+        value: "2"
+      }, {
+        label: '已驳回',
+        value: "3"
+      }, {
+        label: '驳回再申请',
+        value: "4"
+      }]
+    },
+    {
+      label: '审批描述',
       prop: 'applyDesc'
     },
   ]

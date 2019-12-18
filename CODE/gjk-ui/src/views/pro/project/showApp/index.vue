@@ -882,6 +882,7 @@ export default {
       ) {
         getAppVosPage(this.searchAppName).then(val => {
           this.dynamicValidateForm.domains.push(val.data.data);
+          this.total = val.data.data.length
         });
       } else {
         this.reload();

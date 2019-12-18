@@ -108,7 +108,7 @@ public interface GjkPlatformMapper extends BaseMapper<GjkPlatform> {
 	 */
 	List<String> getCompIdsGroupCompId();
 
-	ComponentDetail getCompDetailByComponentId(@Param("componentId")String componentId);
+	ComponentDetail getCompDetailByComponentId(@Param("componentId")String componentId,@Param("fileName") String fileName);
 	
 	List<Component> getCompByCompId(@Param("compId")String compId);
 	/**

@@ -23,7 +23,10 @@ var linkList = []
 var linkGraphList = { datas: [] }
 var clickCheckedChip
 var ChipsWithIPs = []
+var checkIPMap= new Map()
 var frontCaseForDeployment
+var clickChipsList = [] //记录点击的芯片次序
+
 Q.registerImage('rack', 'images/Crate.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
 Q.registerImage('card', 'images/BeforeTheBoard.svg');
 Q.registerImage('behindcard', 'images/AfterTheBoard.svg');
@@ -35,7 +38,7 @@ Q.registerImage('ePort', 'images/InternetAccess.svg');
 
 // 子接收父参数
 function handleMessageFromParent(event) {
-	// console.log("event.data.params", event.data)
+	console.log("event.data.params", event.data)
 	switch (event.data.cmd) {
 		case 'getHardwarelibs':
 			caseArr = event.data.params[1];
@@ -62,6 +65,7 @@ function handleMessageFromParent(event) {
 										if (graphList.fJson[n].datas[m].json.properties != null && graphList.fJson[n].datas[m].json.properties.chipName != null
 											&& graphList.fJson[n].datas[m].json.properties.uniqueId == graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].uniqueId) {
 											graphList.fJson[n].datas[m].json.properties.IP = graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].IP
+                      checkIPMap.set(graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].uniqueId, graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].IP)
 										}
 									}
 								}
@@ -72,6 +76,7 @@ function handleMessageFromParent(event) {
 			}
 			// console.log("graphList", graphList)
 			// console.log("linkGraphList", linkGraphList)
+      // console.log("checkIPMap",checkIPMap)
 			graphList.fJson = JSON.parse(JSON.stringify(graphList.fJson))
 			graphList.bJson = JSON.parse(JSON.stringify(graphList.bJson))
 			for (const i in caseArr) {
@@ -583,7 +588,7 @@ function initEditor(editor) {
       //连线关系
       createLinkData()
       graphList.fJson = JSON.parse(JSON.stringify(graphList.fJson))
-      // console.log("graphList", graphList)
+      console.log("graphList", graphList)
       var linkArr = Array.from(linkMap)
       var linkStr = JSON.stringify(linkArr)
       if (graphList.link === undefined) {
@@ -592,7 +597,7 @@ function initEditor(editor) {
       frontCaseForDeployment = JSON.stringify(frontCaseForDeployment)
       postMessageParentData.cmd = "submitCaseJSON";
       postMessageParentData.params = [graphList, linkStr, allChipToFlow, frontCaseForDeployment]
-      window.parent.postMessage(postMessageParentData, "*")
+      // window.parent.postMessage(postMessageParentData, "*")
       // console.log("postMessageParentData--first", postMessageParentData)
       return
     } else if (graphName == '背部视图') {
@@ -1228,7 +1233,17 @@ function initEditor(editor) {
     // console.log("data",data)
     if (data.properties.chipName != null) {
       clickCheckedChip = data.properties
+      if (clickChipsList.length === 2) {
+        clickChipsList.splice(0,1)
+      }
+      clickChipsList.push(data.properties)
+      checkIPMap.forEach((value, key) => {
+        if (key === data.properties.uniqueId) {
+          data.set('IP', value);
+        }
+      })
     }
+    // console.log("clickChipsList",clickChipsList)
     // console.log("type",type)
     //这里可以获得当前点击的图元对象
     graph.onclick = function (evt) {

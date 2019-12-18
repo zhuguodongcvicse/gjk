@@ -1,5 +1,5 @@
 <template>
-  <div id="container" class>
+  <div ref="container" class>
     <!-- 当前项目 -->
     <div class="project_tree_14s">
       <img src="/img/theme/night/logo/proImg.png" ondragstart="return false;" />
@@ -17,7 +17,7 @@
       </el-dropdown>
     </div>
     <!-- 树 -->
-    <div class="tree-container">
+    <div class="tree-container" ref="tree-container">
       <el-tree
         ref="tree"
         :data="treeData"
@@ -256,10 +256,10 @@ export default {
   },
   mounted: function() {
     // this.initTreeCard()
-    this.changeHeight();
+    // this.changeHeight();
     let that = this;
     window.onresize = function() {
-      that.changeHeight();
+      // that.changeHeight();
     };
   },
   beforeDestroy: function() {},
@@ -280,9 +280,29 @@ export default {
           if (this.$store.state.projectTreeShow.projectTreeShow.length != 0) {
             this.projects = this.$store.state.projectTreeShow.projectTreeShow;
             // console.log("this.projects",this.projects)
-            for (const i in this.projects) {
-              if (this.projects[i].showFlag == 0) {
-                this.temp_currProject = this.projects[i];
+            if (JSON.stringify(this.temp_currProject) != "{}") {
+              let pro = response.data.data.find(item => {
+                return item.id === this.temp_currProject.id;
+              });
+              if (pro != undefined) {
+                let index = response.data.data.indexOf(pro);
+                let proItem = this.projects.find(item => {
+                  return item.id === this.temp_currProject.id;
+                });
+                this.$set(pro, "showFlag", 0);
+                if (proItem != undefined) {
+                  let i = this.projects.indexOf(proItem);
+                  this.projects[i] = pro;
+                }
+                projectList[index] = this.temp_currProject;
+                this.$store.dispatch("setProjectTreeShow", this.projects);
+              }
+            } else {
+              console.log("11111111111111111", this.projects);
+              for (const i in this.projects) {
+                if (this.projects[i].showFlag == 0) {
+                  this.temp_currProject = this.projects[i];
+                }
               }
             }
           } else {
@@ -304,11 +324,11 @@ export default {
           // console.log("err: ", err);
         });
     },
-    // changeHeight() {
-    //   let height = document.body.clientHeight;
-    //   $("#container").css({ height: height - 50 + "px" });
-    //   $(".tree-container").css({ height: height - 220 + "px" });
-    // },
+    changeHeight() {
+      let height = document.body.clientHeight;
+      this.$refs.container.style.height = height - 50 + "px";
+      this.$refs["tree-container"].style.height = height - 220 + "px";
+    },
     initTreeCard() {
       // let that = this
       // let container = document.getElementById('container')
@@ -375,7 +395,7 @@ export default {
     },
     async nodeContextmenuClick(item) {
       if (item == "集成代码生成") {
-        codeGeneration(this.procedureId, this.userInfo.name).then(res => {});
+        codeGeneration(this.procedureId, this.userInfo.username).then(res => {});
         const loading = this.$loading({
           lock: true,
           text: "集成代码生成中。。。",
@@ -911,50 +931,41 @@ export default {
       if (this.importProjectFileList.length == 0) {
         this.$message.warning("请选择文件上传。");
       } else {
-        let params = new FormData();
-        params.append("file", this.importProjectFileList[0]);
-        params.append("projectId", this.currentNodeData.id);
-        importProjectZipUpload(params).then(Response => {
-          if (Response.data.data == -1) {
-            this.$message.warning("上传的压缩包内容错误，请重新选择文件上传。");
-          } else {
-            this.$confirm(
-              "导入流程可能会产生以下结果：<br>" +
-                "&nbsp;&nbsp;&nbsp;&nbsp;1. 替换项目引用的模板<br>" +
-                "&nbsp;&nbsp;&nbsp;&nbsp;2. 可能会覆盖构件库文件<br>" +
-                "&nbsp;&nbsp;&nbsp;&nbsp;3. 可能会覆盖BSP库文件<br>" +
-                "&nbsp;&nbsp;&nbsp;&nbsp;4. 可能会覆盖软件框架文件<br>" +
-                "&nbsp;&nbsp;&nbsp;&nbsp;5. 构件库版本可能会有重复<br>" +
-                "&nbsp;&nbsp;&nbsp;&nbsp;6. 构件库数据可能会被覆盖<br>" +
-                "&nbsp;&nbsp;&nbsp;&nbsp;7. 结构体数据可能会被覆盖<br>" +
-                "&nbsp;&nbsp;&nbsp;&nbsp;8. 字典数据可能会被覆盖<br>" +
-                "&nbsp;&nbsp;&nbsp;&nbsp;9. 芯片数据可能会被覆盖<br>" +
-                "&nbsp;&nbsp;&nbsp;&nbsp;10.硬件建模数据可能会被覆盖<br><br>" +
-                "是否确认导入?",
-              "提示",
-              {
-                dangerouslyUseHTMLString: true,
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
-                type: "warning"
-              }
-            ).then(data => {
-              let params = new FormData();
-              params.append("file", this.importProjectFileList[0]);
-              params.append("projectId", this.currentNodeData.id);
-              importProjectZipUpload(params).then(Response => {
-                if (Response.data.data == -1) {
-                  this.$message.warning(
-                    "上传的压缩包内容错误，请重新选择文件上传。"
-                  );
-                } else {
-                  this.$message.success("导入成功。");
-                  this.getProjects();
-                  this.closeImportProjectDialog();
-                }
-              });
-            });
+        this.$confirm(
+          "导入流程可能会产生以下结果：<br>" +
+            "&nbsp;&nbsp;&nbsp;&nbsp;1. 替换项目引用的模板<br>" +
+            "&nbsp;&nbsp;&nbsp;&nbsp;2. 可能会覆盖构件库文件<br>" +
+            "&nbsp;&nbsp;&nbsp;&nbsp;3. 可能会覆盖BSP库文件<br>" +
+            "&nbsp;&nbsp;&nbsp;&nbsp;4. 可能会覆盖软件框架文件<br>" +
+            "&nbsp;&nbsp;&nbsp;&nbsp;5. 构件库版本可能会有重复<br>" +
+            "&nbsp;&nbsp;&nbsp;&nbsp;6. 构件库数据可能会被覆盖<br>" +
+            "&nbsp;&nbsp;&nbsp;&nbsp;7. 结构体数据可能会被覆盖<br>" +
+            "&nbsp;&nbsp;&nbsp;&nbsp;8. 字典数据可能会被覆盖<br>" +
+            "&nbsp;&nbsp;&nbsp;&nbsp;9. 芯片数据可能会被覆盖<br>" +
+            "&nbsp;&nbsp;&nbsp;&nbsp;10.硬件建模数据可能会被覆盖<br><br>" +
+            "是否确认导入?",
+          "提示",
+          {
+            dangerouslyUseHTMLString: true,
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning"
           }
+        ).then(data => {
+          let params = new FormData();
+          params.append("file", this.importProjectFileList[0]);
+          params.append("projectId", this.currentNodeData.id);
+          importProjectZipUpload(params).then(Response => {
+            if (Response.data.data == -1) {
+              this.$message.warning(
+                "上传的压缩包内容错误，请重新选择文件上传。"
+              );
+            } else {
+              this.$message.success("导入成功。");
+              this.getProjects();
+              this.closeImportProjectDialog();
+            }
+          });
         });
       }
     }

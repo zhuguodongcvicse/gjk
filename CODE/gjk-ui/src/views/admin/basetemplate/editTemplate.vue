@@ -222,7 +222,7 @@
         <el-row>
           <el-button type="primary" plain @click="addAttribute">添加属性</el-button>
         </el-row>
-        <div class="libs_structlibs_configstruct_14s_25s_table">
+        <div class="admin_basetemplate_dialog">
           <el-table :data="configureType.attrs" class="w100_14s" border>
             <!--属性名添加-->
             <el-table-column label="属性名">
@@ -372,7 +372,7 @@
           </el-col>
           <!--选择粘贴到的位置的标签树-->
           <el-col :span="14">
-            <div class="libs_structlibs_configstruct_14s_25s_table">
+            <div class="admin_basetemplate_dialog">
               <el-tree
                 class="filter-tree"
                 node-key="id"
@@ -1447,7 +1447,7 @@ export default {
           {
             label: "选项卡",
             value: "tab"
-          },
+          }
         ];
       } else if (this.template == "hsm_param_type") {
         this.lableConfigTypeData = [
@@ -1694,30 +1694,41 @@ export default {
             for (let i of dictValues) {
               if (configureType.mappingKeys == i.id) {
                 Vue.set(XmlEntityMap, "lableMappingName", i.label); //如果映射查询字典,设置标签映射名
+                Vue.set(configureType, "lableMappingName", i.label);
                 flag = false;
                 break;
               }
             }
             if (flag) {
               Vue.set(XmlEntityMap, "lableMappingName", XmlEntityMap.lableName);
+              Vue.set(
+                configureType,
+                "lableMappingName",
+                XmlEntityMap.lableName
+              );
             }
           } else {
             //不映射的话页面显示原始标签名
             Vue.set(XmlEntityMap, "lableMappingName", XmlEntityMap.lableName);
+            Vue.set(configureType, "lableMappingName", XmlEntityMap.lableName);
           }
           var attrs = configureType.attrs;
           if (attrs != undefined && attrs.length > 0) {
             //判断标签上是否拥有属性
             for (let i of attrs) {
               //遍历属性
-
               if (i.attrMapping) {
                 //判断属性名是否映射
+                var flag2 = true;
                 for (let j of dictValues) {
                   if (i.attrKeys == j.id) {
                     Vue.set(i, "attrMappingName", j.label); //如果属性名映射,从字典表根据id查询映射名
+                    flag2 = false;
                     break;
                   }
+                }
+                if (flag2) {
+                  Vue.set(i, "attrMappingName", i.attrName);
                 }
               } else {
                 Vue.set(i, "attrMappingName", i.attrName); //否则显示原始属性名

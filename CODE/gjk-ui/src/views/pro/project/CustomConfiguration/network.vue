@@ -132,11 +132,10 @@ export default {
       // this.$refs.networkParam.echo(netWorkIn)
     },
     handleClick(node){
-        console.log(node)
+      console.log(node)
       for (let key in node.data.attributeMap) {
         if('configureType'!==key){
           if(key == 'name'){
-            console.log(node.data.attributeMap['compId'])
             this.formLabelAlign[key] = node.data.attributeMap['compId']
           }else{
             this.formLabelAlign[key] = node.data.attributeMap[key]
@@ -176,13 +175,23 @@ export default {
          }
     },
      addNode(){
+       var copyNode = JSON.parse(JSON.stringify(this.node.data));
+       console.log(copyNode)
+       copyNode.attributeMap.compId = '';
+       copyNode.attributeMap.compName = '';
+       copyNode.attributeMap.name = '';
+       for (let i = 0; i < copyNode.xmlEntityMaps.length; i++) {
+           var xmlEntity = copyNode.xmlEntityMaps[i];
+           xmlEntity.attributeMap.name = '';
+       }
        var index = this.index+1
        var node = {
-         data: JSON.parse(JSON.stringify(this.node.data)),
+         data: copyNode,
          id: index,
          label: this.node.label
        }
        this.index = index
+       console.log(node)
        this.xmlEntityMaps.push(node)
        this.clear()
     },
@@ -240,9 +249,7 @@ export default {
           }
         }
       }
-      console.log(111,entity)
       this.xmlEntityMaps[index].data = entity
-      console.log(222,JSON.parse(JSON.stringify(this.xmlEntityMaps[index].data)))
       let xmlEntityMaps = this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps
       for (let i = 0; i < xmlEntityMaps.length; i++) {
         const element = xmlEntityMaps[i];

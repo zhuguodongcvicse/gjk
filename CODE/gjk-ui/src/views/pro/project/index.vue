@@ -319,15 +319,15 @@ export default {
 
       projectRules: {
         projectName: [
-          { required: true, message: "请输入", trigger: "blur" },
+          { required: true, message: "请输入项目名称", trigger: "blur" },
           { validator: proNameSameNameCheck, trigger: "blur" }
         ],
         // bspSelectString: [
         //   { required: true, message: "请选择", trigger: "change" }
         // ],
-        applyUser: [{ required: true, message: "请选择", trigger: "change" }],
+        applyUser: [{ required: true, message: "请选择审批人", trigger: "change" }],
         processName: [
-          { required: true, message: "请输入", trigger: "blur" },
+          { required: true, message: "请输入流程名称", trigger: "blur" },
           { validator: processNameCheck, trigger: "blur" }
         ]
       },
@@ -602,7 +602,7 @@ export default {
     },
     rowDel: function(row, index) {
       var _this = this;
-      this.$confirm("是否确认删除ID为" + row.id + "的记录", "提示", {
+      this.$confirm("是否确认删除名称为 "+row.projectName+" 的项目?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"

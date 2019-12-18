@@ -14,6 +14,9 @@
         @row-save="handleSave"
         @row-del="rowDel"
       >
+        <template slot="version" slot-scope="scope">
+          <el-tag>V{{parseFloat(scope.row.version).toFixed(1)}}</el-tag>
+        </template>
         <template slot="menuLeft">
           <el-button
             type="primary"
@@ -24,7 +27,7 @@
           >新 增</el-button>
 
           <el-dialog
-            class="libs_bsp_dialog_14s libs_bsp_index_dialog_14s"
+            class=" libs_bsp_index_dialog_14s"
             title="新增BSP库"
             width="40%"
             :visible.sync="dialogTableVisible"
@@ -63,7 +66,7 @@
                 </el-upload>
               </el-form-item>
               <el-form-item
-                label="平台选择: "
+                label="平台选择 "
                 label-width="90px"
                 prop="values"
                 style="margin-bottom: 25px;"
@@ -94,8 +97,8 @@
                   :props="defaultProps"
                 ></el-tree>
               </el-form-item>
-              <el-form-item label="描述: " label-width="90px">
-                <textarea v-model="description" rows="3" cols="70" placeholder="请添加描述"></textarea>
+              <el-form-item label="描述 " label-width="90px">
+                <el-input type="textarea" v-model="description" rows="3" placeholder="请添加描述"></el-input>
               </el-form-item>
               <div class="control-container bsp_footer_btn_14s text_align_right_14s">
                 <el-button
@@ -108,8 +111,8 @@
               </div>
             </el-form>
           </el-dialog>
-          <br>
-          <br>
+          <br />
+          <br />
         </template>
         <template slot-scope="scope" slot="menu">
           <!-- <el-button
@@ -391,11 +394,17 @@ export default {
                   // let resData = response.data.split(",");
                   setTimeout(() => {
                     loading.close();
-                    this.$message({
-                      showClose: true,
+                    this.$notify({
+                      title: "成功",
                       message: "保存成功",
-                      type: "success"
+                      type: "success",
+                      duration: 2000
                     });
+                    // this.$message({
+                    //   showClose: true,
+                    //   message: "保存成功",
+                    //   type: "success"
+                    // });
                     this.dialogTableVisible = false;
                   }, 500);
                   this.reload();
@@ -520,7 +529,6 @@ export default {
     // handleSaveBSP() {},
     //取消保存软件构件信息
     handleCancleBSP() {
-      this.$refs.importComp.clearFiles();
       this.importCompFileList = {};
       this.dialogTableVisible = false;
       this.reload();

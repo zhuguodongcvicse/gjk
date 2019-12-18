@@ -57,7 +57,7 @@ import iconchoose from "@/views/comp/code-editor/icon-choose";
 import filesUpload from "@/views/comp/code-editor/files-upload";
 import { fetchAlgorithmTree } from "@/api/admin/algorithm";
 import { fetchTestTree } from "@/api/admin/test";
-import { fetchPlatformTree } from "@/api/admin/platform";
+import { fetchPlatformTrees } from "@/api/admin/platform";
 import { fetchSavefiles, getDefaultImg } from "@/api/comp/componentdetail";
 import { mapGetters } from "vuex";
 import { randomLenNum, randomUuid, deepClone } from "@/util/util";
@@ -339,7 +339,7 @@ export default {
         });
       } else if (this.fileType == "platform") {
         this.tigPlaceholder = "平台文件";
-        fetchPlatformTree(this.listQuery).then(response => {
+        fetchPlatformTrees(this.listQuery).then(response => {
           this.data = response.data.data;
         });
       }

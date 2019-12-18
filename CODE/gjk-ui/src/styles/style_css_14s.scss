@@ -923,7 +923,7 @@ opacity: 0;
             height: 100% ;
             overflow:auto;
           }
-          
+          .admin_basetemplate_dialog{overflow-y: auto;max-height: 300px}
           .shmapping_isaddlable2,
           .updatamapping_isaddlable2{ overflow:auto;}
   
@@ -944,6 +944,7 @@ opacity: 0;
           .admin_log_index_14s .avue-crud__menu{width:50%;float:right;}
 
           .admin_role_index_14s{}
+          .admin_role__14s_25s_dialog{overflow-y: auto;max-height: 400px}
           .admin_token_14s{}
   
           .admin_uploaders_index_14s .btn_10_14s{margin-left:10px;}

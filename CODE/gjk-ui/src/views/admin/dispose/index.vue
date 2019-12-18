@@ -169,7 +169,7 @@ export default {
       specalHandleSelect: [],
       isAble: true,
       //调接口传的参数
-      appDataDTO: {},
+      appDataDTO: {}
     };
   },
 
@@ -228,47 +228,47 @@ export default {
       .then(val => {
         this.processName = val.data.data.fileName;
         this.flowId = val.data.data.flowId;
-        console.log("获取流程名获取流程名获取流程名获取流程名")
+        console.log("获取流程名获取流程名获取流程名获取流程名");
       })
       .then(Response => {
-                  getProcessFilePathById(this.$route.query.proId).then(val => {
-                    let selectComponent = [];
-                    if (val.data.data != null) {
-                    for (let item of val.data.data) {
-                        let selectComp = {};
-                        selectComp.label = item.compName;
-                        selectComp.value = item.functionName;
-                        selectComp.rightShowName = item.compId;
-                        selectComp.rightName = item.compId;
-                        selectComp.functionName = item.functionName;
-                        selectComp.compId = item.compId;
-                        selectComponent.push(selectComp);
-                        //给起始构件下拉选赋值
-                        this.selectComponent = selectComponent;
-                      }
-                    console.log("11111111111111111111111111111",this.selectComponent)
-                    //处理处理属性是否显示及中英文映射
-                    let vals = this.analysisAttrConfigType(items.xmlEntityMaps);
-                    //处理多个属性名的值
-                    let a = [];
-                    for (let val of vals) {
-                      tmpVal = JSON.parse(JSON.stringify(val));
-                      a.push(val.lableName);
-                    }
-                      //设置下拉框的值
-                      tmpVal.dataKey = selectComponent;
-                      tmpVal.lableName = a;
-                      //设置特殊处理的值
-                      this.$set(selectVal, items.lableName, tmpVal);
-                    } else {
-                      this.$message.error("缺少流程配置文件，请先配置流程。");
-                    }
-                  });
+        getProcessFilePathById(this.$route.query.proId).then(val => {
+          let selectComponent = [];
+          if (val.data.data != null) {
+            for (let item of val.data.data) {
+              let selectComp = {};
+              selectComp.label = item.compName;
+              selectComp.value = item.functionName;
+              selectComp.rightShowName = item.compId;
+              selectComp.rightName = item.compId;
+              selectComp.functionName = item.functionName;
+              selectComp.compId = item.compId;
+              selectComponent.push(selectComp);
+              //给起始构件下拉选赋值
+              this.selectComponent = selectComponent;
+            }
+            console.log("11111111111111111111111111111", this.selectComponent);
+            //处理处理属性是否显示及中英文映射
+            let vals = this.analysisAttrConfigType(items.xmlEntityMaps);
+            //处理多个属性名的值
+            let a = [];
+            for (let val of vals) {
+              tmpVal = JSON.parse(JSON.stringify(val));
+              a.push(val.lableName);
+            }
+            //设置下拉框的值
+            tmpVal.dataKey = selectComponent;
+            tmpVal.lableName = a;
+            //设置特殊处理的值
+            this.$set(selectVal, items.lableName, tmpVal);
+          } else {
+            this.$message.error("缺少流程配置文件，请先配置流程。");
+          }
+        });
         //map
         // getSysConfigXmlEntityMap(this.$route.query.proId).then(Response => {
-          rollbackDispose(this.$route.query.proId).then(Response => {
+        rollbackDispose(this.$route.query.proId).then(Response => {
           this.form = Response.data.data;
-          console.log("lllll",this.form);
+          console.log("lllll", this.form);
           //给方案路径赋值
           for (let item of this.form.xmlEntityMaps) {
             if (item.lableName === this.planFilePaths) {
@@ -305,8 +305,6 @@ export default {
                   // this.baseSpecalHandle = items.xmlEntityMaps[0];
                   this.baseSpecalHandle = items.xmlEntityMaps[0];
                   this.baseSpecalHandles.push(items);
-
-
                 }
               }
             }
@@ -350,7 +348,7 @@ export default {
             key === attr.attrName
           ) {
             tabParam.attributeMap[key] = lableName;
-            console.log("11111111111111",lableName)
+            console.log("11111111111111", lableName);
           }
         });
       }
@@ -434,9 +432,11 @@ export default {
       //用户名
       this.appDataDTO.userName = this.userInfo.username;
       //调用接口
-      getFilePathListById(this.$route.query.proId, this.appDataDTO).then(editor => {
-        console.log("this.editor::::", editor.data.data);
-      });
+      getFilePathListById(this.$route.query.proId, this.appDataDTO).then(
+        editor => {
+          console.log("this.editor::::", editor.data.data);
+        }
+      );
     },
 
     //存软硬件映射信息
@@ -452,13 +452,13 @@ export default {
           if (item.xmlEntityMaps != null) {
             for (let items of item.xmlEntityMaps) {
               //判断软硬件映射配置按钮是否可用
-              if ( items.lableName === this.yesORno ) {
-                if(items.attributeMap.name){
+              if (items.lableName === this.yesORno) {
+                if (items.attributeMap.name) {
                   this.isAble = false;
-                  console.log("ooooo",this.isAble);
-                }else{
+                  console.log("ooooo", this.isAble);
+                } else {
                   this.isAble = true;
-                  console.log("assssss",this.isAble);
+                  console.log("assssss", this.isAble);
                 }
               }
             }
@@ -470,11 +470,17 @@ export default {
       handlerSaveSysXml(this.form, this.$route.query.proId).then(editor => {
         setTimeout(() => {
           loading.close();
-          this.$message({
-            showClose: true,
+          this.$notify({
+            title: "成功",
             message: "保存成功",
-            type: "success"
+            type: "success",
+            duration: 2000
           });
+          // this.$message({
+          //   showClose: true,
+          //   message: "保存成功",
+          //   type: "success"
+          // });
         }, 500);
       });
     }

@@ -21,8 +21,16 @@
             icon="delete"
             @click="handleDelete"
           >删除</el-button>
-          <el-button type="primary" v-if="testManager_btn_export" @click="showInfo.dialogExportVisible = true">导出</el-button>
-          <el-button type="primary" v-if="testManager_btn_import" @click="showInfo.importLibsDialogVisible = true">导入</el-button>
+          <el-button
+            type="primary"
+            v-if="testManager_btn_export"
+            @click="showInfo.dialogExportVisible = true"
+          >导出</el-button>
+          <el-button
+            type="primary"
+            v-if="testManager_btn_import"
+            @click="showInfo.importLibsDialogVisible = true"
+          >导入</el-button>
         </el-button-group>
       </div>
 
@@ -86,8 +94,8 @@ export default {
   data() {
     return {
       showInfo: {
-          importLibsDialogVisible: false,
-          dialogExportVisible: false
+        importLibsDialogVisible: false,
+        dialogExportVisible: false
       },
       list: null,
       total: null,
@@ -127,8 +135,8 @@ export default {
       algorithmManager_btn_add: false,
       algorithmManager_btn_edit: false,
       algorithmManager_btn_del: false,
-        testManager_btn_export: false,
-        testManager_btn_import: false
+      testManager_btn_export: false,
+      testManager_btn_import: false
     };
   },
 
@@ -138,8 +146,8 @@ export default {
     this.algorithmManager_btn_add = this.permissions["sys_algorithm_add"];
     this.algorithmManager_btn_edit = this.permissions["sys_algorithm_edit"];
     this.algorithmManager_btn_del = this.permissions["sys_algorithm_del"];
-      this.testManager_btn_export = this.permissions["sys_test_export"];
-      this.testManager_btn_import = this.permissions["sys_test_import"];
+    this.testManager_btn_export = this.permissions["sys_test_export"];
+    this.testManager_btn_import = this.permissions["sys_test_import"];
   },
   computed: {
     ...mapGetters(["elements", "permissions"])
@@ -233,18 +241,26 @@ export default {
       if (this.form.algorithmId) {
         this.formEdit = false;
         this.formStatus = "update";
-      }else{
-        alert("请选择一个节点进行编辑！！！");
+      } else {
+        this.$message({
+          showClose: true,
+          message: "请选择一个节点进行编辑！！！",
+          type: "error"
+        });
       }
     },
     handlerAdd() {
-      //this.resetForm()
+      // this.resetForm()
       this.formEdit = false;
       this.formStatus = "create";
     },
     handleDelete() {
       if (this.currentId === -1) {
-        alert("请选择一个节点进行删除！！！");
+        this.$message({
+          showClose: true,
+          message: "请选择一个节点进行删除！！！",
+          type: "error"
+        });
         this.reload();
       } else {
         this.$confirm("此操作将永久删除, 是否继续?", "提示", {
@@ -276,41 +292,32 @@ export default {
           type: "success",
           duration: 2000
         });
-        this.onCancel()
+        this.onCancel();
       });
     },
     create() {
-      var parentId =  JSON.parse(JSON.stringify(this.form)).parentId
-      if (this.form.algorithmId == undefined) {
-        if (this.treeData.length == 0) {
-          Vue.set(this.form, "parentId", "-1");
-          addObj(this.form).then(() => {
-            this.getList();
-            this.$notify({
-              title: "成功",
-              message: "创建成功",
-              type: "success",
-              duration: 2000
-            });
-          });
-        } else {
-          alert("请先选择一个节点！！！");
-          this.reload();
-        }
+      var parentId = JSON.parse(JSON.stringify(this.form)).parentId;
+      console.log("xswe", parentId, this.currentId);
+      //新添加一个根节点
+      if (parentId === undefined) {
+        Vue.set(this.form, "parentId", "-1");
       } else {
         Vue.set(this.form, "parentId", this.currentId);
-        addObj(this.form).then(() => {
-          this.getList();
-          this.$notify({
-            title: "成功",
-            message: "创建成功",
-            type: "success",
-            duration: 2000
-          });
-          this.onCancel()
-          Vue.set(this.form, "parentId", parentId);
-        });
       }
+      addObj(this.form).then(res => {
+        this.getList();
+        this.$notify({
+          title: "成功",
+          message: "创建成功",
+          type: "success",
+          duration: 2000
+        });
+        this.onCancel();
+        //清空this.form的值
+        Object.assign(this.form,this.$options.data().form)
+        //展开当前节点节点。。
+        this.aExpandedKeys = [this.currentId];
+      });
     },
     onCancel() {
       this.formEdit = true;

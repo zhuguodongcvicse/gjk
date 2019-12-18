@@ -145,7 +145,7 @@
                         saveCase(this.params).then(response => {
                             this.$message({
                                 type: "success",
-                                message: "修改成功!"
+                                message: "复制成功!"
                             })
                             this.refreshListFlag = Math.random()
                             this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);

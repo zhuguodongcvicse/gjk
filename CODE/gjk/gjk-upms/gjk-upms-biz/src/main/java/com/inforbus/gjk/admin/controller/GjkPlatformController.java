@@ -65,26 +65,8 @@ public class GjkPlatformController {
 	@GetMapping(value = "/tree")
 	public R getTree() {
 		List<GjkPlatform> platformList = gjkPlatformService.list(Wrappers.emptyWrapper());
-		List<GjkPlatform> platforms = Lists.newArrayList();
-		for (GjkPlatform gjkPlatform : platformList) {
-			GjkPlatform platform = new GjkPlatform();
-			platform.setParentId(gjkPlatform.getPlatformId());
-			platform.setPlatformId("BSP"+gjkPlatform.getPlatformId());
-			platform.setName("BSP库");
-			platforms.add(platform);
-			GjkPlatform platform1 = new GjkPlatform();
-			platform1.setParentId(gjkPlatform.getPlatformId());
-			platform1.setPlatformId("software"+gjkPlatform.getPlatformId());
-			platform1.setName("软件框架库");
-			platforms.add(platform1);
-			GjkPlatform platform2 = new GjkPlatform();
-			platform2.setParentId(gjkPlatform.getPlatformId());
-			platform2.setPlatformId("component"+gjkPlatform.getPlatformId());
-			platform2.setName("构件库");
-			platforms.add(platform2);
-		}
-		platformList.addAll(platforms);
-		List<GjkPlatform> softwareList = gjkPlatformService.getPlatformTree();
+		
+		List<GjkPlatform> softwareList = gjkPlatformService.getPlatformTree(platformList);
 		if (CollectionUtils.isNotEmpty(platformList) && CollectionUtils.isNotEmpty(softwareList)) {
 			platformList.addAll(softwareList);
 		}

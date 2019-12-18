@@ -217,9 +217,9 @@ export default {
       }
     };
     var validateFileName = (rule, value, callback) => {
-      if (/^[0-9a-zA-Z+-?()-_\u4e00-\u9fa5]+\.[x|X][m|M][l|L]$/.test(value) == false) {
+      if (/^[0-9a-zA-Z+-?()-_ \u4e00-\u9fa5]+\.[x|X][m|M][l|L]$/.test(value) == false) {
         callback(
-          "文件选择错误,请选择xml文件"
+          "请选择不含特殊字符的xml文件"
         );
        
       } else {

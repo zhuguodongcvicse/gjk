@@ -540,7 +540,7 @@ function initEditor(editor) {
       //给板卡赋ID
       setBoardsID()
     }
-    // console.log("fJson", fJson)
+    console.log("fJson", fJson)
     // console.log("bJson", bJson)
     let fJsonStr = JSON.stringify(fJson)
     let bJsonStr = JSON.stringify(bJson)
@@ -959,49 +959,47 @@ function initEditor(editor) {
     var type = data.get('type');
     var image = data.image;
     //console.log("data----",data)
+    currentBoard = data.properties
+    if (data.properties.boardType == 1) {
+      // console.log("allInfOfFrontBoard", allInfOfFrontBoard)
+      data.properties.outLinkArr = []
+      //将板卡对应卡槽的slotnum赋给fSlotNum
+      fSlotNum = data.parent.properties.slotNum
+      //eval("var board_" + data.properties.uniqueId + "=" + data.properties)
+      //初次添加板卡到数组
+      if (clickBoardList.length == 0) {
+        clickBoardList.push(data.properties)
+      }
+      //给数组添加是否存在的标识
+      var ifExist = 0
+      for (const i in clickBoardList) {
+        //如果存在则++
+        if (clickBoardList[i].uniqueId == data.properties.uniqueId) {
+          ifExist++
+        }
+      }
+      //板卡不存在则添加该板卡
+      if (ifExist == 0) {
+        clickBoardList.push(data.properties)
+      }
+      //给点击选中的当前板卡标位0，其他没选中的标为1
+      for (const i in clickBoardList) {
+        if (clickBoardList[i].uniqueId == data.properties.uniqueId) {
+          clickBoardList[i].ifClick = 0
+          //把当前选中板卡赋给变量
+          currentBoard = clickBoardList[i]
+        } else {
+          clickBoardList[i].ifClick = 1
+        }
+      }
+      selectCount = 0
+      // console.log("clickBoardList", JSON.parse(JSON.stringify(clickBoardList)))
+    }
     //这里可以获得当前点击的图元对象
     graph.onclick = function (evt) {
       var data = graph.getElement(evt);
-      console.log("data", data)
+      // console.log("data", data)
       if (typeof (data) != 'undefined') {
-        currentBoard = data.properties
-        if (data.properties.boardType == 1) {
-          // console.log("allInfOfFrontBoard", allInfOfFrontBoard)
-          data.properties.outLinkArr = []
-          //将板卡对应卡槽的slotnum赋给fSlotNum
-          fSlotNum = data.parent.properties.slotNum
-          //eval("var board_" + data.properties.uniqueId + "=" + data.properties)
-          //初次添加板卡到数组
-          if (clickBoardList.length == 0) {
-            clickBoardList.push(data.properties)
-          }
-          //给数组添加是否存在的标识
-          var ifExist = 0
-          for (const i in clickBoardList) {
-            //如果存在则++
-            if (clickBoardList[i].uniqueId == data.properties.uniqueId) {
-              ifExist++
-            }
-          }
-          //板卡不存在则添加该板卡
-          if (ifExist == 0) {
-            clickBoardList.push(data.properties)
-          }
-          //给点击选中的当前板卡标位0，其他没选中的标为1
-          for (const i in clickBoardList) {
-            if (clickBoardList[i].uniqueId == data.properties.uniqueId) {
-              clickBoardList[i].ifClick = 0
-              //把当前选中板卡赋给变量
-              currentBoard = clickBoardList[i]
-            } else {
-              clickBoardList[i].ifClick = 1
-            }
-          }
-          selectCount = 0
-          console.log("clickBoardList", JSON.parse(JSON.stringify(clickBoardList)))
-        }
-        // console.log("点击",data.properties)
-
         if( data.properties.chipName !== undefined) {
           data.set('chipName', data.properties.chipName);
           data.set('coreNum', data.properties.coreNum);
@@ -1031,9 +1029,6 @@ function initEditor(editor) {
           data.set('opticalNum', data.properties.opticalNum);
           data.set('caseName', data.properties.caseName);
         }
-
-        // data.set('boardnum',data.properties.bdnum);
-        // console.log("data", data)
       }
     }
     if (image == 'images/Chip.svg') {

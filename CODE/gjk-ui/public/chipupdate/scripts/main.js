@@ -571,12 +571,12 @@ function initEditor(editor) {
     //console.log("propertySheet",propertySheet)
     var type = data.get('type');
     var image = data.image;
+    selectCurrentChip = data
     //这里可以获得当前点击的图元对象
     graph.onclick = function (evt) {
       // console.log("graph.toJSON()", graph.toJSON())
       var data = graph.getElement(evt);
       // console.log("data", data)
-      selectCurrentChip = data
       /*var infName = data.properties.infName;
       // var infRate = data.properties.infRate;
       var id = data.properties.id;
