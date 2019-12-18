@@ -239,7 +239,7 @@ public class ProcedureXmlAnalysis {
 		component.setCompName(getAttributeValue(entityMap, "显示名", "name"));
 		component.setFunctionName(getAttributeValue(entityMap, "函数名", "name"));
 		component.setCompNum(getAttributeValue(entityMap, "构件编号", "name"));
-		component.setFunctionPath(getAttributeValue(entityMap, "函数路径", "name"));
+		component.setFunctionPath(new File(getAttributeValue(entityMap, "函数路径", "name")).getParent());
 	}
 
 	/**
@@ -271,7 +271,7 @@ public class ProcedureXmlAnalysis {
 	 * 递归获取所属节点标签的属性值
 	 * 
 	 * @param xmlEntityMap
-	 * @param //lableName
+	 * @param              //lableName
 	 * @return
 	 */
 	private void getHardwarePartMapList(List<HardwarePart> hardwarePartMapList, XmlEntityMap xmlEntityMap) {

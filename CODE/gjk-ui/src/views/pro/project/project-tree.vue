@@ -1,5 +1,5 @@
 <template>
-  <div id="container" class="">
+  <div id="container" class>
     <!-- 当前项目 -->
     <div class="project_tree_14s">
       <img src="/img/theme/night/logo/proImg.png" ondragstart="return false;" />
@@ -71,6 +71,7 @@
 
     <!-- 再次申请构件 -->
     <add-pro-comp
+      v-if="addProCompDialogVisible"
       :temp_currProject="temp_currProject"
       :dialog="addProCompDialogVisible"
       @closeDialog="closeAddProCompDialog"
@@ -385,11 +386,11 @@ export default {
           loading.close();
         }, 2000);
         // $("#projectRightMenu").hide();
-         this.contextmenuFlag = false;
+        this.contextmenuFlag = false;
       } else if (item == "修改软件框架") {
         this.softwareDialogVisible = true;
         // $("#projectRightMenu").hide();
-         this.contextmenuFlag = false;
+        this.contextmenuFlag = false;
       } else if (item == "修改BSP") {
         this.bspDialogVisible = true;
       } else if (item == "APP组件工程生成") {
@@ -462,7 +463,7 @@ export default {
           });
         }
         // $("#projectRightMenu").hide();
-         this.contextmenuFlag = false;
+        this.contextmenuFlag = false;
       } else if (item == "添加流程") {
         this.addProcedureDialogVisible = true;
       } else if (item == "申请构件") {
@@ -544,7 +545,7 @@ export default {
         };
         createZipFile(param);
         // $("#projectRightMenu").hide();
-         this.contextmenuFlag = false;
+        this.contextmenuFlag = false;
       }
     },
     findTargetNode(currentNodeObj, targetNodeObj) {
@@ -689,7 +690,7 @@ export default {
           }
         }
         // $("#projectRightMenu").hide();
-         this.contextmenuFlag = false;
+        this.contextmenuFlag = false;
         // this.showProjects = false
       }
       this.$emit(

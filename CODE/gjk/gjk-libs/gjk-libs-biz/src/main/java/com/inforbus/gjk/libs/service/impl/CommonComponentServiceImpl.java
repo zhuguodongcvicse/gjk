@@ -109,11 +109,11 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		}
 		try {
 			String img = commonComponent.getCompImg();// >测试构件01-Vnull<
-			String showName=commonComponent.getCompName()+"_V"+commonComponent.getVersion();
-			System.out.println("showName:  "+showName);
-			img=img.replaceAll(">"+commonComponent.getCompName()+"([^<>]*)<", ">"+showName+"<");
-			System.out.println("img:  "+img);
-			
+			String showName = commonComponent.getCompName() + "_V" + commonComponent.getVersion();
+			System.out.println("showName:  " + showName);
+			img = img.replaceAll(">" + commonComponent.getCompName() + "([^<>]*)<", ">" + showName + "<");
+			System.out.println("img:  " + img);
+
 			commonComponent.setCompImg(img);
 			baseMapper.saveCommonComp(commonComponent);
 			return true;
@@ -445,7 +445,7 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		}
 		// 添加构件选择树的所有子节点
 		for (CommonComponent comp : comps) {
-			tree.add(new CompVO(comp.getId(), comp.getCompId() + "-" + comp.getVersion(), comp.getVersion(),
+			tree.add(new CompVO(comp.getId(), comp.getCompName() + "-" + comp.getVersion(), comp.getVersion(),
 					comp.getCompId()));
 		}
 		return tree;
