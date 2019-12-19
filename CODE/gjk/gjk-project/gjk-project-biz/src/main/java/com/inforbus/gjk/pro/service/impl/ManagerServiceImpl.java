@@ -1201,13 +1201,13 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				flowFilePath = proDetailPath + proFile.getFilePath() + proFile.getFileName() + ".xml";
 			}
 		}
-		String newFilePath = filePath + "新xml文件/";
+		String newFilePath = filePath + "TopicConfig/";
 		File newFile = new File(newFilePath);
 		if (!newFile.exists()) {
 			newFile.mkdirs();
 		}
-		ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName, newFilePath + "xxx.xml");
-		baseMapper.saveNewFilePath(newFilePath + "xxx.xml", proDetailId);
+		ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName, newFilePath + "UserDefineTopicFile.xml");
+		baseMapper.saveNewFilePath(newFilePath + "UserDefineTopicFile.xml", proDetailId);
 
 		JGitUtil.commitAndPush(filePath + fileName, "上传构件相关文件");
 		return flag;
@@ -1549,7 +1549,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				break;
 			}
 		}
-		String userDefineTopicFilePath = local_REPO_PATH + Path + "新xml文件/xxx.xml";
+		String userDefineTopicFilePath = local_REPO_PATH + Path + "TopicConfig/UserDefineTopicFile.xml";
 
 		return userDefineTopicFilePath;
 	}
