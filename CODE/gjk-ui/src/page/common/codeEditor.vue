@@ -1,25 +1,32 @@
 <template>
-  <div>
-    <div style="margin-bottom:10px">
-      <el-form :model="editorForm" inline="inline">
-        <el-form-item>
-          <el-button type="primary" icon="el-icon-thirdsave" size="mini" @click.native="save">保存</el-button>
-        </el-form-item>
-        <el-form-item label="编码格式：">
-          <el-select v-model="editorForm.editorData" placeholder="请选择编码格式(默认UTF-8)" @change="editorChange" style="width:300px">
-            <el-option label="UTF-8" value="UTF-8"></el-option>
-            <el-option label="Unicode" value="Unicode"></el-option>
-            <el-option label="UTF-16BE" value="UTF-16BE"></el-option>
-            <el-option label="GBK" value="GBK"></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-    </div>
-    <div class="code-editor-container">
-      <!-- 程序文本编辑器 -->
-      <monaco-editor class="editor" v-model="textContexts" language="c"></monaco-editor>
-    </div>
-  </div>
+  <el-row>
+    <el-col :span="24">
+      <div ref="editorDiv" style="margin-bottom:10px">
+        <el-form :model="editorForm" inline="inline">
+          <el-form-item>
+            <el-button type="primary" icon="el-icon-thirdsave" size="mini" @click.native="save">保存</el-button>
+          </el-form-item>
+          <el-form-item label="编码格式：">
+            <el-select
+              v-model="editorForm.editorData"
+              placeholder="请选择编码格式(默认UTF-8)"
+              @change="editorChange"
+              style="width:300px"
+            >
+              <el-option label="UTF-8" value="UTF-8"></el-option>
+              <el-option label="Unicode" value="Unicode"></el-option>
+              <el-option label="UTF-16BE" value="UTF-16BE"></el-option>
+              <el-option label="GBK" value="GBK"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div class="code-editor-container">
+        <!-- 程序文本编辑器 -->
+        <monaco-editor ref="test" v-model="textContexts" language="c" v-bind:style="editorClass"></monaco-editor>
+      </div>
+    </el-col>
+  </el-row>
 </template>
 
 <script>
@@ -38,13 +45,24 @@ export default {
   props: ["textContext", "tFilePath"],
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
+    let _this = this;
+    this.$nextTick(r => {
+      let width = _this.$refs.editorDiv.offsetWidth;
+      console.log(" _this.$refs.editorDiv.$el;", width);
+      // this.editorClass.width = width + "px";
+      // this.$refs.test.$el.style.height = "calc(";
+      _this.editorClass = { width: width + "px", height: "500px" };
+      console.log("test");
+      console.log("test", _this.$refs.test.$el.offsetHeight);
+      console.log("test", _this.$refs.test.$el.of);
+    });
   },
   watch: {
     textContext: {
       immediate: true,
       handler: function() {
         //为最新内容时下拉选为空
-        this.editorForm.editorData ="";
+        this.editorForm.editorData = "";
         this.textContexts = this.textContext;
       },
       deep: true
@@ -52,6 +70,10 @@ export default {
   },
   data() {
     return {
+      editorClass: {
+        height: "900px"
+      },
+
       editorForm: {
         editorData: ""
       },
@@ -72,14 +94,15 @@ export default {
     editorChange() {
       console.log("ppppppp");
       //文件内容
-      
       this.threeLibsFilePathDTO.filePathName = this.tFilePath;
       this.threeLibsFilePathDTO.code = this.editorForm.editorData;
       console.log(this.threeLibsFilePathDTO);
       readAlgorithmfile(this.threeLibsFilePathDTO).then(response => {
         console.log("arrays:::", response);
         //文件内容
-          this.textContexts = response.data.data.textContext.split("@%#@*+-+@")[1];
+        this.textContexts = response.data.data.textContext.split(
+          "@%#@*+-+@"
+        )[1];
       });
     },
     save() {
@@ -136,11 +159,17 @@ export default {
 };
 </script>
 
-<style>
+<style lang='scss' scoped>
 /* 程序文本编辑器的大小 */
 .editor {
-  width: calc(90% - 120px);
+  /* width: calc(90% - 120px);*/
   height: 600px;
+}
+.code-editor,
+.code-editor-container {
+  top: 25px;
+  left: 0px;
+  height: 80%;
 }
 </style>
 

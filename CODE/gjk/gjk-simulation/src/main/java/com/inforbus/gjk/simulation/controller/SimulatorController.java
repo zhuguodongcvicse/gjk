@@ -1,14 +1,19 @@
 package com.inforbus.gjk.simulation.controller;
 
 
+import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.simulation.dto.SimulationDTO;
 import com.inforbus.gjk.simulation.service.SimulatorService;
+
+import cn.hutool.json.JSONUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 仿真webAPI
@@ -29,8 +34,9 @@ public class SimulatorController {
 	 * @return
 	 */
 	@PostMapping("/startSimulator/{username}")
-	public R startSimulator(@PathVariable("username") String username,@RequestParam(value = "componentLinks",required=false) List<String> componentLinks, String filePath){
-		return new R<>(simulatorService.startSimulator(username,componentLinks,filePath));
+	public R startSimulator(@PathVariable("username") String username,@RequestBody Object obj){
+		Map parse = JSON.parseObject(JSONUtil.toJsonStr(obj));
+		return new R<>(simulatorService.startSimulator(username,(List<String>)parse.get("componentLinks"),(String)parse.get("filePath")));
 	}
 
 	@PostMapping("/getDataSource")
@@ -48,3 +54,4 @@ public class SimulatorController {
 		return new R<>(simulatorService.stopSimulator(username));
 	}
 }
+

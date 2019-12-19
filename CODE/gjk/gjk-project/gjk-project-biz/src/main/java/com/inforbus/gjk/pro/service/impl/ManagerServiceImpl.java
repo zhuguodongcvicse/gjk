@@ -604,6 +604,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			if (file1.exists()) {
 				XmlEntityMap xmlJson = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file1);
 				retMap.put("xmlJson", xmlJson);
+				retMap.put("flowFilePath", str);
 			}
 		}
 		if (map.get("jsonPath") == null) {

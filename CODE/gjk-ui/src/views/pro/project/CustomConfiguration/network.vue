@@ -176,7 +176,6 @@ export default {
     },
      addNode(){
        var copyNode = JSON.parse(JSON.stringify(this.node.data));
-       console.log(copyNode)
        copyNode.attributeMap.compId = '';
        copyNode.attributeMap.compName = '';
        copyNode.attributeMap.name = '';
@@ -191,12 +190,15 @@ export default {
          label: this.node.label
        }
        this.index = index
-       console.log(node)
        this.xmlEntityMaps.push(node)
        this.clear()
     },
     removeNode(){
-       this.xmlEntityMaps.pop(this.node)
+        for(var i in this.xmlEntityMaps){
+            if(this.node.id == this.xmlEntityMaps[i].id){
+                this.xmlEntityMaps.splice(i,1);
+            }
+        }
        this.clear()
     },
     clear(){

@@ -1,4 +1,5 @@
-window.addEventListener("message", this.handleMessageFromParent) // 子接收方式二参数
+window.addEventListener("message", this.handleMessageFromParent)
+ // 子接收方式二参数
 var iframeData; // 子接收方式一参数
 //页面加载数据
 var dat;
@@ -188,10 +189,9 @@ function handleMessageFromParent(event) {
 			if (!data.params) {
 				$("#accordion").show()
 				$("#gjk").hide()
-				// $('#update').html("")
-				// $('#notUpdate').html("")
+				$('#update').html("")
+				$('#notUpdate').html("")
 				compUpdateState = data.compUpdateState;
-				//console.log("检查更新数据",compUpdateState)
 				appendUpdateDiv()
 			} else {
 				$("#accordion").hide()
@@ -204,16 +204,19 @@ function handleMessageFromParent(event) {
 			//警告
 			//let styleColor = "#F4A460"
 			//错误
-			//let styleColor = "#ff0000"
+			let styleColor = "#ff0000"
 			//$('.pa').addClass("warn")
 			//endpointCheck(styleColor);
-			//connectionCheck(styleColor);
+			connectionCheck(styleColor);
 			break;
 		case 'startSimulation':
 			getSimulationData();
 			break;
 		case 'endSimulation':
 			deleteFzPicture();
+			break;
+		case 'returnRemoveComp':
+			$("#" + data.params).remove()
 			break;
 	}
 };
@@ -605,6 +608,15 @@ function checkDat() {
 		//$("#gjk").load();	
 	}
 }
+//获取构件列表所有构件id
+// function getCompIdList(){
+
+// 	let divArray = $("#gjk").find(".btn")
+// 	for(let i=0;i<divArray.length;i++){
+// 		console.log("构件列表构件",$(divArray[i]).attr("id"))
+// 	}
+// }
+
 function appendUpdateDiv() {
 	var strUpdate = ""
 	var notUpdate = ""
@@ -871,7 +883,7 @@ function main() {
 		$('#' + event.currentTarget.id).focus();
 		document.getElementById(event.currentTarget.id).onkeydown = function (e) {
 			if (e.keyCode == 46) {
-				$("#" + event.currentTarget.id).remove()
+				//$("#" + event.currentTarget.id).remove()
 				//console.log("参数：",JSON.stringify(gjidAndTemid));
 				//gjIdAndTemId = gjidAndTemid;
 				handleMessageToParent("removeComp", event.currentTarget.id);
@@ -1274,18 +1286,24 @@ function deleteFzPicture() {
 //获取所有仿真所需数据
 var simulationData = []
 function getSimulationData() {
+	simulationData = []
 	let index = 0;
 	$.each(jsPlumb.getConnections(), function (idx, connection) {
-		if (connection.getLabel() != null) {
+		console.log("connection.getLabel()",connection.getLabel())
+		if (connection.getLabel() != '') {
 			index++
-			let simulation = {}
-			simulation.startId = connection.sourceId
-			simulation.endId = connection.targetId
+			// let simulation = {}
+			// simulation.startId = connection.sourceId
+			// simulation.endId = connection.targetId
+			let simulation = connection.sourceId +"|" + connection.targetId
 			if (index == 1) {
 				simulationData.push(simulation)
 			} else {
 				for (let i = 0; i < simulationData.length; i++) {
-					if (connection.sourceId != simulationData[i].startId && connection.targetId != simulationData[i].endId) {
+					// if (connection.sourceId != simulationData[i].startId && connection.targetId != simulationData[i].endId) {
+					// 	simulationData.push(simulation)
+					// }
+					if(simulation != simulationData[i]){
 						simulationData.push(simulation)
 					}
 				}
@@ -1316,7 +1334,8 @@ jsPlumb.bind("dblclick", function (conn, originalEvent) {
 			$("#" + id).bind("click", function () {
 				document.getElementById(id).onkeydown = function (e) {
 					if (e.keyCode == 46) {
-						$("#" + id).remove()
+						//$("#" + id).remove()
+						conn.setLabel('')
 					}
 				}
 				return false
@@ -2364,7 +2383,20 @@ function save() {
 		var sourCompName = canvasData.get(source).functionName;
 		//console.log("数据比较+++++++++",sourCompName)
 		var sourcePrame = sourDataTypeName + " " + sourVariableName + "_" + sourCompName
-		
+		let reg = /\w+\[[0-9]+\]/i; //
+		if (reg.test(sourVariableName)) {
+			let strTemp = sourVariableName.split("[")
+			console.log(strTemp)
+			sourcePrame = sourDataTypeName + " " + strTemp[0] + "_"+ sourCompName + "[" + strTemp[1]
+		}
+		if(sourVariableName.indexOf("->")!= -1){
+			let strTemp = sourVariableName.split("->")
+			sourcePrame = sourDataTypeName + " " + strTemp[0] + "_"+ sourCompName + "->" + strTemp[1]
+		}
+		console.log("sourVariableName",sourVariableName)
+		console.log("sourVariableName",sourVariableName.indexOf("->"))
+
+
 		//获取画布目标节点id
 		var target = connection.targetId;
 		//获取目标构件中数据id
@@ -2405,11 +2437,15 @@ function save() {
 		//var tarCompName = dat[targetGj].functionName;
 		var tarCompName = canvasData.get(target).functionName
 		var targetPrame = tarDataTypeName + " " + tarVariableName + "_" + tarCompName
-		let reg = /\w+\[[0-9]+\]/i; //
+		console.log("tarVariableName",tarVariableName)
 		if (reg.test(tarVariableName)) {
 			let strTemp = tarVariableName.split("[")
 			console.log(strTemp)
 			targetPrame = tarDataTypeName + " " + strTemp[0] + "_"+ tarCompName + "[" + strTemp[1]
+		}
+		if(tarVariableName.indexOf("->")!= -1){
+			let strTemp = tarVariableName.split("->")
+			targetPrame = tarDataTypeName + " " + strTemp[0] + "_"+ tarCompName + "->" + strTemp[1]
 		}
 		//拼接source与target
 		var st = source + target;
@@ -3320,13 +3356,16 @@ function endpointCheck(endpointId,styleColor) {
 }
 
 //完备性检查修改连线样式
-function connectionCheck(styleColor) {
+function connectionCheck(startUuid,endUuid,styleColor) {
 	$.each(jsPlumb.getConnections(), function (idx, connection) {
 		//console.log(connection.getPaintStyle())
 		//connection.addClass("warn")
-		connection.getPaintStyle().lineWidth = "3"
-		connection.getPaintStyle().stroke = styleColor
-		connection.getPaintStyle().strokeStyle = styleColor
+		if(connection.endpoints[0].getUuid() == startUuid && connection.endpoints[1].getUuid() == endUuid){
+			console.log("68465123654",connection)
+			connection.getPaintStyle().lineWidth = "3"
+			connection.getPaintStyle().stroke = styleColor
+			connection.getPaintStyle().strokeStyle = styleColor
+		}	
 	});
 	jsPlumb.setSuspendDrawing(false, true);
 }
@@ -3348,7 +3387,13 @@ function completeCheckFun(val){
 						}
 						break;
 					case '1': //修改连线
+						if(checkResult.m_modifyState == '0'){
 
+						}else if(checkResult.m_modifyState == '1'){ //警告
+							connectionCheck(checkResult.m_startPointId,checkResult.m_endPointId,"#F4A460")
+						}else if(checkResult.m_modifyState == '2'){ ///错误
+							connectionCheck(checkResult.m_startPointId,checkResult.m_endPointId,"#ff0000")
+						}
 						break;
 					case '2': //修改锚点
 						if(checkResult.m_modifyState == '0'){ //正常
@@ -3373,16 +3418,16 @@ function completeCheckFun(val){
 //完备性检查确认锚点id
 function endPoint(checkResult){
 	let endpointUUid = ""
-	console.log("99999",endpointMap)
+	console.log("111111",checkResult)
+	console.log(endpointMap)
 	for (let [k, v] of endpointMap) {
-		
 		if(k.split("*")[2] == checkResult.m_spbId && k.split("*")[1] == "input" && checkResult.m_paramType =="输入" && v.variableName == checkResult.m_paramName){
 			endpointUUid = k
 		}else if(k.split("*")[2] == checkResult.m_spbId && k.split("*")[1] == "output" && checkResult.m_paramType =="输出" && v.variableName == checkResult.m_paramName){
 			endpointUUid = k
 		}
 	}
-	console.log("endpointUUid",endpointUUid)
+	//console.log("endpointUUid",endpointUUid)
 	return endpointUUid
 }
 

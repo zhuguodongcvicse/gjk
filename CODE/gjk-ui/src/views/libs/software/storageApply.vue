@@ -3,7 +3,7 @@
     class="libs_software_storageapply_14s"
     title="软件框架入库"
     :visible.sync="dialog"
-    width="30%"
+    width="40%"
     :before-close="handleClose"
   >
     <el-container>
@@ -35,13 +35,17 @@
         </el-form>
         <!-- 如果需要选择文件进行提交，树加上 show-checkbox 属性，
         selectNodeArray中保存了所有已选择的节点信息-->
-        <el-tree
-          ref="tree"
-          :data="softwareTreeData"
-          :default-expand-all="true"
-          :check-on-click-node="true"
-          @check-change="handleCheckChange"
-        ></el-tree>
+        <div class="compframeDiv">
+          <el-tree
+            ref="tree"
+            node-key="id"
+            :data="softwareTreeData"
+            :auto-expand-parent="true"
+            :check-on-click-node="true"
+            :default-expanded-keys="defaultExpandIds"
+            @check-change="handleCheckChange"
+          ></el-tree>
+        </div>
       </el-main>
     </el-container>
 
@@ -56,6 +60,7 @@
 import { mapGetters } from "vuex";
 import { getTreeById, putObj } from "@/api/libs/software";
 import { getUserhasApplyAuto } from "@/api/admin/user";
+import { getTreeDefaultExpandIds } from "@/util/util";
 //当引用的方法重名时，使用as取别名区分
 import {
   saveApproval,
@@ -79,6 +84,7 @@ export default {
     return {
       softwareName: "",
       softwareTreeData: [],
+      defaultExpandIds: [],
       selectNodeArray: [],
 
       //具有审批权限的用户，用于选择审批人
@@ -95,7 +101,6 @@ export default {
   //监控data中的数据变化
   watch: {
     softwareItemMsg: function() {
-      console.log("11111111111111", this.softwareItemMsg);
       this.softwareName = this.softwareItemMsg.softwareName;
 
       getUserhasApplyAuto().then(Response => {
@@ -109,6 +114,9 @@ export default {
         }
 
         getTreeById(this.softwareItemMsg.id).then(Response => {
+          let defaultExpandIds = [];
+          getTreeDefaultExpandIds(Response.data.data, defaultExpandIds, 0, 1);
+          this.defaultExpandIds = defaultExpandIds;
           this.softwareTreeData = Response.data.data;
         });
       });
@@ -221,4 +229,10 @@ export default {
 };
 </script>
 <style lang='scss' scoped>
+.compframeDiv {
+  height: 40vh;
+  word-wrap: break-word;
+  word-break: break-all;
+  overflow-y: auto;
+}
 </style>

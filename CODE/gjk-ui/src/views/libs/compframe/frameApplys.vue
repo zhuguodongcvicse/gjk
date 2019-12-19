@@ -20,8 +20,9 @@
       <div class="compframeDiv">
         <el-tree
           ref="tree"
+          node-key="id"
           :data="compframeTreeData"
-          :default-expand-all="true"
+          :default-expanded-keys="defaultExpandIds"
           :check-on-click-node="true"
         ></el-tree>
       </div>
@@ -29,8 +30,8 @@
     </el-form>
 
     <div slot="footer">
-      <el-button type="primary" @click="frameApplysClickSubmit('compForm')">确 定</el-button>
       <el-button @click="dialogVisible = false">取 消</el-button>
+      <el-button type="primary" @click="frameApplysClickSubmit('compForm')">入 库</el-button>
     </div>
   </el-dialog>
 </template>
@@ -46,7 +47,7 @@ import {
   getIdByApplyId,
   putObj as approvalPutObj
 } from "@/api/libs/approval";
-import { deepClone } from "@/util/util";
+import { deepClone, getTreeDefaultExpandIds } from "@/util/util";
 export default {
   //import引入的组件需要注入到对象中才能使用
   props: {
@@ -66,6 +67,7 @@ export default {
       //具有审批权限的用户，用于选择审批人
       applyUserSelect: [],
       compframeTreeData: [],
+      defaultExpandIds: [],
       compFormParam: {},
       compFormParamRules: {
         applyUser: [
@@ -98,8 +100,10 @@ export default {
     fetchTreeDataLoading(param) {
       this.applysParam = param;
       fetchCompframeToTree(param).then(res => {
+        let defaultExpandIds = [];
+        getTreeDefaultExpandIds(res.data.data, defaultExpandIds, 0, 1);
+        this.defaultExpandIds = deepClone(defaultExpandIds);
         this.compframeTreeData = res.data.data;
-        console.log("res", res.data.data);
       });
     },
     frameApplysClickSubmit(valName) {

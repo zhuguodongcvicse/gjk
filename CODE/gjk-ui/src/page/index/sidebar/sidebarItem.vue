@@ -1,46 +1,51 @@
 <template>
   <div class="menu-wrapper page_index_sidebar_index_14s">
     <template v-for="item in menu">
-      <el-menu-item v-if="validatenull(item[childrenKey]) && vaildRoles(item)"
-                    :index="item[pathKey]"
-                    @click="open(item)"
-                    :key="item[labelKey]"
-                    :class="{'is-active':vaildAvtive(item)}">
+      <el-menu-item
+        v-if="validatenull(item[childrenKey]) && vaildRoles(item)"
+        :index="item[pathKey]"
+        @click="open(item)"
+        :key="item[labelKey]"
+        :class="{'is-active':vaildAvtive(item)}"
+      >
         <i :class="item[iconKey]"></i>
-        <span slot="title"
-              :alt="item[pathKey]">{{item[labelKey]}}</span>
+        <span slot="title" :alt="item[pathKey]">{{item[labelKey]}}</span>
       </el-menu-item>
 
-      <el-submenu class="sidebar_style_14s" v-else-if="!validatenull(item[childrenKey])&&vaildRoles(item)"
-                  :index="item[pathKey]"
-                  :key="item[labelKey]">
-
+      <el-submenu
+        class="sidebar_style_14s"
+        v-else-if="!validatenull(item[childrenKey])&&vaildRoles(item)"
+        :index="item[pathKey]"
+        :key="item[labelKey]"
+      >
         <template slot="title">
           <i :class="item[iconKey]"></i>
-          <span slot="title"
-                :class="{'el-menu--display':collapse && first}">{{item[labelKey]}}</span>
+          <span slot="title" :class="{'el-menu--display':collapse && first}">{{item[labelKey]}}</span>
         </template>
 
         <template v-for="(child,cindex) in item[childrenKey]">
-        <div class="sidebaritem_childmenu_14s">
-          <el-menu-item :index="child[pathKey],cindex"
-                        @click="open(child)"
-                        :class="{'is-active':vaildAvtive(child)}"
-                        v-if="validatenull(child[childrenKey])"
-                        :key="child[labelKey]">
-            <i :class="child[iconKey]"></i>
-            <span slot="title">{{child[labelKey]}}</span>
-          </el-menu-item>
-          <sidebar-item v-else
-                        :menu="[child]"
-                        :key="cindex"
-                        :props="props"
-                        :screen="screen"
-                        :collapse="collapse"></sidebar-item>
-        </div>
+          <div class="sidebaritem_childmenu_14s" :key="cindex">
+            <el-menu-item
+              :index="child[pathKey]"
+              @click="open(child)"
+              :class="{'is-active':vaildAvtive(child)}"
+              v-if="validatenull(child[childrenKey])"
+              :key="child[labelKey]"
+            >
+              <i :class="child[iconKey]"></i>
+              <span slot="title">{{child[labelKey]}}</span>
+            </el-menu-item>
+            <sidebar-item
+              v-else
+              :menu="[child]"
+              :key="cindex"
+              :props="props"
+              :screen="screen"
+              :collapse="collapse"
+            ></sidebar-item>
+          </div>
         </template>
       </el-submenu>
-
     </template>
   </div>
 </template>

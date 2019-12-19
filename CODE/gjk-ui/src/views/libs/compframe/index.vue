@@ -30,21 +30,24 @@
         <template slot-scope="{row,index}" slot="menu">
           <el-button
             type="danger"
-            v-if="permissions.libs_compframe_del"
-            v-show="row.applyState == '0'"
+            v-if="row.applyState=='0'||row.applyState==null||row.applyState=='3'?true:false"
+            v-show="permissions.libs_compframe_del"
             size="small"
             plain
             @click="handleDel(row,index)"
           >删除</el-button>
-          <el-button type="primary" size="small" plain>
-            <!-- v-show="row.applyState == '0' || row.applyState == '3'" -->
-            <span
-              v-if="row.applyState == '0'|| row.applyState == '3'"
+          <el-tooltip class="item" effect="dark" content="入库" placement="top">
+            <el-button
+              type="primary"
+              plain
+              size="mini"
               @click="compFrameApplysClick(row,index)"
-            >入库</span>
-            <span v-else-if="row.applyState == '1'||row.applyState == '4'">已提交</span>
-            <span v-else>已入库</span>
-          </el-button>
+              v-if="row.applyState=='0'||row.applyState==null?true:false"
+            >入 库</el-button>
+          </el-tooltip>
+          <span
+            v-if="row.applyState=='0'||row.applyState=='3'||row.applyState==null?false:true"
+          >{{row.applyState=='1'?"已申请":row.applyState=='2'?"已入库":row.applyState=='3'?"已驳回":row.applyState=='4'?"驳回再申请":"未处理"}}</span>
         </template>
       </avue-crud>
     </basic-container>

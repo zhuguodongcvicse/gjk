@@ -441,7 +441,7 @@ export default {
     changeBaseTemplate(tempPath) {
       analysisXmlFile(tempPath).then(response => {
         // console.log("response", response);
-        this.$store.dispatch("setFetchStrInPointer");
+        // this.$store.dispatch("setFetchStrInPointer");
         //保存加载的数据
         this.$store.dispatch("setSaveXmlMaps", response.data.data).catch(() => {
           this.$message({

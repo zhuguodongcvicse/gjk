@@ -48,19 +48,28 @@
                 <el-form-item label="数据源:">
                   <el-select placeholder="请选择" v-model="formData.symbol">
                     <el-option
-                    v-for="(attribute,index) in datasource"
-                    :key="index"
-                    :label="attribute.label"
-                    :value="attribute.value"></el-option>
+                      v-for="(attribute,index) in datasource"
+                      :key="index"
+                      :label="attribute.label"
+                      :value="attribute.value"></el-option>
                   </el-select>
                 </el-form-item>
-                <el-form-item label="参数1:">
+                <el-form-item label="数据处理类型:">
+                  <el-select placeholder="请选择" v-model="formData.symbol">
+                    <el-option
+                      v-for="(attribute,index) in datasource"
+                      :key="index"
+                      :label="attribute.label"
+                      :value="attribute.value"></el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="X维:">
                   <el-input v-model="formData.attr1"></el-input>
                 </el-form-item>
-                <el-form-item label="参数2:">
+                <el-form-item label="Y维:">
                   <el-input v-model="formData.attr2"></el-input>
                 </el-form-item>
-                <el-form-item label="参数3:">
+                <el-form-item label="Z维:">
                   <el-input v-model="formData.attr3"></el-input>
                 </el-form-item>
                 <el-form-item label="数据展示:">

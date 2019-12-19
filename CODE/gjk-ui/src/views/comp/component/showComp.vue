@@ -1,6 +1,6 @@
 <template>
-  <div class="split-pane-page-wrapper comp_component_showcomp_14s">
-    <split-pane v-model="offset" @on-moving="handleMoving" min="0" max="1150px">
+  <div ref="splitDiv" class="split-pane-page-wrapper comp_component_showcomp_14s">
+    <split-pane v-model="splitOffset" @on-moving="handleMoving" :min="splitMin" :max="splitMax">
       <div slot="left" class="comp_component_showcomp_tree_14s">
         <el-tree
           style="height:100%;overflow-y: auto;"
@@ -77,8 +77,11 @@ export default {
   },
   data() {
     return {
-      offset: "250px",
-      offsetVertical: "250px",
+      splitOffset: "300px",
+      splitMin: "250",
+      splitMax: "",
+      splitMinMax: "400",
+
       treeData: [],
       defaultExpandIds: [],
       contextMenus: [],
@@ -96,6 +99,19 @@ export default {
 
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
+    let _this = this;
+    this.$nextTick(vm => {
+      let splitDivWidth = _this.$refs.splitDiv.offsetWidth;
+      let compType = _this.$route.query.type;
+      console.log("splitDivWidth", compType);
+      if (compType === "add") {
+        this.splitMax = splitDivWidth - 15 + "px";
+        this.splitMin = "0px";
+        this.splitOffset = "0px";
+      } else {
+        this.splitMax = splitDivWidth - _this.splitMinMax + "px";
+      }
+    });
     this.getCompList();
   },
   methods: {
@@ -167,16 +183,35 @@ export default {
       this.currNode = data;
       let parentType = data.parentType;
       if (data.children.length === 0) {
-        this.$router.push({
-          path: "/comp/showComp/codeEditor",
-          query: {
-            compId: this.$route.query.compId,
-            fileType: "comp",
-            compFilePath: data.filePath + "\\" + data.label,
-            compFileName: data.label,
-            proFloName: b[5] + "_" + b[7] + "_" + data.label
+        let name = String(data.label);
+        if (name.endsWith(".pdf")) {
+          if (data.filePath != null) {
+            this.$router.push({
+              path: "/comp/manager/fileProview",
+              query: {
+                filePath: this.filePathName,
+                appFileName: data.fileName,
+                proFloName:
+                  this.treeData[0].fileName +
+                  "_" +
+                  this.treeData[0].children[0].fileName +
+                  "_" +
+                  data.label
+              }
+            });
           }
-        });
+        } else {
+          this.$router.push({
+            path: "/comp/showComp/codeEditor",
+            query: {
+              compId: this.$route.query.compId,
+              fileType: "comp",
+              compFilePath: data.filePath + "\\" + data.label,
+              compFileName: data.label,
+              proFloName: b[5] + "_" + b[7] + "_" + data.label
+            }
+          });
+        }
       }
     },
     nodeContextmenu(event, data) {
@@ -213,7 +248,7 @@ export default {
         return ret;
       }
     },
-    nodeContextmenuClick(item) {
+    async nodeContextmenuClick(item) {
       let path = this.nodeClickData.filePath + "\\" + this.nodeClickData.label;
       if (item == "删除") {
         var _this = this;
@@ -245,28 +280,19 @@ export default {
         }
       } else if (item == "静态检查") {
         let filePath = { filePath: path, fileName: this.nodeClickData.label };
-        staticInspect(filePath).then(response => {
-          window.open(
-            "http://localhost:9000/dashboard?id=" + response.data.data,
-            "_blank"
-          );
-        });
+        let Id = (await staticInspect(filePath)).data.data;
+        window.open("http://localhost:9000/dashboard?id=" + Id, "_blank");
       } else if (item == "构件编译") {
-        let platformName = {};
-        getPlatformName().then(val => {
-          console.log("获取平台类型", item, val);
-          platformName = val.data.data;
-        });
         //获取平台类型
-        findPlatformByName(this.nodeClickData.label).then(res => {
-          res.data.data.forEach(item => {
-            console.log("1111", platformName[item]);
-            getPath({
-              path: path,
-              fileName: this.nodeClickData.label,
-              platformType: platformName[item],
-              token: this.$store.getters.access_token
-            });
+        let platformName = (await getPlatformName()).data.data;
+        const label = this.nodeClickData.label;
+        let tmpName = (await findPlatformByName(label)).data.data;
+        tmpName.forEach(item => {
+          getPath({
+            path: path,
+            fileName: "Component_" + platformName[item],
+            platformType: platformName[item],
+            token: this.$store.getters.access_token
           });
         });
       }
