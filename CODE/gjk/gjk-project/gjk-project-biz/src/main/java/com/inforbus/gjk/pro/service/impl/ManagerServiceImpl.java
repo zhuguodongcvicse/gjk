@@ -260,7 +260,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (projectFile != null) {
 			filePath = proDetailPath + projectFile.getFilePath() + File.separator + projectFile.getFileName() + ".xml";
 		} else {
-			//return false;
+			// return false;
 		}
 		File file = new File(filePath);
 		if (!file.getParentFile().exists()) {
@@ -1201,13 +1201,13 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				flowFilePath = proDetailPath + proFile.getFilePath() + proFile.getFileName() + ".xml";
 			}
 		}
-		String newFilePath = filePath + "新xml文件/";
+		String newFilePath = filePath + "TopicConfig/";
 		File newFile = new File(newFilePath);
 		if (!newFile.exists()) {
 			newFile.mkdirs();
 		}
-		ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName, newFilePath + "xxx.xml");
-		baseMapper.saveNewFilePath(newFilePath + "xxx.xml", proDetailId);
+		ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName, newFilePath + "UserDefineTopicFile.xml");
+		baseMapper.saveNewFilePath(newFilePath + "UserDefineTopicFile.xml", proDetailId);
 
 		JGitUtil.commitAndPush(filePath + fileName, "上传构件相关文件");
 		return flag;
@@ -1549,7 +1549,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				break;
 			}
 		}
-		String userDefineTopicFilePath = local_REPO_PATH + Path + "新xml文件/xxx.xml";
+		String userDefineTopicFilePath = local_REPO_PATH + Path + "TopicConfig/UserDefineTopicFile.xml";
 
 		return userDefineTopicFilePath;
 	}
@@ -1838,18 +1838,17 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		}
 		return new R<>(true);
 	}
-	
-	
-    @Override
-    public byte[] createZip(String projectId, String processId) throws Exception {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ZipOutputStream zip = new ZipOutputStream(outputStream);
 
-        createExcelFileToZipIO(projectId, processId, zip);
+	@Override
+	public byte[] createZip(String projectId, String processId) throws Exception {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		ZipOutputStream zip = new ZipOutputStream(outputStream);
 
-        IOUtils.closeQuietly(zip);
-        return outputStream.toByteArray();
-    }
+		createExcelFileToZipIO(projectId, processId, zip);
+
+		IOUtils.closeQuietly(zip);
+		return outputStream.toByteArray();
+	}
 
 	@Override
 	public int analysisZipFile(MultipartFile ufile, String projectId) {
@@ -1872,24 +1871,26 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			File[] files = new File(descDirPath).listFiles();
 			for (File item : files) {
 				// 表数据入库处理
-				if(item.getName().equals("mysql")){
+				if (item.getName().equals("mysql")) {
 					String excelFilePath = descDirPath + File.separator + "mysql" + File.separator + "MySQL.xls";
 					tag = readExcel(descDirPath, excelFilePath, projectId);
 					// 硬件建模数据
 					excelFilePath = descDirPath + File.separator + "mysql" + File.separator + "gjk_hardwarelibs.csv";
 					tag = readCvs(excelFilePath, "gjk_hardwarelibs", projectId);
 					// 芯片数据
-					excelFilePath = descDirPath + File.separator + "mysql" + File.separator + "gjk_chipsfromhardwarelibs.csv";
+					excelFilePath = descDirPath + File.separator + "mysql" + File.separator
+							+ "gjk_chipsfromhardwarelibs.csv";
 					tag = readCvs(excelFilePath, "gjk_chipsfromhardwarelibs", projectId);
 				}
 
 				// 引用的资源文件拷贝到指定目录
-				else{
-					if(item.getName().equals("project")){
+				else {
+					if (item.getName().equals("project")) {
 						// project 需要把目录改成导入项目的目录名
-						String targetFilePath = serverPath + "gjk" + File.separator + item.getName() + File.separator + project.getProjectName();
+						String targetFilePath = serverPath + "gjk" + File.separator + item.getName() + File.separator
+								+ project.getProjectName();
 						FileUtil.copyFile(item.listFiles()[0].getPath(), targetFilePath);
-					}else{
+					} else {
 						String targetFilePath = serverPath + "gjk" + File.separator + item.getName();
 						FileUtil.copyFile(item.getPath(), targetFilePath);
 					}
@@ -1909,6 +1910,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 	/**
 	 * 解析excel文件
+	 * 
 	 * @param unZipFilePath
 	 * @param path
 	 * @param projectId
@@ -1940,7 +1942,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 //		List<Chipsfromhardwarelibs> chipsfromhardwarelibsList = new ArrayList<>();
 		List<SysDict> sysDictList = new ArrayList<>();
 
-				// 获取所有sheet对象
+		// 获取所有sheet对象
 		Iterator<Sheet> sheetIterator = workbook.sheetIterator();
 		while (sheetIterator.hasNext()) {
 			Sheet sheet = sheetIterator.next();
@@ -1954,112 +1956,112 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				}
 			}
 			// 项目详情表
-			else if("gjk_project_detail".equals(tableName)){
+			else if ("gjk_project_detail".equals(tableName)) {
 				className = "com.inforbus.gjk.pro.api.entity.ProjectFile";
 				for (Object obj : parseSheet(sheet, className)) {
 					projectDetailList.add((ProjectFile) obj);
 				}
 			}
 			// app表
-			else if("gjk_app".equals(tableName)){
+			else if ("gjk_app".equals(tableName)) {
 				className = "com.inforbus.gjk.pro.api.entity.App";
 				for (Object obj : parseSheet(sheet, className)) {
 					appList.add((App) obj);
 				}
 			}
 			// 基础模版表
-			else if("gjk_base_template".equals(tableName)){
+			else if ("gjk_base_template".equals(tableName)) {
 				className = "com.inforbus.gjk.admin.api.entity.BaseTemplate";
 				for (Object obj : parseSheet(sheet, className)) {
 					baseTemplateList.add((BaseTemplate) obj);
 				}
 			}
 			// 软件框架与流程关系表
-			else if("gjk_app_part_platform_software".equals(tableName)){
+			else if ("gjk_app_part_platform_software".equals(tableName)) {
 				className = "com.inforbus.gjk.pro.api.entity.PartPlatformSoftware";
 				for (Object obj : parseSheet(sheet, className)) {
 					partPlatformSoftwareList.add((PartPlatformSoftware) obj);
 				}
 			}
 			// 软件框架表
-			else if("gjk_software".equals(tableName)){
+			else if ("gjk_software".equals(tableName)) {
 				className = "com.inforbus.gjk.pro.api.entity.Software";
 				for (Object obj : parseSheet(sheet, className)) {
 					softwareList.add((Software) obj);
 				}
 			}
 			// 软件框架与平台关系表
-			else if("gjk_software_detail".equals(tableName)){
+			else if ("gjk_software_detail".equals(tableName)) {
 				className = "com.inforbus.gjk.admin.api.entity.SoftwareDetail";
 				for (Object obj : parseSheet(sheet, className)) {
 					softwareDetailList.add((SoftwareDetail) obj);
 				}
 			}
 			// 软件框架文件表
-			else if("gjk_software_file".equals(tableName)){
+			else if ("gjk_software_file".equals(tableName)) {
 				className = "com.inforbus.gjk.admin.api.entity.SoftwareFile";
 				for (Object obj : parseSheet(sheet, className)) {
 					softwareFileList.add((SoftwareFile) obj);
 				}
 			}
 			// 软件框架文件表
-			else if("gjk_app_part_platform_bsp".equals(tableName)){
+			else if ("gjk_app_part_platform_bsp".equals(tableName)) {
 				className = "com.inforbus.gjk.pro.api.entity.PartPlatformBSP";
 				for (Object obj : parseSheet(sheet, className)) {
 					partPlatformBSPList.add((PartPlatformBSP) obj);
 				}
 			}
 			// bsp表
-			else if("gjk_bsp".equals(tableName)){
+			else if ("gjk_bsp".equals(tableName)) {
 				className = "com.inforbus.gjk.admin.api.entity.BSP";
 				for (Object obj : parseSheet(sheet, className)) {
 					bspList.add((BSP) obj);
 				}
 			}
 			// bsp和平台关系表
-			else if("gjk_bsp_detail".equals(tableName)){
+			else if ("gjk_bsp_detail".equals(tableName)) {
 				className = "com.inforbus.gjk.admin.api.entity.BSPDetail";
 				for (Object obj : parseSheet(sheet, className)) {
 					bspDetailList.add((BSPDetail) obj);
 				}
 			}
 			// BSP文件表
-			else if("gjk_bsp_file".equals(tableName)){
+			else if ("gjk_bsp_file".equals(tableName)) {
 				className = "com.inforbus.gjk.admin.api.entity.BSPFile";
 				for (Object obj : parseSheet(sheet, className)) {
 					bspFileList.add((BSPFile) obj);
 				}
 			}
 			// 项目和构件关系表
-			else if("gjk_project_comp".equals(tableName)){
+			else if ("gjk_project_comp".equals(tableName)) {
 				className = "com.inforbus.gjk.pro.api.entity.ProComp";
 				for (Object obj : parseSheet(sheet, className)) {
 					proCompList.add((ProComp) obj);
 				}
 			}
 			// 构件库表
-			else if("gjk_common_component".equals(tableName)){
+			else if ("gjk_common_component".equals(tableName)) {
 				className = "com.inforbus.gjk.pro.api.entity.CommonComponent";
 				for (Object obj : parseSheet(sheet, className)) {
 					compList.add((CommonComponent) obj);
 				}
 			}
 			// 结构库详细表
-			else if("gjk_common_component_detail".equals(tableName)){
+			else if ("gjk_common_component_detail".equals(tableName)) {
 				className = "com.inforbus.gjk.pro.api.entity.CommonComponentDetail";
 				for (Object obj : parseSheet(sheet, className)) {
 					compDetailList.add((CommonComponentDetail) obj);
 				}
 			}
 			// 构件库和结构体表关系表
-			else if("gjk_comp_struct".equals(tableName)){
+			else if ("gjk_comp_struct".equals(tableName)) {
 				className = "com.inforbus.gjk.common.core.entity.CompStruct";
 				for (Object obj : parseSheet(sheet, className)) {
 					compStructList.add((CompStruct) obj);
 				}
 			}
 			// 结构体表
-			else if("gjk_structlibs".equals(tableName)){
+			else if ("gjk_structlibs".equals(tableName)) {
 				className = "com.inforbus.gjk.common.core.entity.Structlibs";
 				for (Object obj : parseSheet(sheet, className)) {
 					structlibsList.add((Structlibs) obj);
@@ -2080,7 +2082,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 //				}
 //			}
 			// 字典表
-			else if("sys_dict".equals(tableName)){
+			else if ("sys_dict".equals(tableName)) {
 				className = "com.inforbus.gjk.admin.api.entity.SysDict";
 				for (Object obj : parseSheet(sheet, className)) {
 					sysDictList.add((SysDict) obj);
@@ -2097,7 +2099,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// 项目详情表
 		for (ProjectFile projectFile : projectDetailList) {
 			// 判断id是否存在
-			if(baseMapper.getProDetailById(projectFile.getId()) != null){
+			if (baseMapper.getProDetailById(projectFile.getId()) != null) {
 				continue;
 			}
 			// 项目id替换成导入的项目id
@@ -2115,118 +2117,122 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		// app表
 		for (App app : appList) {
-			if(appMapper.selectById(app.getId()) == null){
+			if (appMapper.selectById(app.getId()) == null) {
 				appMapper.saveApp(app);
 			}
 		}
 
 		// 基础模版表
 		for (BaseTemplate baseTemplate : baseTemplateList) {
-			if(baseTemplateService.getById(baseTemplate.getTempId()).getData() == null){
+			if (baseTemplateService.getById(baseTemplate.getTempId()).getData() == null) {
 				baseMapper.saveBaseTemplate(baseTemplate);
 			}
 		}
 
 		// 软件框架与流程关系表
 		for (PartPlatformSoftware partPlatformSoftware : partPlatformSoftwareList) {
-			if(partPlatformSoftwareMapper.selectById(partPlatformSoftware.getId()) == null){
+			if (partPlatformSoftwareMapper.selectById(partPlatformSoftware.getId()) == null) {
 				partPlatformSoftwareMapper.savePartPlatformSoftware(partPlatformSoftware);
 			}
 		}
 
 		// 软件框架表
 		for (Software software : softwareList) {
-			if(baseMapper.getSoftwareById(software.getId()) == null){
+			if (baseMapper.getSoftwareById(software.getId()) == null) {
 				baseMapper.saveSoftware(software);
 			}
 		}
 
 		// 软件框架与平台关系表
 		for (SoftwareDetail softwareDetail : softwareDetailList) {
-			if(baseMapper.getSoftwareDetailBySoftwareIdAndPlatformId(softwareDetail.getSoftwareId(), softwareDetail.getPlatformId()) == null){
+			if (baseMapper.getSoftwareDetailBySoftwareIdAndPlatformId(softwareDetail.getSoftwareId(),
+					softwareDetail.getPlatformId()) == null) {
 				baseMapper.saveSoftwareDetail(softwareDetail);
 			}
 		}
 
 		// 软件框架文件表
 		for (SoftwareFile softwareFile : softwareFileList) {
-			if(baseMapper.getSoftwareFileBySoftwareIdAndFileName(softwareFile.getSoftwareId(), softwareFile.getFileName()) == null){
+			if (baseMapper.getSoftwareFileBySoftwareIdAndFileName(softwareFile.getSoftwareId(),
+					softwareFile.getFileName()) == null) {
 				baseMapper.saveSoftwareFile(softwareFile);
 			}
 		}
 
 		// bsp与流程关系表
 		for (PartPlatformBSP partPlatformBSP : partPlatformBSPList) {
-			if(partPlatformBSPMapper.selectById(partPlatformBSP.getId()) == null){
+			if (partPlatformBSPMapper.selectById(partPlatformBSP.getId()) == null) {
 				partPlatformBSPMapper.insert(partPlatformBSP);
 			}
 		}
 
 		// bsp表
 		for (BSP bsp : bspList) {
-			if(baseMapper.getBSPById(bsp.getId()) == null){
+			if (baseMapper.getBSPById(bsp.getId()) == null) {
 				baseMapper.saveBSP(bsp);
 			}
 		}
 
 		// bsp和平台关系表
 		for (BSPDetail bspDetail : bspDetailList) {
-			if(baseMapper.getBSPDetailByBSPIdAndPlatformId(bspDetail.getBspId(), bspDetail.getPlatformId()) == null){
+			if (baseMapper.getBSPDetailByBSPIdAndPlatformId(bspDetail.getBspId(), bspDetail.getPlatformId()) == null) {
 				baseMapper.saveBSPDetail(bspDetail);
 			}
 		}
 
 		// BSP文件表
 		for (BSPFile bspFile : bspFileList) {
-		    if(baseMapper.getBSPFileByBSPIdAndFileNameAndFilePath(bspFile.getBspId(), bspFile.getFileName(), bspFile.getFilePath()) == null){
-                baseMapper.saveBSPFile(bspFile);
-            }
+			if (baseMapper.getBSPFileByBSPIdAndFileNameAndFilePath(bspFile.getBspId(), bspFile.getFileName(),
+					bspFile.getFilePath()) == null) {
+				baseMapper.saveBSPFile(bspFile);
+			}
 		}
 
-		// 项目和构件关系表  存在则更新 不存在则新增
+		// 项目和构件关系表 存在则更新 不存在则新增
 		for (ProComp proComp : proCompList) {
-		    if(projectMapper.getIdByProIdCompId(proComp) == null){
-                // 项目id替换成导入项目的id
-                proComp.setProjectId(projectId);
-                projectMapper.saveProComp(proComp);
-            }else {
-                projectMapper.updateCompProjectByCompIdAndProId(proComp.getCompId(), proComp.getProjectId(), proComp.getCanUse());
-            }
+			if (projectMapper.getIdByProIdCompId(proComp) == null) {
+				// 项目id替换成导入项目的id
+				proComp.setProjectId(projectId);
+				projectMapper.saveProComp(proComp);
+			} else {
+				projectMapper.updateCompProjectByCompIdAndProId(proComp.getCompId(), proComp.getProjectId(),
+						proComp.getCanUse());
+			}
 		}
 
 		// 构件库表 id存在则更新 不存在则新增
 		for (CommonComponent commonComponent : compList) {
-		    if(baseMapper.getCommonComponentByIdIn("'"+commonComponent.getId()+"'") == null){
-                baseMapper.saveCommonComp(commonComponent);
-            }else{
-		        commonComponent.setUpdateTime(LocalDateTime.now());
-                baseMapper.updateCommonComp(commonComponent);
-            }
+			if (baseMapper.getCommonComponentByIdIn("'" + commonComponent.getId() + "'") == null) {
+				baseMapper.saveCommonComp(commonComponent);
+			} else {
+				commonComponent.setUpdateTime(LocalDateTime.now());
+				baseMapper.updateCommonComp(commonComponent);
+			}
 		}
 
 		// 结构库详细表 id存在则更新 不存在则新增
 		for (CommonComponentDetail commonComponentDetail : compDetailList) {
-		    if(baseMapper.getCommonComponentDetailByCompIdIn("'"+commonComponentDetail.getId()+"'") == null){
-                baseMapper.saveCommonCompDetail(commonComponentDetail);
-            }else{
-                baseMapper.updateCommonCompDetail(commonComponentDetail);
-            }
+			if (baseMapper.getCommonComponentDetailByCompIdIn("'" + commonComponentDetail.getId() + "'") == null) {
+				baseMapper.saveCommonCompDetail(commonComponentDetail);
+			} else {
+				baseMapper.updateCommonCompDetail(commonComponentDetail);
+			}
 		}
 
 		// 构件库和结构体表关系表
 		for (CompStruct compStruct : compStructList) {
-		    if(baseMapper.getCompStructById(compStruct.getId()) == null){
-                baseMapper.saveCompAndStruct(compStruct);
-            }
+			if (baseMapper.getCompStructById(compStruct.getId()) == null) {
+				baseMapper.saveCompAndStruct(compStruct);
+			}
 		}
 
 		// 结构体表
 		for (Structlibs structlibs : structlibsList) {
-            if(baseMapper.getStructlibsById(structlibs.getId()) == null){
-                baseMapper.saveStructlibs(structlibs);
-            }else{
-                baseMapper.updateStructlibs(structlibs);
-            }
+			if (baseMapper.getStructlibsById(structlibs.getId()) == null) {
+				baseMapper.saveStructlibs(structlibs);
+			} else {
+				baseMapper.updateStructlibs(structlibs);
+			}
 		}
 
 //		// 硬件建模表
@@ -2251,9 +2257,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		// 字典表
 		for (SysDict sysDict : sysDictList) {
-			if(baseMapper.getSysDictById(sysDict.getId()) == null){
+			if (baseMapper.getSysDictById(sysDict.getId()) == null) {
 				baseMapper.saveSysDict(sysDict);
-			}else{
+			} else {
 				baseMapper.updateSysDict(sysDict);
 			}
 		}
@@ -2348,10 +2354,11 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			Method wM = pd.getWriteMethod();// 获得写方法
 
 			// 判断字段类型 转换类型
-			if(pd.getPropertyType().getName().indexOf("Double") > -1){
-				value = Double.valueOf((String)value);
-			}else if(pd.getPropertyType().getName().indexOf("Integer") > -1 || pd.getPropertyType().getName().indexOf("int") > -1){
-				value = Integer.valueOf((String)value);
+			if (pd.getPropertyType().getName().indexOf("Double") > -1) {
+				value = Double.valueOf((String) value);
+			} else if (pd.getPropertyType().getName().indexOf("Integer") > -1
+					|| pd.getPropertyType().getName().indexOf("int") > -1) {
+				value = Integer.valueOf((String) value);
 			}
 
 			wM.invoke(o, value);
@@ -2361,14 +2368,16 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	}
 
 	/**
-     * 生成Excel文件并添加到压缩文件流中
-     * @param projectId
-     * @param processId
-     * @param zip
-     * @throws Exception
-     * @throws IOException
-     */
-    private void createExcelFileToZipIO(String projectId, String processId, ZipOutputStream zip) throws Exception, IOException {
+	 * 生成Excel文件并添加到压缩文件流中
+	 * 
+	 * @param projectId
+	 * @param processId
+	 * @param zip
+	 * @throws Exception
+	 * @throws IOException
+	 */
+	private void createExcelFileToZipIO(String projectId, String processId, ZipOutputStream zip)
+			throws Exception, IOException {
 		// 创建表格工作空间
 		XSSFWorkbook workbook = new XSSFWorkbook();
 
@@ -2380,14 +2389,14 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		// 项目详细信息表
 		List<ProjectFile> projectDetailList = new ArrayList<>();
-		//查询流程数据
+		// 查询流程数据
 		ProjectFile projectFile = baseMapper.getProDetailById(processId);
 		projectDetailList.add(projectFile);
-		//查询模型数据
+		// 查询模型数据
 		List<ProjectFile> processTemplatList = baseMapper.getProFileListByModelId(processId);
 		projectDetailList.addAll(processTemplatList);
 		for (ProjectFile file : processTemplatList) {
-			//查询流程建模、硬件建模、软硬件映射配置、方案展示、部署图、自定义配置、系统配置数据
+			// 查询流程建模、硬件建模、软硬件映射配置、方案展示、部署图、自定义配置、系统配置数据
 			List<ProjectFile> list11_17 = baseMapper.getProFileListByModelId(file.getId());
 			projectDetailList.addAll(list11_17);
 		}
@@ -2395,11 +2404,11 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		// 项目文件
 		for (ProjectFile projectDetail : projectDetailList) {
-			if(projectDetail.getFileType().equals("9")){
+			if (projectDetail.getFileType().equals("9")) {
 				String peoFlowPath = serverPath + projectDetail.getFilePath() + projectDetail.getFileName();
 				if (new File(peoFlowPath).exists()) {
-					zipDirOrFile(zip, new File(peoFlowPath),
-							"project" + File.separator + project.getProjectName() + File.separator + projectDetail.getFileName());
+					zipDirOrFile(zip, new File(peoFlowPath), "project" + File.separator + project.getProjectName()
+							+ File.separator + projectDetail.getFileName());
 				}
 				break;
 			}
@@ -2408,7 +2417,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// app表
 		App app = appMapper.getAppByProcessId(projectId);
 		List<App> appList = new ArrayList<>();
-		if(app != null){
+		if (app != null) {
 			appList.add(app);
 		}
 		createSheet(workbook, appList, "gjk_app");
@@ -2440,7 +2449,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		createSheet(workbook, partPlatformSoftwareList, "gjk_app_part_platform_software");
 
 		// 软件框架表
-		List<String> softwareIdList = partPlatformSoftwareList.stream().map(PartPlatformSoftware::getSoftwareId).collect(Collectors.toList());
+		List<String> softwareIdList = partPlatformSoftwareList.stream().map(PartPlatformSoftware::getSoftwareId)
+				.collect(Collectors.toList());
 		List<Software> softwareList = new ArrayList<>();
 		String ids = "";
 		if (softwareIdList.size() > 0) {
@@ -2454,7 +2464,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			String peoFlowPath = serverPath + software.getFilePath();
 			File file = new File(peoFlowPath);
 			if (file.exists()) {
-				zipDirOrFile(zip, file, "software" + File.separator + software.getVersion() + File.separator + file.getName());
+				zipDirOrFile(zip, file,
+						"software" + File.separator + software.getVersion() + File.separator + file.getName());
 			}
 		}
 
@@ -2477,7 +2488,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		createSheet(workbook, partPlatformBSPList, "gjk_app_part_platform_bsp");
 
 		// bsp表
-		List<String> bspIdList = partPlatformBSPList.stream().map(PartPlatformBSP::getBspId).collect(Collectors.toList());
+		List<String> bspIdList = partPlatformBSPList.stream().map(PartPlatformBSP::getBspId)
+				.collect(Collectors.toList());
 		List<BSP> bspList = new ArrayList<>();
 		String bspIds = "";
 		if (bspIdList.size() > 0) {
@@ -2532,11 +2544,13 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		// 结构库文件
 		for (CommonComponent commonComponent : compList) {
-			String compPath = serverPath + "gjk" + File.separator + "common" + File.separator + "component" + File.separator
-					+ commonComponent.getCompId() + File.separator + commonComponent.getVersion() + File.separator;
+			String compPath = serverPath + "gjk" + File.separator + "common" + File.separator + "component"
+					+ File.separator + commonComponent.getCompId() + File.separator + commonComponent.getVersion()
+					+ File.separator;
 			File file = new File(compPath);
 			if (file.exists()) {
-				zipDirOrFile(zip, file, "common" + File.separator + "component" + File.separator + commonComponent.getCompId() + File.separator + commonComponent.getVersion());
+				zipDirOrFile(zip, file, "common" + File.separator + "component" + File.separator
+						+ commonComponent.getCompId() + File.separator + commonComponent.getVersion());
 			}
 		}
 
@@ -2581,7 +2595,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		File hardwarelibsFile = FileUtil.writeFileContent(filePath, cvsContent);
 
 //        //芯片表
-        Chipsfromhardwarelibs chipsfromhardwarelibs = baseMapper.getChipsByFlowId(processId);
+		Chipsfromhardwarelibs chipsfromhardwarelibs = baseMapper.getChipsByFlowId(processId);
 //        List<Chipsfromhardwarelibs> chipsfromhardwarelibsList = new ArrayList<>();
 //        chipsfromhardwarelibsList.add(chipsfromhardwarelibs);
 //        createSheet(workbook, chipsfromhardwarelibsList, "gjk_chipsfromhardwarelibs");
@@ -2601,12 +2615,11 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		filePath = serverPath + "gjk" + File.separator + "testExcel" + File.separator + "gjk_chipsfromhardwarelibs.csv";
 		File chipsFile = FileUtil.writeFileContent(filePath, cvsContent);
 
-        // 字典表
+		// 字典表
 		List<SysDict> sysDictList = baseMapper.getSysDictByRemarksIn("'mapperType','selectType'");
-        createSheet(workbook, sysDictList, "sys_dict");
+		createSheet(workbook, sysDictList, "sys_dict");
 
-
-        // 创建Excel文件保存的临时地址
+		// 创建Excel文件保存的临时地址
 		File file = new File(serverPath + "gjk" + File.separator + "testExcel" + File.separator + "MySQL.xls");
 		if (!file.getParentFile().exists()) {
 			file.getParentFile().mkdirs();
@@ -2638,157 +2651,159 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 	/**
 	 * 递归获取结构体数据
+	 * 
 	 * @param structlibsList
 	 * @param resList
 	 */
-	private void findStructlibsRecursion(List<Structlibs> structlibsList, List<Structlibs> resList){
+	private void findStructlibsRecursion(List<Structlibs> structlibsList, List<Structlibs> resList) {
 		List<String> structIdList = structlibsList.stream().map(Structlibs::getId).collect(Collectors.toList());
 		List<Structlibs> list = new ArrayList<>();
-		if(structIdList.size() > 0){
+		if (structIdList.size() > 0) {
 			list = baseMapper.getStructlibsByIdList(structIdList);
 		}
-		if(list.size() > 0){
+		if (list.size() > 0) {
 			resList.addAll(list);
 			findStructlibsRecursion(list, resList);
 		}
 	}
 
 	/**
-     * 创建一个sheep标签 并处理数据
-     * @param workbook
-     * @param dataList
-     * @param tableName
-     * @throws Exception
-     */
-    private void createSheet(XSSFWorkbook workbook, List<?> dataList, String tableName) throws Exception {
-        XSSFSheet compDetailSheet = workbook.createSheet(tableName);
-        // set Sheet页头部
-        List<String> compDetailColumnList = setSheetHeader(workbook, compDetailSheet, tableName);
-        // set Sheet页内容
-        List<Object> list = new ArrayList<Object>();
-        list.addAll(dataList);
-        setSheetContent(workbook, compDetailSheet, list, compDetailColumnList);
-    }
+	 * 创建一个sheep标签 并处理数据
+	 * 
+	 * @param workbook
+	 * @param dataList
+	 * @param tableName
+	 * @throws Exception
+	 */
+	private void createSheet(XSSFWorkbook workbook, List<?> dataList, String tableName) throws Exception {
+		XSSFSheet compDetailSheet = workbook.createSheet(tableName);
+		// set Sheet页头部
+		List<String> compDetailColumnList = setSheetHeader(workbook, compDetailSheet, tableName);
+		// set Sheet页内容
+		List<Object> list = new ArrayList<Object>();
+		list.addAll(dataList);
+		setSheetContent(workbook, compDetailSheet, list, compDetailColumnList);
+	}
 
-    /**
-     * 配置Excel表格的顶部信息，如：学号 姓名 年龄 出生年月
-     *
-     * @param xWorkbook
-     * @param xSheet
-     */
-    private List<String> setSheetHeader(XSSFWorkbook xWorkbook, XSSFSheet xSheet, String tableName) {
-        List<String> columnList = new ArrayList<>();
+	/**
+	 * 配置Excel表格的顶部信息，如：学号 姓名 年龄 出生年月
+	 *
+	 * @param xWorkbook
+	 * @param xSheet
+	 */
+	private List<String> setSheetHeader(XSSFWorkbook xWorkbook, XSSFSheet xSheet, String tableName) {
+		List<String> columnList = new ArrayList<>();
 
-        // 设置表格的宽度 xSheet.setColumnWidth(0, 20 * 256); 中的数字 20 自行设置为自己适用的
-        xSheet.setColumnWidth(0, 20 * 256);
-        xSheet.setColumnWidth(1, 15 * 256);
-        xSheet.setColumnWidth(2, 15 * 256);
-        xSheet.setColumnWidth(3, 20 * 256);
+		// 设置表格的宽度 xSheet.setColumnWidth(0, 20 * 256); 中的数字 20 自行设置为自己适用的
+		xSheet.setColumnWidth(0, 20 * 256);
+		xSheet.setColumnWidth(1, 15 * 256);
+		xSheet.setColumnWidth(2, 15 * 256);
+		xSheet.setColumnWidth(3, 20 * 256);
 
-        // 创建表格的样式
-        XSSFCellStyle cs = xWorkbook.createCellStyle();
-        // 设置居中
-        cs.setAlignment(HorizontalAlignment.CENTER);
-        // 设置字体
-        Font headerFont = xWorkbook.createFont();
-        headerFont.setFontHeightInPoints((short) 12);
+		// 创建表格的样式
+		XSSFCellStyle cs = xWorkbook.createCellStyle();
+		// 设置居中
+		cs.setAlignment(HorizontalAlignment.CENTER);
+		// 设置字体
+		Font headerFont = xWorkbook.createFont();
+		headerFont.setFontHeightInPoints((short) 12);
 //		headerFont.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
-        headerFont.setFontName("宋体");
-        cs.setFont(headerFont);
-        cs.setWrapText(true);// 是否自动换行
+		headerFont.setFontName("宋体");
+		cs.setFont(headerFont);
+		cs.setWrapText(true);// 是否自动换行
 
-        // 创建一行
-        XSSFRow row = xSheet.createRow(0);
+		// 创建一行
+		XSSFRow row = xSheet.createRow(0);
 
-        int columnNum = 0;
-        // 设置每一列
-        for (Map<String, String> column : queryColumns(tableName)) {
-            XSSFCell cell = row.createCell(columnNum);
-            cell.setCellStyle(cs);
-            cell.setCellValue(columnToJava(column.get("columnName")));
-            columnList.add(columnToJava(column.get("columnName")));
-            columnNum++;
-        }
-        return columnList;
-    }
+		int columnNum = 0;
+		// 设置每一列
+		for (Map<String, String> column : queryColumns(tableName)) {
+			XSSFCell cell = row.createCell(columnNum);
+			cell.setCellStyle(cs);
+			cell.setCellValue(columnToJava(column.get("columnName")));
+			columnList.add(columnToJava(column.get("columnName")));
+			columnNum++;
+		}
+		return columnList;
+	}
 
-    /**
-     * 配置(赋值)表格内容部分
-     *
-     * @param xWorkbook
-     * @param xSheet
-     * @throws Exception
-     */
-    private void setSheetContent(XSSFWorkbook xWorkbook, XSSFSheet xSheet, List<Object> objList,
-                                 List<String> columnList) throws Exception {
-        // 创建内容样式（头部以下的样式）
-        CellStyle cs = xWorkbook.createCellStyle();
-        cs.setWrapText(true);
-        cs.setAlignment(HorizontalAlignment.CENTER);
+	/**
+	 * 配置(赋值)表格内容部分
+	 *
+	 * @param xWorkbook
+	 * @param xSheet
+	 * @throws Exception
+	 */
+	private void setSheetContent(XSSFWorkbook xWorkbook, XSSFSheet xSheet, List<Object> objList,
+			List<String> columnList) throws Exception {
+		// 创建内容样式（头部以下的样式）
+		CellStyle cs = xWorkbook.createCellStyle();
+		cs.setWrapText(true);
+		cs.setAlignment(HorizontalAlignment.CENTER);
 
-        int rowIndex = 1;
-        if (null != objList && objList.size() > 0) {
-            for (Object obj : objList) {
-                XSSFRow xRow = xSheet.createRow(rowIndex);
-                int columnIndex = 0;
-                for (String key : columnList) {
-                    Object temp = getFieldValueByName(key, obj);
-                    String strTemp = "";
-                    if (temp != null) {
-                        strTemp = temp.toString();
-                    }
-                    XSSFCell cell = xRow.createCell(columnIndex);
-                    cell.setCellStyle(cs);
-                    // 把每个对象此字段的属性写入这一列excel中
-                    cell.setCellValue(strTemp);
+		int rowIndex = 1;
+		if (null != objList && objList.size() > 0) {
+			for (Object obj : objList) {
+				XSSFRow xRow = xSheet.createRow(rowIndex);
+				int columnIndex = 0;
+				for (String key : columnList) {
+					Object temp = getFieldValueByName(key, obj);
+					String strTemp = "";
+					if (temp != null) {
+						strTemp = temp.toString();
+					}
+					XSSFCell cell = xRow.createCell(columnIndex);
+					cell.setCellStyle(cs);
+					// 把每个对象此字段的属性写入这一列excel中
+					cell.setCellValue(strTemp);
 
-                    columnIndex++;
-                }
-                rowIndex++;
-            }
-        }
-    }
+					columnIndex++;
+				}
+				rowIndex++;
+			}
+		}
+	}
 
-    /**
-     * 获取属性值
-     *
-     * @param fieldName 字段名称
-     * @param o         对象
-     * @return Object
-     */
-    private static Object getFieldValueByName(String fieldName, Object o) {
-        try {
-            String firstLetter = fieldName.substring(0, 1).toUpperCase();
-            String getter = "get" + firstLetter + fieldName.substring(1); // 获取方法名
-            Method method = o.getClass().getMethod(getter, new Class[] {}); // 获取方法对象
-            Object value = method.invoke(o, new Object[] {}); // 用invoke调用此对象的get字段方法
-            return value; // 返回值
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+	/**
+	 * 获取属性值
+	 *
+	 * @param fieldName 字段名称
+	 * @param o         对象
+	 * @return Object
+	 */
+	private static Object getFieldValueByName(String fieldName, Object o) {
+		try {
+			String firstLetter = fieldName.substring(0, 1).toUpperCase();
+			String getter = "get" + firstLetter + fieldName.substring(1); // 获取方法名
+			Method method = o.getClass().getMethod(getter, new Class[] {}); // 获取方法对象
+			Object value = method.invoke(o, new Object[] {}); // 用invoke调用此对象的get字段方法
+			return value; // 返回值
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
-    /**
-     * 获取表中的字段名
-     *
-     * @param tableName
-     * @return
-     */
-    private List<Map<String, String>> queryColumns(String tableName) {
-        return baseMapper.queryColumns(tableName);
-    }
+	/**
+	 * 获取表中的字段名
+	 *
+	 * @param tableName
+	 * @return
+	 */
+	private List<Map<String, String>> queryColumns(String tableName) {
+		return baseMapper.queryColumns(tableName);
+	}
 
-    /**
-     * 列名转换成Java属性名
-     */
-    private String columnToJava(String columnName) {
-    	if(columnName.contains("_")){
+	/**
+	 * 列名转换成Java属性名
+	 */
+	private String columnToJava(String columnName) {
+		if (columnName.contains("_")) {
 			return WordUtils.capitalizeFully(columnName, new char[] { '_' }).replace("_", "");
-		}else{
+		} else {
 			return columnName;
 		}
-    }
+	}
 
 	/**
 	 * 根据打包路径打包文件或文件夹
@@ -2874,20 +2889,22 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 	/**
 	 * 字符串中的逗号替换成@#
+	 * 
 	 * @param str
 	 * @return
 	 */
-	public static String cvsString(String str){
+	public static String cvsString(String str) {
 		str = str.replaceAll(",", "@#");
 		return str;
 	}
 
 	/**
 	 * 字符串中的@#替换成逗号
+	 * 
 	 * @param str
 	 * @return
 	 */
-	public static String cvsStringUn(String str){
+	public static String cvsStringUn(String str) {
 		str = str.replaceAll("@#", ",");
 		return str;
 	}
@@ -2904,7 +2921,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			}
 		}
 		// 芯片表
-		else if("gjk_chipsfromhardwarelibs".equals(tableName)){
+		else if ("gjk_chipsfromhardwarelibs".equals(tableName)) {
 			className = "com.inforbus.gjk.pro.api.entity.Chipsfromhardwarelibs";
 			for (Object obj : parseCvsFile(path, className)) {
 				chipsfromhardwarelibsList.add((Chipsfromhardwarelibs) obj);
@@ -2914,9 +2931,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// 硬件建模表
 		for (Hardwarelibs hardwarelibs : hardwarelibsList) {
 			hardwarelibs.setProjectId(projectId);
-			if(baseMapper.getHardwarelibsById(hardwarelibs.getId()) == null){
+			if (baseMapper.getHardwarelibsById(hardwarelibs.getId()) == null) {
 				baseMapper.saveHardwarelibs(hardwarelibs);
-			}else{
+			} else {
 				baseMapper.updateHardwarelibById(hardwarelibs);
 			}
 		}
@@ -2924,9 +2941,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// 芯片表
 		for (Chipsfromhardwarelibs chipsfromhardwarelibs : chipsfromhardwarelibsList) {
 			chipsfromhardwarelibs.setProjectId(projectId);
-			if(baseMapper.getChipsfromhardwarelibsById(chipsfromhardwarelibs.getId()) == null){
+			if (baseMapper.getChipsfromhardwarelibsById(chipsfromhardwarelibs.getId()) == null) {
 				baseMapper.saveChipsfromhardwarelibs(chipsfromhardwarelibs);
-			}else{
+			} else {
 				baseMapper.updateChipsfromhardwarelibsById(chipsfromhardwarelibs);
 			}
 		}
@@ -2936,6 +2953,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 	/**
 	 * 解析CVS文件
+	 * 
 	 * @param filePath
 	 * @param className
 	 * @return
@@ -2946,8 +2964,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		List<String> columnList = new ArrayList<>();
 
 		List<String> fileContent = FileUtil.readFileContent(filePath);
-		for(int i = 0; i < fileContent.size(); i ++){
-			if(i == 0){
+		for (int i = 0; i < fileContent.size(); i++) {
+			if (i == 0) {
 				columnList = parseCvsRow(fileContent.get(i));
 			} else {
 				objects.add(parseCvsRow(fileContent.get(i), className, columnList));
@@ -2972,6 +2990,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 	/**
 	 * 解析cvs每行数据
+	 * 
 	 * @param row
 	 * @param calssName
 	 * @param columnList
@@ -2983,9 +3002,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		Object obj = cla.newInstance();
 
 		String[] colArr = row.split(",");
-		for (int i = 0; i < colArr.length; i ++) {
+		for (int i = 0; i < colArr.length; i++) {
 			String value = cvsStringUn(colArr[i]);
-			if(StringUtils.isNotBlank(value)){
+			if (StringUtils.isNotBlank(value)) {
 				if ("CreateTime".equals(columnList.get(i)) || "UpdateTime".equals(columnList.get(i))) {
 					LocalDateTime parse = LocalDateTime.parse(value);
 					setFieldValueByName(columnList.get(i), cla, obj, parse);
@@ -2996,14 +3015,57 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		}
 		return obj;
 	}
-	
+
 	@Override
-	public R completeCheck(String id,String userId) {
+	public R completeCheck(String id, String userId) {
 		Map<String, String> map = baseMapper.findProJSON(id);
 		String xmlFilepath = proDetailPath + map.get("filePath") + map.get("fileName") + ".xml";
 		CheckResult checkResult = ExternalIOTransUtils.completeCheck(xmlFilepath);
 		String strLog = checkResult.getM_textConsole();
 		this.rabbitmqTemplate.convertAndSend(userId, "checkLog" + "===@@@===" + strLog);
 		return new R(checkResult);
+	}
+
+	@Override
+	public R codeGeneration(String projectId, String username) {
+		// 获取流程对应记录
+		ProjectFile procedure = this.getById(projectId);
+		// 获取流程下generateCodeResult文件夹路径
+		String tmpGenerateCodeResult = gitDetailPath + procedure.getFilePath() + procedure.getFileName()
+				+ File.separator + generateCodeResult;
+		File file = new File(tmpGenerateCodeResult);
+		if (!file.exists()) {
+			file.mkdirs();
+		}
+		// generatecode.exe所在路径
+		// "D:\\14S_GJK_GIT\\gjk\\gjk\\generateCodeExe\\generatecode.exe";
+		String generatecode = JGitUtil.getGeneratecode();
+
+		String workModeId = String.valueOf(procedure.getFlowId());
+
+		String workModeFilePath = getWorkModeFilePath(projectId);
+		String packinfoPath = tmpGenerateCodeResult + File.separator + "packinfo.xml";
+		String userDefineTopicFilePath = getUserDefineTopicFilePath(projectId);
+
+		String[] strArray = new String[] { generatecode, username, workModeId, workModeFilePath, packinfoPath,
+				userDefineTopicFilePath, tmpGenerateCodeResult };
+		try {
+			Process process = Runtime.getRuntime().exec(strArray);
+
+			InputStreamReader reader = new InputStreamReader(process.getInputStream());
+			BufferedReader bufferedReader = new BufferedReader(reader);
+
+			StringBuffer stringBuffer = new StringBuffer();
+			String str = null;
+			while ((str = bufferedReader.readLine()) != null) {
+				stringBuffer.append(str);
+			}
+
+			System.out.println(stringBuffer);
+			return new R<>("集成代码生成成功。");
+		} catch (IOException e) {
+			e.printStackTrace();
+			return new R<>(new Exception("集成代码生成失败，请联系管理员。"));
+		}
 	}
 }

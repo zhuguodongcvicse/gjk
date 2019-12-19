@@ -29,18 +29,8 @@
         @node-expand="handleNodeExpand"
         @node-collapse="handleNodeCollapse"
       ></el-tree>
-
-      <!-- 右键菜单 -->
-      <!-- <div class="rightmenu" id="projectRightMenu" @mouseleave="changeCount()" style="width: 130px">
-        <div class="menu">
-          <a v-for="item in menus" :key="item" @click="nodeContextmenuClick(item)">
-            <div class="command">
-              <span>{{item}}</span>
-            </div>
-          </a>
-        </div>
-      </div>-->
     </div>
+
     <!-- 右键菜单 -->
     <div
       v-if="contextmenuFlag"
@@ -55,6 +45,7 @@
         @click="nodeContextmenuClick(item)"
       >{{item}}</div>
     </div>
+
     <!-- 添加流程 -->
     <add-procedure
       :temp_currProject="temp_currProject"
@@ -267,7 +258,6 @@ export default {
     changeCount() {
       setTimeout(() => {
         this.contextmenuFlag = false;
-        // $("#projectRightMenu").hide();
       }, 500);
     },
 
@@ -395,21 +385,28 @@ export default {
     },
     async nodeContextmenuClick(item) {
       if (item == "集成代码生成") {
-        codeGeneration(this.procedureId, this.userInfo.username).then(res => {});
         const loading = this.$loading({
           lock: true,
           text: "集成代码生成中。。。",
           spinner: "el-icon-loading",
           background: "rgba(0, 0, 0, 0.7)"
         });
-        setTimeout(() => {
-          loading.close();
-        }, 2000);
-        // $("#projectRightMenu").hide();
+        codeGeneration(this.procedureId, this.userInfo.username)
+          .then(res => {
+            loading.close();
+            this.$notify({
+              title: "成功",
+              message: res.data.data,
+              type: "success"
+            });
+          })
+          .catch(error => {
+            loading.close();
+            this.reflush(loading);
+          });
         this.contextmenuFlag = false;
       } else if (item == "修改软件框架") {
         this.softwareDialogVisible = true;
-        // $("#projectRightMenu").hide();
         this.contextmenuFlag = false;
       } else if (item == "修改BSP") {
         this.bspDialogVisible = true;
@@ -482,7 +479,6 @@ export default {
             });
           });
         }
-        // $("#projectRightMenu").hide();
         this.contextmenuFlag = false;
       } else if (item == "添加流程") {
         this.addProcedureDialogVisible = true;
@@ -501,14 +497,7 @@ export default {
           let filePath = { filePath: "" };
           filePath.filePath =
             this.fileData.filePath + "\\" + this.fileData.fileName;
-          // console.log("this.fileData", this.fileData);
-          // console.log("this.treeData", this.treeData[0]);
-
-          // var filePathTemp = {filePathTemp: 'D:/14S_GJK_GIT/gjk/gjk/project/project11/Flow1流程/模型/222'};
-          // console.log("filePath", filePath);
-          // console.log("filePathTemp", filePathTemp)
           deleteSelectFile(filePath).then(response => {
-            // console.log("response", response);
             if (response.data == true) {
               let flowFile = this.treeData[0].children;
               let appList;
@@ -564,7 +553,6 @@ export default {
           processId: this.currentNodeData.id
         };
         createZipFile(param);
-        // $("#projectRightMenu").hide();
         this.contextmenuFlag = false;
       }
     },
@@ -650,12 +638,6 @@ export default {
       } else {
         this.menus = [];
       }
-      // $("#projectRightMenu")
-      //   .css({
-      //     top: event.y - 248
-      //   })
-      //   .show();
-      // // }
       this.contentmenuX = event.clientX;
       this.contentmenuY = event.clientY;
       this.contextmenuFlag = true;
@@ -709,7 +691,6 @@ export default {
             });
           }
         }
-        // $("#projectRightMenu").hide();
         this.contextmenuFlag = false;
         // this.showProjects = false
       }
@@ -718,49 +699,6 @@ export default {
         data,
         JSON.parse(JSON.stringify(this.treeData[0]))
       );
-    },
-    removeComponent(component) {
-      // this.$confirm('确定删除构件【' + component.displayName + '】？', '提示', {
-      //   confirmButtonText: '确定',
-      //   cacelButtonText: '取消',
-      //   type: 'warning'
-      // }).then(() => {
-      //   removeComponent(component).then(async res => {
-      //     this.$message({
-      //       type: 'success',
-      //       message: '构件【' + component.displayName + '】删除成功！'
-      //     })
-      //     this.getTreeData()
-      //   })
-      // })
-    },
-    saveComponent() {
-      // this.$refs.dialog.setProjectName(this.temp_currProject.name)
-      // let component = this.$refs.dialog.getform()
-      // let displayName = component.displayName
-      // component.category = ''
-      // saveComponent(component).then(async res => {
-      //   this.getTreeData()
-      //   this.$refs.dialog.close()
-      //   if (component.id) {
-      //     this.$message({
-      //       type: 'success',
-      //       message: '构件【' + displayName + '】编辑成功！'
-      //     })
-      //   } else {
-      //     this.$message({
-      //       type: 'success',
-      //       message: '构件【' + displayName + '】添加成功！'
-      //     })
-      //   }
-      // })
-      //   .catch(err => {
-      //     console.log('err: ', err)
-      //     this.$message({
-      //       type: 'error',
-      //       message: err
-      //     })
-      //   })
     },
     //自定义树
     renderContent(h, { node, data, store }) {
