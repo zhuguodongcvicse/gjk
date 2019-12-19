@@ -34,36 +34,30 @@ export const tableOption = {
       label: '接口名称',
       prop: 'infName'
     },
-	  /* {
-      label: 'SN',
-      prop: 'sn'
-    }, */
-	  /* {
-      label: '顺序号',
-      prop: 'infId'
-    }, */
+    {
+      label: '接口类型',
+      prop: 'infType',
+      dicData: [{
+        label: '网口',
+        value: "0"
+      }, {
+        label: '串口',
+        value: "1"
+      }, {
+        label: '光纤口',
+        value: "2"
+      }, {
+        label: '芯片接口',
+        value: "3"
+      }, {
+        label: '圆口',
+        value: "4"
+      }]
+    },
 	  {
       label: '接口速率',
       prop: 'infRate'
     },
-	  /*{
-      label: '接口类型',
-      prop: 'infType'
-    },*/
-
-	  /* {
-      label: '创建时间',
-      prop: 'createTime'
-    },
-	  {
-      label: '修改时间',
-      prop: 'updateTime'
-    }, */
-	  /* {
-      label: '',
-      prop: 'projectImg'
-    }, */
-
 	  /* {
       label: '逻辑删除',
       prop: 'delFlag'

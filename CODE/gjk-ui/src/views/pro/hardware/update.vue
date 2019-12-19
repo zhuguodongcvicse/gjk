@@ -83,11 +83,15 @@
             };
         },
         created() {
+            // console.log("this.hardwarelibObj",this.hardwarelibObj)
+            console.log("this.$route",this.$route)
             NProgress.configure({showSpinner: false});
-            // console.log("this.$route.query",this.$route.query.existHardwarelib)
-            // var hardwareObj = this.$route.query.existHardwarelib;
-            this.params = this.hardwarelibObj;
-            // console.log("this.params",this.params)
+            let allHardwarelibs = this.hardwarelibObj //JSON.parse(JSON.stringify())
+            let currentHardwarelibId = this.$route.query.flowId
+            if (allHardwarelibs.hasOwnProperty(currentHardwarelibId)) {
+                this.params = allHardwarelibs[currentHardwarelibId]
+            }
+            console.log("this.params",this.params)
             // console.log("this.hardwarelibObj",this.hardwarelibObj)
             //this.sendMessage()
         },
@@ -127,6 +131,13 @@
             // 接受子页面发来的信息
             handleMessage(event) {
                 // console.log("event.data", event.data);
+                if (typeof this.params === "string") {
+                    return;
+                }
+                this.params.id = this.$route.query.id
+                if (this.params.id !== this.$route.query.id) {
+                    return;
+                }
                 if (event.data.params == null) {
                     return;
                 }
@@ -158,17 +169,24 @@
                         // 处理业务逻辑
                         this.ifSave = 0;
                         if (event.data.params[0].fJson.length !== 0) {
-                            saveChipsFromHardwarelibs(chipsfromhardwarelibs).then(res => {
-                                // console.log("res", res);
-                            });
-                            this.createXml();
                             updateHardwarelib(this.params).then(response => {
-                                this.$message({
-                                    showClose: true,
-                                    message: "修改成功",
-                                    type: "success"
-                                });
+                                if (response.data === 1) {
+                                    saveChipsFromHardwarelibs(chipsfromhardwarelibs).then(res => {
+                                        // console.log("res", res);
+                                        if (res.data === 2) {
+                                            this.createXml();
+                                        }
+                                    });
+                                    this.$message({
+                                        showClose: true,
+                                        message: "修改成功",
+                                        type: "success"
+                                    });
+                                    var tag1 = this.tag;
+                                    menuTag(this.$route.path, "remove", this.tagList, tag1);
+                                }
                             });
+
                         } else {
                             deleteHardwarelibById(this.params.id).then(response => {
                                 this.$message({
@@ -181,8 +199,6 @@
                                 // console.log("res", res);
                             });
                         }
-                        var tag1 = this.tag;
-                        menuTag(this.$route.path, "remove", this.tagList, tag1);
                         break;
                 }
             },
@@ -193,7 +209,7 @@
                     this.params.linkRelation
                 ];
                 this.hrConfigXmlEntityMap = createXmlEntityMap(paramsList);
-                console.log("this.hrConfigXmlEntityMap", this.hrConfigXmlEntityMap)
+                // console.log("this.hrConfigXmlEntityMap", this.hrConfigXmlEntityMap)
                 createHardwarelibXML(this.hrConfigXmlEntityMap, this.params.id).then(
                     response => {
                         // console.log("this.params",this.params)

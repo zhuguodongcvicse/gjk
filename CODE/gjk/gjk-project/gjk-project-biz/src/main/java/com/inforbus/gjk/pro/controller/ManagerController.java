@@ -629,9 +629,10 @@ public class ManagerController {
 	 * @param hardwarelibs
 	 */
 	@PostMapping("saveHardwarelibs")
-	public void saveHarewarelibs(@RequestBody Hardwarelibs hardwarelibs) {
+	public int saveHarewarelibs(@RequestBody Hardwarelibs hardwarelibs) {
 		System.out.println("hardwarelibs" + hardwarelibs);
-		managerService.saveHardwarelibs(hardwarelibs);
+		int row = managerService.saveHardwarelibs(hardwarelibs);
+		return row;
 	}
 
 	/**
@@ -640,8 +641,9 @@ public class ManagerController {
 	 * @param chipsfromhardwarelibs
 	 */
 	@PostMapping("saveChipsFromHardwarelibs")
-	public void saveChipsFromHardwarelibs(@RequestBody Chipsfromhardwarelibs chipsfromhardwarelibs) {
-		managerService.saveChipsfromhardwarelibs(chipsfromhardwarelibs);
+	public int saveChipsFromHardwarelibs(@RequestBody Chipsfromhardwarelibs chipsfromhardwarelibs) {
+		int row = managerService.saveChipsfromhardwarelibs(chipsfromhardwarelibs);
+		return row;
 	}
 
 	@GetMapping("getChipsfromhardwarelibs/{id}")
@@ -695,8 +697,8 @@ public class ManagerController {
 	 * @param hardwarelibs
 	 */
 	@PostMapping("updateHardwarelib")
-	public void updateHardwarelib(@RequestBody Hardwarelibs hardwarelibs) {
-		managerService.updateHardwarelib(hardwarelibs);
+	public int updateHardwarelib(@RequestBody Hardwarelibs hardwarelibs) {
+		return managerService.updateHardwarelib(hardwarelibs);
 	}
 
 	/**

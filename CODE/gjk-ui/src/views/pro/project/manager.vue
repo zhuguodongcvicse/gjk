@@ -95,15 +95,13 @@
             return {
                 hardwarelibNode: "",
                 existHardwarelib: "",
+                objTemp: {},
                 dialogVisible: false,
                 dialogVisible2: false,
                 dialogVisible3: false,
                 leftShow: true,
                 hardwarelibs: {
                     id: "",
-                    frontJson: "",
-                    backJson: "",
-                    linkRelation: ""
                 },
                 leftClass: {
                     position: "absolute",
@@ -161,7 +159,7 @@
         },
         //监听属性 类似于data概念
         computed: {
-            ...mapGetters(["elements", "permissions", "userInfo", "isCollapse"]),
+            ...mapGetters(["elements", "permissions", "userInfo", "isCollapse", "hardwarelibObj"]),
             ...mapState("common", ["showIframe"])
         },
         //监控data中的数据变化
@@ -169,44 +167,64 @@
         //方法集合
         methods: {
             //查找是否添加了硬件建模
-            hardwarelibIfExist(node) {
-                this.hardwarelibNode = node;
+            hardwarelibIfExist(node, nodeRoot) {
+                // console.log("node", node)
+                // console.log("nodeRoot", nodeRoot)
                 this.hardwarelibs.id = node.id;
+                let flowName
+                let flowId
+                if(this.hardwarelibObj !== null && this.hardwarelibObj !== '') {
+                    this.objTemp = this.hardwarelibObj
+                } else {
+                    this.objTemp = {}
+                }
+                // console.log("this.objTemp", this.objTemp)
+                for (const i in nodeRoot.children) {
+                    if (nodeRoot.children[i].children[0].id === node.parentId) {
+                        flowName = nodeRoot.children[i].fileName
+                        flowId = nodeRoot.children[i].id
+                    }
+                }
                 getHardwarelibs(node.id).then(response => {
                     // console.log("response.data", response.data);
                     this.existHardwarelib = response.data;
                     if (response.data.frontJson == null) {
                         // this.dialogVisible = true;
-                        this.confirmAddHardwarelibs(node);
+                        this.confirmAddHardwarelibs(node, nodeRoot, flowName, flowId);
                     } else {
                         // this.dialogVisible2 = true;
-                        this.confirmUpdateHardwarelibs();
+                        this.confirmUpdateHardwarelibs(node, nodeRoot, flowName, flowId);
                     }
                 });
             },
-            confirmAddHardwarelibs(node) {
-                // console.log("this.hardwarelibs",this.hardwarelibs)
-                let hardwarelibs = this.hardwarelibs;
-                // let hardwarelibModelId = node.parentId;
-                // console.log("hardwarelibs",hardwarelibs)
-                this.$store.dispatch("setHardwarelibObj", hardwarelibs);
+            confirmAddHardwarelibs(node, nodeRoot, flowName, id) {
+                let flowId = id
+                this.objTemp[flowId] = this.hardwarelibs;
+                // console.log("this.objTemp",this.objTemp)
+                this.objTemp = JSON.parse(JSON.stringify(this.objTemp))
+                this.$store.dispatch("setHardwarelibObj", this.objTemp);
                 this.$router.replace({
                     path: "/comp/manager/hardwareAdd",
                     query: {
+                        proFloName: nodeRoot.fileName + "_" + flowName + "_" + node.label + "新增",
+                        flowId: id,
+                        id: node.id
                     }
                 });
                 // this.dialogVisible = false;
                 // this.closeRouterTag()
             },
-            confirmUpdateHardwarelibs() {
-                let existHardwarelib = this.existHardwarelib;
-                let hardwarelibModelId = this.hardwarelibNode.parentId;
-                this.$store.dispatch("setHardwarelibObj", existHardwarelib);
+            confirmUpdateHardwarelibs(node, nodeRoot, flowName, id) {
+                let flowId = id
+                this.objTemp[flowId] = this.existHardwarelib
+                // console.log("this.objTemp",this.objTemp)
+                this.$store.dispatch("setHardwarelibObj", this.objTemp);
                 this.$router.push({
                     path: "/comp/manager/hardwareUpdate",
                     query: {
-                        // "existHardwarelib": existHardwarelib,
-                        // "hardwarelibModelId": hardwarelibModelId
+                        proFloName: nodeRoot.fileName + "_" + flowName + "_" + node.label + "编辑",
+                        flowId: id,
+                        id: node.id
                     }
                 });
                 // this.dialogVisible2 = false;
@@ -360,7 +378,7 @@
                 if (node.parentType == "12") {
                     if (node.type == "12") {
                         // console.log("node",node)
-                        this.hardwarelibIfExist(node);
+                        this.hardwarelibIfExist(node, nodeRoot);
                         /* this.$router.replace({
                           name: "hardware",
                           params: { sysId: node.id }

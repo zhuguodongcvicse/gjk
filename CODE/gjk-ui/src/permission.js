@@ -59,6 +59,15 @@ router.beforeEach((to, from, next) => {
             query: to.query,
             group: router.$avueRouter.group || []
           })
+          let tagListTemp = store.state.tags.tagList
+          // console.log("store",store.state.tags.tagList)
+          for (const i in tagListTemp) {
+            if (tagListTemp[i].value.indexOf('hardwareAdd') !== -1 && tagListTemp[i].value.indexOf('?') === -1) {
+              // console.log("tagListTemp",tagListTemp[i])
+              store.commit("DEL_TAG", tagListTemp[i]);
+            }
+          }
+
         }
         next()
       }
