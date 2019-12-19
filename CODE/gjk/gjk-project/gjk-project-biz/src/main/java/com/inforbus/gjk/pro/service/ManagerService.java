@@ -281,6 +281,7 @@ public interface ManagerService extends IService<ProjectFile> {
 
 	/**
 	 * 获取修改BSP下拉列表内容
+	 * 
 	 * @return
 	 */
 	R getBSPListAndPlatformName();
@@ -301,14 +302,15 @@ public interface ManagerService extends IService<ProjectFile> {
 	 */
 	R updatePartBSPAndPlatform(BSP bsp);
 
-    /**
-     * 导出项目流程压缩文件流
-     * @param projectId
-     * @param processId
-     * @return
-     * @throws Exception
-     */
-    byte[] createZip(String projectId, String processId) throws Exception;
+	/**
+	 * 导出项目流程压缩文件流
+	 * 
+	 * @param projectId
+	 * @param processId
+	 * @return
+	 * @throws Exception
+	 */
+	byte[] createZip(String projectId, String processId) throws Exception;
 
 	/**
 	 * 解析传入的压缩文件
@@ -317,12 +319,22 @@ public interface ManagerService extends IService<ProjectFile> {
 	 * @param projectId
 	 */
 	int analysisZipFile(MultipartFile ufile, String projectId);
-	
+
 	/**
 	 * 流程建模完备性检查
+	 * 
 	 * @param id
 	 * @return
 	 */
-	R completeCheck(String id,String userId);
+	R completeCheck(String id, String userId);
+
+	/**
+	 * 集成代码生成
+	 * 
+	 * @param projectId
+	 * @param username
+	 * @return
+	 */
+	R codeGeneration(String projectId, String username);
 
 }
