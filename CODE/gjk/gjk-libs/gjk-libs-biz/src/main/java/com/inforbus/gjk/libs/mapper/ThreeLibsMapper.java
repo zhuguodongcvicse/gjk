@@ -17,10 +17,13 @@
 package com.inforbus.gjk.libs.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.inforbus.gjk.admin.api.entity.ComponentDetail;
+import com.inforbus.gjk.libs.api.entity.BSPDetail;
 import com.inforbus.gjk.libs.api.entity.Software;
 import com.inforbus.gjk.libs.api.entity.SoftwareDetail;
 import com.inforbus.gjk.libs.api.entity.SoftwareFile;
@@ -85,6 +88,28 @@ public interface ThreeLibsMapper extends BaseMapper<ThreeLibs> {
 	 * 获取软件框架库文件夹的副表信息
 	 */
 	List<SoftwareFile> getSoftwareFile();
+	
+	/**
+	 * 根据libsid查询到已入库的表中是否选中三个库
+	 * @return
+	 */
+	List<Map<String, String>> findBSPDetailByPlatformId(@Param("platformId") String platformId);
+	/**
+	 * 根据libsid查询到已入库的表中是否选中三个库
+	 * @return
+	 */
+	List<Map<String, String>> findSoftwareDetailByPlatformId(@Param("platformId") String platformId);
+	/**
+	 * 根据libsid查询到已入库的表中是否选中三个库
+	 * @return
+	 */
+	List<Map<String, String>> findCompframeDetailByPlatformId(@Param("platformId") String platformId);
+	/**
+	 * 根据libsid查询到已入库的表中是否选中三个库
+	 * @return
+	 */
+	List<ComponentDetail> findComponentDetailByPlatformId(@Param("platformId") String platformId);
+	
 	
 	
 	

@@ -120,11 +120,11 @@ export default {
         }
       }
       if (!isvalid) {
-        this.$notify({
+        this.$message({
           title: "提示",
           message: names + " 有必填信息项",
           type: "warning",
-          duration: 2000
+          duration: 4000
         });
       }
       return Promise.resolve(isvalid);

@@ -199,15 +199,18 @@ function handleMessageFromParent(event) {
 			}
 			break;
 		case 'completeCheck':
-			console.log("998989898989889898",data.params)
-			completeCheckFun(data.params)
+			if(!data.state){
+				completeCheckFun(data.params)
+			}else{
+				removeStyle()
+			}
 			//警告
 			//let styleColor = "#F4A460"
 			//错误
-			let styleColor = "#ff0000"
+			//let styleColor = "#ff0000"
 			//$('.pa').addClass("warn")
 			//endpointCheck(styleColor);
-			connectionCheck(styleColor);
+			//connectionCheck(styleColor);
 			break;
 		case 'startSimulation':
 			getSimulationData();
@@ -964,7 +967,8 @@ function saveNodeJson(nodeId) {
 	copyDataJson.nodes = nodes;
 	copyDataJson.connections = connections;
 	copyDataJson.jsonendpoints = jsonendpoints;
-	copyDataJson.endpointMap = ""
+	//copyDataJson.endpointMap = ""
+	copyDataJson.endpointMap = JSON.stringify(strMapToObj(endpointMap));
 	//console.log(copyDataJson);
 	return copyDataJson;
 }
@@ -1120,7 +1124,7 @@ function updatePoint(proPream) {
 					differenceValue += anchorNumber
 				}
 			});
-			config.isSource = true
+			config.isTarget = false
 			config.maxConnections = -1
 			var addOutPoint = jsPlumb.addEndpoint(proPream.compId, {
 				anchors: [1, differenceValue, 1, 0],
@@ -1540,7 +1544,12 @@ document.onkeydown = function () {
 		//console.log(11111111111111)
 		if (copyData.length <= 0) {
 			copyData = JSON.parse(sessionStorage.getItem("copyData"));
-			//console.log("复制数据",copyData)
+			//console.log("复制数据",copyData[0].endpointMap)
+			let copyEndpointMap = objToMap(JSON.parse(copyData[0].endpointMap));
+			//将解析数据重新加入endpointMap
+			for (let [k, v] of copyEndpointMap) {
+				endpointMap.set(k, v)
+			}
 		}
 		for (var i = 0; i < copyData.length; i++) {
 			pasteJson(copyData[i]);
@@ -2245,7 +2254,7 @@ function pasteJson(pasteDataJson) {
 				var midpoints = [0.7, 0.5, 0.3, 0.1]
 				var stub = [40, 30, 20, 10]
 				outIndex++
-				config.isTarget = true
+				config.isTarget = false
 				config.maxConnections = -1
 				console.log(midpoints)
 				config.connector[1].midpoint = midpoints[outIndex]
@@ -2808,7 +2817,7 @@ function loadJson(loadJson) {
 					var midpoints = [0.7, 0.5, 0.3, 0.1]
 					var stub = [40, 30, 20, 10]
 					outIndex++
-					config.isTarget = true
+					config.isTarget = false
 					config.maxConnections = -1
 					config.connector[1].midpoint = midpoints[outIndex]
 					config.connector[1].stub = stub[outIndex]
@@ -3361,7 +3370,7 @@ function connectionCheck(startUuid,endUuid,styleColor) {
 		//console.log(connection.getPaintStyle())
 		//connection.addClass("warn")
 		if(connection.endpoints[0].getUuid() == startUuid && connection.endpoints[1].getUuid() == endUuid){
-			console.log("68465123654",connection)
+			//console.log("68465123654",connection)
 			connection.getPaintStyle().lineWidth = "3"
 			connection.getPaintStyle().stroke = styleColor
 			connection.getPaintStyle().strokeStyle = styleColor
@@ -3418,8 +3427,8 @@ function completeCheckFun(val){
 //完备性检查确认锚点id
 function endPoint(checkResult){
 	let endpointUUid = ""
-	console.log("111111",checkResult)
-	console.log(endpointMap)
+	// console.log("111111",checkResult)
+	// console.log(endpointMap)
 	for (let [k, v] of endpointMap) {
 		if(k.split("*")[2] == checkResult.m_spbId && k.split("*")[1] == "input" && checkResult.m_paramType =="输入" && v.variableName == checkResult.m_paramName){
 			endpointUUid = k
@@ -3429,6 +3438,36 @@ function endPoint(checkResult){
 	}
 	//console.log("endpointUUid",endpointUUid)
 	return endpointUUid
+}
+
+//还原完备性检查
+function removeStyle(){
+	$(".pa").removeClass("error")
+	$(".pa").removeClass("warn")
+	$(".pa").each(function (idx, elem) {
+		var $elem = $(elem);
+		//i用于定位使用什么数据
+		var i = $elem.find("div").find("div")[0].dataset.id;
+		var endpoints = jsPlumb.getEndpoints($elem.attr('id'));
+		$.map(endpoints, function (endpoint) {
+			//console.log(endpoint)
+			if(endpoint.anchor.x == "0"){
+				endpoint.getPaintStyle().strokeStyle = "#4ECB74"
+			}else{
+				endpoint.getPaintStyle().strokeStyle = "#4ECB74"
+				endpoint.getPaintStyle().fillStyle = "#4ECB74"
+			}
+		})
+	})
+
+	$.each(jsPlumb.getConnections(), function (idx, connection) {
+		connection.getPaintStyle().lineWidth = "2"
+		connection.getPaintStyle().stroke = "#436D9F"
+		connection.getPaintStyle().strokeStyle = "#436D9F"		
+	});
+
+
+	jsPlumb.setSuspendDrawing(false, true);
 }
 
 //})();

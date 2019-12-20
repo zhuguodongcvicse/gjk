@@ -19,7 +19,7 @@
         <template slot="menuLeft">
           <el-button
             type="primary"
-            icon="el-icon-edit el-icon--left"
+            icon="el-icon-plus"
             size="small"
             @click="goToAddCompPage()"
           >新增</el-button>
@@ -211,7 +211,7 @@ export default {
     };
   },
   created() {
-    this.getList();
+    this.getList(this.page);
   },
   mounted: function() {},
   computed: {
@@ -412,8 +412,12 @@ export default {
       this.storageApplyDialog = false;
       this.reload();
     },
-    getList() {
+    getList(page) {
       this.tableLoading = true;
+      this.listQuery = {
+        current: page.currentPage,
+        size: page.pageSize
+      };
       fetchList(this.listQuery).then(response => {
         this.tableData = response.data.data.records;
         this.page.total = response.data.data.total;
@@ -424,15 +428,13 @@ export default {
       this.page.page = 1;
       this.getList(this.page, param);
     },
-    currentChange(val) {
-      this.page.current = val;
-      this.listQuery.current = val;
-      this.getList();
+    currentChange(currentPage) {
+      this.page.currentPage = currentPage;
+      this.getList(this.page);
     },
-    sizeChange(val) {
-      this.page.size = val;
-      this.listQuery.size = val;
-      this.getList();
+    sizeChange(pageSize) {
+      this.page.pageSize = pageSize;
+      this.getList(this.page);
     },
     /**
      * @title 打开新增窗口
@@ -561,7 +563,7 @@ export default {
      * 刷新回调
      */
     refreshChange() {
-      this.getList();
+      this.getList(this.page);
     },
     batchStorageApply() {
       if (this.batchStorageList.length > 0) {

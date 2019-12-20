@@ -34,7 +34,7 @@ public interface SimulatorService {
      */
     Map<String,Object> getData(String username, SimulationDTO simulationDTO);
 
-    List<Map<String, Object>> stop(String username, List<String> symbols);
+    Map<String, List<String>> stop(String username, List<String> symbols);
 
     List<String> getDataSource(SimulationDTO simulationDTO);
 

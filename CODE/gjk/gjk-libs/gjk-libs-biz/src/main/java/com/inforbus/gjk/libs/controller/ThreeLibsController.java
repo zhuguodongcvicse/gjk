@@ -23,6 +23,8 @@ import com.inforbus.gjk.libs.api.dto.ThreeLibsFilePathDTO;
 import com.inforbus.gjk.libs.api.entity.Software;
 import com.inforbus.gjk.libs.api.entity.SoftwareDetail;
 import com.inforbus.gjk.libs.api.entity.SoftwareFile;
+import com.inforbus.gjk.libs.service.CommonComponentDetailService;
+import com.inforbus.gjk.libs.service.CommonComponentService;
 import com.inforbus.gjk.libs.service.ThreeLibsService;
 
 import lombok.AllArgsConstructor;
@@ -55,6 +57,7 @@ import javax.servlet.http.HttpServletResponse;
 public class ThreeLibsController {
 
 	private final ThreeLibsService threeLibsService;
+	private final CommonComponentDetailService commonComponentDetailService;
 	private static final String softwarePath = JGitUtil.getLOCAL_REPO_PATH();
 	private static final String defaultEncoding = JGitUtil.getDefaultEncoding();
 
@@ -163,19 +166,19 @@ public class ThreeLibsController {
 	@PostMapping("/readAlgorithmfile")
 	public R fileRead(@RequestBody ThreeLibsFilePathDTO threeLibsFilePathDTO) throws Exception {
 		String fileName = threeLibsFilePathDTO.getFilePathName();
-		//获取文件编码格式
+		// 获取文件编码格式
 		String code = "";
-		if(StringUtils.isEmpty(threeLibsFilePathDTO.getCode())) {
+		if (StringUtils.isEmpty(threeLibsFilePathDTO.getCode())) {
 			code = defaultEncoding;
-		}else {
+		} else {
 			code = threeLibsFilePathDTO.getCode();
 		}
-		if(StringUtils.isEmpty(fileName)) {
+		if (StringUtils.isEmpty(fileName)) {
 			return new R<>();
 		}
 		File isFile = new File(fileName);
-		//获取文件编码格式
-		//获得文件编码
+		// 获取文件编码格式
+		// 获得文件编码
 //		String fileEncode=EncodingDetect.getJavaEncode(filePath);
 //		if(threeLibsFilePathDTO.getEditorCode()!=null) {
 //			code = threeLibsFilePathDTO.getEditorCode();
@@ -240,7 +243,7 @@ public class ThreeLibsController {
 			else {
 				// 获得文件编码
 //				String fileEncode=EncodingDetect.getJavaEncode(fileName);
-				//String encoding = "utf-8";
+				// String encoding = "utf-8";
 				try {
 					str = FileUtils.readFileToString(new File(fileName), code);
 					System.out.println("sss:::" + str);
@@ -249,8 +252,8 @@ public class ThreeLibsController {
 					e.printStackTrace();
 				}
 			}
-			System.out.println("**************************code::::"+code);
-			dto.setTextContext(prefix + "@%#@*+-+@" + str + "@%#@*+-+@" +  code);
+			System.out.println("**************************code::::" + code);
+			dto.setTextContext(prefix + "@%#@*+-+@" + str + "@%#@*+-+@" + code);
 		} else {
 			System.out.println("找不到指定的文件");
 		}
@@ -258,28 +261,28 @@ public class ThreeLibsController {
 
 	}
 
-    public String codeString(String fileName) throws Exception {
-        BufferedInputStream bin = new BufferedInputStream(new FileInputStream(fileName));
-        int p = (bin.read() << 8) + bin.read();
-        bin.close();
-        String code = null;
+	public String codeString(String fileName) throws Exception {
+		BufferedInputStream bin = new BufferedInputStream(new FileInputStream(fileName));
+		int p = (bin.read() << 8) + bin.read();
+		bin.close();
+		String code = null;
 
-        switch (p) {
-        case 298127:
-            code = "UTF-8";
-            break;
-        case 65534:
-            code = "Unicode";
-            break;
-        case 65279:
-            code = "UTF-16BE";
-            break;
-        default:
-            code = "GBK";
-        }
+		switch (p) {
+		case 298127:
+			code = "UTF-8";
+			break;
+		case 65534:
+			code = "Unicode";
+			break;
+		case 65279:
+			code = "UTF-16BE";
+			break;
+		default:
+			code = "GBK";
+		}
 
-        return code;
-    }
+		return code;
+	}
 
 	/**
 	 * 得到平台库的文件夹树
@@ -310,22 +313,23 @@ public class ThreeLibsController {
 	}
 
 	@GetMapping("/getFileStream/{filePath}")
-	public void getFileStream(HttpServletRequest request, HttpServletResponse response,@PathVariable("filePath") String filePath){
+	public void getFileStream(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable("filePath") String filePath) {
 		String replace = filePath.replace("!", "\\");
 		response.setContentType("application/pdf");
 		FileInputStream in = null;
 		OutputStream out = null;
-	  	try {
+		try {
 			in = new FileInputStream(new File(replace));
 			out = response.getOutputStream();
 			byte[] b = new byte[512];
 			while ((in.read(b)) != -1) {
 				out.write(b);
 			}
-	  	} catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
-	  	}finally {
-	  		if(out!=null){
+		} finally {
+			if (out != null) {
 				try {
 					out.flush();
 					out.close();
@@ -333,7 +337,7 @@ public class ThreeLibsController {
 					e.printStackTrace();
 				}
 			}
-			if(in!=null){
+			if (in != null) {
 				try {
 					in.close();
 				} catch (IOException e) {
@@ -341,6 +345,31 @@ public class ThreeLibsController {
 				}
 			}
 		}
+	}
+/**
+ * 根据libsid查询到已入库的表中是否选中三个库
+ * @param platfromId
+ * @return
+ */
+	@PostMapping("/findThreeLibsId/{platformId}")
+	public boolean findThreeLibsId(@PathVariable("platformId") String platformId) {
+		boolean bool = false;
+		if(((threeLibsService.findBSPDetailByPlatformId(platformId)).size()) > 0) {
+			bool = true;
+		}
+		if(((threeLibsService.findSoftwareDetailByPlatformId(platformId)).size()) > 0) {
+			bool = true;
+		}
+		if(((threeLibsService.findComponentDetailByPlatformId(platformId)).size()) > 0) {
+			bool = true;
+		}
+		if(((threeLibsService.findCompframeDetailByPlatformId(platformId)).size()) > 0) {
+			bool = true;
+		}
+		if(((commonComponentDetailService.findCommonComponentDetailByLibsId(platformId)).size()) > 0) {
+			bool = true;
+		}
+		return bool;
 	}
 
 }

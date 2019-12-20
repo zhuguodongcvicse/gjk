@@ -34,6 +34,11 @@ router.beforeEach((to, from, next) => {
     to.meta.$keepAlive = false
     to.meta.keepAlive = false
   }
+  //移除审批的缓存
+  if (to.path.indexOf("/library/ce") !== -1) {
+    to.meta.$keepAlive = false
+    to.meta.keepAlive = false
+  }
   const meta = to.meta || {}
   if (store.getters.access_token) {
     if (to.path === '/login') {
@@ -64,6 +69,10 @@ router.beforeEach((to, from, next) => {
           for (const i in tagListTemp) {
             if (tagListTemp[i].value.indexOf('hardwareAdd') !== -1 && tagListTemp[i].value.indexOf('?') === -1) {
               // console.log("tagListTemp",tagListTemp[i])
+              store.commit("DEL_TAG", tagListTemp[i]);
+            }
+            if (tagListTemp[i].value.indexOf('hardwareUpdate') !== -1 && tagListTemp[i].value.indexOf('?') === -1) {
+              // console.log("tagListTemp",tagListTemp[i])hardwareUpdate
               store.commit("DEL_TAG", tagListTemp[i]);
             }
           }

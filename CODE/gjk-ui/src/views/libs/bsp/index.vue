@@ -27,7 +27,7 @@
           >新 增</el-button>
 
           <el-dialog
-            class=" libs_bsp_index_dialog_14s"
+            class="libs_bsp_index_dialog_14s"
             title="新增BSP库"
             width="40%"
             :visible.sync="dialogTableVisible"
@@ -249,7 +249,7 @@ export default {
     };
   },
   created() {
-    this.getList();
+    this.getList(this.page);
 
     this.getPlatformSelectTree();
   },
@@ -433,8 +433,12 @@ export default {
       });
     },
 
-    getList() {
+    getList(page) {
       this.tableLoading = true;
+      this.listQuery = {
+        current: page.currentPage,
+        size: page.pageSize
+      };
       fetchList(this.listQuery).then(response => {
         this.tableData = response.data.data.records;
         // this.page.total = response.data.data.records.length;
@@ -442,17 +446,13 @@ export default {
         this.tableLoading = false;
       });
     },
-    currentChange(val) {
-      console.log(val);
-      this.page.current = val;
-      this.listQuery.current = val;
-      this.getList();
+    currentChange(currentPage) {
+      this.page.currentPage = currentPage;
+      this.getList(this.page);
     },
-    sizeChange(val) {
-      console.log(val);
-      this.page.size = val;
-      this.listQuery.size = val;
-      this.getList();
+    sizeChange(pageSize) {
+      this.page.pageSize = pageSize;
+      this.getList(this.page);
     },
     /**
      * @title 打开新增窗口
@@ -470,7 +470,7 @@ export default {
     },
     rowDel: function(row, index) {
       var _this = this;
-      this.$confirm("是否确认删除ID为" + row.id + "的记录", "提示", {
+      this.$confirm("是否确认删除" + row.bspName + "的记录", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
@@ -537,7 +537,7 @@ export default {
      * 刷新回调
      */
     refreshChange() {
-      this.getList();
+      this.getList(this.page);
     },
 
     storageApplyDialogState(state) {

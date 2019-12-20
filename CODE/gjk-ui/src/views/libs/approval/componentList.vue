@@ -99,6 +99,7 @@ export default {
     ...mapGetters(["permissions"])
   },
   created() {
+    this.hideVersion()
     this.loading = true;
     this.getList();
     this.loading = false;
@@ -110,6 +111,15 @@ export default {
     }
   },
   methods: {
+    hideVersion(){
+        console.log(1111,this.tableOption.column[4])
+        if(this.batchType=='4'){
+            console.log(222)
+            this.tableOption.column[4].hide=true;
+        }else{
+            this.tableOption.column[4].hide=false;
+        }
+    },
     getList() {
       this.tableLoading = true;
       let page = JSON.parse(JSON.stringify(this.listQuery));

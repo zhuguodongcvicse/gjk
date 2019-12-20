@@ -78,4 +78,10 @@ public interface CommonComponentDetailService extends IService<CommonComponentDe
 	 * @return 
 	 */
 	List<CommCompDetailVO> getCommCompViewTree(CommonComponent comp);
+	/**
+	 * 根据libsid查询到已入库的表中是否选中三个库
+	 * @param libsId
+	 * @return
+	 */
+	List<CommonComponentDetail> findCommonComponentDetailByLibsId(String libsId);
 }

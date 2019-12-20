@@ -16,13 +16,17 @@
  */
 package com.inforbus.gjk.libs.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.inforbus.gjk.admin.api.entity.ComponentDetail;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
+import com.inforbus.gjk.libs.api.entity.BSPDetail;
 import com.inforbus.gjk.libs.api.entity.Software;
 import com.inforbus.gjk.libs.api.entity.SoftwareDetail;
 import com.inforbus.gjk.libs.api.entity.SoftwareFile;
 import com.inforbus.gjk.libs.api.entity.ThreeLibs;
 import com.inforbus.gjk.libs.mapper.ThreeLibsMapper;
+import com.inforbus.gjk.libs.service.HardwarelibChipService;
 import com.inforbus.gjk.libs.service.ThreeLibsService;
 
 import java.io.File;
@@ -110,10 +114,10 @@ public class ThreeLibsServiceImpl extends ServiceImpl<ThreeLibsMapper, ThreeLibs
 		return baseMapper.getSoftwareFile();
 	}
 
-	//文本编辑器的
+	// 文本编辑器的
 	public void saveFileContext(String filePath, String textContext) {
 //	 public static void main(String[] args) {
-		String fileName =filePath;
+		String fileName = filePath;
 //		 String fileName = softwarePath +"soft\\func2.h";
 		File file = new File(fileName);
 		OutputStream outputStream = null;
@@ -150,6 +154,31 @@ public class ThreeLibsServiceImpl extends ServiceImpl<ThreeLibsMapper, ThreeLibs
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * 删除三个库的时候，如果关联了构件、bsp、软甲框架等文件，不能被删除 根据各个模块用到的三个库的id来查询数据
+	 * 
+	 * @return
+	 */
+	@Override
+	public List<Map<String, String>> findBSPDetailByPlatformId(String platformId) {
+		return baseMapper.findBSPDetailByPlatformId(platformId);
+	}
+
+	@Override
+	public List<Map<String, String>> findSoftwareDetailByPlatformId(String platformId) {
+		return baseMapper.findSoftwareDetailByPlatformId(platformId);
+	}
+
+	@Override
+	public List<Map<String, String>> findCompframeDetailByPlatformId(String platformId) {
+		return baseMapper.findCompframeDetailByPlatformId(platformId);
+	}
+
+	@Override
+	public List<ComponentDetail> findComponentDetailByPlatformId(String platformId) {
+		return baseMapper.findComponentDetailByPlatformId(platformId);
 	}
 
 }

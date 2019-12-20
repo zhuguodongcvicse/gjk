@@ -1,38 +1,46 @@
 <template>
   <div class="app-container pull-auto libs_project_index_14s">
     <basic-container>
-      <avue-crud ref="crud"
-                 :page="page"
-                 :data="tableData"
-                 :table-loading="tableLoading"
-                 :option="tableOption"
-                 menu=false
-                 @current-change="currentChange"
-                 @refresh-change="refreshChange"
-                 @size-change="sizeChange"
-                 @row-update="handleUpdate"
-                 @row-save="handleSave"
-                 @row-del="rowDel">
-         <template slot="menuLeft">
-          <el-button type="primary"
-                     @click="handleAdd"
-                     size="small"
-                     icon="el-icon-plus"
-                     v-if="permissions.libs_project_add">新 增</el-button> 
-           <br /><br />
-        </template> 
-        <template slot-scope="scope"
-                  slot="menu">
-          <el-button type="primary"
-                     v-if="permissions.libs_project_edit"
-                     size="small"
-                     plain
-                     @click="handleEdit(scope.row,scope.index)">编辑</el-button>
-          <el-button type="danger"
-                     v-if="permissions.libs_project_del"
-                     size="small"
-                     plain
-                     @click="handleDel(scope.row,scope.index)">删除</el-button>
+      <avue-crud
+        ref="crud"
+        :page="page"
+        :data="tableData"
+        :table-loading="tableLoading"
+        :option="tableOption"
+        menu="false"
+        @current-change="currentChange"
+        @refresh-change="refreshChange"
+        @size-change="sizeChange"
+        @row-update="handleUpdate"
+        @row-save="handleSave"
+        @row-del="rowDel"
+      >
+        <template slot="menuLeft">
+          <el-button
+            type="primary"
+            @click="handleAdd"
+            size="small"
+            icon="el-icon-plus"
+            v-if="permissions.libs_project_add"
+          >新 增</el-button>
+          <br />
+          <br />
+        </template>
+        <template slot-scope="scope" slot="menu">
+          <el-button
+            type="primary"
+            v-if="permissions.libs_project_edit"
+            size="small"
+            plain
+            @click="handleEdit(scope.row,scope.index)"
+          >编辑</el-button>
+          <el-button
+            type="danger"
+            v-if="permissions.libs_project_del"
+            size="small"
+            plain
+            @click="handleDel(scope.row,scope.index)"
+          >删除</el-button>
         </template>
       </avue-crud>
     </basic-container>
@@ -40,52 +48,54 @@
 </template>
 
 <script>
-  import { fetchList, getObj, addObj, putObj, delObj } from '@/api/libs/project'
-  import { tableOption } from '@/const/crud/libs/project'
-  import { mapGetters } from 'vuex'
-  export default {
-    name: 'project',
-    data() {
-      return {
-        tableData: [],
-        page: {
-          total: 0, // 总页数
-          currentPage: 1, // 当前页数
-          pageSize: 20 // 每页显示多少条
-        },
-        listQuery: {
-          current: 1,
-          size: 20
-        },
-        tableLoading: false,
-        tableOption: tableOption
-      }
-    },
-    created() {
-      this.getList()
-    },
-    mounted: function() { },
-    computed: {
-      ...mapGetters(['permissions'])
+import { fetchList, getObj, addObj, putObj, delObj } from "@/api/libs/project";
+import { tableOption } from "@/const/crud/libs/project";
+import { mapGetters } from "vuex";
+export default {
+  name: "project",
+  data() {
+    return {
+      tableData: [],
+      page: {
+        total: 0, // 总页数
+        currentPage: 1, // 当前页数
+        pageSize: 20 // 每页显示多少条
+      },
+      listQuery: {
+        current: 1,
+        size: 20
+      },
+      tableLoading: false,
+      tableOption: tableOption
+    };
+  },
+  created() {
+    this.getList(this.page);
+  },
+  mounted: function() {},
+  computed: {
+    ...mapGetters(["permissions"])
   },
   methods: {
-    getList() {
-      this.tableLoading = true
+    getList(page) {
+      this.tableLoading = true;
+      this.listQuery = {
+        current: page.currentPage,
+        size: page.pageSize
+      };
       fetchList(this.listQuery).then(response => {
-        this.tableData = response.data.data.records
-        this.page.total = response.data.data.total
-        this.tableLoading = false
-    })
+        this.tableData = response.data.data.records;
+        this.page.total = response.data.data.total;
+        this.tableLoading = false;
+      });
     },
-    currentChange(val) {
-      this.page.current = val
-      this.listQuery.current = val
-      this.getList()
+    currentChange(currentPage) {
+      this.page.currentPage = currentPage;
+      this.getList(this.page);
     },
-    sizeChange(val) {
-      this.page.size = val
-      this.listQuery.size = val
-      this.getList()
+    sizeChange(pageSize) {
+      this.page.pageSize = pageSize;
+      this.getList(this.page);
     },
     /**
      * @title 打开新增窗口
@@ -93,33 +103,33 @@
      *
      **/
     handleAdd: function() {
-      this.$refs.crud.rowAdd()
+      this.$refs.crud.rowAdd();
     },
     handleEdit(row, index) {
-      this.$refs.crud.rowEdit(row, index)
+      this.$refs.crud.rowEdit(row, index);
     },
     handleDel(row, index) {
-      this.$refs.crud.rowDel(row, index)
+      this.$refs.crud.rowDel(row, index);
     },
     rowDel: function(row, index) {
-      var _this = this
-      this.$confirm('是否确认删除ID为' + row.id + '的记录', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+      var _this = this;
+      this.$confirm("是否确认删除ID为" + row.id + "的记录", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
       })
         .then(function() {
-          return delObj(row.id)
+          return delObj(row.id);
         })
         .then(data => {
-        _this.tableData.splice(index, 1)
-      _this.$message({
-        showClose: true,
-        message: '删除成功',
-        type: 'success'
-      })
-    })
-    .catch(function(err) { })
+          _this.tableData.splice(index, 1);
+          _this.$message({
+            showClose: true,
+            message: "删除成功",
+            type: "success"
+          });
+        })
+        .catch(function(err) {});
     },
     /**
      * @title 数据更新
@@ -130,14 +140,14 @@
      **/
     handleUpdate: function(row, index, done) {
       putObj(row).then(data => {
-        this.tableData.splice(index, 1, Object.assign({}, row))
-      this.$message({
-        showClose: true,
-        message: '修改成功',
-        type: 'success'
-      })
-      done()
-    })
+        this.tableData.splice(index, 1, Object.assign({}, row));
+        this.$message({
+          showClose: true,
+          message: "修改成功",
+          type: "success"
+        });
+        done();
+      });
     },
     /**
      * @title 数据添加
@@ -147,23 +157,23 @@
      **/
     handleSave: function(row, done) {
       addObj(row).then(data => {
-        this.tableData.push(Object.assign({}, row))
-      this.$message({
-        showClose: true,
-        message: '添加成功',
-        type: 'success'
-      })
-      done()
-    })
+        this.tableData.push(Object.assign({}, row));
+        this.$message({
+          showClose: true,
+          message: "添加成功",
+          type: "success"
+        });
+        done();
+      });
     },
     /**
      * 刷新回调
      */
     refreshChange() {
-      this.getList()
+      this.getList(this.page);
     }
   }
-  }
+};
 </script>
 
 <style lang="scss" scoped>
