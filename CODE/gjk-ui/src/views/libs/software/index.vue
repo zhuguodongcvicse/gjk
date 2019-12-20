@@ -165,6 +165,7 @@ import { fetchPlatformTrees } from "@/api/admin/platform";
 import Vue from "vue";
 import uploader from "vue-simple-uploader";
 import storageApply from "@/views/libs/software/storageApply";
+import { deepClone } from "../../../util/util";
 export default {
   name: "software",
   //刷新
@@ -242,7 +243,7 @@ export default {
     };
   },
   created() {
-    this.getList();
+    this.getList(this.page);
 
     this.getPlatformSelectTree();
   },
@@ -431,26 +432,27 @@ export default {
       });
     },
 
-    getList() {
+    getList(page) {
       this.tableLoading = true;
+      this.listQuery = {
+        current: page.currentPage,
+        size: page.pageSize
+      };
       fetchList(this.listQuery).then(response => {
         this.tableData = response.data.data.records;
         // this.page.total = response.data.data.records.length;
         this.page.total = response.data.data.total;
+        console.lo;
         this.tableLoading = false;
       });
     },
-    currentChange(val) {
-      console.log(val);
-      this.page.current = val;
-      this.listQuery.current = val;
-      this.getList();
+    currentChange(currentPage) {
+      this.page.currentPage = currentPage;
+      this.getList(this.page);
     },
-    sizeChange(val) {
-      console.log(val);
-      this.page.size = val;
-      this.listQuery.size = val;
-      this.getList();
+    sizeChange(pageSize) {
+      this.page.pageSize = pageSize;
+      this.getList(this.page);
     },
     /**
      * @title 打开新增窗口
@@ -536,7 +538,7 @@ export default {
      * 刷新回调
      */
     refreshChange() {
-      this.getList();
+      this.getList(this.page);
     },
 
     storageApplyDialogState(state) {

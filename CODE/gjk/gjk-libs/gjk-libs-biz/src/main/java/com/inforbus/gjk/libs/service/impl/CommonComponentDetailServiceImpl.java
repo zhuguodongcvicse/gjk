@@ -75,7 +75,8 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 	public boolean saveCommonCompDetailList(List<CommonComponentDetail> commonComponentDetailList,
 			CommonComponent component, String userCurrent) {
 		try {
-			// 格式：gjk/common/component/构件名/构件版本/ createTime.replaceAll("[[\\s-T:punct:]]", "") 
+			// 格式：gjk/common/component/构件名/构件版本/ createTime.replaceAll("[[\\s-T:punct:]]",
+			// "")
 			String compPath = "gjk" + File.separator + "common" + File.separator + "component" + File.separator
 					+ component.getCompId() + File.separator + component.getVersion() + File.separator;
 			String subStr = null;
@@ -227,5 +228,14 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 		}
 		return tree;
 	}
+/**
+ * 根据libsid查询到已入库的表中是否选中三个库
+ * @param libsId
+ * @return
+ */
+	public List<CommonComponentDetail> findCommonComponentDetailByLibsId(String libsId) {
+		return baseMapper.selectList(
+				Wrappers.<CommonComponentDetail>query().lambda().eq(CommonComponentDetail::getLibsId, libsId));
 
+	}
 }

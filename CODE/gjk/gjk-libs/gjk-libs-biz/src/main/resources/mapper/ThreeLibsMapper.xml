@@ -26,7 +26,7 @@
 		<result property="paraentIds" column="paraent_ids" />
 		<result property="libsId" column="libs_id" />
 	</resultMap>
-	
+
 	<resultMap id="softwareMap"
 		type="com.inforbus.gjk.libs.api.entity.Software">
 		<id property="id" column="id" />
@@ -39,18 +39,24 @@
 		<result property="description" column="description" />
 		<result property="delFlag" column="del_flag" />
 	</resultMap>
-	
+
 	<resultMap id="softwareDetailMap"
 		type="com.inforbus.gjk.libs.api.entity.SoftwareDetail">
-		<id property="software_id" column="softwareId" />
-		<result property="platformId" column="platformId" />
+		<id property="softwareId" column="software_id" />
+		<result property="platformId" column="platform_id" />
 	</resultMap>
-	
+	<resultMap id="bspDetailMap"
+		type="com.inforbus.gjk.libs.api.entity.BSPDetail">
+		<id property="bspId" column="bsp_id" />
+		<result property="platformId" column="platform_id" />
+	</resultMap>
+
+
 	<resultMap id="softwareFileMap"
 		type="com.inforbus.gjk.libs.api.entity.SoftwareFile">
-		<id property="software_id" column="softwareId" />
-		<result property="file_name" column="fileName" />
-		<result property="file_path" column="filePath" />
+		<id property="softwareId" column="software_id" />
+		<result property="fileName" column="file_name" />
+		<result property="filePath" column="file_path" />
 	</resultMap>
 
 	<sql id="compDetailSql">
@@ -139,22 +145,54 @@
 		gjk_component_detail
 		WHERE id= #{id}
 	</select>
-	
+
 	<!-- 获取软件框架库的主表信息 -->
 	<select id="getSoftware" resultMap="softwareMap">
 		SELECT * FROM gjk_software
-		s WHERE s.id IN (SELECT b.software_id FROM gjk_software_detail b)
+		s
+		WHERE s.id IN (SELECT b.software_id FROM gjk_software_detail b)
 	</select>
-	
+
 	<!-- 获取软件框架库平台id的副表信息 -->
 	<select id="getSoftwarePlatform" resultMap="softwareMap">
-		SELECT * FROM gjk_software_detail
-		s WHERE s.software_id IN (SELECT b.id FROM gjk_software b)
+		SELECT * FROM
+		gjk_software_detail
+		s WHERE s.software_id IN (SELECT b.id FROM
+		gjk_software b)
 	</select>
-	
+
 	<!-- 获取软件框架库文件夹的副表信息 -->
 	<select id="getSoftwareFile" resultMap="softwareMap">
-		SELECT * FROM gjk_software_file
-		s WHERE s.software_id IN (SELECT b.id FROM gjk_software b)
+		SELECT * FROM
+		gjk_software_file
+		s WHERE s.software_id IN (SELECT b.id FROM
+		gjk_software b)
+	</select>
+
+	<!-- 根据libsid查询到已入库的表中是否选中三个库 -->
+	<select id="findBSPDetailByPlatformId" resultType="map">
+		SELECT * FROM
+		gjk_bsp_detail
+		WHERE platform_id = #{platformId}
+	</select>
+	<!-- 根据libsid查询到已入库的表中是否选中三个库 -->
+	<select id="findSoftwareDetailByPlatformId"
+		resultType="map">
+		SELECT * FROM gjk_software_detail
+		WHERE platform_id =
+		#{platformId}
+	</select>
+	<!-- 根据libsid查询到已入库的表中是否选中三个库 -->
+	<select id="findCompframeDetailByPlatformId" resultType="map">
+		SELECT *
+		FROM gjk_compframe_platform
+		WHERE platform_id = #{platformId}
+	</select>
+	<!-- 根据libsid查询到已入库的表中是否选中三个库 -->
+	<select id="findComponentDetailByPlatformId"
+		resultMap="componentDetailMap">
+		SELECT * FROM gjk_component_detail d
+		LEFT JOIN gjk_component c ON c.id=d.comp_id WHERE libs_id
+		=#{platformId} AND c.del_flag='0'
 	</select>
 </mapper>
