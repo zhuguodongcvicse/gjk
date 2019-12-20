@@ -19,6 +19,7 @@
             type="primary"
             @click="innerVisible = true"
             size="small"
+            icon="el-icon-plus"
             v-if="permissions.libs_compframe_add"
           >新 增</el-button>
           <br />
@@ -97,7 +98,7 @@ export default {
     };
   },
   created() {
-    this.getList();
+    this.getList(this.page);
   },
   mounted: function() {},
   computed: {
@@ -107,7 +108,7 @@ export default {
     innerVisible: {
       handler: function(isData) {
         if (!isData) {
-          this.getList();
+          this.getList(this.page);
           this.reload();
         }
       },
@@ -116,7 +117,7 @@ export default {
     addframeVisible: {
       handler: function(isData) {
         if (!isData) {
-          this.getList();
+          this.getList(this.page);
           this.reload();
         }
       },
@@ -124,23 +125,25 @@ export default {
     }
   },
   methods: {
-    getList() {
+    getList(page) {
       this.tableLoading = true;
+      this.listQuery = {
+        current: page.currentPage,
+        size: page.pageSize
+      };
       fetchList(this.listQuery).then(response => {
         this.tableData = response.data.data.records;
         this.page.total = response.data.data.total;
         this.tableLoading = false;
       });
     },
-    currentChange(val) {
-      this.page.current = val;
-      this.listQuery.current = val;
-      this.getList();
+    currentChange(currentPage) {
+      this.page.currentPage = currentPage;
+      this.getList(this.page);
     },
-    sizeChange(val) {
-      this.page.size = val;
-      this.listQuery.size = val;
-      this.getList();
+    sizeChange(pageSize) {
+      this.page.pageSize = pageSize;
+      this.getList(this.page);
     },
     /**
      * @title 打开新增窗口
@@ -158,7 +161,7 @@ export default {
     },
     rowDel: function(row, index) {
       var _this = this;
-      this.$confirm("是否确认 " + row.name + " 的记录？", "提示", {
+      this.$confirm("是否确认删除 " + row.name + " 的记录？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
@@ -215,7 +218,7 @@ export default {
      * 刷新回调
      */
     refreshChange() {
-      this.getList();
+      this.getList(this.page);
     },
     compFrameApplysClick(param) {
       this.$refs.applysData.fetchTreeDataLoading(param);

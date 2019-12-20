@@ -33,7 +33,7 @@ export const tableOption = {
     //   prop: 'id'
     // },
     {
-      label: '软件框架名',
+      label: '软件框架库名',
       prop: 'softwareName'
     },
 	  {

@@ -39,16 +39,12 @@ import {
   getHardwarelibs,
   deleteHardwarelibById
 } from "@/api/pro/project";
-import { getCaseData } from "@/api/libs/hardwarelibcase";
-import property from "@/views/pro/hardware/property";
 import { mapGetters } from "vuex";
 import NProgress from "nprogress"; // progress bar
 import "nprogress/nprogress.css"; // progress bar style
-import { saveProcessModel } from "@/api/pro/project";
 export default {
   //import引入的组件需要注入到对象中才能使用
   components: {
-    property
   },
   data() {
     return {

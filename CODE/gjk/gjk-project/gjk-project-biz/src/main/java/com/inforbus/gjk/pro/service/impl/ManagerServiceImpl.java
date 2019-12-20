@@ -1318,7 +1318,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 //		String projectId = (String) allIdByHardwarelibId.get("projectId");
 //		ProjectFile projectFile = (ProjectFile) allIdByHardwarelibId.get("projectFile");
 		int i = baseMapper.updateHardwarelib(hardwarelibs);
-//		System.out.println("------------------------------------>  " + i);
+		System.out.println("------------------------------------>  " + i);
 		return i;
 	}
 

@@ -14,7 +14,13 @@
             size="small"
             @click="bottonCheckComp = !bottonCheckComp"
           >{{bottonCheckComp?'检查更新':'还原'}}</el-button>
-          <el-button type="primary" plain size="small" @click="sendMessage('completeCheck')">完备性检查</el-button>
+          <!-- <el-button type="primary" plain size="small" @click="sendMessage('completeCheck')">完备性检查</el-button> -->
+           <el-button
+            type="primary"
+            plain
+            size="small"
+            @click="completeCheck = !completeCheck"
+          >{{completeCheck?'完备性检查':'还原'}}</el-button>
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('loading')">加载</el-button> -->
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('simulation')">仿真</el-button> -->
            <el-button type="primary" plain size="small" @click="sendMessage('startSimulation')">开始仿真</el-button>
@@ -183,6 +189,7 @@ export default {
       dialogNext: "",
       flowFilePath: "" ,//流程建模文件路径
       simulationData :[], //存放仿真数据
+      completeCheck:true
     };
   },
   //监听属性 类似于data概念
@@ -217,6 +224,7 @@ export default {
         }
       }
     },
+    //检查更新
     bottonCheckComp: {
       handler: function() {
         console.log(this.bottonCheckComp)
@@ -249,6 +257,26 @@ export default {
         }
        
       }
+    },
+    //完备性检查
+    completeCheck:{
+       handler: function() {
+         if(!this.completeCheck){
+           console.log("完备性检查状态",this.completeCheck)
+           completeCheck(this.$route.query.processId,this.$store.getters.access_token).then(res => {
+           //console.log("返回数据", res.data.data);
+           this.postMessageData.cmd = "completeCheck";
+           this.postMessageData.params = res.data.data;
+           this.postMessageData.state = this.completeCheck
+           this.$refs.gjkIframe.sendMessage(this.postMessageData);
+          });
+         }else{
+           this.postMessageData.cmd = "completeCheck";
+           this.postMessageData.params = "";
+           this.postMessageData.state = this.completeCheck
+           this.$refs.gjkIframe.sendMessage(this.postMessageData);
+         }
+       }
     },
     /* 监听iframeParams数据 */
     iframeParams: {
@@ -572,14 +600,16 @@ export default {
         this.postMessageData.params = "save";
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
         //exportFile(this.$route.query.processId);
-      } else if (state === "completeCheck") {
-        completeCheck(this.$route.query.processId,this.$store.getters.access_token).then(res => {
-          //console.log("返回数据", res.data.data);
-          this.postMessageData.cmd = "completeCheck";
-          this.postMessageData.params = res.data.data;
-          this.$refs.gjkIframe.sendMessage(this.postMessageData);
-        });
-      } else if(state === "startSimulation"){  //开始仿真
+      } 
+      // else if (state === "completeCheck") {
+      //   completeCheck(this.$route.query.processId,this.$store.getters.access_token).then(res => {
+      //     //console.log("返回数据", res.data.data);
+      //     this.postMessageData.cmd = "completeCheck";
+      //     this.postMessageData.params = res.data.data;
+      //     this.$refs.gjkIframe.sendMessage(this.postMessageData);
+      //   });
+      // } 
+      else if(state === "startSimulation"){  //开始仿真
         this.postMessageData.cmd = "startSimulation";
         this.postMessageData.params = "";
         this.$refs.gjkIframe.sendMessage(this.postMessageData);

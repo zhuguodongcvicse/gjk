@@ -97,3 +97,10 @@ export function getFileStream (query) {
     data: query
   })
 }
+
+export function findThreeLibsId (platfromId) {
+  return request({
+    url: '/libs/threelibs/findThreeLibsId/' + platfromId ,
+    method: 'post',
+  })
+}

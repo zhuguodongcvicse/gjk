@@ -83,6 +83,7 @@ import {
   getObj,
   putObj
 } from "@/api/admin/algorithm";
+import { findThreeLibsId } from "@/api/libs/threelibs";
 import { mapGetters } from "vuex";
 import importLibs from "@/views/admin/test/importLibs";
 import exportLibs from "@/views/admin/test/exportLibs";
@@ -268,6 +269,9 @@ export default {
           cancelButtonText: "取消",
           type: "warning"
         }).then(() => {
+          findThreeLibsId(this.currentId).then(res => {
+          if (!res.data) {
+            //让删
           delObj(this.currentId).then(() => {
             this.getList();
             this.resetForm();
@@ -280,6 +284,14 @@ export default {
             });
             this.reload();
           });
+          } else {
+              this.$message({
+                showClose: true,
+                message: "该节点已被构件使用，禁止删除！！！",
+                type: "error"
+              });
+            }
+        });
         });
       }
     },

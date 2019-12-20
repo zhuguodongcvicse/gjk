@@ -51,14 +51,12 @@
         createXmlEntityMap
     } from "@/util/createXmlWithhardwarelib";
     import {getCaseData} from "@/api/libs/hardwarelibcase";
-    import property from "@/views/pro/hardware/property";
     import {mapGetters} from "vuex";
     import NProgress from "nprogress"; // progress bar
     import "nprogress/nprogress.css"; // progress bar style
     export default {
         //import引入的组件需要注入到对象中才能使用
         components: {
-            property
         },
         beforeRouteLeave(to, from, next) {
             if (this.ifSave == 0) {
@@ -131,10 +129,11 @@
             // 接受子页面发来的信息
             handleMessage(event) {
                 // console.log("event.data", event.data);
+                // console.log("this.params", this.params);
                 if (typeof this.params === "string") {
                     return;
                 }
-                this.params.id = this.$route.query.id
+                // this.params.id = this.$route.query.id
                 if (this.params.id !== this.$route.query.id) {
                     return;
                 }
@@ -197,6 +196,8 @@
                             });
                             deleteChipsFromHardwarelibs(this.params.id).then(res => {
                                 // console.log("res", res);
+                                var tag1 = this.tag;
+                                menuTag(this.$route.path, "remove", this.tagList, tag1);
                             });
                         }
                         break;

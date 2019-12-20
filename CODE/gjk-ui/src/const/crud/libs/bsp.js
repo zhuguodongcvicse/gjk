@@ -33,7 +33,7 @@ export const tableOption = {
     //   prop: 'id'
     // },
     {
-      label: 'BSP文件名',
+      label: 'BSP库名',
       prop: 'bspName'
     },
 	  {
