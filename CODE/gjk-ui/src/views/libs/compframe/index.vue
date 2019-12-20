@@ -19,6 +19,7 @@
             type="primary"
             @click="innerVisible = true"
             size="small"
+            icon="el-icon-plus"
             v-if="permissions.libs_compframe_add"
           >新 增</el-button>
           <br />
@@ -160,7 +161,7 @@ export default {
     },
     rowDel: function(row, index) {
       var _this = this;
-      this.$confirm("是否确认 " + row.name + " 的记录？", "提示", {
+      this.$confirm("是否确认删除 " + row.name + " 的记录？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"

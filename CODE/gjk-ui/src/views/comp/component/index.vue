@@ -19,7 +19,7 @@
         <template slot="menuLeft">
           <el-button
             type="primary"
-            icon="el-icon-edit el-icon--left"
+            icon="el-icon-plus"
             size="small"
             @click="goToAddCompPage()"
           >新增</el-button>

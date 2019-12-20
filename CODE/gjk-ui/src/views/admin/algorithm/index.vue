@@ -287,7 +287,7 @@ export default {
           } else {
               this.$message({
                 showClose: true,
-                message: "该节点已被构件\BSP\软件框架库使用，禁止删除！！！",
+                message: "该节点已被构件使用，禁止删除！！！",
                 type: "error"
               });
             }
