@@ -254,7 +254,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 *      java.lang.String, java.lang.String)
 	 */
 	@Override
-	public String createXmlFile(XmlEntityMap entity, String proDetailId) {
+	public synchronized String createXmlFile(XmlEntityMap entity, String proDetailId) {
 		ProjectFile projectFile = this.getById(proDetailId);
 		String filePath = null;
 		if (projectFile != null) {
@@ -1190,13 +1190,13 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				flowFilePath = proDetailPath + proFile.getFilePath() + proFile.getFileName() + ".xml";
 			}
 		}
-		String newFilePath = filePath + "新xml文件/";
+		String newFilePath = filePath + "TopicConfig/";
 		File newFile = new File(newFilePath);
 		if (!newFile.exists()) {
 			newFile.mkdirs();
 		}
-		ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName, newFilePath + "xxx.xml");
-		baseMapper.saveNewFilePath(newFilePath + "xxx.xml", proDetailId);
+		ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName, newFilePath + "UserDefineTopicFile.xml");
+		baseMapper.saveNewFilePath(newFilePath + "UserDefineTopicFile.xml", proDetailId);
 
 		JGitUtil.commitAndPush(filePath + fileName, "上传构件相关文件");
 		return flag;
@@ -1243,16 +1243,23 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	public Hardwarelibs getHardwarelibs(String id) {
 		ProjectFile projectFile = this.getById(id);
 		String modelId = projectFile.getParentId();
-		Hardwarelibs hardwarelib = baseMapper.getHardwarelibs(modelId);
+		ProjectFile modelFile = this.getById(modelId);
+		String flowId = modelFile.getParentId();
+		Hardwarelibs hardwarelib = baseMapper.getHardwarelibs(flowId);
 		return hardwarelib;
 	}
 
 	@Override
-	public void saveHardwarelibs(Hardwarelibs hardwarelibs) {
+	public synchronized int saveHardwarelibs(Hardwarelibs hardwarelibs) {
 		Map allIdByHardwarelibId = getAllIdByHardwarelibId(hardwarelibs);
 		String modelId = (String) allIdByHardwarelibId.get("modelId");
 		String flowId = (String) allIdByHardwarelibId.get("flowId");
 		String projectId = (String) allIdByHardwarelibId.get("projectId");
+		Hardwarelibs hardwarelib = baseMapper.getHardwarelibs(flowId);
+//		System.out.println("hardwarelib-------------------------->: " + hardwarelib);
+		if (hardwarelib != null) {
+			return 0;
+		}
 		// String projectFile = (String) allIdByHardwarelibId.get("projectFile");
 		/*
 		 * ProjectFile projectFile = this.getById(hardwarelibs.getId()); String modelId
@@ -1260,11 +1267,14 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		 * String flowId = modelFile.getParentId();
 		 */
 		// hardwarelibs.setId(projectFile.getId());
+		hardwarelibs.setVersion(0);
 		hardwarelibs.setFlowId(flowId);
 		hardwarelibs.setProjectId(projectId);
 		hardwarelibs.setModelId(modelId);
+//		System.out.println("flowId----------------------------> " + flowId);
 		// System.out.println(hardwarelibs);
-		baseMapper.saveHardwarelibs(hardwarelibs);
+		int row = baseMapper.saveHardwarelibs(hardwarelibs);
+		return row;
 	}
 
 	public Map getAllIdByHardwarelibId(Hardwarelibs hardwarelibs) {
@@ -1290,17 +1300,15 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	}
 
 	@Override
-	public void updateHardwarelib(Hardwarelibs hardwarelibs) {
-		Map allIdByHardwarelibId = getAllIdByHardwarelibId(hardwarelibs);
-		String modelId = (String) allIdByHardwarelibId.get("modelId");
-		String flowId = (String) allIdByHardwarelibId.get("flowId");
-		String projectId = (String) allIdByHardwarelibId.get("projectId");
-		ProjectFile projectFile = (ProjectFile) allIdByHardwarelibId.get("projectFile");
-		System.out.println("modelId" + modelId);
-		System.out.println("flowId" + flowId);
-		System.out.println("projectFile" + projectFile);
-		System.out.println("projectId" + projectId);
-		baseMapper.updateHardwarelib(hardwarelibs);
+	public synchronized int updateHardwarelib(Hardwarelibs hardwarelibs) {
+//		Map allIdByHardwarelibId = getAllIdByHardwarelibId(hardwarelibs);
+//		String modelId = (String) allIdByHardwarelibId.get("modelId");
+//		String flowId = (String) allIdByHardwarelibId.get("flowId");
+//		String projectId = (String) allIdByHardwarelibId.get("projectId");
+//		ProjectFile projectFile = (ProjectFile) allIdByHardwarelibId.get("projectFile");
+		int i = baseMapper.updateHardwarelib(hardwarelibs);
+		System.out.println("------------------------------------>  " + i);
+		return i;
 	}
 
 	@Override
@@ -1468,19 +1476,25 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	}
 
 	@Override
-	public void saveChipsfromhardwarelibs(Chipsfromhardwarelibs chipsfromhardwarelibs) {
+	public synchronized int saveChipsfromhardwarelibs(Chipsfromhardwarelibs chipsfromhardwarelibs) {
+//		System.out.println("chipsfromhardwarelibs------------------------> " + chipsfromhardwarelibs);
+		if (chipsfromhardwarelibs.getId() == null) {
+			return 0;
+		}
 		ProjectFile projectFile = this.getById(chipsfromhardwarelibs.getId());
 		String modelId = projectFile.getParentId();
-		Chipsfromhardwarelibs chips = baseMapper.getChipsById(modelId);
+		ProjectFile modelFile = this.getById(modelId);
+		String flowId = modelFile.getParentId();
+		Chipsfromhardwarelibs chips = baseMapper.getChipsByFlowId(flowId);
 		if (chips != null) {
 			baseMapper.updateChipsfromhardwarelibs(chipsfromhardwarelibs);
+			return 2;
 		} else {
-			ProjectFile modelFile = this.getById((modelId));
-			String flowId = modelFile.getParentId();
 			chipsfromhardwarelibs.setFlowId(flowId);
 			chipsfromhardwarelibs.setModelId(modelId);
 			chipsfromhardwarelibs.setProjectId(projectFile.getProjectId());
 			baseMapper.saveChipsfromhardwarelibs(chipsfromhardwarelibs);
+			return 1;
 		}
 	}
 
@@ -1488,13 +1502,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	public Chipsfromhardwarelibs getChipsfromhardwarelibs(String id) {
 		ProjectFile projectFile = this.getById(id);
 		String modelId = projectFile.getParentId();
-		Chipsfromhardwarelibs chips = baseMapper.getChipsById(modelId);
-		/*
-		 * List<ChildrenNodes> childrenNodes = baseMapper.getAllChildrenNodes(modelId);
-		 * Chipsfromhardwarelibs chips = null; for (ChildrenNodes childrenNode :
-		 * childrenNodes) { if ("硬件建模".equals(childrenNode.getFileName())){ chips =
-		 * baseMapper.getChipsById(childrenNode.getId()); break; } }
-		 */
+		ProjectFile modelFile = this.getById(modelId);
+		String flowId = modelFile.getParentId();
+		Chipsfromhardwarelibs chips = baseMapper.getChipsByFlowId(flowId);
 		return chips;
 	}
 
@@ -1538,7 +1548,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				break;
 			}
 		}
-		String userDefineTopicFilePath = local_REPO_PATH + Path + "新xml文件/xxx.xml";
+		String userDefineTopicFilePath = local_REPO_PATH + Path + "TopicConfig/UserDefineTopicFile.xml";
 
 		return userDefineTopicFilePath;
 	}

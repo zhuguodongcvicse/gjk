@@ -279,7 +279,9 @@ export default {
                           })
                       }
                       if(this.dataStreamData.length > 0){
-                          this.$refs.tree.setCurrentKey(this.dataStreamData['0'].id);
+                          this.$nextTick(function(){
+                              this.$refs.tree.setCurrentKey(this.dataStreamData['0'].id);
+                          })
                           this.currDataStreamId = this.dataStreamData['0'].id
 
                           for(let item of this.dataStreamParamData){

@@ -210,8 +210,8 @@ export default {
     },
     onFailed: function(frame) {
       // console.log("Failed: " + frame);
-      this.client = Stomp.client(MQTT_SERVICE)
-      this.connect();
+      //this.client = Stomp.client(MQTT_SERVICE)
+      //this.connect();
         /* this.$message({
              message: 'MQ连接失败,请确认是否开启MQ服务或者刷新页面',
              type: 'warning'

@@ -179,28 +179,7 @@
                 }
             },
             openTag(item) {
-                //直接点击标签跳到路由则关闭以下路由标签
-                /* if (item.$parent != null) {
-                  var closeLastTag = item.$parent.$children;
-                  for (const i in closeLastTag) {
-                    if (closeLastTag[i].label == "芯片设计" || closeLastTag[i].label == "芯片编辑" || closeLastTag[i].label == "板卡设计"
-                     || closeLastTag[i].label == "板卡编辑" || closeLastTag[i].label == "机箱设计" || closeLastTag[i].label == "机箱编辑"
-                     || closeLastTag[i].label == "硬件模型新增"|| closeLastTag[i].label == "硬件模型编辑") {
-                      let aa = this.findTag(closeLastTag[i].name);
-                      this.$store.commit("DEL_TAG", aa.tag);
-                    }
-                  }
-                } */
-                // if (item.$options !== undefined && item.$options.propsData.label !== "机箱新增") {
-                //     if (this.saveDataIsFirstFlag === 0) {
-                //         console.log("保存机箱")
-                //         this.saveDataIsFirstFlag = 1
-                //     }
-                // }
-                // if (item.$options !== undefined && item.$options.propsData.label === "机箱新增") {
-                //     this.saveDataIsFirstFlag = 0
-                // }
-                // console.log("item", item);
+                // console.log("item", item)
                 let tag;
                 if (item.name) {
                     tag = this.findTag(item.name).tag;

@@ -1045,11 +1045,14 @@ function initEditor(editor) {
     if (data.properties.boardType == 1) {
       data.properties.outLinkArr = []
       //将板卡对应卡槽的slotnum赋给fSlotNum
-      if (data.parent.properties.slotNum != null) {
-        fSlotNum = data.parent.properties.slotNum
-      } else {
-        fSlotNum = data.parent.properties.ID
+      if (data.parent !== undefined && data.parent !== null) {
+        if (data.parent.properties.slotNum != null) {
+          fSlotNum = data.parent.properties.slotNum
+        } else {
+          fSlotNum = data.parent.properties.ID
+        }
       }
+
       //eval("var board_" + data.properties.uniqueId + "=" + data.properties)
       //初次添加板卡到数组
       if (clickBoardList.length == 0) {

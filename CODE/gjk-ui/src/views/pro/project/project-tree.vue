@@ -645,7 +645,7 @@ export default {
     },
     handleNodeClick(data) {
       //根据 . 判断是否是文件 待确认
-      console.log(data);
+      // console.log(data);
       if (data.label.indexOf(".") >= 0) {
         var d = data.label.length - ".pdf".length;
         if (d >= 0 && data.label.lastIndexOf(".pdf") == d) {

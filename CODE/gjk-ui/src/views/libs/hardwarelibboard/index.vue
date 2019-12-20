@@ -117,6 +117,7 @@
         saveBoard,
     } from "@/api/libs/hardwarelibboard";
     import {tableOption} from "@/const/crud/libs/hardwarelibboard";
+    import { getAllUser } from "@/api/libs/hardwarelibinf";
     import {mapGetters} from "vuex";
     import addboard from "@/views/libs/hardwarelibboard/addboard";
     import {getUserhasApplyAuto} from "@/api/admin/user";
@@ -234,26 +235,26 @@
             },
             getAllUsers() {
                 //查询所有用户
-                getUserhasApplyAuto().then(response => {
-                    // console.log("response",response)
+                getAllUser().then(response => {
+                    console.log("response",response)
                     //如果数组中有数据
                     if (this.allUsersOfLibs.length !== 0) {
                         //清空数组
                         this.allUsersOfLibs = []
                         //循环数据库的用户数据，判断用户数组中有没有数据
-                        for (const i in response.data.data) {
-                            if (this.allUsersOfLibs.hasOwnProperty(response.data.data[i])) {
+                        for (const i in response.data) {
+                            if (this.allUsersOfLibs.hasOwnProperty(response.data[i])) {
                                 //有则跳出本次循环
                                 continue
                             } else {
                                 //没有则加入
-                                this.allUsersOfLibs.push({label: response.data.data[i].name, value: response.data.data[i].name})
+                                this.allUsersOfLibs.push({label: response.data[i].name, value: response.data[i].name})
                             }
                         }
                     } else {
                         //若数组为空则加入数据库的所有数据
-                        for (const i in response.data.data) {
-                            this.allUsersOfLibs.push({label: response.data.data[i].name, value: response.data.data[i].name})
+                        for (const i in response.data) {
+                            this.allUsersOfLibs.push({label: response.data[i].name, value: response.data[i].name})
                         }
                     }
                     // console.log("this.allUsersOfLibs",this.allUsersOfLibs)

@@ -46,6 +46,7 @@
         <result property="flowId" column="flow_id"/>
         <result property="modelId" column="model_id"/>
         <result property="projectId" column="project_id"/>
+        <result property="version" column="version"/>
         <result property="frontJson" column="front_json"/>
         <result property="backJson" column="back_json"/>
         <result property="link" column="link"/>
@@ -257,6 +258,7 @@
 		h.front_json,
 		h.back_json,
 		h.link,
+		h.version,
 		h.link_relation,
 		h.frontCaseForDeployment
 	</sql>
@@ -267,6 +269,7 @@
 		flow_id,
 		model_id,
 		project_id,
+		version,
 		front_json,
 		back_json,
 		link,
@@ -322,15 +325,6 @@
 		paraent_ids,
 		libs_id
 	</sql>
-
-    <select id="getChipsById" resultMap="chipsfromhardwarelibs">
-        SELECT
-        <include refid="chips"/>
-
-        FROM gjk_chipsfromhardwarelibs as a
-        where
-        a.modelId = #{modelId}
-    </select>
 
     <select id="getChipsByFlowId" resultMap="chipsfromhardwarelibs">
         SELECT
@@ -541,7 +535,7 @@
         SELECT
         <include refid="hardwarelibs"/>
         FROM gjk_hardwarelibs h
-        WHERE h.model_id = #{modelId}
+        WHERE h.flow_id = #{flowId}
     </select>
     <!-- 拿到硬件建模 -->
     <select id="getHardwarelibsByFlowId" resultMap="hardwarelibs">
@@ -569,6 +563,7 @@
         #{hardwarelibs.flowId},
         #{hardwarelibs.modelId},
         #{hardwarelibs.projectId},
+        #{hardwarelibs.version},
         #{hardwarelibs.frontJson},
         #{hardwarelibs.backJson},
         #{hardwarelibs.link},
@@ -596,8 +591,9 @@
 		`back_json` = #{backJson},
 		`link` = #{link},
 		`frontCaseForDeployment` = #{frontCaseForDeployment},
-		`link_relation` = #{linkRelation}
-		WHERE `id` = #{id}
+		`link_relation` = #{linkRelation},
+		`version` = version+1
+		WHERE `id` = #{id} and `version` = #{version}
 	</update>
     <update id="updateHardwarelibById">
 		UPDATE `gjk_hardwarelibs` SET

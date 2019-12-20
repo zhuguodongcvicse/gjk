@@ -958,13 +958,15 @@ function initEditor(editor) {
   propertySheet.getCustomPropertyDefinitions = function (data) {
     var type = data.get('type');
     var image = data.image;
-    //console.log("data----",data)
+    console.log("data",data)
     currentBoard = data.properties
     if (data.properties.boardType == 1) {
       // console.log("allInfOfFrontBoard", allInfOfFrontBoard)
       data.properties.outLinkArr = []
       //将板卡对应卡槽的slotnum赋给fSlotNum
-      fSlotNum = data.parent.properties.slotNum
+      if (data.parent !== undefined && data.parent !== null) {
+        fSlotNum = data.parent.properties.slotNum
+      }
       //eval("var board_" + data.properties.uniqueId + "=" + data.properties)
       //初次添加板卡到数组
       if (clickBoardList.length == 0) {

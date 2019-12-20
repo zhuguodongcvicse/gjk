@@ -214,13 +214,13 @@ public interface ManagerService extends IService<ProjectFile> {
 
 	Hardwarelibs getHardwarelibs(String id);
 
-	void saveHardwarelibs(Hardwarelibs hardwarelibs);
+	int saveHardwarelibs(Hardwarelibs hardwarelibs);
 
 	Hardwarelibs getlibsInDepolyment(String id);
 
 	File getXmlFile(String id);
 
-	void updateHardwarelib(Hardwarelibs hardwarelibs);
+	int updateHardwarelib(Hardwarelibs hardwarelibs);
 
 	void updataDeploymentXml(DeploymentXMLMap deploymentXMLMap);
 
@@ -231,7 +231,7 @@ public interface ManagerService extends IService<ProjectFile> {
 	 */
 	byte[] exportFile(String id, StringRef sr);
 
-	void saveChipsfromhardwarelibs(Chipsfromhardwarelibs chipsfromhardwarelibs);
+	int saveChipsfromhardwarelibs(Chipsfromhardwarelibs chipsfromhardwarelibs);
 
 	Chipsfromhardwarelibs getChipsfromhardwarelibs(String id);
 

@@ -48,7 +48,20 @@ export const tableOption = {
     },
     {
       label: '板卡类型',
-      prop: 'boardType'
+      prop: 'boardType',
+      dicData: [{
+        label: 'calculateBoard',
+        value: "0"
+      }, {
+        label: 'FpgaBoard',
+        value: "1"
+      }, {
+        label: 'exchangeBoard',
+        value: "2"
+      }, {
+        label: 'interfaceBoard',
+        value: "3"
+      }]
     },
     {
       label: '备注',
