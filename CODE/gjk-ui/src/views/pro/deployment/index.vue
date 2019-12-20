@@ -25,10 +25,10 @@
       :before-upload="beforeUpload"
     >
       <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-      
+
       <el-button type="primary" class="pro_deployment_btn" @click="analysisXml()">确定</el-button>
       <el-button @click="visible = false">取消</el-button>
-     
+
       <div slot="tip" class="el-upload__tip">只能上传xml文件</div>
       <div slot="tip" class="el-upload-list__item-name">{{fileName}}</div>
     </el-upload>-->
@@ -48,8 +48,6 @@
 //例如：import 《组件名称》 from '《组件路径》';
 import { menuTag } from "@/util/closeRouter";
 import { getHardwarelibs } from "@/api/pro/project";
-import { getCaseData } from "@/api/libs/hardwarelibcase";
-import property from "@/views/pro/hardware/property";
 import { mapGetters } from "vuex";
 import NProgress from "nprogress"; // progress bar
 import "nprogress/nprogress.css"; // progress bar style
@@ -59,7 +57,6 @@ import { submitXmlEntity } from "@/api/pro/manager";
 export default {
   //import引入的组件需要注入到对象中才能使用
   components: {
-    property
   },
   data() {
     return {
