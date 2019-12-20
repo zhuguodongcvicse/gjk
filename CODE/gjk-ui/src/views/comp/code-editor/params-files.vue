@@ -2,16 +2,24 @@
   <el-form
     class="params_files_14s"
     :label-position="labelPosition"
-    label-width="80px"
+    label-width="90px"
     :model="formLabelAlign"
+    ref="compFilesForm"
     size="mini"
+    :rules="compFilesFormRules"
   >
-    <el-form-item label="文件选择" v-if="show">
-      <files-upload ref="saveFiles" v-model="filesPath" :disabled="disabled" @save-leftData="saveLeftData"></files-upload>
+    <el-form-item label="文件选择" v-if="show" prop="filesPath.length"  style="margin-bottom: 25px;">
+      <files-upload
+        ref="saveFiles"
+        v-model="formLabelAlign.filesPath"
+        :disabled="disabled"
+        @save-leftData="saveLeftData"
+      ></files-upload>
+      <el-input v-model="formLabelAlign.filesPath.length" v-if="false"></el-input>
     </el-form-item>
-    <el-form-item label="所属分支" v-if="show">
+    <el-form-item label="所属分支" v-if="show" prop="algorithm">
       <el-col :span="13">
-        <el-input v-model="algorithm" :placeholder="tigPlaceholder" :disabled="disabled"></el-input>
+        <el-input v-model="formLabelAlign.algorithm" :placeholder="tigPlaceholder" :readonly="true"></el-input>
       </el-col>
       <el-col :span="11">
         <!-- 弹出框 -->
@@ -65,12 +73,34 @@ import { randomLenNum, randomUuid, deepClone } from "@/util/util";
 // import { connect } from 'http2';
 export default {
   //import引入的组件需要注入到对象中才能使用
-  props: ["comp", "fileType", "show", "fileLists","disabled"],
+  props: ["comp", "fileType", "show", "fileLists", "disabled"],
   components: {
     "icon-choose": iconchoose,
     "files-upload": filesUpload
   },
   data() {
+    var compCheckFile = (rule, value, callback) => {
+      if (this.formLabelAlign.filesPath.length == 0) {
+        callback();
+      } else {
+        if (value == "") {
+          callback("请选择所属分支");
+        } else {
+          callback();
+        }
+      }
+    };
+    var compCheckLength = (rule, value, callback) => {
+      if (this.formLabelAlign.algorithm == "") {
+        callback();
+      } else {
+        if (this.formLabelAlign.filesPath.length == 0) {
+          callback("请添加文件");
+        } else {
+          callback();
+        }
+      }
+    };
     return {
       divStyle: "",
       compImg: {},
@@ -119,9 +149,12 @@ export default {
       labelPosition: "right",
       algorithm: "",
       formLabelAlign: {
-        name: "",
-        region: "",
-        type: ""
+        algorithm: "",
+        filesPath: []
+      },
+      compFilesFormRules: {
+        algorithm: [{ validator: compCheckFile, trigger: "change" }],
+        "filesPath.length": [{ validator: compCheckLength, trigger: "change" }]
       },
       dynamic: {
         xmlEntitys: [
@@ -193,25 +226,26 @@ export default {
           this.compImg = paramFile.filevo[0].compImg;
         } else {
           if (null !== paramFile && null !== paramFile.filePath) {
-            this.algorithm = paramFile.filePath.name;
+            this.formLabelAlign.algorithm = paramFile.filePath.name;
             this.compValueType.libsID = paramFile.filePath.id;
           }
-          this.compValueType.paths = this.filesPath = paramFile.filevo;
+          this.compValueType.paths = this.formLabelAlign.filesPath =
+            paramFile.filevo;
         }
       }
     },
     pointHFile(newFile, oldFile) {
       //移除上一次添加的数据
       if (this.fileType === "platform") {
-        this.filesPath.push(newFile);
-        let index = this.filesPath.findIndex(
+        this.formLabelAlign.filesPath.push(newFile);
+        let index = this.formLabelAlign.filesPath.findIndex(
           item =>
             item.name === oldFile.name &&
             item.relativePath === oldFile.relativePath &&
             item.size === oldFile.size
         );
         if (index !== -1) {
-          this.filesPath.splice(index, 1);
+          this.formLabelAlign.filesPath.splice(index, 1);
         }
         // this.saveLeftData(this.filesPath);
         // console.log("index", index, this.filesPath, oldFile);
@@ -225,14 +259,14 @@ export default {
             const file = old[keys];
             let strArr = new String(keys).split("-");
             if (this.fileType === strArr[0]) {
-              let index = this.filesPath.findIndex(
+              let index = this.formLabelAlign.filesPath.findIndex(
                 item =>
                   item.name === file.name &&
                   item.relativePath === file.relativePath &&
                   item.size === file.size
               );
               if (index !== -1) {
-                this.filesPath.splice(index, 1);
+                this.formLabelAlign.filesPath.splice(index, 1);
               }
             }
           }
@@ -243,17 +277,38 @@ export default {
             let strArr = new String(keys).split("-");
             if (this.fileType === strArr[0]) {
               if (JSON.stringify(newb[keys]) !== "{}") {
-                this.filesPath.push(newb[keys]);
+                this.formLabelAlign.filesPath.push(newb[keys]);
               }
             }
           }
         });
-        this.saveLeftData(this.filesPath);
+        this.saveLeftData(this.formLabelAlign.filesPath);
       },
       deep: true
     }
   }, //方法集合
   methods: {
+    visibleCount() {
+      console.log("1111111111visibleCount");
+      this.visible2 = false;
+    },
+    checkedCompFilesForm() {
+      let isValid = false;
+      this.$refs.compFilesForm.validate((valid, object) => {
+        isValid = valid;
+      });
+      return Promise.resolve(isValid);
+    },
+    visibleClick() {
+      if (this.formLabelAlign.filesPath.length == 0) {
+        this.$message({
+          type: "warning",
+          message: "请先添加文件"
+        });
+      } else {
+        this.visible2 = true;
+      }
+    },
     //获取默认图标
     getDefaultImg() {
       getDefaultImg().then(res => {
@@ -290,7 +345,7 @@ export default {
       //   this.compImg.imgShowName + "-V" + param.version
       // );
       imgretStr.compParam.compImg = this.compImg;
-      imgretStr.compParam.username = this.userInfo.username
+      imgretStr.compParam.username = this.userInfo.username;
       // imgretStr.compParam.createTime = param.createTime
       saveCompImg(imgretStr);
     },
@@ -310,7 +365,7 @@ export default {
         fileType: this.fileType,
         paths: this.compValueType.paths,
         userCurrent: this.userInfo.username,
-        createTime: param.createTime,
+        createTime: param.createTime
       };
       return Promise.resolve(fetchSavefiles(savefiles));
     },
@@ -349,7 +404,7 @@ export default {
       let parentType = data.parentType;
       //给input框赋值
       // console.log(this.compValueAndType);
-      this.algorithm = data.name;
+      this.formLabelAlign.algorithm = data.name;
       this.compValueType.libsID = data.id;
       this.visible2 = false;
     },

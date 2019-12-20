@@ -329,16 +329,24 @@ export default {
       // console.log("Date.parse(new Date()) - changeSaveDBXmlMaps",Date.parse(new Date()))
     },
     async inputCompBackupInfo() {
+       //校验右侧文件
+      const isAlgorithm = await this.$refs.saveAlgorithmFiles.checkedCompFilesForm();
+      const isTest = await this.$refs.saveTestFiles.checkedCompFilesForm();
+      const isPlatform = await this.$refs.savePlatformFiles.checkedCompFilesForm();
       //表单校验
       const isvalid = await this.$refs.compForm.compCheckedValidate();
-      if (isvalid) {
+      if (isvalid && isAlgorithm && isTest && isPlatform) {
         this.dialogVisibleOfComBackup = true;
       }
     },
     async compSpbShowDialogChecked() {
+      //校验右侧文件
+      const isAlgorithm = await this.$refs.saveAlgorithmFiles.checkedCompFilesForm();
+      const isTest = await this.$refs.saveTestFiles.checkedCompFilesForm();
+      const isPlatform = await this.$refs.savePlatformFiles.checkedCompFilesForm();
       //表单校验
       const isvalid = await this.$refs.compForm.compCheckedValidate();
-      if (isvalid) {
+      if (isvalid && isAlgorithm && isTest && isPlatform) {
         this.compSpbShowDialog = true;
       }
     },
@@ -541,6 +549,7 @@ export default {
   padding: 0;
 }
 .clearfix {
+  font-weight: 1000;
   margin: -10px;
   padding: 0;
 }

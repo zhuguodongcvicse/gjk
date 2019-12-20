@@ -1,6 +1,7 @@
 import { getStore, setStore } from '@/util/store'
 import { diff } from '@/util/util'
 import website from '@/const/website'
+import router from "../../router/router";
 
 const isFirstPage = website.isFirstPage
 const tagWel = website.fistPage
@@ -42,6 +43,10 @@ const navs = {
 
       if (state.tagList.some(ele => diff(ele, action))) return
       for (const i in state.tagList) {
+        /*if (state.tagList[i].value.indexOf('hardwareAdd') !== -1 && state.tagList[i].value.indexOf('?') === -1) {
+          console.log("state.tagList[i]",state.tagList[i])
+          return;
+        }*/
         if (state.tagList[i].query.modelId != null && state.tagList[i].query.modelId == action.query.modelId) {
           return
         }

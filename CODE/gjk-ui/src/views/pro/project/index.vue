@@ -325,7 +325,9 @@ export default {
         // bspSelectString: [
         //   { required: true, message: "请选择", trigger: "change" }
         // ],
-        applyUser: [{ required: true, message: "请选择审批人", trigger: "change" }],
+        applyUser: [
+          { required: true, message: "请选择审批人", trigger: "change" }
+        ],
         processName: [
           { required: true, message: "请输入流程名称", trigger: "blur" },
           { validator: processNameCheck, trigger: "blur" }
@@ -563,7 +565,11 @@ export default {
       Object.assign(this.formLabelAlign, this.$options.data().formLabelAlign);
       this.reload();
     },
-    getList() {
+    getList(page) {
+      this.listQuery = {
+        current: page.currentPage,
+        size: page.pageSize
+      };
       fetchAlgorithmTree(this.listQuery).then(Response => {
         this.data = Response.data.data;
       });
@@ -576,15 +582,13 @@ export default {
         this.tableLoading = false;
       });
     },
-    currentChange(val) {
-      this.page.current = val;
-      this.listQuery.current = val;
-      this.getList();
+    currentChange(currentPage) {
+      this.page.currentPage = currentPage;
+      this.getList(this.page);
     },
-    sizeChange(val) {
-      this.page.size = val;
-      this.listQuery.size = val;
-      this.getList();
+    sizeChange(pageSize) {
+      this.page.pageSize = pageSize;
+      this.getList(this.page);
     },
     /**
      * @title 打开新增窗口
@@ -602,11 +606,15 @@ export default {
     },
     rowDel: function(row, index) {
       var _this = this;
-      this.$confirm("是否确认删除名称为 "+row.projectName+" 的项目?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
+      this.$confirm(
+        "是否确认删除名称为 " + row.projectName + " 的项目?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      )
         .then(function() {
           return delObj(row.id);
         })
@@ -670,7 +678,7 @@ export default {
      * 刷新回调
      */
     refreshChange() {
-      this.getList();
+      this.getList(this.page);
     },
     handleRowClick(row, event, column) {
       // console.log("this.tableData",this.tableData)
@@ -863,7 +871,7 @@ export default {
     }
   },
   created() {
-    this.getList();
+    this.getList(this.page);
     this.getCreateData();
     this.getLibsTree();
     this.getSoftwareSelectList();

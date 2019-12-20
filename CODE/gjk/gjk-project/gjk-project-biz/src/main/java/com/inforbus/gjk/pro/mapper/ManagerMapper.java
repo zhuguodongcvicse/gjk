@@ -123,9 +123,9 @@ public interface ManagerMapper extends BaseMapper<ProjectFile> {
 	 */
 	void saveNewFilePath(@Param("newFilePath") String newFilePath, @Param("proDetailId") String proDetailId);
 
-	Hardwarelibs getHardwarelibs(@Param("modelId") String modelId);
+	Hardwarelibs getHardwarelibs(@Param("flowId") String flowId);
 
-	void saveHardwarelibs(@Param("hardwarelibs") Hardwarelibs hardwarelibs);
+	int saveHardwarelibs(@Param("hardwarelibs") Hardwarelibs hardwarelibs);
 
     Hardwarelibs getHardwarelibByProjectId(@Param("projectId") String projectId);
 
@@ -141,15 +141,13 @@ public interface ManagerMapper extends BaseMapper<ProjectFile> {
      */
     List<ProjectFile> getProcedureListByProjectId(@Param("projectId") String projectId);
 
-	void updateHardwarelib(Hardwarelibs hardwarelibs);
+	int updateHardwarelib(Hardwarelibs hardwarelibs);
 
 	void deleteHardwarelibById(@Param("hardwarelibId") String hardwarelibId);
 
     void saveChipsfromhardwarelibs(@Param("chipsfromhardwarelibs") Chipsfromhardwarelibs chipsfromhardwarelibs);
 
     Chipsfromhardwarelibs getChipsfromhardwarelibsById(@Param("id") String id);
-
-	Chipsfromhardwarelibs getChipsById(@Param("modelId") String modelId);
 
 	Chipsfromhardwarelibs getChipsByFlowId(@Param("flowId") String flowId);
 

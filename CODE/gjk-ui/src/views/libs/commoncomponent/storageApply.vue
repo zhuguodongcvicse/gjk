@@ -1,7 +1,5 @@
 <template>
-  <el-dialog class="libs_software_storageapply_14s" title="构件库批量导出" :visible.sync="dialog" width="30%" :before-close="handleClose">
-    <el-container>
-      <el-main>
+  <el-dialog class="" title="构件库批量导出" :visible.sync="dialog" width="30%" :before-close="handleClose">
         <el-form size="mini" label-position="right" label-width="120px" ref="form" :model="form" :rules="projectRules">
           <el-form-item label="请选择审批人" prop="applyUser">
             <el-select v-model="form.applyUser" placeholder="请选择">
@@ -14,9 +12,6 @@
             </el-select>
           </el-form-item>
         </el-form>
-      </el-main>
-    </el-container>
-
     <span slot="footer" class="dialog-footer">
       <el-button @click="dialogStateShow(false)">取 消</el-button>
       <el-button type="primary" @click="storageApplySoftware('form')">确定</el-button>

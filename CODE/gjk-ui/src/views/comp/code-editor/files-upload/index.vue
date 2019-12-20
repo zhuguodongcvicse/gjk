@@ -101,7 +101,7 @@ export default {
             label: "文件大小",
             prop: "formatedSize",
             slot: true
-          },
+          }
           // {
           //   label: "状态",
           //   prop: "status",
@@ -238,6 +238,7 @@ export default {
     // 全部取消功能
     removeAll(files) {
       files.splice(0, files.length);
+      this.innerVisible = false;
     },
     // 文件移除功能
     remove(filerow, files) {

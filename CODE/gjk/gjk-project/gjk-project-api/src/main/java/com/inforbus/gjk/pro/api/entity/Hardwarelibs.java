@@ -13,7 +13,7 @@ public class Hardwarelibs {
     @TableId
     private String id;
     /**
-     * 项目名
+     * 更新次数
      */
     private String hardwareName;
     /**
@@ -55,7 +55,7 @@ public class Hardwarelibs {
     /**
      * 版本
      */
-    private String version;
+    private int version;
 
     /**
      * 正面json

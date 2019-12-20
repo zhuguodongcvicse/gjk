@@ -19,7 +19,7 @@
           :model="form"
           :rules="projectRules"
         >
-          <el-form-item label="请选择审批人" prop="applyUser">
+          <el-form-item label="请选择审批人" prop="applyUser" style="margin-bottom: 20px;">
             <el-select v-model="form.applyUser" placeholder="请选择">
               <el-option
                 v-for="item in applyUserSelect"
@@ -94,7 +94,7 @@ export default {
         applyUser: ""
       },
       projectRules: {
-        applyUser: [{ required: true, message: "请选择", trigger: "change" }]
+        applyUser: [{ required: true, message: "请选择审批人", trigger: "change" }]
       }
     };
   },

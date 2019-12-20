@@ -38,7 +38,7 @@ Q.registerImage('ePort', 'images/InternetAccess.svg');
 
 // 子接收父参数
 function handleMessageFromParent(event) {
-	console.log("event.data.params", event.data)
+	// console.log("event.data.params", event.data)
 	switch (event.data.cmd) {
 		case 'getHardwarelibs':
 			caseArr = event.data.params[1];
@@ -597,7 +597,7 @@ function initEditor(editor) {
       frontCaseForDeployment = JSON.stringify(frontCaseForDeployment)
       postMessageParentData.cmd = "submitCaseJSON";
       postMessageParentData.params = [graphList, linkStr, allChipToFlow, frontCaseForDeployment]
-      // window.parent.postMessage(postMessageParentData, "*")
+      window.parent.postMessage(postMessageParentData, "*")
       // console.log("postMessageParentData--first", postMessageParentData)
       return
     } else if (graphName == '背部视图') {

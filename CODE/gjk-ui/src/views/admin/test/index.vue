@@ -11,8 +11,16 @@
             icon="delete"
             @click="handleDelete"
           >删除</el-button>
-          <el-button type="primary" v-if="testManager_btn_export" @click="showInfo.dialogExportVisible = true">导出</el-button>
-          <el-button type="primary" v-if="testManager_btn_import" @click="showInfo.importLibsDialogVisible = true">导入</el-button>
+          <el-button
+            type="primary"
+            v-if="testManager_btn_export"
+            @click="showInfo.dialogExportVisible = true"
+          >导出</el-button>
+          <el-button
+            type="primary"
+            v-if="testManager_btn_import"
+            @click="showInfo.importLibsDialogVisible = true"
+          >导入</el-button>
         </el-button-group>
       </div>
 
@@ -63,8 +71,9 @@ import {
   delObj,
   fetchTestTree,
   getObj,
-  putObj,
+  putObj
 } from "@/api/admin/test";
+import { findThreeLibsId } from "@/api/libs/threelibs";
 import { mapGetters } from "vuex";
 import importLibs from "@/views/admin/test/importLibs";
 import exportLibs from "@/views/admin/test/exportLibs";
@@ -76,8 +85,8 @@ export default {
   data() {
     return {
       showInfo: {
-          importLibsDialogVisible: false,
-          dialogExportVisible: false
+        importLibsDialogVisible: false,
+        dialogExportVisible: false
       },
       list: null,
       total: null,
@@ -220,7 +229,7 @@ export default {
       if (this.form.testId) {
         this.formEdit = false;
         this.formStatus = "update";
-      }else{
+      } else {
         this.$message({
           showClose: true,
           message: "请选择一个节点进行编辑！！！",
@@ -247,17 +256,28 @@ export default {
           cancelButtonText: "取消",
           type: "warning"
         }).then(() => {
-          delObj(this.currentId).then(() => {
-            this.getList();
-            this.resetForm();
-            this.onCancel();
-            this.$notify({
-              title: "成功",
-              message: "删除成功",
-              type: "success",
-              duration: 2000
-            });
-            this.reload();
+          findThreeLibsId(this.currentId).then(res => {
+            if (!res.data) {
+              //让删
+              delObj(this.currentId).then(() => {
+                this.getList();
+                this.resetForm();
+                this.onCancel();
+                this.$notify({
+                  title: "成功",
+                  message: "删除成功",
+                  type: "success",
+                  duration: 2000
+                });
+                this.reload();
+              });
+            } else {
+              this.$message({
+                showClose: true,
+                message: "该节点已被构件使用，禁止删除！！！",
+                type: "error"
+              });
+            }
           });
         });
       }
@@ -271,7 +291,7 @@ export default {
           type: "success",
           duration: 2000
         });
-        this.onCancel()
+        this.onCancel();
       });
     },
     create() {
@@ -293,7 +313,7 @@ export default {
         });
         this.onCancel();
         //清空this.form的值
-        Object.assign(this.form,this.$options.data().form)
+        Object.assign(this.form, this.$options.data().form);
         //展开当前节点节点。。
         this.aExpandedKeys = [this.currentId];
       });
