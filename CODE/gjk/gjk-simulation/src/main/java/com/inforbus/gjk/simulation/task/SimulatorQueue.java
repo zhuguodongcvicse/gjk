@@ -1,14 +1,13 @@
 package com.inforbus.gjk.simulation.task;
 
 
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import redis.clients.jedis.Jedis;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class SimulatorQueue extends Thread {
 
@@ -34,13 +33,13 @@ public class SimulatorQueue extends Thread {
             Jedis jedis = new Jedis(jedisHost);
             Map<String, Object> map = Maps.newHashMap();
             map.put("data",getData());
-            map.put("frameNum",i);
+            map.put("frameNum",i++);
             map.put("symbol","link1");
             String s = JSONUtil.toJsonStr(map);
             jedis.publish(channelName,s);
             jedis.close();
             try {
-                Thread.sleep(100);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

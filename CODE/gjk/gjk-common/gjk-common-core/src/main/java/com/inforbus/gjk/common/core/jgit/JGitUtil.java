@@ -70,6 +70,8 @@ public class JGitUtil {
 	private static String BRANCH_NAME;
 	@Getter
 	private static String INTEGER_CODE_FILE_NAME;
+	@Getter
+	private static String SONAR_SCANNER_PATH;
 	final static Logger log = LoggerFactory.getLogger(JGitUtil.class);
 
 	static {
@@ -115,6 +117,7 @@ public class JGitUtil {
 			srcTemplateFile = father.get("gjk.pro.templateFile.src").toString();
 			IDEPath1 = father.get("sylixos.idepath1").toString();
 			IDEPath2 = father.get("sylixos.idepath2").toString();
+			SONAR_SCANNER_PATH = father.get("sonar.scanner.path").toString();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

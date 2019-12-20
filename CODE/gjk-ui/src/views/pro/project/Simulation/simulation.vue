@@ -95,7 +95,7 @@
             <div style="padding: 3px;height: 30px; width: 30%; margin:auto">
               <span style="margin: auto;font-weight: bold;font-size: 16px;">结构体数据</span>
             </div>
-            <el-table border :data="tableData">
+            <el-table border max-height="100%" :data="tableData">
               <el-table-column type="index" width="50px" label="序号"></el-table-column>
               <el-table-column label="名称" prop="name"></el-table-column>
               <el-table-column label="值" prop="value"></el-table-column>
@@ -106,7 +106,7 @@
             <div style="padding: 3px;height: 30px; width: 30%; margin:auto">
               <span style="font-weight: bold;font-size: 16px;">结构体数据</span>
             </div>
-            <el-table border :data="tableData">
+            <el-table border max-height="100%" :data="tableData">
               <el-table-column type="index" width="50px" label="序号"></el-table-column>
               <el-table-column label="名称" prop="name"></el-table-column>
               <el-table-column label="值" prop="value"></el-table-column>
@@ -138,7 +138,7 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import { getDataSource, simulation, startSimulator } from "@/api/simula/simulation"
+import { getDataSource, simulation, stop } from "@/api/simula/simulation"
 
 export default {
   name: "hello",
@@ -410,6 +410,13 @@ export default {
         this.myCharts = null
         this.myCharts1 = null
         this.flag = true;
+        let symbols = []
+        for (let i = 0; i < this.datasource.length; i++) {
+            symbols.push(this.datasource[i].value)
+        }
+        stop(this.userInfo.username,{"symbols":symbols}).then(req=>{
+            console.log(req.data.data)
+        })
     },
     getDataSource(flowFilePath, startId, endId){
       var simulationDto = {"flowFilePath":flowFilePath,"startId":startId, "endId":endId}

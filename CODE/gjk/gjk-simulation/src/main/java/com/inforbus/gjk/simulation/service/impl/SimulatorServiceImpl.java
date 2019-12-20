@@ -12,6 +12,7 @@ import com.inforbus.gjk.simulation.task.Subscriber;
 import com.inforbus.gjk.simulation.task.SubscriberThread;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -35,19 +36,22 @@ public class SimulatorServiceImpl implements SimulatorService {
 
     @Override
     public boolean startSimulator(String username, List<String> componentLinks, String filePath) {
-        //启用客户线程，传入参数
+        //定义通道名
         String channelName = username+"SimulatorChannel";
-        SimulatorQueue simulatorQueue = new SimulatorQueue(host, channelName);
-        Global.USERS_SIMULATOR_THREAD.put(username,simulatorQueue);
-        simulatorQueue.start();
-        //暂时模拟数据接口
+        //队列初始状态
+        redisTemplate.opsForValue().set(username+":initState","1");
+        //初始化监听对象
         Subscriber subscriber = new Subscriber();
         subscriber.setQueueSize(Integer.parseInt(queueSize));
         subscriber.setUsername(username);
         subscriber.setRedisTemplate(redisTemplate);
-        //根据标识放入不同队列
-        Global.USERS_SIMULATOR_SUBSCRIBER.put(username,subscriber);
+        //启动监听线程
         new SubscriberThread(subscriber,channelName,host).start();
+        //启用客户线程，传入参数
+        SimulatorQueue simulatorQueue = new SimulatorQueue(host, channelName);
+        simulatorQueue.start();
+        //放入全局变量
+        Global.USERS_SIMULATOR_THREAD.put(username,simulatorQueue);
         return true;
     }
 
@@ -59,18 +63,21 @@ public class SimulatorServiceImpl implements SimulatorService {
         }
         simulatorQueues.close();
         Global.USERS_SIMULATOR_THREAD.remove(username);
-        Set<String> keys = redisTemplate.keys("Simulator:" + username + ":");
+        Set<String> keys = redisTemplate.keys("Simulator:" + username + ":*");
         for (String key : keys) {
             redisTemplate.delete(key);
         }
+        Set<String> keys1 = redisTemplate.keys(username + ":initState:*");
+        keys1.stream().forEach(key->{
+            redisTemplate.delete(key);
+        });
         return true;
     }
 
     @Override
     public Map<String,Object> getData(String username, SimulationDTO simulationDTO) {
-        Subscriber subscriber = Global.USERS_SIMULATOR_SUBSCRIBER.get(username);
         //修改初始化状态
-        subscriber.initState();
+        redisTemplate.opsForValue().set(username+":initState:"+simulationDTO.getSymbol(),"1");
         String key = "Simulator:" + username+ ":" + simulationDTO.getSymbol();
         String str = redisTemplate.opsForList().rightPop(key);
         //调用客户接口解析
@@ -93,8 +100,21 @@ public class SimulatorServiceImpl implements SimulatorService {
     }
 
     @Override
-    public List<Map<String, Object>> stop(String username,List<String> symbols) {
-        return null;
+    public Map<String, List<String>> stop(String username,List<String> symbols) {
+        ListOperations<String, String> operations = redisTemplate.opsForList();
+        Map<String, List<String>> symbolFrameSelect = Maps.newHashMap();
+        List<String> selectData = Lists.newArrayList();
+        for (String symbol : symbols) {
+            String key = "Simulator:"+username+":"+symbol;
+            Long size = operations.size(key);
+            List<String> range = operations.range(key, 0, size - 1);
+            for (String s : range) {
+                JSONObject dataMap = JSONUtil.parseObj(s);
+                selectData.add(dataMap.get("frameNum")+"");
+            }
+            symbolFrameSelect.put(symbol,selectData);
+        }
+        return symbolFrameSelect;
     }
 
     @Override
