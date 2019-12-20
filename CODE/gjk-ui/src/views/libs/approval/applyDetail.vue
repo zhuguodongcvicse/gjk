@@ -93,23 +93,23 @@
 
             </el-table>
             <div v-if="hardwareLibData.length === 0">
-                <div v-if="isComp">
-                    <el-scrollbar
-                        wrapClass="scrollbar-wrap"
-                        :style="{height: '100%'}"
-                        ref="scrollbarContainer">
-                        <div style="height:570px;overflow-y:auto">
-                        <el-tree
-                            v-if="isComp===true"
-                            ref="tree"
-                            :data="compTreeData"
-                            :default-expand-all="true"
-                            :check-on-click-node="true"
-                            @check-change="handleCheckChange"
-                        ></el-tree>
-                        </div>
-                    </el-scrollbar>
-                </div>
+              <div v-if="isComp">
+                <el-scrollbar
+                  wrapClass="scrollbar-wrap"
+                  :style="{height: '100%'}"
+                  ref="scrollbarContainer">
+                  <div style="height:570px;overflow-y:auto">
+                    <el-tree
+                      v-if="isComp===true"
+                      ref="tree"
+                      :data="compTreeData"
+                      :default-expand-all="true"
+                      :check-on-click-node="true"
+                      @check-change="handleCheckChange"
+                    ></el-tree>
+                  </div>
+                </el-scrollbar>
+              </div>
               <span v-if="!isComp">
               {{proCompIdListMsg}}
               <span v-for="(item,index) in proCompIdList" :key="index">
@@ -124,10 +124,15 @@
         </el-card>
       </el-col>
     </el-row>
+
     <el-dialog width="30%" title="请填写驳回原因" :visible.sync="rejectDialog" append-to-body>
-      <el-input type="textarea" :rows="3" placeholder="请输入内容" v-model="rejectMassage"></el-input>
+      <el-form :model="rejectForm" :rules="rules" ref="rejectForm">
+        <el-form-item  prop="rejectMassage">
+          <el-input type="textarea" :rows="3" placeholder="请输入内容" autocomplete="off" v-model="rejectForm.rejectMassage"></el-input>
+        </el-form-item>
+      </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button type="success" @click="rejectDetermine">确 定</el-button>
+        <el-button type="success" @click="rejectDetermine('rejectForm')">确 定</el-button>
         <el-button type="primary" @click="rejectDialog=false">取 消</el-button>
       </span>
     </el-dialog>
@@ -234,14 +239,21 @@
                 //驳回申请理由填写弹出窗
                 rejectDialog: false,
                 //驳回原因
-                rejectMassage: "",
+                rejectForm: {
+                    rejectMassage: ""
+                },
 
                 //如果审批处于未处理状态，通过和驳回按钮可以使用(false)
                 //处以已通过或已驳回状态，按钮不能使用(true)
                 isButtonUse: false,
 
                 proCompIdList: [],
-                proCompIdListMsg: ""
+                proCompIdListMsg: "",
+                rules: {
+                    rejectMassage: [
+                        {required: true, message: "不能为空", trigger: "blur"}
+                    ]
+                }
             };
         },
         //监控data中的数据变化
@@ -489,163 +501,170 @@
                 this.rejectDialog = true;
             },
             //审批驳回调用方法
-            rejectDetermine() {
-                //驳回申请，修改记录的审批状态
-                let modifyApply = {};
-                modifyApply.id = this.applyItemMsg.id;
-                modifyApply.approvalState = "3";
-                modifyApply.description = this.rejectMassage;
-                putObj(modifyApply).then(Response => {
-                    switch (this.applyItemMsg.libraryType) {
-                        case "1":
-                            let modifyComponent = {};
-                            modifyComponent.id = this.component.id;
-                            modifyComponent.applyState = "3";
-                            modifyComponent.applyDesc = this.rejectMassage;
-                            if (this.applyItemMsg.applyType != "3" && this.applyItemMsg.applyType != "4") {
-                                //修改构件的审批状态，审批备注中写上审批理由
-                                modifyComp(modifyComponent).then(Response => {
-                                    this.rejectDialog = false;
-                                    this.dialogStateShow(false);
-                                    //刷新页面
-                                    this.$emit("refresh");
-                                });
-                            } else if (this.applyItemMsg.applyType == "4") {
-                                for (let item of this.componentlists) {
+            rejectDetermine(formName) {
+                this.$refs[formName].validate(valid => {
+                    if (valid) {
+                        //驳回申请，修改记录的审批状态
+                        let modifyApply = {};
+                        modifyApply.id = this.applyItemMsg.id;
+                        modifyApply.approvalState = "3";
+                        modifyApply.description = this.rejectForm.rejectMassage;
+                        putObj(modifyApply).then(Response => {
+                            switch (this.applyItemMsg.libraryType) {
+                                case "1":
                                     let modifyComponent = {};
-                                    modifyComponent.id = item.id;
+                                    modifyComponent.id = this.component.id;
                                     modifyComponent.applyState = "3";
-                                    modifyComponent.applyDesc = this.rejectMassage;
-                                    modifyComp(modifyComponent)
-                                }
-                            }
-                            break;
-                        case "2-1":
-                            let infTemp = {};
-                            infTemp.id = this.applyItemMsg.applyId;
-                            infTemp.applyState = "3";
-                            infTemp.applyDesc = "驳回原因： " + this.rejectMassage;
-                            updateInf(infTemp).then(Response => {
-                                this.rejectDialog = false;
-                                this.dialogStateShow(false);
-                                //生成随机数,用来刷新页面
-                                this.refreshListFlag = Math.random()
-                                //将随机数放到store
-                                this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
-                            });
-                            break;
-                        case "2-2":
-                            let chipTemp = {};
-                            chipTemp.id = this.applyItemMsg.applyId;
-                            chipTemp.applyState = "3";
-                            chipTemp.applyDesc = "驳回原因： " + this.rejectMassage;
-                            updateChip(chipTemp).then(Response => {
-                                this.rejectDialog = false;
-                                this.dialogStateShow(false);
-                                //生成随机数,用来刷新页面
-                                this.refreshListFlag = Math.random()
-                                //将随机数放到store
-                                this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
-                            });
-                            break;
-                        case "2-3":
-                            let boardTemp = {};
-                            boardTemp.id = this.applyItemMsg.applyId;
-                            boardTemp.applyState = "3";
-                            boardTemp.applyDesc = "驳回原因： " + this.rejectMassage;
-                            updateBoard(boardTemp).then(Response => {
-                                this.rejectDialog = false;
-                                this.dialogStateShow(false);
-                                //生成随机数,用来刷新页面
-                                this.refreshListFlag = Math.random()
-                                //将随机数放到store
-                                this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
-                            });
-                            break;
-                        case "3":
-                            let software = {};
-                            software.id = this.applyItemMsg.applyId;
-                            software.applyState = "3";
-                            software.applyDesc = this.rejectMassage;
-                            modifySoftware(software).then(Response => {
-                                this.rejectDialog = false;
-                                this.dialogStateShow(false);
-                                //刷新页面
-                                this.$emit("refresh");
-                            });
-                            break;
-                        case "5":
-                            let bsp = {};
-                            bsp.id = this.applyItemMsg.applyId;
-                            bsp.applyState = "3";
-                            bsp.applyDesc = this.rejectMassage;
-                            modifyBSP(bsp).then(Response => {
-                                this.rejectDialog = false;
-                                this.dialogStateShow(false);
-                                //刷新页面
-                                this.$emit("refresh");
-                            });
-                            break;
-                        case "6":
-                            let struct = {};
-                            struct.id = this.applyItemMsg.applyId;
-                            struct.storageFlag = "3";
-                            struct.applyDesc = this.rejectMassage;
-                            modifyStruct(struct).then(Response => {
-                                this.rejectDialog = false;
-                                this.dialogStateShow(false);
-                                //刷新页面
-                                this.$emit("refresh");
-                            });
-                            break;
-                        case "7":
-                            let updateList = [];
-                            console.log("1111111111111111111111", this.proCompIdList);
-                            for (let item of this.proCompIdList) {
-                                let approvalApply = {};
-                                approvalApply.approvalId = this.applyItemMsg.id;
-                                approvalApply.applyId = item.id;
-                                approvalApply.approvalState = "3";
-                                updateList.push(approvalApply);
-                            }
-                            updateApprovalApplyById(updateList).then(Response => {
-                                let proCompIdArray = [];
-                                for (let item of this.proCompIdList) {
-                                    proCompIdArray.push(item.id);
-                                }
-                                let proId = this.applyItemMsg.applyId;
-                                updateProCompApprovalState(proId, proCompIdArray, "1").then(
-                                    Response => {
+                                    modifyComponent.applyDesc = this.rejectForm.rejectMassage;
+                                    if (this.applyItemMsg.applyType != "3" && this.applyItemMsg.applyType != "4") {
+                                        //修改构件的审批状态，审批备注中写上审批理由
+                                        modifyComp(modifyComponent).then(Response => {
+                                            this.rejectDialog = false;
+                                            this.dialogStateShow(false);
+                                            //刷新页面
+                                            this.$emit("refresh");
+                                        });
+                                    } else if (this.applyItemMsg.applyType == "4") {
+                                        for (let item of this.componentlists) {
+                                            let modifyComponent = {};
+                                            modifyComponent.id = item.id;
+                                            modifyComponent.applyState = "3";
+                                            modifyComponent.applyDesc = this.rejectForm.rejectMassage;
+                                            modifyComp(modifyComponent)
+                                        }
+                                    }
+                                    break;
+                                case "2-1":
+                                    let infTemp = {};
+                                    infTemp.id = this.applyItemMsg.applyId;
+                                    infTemp.applyState = "3";
+                                    infTemp.applyDesc = "驳回原因： " + this.rejectForm.rejectMassage;
+                                    updateInf(infTemp).then(Response => {
+                                        this.rejectDialog = false;
+                                        this.dialogStateShow(false);
+                                        //生成随机数,用来刷新页面
+                                        this.refreshListFlag = Math.random()
+                                        //将随机数放到store
+                                        this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
+                                    });
+                                    break;
+                                case "2-2":
+                                    let chipTemp = {};
+                                    chipTemp.id = this.applyItemMsg.applyId;
+                                    chipTemp.applyState = "3";
+                                    chipTemp.applyDesc = "驳回原因： " + this.rejectForm.rejectMassage;
+                                    updateChip(chipTemp).then(Response => {
+                                        this.rejectDialog = false;
+                                        this.dialogStateShow(false);
+                                        //生成随机数,用来刷新页面
+                                        this.refreshListFlag = Math.random()
+                                        //将随机数放到store
+                                        this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
+                                    });
+                                    break;
+                                case "2-3":
+                                    let boardTemp = {};
+                                    boardTemp.id = this.applyItemMsg.applyId;
+                                    boardTemp.applyState = "3";
+                                    boardTemp.applyDesc = "驳回原因： " + this.rejectForm.rejectMassage;
+                                    updateBoard(boardTemp).then(Response => {
+                                        this.rejectDialog = false;
+                                        this.dialogStateShow(false);
+                                        //生成随机数,用来刷新页面
+                                        this.refreshListFlag = Math.random()
+                                        //将随机数放到store
+                                        this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
+                                    });
+                                    break;
+                                case "3":
+                                    let software = {};
+                                    software.id = this.applyItemMsg.applyId;
+                                    software.applyState = "3";
+                                    software.applyDesc = this.rejectForm.rejectMassage;
+                                    modifySoftware(software).then(Response => {
+                                        this.rejectDialog = false;
                                         this.dialogStateShow(false);
                                         //刷新页面
                                         this.$emit("refresh");
+                                    });
+                                    break;
+                                case "5":
+                                    let bsp = {};
+                                    bsp.id = this.applyItemMsg.applyId;
+                                    bsp.applyState = "3";
+                                    bsp.applyDesc = this.rejectForm.rejectMassage;
+                                    modifyBSP(bsp).then(Response => {
+                                        this.rejectDialog = false;
+                                        this.dialogStateShow(false);
+                                        //刷新页面
+                                        this.$emit("refresh");
+                                    });
+                                    break;
+                                case "6":
+                                    let struct = {};
+                                    struct.id = this.applyItemMsg.applyId;
+                                    struct.storageFlag = "3";
+                                    struct.applyDesc = this.rejectForm.rejectMassage;
+                                    modifyStruct(struct).then(Response => {
+                                        this.rejectDialog = false;
+                                        this.dialogStateShow(false);
+                                        //刷新页面
+                                        this.$emit("refresh");
+                                    });
+                                    break;
+                                case "7":
+                                    let updateList = [];
+                                    console.log("1111111111111111111111", this.proCompIdList);
+                                    for (let item of this.proCompIdList) {
+                                        let approvalApply = {};
+                                        approvalApply.approvalId = this.applyItemMsg.id;
+                                        approvalApply.applyId = item.id;
+                                        approvalApply.approvalState = "3";
+                                        updateList.push(approvalApply);
                                     }
-                                );
+                                    updateApprovalApplyById(updateList).then(Response => {
+                                        let proCompIdArray = [];
+                                        for (let item of this.proCompIdList) {
+                                            proCompIdArray.push(item.id);
+                                        }
+                                        let proId = this.applyItemMsg.applyId;
+                                        updateProCompApprovalState(proId, proCompIdArray, "1").then(
+                                            Response => {
+                                                this.dialogStateShow(false);
+                                                //刷新页面
+                                                this.$emit("refresh");
+                                            }
+                                        );
+                                    });
+                                    break;
+                                case "8":
+                                    let compframe = {};
+                                    compframe.id = this.applyItemMsg.applyId;
+                                    compframe.applyState = "3";
+                                    compframe.applyDesc = this.rejectForm.rejectMassage;
+                                    modifyCompframe(compframe).then(Response => {
+                                        this.rejectDialog = false;
+                                        this.dialogStateShow(false);
+                                        //刷新页面
+                                        this.$emit("refresh");
+                                    });
+                                    break;
+                            }
+                            this.rejectDialog = false
+                            this.isButtonUse = true
+                            this.$message({
+                                showClose: true,
+                                message: "已驳回",
+                                type: "success"
                             });
-                            break;
-                        case "8":
-                            let compframe = {};
-                            compframe.id = this.applyItemMsg.applyId;
-                            compframe.applyState = "3";
-                            compframe.applyDesc = this.rejectMassage;
-                            modifyCompframe(compframe).then(Response => {
-                                this.rejectDialog = false;
-                                this.dialogStateShow(false);
-                                //刷新页面
-                                this.$emit("refresh");
-                            });
-                            break;
+                        });
+                        var tag1 = this.tag;
+                        menuTag(this.$route.path, "remove", this.tagList, tag1);
+                    } else {
+                        // console.log("error submit!!");
+                        return false;
                     }
-                    this.rejectDialog = false
-                    this.isButtonUse = true
-                    this.$message({
-                        showClose: true,
-                        message: "已驳回",
-                        type: "success"
-                    });
                 });
-                var tag1 = this.tag;
-                menuTag(this.$route.path, "remove", this.tagList, tag1);
             },
             handleCreate() {
                 // Object.assign(this.$data, this.$options.data());
