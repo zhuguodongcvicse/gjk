@@ -142,6 +142,7 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
             if (XmlFileHandleUtil.createXmlFile(xmlEntityMap, localPath)) {//先生成xml模板文件至指定位置
                 baseTemplate.setTempId(IdGenerate.uuid());
                 baseTemplate.setCreateTime(LocalDateTime.now());
+                baseTemplate.setUpdateTime(null);
                 baseTemplate.setDelFlag("0");
                 baseTemplate.setTempPath("gjk"+File.separator+"baseTemplate" + File.separator+ baseTemplate.getTempName() + String.valueOf(millis) + ".xml");
                 Integer version = baseMapper.getMaxVersion(baseTemplate.getTempType());

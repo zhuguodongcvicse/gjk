@@ -157,7 +157,7 @@ public class WorkbenchUtil {
                 //遍历加工.a路径
                 String paths = "";
                 for (String path : list) {
-                    paths += "$(PRJ_ROOT_DIR)" + path.substring(path.indexOf("\\"+other+"\\") + other.length(), path.length()).replace("\\", "/") + " ";
+                    paths += "$(PRJ_ROOT_DIR)" + path.substring(path.indexOf("\\" + other + "\\") + other.length(), path.length()).replace("\\", "/") + " ";
                 }
                 //重新组装数据 写入文件中
                 String str = sb.toString()
@@ -183,8 +183,8 @@ public class WorkbenchUtil {
                 String paths = "OBJ_DIR := srFrame_Mul_partialImage/$(MODE_DIR) \r\r";
                 for (String path : list) {
                     //paths += "srFrame_Mul_partialImage/$(MODE_DIR)/Objects/srFrame_Mul" + path.substring(path.indexOf(other) + other.length(), path.lastIndexOf(".")).replace("\\", "/") + ".o";
-                    paths += "srFrame_Mul_partialImage/$(MODE_DIR)/Objects" + path.substring(path.indexOf("\\" + other + "\\"), path.lastIndexOf(".")).replace("\\", "/") + ".o";
-                    paths += " : $(PRJ_ROOT_DIR)" + path.substring(path.indexOf("\\"+other+"\\") + other.length(), path.length()).replace("\\", "/") + " $(FORCE_FILE_BUILD) \r";
+                    paths += "srFrame_Mul_partialImage/$(MODE_DIR)/Objects/srFrame_Mul" + path.substring(path.indexOf("\\" + other + "\\") + other.length() + 1, path.lastIndexOf(".")).replace("\\", "/") + ".o";
+                    paths += " : $(PRJ_ROOT_DIR)" + path.substring(path.indexOf("\\" + other + "\\") + other.length() + 1, path.length()).replace("\\", "/") + " $(FORCE_FILE_BUILD) \r";
                     paths += "	$(TRACE_FLAG)if [ ! -d \"`dirname \"$@\"`\" ]; then mkdir -p \"`dirname \"$@\"`\"; fi;echo \"building $@\"; $(TOOL_PATH)dcc $(DEBUGFLAGS_C-Compiler) $(CC_ARCH_SPEC) -W:c:,-Xclib-optim-off -Xansi -Xlocal-data-area-static-only -Xforce-declarations   -Xmake-dependency=0xd $(ADDED_CFLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL -D_WRS_VX_SMP -D_WRS_CONFIG_SMP -D_VSB_CONFIG_FILE=\\\"$(VSB_CONFIG_FILE)\\\" -D_WRS_MIPS_N32_ABI -DMIPSEL  $(DEFINES) -o \"$@\" -c \"$<\"";
                     paths += "\r\r\r";
                 }
@@ -211,11 +211,11 @@ public class WorkbenchUtil {
                 for (int i = 0; i < list.size(); i++) {
                     if (list.size() - i == 1) {
                         //.o文件路径
-                        paths += "	srFrame_Mul_partialImage/$(MODE_DIR)/Objects" + list.get(i).substring(list.get(i).indexOf("\\" + other + "\\"), list.get(i).lastIndexOf(".")).replace("\\", "/") + ".o  \r\r";
+                        paths += "	srFrame_Mul_partialImage/$(MODE_DIR)/Objects/srFrame_Mul" + list.get(i).substring(list.get(i).indexOf("\\" + other + "\\") + other.length() + 1, list.get(i).lastIndexOf(".")).replace("\\", "/") + ".o  \r\r";
                     } else if (i == 0) {
-                        paths += "srFrame_Mul_partialImage/$(MODE_DIR)/Objects" + list.get(i).substring(list.get(i).indexOf("\\" + other + "\\"), list.get(i).lastIndexOf(".")).replace("\\", "/") + ".o \\ \r";
+                        paths += "srFrame_Mul_partialImage/$(MODE_DIR)/Objects/srFrame_Mul" + list.get(i).substring(list.get(i).indexOf("\\" + other + "\\") + other.length() + 1, list.get(i).lastIndexOf(".")).replace("\\", "/") + ".o \\ \r";
                     } else {
-                        paths += "	srFrame_Mul_partialImage/$(MODE_DIR)/Objects" + list.get(i).substring(list.get(i).indexOf("\\" + other + "\\"), list.get(i).lastIndexOf(".")).replace("\\", "/") + ".o \\ \r";
+                        paths += "	srFrame_Mul_partialImage/$(MODE_DIR)/Objects/srFrame_Mul" + list.get(i).substring(list.get(i).indexOf("\\" + other + "\\") + other.length() + 1, list.get(i).lastIndexOf(".")).replace("\\", "/") + ".o \\ \r";
                     }
                 }
 
@@ -245,15 +245,15 @@ public class WorkbenchUtil {
                     for (int i = 0; i < list.size(); i++) {
                         if (i == list.size() - 1) {
                             //paths += "srFrame_Mul_partialImage/$(MODE_DIR)/Objects/srFrame_Mul"+list.get(i).substring(list.get(i).indexOf(other)+other.length(),list.get(i).length()).replace("\\", "/")+"  \r";
-                            String str = list.get(i).substring(list.get(i).indexOf("\\" + other + "\\"), list.get(i).length()).replace("\\", "/");
+                            String str = list.get(i).substring(list.get(i).indexOf("\\" + other + "\\") + other.length() + 1, list.get(i).length()).replace("\\", "/");
                             str = str.replace(".c", ".d");
-                            paths += "srFrame_Mul_partialImage/$(MODE_DIR)/Objects" + str + "\r";
+                            paths += "srFrame_Mul_partialImage/$(MODE_DIR)/Objects/srFrame_Mul" + str + "\r";
 
                         } else {
                             //paths += "	srFrame_Mul_partialImage/$(MODE_DIR)/Objects/srFrame_Mul"+list.get(i).substring(list.get(i).indexOf(other)+other.length(),list.get(i).length()).replace("\\", "/")+"  \r";
-                            String str = list.get(i).substring(list.get(i).indexOf("\\" + other + "\\"), list.get(i).length()).replace("\\", "/");
+                            String str = list.get(i).substring(list.get(i).indexOf("\\" + other + "\\") + other.length() + 1, list.get(i).length()).replace("\\", "/");
                             str = str.replace(".c", ".d");
-                            paths += "srFrame_Mul_partialImage/$(MODE_DIR)/Objects" + str + " \\ \r";
+                            paths += "srFrame_Mul_partialImage/$(MODE_DIR)/Objects/srFrame_Mul" + str + " \\ \r";
                         }
                     }
                 }
