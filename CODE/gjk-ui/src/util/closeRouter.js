@@ -13,6 +13,9 @@ export function menuTag(value, action, tagList, tag1) {
   let tagUrl = urlStr(tag1.value)
   if (action === "remove") {
     let { tag, key } = findTag(value, tagList);
+    // console.log("tag",tag)
+    // console.log("key",key)
+    // console.log("tagUrl",tagUrl)
     store.commit("DEL_TAG", tag);
     if (tag.value === tagUrl) {
       tag = tagList[key === 0 ? key : key - 1]; //如果关闭本标签让前推一个src\router\router.js
@@ -25,6 +28,8 @@ export function menuTag(value, action, tagList, tag1) {
   }
 }
 function findTag(value, tagList) {
+  // console.log("value",value)
+  // console.log("tagList",tagList)
   let tag, key;
   tagList.map((item, index) => {
     if (item.value.indexOf('?') != -1) {
@@ -49,6 +54,7 @@ function urlStr(oldUrl) {
   return newUrl
 }
 function openTag(item) {
+  // console.log("item",item)
   let tag;
   if (item.name) {
     tag = findTag(item.name).tag;

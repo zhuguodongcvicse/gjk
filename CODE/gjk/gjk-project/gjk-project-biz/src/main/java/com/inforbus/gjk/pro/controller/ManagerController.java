@@ -629,9 +629,10 @@ public class ManagerController {
 	 * @param hardwarelibs
 	 */
 	@PostMapping("saveHardwarelibs")
-	public void saveHarewarelibs(@RequestBody Hardwarelibs hardwarelibs) {
+	public int saveHarewarelibs(@RequestBody Hardwarelibs hardwarelibs) {
 		System.out.println("hardwarelibs" + hardwarelibs);
-		managerService.saveHardwarelibs(hardwarelibs);
+		int row = managerService.saveHardwarelibs(hardwarelibs);
+		return row;
 	}
 
 	/**
@@ -640,8 +641,9 @@ public class ManagerController {
 	 * @param chipsfromhardwarelibs
 	 */
 	@PostMapping("saveChipsFromHardwarelibs")
-	public void saveChipsFromHardwarelibs(@RequestBody Chipsfromhardwarelibs chipsfromhardwarelibs) {
-		managerService.saveChipsfromhardwarelibs(chipsfromhardwarelibs);
+	public int saveChipsFromHardwarelibs(@RequestBody Chipsfromhardwarelibs chipsfromhardwarelibs) {
+		int row = managerService.saveChipsfromhardwarelibs(chipsfromhardwarelibs);
+		return row;
 	}
 
 	@GetMapping("getChipsfromhardwarelibs/{id}")
@@ -695,8 +697,8 @@ public class ManagerController {
 	 * @param hardwarelibs
 	 */
 	@PostMapping("updateHardwarelib")
-	public void updateHardwarelib(@RequestBody Hardwarelibs hardwarelibs) {
-		managerService.updateHardwarelib(hardwarelibs);
+	public int updateHardwarelib(@RequestBody Hardwarelibs hardwarelibs) {
+		return managerService.updateHardwarelib(hardwarelibs);
 	}
 
 	/**
@@ -718,16 +720,17 @@ public class ManagerController {
 	public void deleteChipsFromHardwarelibs(@PathVariable String id) {
 		managerService.deleteChipsFromHardwarelibs(id);
 	}
-	
+
 	/**
 	 * 流程建模完备性检查
+	 * 
 	 * @param id
 	 * @return
 	 */
 	@GetMapping
 	@RequestMapping("/completeCheck/{id}/{userId}")
-	public R completeCheck(@PathVariable("id") String id,@PathVariable("userId") String userId) {
-		return managerService.completeCheck(id,userId);
+	public R completeCheck(@PathVariable("id") String id, @PathVariable("userId") String userId) {
+		return managerService.completeCheck(id, userId);
 	}
 
 	/**
@@ -819,51 +822,8 @@ public class ManagerController {
 	 * 集成代码生成
 	 */
 	@PutMapping("/codeGeneration/{projectId}/{username}")
-	public void codeGeneration(@PathVariable("projectId") String projectId, @PathVariable("username") String username) {
-		ProjectFile processFile = managerService
-				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, projectId));
-		// processFile.getFilePath()
-		String tmpGenerateCodeResult = gitDetailPath + processFile.getFilePath() + processFile.getFileName()
-				+ File.separator + generateCodeResult;
-		// String
-		// tmpSoftToHardResult=gitDetailPath+processFile.getFilePath()+softToHardResult;
-		String generatecode = JGitUtil.getGeneratecode();// "D:\\14S_GJK_GIT\\gjk\\gjk\\generateCodeExe\\generatecode.exe";
-		String userName = username;
-
-		ProjectFile projectFile = managerService.getBaseMapper().selectById(projectId);
-		String workModeId = String.valueOf(projectFile.getFlowId());
-
-		String workModeFilePath = managerService.getWorkModeFilePath(projectId);
-		String packinfoPath = tmpGenerateCodeResult + File.separator + "packinfo.xml";
-		String userDefineTopicFilePath = managerService.getUserDefineTopicFilePath(projectId);
-		String cmpIntgCodeFilePath = tmpGenerateCodeResult;
-
-		String filePath = gitDetailPath + processFile.getFilePath() + processFile.getFileName() + "/generateCodeResult";
-		File file = new File(filePath);
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-
-		String[] strArray = new String[] { generatecode, userName, workModeId, workModeFilePath, packinfoPath,
-				userDefineTopicFilePath, cmpIntgCodeFilePath };
-		try {
-			Process process = Runtime.getRuntime().exec(strArray);
-			InputStreamReader reader = new InputStreamReader(process.getInputStream());
-			BufferedReader bufferedReader = new BufferedReader(reader);
-
-			StringBuffer stringBuffer = new StringBuffer();
-
-			String str = null;
-
-			while ((str = bufferedReader.readLine()) != null) {
-				stringBuffer.append(str);
-			}
-
-			System.out.println(stringBuffer);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+	public R codeGeneration(@PathVariable("projectId") String projectId, @PathVariable("username") String username) {
+		return managerService.codeGeneration(projectId, username);
 	}
 
 	@ResponseBody
