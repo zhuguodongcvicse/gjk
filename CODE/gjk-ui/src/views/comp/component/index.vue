@@ -362,6 +362,7 @@ export default {
         let params = new FormData();
         params.append("file", this.importCompFileList[0]);
         params.append("userId", this.userInfo.userId);
+        params.append("userName", this.userInfo.username);
         importCompZipUpload(params).then(Response => {
           if (Response.data.data == null) {
             this.$message.warning("上传的压缩包内容错误，请重新选择文件上传。");

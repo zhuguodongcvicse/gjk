@@ -160,7 +160,7 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 					+ File.separator + comp.getCompId() + File.separator + comp.getVersion();
 			if (new File(compPath).exists()) {
 				zipDirOrFile(zip, new File(compPath),
-						"component" + File.separator + comp.getCompName() + File.separator + comp.getVersion());
+						"component" + File.separator + comp.getCompId() + File.separator + comp.getVersion());
 			}
 		}
 
@@ -339,7 +339,7 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		List<String> structIdList = structlibsList.stream().map(Structlibs::getId).collect(Collectors.toList());
 		List<Structlibs> list = new ArrayList<>();
 		if (structIdList.size() > 0) {
-			list = structlibsMapper.getStructlibsByIdList(structIdList);
+			list = structlibsMapper.getStructlibsByParentIdList(structIdList);
 		}
 		if (list.size() > 0) {
 			resList.addAll(list);

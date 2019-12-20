@@ -298,8 +298,9 @@ public class ComponentController {
 	@ResponseBody
 	@PostMapping(path = "/importCompZipUpload", consumes = { "multipart/mixed", "multipart/form-data" })
 	public R<?> appImageUpload(@RequestParam(value = "file", required = false) MultipartFile ufile,
-			@RequestParam(value = "userId", required = false) String userId) {
-		return new R<>(componentService.analysisZipFile(ufile, userId));
+			@RequestParam(value = "userId", required = false) String userId,
+			@RequestParam(value = "userName", required = false) String userName) {
+		return new R<>(componentService.analysisZipFile(ufile, userId, userName));
 	}
 
 	@ResponseBody

@@ -276,20 +276,20 @@ export default {
       putObj(modifyApply).then(Response => {
         switch (this.applyItemMsg.libraryType) {
           case "1":
-            //将通过审批的构件提交到公共构件库
-            let commonComp = {};
-            commonComp.id = this.component.id;
-            commonComp.compId = this.component.compId;
-            commonComp.compName = this.component.compName;
-            commonComp.compFuncname = this.component.compFuncname;
-            commonComp.userId = this.component.userId;
-            commonComp.compImg = this.component.compImg;
-            commonComp.description = this.component.compBackupinfo;
-            commonComp.delFlag = "0";
             if (
               this.applyItemMsg.applyType != "3" &&
               this.applyItemMsg.applyType != "4"
             ) {
+              //将通过审批的构件提交到公共构件库
+              let commonComp = {};
+              commonComp.id = this.component.id;
+              commonComp.compId = this.component.compId;
+              commonComp.compName = this.component.compName;
+              commonComp.compFuncname = this.component.compFuncname;
+              commonComp.userId = this.component.userId;
+              commonComp.compImg = this.component.compImg;
+              commonComp.description = this.component.compBackupinfo;
+              commonComp.delFlag = "0";
               saveCommonComp(commonComp).then(Response => {
                 let compVersion = Response.data.data.version;
                 getAllDetailByCompId(this.applyItemMsg.applyId).then(

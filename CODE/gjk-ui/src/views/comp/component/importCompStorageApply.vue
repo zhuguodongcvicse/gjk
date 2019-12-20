@@ -58,6 +58,7 @@
 //例如：import 《组件名称》 from '《组件路径》';
 //当引用的方法重名时，使用as取别名区分
 import { tableOption } from "@/const/crud/comp/component";
+import { fetchCompLists } from "@/api/comp/component";
 import { getTreeDefaultExpandIds } from "@/util/util";
 export default {
   //注入依赖，调用this.reload();用于刷新页面
