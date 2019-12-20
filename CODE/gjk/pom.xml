@@ -33,7 +33,7 @@
 		<kaptcha.version>0.0.9</kaptcha.version>
 		<velocity.version>1.7</velocity.version>
 		<jasypt.version>2.1.0</jasypt.version>
-		<security.oauth.version>2.3.5.RELEASE</security.oauth.version>
+		<security.oauth.version>2.3.6.RELEASE</security.oauth.version>
 		<security.oauth.auto.version>2.1.2.RELEASE</security.oauth.auto.version>
 		<jackson.modules>2.9.8</jackson.modules>
 		<!--zipkin2.12.x需要此版本jooq -->
