@@ -4,12 +4,16 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.inforbus.gjk.common.core.jgit.JGitUtil;
+import com.inforbus.gjk.common.core.util.ExternalIOTransUtils;
 import com.inforbus.gjk.simulation.dto.SimulationDTO;
 import com.inforbus.gjk.simulation.core.Global;
+import com.inforbus.gjk.simulation.dto.SimulationTableDataDTO;
 import com.inforbus.gjk.simulation.service.SimulatorService;
 import com.inforbus.gjk.simulation.task.SimulatorQueue;
 import com.inforbus.gjk.simulation.task.Subscriber;
 import com.inforbus.gjk.simulation.task.SubscriberThread;
+import flowModel.MoniRecvDataThread;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ListOperations;
@@ -48,10 +52,9 @@ public class SimulatorServiceImpl implements SimulatorService {
         //启动监听线程
         new SubscriberThread(subscriber,channelName,host).start();
         //启用客户线程，传入参数
-        SimulatorQueue simulatorQueue = new SimulatorQueue(host, channelName);
-        simulatorQueue.start();
+        MoniRecvDataThread startMoniRecvDataThread = ExternalIOTransUtils.startMoniRecvDataThread(host, channelName, componentLinks, filePath, JGitUtil.getCTRL_TAB_FILE_PATH());
+        Global.USERS_SIMULATOR_THREAD.put(username,startMoniRecvDataThread);
         //放入全局变量
-        Global.USERS_SIMULATOR_THREAD.put(username,simulatorQueue);
         return true;
     }
 
@@ -82,21 +85,43 @@ public class SimulatorServiceImpl implements SimulatorService {
         String str = redisTemplate.opsForList().rightPop(key);
         //调用客户接口解析
         JSONObject objects = JSONUtil.parseObj(str);
-        List<Object> data = (List<Object>) objects.get("data");
-        if(data==null){
-            return null;
-        }
-        List<String> xaxisData = Lists.newArrayList();
-        List<String> yaxisData = Lists.newArrayList();
-        for (int i = 0; i < data.size(); i++) {
-            xaxisData.add((i+1)+"");
-            yaxisData.add(data.get(i)+"");
-        }
-        Map<String,Object> res = Maps.newHashMap();
-        res.put("xaxisData",xaxisData);
-        res.put("yaxisData",yaxisData);
-        res.put("select",simulationDTO.getSelect());
-        return res;
+//        List<Object> data = (List<Object>) objects.get("Data");
+//        if(data==null){
+//            return null;
+//        }
+        String[] tabNames = ((String) objects.get("tabNameList")).split("\\|");
+        List<SimulationTableDataDTO> tableData = Lists.newArrayList();
+        Map<String, String> tabNameDataMap = (Map) objects.get(tabNames[0]);
+        tabNameDataMap.keySet().stream().forEach(tableDataKey->{
+            SimulationTableDataDTO simulationTableDTO = new SimulationTableDataDTO();
+            simulationTableDTO.setName(tableDataKey);
+            String[] split = tabNameDataMap.get(tableDataKey).split("\\|");
+            simulationTableDTO.setValue(split.length > 0?split[0]:"");
+            simulationTableDTO.setRemark(split.length == 2 ? split[1]: "");
+            tableData.add(simulationTableDTO);
+        });
+        Map<String, String> tabNameDataMap1 = (Map)objects.get(tabNames[1]);
+        tabNameDataMap1.keySet().stream().forEach(tableDataKey->{
+            SimulationTableDataDTO simulationTableDTO = new SimulationTableDataDTO();
+            simulationTableDTO.setName(tableDataKey);
+            String[] split = tabNameDataMap1.get(tableDataKey).split("\\|");
+            simulationTableDTO.setValue(split.length > 0?split[0]:"");
+            simulationTableDTO.setRemark(split.length == 2 ? split[1]: "");
+            tableData.add(simulationTableDTO);
+        });
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("tableData", tableData);
+//        List<String> xaxisData = Lists.newArrayList();
+//        List<String> yaxisData = Lists.newArrayList();
+//        for (int i = 0; i < data.size(); i++) {
+//            xaxisData.add((i+1)+"");
+//            yaxisData.add(data.get(i)+"");
+//        }
+//        Map<String,Object> res = Maps.newHashMap();
+//        res.put("xaxisData",xaxisData);
+//        res.put("yaxisData",yaxisData);
+//        res.put("select",simulationDTO.getSelect());
+        return map;
     }
 
     @Override
