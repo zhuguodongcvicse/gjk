@@ -128,8 +128,8 @@
             },
             // 接受子页面发来的信息
             handleMessage(event) {
-                console.log("event.data", event.data);
-                console.log("this.params", this.params);
+                // console.log("event.data", event.data);
+                // console.log("this.params", this.params);
                 if (typeof this.params === "string") {
                     return;
                 }
