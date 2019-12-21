@@ -101,23 +101,16 @@ export function getUnprocessedRecord(approval) {
   })
 }
 
-export function getPassCompByProId(approvalId) {
+export function removeCompApproval(compId, projectId) {
   return request({
-    url: '/libs/approval/getPassCompByProId/' + approvalId,
+    url: '/libs/approval/removeCompApproval/' + compId + '/' + projectId,
     method: 'get'
   })
 }
 
-export function removeCompApproval(compId,projectId){
+export function checkApproval(projectId) {
   return request({
-    url:'/libs/approval/removeCompApproval/' + compId+'/'+projectId,
-    method:'get'
-  })
-}
-
-export function checkApproval(projectId){
-  return request({
-    url:'/libs/approval/checkApproval/'+ projectId,
-    method:'get'
+    url: '/libs/approval/checkApproval/' + projectId,
+    method: 'get'
   })
 }

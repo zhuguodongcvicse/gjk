@@ -277,7 +277,11 @@ export default {
       hardwareTreeData: [],
       hardwareSelectArray: [],
 
-      screenLibsTree: [],
+      screenLibsTree: [
+        { label: "算法", id: "0", children: [] },
+        { label: "测试", id: "0", children: [] },
+        { label: "平台", id: "0", children: [] }
+      ],
       screenLibsIdArray: [],
 
       compTreeData: [],
@@ -297,7 +301,9 @@ export default {
           { required: true, message: "请输入项目名称", trigger: "blur" },
           { validator: proNameSameNameCheck, trigger: "blur" }
         ],
-        applyUser: [{ required: true, message: "请选择审批人", trigger: "change" }],
+        applyUser: [
+          { required: true, message: "请选择审批人", trigger: "change" }
+        ],
         processName: [
           { required: true, message: "请输入流程名称", trigger: "blur" },
           { validator: processNameCheck, trigger: "blur" }
@@ -318,12 +324,21 @@ export default {
           this.$delete(this.compSelectArray, index);
         }
       }
-      // console.log("compSelectArray:", this.compSelectArray);
+      console.log("compSelectArray:", this.compSelectArray);
     },
     "formLabelAlign.applyUser": function() {
       // console.log("formLabelAlign.applyUser:", this.formLabelAlign.applyUser);
     },
     screenLibsIdArray() {
+      for (let item of this.screenLibsIdArray) {
+        if (item == "0") {
+          this.screenLibsIdArray.splice(
+            this.screenLibsIdArray.indexOf(item),
+            1
+          );
+        }
+      }
+      console.log("screenLibsIdArray", this.screenLibsIdArray);
       this.getTableData();
       this.compSelectArray = [];
     }
@@ -370,18 +385,14 @@ export default {
       });
     },
     getLibsTree() {
-      fetchAlgorithmTree(this.listQuery).then(response => {
-        this.screenLibsTree = response.data.data;
-        fetchTestTree(this.listQuery).then(testTree => {
-          for (let item of testTree.data.data) {
-            this.screenLibsTree.push(item);
-          }
-          fetchPlatformTrees(this.listQuery).then(platformTree => {
-            for (let platformItem of platformTree.data.data) {
-              this.screenLibsTree.push(platformItem);
-            }
-          });
-        });
+      fetchAlgorithmTree(this.listQuery).then(algorithmTree => {
+        this.screenLibsTree[0].children = algorithmTree.data.data;
+      });
+      fetchTestTree(this.listQuery).then(testTree => {
+        this.screenLibsTree[1].children = testTree.data.data;
+      });
+      fetchPlatformTrees(this.listQuery).then(platformTree => {
+        this.screenLibsTree[2].children = platformTree.data.data;
       });
     },
     getCompSelectTree() {
