@@ -111,14 +111,6 @@ public interface ApprovalMapper extends BaseMapper<Approval> {
 	 */
 	List<Approval> getUnprocessedRecord(@Param("approval") Approval approval);
 
-	/**
-	 * 获取项目对应的已申请构件ID集合
-	 * 
-	 * @param proId
-	 * @return
-	 */
-	List<ApprovalApply> getPassCompByProId(@Param("proId") String proId);
-
 	void removeCompApproval(@Param("idList") List<String> idList, @Param("compId") String compId);
 
 	List<Approval> getByApplyId(@Param("projectId") String projectId);

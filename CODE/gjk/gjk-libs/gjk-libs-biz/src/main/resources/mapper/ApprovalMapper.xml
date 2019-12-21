@@ -212,7 +212,7 @@
 			</if>
 		</where>
 	</select>
-	
+
 	<select id="getByApplyId"
 		parameterType="com.inforbus.gjk.libs.api.entity.Approval"
 		resultMap="approvalMap">
@@ -255,20 +255,6 @@
 		</where>
 	</select>
 
-	<select id="getPassCompByProId" resultMap="approvalApplyMap">
-		SELECT
-		<include refid="approvalApplySql" />
-		FROM gjk_approval_apply
-		<where>
-			approval_id in(
-			SELECT id FROM gjk_approval
-			where apply_id =
-			#{proId}
-			)
-			AND approval_state in ('0','1','2','4')
-		</where>
-	</select>
-	
 	<update id="removeCompApproval">
 		UPDATE gjk_approval_apply SET approval_state = '3'
 		where approval_id IN

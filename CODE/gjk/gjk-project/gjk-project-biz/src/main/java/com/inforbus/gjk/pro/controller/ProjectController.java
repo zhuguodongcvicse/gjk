@@ -326,4 +326,10 @@ public class ProjectController {
 	public R updateBaseTemplateIDs(@RequestBody Project project) {
 		return new R<>(projectService.updateBaseTemplate(project));
 	}
+
+	@GetMapping("/getPassCompByProId/{projectId}")
+	public R getProjectCompByProId(@PathVariable String projectId) {
+		return new R<>(projectService.getProjectCompByProId(projectId));
+	}
+
 }

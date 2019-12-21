@@ -202,7 +202,7 @@ export default {
           }
     },
     saveTheme() {
-        let themeDataXml = this.xmlDataMap[this.$route.query.sysId].themeData
+        let themeDataXml = this.xmlDataMap.get(this.$route.query.sysId).themeData
         this.xml.xmlEntityMaps[0].xmlEntityMaps = [];
         this.xml.xmlEntityMaps[1].xmlEntityMaps = [];
         this.$set(this.xml.attributeMap, "configureType", this.getXmlConfigureType(themeDataXml, 'root'));
@@ -376,7 +376,7 @@ export default {
       //  }
       //  console.log("网络配置xml数据",this.netWorkXML)
       //createNetWorkXml(this.netWorkIn)
-      createNetWorkXML(this.xmlDataMap[this.$route.query.sysId].netWorkData,this.$route.query.sysId,this.netWorkName).then(response => {
+      createNetWorkXML(this.xmlDataMap.get(this.$route.query.sysId).netWorkData,this.$route.query.sysId,this.netWorkName).then(response => {
         if (response.data.data) {
           this.$notify({
             title: "成功",

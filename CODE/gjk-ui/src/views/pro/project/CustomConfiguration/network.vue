@@ -74,7 +74,7 @@ export default {
   watch: {
     xmlEntityMaps:{
       handler:function(){
-        let xmlEntityMaps = this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps
+        let xmlEntityMaps = this.xmlDataMap.get(this.$route.query.sysId).netWorkData.xmlEntityMaps
           for (let i = 0; i < xmlEntityMaps.length; i++) {
             const element = xmlEntityMaps[i];
             if(element.lableName==this.labelName){
@@ -84,7 +84,7 @@ export default {
                 entityMaps.push(element1.data)
               }
               element.xmlEntityMaps = entityMaps
-              this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps[i] = element
+              this.xmlDataMap.get(this.$route.query.sysId).netWorkData.xmlEntityMaps[i] = element
             }
           }
       }
@@ -252,7 +252,7 @@ export default {
         }
       }
       this.xmlEntityMaps[index].data = entity
-      let xmlEntityMaps = this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps
+      let xmlEntityMaps = this.xmlDataMap.get(this.$route.query.sysId).netWorkData.xmlEntityMaps
       for (let i = 0; i < xmlEntityMaps.length; i++) {
         const element = xmlEntityMaps[i];
         if(element.lableName==this.labelName){
@@ -262,8 +262,8 @@ export default {
             entityMaps.push(element1.data)
           }
           element.xmlEntityMaps = entityMaps
-          this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps[i] = element
-            console.log(this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps[i])
+          this.xmlDataMap.get(this.$route.query.sysId).netWorkData.xmlEntityMaps[i] = element
+            console.log(this.xmlDataMap.get(this.$route.query.sysId).netWorkData.xmlEntityMaps[i])
         }
       }
       // for (let key in this.formLabelAlign) {
@@ -329,7 +329,7 @@ export default {
       this.protocolNameOptions = res.data.data
       // this.protocolNameOptions = [{label: '1', value: '1'}]
     })
-    let xmlEntityMaps = this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps
+    let xmlEntityMaps = this.xmlDataMap.get(this.$route.query.sysId).netWorkData.xmlEntityMaps
     let index = 0;
     for (let i = 0; i < xmlEntityMaps.length; i++) {
       const element = xmlEntityMaps[i];

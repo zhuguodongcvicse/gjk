@@ -40,12 +40,8 @@
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
 import { mapGetters } from "vuex";
-import { saveProCompList } from "@/api/pro/project";
-import {
-  getPassCompByProId,
-  saveApproval,
-  saveApprovalApply
-} from "@/api/libs/approval";
+import { getPassCompByProId, saveProCompList } from "@/api/pro/project";
+import { saveApproval, saveApprovalApply } from "@/api/libs/approval";
 import { getAllComp, screenCompByLibs } from "@/api/libs/commoncomponent";
 import { fetchAlgorithmTree } from "@/api/admin/algorithm";
 import { fetchTestTree } from "@/api/admin/test";
@@ -68,7 +64,11 @@ export default {
         compSelectArray: []
       },
       applyUserSelect: [],
-      screenLibsTree: [],
+      screenLibsTree: [
+        { label: "算法", id: "0", children: [] },
+        { label: "测试", id: "0", children: [] },
+        { label: "平台", id: "0", children: [] }
+      ],
       screenLibsIdArray: [],
       compTreeData: [],
       defaultExpandedNodeArray: [],
@@ -87,6 +87,15 @@ export default {
   //监控data中的数据变化
   watch: {
     screenLibsIdArray() {
+      for (let item of this.screenLibsIdArray) {
+        if (item == "0") {
+          this.screenLibsIdArray.splice(
+            this.screenLibsIdArray.indexOf(item),
+            1
+          );
+        }
+      }
+      console.log("screenLibsIdArray", this.screenLibsIdArray);
       this.getTableData();
       this.addProCompForm.compSelectArray = [];
     },
@@ -141,18 +150,14 @@ export default {
       });
     },
     getLibsTree() {
-      fetchAlgorithmTree(this.listQuery).then(response => {
-        this.screenLibsTree = response.data.data;
-        fetchTestTree(this.listQuery).then(testTree => {
-          for (let item of testTree.data.data) {
-            this.screenLibsTree.push(item);
-          }
-          fetchPlatformTrees(this.listQuery).then(platformTree => {
-            for (let platformItem of platformTree.data.data) {
-              this.screenLibsTree.push(platformItem);
-            }
-          });
-        });
+      fetchAlgorithmTree(this.listQuery).then(algorithmTree => {
+        this.screenLibsTree[0].children = algorithmTree.data.data;
+      });
+      fetchTestTree(this.listQuery).then(testTree => {
+        this.screenLibsTree[1].children = testTree.data.data;
+      });
+      fetchPlatformTrees(this.listQuery).then(platformTree => {
+        this.screenLibsTree[2].children = platformTree.data.data;
       });
     },
     getTableData() {
