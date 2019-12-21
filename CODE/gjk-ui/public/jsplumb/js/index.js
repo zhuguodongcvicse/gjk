@@ -1319,33 +1319,39 @@ function getSimulationData() {
 }
 
 //双击连线出现仿真图标
+let fzMap = new Map()
 jsPlumb.bind("dblclick", function (conn, originalEvent) {
 	console.warn("双击连线出现仿真图标",dblclickPoint)
 	if(!dblclickPoint){
 		connectionObjClick = {};
-		console.log("双击获取连线数据", conn)
 		let startId = conn.sourceId
 		let endId = conn.targetId
 		if (componentMap.get(startId) === componentMap.get(endId)) {
 			handleMessageToParent("returnFZInfo", "所选连线俩端构件属于同一组件");
 		} else {
+			let startName = endpointMap.get(conn.endpoints[0].getUuid()).variableName
+			let endName = endpointMap.get(conn.endpoints[1].getUuid()).variableName
+			let TempData = { startId: startId, endId: endId, startName:startName,endName:endName}
+			fzMap.set(conn.id,TempData)
 			let id = createNum()
 			conn.setLabel(function () {
-				return '<div class ="fz" id = "' + id + '" style="width:20px;height:12px;"></div>'
+				return '<div class ="fz" id = "' + conn.id + '" style="width:20px;height:12px;"></div>'
 			})
-			$('#' + id).attr('tabindex', 0);
-			$('#' + id).focus();
-			$("#" + id).bind("click", function () {
-				document.getElementById(id).onkeydown = function (e) {
+			console.log("仿真图标",$('#' + conn.id))
+			$('#' + conn.id).attr('tabindex', 0);
+			$('#' + conn.id).focus();
+			$("#" + conn.id).bind("click", function () {
+				document.getElementById(conn.id).onkeydown = function (e) {
 					if (e.keyCode == 46) {
-						//$("#" + id).remove()
+						$("#" + conn.id).remove()
 						conn.setLabel('')
 					}
 				}
 				return false
 			})
-			$("#" + id).bind("dblclick", function () {
-				handleMessageToParent("returnFZ", { startId: startId, endId: endId });
+			$("#" + conn.id).bind("dblclick", function (event) {
+				//console.log("asdasdd",event.currentTarget.id)
+				handleMessageToParent("returnFZ", fzMap.get(event.currentTarget.id));
 			})
 		}
 

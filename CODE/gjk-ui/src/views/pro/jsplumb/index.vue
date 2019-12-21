@@ -6,8 +6,21 @@
         <el-input placeholder="请输入内容" v-bind:style="'width:20%'">
           <el-button slot="append" icon="el-icon-search" @click="sendMessage"></el-button>
         </el-input>
+
+        <!-- <el-tooltip class="item" effect="dark" content="Bottom Center 提示文字" placement="bottom">
+           <el-button>下边</el-button>
+         </el-tooltip>
+
+          <el-tooltip class="item" effect="dark" content="Bottom Center 提示文字" placement="bottom">
+                <i class="el-icon-user"></i>
+          </el-tooltip> -->
+
+
+         
         <el-button-group>
-          <el-button type="primary" plain size="small" @click="sendMessage('save')">保存</el-button>
+          
+              <el-button type="primary"  plain size="small" @click="sendMessage('save')">保存</el-button>
+         
           <el-button
             type="primary"
             plain
@@ -26,7 +39,7 @@
            <el-button type="primary" plain size="small" @click="sendMessage('startSimulation')">开始仿真</el-button>
             <el-button type="primary" plain size="small" @click="sendMessage('endSimulation')">结束仿真</el-button>
           <el-button type="primary" plain size="small" @click="sendMessage('exportJSON')">导出</el-button>
-          <!-- <input type="file" @change="getFile($event)"> -->
+          <!-- &nbsp; -->
           <el-upload
             class="upload-demo inline-block"
             action="/pro/manager/importFile"
@@ -37,7 +50,6 @@
           >
             <el-button type="primary" plain size="small">导入</el-button>
           </el-upload>
-          <!-- <el-button type="primary" plain size="small" @click="submit($event)">导入</el-button> -->
         </el-button-group>
         <el-select
           v-model="alignmentValue"
@@ -761,7 +773,7 @@ export default {
         case "returnFZ":
           this.$router.push({
             path: "/comp/manager/simulator",
-            query: { flowFilePath: this.flowFilePath, startId: data.params.startId,endId:data.params.endId }
+            query: { flowFilePath: this.flowFilePath, startId: data.params.startId,endId:data.params.endId,startName:data.params.startName,endName:data.params.endName}
           });
           break;
         case "returnSimulationData":
