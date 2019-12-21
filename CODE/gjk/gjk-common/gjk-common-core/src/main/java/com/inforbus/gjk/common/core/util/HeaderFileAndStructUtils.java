@@ -246,7 +246,7 @@ public class HeaderFileAndStructUtils {
 //				params[i] = new StringBuilder();
 				params[i].append(strArray[i]);
 			} else {
-				return false;
+			
 			}
 		}
 		return true;
