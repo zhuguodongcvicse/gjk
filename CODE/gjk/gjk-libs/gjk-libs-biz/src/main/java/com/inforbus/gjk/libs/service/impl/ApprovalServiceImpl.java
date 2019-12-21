@@ -136,16 +136,6 @@ public class ApprovalServiceImpl extends ServiceImpl<ApprovalMapper, Approval> i
 	}
 
 	@Override
-	public List<String> getPassCompByProId(String proId) {
-		List<ApprovalApply> approvalApplies = baseMapper.getPassCompByProId(proId);
-		List<String> idList = new ArrayList<String>();
-		for (ApprovalApply approvalApply : approvalApplies) {
-			idList.add(approvalApply.getApplyId());
-		}
-		return idList;
-	}
-
-	@Override
 	public List<ApprovalApply> getApprovalApplyIdByList(List<ApprovalApply> approvalApplies) {
 		List<ApprovalApply> list = new ArrayList<ApprovalApply>();
 		for (ApprovalApply item : approvalApplies) {
@@ -161,10 +151,10 @@ public class ApprovalServiceImpl extends ServiceImpl<ApprovalMapper, Approval> i
 	public void removeCompApproval(String compId, String projectId) {
 		List<Approval> approvalApp = baseMapper.getByApplyId(projectId);
 		List<String> idList = new ArrayList<String>();
-		for(Approval approval:approvalApp) {
+		for (Approval approval : approvalApp) {
 			idList.add(approval.getId());
 		}
-		baseMapper.removeCompApproval(idList,compId);	
+		baseMapper.removeCompApproval(idList, compId);
 	}
 
 	@Override
@@ -172,8 +162,8 @@ public class ApprovalServiceImpl extends ServiceImpl<ApprovalMapper, Approval> i
 		System.out.println(projectId);
 		String checkApprovalState = "0";
 		List<Approval> approvalApp = baseMapper.getByApplyId(projectId);
-		for(Approval approval : approvalApp) {
-			if("0".equals(approval.getApprovalState())) {
+		for (Approval approval : approvalApp) {
+			if ("0".equals(approval.getApprovalState())) {
 				checkApprovalState = "1";
 			}
 		}

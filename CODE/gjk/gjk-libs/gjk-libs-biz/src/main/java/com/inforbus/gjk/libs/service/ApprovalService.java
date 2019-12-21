@@ -93,14 +93,6 @@ public interface ApprovalService extends IService<Approval> {
 	List<Approval> getUnprocessedRecord(Approval approval);
 
 	/**
-	 * 获取项目对应的已申请构件ID集合
-	 * 
-	 * @param proId
-	 * @return
-	 */
-	List<String> getPassCompByProId(String proId);
-
-	/**
 	 * 查找审批关联表中的各项的id
 	 * 
 	 * @param approvalApplies
@@ -109,7 +101,7 @@ public interface ApprovalService extends IService<Approval> {
 	List<ApprovalApply> getApprovalApplyIdByList(List<ApprovalApply> approvalApplies);
 
 	void removeCompApproval(String compId, String projectId);
-	
+
 	String checkApproval(String projectId);
 
 }

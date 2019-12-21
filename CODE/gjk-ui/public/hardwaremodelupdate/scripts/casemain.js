@@ -1464,7 +1464,7 @@ function initEditor(editor) {
       if (evt.kind == Q.InteractionEvent.ELEMENT_CREATED && evt.data instanceof Q.Edge) {
         var edge = evt.data;
         //校验只能接口连线
-        if(evt.data.from.host.host == evt.data.to.host.host){
+        if(evt.data.from.host.host.host.host == evt.data.to.host.host.host.host){
           graph.removeElement(edge);
         }
         if (evt.data.from.image != 'images/OpticalFiberMouth.svg' && evt.data.from.image != 'images/RoundMouth.svg' &&

@@ -109,6 +109,13 @@ export function saveProCompList(projectId, compList) {
   })
 }
 
+export function getPassCompByProId(projectId) {
+  return request({
+    url: '/pro/project/getPassCompByProId/' + projectId,
+    method: 'get'
+  })
+}
+
 export function editProJSON(obj, proId) {
   return request({
     url: '/pro/manager/editProJson/' + proId,
@@ -275,9 +282,9 @@ export function staticInspect(obj) {
   })
 }
 
-export function completeCheck(id,userId) {
+export function completeCheck(id, userId) {
   return request({
-    url: '/pro/manager/completeCheck/'+id + '/' + userId,
+    url: '/pro/manager/completeCheck/' + id + '/' + userId,
     method: 'get'
   })
 }
