@@ -75,9 +75,9 @@ export default {
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
       this.$store.dispatch("setThemeChineseMapping", "theme_param_type");
-      this.themeData = this.xmlDataMap[this.$route.query.sysId].themeData
+      this.themeData = this.xmlDataMap.get(this.$route.query.sysId).themeData
       console.log('themeData====', this.themeData)
-      this.partList = this.xmlDataMap[this.$route.query.sysId].partList
+      this.partList = this.xmlDataMap.get(this.$route.query.sysId).partList
       this.xmlEntityMaps = this.themeData.xmlEntityMaps
       console.log('xmlEntityMaps===', this.xmlEntityMaps)
       this.initXmlData2StoreHandle()

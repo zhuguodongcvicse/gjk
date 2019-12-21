@@ -60,7 +60,7 @@ export default {
         if(this.funcConfigKey != "" && this.cleanState != "1"){
            this.$store.dispatch('getNetworkIn', {key:"network_in*"+this.funcConfigKey,value:this.funcConfigData})
         }
-       
+
       },
       deep:true
     },
@@ -79,7 +79,7 @@ export default {
         ip:"",
         port:"",
         protocol:""
-        
+
       },
       options_name:[],
       options: [
@@ -176,10 +176,10 @@ export default {
   created() {
     this.$store.dispatch('cleanNetworkIn');
     for(var x = 0;x<this.xmlDataMap.length;x++){
-      for(var i in this.xmlDataMap[x]) {
+      for(var i in this.xmlDataMap.get(x)) {
         if(i==this.$route.query.sysId){
-          this.netWorkData = this.xmlDataMap[x][i].netWorkData
-          this.partList = this.xmlDataMap[x][i].partList
+          this.netWorkData = this.xmlDataMap.get(x)[i].netWorkData
+          this.partList = this.xmlDataMap.get(x)[i].partList
         }
       }
     }
@@ -228,7 +228,7 @@ export default {
       }
     }
   },
-  
+
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   beforeCreate() {}, //生命周期 - 创建之前

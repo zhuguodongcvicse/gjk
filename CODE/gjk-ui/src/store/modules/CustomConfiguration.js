@@ -1,4 +1,4 @@
-import { getStore, removeStore, setStore } from '@/util/store'
+import { getStore, removeStore, setStore, strMapToObj } from '@/util/store'
 import { remote } from "@/api/admin/dict";
 
 const CustomConfiguration = {
@@ -10,7 +10,7 @@ const CustomConfiguration = {
       netWorkData : getStore({ name: 'netWorkData' })||{},
       netWorkOut : new Map(),
       partList : getStore({name: 'partList'}) || new Array(),
-      xmlDataMap : getStore({name: 'xmlDataMap'}) || new Array(),
+      xmlDataMap : getStore({name: 'xmlDataMap'}) || new Map(),
       themeCustomConfigData: new Map(),
       themeChineseMapping: getStore({ name: 'themeChineseMapping' }) || [],
     },
@@ -223,7 +223,11 @@ const CustomConfiguration = {
           // var xmlDataObj = {}
           // xmlDataObj[id] = params
           // state.xmlDataMap.push(xmlDataObj)
-          state.xmlDataMap[id] = params
+          // state.xmlDataMap[id] = params
+          state.xmlDataMap.set(id, params)
+
+          let xmlDataMapObj = strMapToObj(state.xmlDataMap)
+
           setStore({
             name: 'themeData',
             content: state.themeData,
@@ -241,7 +245,7 @@ const CustomConfiguration = {
           })
           setStore({
             name: 'xmlDataMap',
-            content: state.xmlDataMap,
+            content: xmlDataMapObj,
             type:"session"
           })
           console.log("商店state.xmlDataMap++++++++++++",state.xmlDataMap)

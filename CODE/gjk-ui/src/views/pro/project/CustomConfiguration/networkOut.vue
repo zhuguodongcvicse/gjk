@@ -111,7 +111,7 @@ export default {
     //     }
     //   }
     // }
-    this.netWorkData = this.xmlDataMap[this.$route.query.sysId].netWorkData
+    this.netWorkData = this.xmlDataMap.get(this.$route.query.sysId).netWorkData
     if(this.netWorkData.xmlEntityMaps != null){
       for(var i = 0;i<this.netWorkData.xmlEntityMaps[1].xmlEntityMaps.length;i++){
       this.data.push(
@@ -123,7 +123,7 @@ export default {
     }
     this.index = this.data[this.data.length-1].id+1
     }
-    
+
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
