@@ -2094,6 +2094,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// 项目表
 		Project project = projectMapper.getProById(projectId);
 		project.setBasetemplateIds(projectList.get(0).getBasetemplateIds());
+		projectMapper.updateById(project);
 
 		// 项目详情表
 		for (ProjectFile projectFile : projectDetailList) {
@@ -2583,13 +2584,17 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		for (Map<String, String> column : columns) {
 			String colName = columnToJava(column.get("columnName"));
 			columnNames.add(colName);
-			String cvsStr = (String) getFieldValueByName(colName, hardwarelibs);
-			cvsStr = cvsStr == null ? "" : cvsString(cvsStr);
-			columnValues.append(cvsStr).append(",");
+			if(hardwarelibs != null){
+				String cvsStr = String.valueOf(getFieldValueByName(colName, hardwarelibs));
+				cvsStr = cvsStr == null || cvsStr.equals("null") ? "" : cvsString(cvsStr);
+				columnValues.append(cvsStr).append(",");
+			}
 		}
 		List<String> cvsContent = new ArrayList<>();
 		cvsContent.add(String.join(",", columnNames));
-		cvsContent.add(columnValues.substring(0, columnValues.length() - 1));
+		if(columnValues.length() > 0){
+			cvsContent.add(columnValues.substring(0, columnValues.length() - 1));
+		}
 		String filePath = serverPath + "gjk" + File.separator + "testExcel" + File.separator + "gjk_hardwarelibs.csv";
 		File hardwarelibsFile = FileUtil.writeFileContent(filePath, cvsContent);
 
@@ -2604,13 +2609,17 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		for (Map<String, String> column : columns) {
 			String colName = columnToJava(column.get("columnName"));
 			columnNames.add(colName);
-			String cvsStr = (String) getFieldValueByName(colName, chipsfromhardwarelibs);
-			cvsStr = cvsStr == null ? "" : cvsString(cvsStr);
-			columnValues.append(cvsStr).append(",");
+			if(chipsfromhardwarelibs != null){
+				String cvsStr = String.valueOf(getFieldValueByName(colName, chipsfromhardwarelibs));
+				cvsStr = cvsStr == null || cvsStr.equals("null") ? "" : cvsString(cvsStr);
+				columnValues.append(cvsStr).append(",");
+			}
 		}
 		cvsContent = new ArrayList<>();
 		cvsContent.add(String.join(",", columnNames));
-		cvsContent.add(columnValues.substring(0, columnValues.length() - 1));
+		if(columnValues.length() > 0){
+			cvsContent.add(columnValues.substring(0, columnValues.length() - 1));
+		}
 		filePath = serverPath + "gjk" + File.separator + "testExcel" + File.separator + "gjk_chipsfromhardwarelibs.csv";
 		File chipsFile = FileUtil.writeFileContent(filePath, cvsContent);
 
