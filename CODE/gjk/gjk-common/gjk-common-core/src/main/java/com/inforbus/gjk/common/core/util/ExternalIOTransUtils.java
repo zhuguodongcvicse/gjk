@@ -14,16 +14,7 @@ import SpbModel.HeadFile;
 import SpbModel.Performance;
 import SpbModel.Struc;
 import appcontrol.AppControl;
-import flowModel.BackNodeInfoForSpb;
-import flowModel.CheckResult;
-import flowModel.SanityCheck;
-import flowModel.SimpleScheme;
-import flowModel.SpbFrameAutoGen;
-import flowModel.SystemConfig;
-import flowModel.SystemPara;
-import flowModel.TopicConfig;
-import flowModel.cmpProCreate;
-
+import flowModel.*;
 
 
 /**
@@ -284,5 +275,21 @@ public class ExternalIOTransUtils {
 	public static CheckResult completeCheck(String flowFilePath) {
 		SanityCheck sanityCheck = new SanityCheck();
 		return sanityCheck.sanityChecking(flowFilePath);
+	}
+
+	/**
+	 * 仿真数据
+	 */
+	public static MoniRecvDataThread startMoniRecvDataThread(String redisIP, String channelName,List<String> arrowList, String flowFilePath, String ctrlTabFilePath ){
+		MoniRecvDataThread moniRecvDataThread = new MoniRecvDataThread(redisIP,channelName,arrowList,flowFilePath,ctrlTabFilePath);
+		moniRecvDataThread.start();
+		return moniRecvDataThread;
+	}
+
+	/**
+	 * 停止推送仿真数据
+	 */
+	public static void stopMoniRecvDataThread(MoniRecvDataThread thread){
+		thread.stopRunning();
 	}
 }

@@ -29,8 +29,7 @@ public class SimulatorController {
 	/**
 	 * 开始仿真
 	 * @param username
-	 * @param componentLinks
-	 * @param filePath
+	 * @param obj
 	 * @return
 	 */
 	@PostMapping("/startSimulator/{username}")
@@ -52,6 +51,12 @@ public class SimulatorController {
 	@PostMapping("/stopSimulator/{username}")
 	public R stopSimulator(@PathVariable("username") String username){
 		return new R<>(simulatorService.stopSimulator(username));
+	}
+
+	@PostMapping("/stop/{username}")
+	public R stop(@PathVariable("username") String username,@RequestBody Object obj){
+		Map parse = JSON.parseObject(JSONUtil.toJsonStr(obj));
+		return new R<>(simulatorService.stop(username,(List<String>) parse.get("symbols")));
 	}
 }
 

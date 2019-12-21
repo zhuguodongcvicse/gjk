@@ -12,6 +12,7 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 import com.jcraft.jsch.SftpProgressMonitor;
+import javafx.beans.binding.MapBinding;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.imageio.IIOImage;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -190,7 +192,7 @@ public class CompileTask implements Task {
     private boolean sylixos(String sylixosPath, String fileName, String token) {
         File dir = new File(sylixosPath);
         //拼接 cmd命令
-        String str = "make all";
+        String str = "make clean";
         String[] cmd = new String[]{"cmd", "/c", str};
         Runtime rt = Runtime.getRuntime();
         Process p = null;
@@ -200,6 +202,15 @@ public class CompileTask implements Task {
             StreamManage successThread = new StreamManage(p.getInputStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译正常控制台信息
             errorThread.start();//开启编译错误流线程
             successThread.start();//开启编译正常流线程
+            errorThread.join();//等待线程结束
+            successThread.join();//等待线程结束
+            str = "make all";
+            cmd = new String[]{"cmd","/c",str};
+            p = rt.exec(cmd, null, dir);//打开cmd执行make命令
+            StreamManage errorThread1 = new StreamManage(p.getErrorStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译错误控制台信息
+            StreamManage successThread1 = new StreamManage(p.getInputStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译正常控制台信息
+            errorThread1.start();//开启编译错误流线程
+            successThread1.start();//开启编译正常流线程
             return true;
         } catch (Exception e) {
             logger.error("sylixos平台编译失败，请检查编译进程是否阻塞。");
@@ -237,6 +248,15 @@ public class CompileTask implements Task {
             StreamManage successThread = new StreamManage(p.getInputStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译正常控制台信息
             errorThread.start();//开启编译错误流线程
             successThread.start();//开启编译正常流线程
+            errorThread.join();
+            successThread.join();
+            str = "wrenv -p vxworks-6.8 make -C " + workbenchPath + " --no-print-directory BUILD_SPEC= MIPSI64disable_SMP DEBUG_MODE=1 TRACE=1";
+            cmd = new String[]{"cmd","/c",str};
+            p = rt.exec(cmd,null,dir);
+            StreamManage errorThread2 = new StreamManage(p.getErrorStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译错误控制台信息
+            StreamManage successThread2 = new StreamManage(p.getInputStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译正常控制台信息
+            errorThread2.start();//开启编译错误流线程
+            successThread2.start();//开启编译正常流线程
             return true;
         } catch (Exception e) {
             logger.error("workbench平台编译失败，请检查编译进程。");

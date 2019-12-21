@@ -355,8 +355,8 @@
         </div>
         <el-row class="addtemplate_dialogbtn_14s text_align_right_14s">
           <el-button @click="dialogVisible = false">取 消</el-button>
-          <el-button v-show="dialogType == '编辑标签'" type="primary" @click="eidtLable()">确 定</el-button>
-          <el-button v-show="dialogType == '添加标签'" type="primary" @click="AddLable()">确 定</el-button>
+          <el-button v-show="dialogType == '编辑标签'" type="primary" @click="eidtLable2()">确 定</el-button>
+          <el-button v-show="dialogType == '添加标签'" type="primary" @click="AddLable2()">确 定</el-button>
         </el-row>
       </el-dialog>
 
@@ -865,6 +865,13 @@ export default {
       Vue.delete(this.currentXmlMap.attributeMap, attribute.attributename);
     },
 
+    AddLable2() {
+      this.$refs.configureTypeRef.validate(valid => {
+        if (valid) {
+          this.AddLable();
+        }
+      });
+    },
     async AddLable() {
       //确定添加标签
       var lableMapping = this.configureType.lableMapping;
@@ -1081,7 +1088,13 @@ export default {
         this.dialogVisible = true;
       }
     },
-
+    eidtLable2() {
+      this.$refs.configureTypeRef.validate(valid => {
+        if (valid) {
+          this.eidtLable();
+        }
+      });
+    },
     async eidtLable() {
       //编辑标签
       var mappingData = this.dictValues;

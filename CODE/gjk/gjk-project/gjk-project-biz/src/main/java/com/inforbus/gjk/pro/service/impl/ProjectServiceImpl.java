@@ -349,7 +349,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         //文件所在盘符
         String diskCharacter = filePath.split(":")[0]+":";
         String execCommand = "cmd.exe /c cd " + filePath + " && "
-                + diskCharacter + " && E:\\soft\\sonar1024\\sonar-scanner-2.8\\bin\\sonar-scanner.bat -D\"sonar.projectKey="
+                + diskCharacter + " && "+JGitUtil.getSONAR_SCANNER_PATH()+"\\sonar-scanner.bat -D\"sonar.projectKey="
                 + projectKey + "\" -D\"sonar.sources=.\" -D\"sonar.host.url=http://localhost:9000\"";
         try {
             Process execResult = Runtime.getRuntime().exec(execCommand);

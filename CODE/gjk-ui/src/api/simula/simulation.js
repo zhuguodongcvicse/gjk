@@ -35,3 +35,11 @@ export function stopSimulation(query) {
     method: 'post'
   })
 }
+
+export function stop(username,data) {
+  return request({
+    url: '/simula/simulation/stop/'+username,
+    method: 'post',
+    data: data
+  })
+}

@@ -69,10 +69,10 @@ public class R<T> implements Serializable {
 		this.code = CommonConstants.FAIL;
 	}
 
-	public R setAllAttr(int code, String msg, T data) {
-		this.code = code;
-		this.msg = msg;
-		this.data = data;
+	public R setException(Throwable e) {
+		this.msg = e.getMessage();
+		this.data = null;
+		this.code = CommonConstants.FAIL;
 		return this;
 	}
 }
