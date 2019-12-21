@@ -20,11 +20,8 @@ public class Subscriber extends JedisPubSub {
 
     private Integer queueSize;
 
-    private volatile boolean initState;
 
-    public Subscriber() {
-        this.initState = true;
-    }
+    public Subscriber() {}
 
     public void setUsername(String username) {
         this.username = username;
@@ -51,7 +48,7 @@ public class Subscriber extends JedisPubSub {
         if(size == null || size < queueSize){
             operations.leftPush(key,message);
         }else{
-            if(initState){
+            if(!redisTemplate.hasKey(username+":initState:"+symbol)){
                 operations.rightPop(key);
                 operations.leftPush(key,message);
             }
@@ -68,9 +65,6 @@ public class Subscriber extends JedisPubSub {
                 channel, subscribedChannels));
     }
 
-    public void initState(){
-        this.initState = false;
-    }
 
 }
 

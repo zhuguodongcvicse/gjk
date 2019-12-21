@@ -18,6 +18,8 @@ package com.inforbus.gjk.pro.service;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -149,8 +151,17 @@ public interface ProjectService extends IService<Project> {
 
 	/**
 	 * 更新项目基础模板
+	 * 
 	 * @param project
 	 * @return
 	 */
 	boolean updateBaseTemplate(Project project);
+
+	/**
+	 * 根据项目ID获取 项目和构件关系数据
+	 * 
+	 * @param projectId
+	 * @return
+	 */
+	List<String> getProjectCompByProId(@Param("projectId") String projectId);
 }

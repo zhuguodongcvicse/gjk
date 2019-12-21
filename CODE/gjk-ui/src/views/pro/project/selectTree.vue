@@ -28,6 +28,7 @@
       ref="select"
       v-model="key"
       size="small"
+      collapse-tags
       :clearable="true"
       :multiple="multiple"
       :placeholder="tipText"

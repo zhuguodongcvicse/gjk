@@ -15,23 +15,13 @@
         @row-del="rowDel"
         @selection-change="selectionChange"
       >
-        <!-- <template slot="menuLeft">
-          <el-button
-            type="primary"
-            @click="handleAdd"
-            size="small"
-            icon="el-icon-plus"            v-if="permissions.libs_commoncomponent_add"
-          >新 增</el-button>
-          <br>
-          <br>
-        </template>-->
         <template slot="menuLeft">
           <el-form :inline="true">
             <el-form-item label="筛选:">
               <select-tree :treeData="screenLibsTreeData" multiple :id.sync="screenLibsSelectArray"></select-tree>
             </el-form-item>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <el-form-item label="搜索:">
-              <el-input v-model="selectString" size="mini"></el-input>
+              <el-input v-model="selectString" size="mini" clearable></el-input>
             </el-form-item>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <el-form-item label>
               <el-button type="primary" @click="exportCompFunc">导出申请</el-button>
@@ -40,7 +30,6 @@
               <el-button type="primary" @click="vatchExportList">申请列表</el-button>
             </el-form-item>
           </el-form>
-          <!-- <el-button type="primary" size="mini" plain @click="showScreen">筛选</el-button> -->
         </template>
 
         <template slot="version" slot-scope="scope">
@@ -55,20 +44,6 @@
         </template>
         <template slot-scope="scope" slot="menu">
           <el-button type="primary" size="small" plain @click="handleEdit(scope.row,scope.index)">查看</el-button>
-          <!-- <el-button
-            type="primary"
-            v-if="permissions.libs_commoncomponent_edit"
-            size="small"
-            plain
-            @click="handleEdit(scope.row,scope.index)"
-          >编辑</el-button>
-          <el-button
-            type="danger"
-            v-if="permissions.libs_commoncomponent_del"
-            size="small"
-            plain
-            @click="handleDel(scope.row,scope.index)"
-          >删除</el-button>-->
         </template>
       </avue-crud>
       <el-dialog
@@ -106,23 +81,6 @@
         :component="exportCompList"
       ></storage-apply>
     </basic-container>
-    <!-- <el-dialog title="筛选" :visible.sync="screenDia" width="width" :before-close="dialogBeforeClose">
-      <div>
-        <el-form ref="form" :model="form" label-width="80px">
-          <el-form-item label="算法：">
-            <select-tree :treeData="algorithmTreeData" multiple :id.sync="algorithmSelectArray"></select-tree>
-          </el-form-item>
-          <el-form-item label="测试：">
-            <select-tree :treeData="testTreeData" multiple :id.sync="testSelectArray"></select-tree>
-          </el-form-item>
-          <avue-crud
-            :data="screenTableData"
-            :table-loading="tableLoading"
-            :option="screenCompOption"
-          ></avue-crud>
-        </el-form>
-      </div>
-    </el-dialog>-->
   </div>
 </template>
 
@@ -144,7 +102,6 @@ import { fetchAlgorithmTree } from "@/api/admin/algorithm";
 import { fetchTestTree } from "@/api/admin/test";
 import { fetchPlatformTrees } from "@/api/admin/platform";
 import { tableOption } from "@/const/crud/libs/commoncomponent";
-// import { screenCompOption } from "@/const/crud/libs/screenComp";
 import { mapGetters } from "vuex";
 import selectTree from "@/views/pro/project/selectTree";
 import storageApply from "@/views/libs/commoncomponent/storageApply";
@@ -171,7 +128,11 @@ export default {
       showAllVersionDia: false,
       allVersionTableData: [],
 
-      screenLibsTreeData: [],
+      screenLibsTreeData: [
+        { label: "算法", id: "0", children: [] },
+        { label: "测试", id: "0", children: [] },
+        { label: "平台", id: "0", children: [] }
+      ],
       screenLibsSelectArray: [],
 
       storageApplyDialog: false,
@@ -184,17 +145,6 @@ export default {
       currDialogId: "",
 
       selectString: ""
-
-      // form: {},
-
-      // screenDia: false,
-      // algorithmTreeData: [],
-      // algorithmSelectArray: [],
-      // testTreeData: [],
-      // testSelectArray: [],
-
-      // screenTableData: [],
-      // screenCompOption: screenCompOption
     };
   },
 
@@ -216,6 +166,14 @@ export default {
   mounted: function() {},
   watch: {
     screenLibsSelectArray() {
+      for (let item of this.screenLibsSelectArray) {
+        if (item == "0") {
+          this.screenLibsSelectArray.splice(
+            this.screenLibsSelectArray.indexOf(item),
+            1
+          );
+        }
+      }
       console.log("screenLibsSelectArray", this.screenLibsSelectArray);
       this.getTableData();
     },
@@ -265,18 +223,14 @@ export default {
       }, []);
     },
     getLibsTree() {
-      fetchAlgorithmTree(this.listQuery).then(response => {
-        this.screenLibsTreeData = response.data.data;
-        fetchTestTree(this.listQuery).then(testTree => {
-          for (let item of testTree.data.data) {
-            this.screenLibsTreeData.push(item);
-          }
-          fetchPlatformTrees(this.listQuery).then(platformTree => {
-            for (let platformItem of platformTree.data.data) {
-              this.screenLibsTreeData.push(platformItem);
-            }
-          });
-        });
+      fetchAlgorithmTree(this.listQuery).then(algorithmTree => {
+        this.screenLibsTreeData[0].children = algorithmTree.data.data;
+      });
+      fetchTestTree(this.listQuery).then(testTree => {
+        this.screenLibsTreeData[1].children = testTree.data.data;
+      });
+      fetchPlatformTrees(this.listQuery).then(platformTree => {
+        this.screenLibsTreeData[2].children = platformTree.data.data;
       });
     },
     showScreen() {

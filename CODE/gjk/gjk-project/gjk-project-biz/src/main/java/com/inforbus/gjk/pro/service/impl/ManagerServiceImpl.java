@@ -695,6 +695,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @param procedureId 流程ID
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public R appAssemblyProjectCreate(MultipartFile ufile, Map<String, String> messageMap) {
 		R r = new R<>();
@@ -729,7 +730,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				hardwareNodes = ProcedureXmlAnalysis.getHardwareNodeList(file);
 			} catch (Exception e) {
 				logger.error("解析流程文件错误，请确保流程建模配置正确。");
-				return r.setAllAttr(CommonConstants.FAIL, "解析流程文件错误，请确保流程建模配置正确。", null);
+				return new R<>(new Exception("解析流程文件错误，请确保流程建模配置正确。"));
 			}
 
 			List<Map<String, Object>> maps = null;
@@ -739,8 +740,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				maps = (List<Map<String, Object>>) JSONArray.parse(chipStr);
 			} catch (Exception e) {
 				logger.error("获取硬件建模数据失败，请确保硬件建模配置正确。");
-				r.setAllAttr(CommonConstants.FAIL, "获取硬件建模数据失败，请确保硬件建模配置正确。", null);
-				return r;
+				return new R<>(new Exception("获取硬件建模数据失败，请确保硬件建模配置正确。"));
 			}
 
 			Map platformProp = null;
@@ -752,9 +752,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				platformProp = (Map) prop.getData();
 			}
 
-			// 获取流程对应记录
-			ProjectFile proFile = this.getById(proceId);
-			// 根据"员工号_项目名称_流程名称APP"格式创建App的名字及路径，并存放在流程文件夹下
+			// 创建App的名字及路径，并存放在流程文件夹下
 			appFilePath = proDetailPath + File.separator + this.getById(modelId).getFilePath() + File.separator + "app"
 					+ File.separator + "AppPro" + File.separator;
 
@@ -779,8 +777,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 							} catch (Exception e) {
 								e.printStackTrace();
 								logger.error("读取配置文件失败，请检查配置文件中" + libsType + "配置是否正确");
-								r.setAllAttr(CommonConstants.FAIL, "读取配置文件失败，请检查配置文件中" + libsType + "配置是否正确", null);
-								return r;
+								return new R<>(new Exception("读取配置文件失败，请检查配置文件中" + libsType + "配置是否正确"));
 							}
 
 							String softwareFilePath = "";
@@ -820,7 +817,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				}
 				if (!flag) {
 					logger.error("流程建模与硬件建模数据匹配错误，请重新配置流程建模与硬件建模。");
-					return r.setAllAttr(CommonConstants.FAIL, "流程建模与硬件建模数据匹配错误，请重新配置流程建模与硬件建模。", null);
+					return r.setException(new Exception("流程建模与硬件建模数据匹配错误，请重新配置流程建模与硬件建模。"));
 				}
 			}
 
@@ -848,22 +845,23 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				app.setBackPath(appDirPath.substring(proDetailPath.length()));
 			} catch (IOException e) {
 				e.printStackTrace();
-				return r.setAllAttr(CommonConstants.FAIL, "保存App组件工程img失败。", null);
+				return r.setException(new Exception("保存App组件工程img失败。"));
 			}
 
 			JGitUtil.commitAndPush(appFilePath, "上传App组件工程");
-			return r.setAllAttr(CommonConstants.SUCCESS, "生成App组件工程文件夹成功。", app);
+			return new R<>(app, "生成App组件工程文件夹成功。");
 
 		} else {
-			return r.setAllAttr(CommonConstants.FAIL, "流程配置xml文件不存在，请重新配置流程。", null);
+			return r.setException(new Exception("流程配置xml文件不存在，请重新配置流程。"));
 		}
 	}
 
 	private void copySoftwareAndBsp(R r, String appFilePath, String partName, String libsType, String platformType,
 			String softwareFilePath, String softwareName, String bspFilePath) {
+
 		if ("".equals(bspFilePath)) {
-			logger.error(partName + "寻找bsp错误，请配置" + libsType + "对应的bsp。");
-			r.setAllAttr(CommonConstants.FAIL, partName + "寻找bsp错误，请配置" + libsType + "对应的bsp。", null);
+			logger.error("请配置" + libsType + "对应的bsp," + "部件" + partName + "缺少对应的BSP。");
+			r.setException(new Exception("请配置" + libsType + "对应的BSP," + "部件" + partName + "缺少对应的BSP。"));
 			return;
 		}
 		Thread thread = new Thread() {
@@ -878,7 +876,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 						FileUtil.copyFile(proDetailPath + bspFilePath, file.getAbsolutePath());
 					} catch (IOException e) {
 						logger.error("复制BSP文件夹错误，请联系系统管理员");
-						r.setAllAttr(CommonConstants.FAIL, "复制BSP文件夹错误，请联系系统管理员", null);
+						r.setException(new Exception("复制BSP文件夹错误，请联系系统管理员"));
 						return;
 					}
 				}
@@ -888,7 +886,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		if ("".equals(softwareFilePath)) {
 			logger.error(partName + "寻找软件框架错误，请配置" + libsType + "对应的软件框架。");
-			r.setAllAttr(CommonConstants.FAIL, partName + "寻找软件框架错误，请配置" + libsType + "对应的软件框架。", null);
+			r.setException(new Exception("请配置" + libsType + "对应的软件框架," + "部件" + partName + "缺少对应的软件框架。"));
 			return;
 		}
 		try {
@@ -898,7 +896,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			FileUtil.copyFile(proDetailPath + softwareFilePath, assemblyName);
 		} catch (IOException e) {
 			logger.error("复制软件框架" + softwareName + "文件夹错误，请联系系统管理员。");
-			r.setAllAttr(CommonConstants.FAIL, "复制软件框架" + softwareName + "文件夹错误，请联系系统管理员。", null);
+			r.setException(new Exception("复制软件框架" + softwareName + "文件夹错误，请联系系统管理员。"));
 			return;
 		}
 	}
@@ -962,7 +960,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 					}
 				} catch (IOException e) {
 					logger.error("复制集成代码失败，请联系管理员。");
-					r.setAllAttr(CommonConstants.FAIL, "复制集成代码失败，请联系管理员。", null);
+					r.setException(new Exception("复制集成代码失败，请联系管理员。"));
 					return;
 				}
 
@@ -984,7 +982,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 //				} catch (IOException e) {
 //					e.printStackTrace();
 //					logger.error("调用客户接口失败，请联系管理员。");
-//					r.setAllAttr(CommonConstants.FAIL, "调用客户接口失败，请联系管理员。", null);
+//					r.setException(new Exception("调用客户接口失败，请联系管理员。"));
 //					return;
 //				}
 
@@ -994,7 +992,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 //				} catch (IOException e) {
 //					e.printStackTrace();
 //					logger.error("调用客户接口失败，请联系管理员。");
-//					r.setAllAttr(CommonConstants.FAIL, "调用客户接口失败，请联系管理员。", null);
+//					r.setException(new Exception("调用客户接口失败，请联系管理员。"));
 //					return;
 //				}
 			}
@@ -1032,7 +1030,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				} catch (Exception e) {
 					e.printStackTrace();
 					logger.error("调用" + makefileType + "工具类修改MakeFile文件失败，请联系管理员。");
-					r.setAllAttr(CommonConstants.FAIL, "调用" + makefileType + "工具类修改MakeFile文件失败，请联系管理员。", null);
+					r.setException(new Exception("调用" + makefileType + "工具类修改MakeFile文件失败，请联系管理员。"));
 					return;
 				}
 			}
@@ -1071,7 +1069,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			} catch (Exception e) {
 				logger.error("复制.h文件错误，请联系管理员。");
 				e.printStackTrace();
-				r.setAllAttr(CommonConstants.FAIL, "复制" + hFilePath + "文件到" + includeFilePath + "路径下错误，请联系管理员。", null);
+				r.setException(new Exception("复制" + hFilePath + "文件到" + includeFilePath + "路径下错误，请联系管理员。"));
 				return;
 			}
 		}
@@ -1089,7 +1087,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				apiNeedStringSet.add(cFileName.substring(0, cFileName.lastIndexOf(".")));
 			} catch (IOException e) {
 				logger.error("复制.c文件错误，请联系管理员。");
-				r.setAllAttr(CommonConstants.FAIL, "复制" + cFilePath + "文件到" + srcFilePath + "路径下错误，请联系管理员。", null);
+				r.setException(new Exception("复制" + cFilePath + "文件到" + srcFilePath + "路径下错误，请联系管理员。"));
 				return;
 			}
 		}
@@ -1097,15 +1095,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 	private R getMakefileTypeByProperties() {
 		// 获取当前类的路径
-		/*
-		 * String filePath = ManagerServiceImpl.class.getResource("").getPath(); try {
-		 * // 中文乱码问题 filePath = URLDecoder.decode(filePath, "utf-8"); } catch
-		 * (UnsupportedEncodingException e1) { e1.printStackTrace();
-		 * logger.error("中文路径转义失败。"); return new R<>(CommonConstants.FAIL, "中文路径转义失败。",
-		 * null); } // 找到bootstrap.properties的地址 filePath = filePath.substring(0,
-		 * filePath.indexOf("target/classes/") + "target/classes/".length()) +
-		 * "platformType.yml"; File dumpFile = new File(filePath);
-		 */
 		Map father;
 		File file = null;
 		InputStream inputStream = null;
@@ -1118,11 +1107,10 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			// 将信息写入临时文件
 			FileUtils.copyInputStreamToFile(inputStream, file);
 			father = Yaml.loadType(file, HashMap.class);
-//			makefileType = father.get(platformName).toString();
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("读取配置文件失败，请联系管理员检查配置文件是否正确");
-			return new R<>(CommonConstants.FAIL, "读取配置文件失败，请联系管理员检查配置文件是否正确", null);
+			return new R<>(new Exception("读取配置文件失败，请联系管理员检查配置文件是否正确"));
 		} finally {
 			if (inputStream != null) {
 				try {
@@ -1132,7 +1120,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				}
 			}
 		}
-
 		return new R<>(father);
 	}
 
@@ -1147,7 +1134,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			list.addAll(makeFileList);
 			filtersFileName = list.get(0);
 		} else {
-			r.setAllAttr(CommonConstants.FAIL, "查找" + assemblyName + "路径下.filters文件失败，请确认选择的软件框架正确及其他配置正确。", null);
+			r.setException(
+					new Exception("查找" + new File(assemblyName).getName() + "路径下.filters文件失败，请确认选择的软件框架正确及其他配置正确。"));
 			return;
 		}
 		// 获取makeFile文件,vs2010中的. vcxproj文件
@@ -1159,7 +1147,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			list.addAll(makeFileList);
 			vcxprojFileName = list.get(0);
 		} else {
-			r.setAllAttr(CommonConstants.FAIL, "查找" + assemblyName + "路径下.vcxproj文件失败，请确认选择的软件框架正确及其他配置正确。", null);
+			r.setException(
+					new Exception("查找" + new File(assemblyName).getName() + "路径下.vcxproj文件失败，请确认选择的软件框架正确及其他配置正确。"));
 			return;
 		}
 
@@ -2105,6 +2094,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// 项目表
 		Project project = projectMapper.getProById(projectId);
 		project.setBasetemplateIds(projectList.get(0).getBasetemplateIds());
+		projectMapper.updateById(project);
 
 		// 项目详情表
 		for (ProjectFile projectFile : projectDetailList) {
@@ -2594,13 +2584,17 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		for (Map<String, String> column : columns) {
 			String colName = columnToJava(column.get("columnName"));
 			columnNames.add(colName);
-			String cvsStr = (String) getFieldValueByName(colName, hardwarelibs);
-			cvsStr = cvsStr == null ? "" : cvsString(cvsStr);
-			columnValues.append(cvsStr).append(",");
+			if(hardwarelibs != null){
+				String cvsStr = String.valueOf(getFieldValueByName(colName, hardwarelibs));
+				cvsStr = cvsStr == null || cvsStr.equals("null") ? "" : cvsString(cvsStr);
+				columnValues.append(cvsStr).append(",");
+			}
 		}
 		List<String> cvsContent = new ArrayList<>();
 		cvsContent.add(String.join(",", columnNames));
-		cvsContent.add(columnValues.substring(0, columnValues.length() - 1));
+		if(columnValues.length() > 0){
+			cvsContent.add(columnValues.substring(0, columnValues.length() - 1));
+		}
 		String filePath = serverPath + "gjk" + File.separator + "testExcel" + File.separator + "gjk_hardwarelibs.csv";
 		File hardwarelibsFile = FileUtil.writeFileContent(filePath, cvsContent);
 
@@ -2615,13 +2609,17 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		for (Map<String, String> column : columns) {
 			String colName = columnToJava(column.get("columnName"));
 			columnNames.add(colName);
-			String cvsStr = (String) getFieldValueByName(colName, chipsfromhardwarelibs);
-			cvsStr = cvsStr == null ? "" : cvsString(cvsStr);
-			columnValues.append(cvsStr).append(",");
+			if(chipsfromhardwarelibs != null){
+				String cvsStr = String.valueOf(getFieldValueByName(colName, chipsfromhardwarelibs));
+				cvsStr = cvsStr == null || cvsStr.equals("null") ? "" : cvsString(cvsStr);
+				columnValues.append(cvsStr).append(",");
+			}
 		}
 		cvsContent = new ArrayList<>();
 		cvsContent.add(String.join(",", columnNames));
-		cvsContent.add(columnValues.substring(0, columnValues.length() - 1));
+		if(columnValues.length() > 0){
+			cvsContent.add(columnValues.substring(0, columnValues.length() - 1));
+		}
 		filePath = serverPath + "gjk" + File.separator + "testExcel" + File.separator + "gjk_chipsfromhardwarelibs.csv";
 		File chipsFile = FileUtil.writeFileContent(filePath, cvsContent);
 

@@ -93,7 +93,7 @@ public class CommonComponentController {
 	@RequestMapping("/saveCommonComp")
 	public R saveCommonComp(@RequestBody CommonComponent commonComponent) {
 		commonComponentService.saveCommonComp(commonComponent);
-		CommonComponent component = getById(commonComponent.getId()).getData();
+		CommonComponent component = commonComponentService.getById(commonComponent.getId());
 		return new R<>(component);
 	}
 
@@ -194,8 +194,9 @@ public class CommonComponentController {
 	}
 
 	@PostMapping("/findPageByBatchApprovalId/{applyId}/{page}/{size}")
-	public R<IPage<CommonComponent>> findPageByBatchApprovalId(@PathVariable("page") Integer current,@PathVariable("size") Integer size, @PathVariable("applyId") String id){
-		return new R<>(commonComponentService.findPageByBatchApprovalId(new Page<>(current, size),id));
+	public R<IPage<CommonComponent>> findPageByBatchApprovalId(@PathVariable("page") Integer current,
+			@PathVariable("size") Integer size, @PathVariable("applyId") String id) {
+		return new R<>(commonComponentService.findPageByBatchApprovalId(new Page<>(current, size), id));
 	}
 
 	@PostMapping("/saveCompList")

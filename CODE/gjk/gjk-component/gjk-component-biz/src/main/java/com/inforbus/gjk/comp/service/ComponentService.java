@@ -198,7 +198,7 @@ public interface ComponentService extends IService<Component> {
 	 * 
 	 * @param ufile
 	 */
-	List<Component> analysisZipFile(MultipartFile ufile, String userId);
+	List<Component> analysisZipFile(MultipartFile ufile, String userId, String userName);
 
 	/**
 	 * 检查更新

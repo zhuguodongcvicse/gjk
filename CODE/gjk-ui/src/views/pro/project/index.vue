@@ -90,14 +90,6 @@
                             >{{ item.description }}</span>
                           </el-option>
                         </el-select>
-                        <!--<el-select v-model="softwareSelectString" placeholder="请选择">-->
-                        <!--<el-option-->
-                        <!--v-for="item in softwareTreeData"-->
-                        <!--:key="item.id"-->
-                        <!--:label="item.label"-->
-                        <!--:value="item.id"-->
-                        <!--&gt;</el-option>-->
-                        <!--</el-select>-->
                       </el-form-item>
                       <el-form-item label="BSP选择">
                         <el-select
@@ -119,14 +111,6 @@
                             >{{ item.description }}</span>
                           </el-option>
                         </el-select>
-                        <!--                        <el-select v-model="formLabelAlign.bspSelectString" placeholder="请选择">-->
-                        <!--                          <el-option-->
-                        <!--                            v-for="item in bspTreeData"-->
-                        <!--                            :key="item.id"-->
-                        <!--                            :label="item.label"-->
-                        <!--                            :value="item.id"-->
-                        <!--                          ></el-option>-->
-                        <!--                        </el-select>-->
                       </el-form-item>
                     </div>
                   </el-form>
@@ -169,13 +153,6 @@
           <br />
         </template>
         <template slot-scope="scope" slot="menu">
-          <!-- <el-button
-            type="primary"
-            v-if="permissions.pro_project_edit"
-            size="small"
-            plain
-            @click="handleEdit(scope.row,scope.index)"
-          >编辑</el-button>-->
           <el-button
             type="danger"
             v-if="permissions.pro_project_del"
@@ -242,7 +219,6 @@ export default {
   inject: ["reload"],
   data() {
     var proNameSameNameCheck = (rule, value, callback) => {
-      // console.log("11111111111111111111111111", rule, value, callback);
       if (/^[0-9a-zA-Z-_()\u4e00-\u9fa5]{1,32}$/.test(value) == false) {
         callback(
           "请输入正确的项目名,项目名最少1个字符,最多32个字符,可包含汉字、字母、数字、—、_、()"
@@ -250,7 +226,6 @@ export default {
       } else {
         for (let item of this.proNameList) {
           if (value === item) {
-            // console.log("2222222222222222", item, value);
             callback(new Error("项目名已存在，请重新输入。"));
           }
         }
@@ -302,7 +277,11 @@ export default {
       hardwareTreeData: [],
       hardwareSelectArray: [],
 
-      screenLibsTree: [],
+      screenLibsTree: [
+        { label: "算法", id: "0", children: [] },
+        { label: "测试", id: "0", children: [] },
+        { label: "平台", id: "0", children: [] }
+      ],
       screenLibsIdArray: [],
 
       compTreeData: [],
@@ -322,9 +301,6 @@ export default {
           { required: true, message: "请输入项目名称", trigger: "blur" },
           { validator: proNameSameNameCheck, trigger: "blur" }
         ],
-        // bspSelectString: [
-        //   { required: true, message: "请选择", trigger: "change" }
-        // ],
         applyUser: [
           { required: true, message: "请选择审批人", trigger: "change" }
         ],
@@ -348,21 +324,21 @@ export default {
           this.$delete(this.compSelectArray, index);
         }
       }
-      // console.log("compSelectArray:", this.compSelectArray);
-    },
-    softwareSelectString: function() {
-      // console.log("softwareSelectString:", this.softwareSelectString);
-    },
-    bspSelectString: function() {
-      // console.log("bspSelectString:", this.formLabelAlign.bspSelectString);
+      console.log("compSelectArray:", this.compSelectArray);
     },
     "formLabelAlign.applyUser": function() {
-      console.log("formLabelAlign.applyUser:", this.formLabelAlign.applyUser);
-    },
-    project: function() {
-      // console.log("project:", this.project);
+      // console.log("formLabelAlign.applyUser:", this.formLabelAlign.applyUser);
     },
     screenLibsIdArray() {
+      for (let item of this.screenLibsIdArray) {
+        if (item == "0") {
+          this.screenLibsIdArray.splice(
+            this.screenLibsIdArray.indexOf(item),
+            1
+          );
+        }
+      }
+      console.log("screenLibsIdArray", this.screenLibsIdArray);
       this.getTableData();
       this.compSelectArray = [];
     }
@@ -395,19 +371,8 @@ export default {
     },
     getCreateData() {
       getProNameListByUserId(this.userInfo.userId).then(Response => {
-        // console.log("proNameListByUserId:", Response.data.data);
         this.proNameList = Response.data.data;
       });
-      // getSoftwareTree().then(Response => {
-      //   this.softwareTreeData = Response.data.data;
-      //   // console.log("softwareTreeData:", this.softwareTreeData);
-      // });
-      // getBSPTree().then(Response => {
-      //   this.bspTreeData = Response.data.data;
-      //   // console.log("bspTreeData：", this.bspTreeData);
-      // });
-      // this.foundChild(this.compTreeData, this.compHaveChildArray);
-      // console.log(this.compHaveChildArray, "+++++++++++++");
       getUserhasApplyAuto().then(Response => {
         // 调用方法获取到所有具有审批权限的用户，将值附到选择器上
         this.applyUserSelect = [];
@@ -420,30 +385,23 @@ export default {
       });
     },
     getLibsTree() {
-      fetchAlgorithmTree(this.listQuery).then(response => {
-        this.screenLibsTree = response.data.data;
-        fetchTestTree(this.listQuery).then(testTree => {
-          for (let item of testTree.data.data) {
-            this.screenLibsTree.push(item);
-          }
-          fetchPlatformTrees(this.listQuery).then(platformTree => {
-            for (let platformItem of platformTree.data.data) {
-              this.screenLibsTree.push(platformItem);
-            }
-          });
-        });
+      fetchAlgorithmTree(this.listQuery).then(algorithmTree => {
+        this.screenLibsTree[0].children = algorithmTree.data.data;
+      });
+      fetchTestTree(this.listQuery).then(testTree => {
+        this.screenLibsTree[1].children = testTree.data.data;
+      });
+      fetchPlatformTrees(this.listQuery).then(platformTree => {
+        this.screenLibsTree[2].children = platformTree.data.data;
       });
     },
     getCompSelectTree() {
       getAllComp().then(Response => {
-        // console.log("Response:", Response);
         this.compTreeData = Response.data.data;
-        // console.log("compTreeData:", this.compTreeData);
       });
     },
     foundChild(data, array) {
       for (let i in data) {
-        // console.log(data[i].children, "00000000000");
         if (data[i].children != undefined) {
           array.push(data[i].id);
           this.foundChild(data[i], array);
@@ -463,8 +421,6 @@ export default {
         if (valid) {
           this.project.projectName = this.formLabelAlign.projectName;
           this.project.processName = this.formLabelAlign.processName;
-          // this.project.defaultSoftwareId = this.softwareSelectString;
-          // this.project.defaultBspId = this.formLabelAlign.bspSelectString;
           this.project.userId = this.userInfo.userId;
           //模板ID赋值
           var basetemplate = {
@@ -475,10 +431,10 @@ export default {
           };
           //给模板id赋json串值
           this.project.basetemplateIds = JSON.stringify(basetemplate);
-          console.log(
-            "this.project.basetemplateIds",
-            this.project.basetemplateIds
-          );
+          // console.log(
+          //   "this.project.basetemplateIds",
+          //   this.project.basetemplateIds
+          // );
           saveProject(this.project)
             .then(Response => {
               this.project.id = Response.data.data.id;
@@ -494,28 +450,17 @@ export default {
               this.$store.dispatch("setProjectTreeShow", projectsTemp);
               saveProProcess(this.project.id, this.project.processName).then(
                 Response => {
-                  // console.log("得到saveProProcess的返回结果：", Response);
                   for (var i = 0; i < Response.data.data.length; i++) {
                     if (Response.data.data[i].fileType == "9") {
                       this.procedureId = Response.data.data[i].id;
                     }
                   }
-                  // console.log("this.procedureId" + this.procedureId);
                   //保存软件框架
                   this.changeProcedureSoftwareId();
                   this.changeProcedureBSPId();
-                  // this.softwareSelectString = []
-                  // showPartSoftwareAndPlatform(this.procedureId).then(Response => {
-                  //   for (var k = 0; k < Response.data.data.length; k++) {
-                  //     this.softwareSelectString.push(Response.data.data[k].softwareId)
-                  //     this.softwareSelectNameString.push(Response.data.data[k].platformName)
-                  //   }
-                  //   //校验是否选中所有平台大类
-                  //   this.checkoutPlatform();
-                  // })
                   if (
                     this.compSelectArray != null &&
-                    this.compSelectArray.length >= 0
+                    this.compSelectArray.length > 0
                   ) {
                     saveProCompList(this.project.id, this.compSelectArray).then(
                       Response => {
@@ -681,7 +626,6 @@ export default {
       this.getList(this.page);
     },
     handleRowClick(row, event, column) {
-      // console.log("this.tableData",this.tableData)
       for (const i in this.tableData) {
         this.tableData[i].showFlag = 1;
         if (this.tableData[i].id == row.id) {
@@ -689,22 +633,14 @@ export default {
         }
       }
       this.$store.dispatch("setProjectTreeShow", this.tableData);
-
       this.$router.push({ path: "/pro/manager" });
-      // this.$notify({
-      //   showClose: false,
-      //   message: JSON.stringify(row),
-      //   type: "success"
-      // });
     },
     getSoftwareSelectList() {
       //得到平台大类
       getPlatformList().then(Response => {
         this.platformDataList = Response.data.data;
-        // console.log("平台大类：", this.platformDataList);
       });
       getSoftwareSelect().then(Response => {
-        // console.log("软件框架库下拉列表：", Response.data.data);
         let datas = Response.data.data;
         let softwareTreeDataList = [];
         for (var i = 0; i < datas.length; i++) {
@@ -750,7 +686,6 @@ export default {
           lastPlatformName.length - 1
         );
         var platformNameArr = lastPlatformName.split(";");
-        // console.log("拆分后的平台类名：", platformNameArr);
         for (var k = 0; k < platformNameArr.length; k++) {
           for (var m = 0; m < val.length - 1; m++) {
             if (valNameArr[m].indexOf(platformNameArr[k]) != -1) {
@@ -773,7 +708,6 @@ export default {
       }
       //至少选中一个
       if (val.length > 1) {
-        // console.log("当前选中的值", val);
         //遍历下拉框得到平台名称
         var lastPlatformName = "";
         for (var i = 0; i < this.softwareTreeData.length; i++) {
@@ -781,19 +715,15 @@ export default {
             lastPlatformName = this.softwareTreeData[i].description;
           }
         }
-        // console.log("最后选中的平台大类：", lastPlatformName);
-        // console.log("选中的平台大类名称：", valNameArr);
         //根据分号拆分平台类
         lastPlatformName = lastPlatformName.substring(
           0,
           lastPlatformName.length - 1
         );
         var platformNameArr = lastPlatformName.split(";");
-        // console.log("拆分后的平台类名：", platformNameArr);
         for (var k = 0; k < platformNameArr.length; k++) {
           for (var m = 0; m < val.length - 1; m++) {
             if (valNameArr[m].indexOf(platformNameArr[k]) != -1) {
-              // console.log("进入删除数组元素：" + m);
               val.splice(m, 1);
               valNameArr.splice(m, 1);
             }
@@ -835,7 +765,6 @@ export default {
         // });
         return;
       }
-      // console.log("修改软件构件库保存：", this.softwareSelectString);
       let prodetail = {};
       prodetail.id = this.procedureId;
       prodetail.description = this.softwareSelectString.join(";");
