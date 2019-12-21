@@ -149,6 +149,13 @@ export function getProcessByProjectId(id) {
   })
 }
 
+export function getProcessByProcessId(parentId) {
+  return request({
+    url: '/pro/app/getProcessByProcessId/' + parentId,
+    method: 'post'
+  })
+}
+
 export function getprojectByProjectId(id) {
   return request({
     url: '/pro/app/getprojectByProjectId/' + id,

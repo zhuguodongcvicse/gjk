@@ -495,6 +495,18 @@ public class AppController {
 		return appService.getProcessByProjectId(id);
 
 	}
+	/**
+	 * 通过流程id拿到当前流程建模信息，用于挨app控制的展开功能
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@PostMapping("/getProcessByProcessId/{parentId}")
+	public ProjectFile getProcessByProcessId(@PathVariable("parentId") String parentId) {
+		return appService.getProcessByProcessId(parentId);
+
+	}
+	
 
 	/**
 	 * 通过项目id拿到当前项目信息
