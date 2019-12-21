@@ -204,6 +204,12 @@
 		gjk_project pd WHERE pd.id=#{id}
 	</select>
 
+	<!-- 通过流程id拿到当前流程建模信息，用于app控制的展开功能 -->
+	<select id="getProcessByProcessId" resultMap="projectFileMap">
+		SELECT * FROM gjk_project_detail WHERE file_type = '11' AND parent_id =
+		(SELECT b.id FROM gjk_project_detail b WHERE b.parent_id = #{parentId}) 
+	</select>
+
 	<!-- 根据appid删除app数据 -->
 	<delete id="deleteAppByAPPId"
 		parameterType="com.inforbus.gjk.pro.api.entity.App">

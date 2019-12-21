@@ -175,4 +175,9 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		return baseMapper.selectAPPByAPPId(id);
 	}
 
+	@Override
+	public ProjectFile getProcessByProcessId(String parentId) {
+		return baseMapper.getProcessByProcessId(parentId);
+	}
+
 }
