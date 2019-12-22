@@ -3,7 +3,7 @@
   <div class="pro_project_custom_themeconfig_14s">
     <div v-for="(item,index) in netWorkData" :key=index >
     <div class="divlable">{{item.lableName}}</div>
-      <div> 
+      <div>
          <network :labelName=item.lableName></network>
       </div>
     </div>
@@ -47,7 +47,7 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    this.netWorkData = this.xmlDataMap[this.$route.query.sysId].netWorkData.xmlEntityMaps
+    this.netWorkData = this.xmlDataMap.get(this.$route.query.sysId).netWorkData.xmlEntityMaps
     // if(this.netWorkData.xmlEntityMaps != null){
     //   for(var i = 0;i<this.netWorkData.xmlEntityMaps[0].xmlEntityMaps.length;i++){
     //   this.data.push(

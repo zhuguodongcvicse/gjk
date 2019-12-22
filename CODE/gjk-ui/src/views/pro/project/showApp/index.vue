@@ -31,7 +31,7 @@
                 <!-- <span>{{dynamicValidateForm.domains[0][index].fileName}}</span> -->
                 <span>{{dynamicValidateForm.domains[0][index].filePath.split("\\")[2] + "_" + dynamicValidateForm.domains[0][index].filePath.split("\\")[3]}}</span>
               </strong>
-              
+
               <!-- <span >计算数据</span><br/> -->
               <div class="child_line_14s">
                 <span>运行状态：</span>
@@ -176,6 +176,7 @@ import {
   appTaskExport,
   editAppState,
   getProcessByProjectId,
+  getProcessByProcessId,
   getprojectByProjectId,
   handleDown,
   deleteAppByAPPId,
@@ -462,13 +463,20 @@ export default {
     },
     //展开图标
     openClick(domain, index) {
-      getProcessByProjectId(domain.processId).then(res => {
-        getprojectByProjectId(res.data.projectId).then(response => {
-          this.$store.dispatch("setTmpProject", response.data);
-          this.$router.push({
-            path: "/comp/manager/process",
-            query: { proId: res.data.parentId, processId: res.data.id }
-          });
+      getProcessByProcessId(domain.processId).then(res => {
+        //  this.$store.dispatch("setTmpProject", response.data);
+        this.$router.push({
+          path: "/comp/manager/process",
+          query: {
+            proId: res.data.projectId,
+            processId: res.data.id,
+            proFloName:
+              (res.data.filePath.split("\\")[2] +
+              "_" +
+              res.data.filePath.split("\\")[3] +
+              "_" +
+              res.data.fileName)
+          }
         });
       });
     },
@@ -493,20 +501,22 @@ export default {
       //appName
       this.appDataDTO.appName = domain.filePath.split("\\")[3];
       //导出接口
-      appTaskExport(this.appDataDTO)
-        .then(res => {
-          if(res){
-            let mm = {};
-            mm.oriFilePath = this.appFilePath;
-            mm.downloadAPPFileName = this.appFilePath.split("\\")[2] + "\\" + this.appFilePath.split("\\")[3]
-            handleDown(mm).then(res => {});
-          }else{
-            this.$notify.error({
+      appTaskExport(this.appDataDTO).then(res => {
+        if (res) {
+          let mm = {};
+          mm.oriFilePath = this.appFilePath;
+          mm.downloadAPPFileName =
+            this.appFilePath.split("\\")[2] +
+            "\\" +
+            this.appFilePath.split("\\")[3];
+          handleDown(mm).then(res => {});
+        } else {
+          this.$notify.error({
             title: "错误",
             message: "调用客户接口出错！！！"
           });
-          }
-        });
+        }
+      });
     },
     //编译图标
     playClick(domain, index) {
@@ -882,7 +892,7 @@ export default {
       ) {
         getAppVosPage(this.searchAppName).then(val => {
           this.dynamicValidateForm.domains.push(val.data.data);
-          this.total = val.data.data.length
+          this.total = val.data.data.length;
         });
       } else {
         this.reload();

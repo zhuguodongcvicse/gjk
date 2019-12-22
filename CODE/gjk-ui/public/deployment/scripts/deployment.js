@@ -198,7 +198,7 @@ function creatbakedge(startId, endId) {
 	var edgejson = {
 		"_className": "Q.Edge",
 		"json": {
-			"zIndex": 200,
+			"zIndex": 250,
 			"styles": {
 				"edge.color": "#03b6ff",
 				"arrow.to": true,
@@ -226,7 +226,7 @@ function createdge(startId, endId) {
 	var edgejson = {
 		"_className": "Q.Edge",
 		"json": {
-			"zIndex": 200,
+			"zIndex": 250,
 			"styles": {
 				"edge.color": "#5bf000",
 				"arrow.to": true,
@@ -285,7 +285,7 @@ function creatbakgj(compName, cpux, cpuy, refid, compid, parttype, components, G
 	var bakgjjson = {
 		"_className": "Q.Text",
 		"json": {
-			"zIndex": 200,
+			"zIndex": 250,
 			"name": name,
 			"parent": {
 				"_ref": refid
@@ -366,7 +366,7 @@ function creatgj(compName, cpux, cpuy, refid, compid, parttype, components, GAT)
 	var gjjson = {
 		"_className": "Q.Text",
 		"json": {
-			"zIndex": 200,
+			"zIndex": 250,
 			"name": name,
 			"parent": {
 				"_ref": refid

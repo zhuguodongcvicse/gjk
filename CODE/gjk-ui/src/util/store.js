@@ -46,6 +46,7 @@ export const getStore = (params = {}) => {
   if (debug) {
     return obj;
   }
+
   if (obj.dataType == 'string') {
     content = obj.content;
   } else if (obj.dataType == 'number') {
@@ -54,6 +55,9 @@ export const getStore = (params = {}) => {
     content = eval(obj.content);
   } else if (obj.dataType == 'object') {
     content = obj.content;
+  }
+  if(name == 'gjk-xmlDataMap'){
+    return objToStrMap(obj.content)
   }
   return content;
 }
@@ -118,4 +122,20 @@ export const clearStore = (params = {}) => {
     window.localStorage.clear()
   }
 
+}
+
+export const strMapToObj = (strMap) => {
+  let obj = Object.create(null)
+  for (let[k, v] of strMap){
+    obj[k] = v
+  }
+  return obj
+}
+
+export const objToStrMap = (obj) => {
+  let strMap = new Map()
+  for(let k of Object.keys(obj)){
+    strMap.set(k, obj[k])
+  }
+  return strMap
 }

@@ -111,6 +111,13 @@ public interface AppService extends IService<App> {
 	ProjectFile getProcessByProjectId(@Param("id") String id);
 	
 	/**
+	 * 通过流程id拿到当前流程建模信息，用于挨app控制的展开功能
+	 * @param id
+	 * @return
+	 */
+	ProjectFile getProcessByProcessId(@Param("parentId") String parentId);
+	
+	/**
 	 * 通过项目id拿到当前项目信息
 	 * @param id
 	 * @return
