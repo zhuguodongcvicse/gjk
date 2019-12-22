@@ -741,16 +741,20 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			}
 
 			List<ComponentDetail> componentDetails = new ArrayList<ComponentDetail>();
+			String beforeDetailFilePath = null;
 			for (ComponentDetail detail : compDetails) {
 				if (detail.getCompId().equals(comp.getId())) {
 					componentDetails.add(detail);
+					if("xml".equals(detail.getFileType())) {
+						beforeDetailFilePath = detail.getFilePath();
+					}
 				}
 			}
 
 			String beforeFilePath = unZipFilePath + File.separator + "component" + File.separator + comp.getCompId()
 					+ File.separator + comp.getVersion() + File.separator;
-			String beforeDetailFilePath = "gjk" + File.separator + "common" + File.separator + "component"
-					+ File.separator + comp.getCompId() + File.separator + comp.getVersion() + File.separator;
+//			String beforeDetailFilePath = "gjk" + File.separator + "common" + File.separator + "component"
+//					+ File.separator + comp.getCompId() + File.separator + comp.getVersion() + File.separator;
 			String compVersion = comp.getVersion();
 
 			comp.setUserId(userId);

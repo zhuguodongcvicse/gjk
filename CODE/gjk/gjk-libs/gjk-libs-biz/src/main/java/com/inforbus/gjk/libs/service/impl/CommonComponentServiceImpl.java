@@ -156,12 +156,23 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		ZipOutputStream zip = new ZipOutputStream(outputStream);
 		// 将目标文件打包成zip导出
 		for (CommonComponent comp : compList) {
-			String compPath = gitFilePath + "gjk" + File.separator + "common" + File.separator + "component"
-					+ File.separator + comp.getCompId() + File.separator + comp.getVersion();
-			if (new File(compPath).exists()) {
-				zipDirOrFile(zip, new File(compPath),
-						"component" + File.separator + comp.getCompId() + File.separator + comp.getVersion());
+			String compFilePath = null;
+			for (CommonComponentDetail detail : details) {
+				if (detail.getCompId().equals(comp.getId()) && "xml".equals(detail.getFileType())) {
+					compFilePath = detail.getFilePath();
+					break;
+				}
 			}
+			if (compFilePath != null) {
+				compFilePath = gitFilePath + compFilePath;
+//				String compPath = gitFilePath + "gjk" + File.separator + "common" + File.separator + "component"
+//						+ File.separator + comp.getCompId() + File.separator + comp.getVersion();
+				if (new File(compFilePath).exists()) {
+					zipDirOrFile(zip, new File(compFilePath),
+							"component" + File.separator + comp.getCompId() + File.separator + comp.getVersion());
+				}
+			}
+
 		}
 
 		createExcelFileToZipIO(compList, details, zip);
