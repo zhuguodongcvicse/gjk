@@ -85,3 +85,35 @@ security:
     resource:
       loadBalanced: true
       token-info-uri: http://gjk-auth/oauth/check_token
+
+git:
+  username: admin
+  password: admin
+  remote:
+    uri: admin@192.168.2.127:29418/gjk.git
+  local:
+    path: D:/14S_GJK_GIT/gjk/
+    config: D:/14S_GJK_GIT/gjk/.git
+    generateCodePath: D:/14S_GJK_GIT/gjk/gjk/generateCodeExe/generatecode.exe
+    mapSoftToHardPath: D:/14S_GJK_GIT/gjk/gjk/mapSoftToHardPath/exe.exe
+  pro:
+    process:
+      softToHardResult: softToHardResult
+      generateCodeResult: generateCodeResult
+      flowInfPath: flowInfPath
+    templateFile:
+      header: gjk/templateFile/SpbTemplate.h
+      src: gjk/templateFile/SpbTemplate.c
+  code:
+    encodeing: utf8
+integer:
+  code:
+    file:
+      name: generateCodeResult
+ctrl:
+  tab:
+    file:
+      path: D:xxx/xxx/xxx.h
+sonar:
+  scanner:
+    path: E:/soft/sonar1024/sonar-scanner-2.8/bin
