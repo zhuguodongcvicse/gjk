@@ -743,13 +743,10 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	@Override
 	public R moveNioFile(String source, String destin) {
 		try {
-			System.out.println("source :" + source);
-			source = source.replace("/", "\\");
-			String dirName = source.substring(source.lastIndexOf("\\"));
-			UploadFilesUtils.moveNioFile(source, destin + dirName);
+			UploadFilesUtils.moveNioFile(source, destin);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return new R<>(e);
+			return new R<>(e.getMessage());
 		}
 		return new R<>();
 

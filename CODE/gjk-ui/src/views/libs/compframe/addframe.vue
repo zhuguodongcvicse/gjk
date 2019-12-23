@@ -203,7 +203,7 @@ export default {
           formData.append("dataParams", JSON.stringify(this.compFormParam));
           saveCompFrame(formData).then(res => {
             loading.close();
-            this.$message({
+            this.$notify({
               showClose: true,
               message: "保存成功",
               type: "success"
@@ -232,7 +232,6 @@ export default {
     },
     //上传文件
     resumes(files) {
-      console.log("222222222222222222", this.compFormParam, this.frameId);
       if (files.length == 0) {
         this.$message({
           type: "warning",

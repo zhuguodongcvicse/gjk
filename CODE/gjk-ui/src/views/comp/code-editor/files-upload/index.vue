@@ -6,7 +6,7 @@
       v-on:click="outerVisible=true"
     >{{leftData.length>0?"查看文件（"+leftData.length+"个）":"添加文件"}}</el-button>
     <el-dialog title="文件列表" :visible.sync="outerVisible">
-      <el-button type="primary" @click="innerVisible=true" size="mini" :disabled="disabled">选择文件</el-button>
+      <el-button type="primary" @click="innerVisible=true" size="mini" v-if="!disabled">选择文件</el-button>
       <avue-crud :data="leftData" :option="leftOption">
         <template slot="size" slot-scope="scope">{{printSize(scope.row.size)}}</template>
         <template slot="menu" slot-scope="scope">
@@ -283,7 +283,13 @@ export default {
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() {
+    //是否禁用按钮及操作
+    if (this.disabled) {
+      //不展示菜单栏
+      this.leftOption.menu = false;
+    }
+  },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   beforeCreate() {}, //生命周期 - 创建之前

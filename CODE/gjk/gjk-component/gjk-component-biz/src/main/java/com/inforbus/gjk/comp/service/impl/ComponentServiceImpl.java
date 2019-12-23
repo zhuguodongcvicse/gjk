@@ -213,7 +213,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		Component comp = baseMapper.listCompByCompId(compId);
 		List<CompDetailVO> tree = Lists.newArrayList();
 //			将构件转成树
-		tree.add(new CompDetailVO(comp.getId(), comp.getCompName(), "", "", "-1", comp.getVersion()));
+		tree.add(new CompDetailVO(comp.getId(), comp.getCompName(), "component", "", "-1", comp.getVersion()));
 		List<ComponentDetail> vos = compDetailMapper.listCompDetailByCompId(comp.getId());
 		// 如果为true,则显示comp的xml文件，不走if内
 		for (ComponentDetail v : vos) {
@@ -247,12 +247,18 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	 */
 	private void addCompDetailTree(List<CompDetailVO> tree, String parentId, File file) {
 		String fileId = IdGenerate.uuid();
-		tree.add(new CompDetailVO(fileId, file.getName(), "", file.getParentFile().getAbsolutePath(), parentId, ""));
+		CompDetailVO vo = new CompDetailVO(fileId, file.getName(), "", file.getParentFile().getAbsolutePath(), parentId,
+				"");
 		if (file.isDirectory()) {
+			vo.setFileType("dirs");
+			tree.add(vo);
 			File[] childFileList = file.listFiles();
 			for (File childFile : childFileList) {
 				addCompDetailTree(tree, fileId, childFile);
 			}
+		} else {
+			vo.setFileType("file");
+			tree.add(vo);
 		}
 	}
 
@@ -741,20 +747,16 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			}
 
 			List<ComponentDetail> componentDetails = new ArrayList<ComponentDetail>();
-			String beforeDetailFilePath = null;
 			for (ComponentDetail detail : compDetails) {
 				if (detail.getCompId().equals(comp.getId())) {
 					componentDetails.add(detail);
-					if("xml".equals(detail.getFileType())) {
-						beforeDetailFilePath = detail.getFilePath();
-					}
 				}
 			}
 
 			String beforeFilePath = unZipFilePath + File.separator + "component" + File.separator + comp.getCompId()
 					+ File.separator + comp.getVersion() + File.separator;
-//			String beforeDetailFilePath = "gjk" + File.separator + "common" + File.separator + "component"
-//					+ File.separator + comp.getCompId() + File.separator + comp.getVersion() + File.separator;
+			String beforeDetailFilePath = "gjk" + File.separator + "common" + File.separator + "component"
+					+ File.separator + comp.getCompId() + File.separator + comp.getVersion() + File.separator;
 			String compVersion = comp.getVersion();
 
 			comp.setUserId(userId);
@@ -1009,37 +1011,41 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			}
 			// 判断平台库数据是否存在
 			if (componentDetail.getFileType().equals("platformfile")) {
-				GjkPlatform platform = baseMapper.getPlatformByIdNotDelete(componentDetail.getLibsId());
-				if (platform == null) {
-					res += "平台文件、";
+				String platformId = componentDetail.getLibsId();
+				if (!"-1".equals(platformId)) {
+					GjkPlatform platform = baseMapper.getPlatformByIdNotDelete(platformId);
+					if (platform == null) {
+						res += "平台文件、";
+					}
 				}
 			}
 			// 判断算法库数据是否存在
 			else if (componentDetail.getFileType().equals("algorithmfile")) {
-				GjkAlgorithm algorithm = baseMapper.getAlgorithmByIdNotDelete(componentDetail.getLibsId());
-				if (algorithm == null) {
-					res += "算法文件、";
+				String algorithmId = componentDetail.getLibsId();
+				if (!"-1".equals(algorithmId)) {
+					GjkAlgorithm algorithm = baseMapper.getAlgorithmByIdNotDelete(algorithmId);
+					if (algorithm == null) {
+						res += "算法文件、";
+					}
 				}
 			}
 			// 判断测试库数据是否存在
 			else if (componentDetail.getFileType().equals("testfile")) {
-				GjkTest test = baseMapper.getTestByIdNotDelete(componentDetail.getLibsId());
-				if (test == null) {
-					res += "测试文件、";
+				String testId = componentDetail.getLibsId();
+				if (!"-1".equals(testId)) {
+					GjkTest test = baseMapper.getTestByIdNotDelete(testId);
+					if (test == null) {
+						res += "测试文件、";
+					}
 				}
 			}
 		}
 
 		if (res.length() > 0) {
 			res = res.substring(0, res.length() - 1);
-			res = "选择的" + res + "不存在";
+			res = "选择的" + res + "不存在,请重新配置相应的库节点";
 		}
 		return res;
 	}
 
-	@Test
-	public void xx() {
-		String sss = "";
-		System.out.println(StringUtils.isNotEmpty(sss));
-	}
 }

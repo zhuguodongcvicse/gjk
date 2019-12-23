@@ -18,6 +18,7 @@ export const tableOption = {
   indexLabel: '序号',
   stripe: true,
   menuAlign: 'center',
+  menuWidth:"110",
   editBtn: false,
   delBtn: false,
   align: 'center',

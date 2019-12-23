@@ -334,27 +334,47 @@ public class UploadFilesUtils {
 			if (!destinPath.exists()) {
 				destinPath.mkdirs();
 			}
-			// 源文件路径下的所有文件和文件夹
-			File[] items = sourcePath.listFiles();
 			FileChannel in = null;
 			FileChannel out = null;
-			for (File file : items) {
-				// 判断是不是文件
-				if (file.isFile()) {
-					try {
-						// 取得对应文件的通道
-						in = new FileInputStream(file).getChannel();//
-						out = new FileOutputStream(destinPath + File.separator + file.getName()).getChannel();
-						// 连接两个通道，并从in通道读取，写入out中
-						in.transferTo(0, in.size(), out);
-					} catch (Exception e) {
-						throw e;
-					} finally {
-						in.close();
-						out.close();
+			// 如果是文件就拷贝文件
+			if (sourcePath.isFile()) {
+				try {
+					in = new FileInputStream(sourcePath).getChannel();
+					String xxx=destinPath + File.separator + sourcePath.getName();
+					FileOutputStream outs=new FileOutputStream(destinPath + File.separator + sourcePath.getName());
+					System.out.println(xxx);
+					System.out.println(outs);
+					out = new FileOutputStream(destinPath + File.separator + sourcePath.getName()).getChannel();
+					// 连接两个通道，并从in通道读取，写入out中
+					in.transferTo(0, in.size(), out);
+				} catch (Exception e) {
+					throw e;
+				} finally {
+					in.close();
+					out.close();
+				}
+			}
+			// 如果是文件夹循环
+			else if (sourcePath.isDirectory()) {
+				// 源文件路径下的所有文件和文件夹
+				File[] items = sourcePath.listFiles();
+				for (File file : items) {
+					// 判断是不是文件
+					if (file.isFile()) {
+						try {
+							in = new FileInputStream(file).getChannel();
+							out = new FileOutputStream(destinPath + File.separator + file.getName()).getChannel();
+							// 连接两个通道，并从in通道读取，写入out中
+							in.transferTo(0, in.size(), out);
+						} catch (Exception e) {
+							throw e;
+						} finally {
+							in.close();
+							out.close();
+						}
+					} else {
+						NioToCopyFile(file.getPath(), destinPath + File.separator + file.getName());
 					}
-				} else {
-					NioToCopyFile(file.getPath(), destinPath + File.separator + file.getName());
 				}
 			}
 		} else {
@@ -386,8 +406,7 @@ public class UploadFilesUtils {
 	 * @throws IOException
 	 */
 	public static void decompression(InputStream file, String targetPathStr) throws IOException {
-		ZipArchiveInputStream inputStream = new ZipArchiveInputStream(
-				new BufferedInputStream(file));
+		ZipArchiveInputStream inputStream = new ZipArchiveInputStream(new BufferedInputStream(file));
 		Files.createDirectories(Paths.get(targetPathStr));
 		ZipArchiveEntry entry = null;
 		while ((entry = inputStream.getNextZipEntry()) != null) {
@@ -396,13 +415,26 @@ public class UploadFilesUtils {
 			} else {
 				OutputStream outputStream = null;
 				try {
-					outputStream = new BufferedOutputStream(new FileOutputStream(new File(targetPathStr, entry.getName())));
+					outputStream = new BufferedOutputStream(
+							new FileOutputStream(new File(targetPathStr, entry.getName())));
 					// 输出文件路径信息
 					IOUtils.copy(inputStream, outputStream);
 				} finally {
 					IOUtils.closeQuietly(outputStream);
 				}
 			}
+		}
+	}
+
+	@Test
+	public void moveNioFileTest() {
+		try {
+			moveNioFile(
+					"D:\\14S_GJK_GIT\\gjk\\gjk\\component\\admin\\1219\\20191220141933\\平台文件\\构件框架库_6.0\\func4 - 副本.c",
+					"D:\\14S_GJK_GIT\\gjk\\gjk\\component\\admin\\1219\\20191220141933\\平台文件\\");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

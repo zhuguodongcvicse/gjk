@@ -46,9 +46,9 @@
               v-if="row.applyState=='0'||row.applyState==null?true:false"
             >入 库</el-button>
           </el-tooltip>
-          <span
-            v-if="row.applyState=='0'||row.applyState=='3'||row.applyState==null?false:true"
-          >{{row.applyState=='1'?"已申请":row.applyState=='2'?"已入库":row.applyState=='3'?"已驳回":row.applyState=='4'?"驳回再申请":"未处理"}}</span>
+          <el-button plain  size="mini" type="primary" v-if="row.applyState=='0'||row.applyState=='3'||row.applyState==null?false:true">
+            {{row.applyState=='1'?"已申请":row.applyState=='2'?"已入库":row.applyState=='3'?"已驳回":row.applyState=='4'?"驳回再申请":"未处理"}}
+            </el-button>
         </template>
       </avue-crud>
     </basic-container>

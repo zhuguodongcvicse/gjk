@@ -6,9 +6,14 @@
     </div>
     <el-row>
       <el-col :span="moduleType==='comp'? 6 : 10" style="margin-top:12px;">
-        <el-input v-model="filterText" placeholder="筛选条件。。" style="height: 24px;line-height: 24px;">
+        <el-input
+          v-model="filterText"
+          placeholder="筛选条件。。"
+          style="height: 24px;line-height: 24px;margin-bottom:12px;"
+        >
           <el-button
-            v-show="moduleType==='comp'||!disabled"
+            v-if="!disabled"
+            v-show="moduleType==='comp'"
             slot="append"
             icon="el-icon-circle-plus"
             size="mini"
@@ -176,7 +181,6 @@ export default {
             this.outputCmpuid = str[2];
           }
         });
-        console.log("uids",uids)
       }
     },
     clickNodeDataComputed: {
@@ -258,7 +262,6 @@ export default {
               uid: tmpblParam.uid,
               data: tabData
             };
-            console.log("tmpblParam.uid",tmpblParam.uid)
             this.$emit("jsplumbUidsChange", jspDataParam);
           }
         }
@@ -316,6 +319,41 @@ export default {
   },
   //方法集合
   methods: {
+    setShowLableName(labelKey, labelValue) {
+      //       bllxParam: "变量类型",
+      // lbParam: "类别",
+      // fzParam: "赋值",
+      // xzblPaeam: "选择变量",
+      // numIndexParam: "序号",
+      // lengthParam: "长度",
+      // nameParam: "名称", //名称
+      let label = labelValue.find(item => {
+        return item.isShow || item.attrMappingName !== "";
+      });
+      switch (labelKey) {
+        case "变量类型":
+          this.bllxParam = label.attrMappingName;
+          break;
+        case "类别":
+          this.lbParam = label.attrMappingName;
+          break;
+        case "赋值":
+          this.fzParam = label.attrMappingName;
+          break;
+        case "选择变量":
+          this.xzblPaeam = label.attrMappingName;
+          break;
+        case "序号":
+          this.numIndexParam = label.attrMappingName;
+          break;
+        case "长度":
+          this.lengthParam = label.attrMappingName;
+          break;
+        case "名称":
+          this.nameParam = label.attrMappingName;
+          break;
+      }
+    },
     //返回lableName的值
     retNodeDataLableName(nodeCol, name) {
       let tmpblParam = {};
@@ -384,7 +422,8 @@ export default {
           base.attributeMap[key] = insertParam.name;
         }
       }
-      treeParam.push(this.analysisMapping(base));
+      const { labelKey, attrs } = this.analysisMapping(base);
+      treeParam.push(attrs);
       //给树赋值显示值
       node["id"] = randomUuid(); //new Number(randomLenNum(5, false));
       node["lableName"] = base.attributeMap.name;
@@ -399,7 +438,8 @@ export default {
             child.attributeMap[key] = "";
           }
         }
-        treeParam.push(this.analysisMapping(child));
+        const { labelKey, attrs } = this.analysisMapping(child);
+        treeParam.push(attrs);
       });
       node["nodeData"] = deepClone(treeParam);
       //节点前
@@ -708,7 +748,8 @@ export default {
       //给树赋值显示值
       attr.attributeMap.structType = nodeData.fparamType;
       attr.attributeMap.paramRemarks = nodeData.paramRemarks;
-      treeData.push(this.analysisMapping(attr));
+      const { labelKey, attrs } = this.analysisMapping(attr);
+      treeData.push(attrs);
       node["id"] = randomUuid(); //new Number(randomLenNum(5, false));
       node["lableName"] = attr.attributeMap.name;
       node["assigParamName"] = "";
@@ -726,7 +767,8 @@ export default {
           // xml.attributeMap.name = "";
         }
         // //处理合并子数据
-        treeData.push(this.analysisMapping(xml));
+        const { labelKey, attrs } = this.analysisMapping(xml);
+        treeData.push(attrs);
       });
       node["nodeData"] = deepClone(treeData);
       // console.log("测试node值", node);
@@ -956,10 +998,10 @@ export default {
           let lableName = xml.attributeMap.name;
           //处理父级数据
           let treeParam = [];
-          let variable = this.analysisMapping(deepClone(xml));
-          treeParam.push(variable);
+          const { labelKey, attrs } = this.analysisMapping(deepClone(xml));
+          treeParam.push(attrs);
           let paramRemarks = "";
-          for (let item of variable) {
+          for (let item of attrs) {
             if (item.attrName == "name") {
               this.nameParam = item.attrMappingName;
             }
@@ -973,26 +1015,28 @@ export default {
           tmpData = xml; //添加基础配置
           xmlChild.forEach(child => {
             if (child.attributeMap.configureType !== undefined) {
-              let childArr = this.analysisMapping(child);
+              const { labelKey, attrs } = this.analysisMapping(child);
+              //设置固定配置
+              this.setShowLableName(labelKey, attrs);
               //如果再流程建模中就添加data节点（uid）
               if (this.flowUids.length > 0) {
                 //循环所有属性
-                for (let key in childArr) {
+                for (let key in attrs) {
                   //类别和data
                   if (
-                    childArr[key].attrMappingName === this.lbParam &&
-                    childArr[key].lableName === "DATA"
+                    attrs[key].attrMappingName === this.lbParam &&
+                    attrs[key].lableName === "DATA"
                   ) {
                     if (this.paramType === "input") {
                       this.$set(
-                        childArr[key],
+                        attrs[key],
                         "uid",
                         this.inputTmpuid.get(String(indexMap++))
                       );
                     }
                     if (this.paramType === "output") {
                       this.$set(
-                        childArr[key],
+                        attrs[key],
                         "uid",
                         this.outputTmpuid.get(String(indexMap++))
                       );
@@ -1002,7 +1046,7 @@ export default {
               }
               tmpMaps = tmpMaps.concat(child);
               //处理合并子数据
-              treeParam.push(childArr);
+              treeParam.push(attrs);
             }
           });
           //判断是不是有‘[数字]’
@@ -1176,6 +1220,7 @@ export default {
     analysisMapping(from) {
       //标签名是否要中英文映射
       var attrObj = {};
+      let labelKey = from.lableName;
       let showName;
       if (from.attributeMap !== undefined) {
         if (from.attributeMap.configureType !== undefined) {
@@ -1183,7 +1228,7 @@ export default {
           if (attrObj !== undefined && attrObj.lableMapping) {
             //基于标签名
             let val = this.compChineseMapping.find(item => {
-              return item.label === con.attrKeys;
+              return item.label === attrObj.attrKeys;
             });
             let param = this.compChineseMapping.find(item => {
               return item.id === attrObj.mappingKeys;
@@ -1232,7 +1277,7 @@ export default {
           attrs.push(con);
         });
       }
-      return attrs;
+      return { labelKey, attrs };
     },
     //去掉重复的数组Obj
     reduceObject(arrObj, name) {
@@ -1301,17 +1346,14 @@ export default {
           } else {
             tree.nodeData[0][0].lableName = tree.lableName;
           }
-          this.attributeAssignmen(
-            saveRow,
-            this.analysisMapping(baseData),
-            tree.nodeData,
-            0
-          );
+          const { labelKey, attrs } = this.analysisMapping(baseData);
+          this.attributeAssignmen(saveRow, attrs, tree.nodeData, 0);
           baseData.xmlEntityMaps.forEach((entityMaps, index) => {
+            const { labelKey, attrs } = this.analysisMapping(entityMaps);
             //保存处理子数据
             this.attributeAssignmen(
               saveRow.xmlEntityMaps[index],
-              this.analysisMapping(entityMaps),
+              attrs,
               tree.nodeData,
               index + 1
             );
@@ -1345,7 +1387,9 @@ export default {
   },
 
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() {
+
+  },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   beforeCreate() {}, //生命周期 - 创建之前

@@ -9,6 +9,7 @@ export const tableOption = {
   editBtn: false,
   delBtn: false,
   addBtn: false,
+  menuWidth:"152",
   column: [
     {
       label: '名称',

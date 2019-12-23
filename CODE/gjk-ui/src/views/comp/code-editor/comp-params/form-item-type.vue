@@ -83,7 +83,7 @@
       :disabled="disabled"
       v-on:blur="onBlurNative"
     >
-      <template slot="append" size="mini">
+      <template slot="append" size="mini" v-if="!disabled">
         <el-upload
           ref="upload"
           action="/comp/componentdetail/uploadUrl"
@@ -189,7 +189,7 @@ export default {
                       this.selectOptions.push({
                         value: item.value,
                         label: item.label,
-                        rightName: "V"+item.version.toFixed(1)
+                        rightName: "V" + item.version.toFixed(1)
                       });
                     }
                   });
@@ -203,6 +203,8 @@ export default {
                     });
                   });
                 }
+              } else if (this.dictKey === "[]") {
+                this.selectOptions = this.dictKey;
               } else {
                 //从字典中查询
                 remote(this.dictKey).then(res => {
