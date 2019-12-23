@@ -176,6 +176,7 @@ export default {
             this.outputCmpuid = str[2];
           }
         });
+        console.log("uids",uids)
       }
     },
     clickNodeDataComputed: {
@@ -257,6 +258,7 @@ export default {
               uid: tmpblParam.uid,
               data: tabData
             };
+            console.log("tmpblParam.uid",tmpblParam.uid)
             this.$emit("jsplumbUidsChange", jspDataParam);
           }
         }

@@ -1163,8 +1163,9 @@ function updatePoint(proPream) {
 
 	} else {
 		var del = false;
+		//console.log("需删除的锚点id",removeUuid(proPream))
 		$.each(endpoints, function (n, val) {
-			if (proPream.uid == val.getUuid()) {
+			if (removeUuid(proPream) == val.getUuid()) {
 				del = true;
 				jsPlumb.deleteEndpoint(endpoints[n]);
 			}
@@ -1223,6 +1224,20 @@ function updatePoint(proPream) {
 			//console.log("index++",index)
 		}
 	});
+}
+
+//获取需要删除的锚点id
+function removeUuid(delData){
+	let endpointUUid = ""
+	for (let [k, v] of endpointMap) {
+		console.log(k.split("*")[2] , delData.compId)
+		console.log(k.split("*")[1] , delData.inOrOut)
+		console.log(v.variableName ,delData.data.categoryName)
+		if(k.split("*")[2] == delData.compId && k.split("*")[1] == delData.inOrOut && v.variableName == delData.data.variableName){
+			endpointUUid = k
+		}
+	}
+	return endpointUUid
 }
 
 //删除锚点
