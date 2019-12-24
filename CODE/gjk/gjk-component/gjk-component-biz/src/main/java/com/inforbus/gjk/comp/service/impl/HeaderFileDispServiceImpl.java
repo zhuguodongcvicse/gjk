@@ -11,6 +11,7 @@ import java.util.function.Function;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
@@ -44,7 +45,8 @@ public class HeaderFileDispServiceImpl implements HeaderFileDispService {
 
 	@Autowired
 	protected HeaderFileDispService headerFileDispService;
-	private static String serverPath = JGitUtil.getLOCAL_REPO_PATH();
+	@Value("${git.local.path}")
+	private String serverPath;
 
 	/**
 	 * 头文件解析
@@ -92,13 +94,14 @@ public class HeaderFileDispServiceImpl implements HeaderFileDispService {
 	public Map<Integer, Float> parsePerformanceTable(String excelPath) {
 		return ExternalIOTransUtils.parsePerformanceTable(parsefilePath(excelPath));
 	}
+
 	/**
 	 * @Title: parsefilePath
 	 * @Description: 添加路径前缀 （GJK）
 	 * @Author xiaohe
 	 * @DateTime 2019年7月17日 下午2:02:27
 	 * @param filePath
-	 * @return 
+	 * @return
 	 */
 	private String parsefilePath(String filePath) {
 		String url = new String(filePath);

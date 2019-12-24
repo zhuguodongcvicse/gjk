@@ -40,7 +40,7 @@ import com.inforbus.gjk.common.core.jgit.JGitUtil;
 public class UploadFilesUtils {
 	// 文件存储在服务器的相对地址
 //	@Value("${file.local.path}")
-	private static String serverPath = JGitUtil.getLOCAL_REPO_PATH();
+//	private static String serverPath = JGitUtil.getLOCAL_REPO_PATH();
 //	static {
 //		serverPath = "D:/14S_GJK_GIT/gjk";
 //	}
@@ -59,9 +59,9 @@ public class UploadFilesUtils {
 //		String fileDir = "D:/upload/files";
 		File file = null;
 		// 判断目录是否存在，不存在就创建一个目录
-		String path = serverPath + "/" + filePath;
-		if (StringUtils.isNotEmpty(path)) {
-			file = new File(path);
+//		String path = serverPath + "/" + filePath;
+		if (StringUtils.isNotEmpty(filePath)) {
+			file = new File(filePath);
 			if (!file.getParentFile().exists()) {
 				file.getParentFile().mkdirs();
 			}
@@ -182,7 +182,7 @@ public class UploadFilesUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			url = new String(serverPath + File.separator + mapPath.get("path")).replace("\\", "/");
+//			url = new String(serverPath + File.separator + mapPath.get("path")).replace("\\", "/");
 		}
 		return listMaps;
 
