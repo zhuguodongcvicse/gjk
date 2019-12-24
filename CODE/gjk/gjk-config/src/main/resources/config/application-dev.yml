@@ -96,6 +96,7 @@ git:
     config: D:/14S_GJK_GIT/gjk/.git
     generateCodePath: D:/14S_GJK_GIT/gjk/gjk/generateCodeExe/generatecode.exe
     mapSoftToHardPath: D:/14S_GJK_GIT/gjk/gjk/mapSoftToHardPath/exe.exe
+gjk:
   pro:
     process:
       softToHardResult: softToHardResult
