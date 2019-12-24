@@ -231,8 +231,8 @@ export default {
         console.log("获取流程名获取流程名获取流程名获取流程名");
       })
       .then(Response => {
+        let selectComponent = [];
         getProcessFilePathById(this.$route.query.proId).then(val => {
-          let selectComponent = [];
           if (val.data.data != null) {
             for (let item of val.data.data) {
               let selectComp = {};
@@ -247,19 +247,7 @@ export default {
               this.selectComponent = selectComponent;
             }
             console.log("11111111111111111111111111111", this.selectComponent);
-            //处理处理属性是否显示及中英文映射
-            let vals = this.analysisAttrConfigType(items.xmlEntityMaps);
-            //处理多个属性名的值
-            let a = [];
-            for (let val of vals) {
-              tmpVal = JSON.parse(JSON.stringify(val));
-              a.push(val.lableName);
-            }
-            //设置下拉框的值
-            tmpVal.dataKey = selectComponent;
-            tmpVal.lableName = a;
-            //设置特殊处理的值
-            this.$set(selectVal, items.lableName, tmpVal);
+           
           } else {
             this.$message.error("缺少流程配置文件，请先配置流程。");
           }
@@ -301,6 +289,19 @@ export default {
                 if (
                   this.analysisConfigureType(items).lableType === "specalHandle"
                 ) {
+                   //处理处理属性是否显示及中英文映射
+            let vals = this.analysisAttrConfigType(items.xmlEntityMaps);
+            //处理多个属性名的值
+            let a = [];
+            for (let val of vals) {
+              tmpVal = JSON.parse(JSON.stringify(val));
+              a.push(val.lableName);
+            }
+            //设置下拉框的值
+            tmpVal.dataKey = selectComponent;
+            tmpVal.lableName = a;
+            //设置特殊处理的值
+            this.$set(selectVal, items.lableName, tmpVal);
                   //基础的SpecalHandle
                   // this.baseSpecalHandle = items.xmlEntityMaps[0];
                   this.baseSpecalHandle = items.xmlEntityMaps[0];
