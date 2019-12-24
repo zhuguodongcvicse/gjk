@@ -104,7 +104,7 @@ public interface ManagerService extends IService<ProjectFile> {
 	 * @param proDetailId
 	 * @return
 	 */
-	Map<String, List<Object>> getSysConfigByApiReturn(String proDetailId);
+	R getSysConfigByApiReturn(String proDetailId);
 
 	/**
 	 * @Title: isXmlFileExist

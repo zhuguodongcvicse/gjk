@@ -179,7 +179,7 @@ public class ManagerController {
 	@GetMapping
 	@RequestMapping("/getSysConfigByApiReturn/{proDetailId}")
 	public R getSysConfigByApiReturn(@PathVariable("proDetailId") String proDetailId) {
-		return new R<>(managerService.getSysConfigByApiReturn(proDetailId));
+		return managerService.getSysConfigByApiReturn(proDetailId);
 	}
 
 	@GetMapping

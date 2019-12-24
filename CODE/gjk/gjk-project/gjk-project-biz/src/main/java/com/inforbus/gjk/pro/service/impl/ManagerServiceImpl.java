@@ -331,7 +331,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				break;
 			}
 		}
-		if (file != null) {
+		if (file.exists()) {
 			return ProcedureXmlAnalysis.getHardwareNodeList(file);
 		} else {
 			return null;
@@ -347,7 +347,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @return
 	 * @see com.inforbus.gjk.pro.service.ManagerService#getSysConfigByApiReturn(java.lang.String)
 	 */
-	public Map<String, List<Object>> getSysConfigByApiReturn(String proDetailId) {
+	public R getSysConfigByApiReturn(String proDetailId) {
 		ProjectFile file = getProDetailById(proDetailId);
 		String modelId = file.getParentId();
 		List<ProjectFile> files = getProFileListByModelId(modelId);
@@ -356,9 +356,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String processFileName = null;
 		String packinfoFileName = null;
 
-		Boolean bool = isXmlFileExist(proDetailId);
 		for (ProjectFile projectFile : files) {
-
 			if (projectFile.getFileType().equals("11")) {
 				System.out.print(proDetailPath + projectFile.getFilePath());
 				processFileName = proDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml";
@@ -366,10 +364,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			if (projectFile.getFileType().equals("16")) {
 				customizeFileName = proDetailPath + projectFile.getFilePath() + "自定义配置__网络配置.xml";
 			}
-
 		}
 
-		// 需要添加判断genarateCode路径或packinfo文件是否存在，判断自定义主题配置文件是否生成
 		ProjectFile processFile = getOne(
 				Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, this.getById(proDetailId).getParentId()));
 		packinfoFileName = gitDetailPath + processFile.getFilePath() + generateCodeResult + "/packinfo.xml";
@@ -378,17 +374,26 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		File packinfofile = new File(packinfoFileName);
 		File processfile = new File(processFileName);
 
+		if (!customizefile.exists()) {
+			return new R<>(new Exception("缺少自定义配置文件，请先配置自定义配置。"));
+		}
+
+		if (!packinfofile.exists()) {
+			return new R<>(new Exception("缺少集成代码的文件，请先生成集成代码。"));
+		}
+
+		if (!processfile.exists()) {
+			return new R<>(new Exception("缺少流程建模的文件，请先配置流程建模。"));
+		}
+
 		// 解析返回值
 		Map<String, List<Object>> map = new HashMap<>();
-		// if (customizefile.exists() && packinfofile.exists() && processfile.exists())
-		// {
 		// 获取客户api的返回值
 		Map<String, List<String>> apiReturnStringList = ExternalIOTransUtils.getCmpSysConfig(customizeFileName,
 				packinfoFileName, processFileName);
 		analysisApiReturnStringList(apiReturnStringList, map);
-		// }
 
-		return map;
+		return new R<>(map);
 	}
 
 	/**
@@ -1195,7 +1200,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (!newFile.exists()) {
 			newFile.mkdirs();
 		}
-		ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName, newFilePath + "UserDefineTopicFile.xml");
+		ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName,
+				newFilePath + "UserDefineTopicFile.xml");
 		baseMapper.saveNewFilePath(newFilePath + "UserDefineTopicFile.xml", proDetailId);
 
 		JGitUtil.commitAndPush(filePath + fileName, "上传构件相关文件");
@@ -2584,7 +2590,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		for (Map<String, String> column : columns) {
 			String colName = columnToJava(column.get("columnName"));
 			columnNames.add(colName);
-			if(hardwarelibs != null){
+			if (hardwarelibs != null) {
 				String cvsStr = String.valueOf(getFieldValueByName(colName, hardwarelibs));
 				cvsStr = cvsStr == null || cvsStr.equals("null") ? "" : cvsString(cvsStr);
 				columnValues.append(cvsStr).append(",");
@@ -2592,7 +2598,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		}
 		List<String> cvsContent = new ArrayList<>();
 		cvsContent.add(String.join(",", columnNames));
-		if(columnValues.length() > 0){
+		if (columnValues.length() > 0) {
 			cvsContent.add(columnValues.substring(0, columnValues.length() - 1));
 		}
 		String filePath = serverPath + "gjk" + File.separator + "testExcel" + File.separator + "gjk_hardwarelibs.csv";
@@ -2609,7 +2615,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		for (Map<String, String> column : columns) {
 			String colName = columnToJava(column.get("columnName"));
 			columnNames.add(colName);
-			if(chipsfromhardwarelibs != null){
+			if (chipsfromhardwarelibs != null) {
 				String cvsStr = String.valueOf(getFieldValueByName(colName, chipsfromhardwarelibs));
 				cvsStr = cvsStr == null || cvsStr.equals("null") ? "" : cvsString(cvsStr);
 				columnValues.append(cvsStr).append(",");
@@ -2617,7 +2623,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		}
 		cvsContent = new ArrayList<>();
 		cvsContent.add(String.join(",", columnNames));
-		if(columnValues.length() > 0){
+		if (columnValues.length() > 0) {
 			cvsContent.add(columnValues.substring(0, columnValues.length() - 1));
 		}
 		filePath = serverPath + "gjk" + File.separator + "testExcel" + File.separator + "gjk_chipsfromhardwarelibs.csv";
