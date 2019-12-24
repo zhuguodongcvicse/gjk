@@ -91,9 +91,9 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.Test;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -120,8 +120,8 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	private ComponentDetailService componentDetailService;
 	@Autowired
 	private AmqpTemplate rabbitmqTemplate;
-
-	private static final String compDetailPath = JGitUtil.getLOCAL_REPO_PATH();
+	@Value("${git.local.path}")
+	private String compDetailPath;
 
 	/**
 	 * 构件简单分页查询
@@ -139,8 +139,8 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		List<ComponentDetail> details = compDetailMapper.listCompDetailByCompId(compId);
 		try {
 			Component comp = this.getById(compId);
-			String filePath = compDetailPath + "gjk" + File.separator + "component" + File.separator + comp.getCompId()
-					+ File.separator + comp.getVersion() + File.separator;
+			String filePath = this.compDetailPath + "gjk" + File.separator + "component" + File.separator
+					+ comp.getCompId() + File.separator + comp.getVersion() + File.separator;
 
 			// 删除构件
 			this.removeById(compId);
@@ -226,7 +226,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			}
 			if ("algorithmfile".equals(v.getFileType()) || "testfile".equals(v.getFileType())
 					|| "platformfile".equals(v.getFileType())) {
-				File file = new File(compDetailPath + v.getFilePath() + File.separator + v.getFileName());
+				File file = new File(this.compDetailPath + v.getFilePath() + File.separator + v.getFileName());
 				if (file.isDirectory()) {
 					File[] childFileList = file.listFiles();
 					for (File childFile : childFileList) {
@@ -275,7 +275,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	}
 
 	private void addTree(List<CompDetailVO> tree, ComponentDetail v) {
-		tree.add(new CompDetailVO(v.getId(), v.getFileName(), v.getFileType(), compDetailPath + v.getFilePath(),
+		tree.add(new CompDetailVO(v.getId(), v.getFileName(), v.getFileType(), this.compDetailPath + v.getFilePath(),
 				v.getParaentId(), v.getVersion()));
 	}
 
@@ -314,7 +314,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 				String path = vo.getFileName();
 				File file = null;
 				if (path.startsWith("Component") && path.toUpperCase().endsWith(".XML")) {
-					file = new File(JGitUtil.getLOCAL_REPO_PATH() + "/" + vo.getFilePath() + "/" + path);
+					file = new File(this.compDetailPath+File.separator+ vo.getFilePath() + "/" + path);
 				}
 				if (file.exists()) {
 					// 将构件文件放入map
@@ -492,7 +492,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			List<CompFilesVO> filesVOs = Lists.newArrayList();
 			if ("algorithmfile".equals(parent.getFileType()) || "testfile".equals(parent.getFileType())
 					|| "platformfile".equals(parent.getFileType())) {
-				File file = new File(compDetailPath + parent.getFilePath() + File.separator + parent.getFileName());
+				File file = new File(this.compDetailPath + parent.getFilePath() + File.separator + parent.getFileName());
 				if (file.isDirectory()) {
 					File[] childFileList = file.listFiles();
 					for (File childFile : childFileList) {
@@ -530,7 +530,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 				String path = parent.getFileName();
 				File file = null;
 				if (path.startsWith("Component") && path.toUpperCase().endsWith(".XML")) {
-					file = new File(JGitUtil.getLOCAL_REPO_PATH() + "/" + parent.getFilePath() + "/" + path);
+					file = new File(this.compDetailPath+File.separator+ parent.getFilePath() + "/" + path);
 					fileMap.put("compBasic", XmlFileHandleUtil.analysisXmlFile(file));
 					fileMap.put("compBasicMap", XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file));
 				}
@@ -573,7 +573,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		} else {
 			detail = baseMapper.getImgFile(imgId);
 		}
-		String basePath = JGitUtil.getLOCAL_REPO_PATH();
+		String basePath = this.compDetailPath;
 		FileInputStream fis = null;
 		try {
 			String fileName = detail.getFileName();
@@ -602,7 +602,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		File file = null;
 		XmlEntityMap xmlEntityMap = null;
 		if (StringUtils.isNotEmpty(filePath)) {
-			file = new File(compDetailPath + filePath);
+			file = new File(this.compDetailPath + filePath);
 		}
 		if (file.exists()) {
 			xmlEntityMap = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);
@@ -612,7 +612,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 
 	@Override
 	public List<Component> analysisZipFile(MultipartFile ufile, String userId, String userName) {
-		String filePath = compDetailPath + "gjk" + File.separator + "zipFile" + File.separator
+		String filePath = this.compDetailPath + "gjk" + File.separator + "zipFile" + File.separator
 				+ (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date()) + "-" + ufile.getOriginalFilename();
 		try {
 			File file = new File(filePath);
@@ -791,7 +791,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 				baseMapper.saveCompAndStruct(compStruct.getId(), compStruct.getCompId(), compStruct.getStructId());
 			}
 
-			FileUtil.copyFile(beforeFilePath, compDetailPath + afterFilePath);
+			FileUtil.copyFile(beforeFilePath, this.compDetailPath + afterFilePath);
 			compList.add(this.getById(comp.getId()));
 		}
 

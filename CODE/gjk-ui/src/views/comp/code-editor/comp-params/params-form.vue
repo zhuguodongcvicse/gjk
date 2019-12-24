@@ -743,6 +743,7 @@ export default {
     //将基础模板的配置方式写到解析后的参数中
     itemTypeChangeAssignmenDataParam(toParam, formParam) {
       if (toParam.lableName === formParam.lableName) {
+        console.log("将基础模板的配置方式写到解析后的参数中",toParam.lableName,deepClone(formParam))
         if (toParam.attributeMap === null) {
           toParam.attributeMap = formParam.attributeMap;
         } else {

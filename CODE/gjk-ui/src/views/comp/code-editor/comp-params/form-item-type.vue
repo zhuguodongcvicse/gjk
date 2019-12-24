@@ -160,7 +160,7 @@ export default {
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["selectBindValue"])
+    ...mapGetters(["selectBindValue",'userInfo'])
   },
   //监控data中的数据变化
   watch: {
@@ -278,7 +278,7 @@ export default {
     },
     //自定义上传
     customFileUpload(param) {
-      getUploadFilesUrl(param).then(res => {
+      getUploadFilesUrl(param,this.userInfo).then(res => {
         let file = {
           name: param.file.name,
           relativePath: res.data.data,

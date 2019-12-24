@@ -58,7 +58,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/componentdetail")
-public class ComponentDetailController {	
+public class ComponentDetailController {
 
 	private final ComponentDetailService componentDetailService;
 
@@ -162,9 +162,10 @@ public class ComponentDetailController {
 	 */
 	@ResponseBody
 	@PostMapping(path = "/uploadUrl", consumes = { "multipart/mixed", "multipart/form-data" })
-	public R<?> uploadReturnUrl(@RequestParam(value = "file", required = false) MultipartFile ufile) {
+	public R<?> uploadReturnUrl(@RequestParam(value = "file", required = false) MultipartFile ufile,
+			@RequestParam(value = "userName", required = false) String userName) {
 		System.out.println("上传的文件是:" + ufile);
-		return new R<>(UploadFilesUtils.getUploadFilesUrl(ufile));
+		return new R<>(componentDetailService.getUploadFilesUrl(ufile,userName));
 	}
 
 	/**
@@ -176,12 +177,13 @@ public class ComponentDetailController {
 	 * @param filesPath 文件路径（JSON字符串）
 	 * @return 文件夹路径
 	 */
+	@SuppressWarnings("unchecked")
 	@ResponseBody
 	@PostMapping(path = "/uploadFiles", consumes = { "multipart/mixed", "multipart/form-data" })
 	public R<?> uploadFilesReturnUrl(@RequestParam(value = "file", required = false) MultipartFile[] ufile,
-			@RequestParam(value = "filesPath", required = false) String filesPath) {
-		JSONObject jsonObject = JSONUtil.parseObj(filesPath);
-		return new R<>(componentDetailService.getUploadFilesUrl(ufile, jsonObject.toBean(Map.class)));
+			@RequestParam(value = "userName", required = false) String userName) {
+//		JSONObject jsonObject = JSONUtil.parseObj(filesPath);
+		return new R<>(componentDetailService.getUploadFilesUrl(ufile, userName));
 	}
 
 	/**
@@ -266,18 +268,22 @@ public class ComponentDetailController {
 
 	@PostMapping(path = "/createSpbFrameFile")
 	public R getCreateSpbFrameFile(@RequestBody Map<String, String> filesPath) {
-		return componentDetailService.createSpbFrameFile(filesPath.get("spbModelXmlFile"), filesPath.get("saveDir"),filesPath.get("frameId"));
+		return componentDetailService.createSpbFrameFile(filesPath.get("spbModelXmlFile"), filesPath.get("saveDir"),
+				filesPath.get("frameId"));
 	}
+
 	@PostMapping(path = "/findSpbFrameFile")
 	public R getFindSpbFrame() {
 		return componentDetailService.findSpbFrameFile();
 	}
+
 	@PostMapping(path = "/findPlatformByName/{frameName}")
 	public R getFindPlatformByName(@PathVariable String frameName) {
 		return new R<>(componentDetailService.findPlatformByName(frameName));
 	}
+
 	@PostMapping("/moveNioFile")
 	public R getMoveNioFile(@RequestBody Map<String, String> maps) {
-		return componentDetailService.moveNioFile(maps.get("source"),maps.get("destin"));
+		return componentDetailService.moveNioFile(maps.get("source"), maps.get("destin"));
 	}
 }

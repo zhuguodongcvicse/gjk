@@ -14,6 +14,7 @@ import java.util.zip.ZipOutputStream;
 
 import com.inforbus.gjk.admin.api.entity.*;
 import com.inforbus.gjk.common.core.entity.*;
+import com.inforbus.gjk.pro.api.dto.AppDataDTO;
 import com.inforbus.gjk.pro.api.dto.BaseTemplateIDsDTO;
 import com.inforbus.gjk.pro.api.entity.*;
 
@@ -33,8 +34,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSON;
@@ -85,7 +91,6 @@ import lombok.AllArgsConstructor;
  * @DateTime 2019年4月24日 上午8:46:04
  */
 @Service
-@AllArgsConstructor
 public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> implements ManagerService {
 
 	private static final Logger logger = LoggerFactory.getLogger(ManagerServiceImpl.class);
@@ -102,14 +107,34 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	@Autowired
 	private AmqpTemplate rabbitmqTemplate;
 
-	private static final String proDetailPath = JGitUtil.getLOCAL_REPO_PATH();
-	private static final String integerCodeFileName = JGitUtil.getINTEGER_CODE_FILE_NAME();
-	private static String serverPath = JGitUtil.getLOCAL_REPO_PATH();
-
-	private static final String flowInfPath = JGitUtil.getFlowInfPath();// 获取流程内外部接口存放路径 add by hu
-	private static final String gitDetailPath = JGitUtil.getLOCAL_REPO_PATH();// gitlu路径
-	private static final String generateCodeResult = JGitUtil.getGenerateCodeResult();// 集成代码生成结果存放路径
-	private static final String softToHardResult = JGitUtil.getSoftToHardResult();// 软硬件映射结果文件存放路径
+//	private static final String proDetailPath = JGitUtil.getLOCAL_REPO_PATH();
+//	private static final String integerCodeFileName = JGitUtil.getINTEGER_CODE_FILE_NAME();
+//	private static String serverPath = JGitUtil.getLOCAL_REPO_PATH();
+//
+//	private static final String flowInfPath = JGitUtil.getFlowInfPath();// 获取流程内外部接口存放路径 add by hu
+//	private static final String gitDetailPath = JGitUtil.getLOCAL_REPO_PATH();// gitlu路径
+//	private static final String generateCodeResult = JGitUtil.getGenerateCodeResult();// 集成代码生成结果存放路径
+//	private static final String softToHardResult = JGitUtil.getSoftToHardResult();// 软硬件映射结果文件存放路径
+	
+	@Value("${git.local.path}")
+	private String proDetailPath;
+	@Value("${integer.code.file.name}")
+	private String integerCodeFileName;
+	@Value("${git.local.path}")
+	private String serverPath;
+	// 获取流程内外部接口存放路径 add by hu
+	@Value("${gjk.pro.process.flowInfPath}")
+	private String flowInfPath;
+	// gitlu路径
+	@Value("${git.local.path}")
+	private String gitDetailPath;
+	// 集成代码生成结果存放路径
+	@Value("${gjk.pro.process.generateCodeResult}")
+	private String generateCodeResult;
+	// 软硬件映射结果文件存放路径
+	@Value("${gjk.pro.process.softToHardResult}")
+	private String softToHardResult;
+	
 
 	/**
 	 * @getTreeByProjectId
@@ -3081,5 +3106,259 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			e.printStackTrace();
 			return new R<>(new Exception("集成代码生成失败，请联系管理员。"));
 		}
+	}
+	
+	/**
+	 * 根据当前软硬件映射配置的id，查找当前流程下的所有模块的文件路径，从而截取想要的路径
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public String getSoftProcessFilePath( String id) {
+		List<ProjectFile> lists = this.getFilePathListById(id);
+		// 流程建模路径（赋给软硬件映射配置xml的流程文件标签）
+		String workModeFilePath = "";
+		// 客户自存自取的文件路径，赋给软硬件映射配置ml的方案路径
+		String planFilePath = "";
+		String str = "";
+		for (ProjectFile ls : lists) {
+			if (ls.getFileType().equals("11")) {
+				String bb = ls.getFilePath().replaceAll("\\\\", "/");
+				String www = gitDetailPath + ls.getFilePath() + ls.getFileName() + ".xml";
+				String aa = bb.substring(0, bb.lastIndexOf("/"));
+				aa = aa.substring(0, aa.lastIndexOf("/"));
+				String ppp = gitDetailPath + aa + File.separator + softToHardResult;
+				workModeFilePath = www.replaceAll("\\\\", "/");
+				planFilePath = ppp.replaceAll("\\\\", "/");
+				str = workModeFilePath + "@###@###@@" + planFilePath;
+			}
+
+		}
+		return str;
+	}
+	
+
+	/**
+	 * 根据当前软硬件映射配置的id，查找当前流程下的所有模块的文件路径
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public R getworkSpacePathById(String id, AppDataDTO appDataDTO) {
+		String local_REPO_PATH = null;
+		// id：软硬件映射配置的主键id
+		List<ProjectFile> lists = this.getFilePathListById(id);
+		// 当前项目id
+		String projectId = lists.size() > 0 ? lists.get(0).getProjectId() : "0";
+		ProjectFile processFile = this
+				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, id));
+		ProjectFile flowFile = this
+				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, processFile.getParentId()));
+		// 流程模型文件
+		String workModeFilePath = "";
+		// cpu模型文件
+		String cpuModelFilePath = "";
+		// 硬件模型文件
+		String hardWareFilePath = "";
+		// 软硬件映射配置文件
+		String mapConfigPath = "";
+		// 系统参数文件
+		String sysParamFilePath = "";
+		// 工作路径
+		String workSpacePath = "";
+		// 详细方案的id
+		String planId = "";
+		// 方案展示的文件路径
+		String simplePlanFile = "";
+		String flowpath = "";
+		String flowName = "";
+		for (ProjectFile ls : lists) {
+			if (ls.getFileType().equals("11")) {
+				workModeFilePath = ls.getFilePath() + ls.getFileName() + ".xml";
+			}
+			if (ls.getFileType().equals("15")) {
+				cpuModelFilePath = ls.getFilePath() + ls.getFileName() + ".xml";
+			}
+			if (ls.getFileType().equals("12")) {
+				hardWareFilePath = ls.getFilePath() + ls.getFileName() + ".xml";
+			}
+			if (ls.getFileType().equals("13")) {
+				mapConfigPath = ls.getFilePath() + ls.getFileName() + ".xml";
+			}
+			if (ls.getFileType().equals("17")) {
+				sysParamFilePath = ls.getFilePath() + ls.getFileName() + ".xml";
+			}
+			// 方案展示的路径
+			if (ls.getFileType().equals("14")) {
+				simplePlanFile = gitDetailPath + ls.getFilePath() + ls.getFileName() + ".xml";
+			}
+			// 详细方案的路径
+			if (ls.getFileType().equals("18")) {
+				planId = ls.getId();
+				workSpacePath = ls.getFilePath();
+			}
+		}
+		// 调用软硬件映射接口
+		// String workSpacePaths = softwareInterface.softInter(workModeFilePath,
+		// cpuModelFilePath, hardWareFilePath,
+		// mapConfigPath, sysParamFilePath, workSpacePath);
+		local_REPO_PATH = JGitUtil.getLOCAL_REPO_PATH();
+		// 后期把filepath替换成数据库中的workSpacePaths
+		// getFile(filepath, planId);
+		/**************************************
+		 * update by zhx
+		 *********************************************/
+		hardWareFilePath = local_REPO_PATH + hardWareFilePath;
+		mapConfigPath = local_REPO_PATH + mapConfigPath;
+		// sysParamFilePath =
+		// "D:\\14S_GJK_GIT\\gjk\\gjk\\project\\24141\\12312312流程\\模型\\系数配置.xml";
+		// sysParamFilePath = gitDetailPath +
+		// flowFile.getFilePath()+flowInfPath+File.separator+"系数文件.xml" ;
+		workSpacePath = gitDetailPath + flowFile.getFilePath() + softToHardResult;
+		sysParamFilePath = workSpacePath + File.separator + "系数文件.xml";
+		// 客户exe文件全路径
+		String exe = JGitUtil.getSoftToHard();// "D:\\14S_GJK_GIT\\gjk\\gjk\\exe\\exe.exe";
+		// 调用客户接口执行exe
+		// appDataDTO.getUserName():当前用户名
+		String[] strArray = new String[] { exe, hardWareFilePath, mapConfigPath, sysParamFilePath,
+				appDataDTO.getUserName() };
+		try {
+			Process process = Runtime.getRuntime().exec(strArray);
+			InputStreamReader reader = new InputStreamReader(process.getInputStream());
+			BufferedReader bufferedReader = new BufferedReader(reader);
+
+			StringBuffer stringBuffer = new StringBuffer();
+
+			String str = null;
+
+			while ((str = bufferedReader.readLine()) != null) {
+				stringBuffer.append(str);
+			}
+
+			System.out.println(stringBuffer);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		/****************************************
+		 * end
+		 ********************************************/
+
+		// 获取方案文件路径列表；调用接口
+		// List<ProjectPlan> planFileLists =
+		// managerService.getPlanFilePathListByParentId(planId);//需要修改,zhx
+		ArrayList<String> schemeFileList = new ArrayList<>();
+
+		List<String> fileName = this.getFile(workSpacePath, 0);
+
+		for (String filename : fileName) {
+			String schemeFile = workSpacePath + "/" + filename;
+			schemeFileList.add(schemeFile);
+		}
+		System.out.println("schemeFileList::" + schemeFileList);
+		// 调用生成缩略方案的接口
+		try {
+			this.simplePlan(schemeFileList, simplePlanFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new R<>(simplePlanFile);
+	}
+	
+	/*
+	 * 函数名：getFile 作用：使用递归，输出指定文件夹内的所有文件 参数：path：文件夹路径 deep：表示文件的层次深度，控制前置空格的个数
+	 * 前置空格缩进，显示文件层次结构
+	 */
+	private static List<String> getFile(String path, int deep) {
+		List<String> fileNamelist = new ArrayList<String>();
+		// 获得指定文件对象
+		File file = new File(path);
+		// 获得该文件夹内的所有文件
+		File[] array = file.listFiles();
+
+		for (int i = 0; i < array.length; i++) {
+			if (array[i].isFile())// 如果是文件
+			{
+				for (int j = 0; j < deep; j++)// 输出前置空格
+					System.out.print(" ");
+				// 只输出文件名字
+				// System.out.println( array[i].getName());
+				if (array[i].getName().startsWith("软硬件映射") && array[i].getName().endsWith(".xml")) {
+
+					fileNamelist.add(array[i].getName());
+				}
+				System.out.println("fileNamelist" + fileNamelist);
+
+				// 输出当前文件的完整路径
+				// System.out.println("#####" + array[i]);
+				// 同样输出当前文件的完整路径 大家可以去掉注释 测试一下
+				// System.out.println(array[i].getPath());
+			} else if (array[i].isDirectory())// 如果是文件夹
+			{
+				for (int j = 0; j < deep; j++)// 输出前置空格
+					System.out.print(" ");
+
+				System.out.println(array[i].getName());
+				// System.out.println(array[i].getPath());
+				// 文件夹需要调用递归 ，深度+1
+				getFile(array[i].getPath(), deep + 1);
+			}
+		}
+		return fileNamelist;
+	}
+	
+	// 调回写部署方案接口
+	public void writeBackDeploySchemeById( Map<String, Object> map) {
+		// 流程模型文件
+		String workModeFilePath = "";
+		String simplePlanFiles = "";
+		String schemeFile = "";
+		map.get("id");
+		map.get("path");
+		List<ProjectFile> lists = this.getFilePathListById((String) map.get("id"));
+		for (ProjectFile ls : lists) {
+			if (ls.getFileType().equals("11")) {
+				workModeFilePath = gitDetailPath + File.separator + ls.getFilePath() + ls.getFileName() + ".xml";
+			}
+			// 方案展示的路径
+			// if (ls.getFileType().equals("14")) {
+			// simplePlanFiles = ls.getFilePath() + ls.getFileName() + ".xml";
+			// }
+		}
+		// 调用回写部署方案接口
+		// String path =
+		// "D:\\14S_GJK_GIT\\gjk\\gjk\\project\\gengTest\\geng流程\\模型\\方案展示.xml";
+		// String simplePlanFiles =
+		// gitDetailPath+processFile.getFilePath()+processFile.getFileName()+"\\模型\\方案展示.xml"
+		// ;
+
+		try {
+			// 后期换成(String)map.get("path")
+			schemeFile = (String) map.get("path");
+			// 报错
+			// 输入：流程模型文件、部署方案文件（选择的方案路径）
+			try {
+				ExternalIOTransUtils.writeBackDeployScheme(workModeFilePath, schemeFile);
+			} catch (Exception e) {
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean createXmlFiles(XmlEntity entity, String proDetailId) {
+		ProjectFile processFile = this
+				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, proDetailId));
+		ProjectFile modelFile = this
+				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, processFile.getParentId()));
+		ProjectFile flowFile = this
+				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, modelFile.getParentId()));
+
+		String filePath = gitDetailPath + flowFile.getFilePath() + flowFile.getFileName() + "/softToHardResult";
+		File file = new File(filePath);
+		if (!file.exists()) {
+			file.mkdirs();
+		}
+		return this.createXmlFile(entity, proDetailId);
 	}
 }
