@@ -81,6 +81,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cglib.beans.BeanMap;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
@@ -108,8 +109,8 @@ import org.slf4j.LoggerFactory;
 @Service("componentDetailService")
 public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMapper, ComponentDetail>
 		implements ComponentDetailService {
-
-	private static final String compDetailPath = JGitUtil.getLOCAL_REPO_PATH();
+	@Value("${git.local.path}")
+	private String compDetailPath;
 	private static final String compUserFilePath = "gjk" + File.separator + "component";
 	@Autowired
 	private ComponentMapper compMapper;
@@ -294,9 +295,9 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 					detail.setFileType(fileName.substring(fileName.lastIndexOf('.')));
 					// git本地库绝对路径
 					System.out.println("1111111111111111111111" + compDetailPath);
-					String absolutePath = compDetailPath + path + fileName;
+					String absolutePath = this.compDetailPath + path + fileName;
 					// 绝对路径的路径file，判断路径是否存在
-					File filePath = new File(compDetailPath + path);
+					File filePath = new File(this.compDetailPath + path);
 					// 绝对路径文件file，直接写入文件
 					File absoluteFile = new File(absolutePath);
 					// 上传
@@ -348,7 +349,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	 */
 	private File createFile(String token, String compId, String userCurrent) {
 		Component component = compMapper.getCompById(compId);
-		String absolutePath = compDetailPath + compUserFilePath + File.separator + userCurrent + File.separator
+		String absolutePath = this.compDetailPath + compUserFilePath + File.separator + userCurrent + File.separator
 				+ component.getCompId() + File.separator
 				+ component.getCreateTime().toString().replaceAll("[[\\s-T:punct:]]", "") + File.separator;
 		String gitRelativePath = compUserFilePath + File.separator + userCurrent + File.separator
@@ -583,7 +584,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		resMap.putAll(JSONUtil.parseObj(map.get("comp")));
 		String userName = (String) map.get("username");
 		// map转成Component
-		String createTime=resMap.get("createTime").toString();
+		String createTime = resMap.get("createTime").toString();
 		Component comp = mapToEntity(resMap, Component.class);
 		resMap.clear();
 		resMap.putAll(JSONUtil.parseObj(map.get("compImg")));
@@ -593,12 +594,12 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		originalFilename = StringUtils.isEmpty(img.getImgShowName()) ? "" : img.getImgShowName() + ".png";
 		// 远程路径
 		String gitRelativePath = compUserFilePath + File.separator + userName + File.separator + comp.getCompId()
-				+ File.separator + createTime.replaceAll("[[\\s-T:punct:]]", "") + File.separator
-				+ "图标文件";
+				+ File.separator + createTime.replaceAll("[[\\s-T:punct:]]", "") + File.separator + "图标文件";
 		// 选择文件后进入的判断
 		if (ObjectUtils.isNotEmpty(file)) {
 			try {
-				File uploadFile = UploadFilesUtils.createFile(gitRelativePath + File.separator + originalFilename);
+				File uploadFile = UploadFilesUtils.createFile(
+						this.compDetailPath + File.separator + gitRelativePath + File.separator + originalFilename);
 				// 将上传文件保存到路径
 				if (uploadFile.exists()) {
 					try {
@@ -623,11 +624,12 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 			StringBuilder strb = new StringBuilder();
 			String imgId = elReplace(img.getImgPath(), "/comp/component/comImg/", "");
 			File uploadFile = new File(
-					JGitUtil.getLOCAL_REPO_PATH() + gitRelativePath + File.separator + originalFilename);
+					this.compDetailPath + File.separator + gitRelativePath + File.separator + originalFilename);
 			OutputStream os = null;
 			try {
 				if (!uploadFile.exists()) {
-					uploadFile = UploadFilesUtils.createFile(gitRelativePath + File.separator + originalFilename);
+					uploadFile = UploadFilesUtils.createFile(
+							this.compDetailPath + File.separator + gitRelativePath + File.separator + originalFilename);
 				}
 				if (imgId.equals("1")) {
 					// 得到默认图标的文件
@@ -663,7 +665,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		detdirs.setFileName("图标文件");
 		detdirs.setFileType("imgfile");
 		detdirs.setFilePath(compUserFilePath + File.separator + userName + File.separator + comp.getCompId()
-				+ File.separator + createTime.replaceAll("[[\\s-T:punct:]]", "")  + File.separator);
+				+ File.separator + createTime.replaceAll("[[\\s-T:punct:]]", "") + File.separator);
 		detdirs.setParaentId(comp.getId());
 		detdirs.setVersion(comp.getVersion());
 		// 保存文件数据
@@ -756,8 +758,8 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	public String getFilePathById(String id) {
 		ComponentDetail des = this.getById(id);
 //		return baseMapper.getFilePathById(id);
-		System.out.println("ddddd:::" + compDetailPath + File.separator + des.getFilePath() + des.getFileName());
-		return compDetailPath + File.separator + des.getFilePath() + des.getFileName();
+		System.out.println("ddddd:::" + this.compDetailPath + File.separator + des.getFilePath() + des.getFileName());
+		return this.compDetailPath + File.separator + des.getFilePath() + des.getFileName();
 	}
 
 	/**
@@ -768,7 +770,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	 * @param file
 	 * @return
 	 */
-	public List<CompFilesVO> getUploadFilesUrl(MultipartFile[] files, Map<String, String> mapPath) {
+	public List<CompFilesVO> getUploadFilesUrl(MultipartFile[] files,String userName) {
 		String url = "";
 		List<CompFilesVO> listvos = Lists.newArrayList();
 		try {
@@ -776,11 +778,10 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 				Map<String, String> map = Maps.newHashMap();
 				// 获取上传文件名,包含后缀
 				String fileName = file.getOriginalFilename();
-				url = new String(mapPath.get("path") + File.separator + fileName);
+				url = new String(this.compDetailPath +"/gjk/upload/" + userName  + File.separator + fileName);
 				File uploadFile = null;
-				String path = compDetailPath + "/" + url;
-				if (StringUtils.isNotEmpty(path)) {
-					uploadFile = new File(path);
+				if (StringUtils.isNotEmpty(url)) {
+					uploadFile = new File(url);
 					if (!uploadFile.getParentFile().exists()) {
 						uploadFile.getParentFile().mkdirs();
 					}
@@ -833,7 +834,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		List<File> files = Lists.newArrayList();
 		Boolean isUpdate = false;
 		String oldPath = "";
-		String libsId=StringUtils.isEmpty(maps.get("libsID").toString())?"-1":maps.get("libsID").toString();
+		String libsId = StringUtils.isEmpty(maps.get("libsID").toString()) ? "-1" : maps.get("libsID").toString();
 		if (null == detdirs) {
 			isUpdate = false;
 			// 保存根目录对象
@@ -843,7 +844,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 			isUpdate = true;
 			detdirs.setLibsId(libsId);
 			oldPath = detdirs.getFilePath() + detdirs.getFileName();
-			File file = new File(compDetailPath + oldPath);
+			File file = new File(this.compDetailPath + oldPath);
 			if (!file.exists()) {
 				file.mkdirs();
 			}
@@ -864,7 +865,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 				if (detfilesPath.equals(oldPath)) {
 					// 如果文件不存在
 					if (!files.contains(uploadFile)) {
-						tmpPath = compDetailPath + File.separator + detfilesPath + File.separator + vo.getName();// 要上传的文件路径
+						tmpPath = this.compDetailPath + File.separator + detfilesPath + File.separator + vo.getName();// 要上传的文件路径
 						if (StringUtils.isNotEmpty(tmpPath)) {
 							file = new File(tmpPath);
 							if (!file.getParentFile().exists()) {
@@ -884,11 +885,11 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 						tmpPath = path.replace("\\", "/").replaceAll(oldPath.replace("\\", "/"),
 								detfilesPath.replace("\\", "/"));
 					} else {
-						tmpPath = compDetailPath + File.separator + detfilesPath + File.separator + vo.getName();// 要上传的文件路径
+						tmpPath = this.compDetailPath + File.separator + detfilesPath + File.separator + vo.getName();// 要上传的文件路径
 					}
 					// 删除以前的文件及文件夹
 					if (isUpdate) {
-						UploadFilesUtils.delFolder(compDetailPath + File.separator + oldPath);
+						UploadFilesUtils.delFolder(this.compDetailPath + File.separator + oldPath);
 					}
 					if (StringUtils.isNotEmpty(tmpPath)) {
 						file = new File(tmpPath);
@@ -1032,14 +1033,14 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		// 框架路径
 		String frameName = "";
 		for (Map<String, Object> map : lists) {
-			framePath = compDetailPath + map.get("file_path");
+			framePath = this.compDetailPath + map.get("file_path");
 			frameName = map.get("name").toString();
 		}
-		saveDir = compDetailPath + saveDir;
+		saveDir = this.compDetailPath + saveDir;
 		File file = null;
 		try {
 			if (StringUtils.isEmpty(spbModelXmlFile)) {
-				spbModelXmlFile = compDetailPath + JGitUtil.getHeaderTemplateFile();
+				spbModelXmlFile = this.compDetailPath + JGitUtil.getHeaderTemplateFile();
 				logger.error("构件模型XML文件 is null");
 				return new R<>(new NullPointerException("构件模型XML文件 is null"));
 			} else {
@@ -1096,6 +1097,45 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	@Override
 	public List<String> findPlatformByName(String frameName) {
 		return baseMapper.findPlatformByName(frameName);
+	}
+	/**
+	 * @Title: getUploadFilesUrl
+	 * @Description: 单文件上传返回路径
+	 * @Author xiaohe
+	 * @DateTime 2019年11月26日 下午2:04:44
+	 * @param ufile 文件流
+	 * @param userName 当前用户
+	 * @return 路径
+	 */
+	@Override
+	public String getUploadFilesUrl(MultipartFile ufile, String userName) {
+		String url = new String();
+		File uploadFile = null;
+		try {
+			// 获取上传文件名,包含后缀
+			String originalFilename = ufile.getOriginalFilename();
+			// 上传"image/"
+
+			url = new String("gjk/upload/" + userName + "/" + originalFilename).replace("\\", "/");
+			uploadFile = UploadFilesUtils.createFile(this.compDetailPath + url);
+			// 将上传文件保存到路径
+			if (uploadFile.exists()) {
+				boolean ok = uploadFile.delete();
+				System.out.println(ok);
+			}
+			ufile.transferTo(uploadFile);
+
+			JGitUtil.commitAndPush(url, "");
+		} catch (IllegalStateException e) {
+
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+
+		} finally {
+			url = new String(uploadFile.getPath().replace("\\", "/"));
+		}
+		return url;
 	}
 
 }
