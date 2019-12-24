@@ -59,8 +59,8 @@
           </el-card>
         </el-col>
       </el-row>
-      <export-libs :showInfo="showInfo"></export-libs>
-      <import-libs :showInfo="showInfo" @callback="getList"></import-libs>
+      <export-libs :showInfo="showInfo" :whichLib="whichLib"></export-libs>
+      <import-libs :showInfo="showInfo" :whichLib="whichLib" @callback="getList"></import-libs>
     </basic-container>
   </div>
 </template>
@@ -88,6 +88,7 @@ export default {
         importLibsDialogVisible: false,
         dialogExportVisible: false
       },
+      whichLib:"test",
       list: null,
       total: null,
       formEdit: true,
@@ -126,6 +127,7 @@ export default {
       testManager_btn_add: false,
       testManager_btn_edit: false,
       testManager_btn_del: false,
+      testManager_btn_sel: false,
       testManager_btn_export: false,
       testManager_btn_import: false
     };
@@ -136,6 +138,7 @@ export default {
     this.testManager_btn_add = this.permissions["sys_test_add"];
     this.testManager_btn_edit = this.permissions["sys_test_edit"];
     this.testManager_btn_del = this.permissions["sys_test_del"];
+    this.testManager_btn_sel = this.permissions["sys_test_select"];
     this.testManager_btn_export = this.permissions["sys_test_export"];
     this.testManager_btn_import = this.permissions["sys_test_import"];
   },
