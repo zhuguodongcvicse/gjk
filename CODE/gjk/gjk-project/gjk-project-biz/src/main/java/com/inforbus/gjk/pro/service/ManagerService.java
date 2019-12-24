@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.inforbus.gjk.admin.api.entity.BSP;
 import com.inforbus.gjk.common.core.util.R;
+import com.inforbus.gjk.pro.api.dto.AppDataDTO;
 import com.inforbus.gjk.pro.api.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -336,5 +337,16 @@ public interface ManagerService extends IService<ProjectFile> {
 	 * @return
 	 */
 	R codeGeneration(String projectId, String username);
+	
+	//根据当前软硬件映射配置的id，查找当前流程下的所有模块的文件路径，从而截取想要的路径
+	String getSoftProcessFilePath( String id);
+	
+	//根据当前软硬件映射配置的id，查找当前流程下的所有模块的文件路径
+	R getworkSpacePathById(String id, AppDataDTO appDataDTO);
+	
+	// 调回写部署方案接口
+	void writeBackDeploySchemeById( Map<String, Object> map); 
+	
+	boolean createXmlFiles(XmlEntity entity, String proDetailId);
 
 }
