@@ -174,6 +174,15 @@ function ondropLoadJSON(evt, graph, center, options) {
   //console.log("graph", graph)
   //console.log("center", center)
   let jsonObj = JSON.parse(options.json)
+  for (var j in jsonObj.datas) {
+    //校验主板上的芯片接口不许移动
+    var image = jsonObj.datas[j].json.image;
+    if (image === 'images/Chip.svg' || image === 'images/OpticalFiberMouth.svg' || image === 'images/InternetAccess.svg'
+      || image === 'images/RoundMouth.svg' || image === 'images/SerialPort.svg'
+    ) {
+      jsonObj.datas[j].json.movable = false;
+    }
+  }
   //找到带芯片的板卡
   if (jsonObj.datas[0].json.properties.boardType === '0' || jsonObj.datas[0].json.properties.boardType === '1') {
     //向数据中添加芯片的唯一标识
@@ -183,13 +192,7 @@ function ondropLoadJSON(evt, graph, center, options) {
         //给芯片的唯一标识拼接上板卡的唯一标识
         jsonObj.datas[i].json.properties.uniqueId = uuidRandom + '_' + jsonObj.datas[i].json.properties.uniqueId
       }
-      //校验主板上的芯片接口不许移动
-      let image = jsonObj.datas[i].json.image;
-      if (image === 'images/Chip.svg' || image === 'images/OpticalFiberMouth.svg' || image === 'images/InternetAccess.svg'
-        || image === 'images/RoundMouth.svg' || image === 'images/SerialPort.svg'
-      ) {
-        jsonObj.datas[i].json.movable = false;
-      }
+    
     }
     // console.log("jsonObj",jsonObj)
     //在自定义数据中添加唯一表示
@@ -208,15 +211,6 @@ function ondropLoadJSON(evt, graph, center, options) {
       }
     }
   }
-  //校验主板上的芯片接口不许移动
-  /*for (index in jsonObj.datas) {
-    let image = jsonObj.datas[index].json.image;
-    if (image === 'images/Chip.svg' || image === 'images/OpticalFiberMouth.svg' || image === 'images/InternetAccess.svg'
-      || image === 'images/RoundMouth.svg' || image === 'images/SerialPort.svg'
-    ) {
-      jsonObj.datas[index].json.movable = false;
-    }
-  }*/
   //主板类型2的校验
   if (jsonObj.datas[0].json.properties.boardType === '2') {
     let newjson = graph.toJSON();
@@ -602,7 +596,7 @@ function initEditor(editor) {
     //网状画布
     var graph = editor.graph;
     //不可改变形状大小
-    graph.editable = true;
+    graph.editable = false;
     //不可缩放
     //	graph.enableWheelZoom = false
     var defaultStyles = graph.styles = {};
