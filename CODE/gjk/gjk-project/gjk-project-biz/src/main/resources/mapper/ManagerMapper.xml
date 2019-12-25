@@ -919,7 +919,7 @@
 		`data_type` = #{structlibs.dataType},
 		`struct_type` = #{structlibs.structType},
 		`data_length` = #{structlibs.dataLength},
-		`permission` = #{structlibs.permission})
+		`permission` = #{structlibs.permission}
 		WHERE `id` = #{structlibs.id}
 	</update>
 
