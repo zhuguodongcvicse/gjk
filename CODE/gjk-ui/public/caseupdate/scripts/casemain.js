@@ -50,7 +50,7 @@ Q.registerImage('ePort', 'images/InternetAccess.svg');
 
 // 子接收父参数
 function handleMessageFromParent(event) {
-  console.log("event.data", event.data)
+  // console.log("event.data", event.data)
   caseData = event.data.params[0];
   boardArr = event.data.params[1];
   fpgaBoardLinkType = event.data.params[2];
@@ -71,33 +71,31 @@ function handleMessageFromParent(event) {
       // console.log("existBackBoards", existBackBoards)
       for (const i in existFrontBoards) {
         if (existFrontBoards[i].boardType == 1) {
+          clickBoardList.push(existFrontBoards[i])
           for (const j in existFrontBoards[i].chipList) {
             allInfOfFrontBoard = allInfOfFrontBoard.concat(existFrontBoards[i].chipList[j].infOfChipList)
           }
           // console.log("allInfOfFrontBoard",allInfOfFrontBoard)
-        }
-      }
-      for (const i in existFrontBoards) {
-        if (existFrontBoards[i].InternalLink != null) {
-          for (const j in existFrontBoards[i].InternalLink) {
-            for (const k in allInfOfFrontBoard) {
-              if (allInfOfFrontBoard[k].uniqueId.indexOf(existFrontBoards[i].InternalLink[j][1].uniqueId) != -1) {
-                removeByValue(allInfOfFrontBoard, allInfOfFrontBoard[k])
-              }
-              if (allInfOfFrontBoard[k].uniqueId.indexOf(existFrontBoards[i].InternalLink[j][3].uniqueId) != -1) {
-                removeByValue(allInfOfFrontBoard, allInfOfFrontBoard[k])
+          if (existFrontBoards[i].InternalLink != null) {
+            for (const j in existFrontBoards[i].InternalLink) {
+              for (const k in allInfOfFrontBoard) {
+                if (allInfOfFrontBoard[k].uniqueId.indexOf(existFrontBoards[i].InternalLink[j][1].uniqueId) != -1) {
+                  removeByValue(allInfOfFrontBoard, allInfOfFrontBoard[k])
+                }
+                if (allInfOfFrontBoard[k].uniqueId.indexOf(existFrontBoards[i].InternalLink[j][3].uniqueId) != -1) {
+                  removeByValue(allInfOfFrontBoard, allInfOfFrontBoard[k])
+                }
               }
             }
-          }
-          for (const j in existFrontBoards[i].outLinkArr) {
-            for (const k in allInfOfFrontBoard) {
-              if (allInfOfFrontBoard[k].uniqueId.indexOf(existFrontBoards[i].outLinkArr[j][1].uniqueId) != -1) {
-                removeByValue(allInfOfFrontBoard, allInfOfFrontBoard[k])
+            for (const j in existFrontBoards[i].outLinkArr) {
+              for (const k in allInfOfFrontBoard) {
+                if (allInfOfFrontBoard[k].uniqueId.indexOf(existFrontBoards[i].outLinkArr[j][1].uniqueId) != -1) {
+                  removeByValue(allInfOfFrontBoard, allInfOfFrontBoard[k])
+                }
               }
             }
           }
         }
-        clickBoardList.push(existFrontBoards[i])
       }
       clickBoardList = JSON.parse(JSON.stringify(clickBoardList))
       // console.log("clickBoardList", JSON.stringify(clickBoardList))
@@ -1043,7 +1041,7 @@ function initEditor(editor) {
     var type = data.get('type');
     var image = data.image;
     //console.log("data----",data)
-    currentBoard = data.properties
+    currentBoard = JSON.parse(JSON.stringify(data.properties))
     if (data.properties.boardType == 1) {
       data.properties.outLinkArr = []
       //将板卡对应卡槽的slotnum赋给fSlotNum

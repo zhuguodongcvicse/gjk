@@ -952,8 +952,8 @@ function initEditor(editor) {
   propertySheet.getCustomPropertyDefinitions = function (data) {
     var type = data.get('type');
     var image = data.image;
-    console.log("data",data)
-    currentBoard = data.properties
+    // console.log("data",data)
+    currentBoard = JSON.parse(JSON.stringify(data.properties))
     if (data.properties.boardType == 1) {
       // console.log("allInfOfFrontBoard", allInfOfFrontBoard)
       data.properties.outLinkArr = []

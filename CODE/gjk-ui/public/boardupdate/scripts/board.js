@@ -890,7 +890,12 @@ function initEditor(editor) {
           data.set('infName', data.properties.infName);
           data.set('infRate', data.properties.infRate);
           data.set('opticalNum', data.properties.opticalNum);
-          data.set('ioType', data.properties.ioType);
+          for (const i in calculateBoardIoType) {
+            if (calculateBoardIoType[i].value === data.properties.ioType) {
+              data.set('ioType', calculateBoardIoType[i].label);
+              break
+            }
+          }
         }
         // console.log("data", data);
       }

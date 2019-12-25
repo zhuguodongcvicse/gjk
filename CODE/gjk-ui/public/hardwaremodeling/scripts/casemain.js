@@ -173,7 +173,7 @@ function ondropLoadJSON(evt, graph, center, options) {
       frontjson.datas[index].json.movable = false;
     }
     //给数据中的芯片拼接唯一标识
-    if (frontjson.datas[index].json.properties.chipName != null) {
+    if (frontjson.datas[index].json.properties !== undefined && frontjson.datas[index].json.properties.chipName != null) {
       frontjson.datas[index].json.properties.uniqueId = uuidRandom + '_' + frontjson.datas[index].json.properties.uniqueId
     }
   }
@@ -522,6 +522,7 @@ function initEditor(editor) {
     ChipsWithIPs = []
     caseID = -1
     graph.clear()
+    checkIPMap = new Map()
   }
   buttonOfSave.onclick = function (evt) {
     if (graphList.fJson.length === 0) {
@@ -1103,6 +1104,13 @@ function initEditor(editor) {
             }
           }
           caseID--
+          //删除map中存在的ip
+          checkIPMap.forEach((value, key) => {
+            if (key.indexOf(selection[0].properties.uniqueId) !== -1) {
+              checkIPMap.delete(key)
+            }
+          })
+
           // console.log("backAllCaseJsonTemp", backAllCaseJsonTemp)
           // console.log("caseList", caseList)
           // console.log("graphList", graphList)
