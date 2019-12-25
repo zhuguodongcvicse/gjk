@@ -122,10 +122,10 @@ export function getCompFiles(compId) {
 // }
 /* 保存图标文件 */
 export function saveCompImg(param) {
-  console.log("saveCompImg - param",param)
+  console.log("saveCompImg - param", param)
   let params = new FormData();
   params.append("file", param.file);
-  params.append("compParam",JSON.stringify(param.compParam));
+  params.append("compParam", JSON.stringify(param.compParam));
   // params.append("userCurrent",userCurrent);
   return request({
     method: "post",
@@ -143,12 +143,6 @@ export function modifyComp(comp) {
   })
 }
 
-export function getCompDict() {
-  return request({
-    url: '/comp/component/info/getCompDict',
-    method: 'get'
-  })
-}
 export function analysisXmlFile(filePath) {
   let params = new FormData();
   params.append("filePath", filePath);
@@ -161,9 +155,9 @@ export function analysisXmlFile(filePath) {
 }
 
 export function analysisBaseTemplateXmlFile(filePath) {
-  console.log("filePath",filePath)
-  let params = {filePath}
-  console.log("params",params)
+  console.log("filePath", filePath)
+  let params = { filePath }
+  console.log("params", params)
   return request({
     url: '/comp/component/analysisXmlFile',
     method: 'post',
@@ -180,11 +174,11 @@ export function importCompZipUpload(param) {
     data: param
   })
 }
-export function checkComp(obj){
+export function checkComp(obj) {
   return request({
-    method:"post",
-    url:"/comp/component/checkComp",
-    data:obj
+    method: "post",
+    url: "/comp/component/checkComp",
+    data: obj
   })
 }
 export function isSelectLibs(compId) {
@@ -194,12 +188,12 @@ export function isSelectLibs(compId) {
   })
 }
 
-export function compByUserId(userId){
+export function compByUserId(userId) {
   return request({
-        method:"post",
-        url:"/comp/component/compByUserId",
-        params:{
-          userId:userId
-        }
+    method: "post",
+    url: "/comp/component/compByUserId",
+    params: {
+      userId: userId
+    }
   })
 }

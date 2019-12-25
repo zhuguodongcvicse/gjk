@@ -4,7 +4,7 @@
     <template>
       <div class="systemconfiguration__btn_14s">
         <el-button type="primary" size="mini" @click="saveSysConfigXmlFile" icon="el-icon-edit">保存</el-button>
-        <el-button type="primary" plain size="mini" icon="el-icon-refresh">刷新</el-button>
+        <el-button type="primary" plain size="mini" icon="el-icon-refresh" @click="reflush">刷新</el-button>
       </div>
       <el-tabs class="sysConfig_tab_14s">
         <template v-for="(item, index) in tablePane">
@@ -34,6 +34,8 @@ import {
   getChipsfromhardwarelibs
 } from "@/api/pro/manager";
 export default {
+  //注入依赖，调用this.reload();用于刷新页面
+  inject: ["reload"],
   //import引入的组件需要注入到对象中才能使用
   components: {
     "node-part-assembly": () =>
@@ -80,6 +82,9 @@ export default {
   },
   //方法集合
   methods: {
+    reflush() {
+      this.reload();
+    },
     getModelXmlEntityMap() {
       //1:解析基础模板文件，获得cpu和cmp的节点
       getSysConfigModelXml(this.$route.query.sysId).then(Response => {
@@ -475,7 +480,7 @@ export default {
           } else {
             this.$notify.error({
               title: "错误",
-              message: "保存失败"
+              message: "保存失败,请联系管理员。"
             });
           }
         }

@@ -261,18 +261,6 @@ public class ComponentController {
 	}
 
 	/**
-	 * 获取构件ID和构件名称对应的字典
-	 *
-	 * @param id 类型
-	 * @return 同类型字典
-	 */
-	@GetMapping("/info/getCompDict")
-	@Cacheable(value = "compDicts")
-	public R getCompDict() {
-		return new R<>(componentService.getCompDictList());
-	}
-
-	/**
 	 * @Title: analysisXmlFile
 	 * @Description: 解析构件基础模板
 	 * @Author xiaohe

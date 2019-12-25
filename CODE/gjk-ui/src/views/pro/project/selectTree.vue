@@ -27,7 +27,7 @@
       slot="reference"
       ref="select"
       v-model="key"
-      size="small"
+      :size="size"
       collapse-tags
       :clearable="true"
       :multiple="multiple"
@@ -49,7 +49,8 @@ export default {
     id: [String, Array],
     nodeKey: { type: String, default: "id" },
     tipText: { type: String, default: "请选择" },
-    defaultExpandedNodeArray: { type: Array }
+    defaultExpandedNodeArray: { type: Array },
+    size: { type: String, default: "medium" }
   },
   data() {
     return {
