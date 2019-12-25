@@ -36,7 +36,7 @@ public interface HardwarelibInfService extends IService<HardwarelibInf> {
    * @param hardwarelibInf 接口设计
    * @return
    */
-  IPage<HardwarelibInf> getHardwarelibInfPage(Page<HardwarelibInf> page, HardwarelibInf hardwarelibInf);
+  IPage<HardwarelibInf> getHardwarelibInfPage(Page<HardwarelibInf> page, String userName, HardwarelibInf hardwarelibInf);
 
   HardwarelibInf saveInf(HardwarelibInf hardwarelibInf);
 

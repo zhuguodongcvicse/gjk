@@ -134,11 +134,16 @@
                         //保存芯片
                         saveChip(this.params).then(response => {
                             // console.log("params", this.params);
-                            this.$message({
+                            this.$notify({
+                                title: '成功',
+                                message: '保存成功',
+                                type: 'success'
+                            });
+                            /*this.$message({
                                 showClose: true,
                                 message: "保存成功",
                                 type: "success"
-                            });
+                            });*/
                             // this.params = "";
                             //关闭标签的方法
                             var tag1 = this.tag;

@@ -49,9 +49,10 @@ public class HardwarelibInfController {
    * @param hardwarelibInf 接口设计
    * @return
    */
-  @GetMapping("/page")
-  public R<IPage<HardwarelibInf>> getHardwarelibInfPage(Page<HardwarelibInf> page, HardwarelibInf hardwarelibInf) {
-    return  new R<>(hardwarelibInfService.getHardwarelibInfPage(page,hardwarelibInf));
+  @GetMapping("/page/{userName}")
+  public R<IPage<HardwarelibInf>> getHardwarelibInfPage(Page<HardwarelibInf> page, HardwarelibInf hardwarelibInf, @PathVariable(value = "userName") String userName) {
+    System.out.println("page" + page);
+    return  new R<>(hardwarelibInfService.getHardwarelibInfPage(page, userName, hardwarelibInf));
   }
 
 

@@ -222,84 +222,11 @@ export default {
           }, 1);
         }
         this.simulationData = response.data.data;
-        var option = {
-          title: {
-            text: data.symbol+"仿真监测",
-            x: "center"
-          },
-
-          tooltip: {
-            trigger: "axis",
-            axisPointer: {
-              animation: false
-            }
-          },
-          legend: {
-            data: ["仿真曲线"],
-            x: "left"
-          },
-          axisPointer: {
-            link: { xAxisIndex: "all" }
-          },
-          dataZoom: [
-            {
-              show: true,
-              realtime: true,
-              start: 30,
-              end: 31 //,
-              //xAxisIndex: [0, 1]
-            },
-            {
-              type: "inside",
-              realtime: true,
-              start: 30,
-              end: 31 //,
-              //xAxisIndex: [0, 1]
-            }
-          ],
-          grid: [
-            {
-              left: 50,
-              right: 50,
-              height: "67%"
-            }
-            // , {
-            //     left: 50,
-            //     right: 50,
-            //     top: '55%',
-            //     height: '35%'
-            // }
-          ],
-          xAxis: [
-            {
-              name: "数据",
-              type: "category",
-              boundaryGap: false,
-              // axisLine: {onZero: true},
-              data: this.simulationData.xaxisData
-            }
-          ],
-          yAxis: [
-            {
-              name: "数据流量",
-              type: "value",
-              max: 500
-            }
-          ],
-          series: [
-            {
-              name: "仿真曲线",
-              type: "line",
-              symbolSize: 8,
-              hoverAnimation: false,
-              data: this.simulationData.yaxisData
-            }
-          ]
-        };
+        var data = {"symol": data.symol,"xaxisData": response.data.data.xaxisData, "yaxisData": response.data.data.yaxisData}
         // 基于准备好的dom，初始化echarts实例
         let myChart = this.$echarts.init(document.getElementById("myChart"));
         // 绘制图表
-        myChart.setOption(option);
+        myChart.setOption(this.getOption(data));
       });
     },
     drawLine2(data) {
@@ -315,85 +242,89 @@ export default {
           }, 1);
         }
         this.simulationData = response.data.data;
-        var option = {
-          title: {
-            text: data.symbol+"仿真监测",
-            x: "center"
-          },
-
-          tooltip: {
-            trigger: "axis",
-            axisPointer: {
-              animation: false
-            }
-          },
-          legend: {
-            data: ["仿真曲线"],
-            x: "left"
-          },
-          axisPointer: {
-            link: { xAxisIndex: "all" }
-          },
-          dataZoom: [
-            {
-              show: true,
-              realtime: true,
-              start: 30,
-              end: 31 //,
-              //xAxisIndex: [0, 1]
-            },
-            {
-              type: "inside",
-              realtime: true,
-              start: 30,
-              end: 31 //,
-              //xAxisIndex: [0, 1]
-            }
-          ],
-          grid: [
-            {
-              left: 50,
-              right: 50,
-              height: "67%"
-            }
-            // , {
-            //     left: 50,
-            //     right: 50,
-            //     top: '55%',
-            //     height: '35%'
-            // }
-          ],
-          xAxis: [
-            {
-              name: "数据",
-              type: "category",
-              boundaryGap: true,
-              // axisLine: {onZero: true},
-              data: this.simulationData.xaxisData
-            }
-          ],
-          yAxis: [
-            {
-              name: "数据流量",
-              type: "value",
-              max: 500
-            }
-          ],
-          series: [
-            {
-              name: "仿真曲线",
-              type: "line",
-              symbolSize: 8,
-              hoverAnimation: false,
-              data: this.simulationData.yaxisData
-            }
-          ]
-        };
+        var data = {"symol": data.symol,"xaxisData": response.data.data.xaxisData, "yaxisData": response.data.data.yaxisData}
         // 基于准备好的dom，初始化echarts实例
         let myChart = this.$echarts.init(document.getElementById("myChart1"));
         // 绘制图表
-        myChart.setOption(option);
+        myChart.setOption(this.getOption(data));
       });
+    },
+    getOption(data){
+        var option = {
+            title: {
+                text: data.symbol+"仿真监测",
+                x: "center"
+            },
+
+            tooltip: {
+                trigger: "axis",
+                axisPointer: {
+                    animation: false
+                }
+            },
+            legend: {
+                data: ["仿真曲线"],
+                x: "left"
+            },
+            axisPointer: {
+                link: { xAxisIndex: "all" }
+            },
+            dataZoom: [
+                {
+                    show: true,
+                    realtime: true,
+                    start: 30,
+                    end: 31 //,
+                    //xAxisIndex: [0, 1]
+                },
+                {
+                    type: "inside",
+                    realtime: true,
+                    start: 30,
+                    end: 31 //,
+                    //xAxisIndex: [0, 1]
+                }
+            ],
+            grid: [
+                {
+                    left: 50,
+                    right: 50,
+                    height: "67%"
+                }
+                // , {
+                //     left: 50,
+                //     right: 50,
+                //     top: '55%',
+                //     height: '35%'
+                // }
+            ],
+            xAxis: [
+                {
+                    name: "数据",
+                    type: "category",
+                    boundaryGap: true,
+                    // axisLine: {onZero: true},
+                    data: data.xaxisData
+                }
+            ],
+            yAxis: [
+                {
+                    name: "数据流量",
+                    type: "value",
+                    max: 500
+                }
+            ],
+            series: [
+                {
+                    name: "仿真曲线",
+                    type: "line",
+                    symbolSize: 8,
+                    hoverAnimation: false,
+                    data: data.yaxisData
+                }
+            ]
+        };
+        return option;
     },
     start(){
         if(this.myChartsFormData!=undefined){

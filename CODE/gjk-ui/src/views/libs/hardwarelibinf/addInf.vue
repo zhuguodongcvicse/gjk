@@ -161,10 +161,15 @@
                         this.form.userId = this.userInfo.name
                         // console.log("this.form",this.form)
                         saveInf(this.form).then(request => {
-                            this.$message({
+                            this.$notify({
+                                title: '成功',
+                                message: '添加成功',
+                                type: 'success'
+                            });
+                            /*this.$message({
                                 message: "添加成功",
                                 type: "success"
-                            });
+                            });*/
                             this.$parent.getList();
                             this.$refs[formName].resetFields();
                         });

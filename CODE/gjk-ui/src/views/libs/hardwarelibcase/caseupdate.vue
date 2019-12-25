@@ -128,10 +128,15 @@
                         // console.log("this.params[1]",this.params[1])
                         this.ifSave = 0;
                         updateCase(this.params).then(response => {
-                            this.$message({
+                            this.$notify({
+                                title: '成功',
+                                message: '修改成功',
+                                type: 'success'
+                            });
+                            /*this.$message({
                                 type: "success",
                                 message: "修改成功!"
-                            })
+                            })*/
                             this.refreshListFlag = Math.random()
                             this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
                         });
@@ -143,10 +148,15 @@
                         // console.log("this.params[1]",this.params[1])
                         this.ifSave = 0;
                         saveCase(this.params).then(response => {
-                            this.$message({
+                            this.$notify({
+                                title: '成功',
+                                message: '复制成功',
+                                type: 'success'
+                            });
+                            /*this.$message({
                                 type: "success",
                                 message: "复制成功!"
-                            })
+                            })*/
                             this.refreshListFlag = Math.random()
                             this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
                         });

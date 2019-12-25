@@ -173,7 +173,7 @@ function ondropLoadJSON(evt, graph, center, options) {
       frontjson.datas[index].json.movable = false;
     }
     //给数据中的芯片拼接唯一标识
-    if (frontjson.datas[index].json.properties.chipName != null) {
+    if (frontjson.datas[index].json.properties !== undefined && frontjson.datas[index].json.properties.chipName != null) {
       frontjson.datas[index].json.properties.uniqueId = uuidRandom + '_' + frontjson.datas[index].json.properties.uniqueId
     }
   }
@@ -522,6 +522,7 @@ function initEditor(editor) {
     ChipsWithIPs = []
     caseID = -1
     graph.clear()
+    checkIPMap = new Map()
   }
   buttonOfSave.onclick = function (evt) {
     if (graphList.fJson.length === 0) {
@@ -795,13 +796,13 @@ function initEditor(editor) {
 
     toolbar.appendChild(button)
     //网状画布
-    //	var graph = editor.graph;
+    var graph = editor.graph;
     //不可改变形状大小
     graph.editable = false;
-
-    //	var defaultStyles = graph.styles = {};
-    //	defaultStyles[Q.Styles.ARROW_TO] = false;
-
+    //不可缩放
+    //	graph.enableWheelZoom = false
+    var defaultStyles = graph.styles = {};
+    defaultStyles[Q.Styles.ARROW_TO] = true;
     var background = new GridBackground(graph);
 
     var currentCell = 10;
@@ -983,27 +984,27 @@ function initEditor(editor) {
     window.parent.postMessage(postMessageParentData, "*")
   }
 
-  graph.popupmenu.getMenuItems = function (graph, data, evt) {
-    if (data) {
-      if (data.from != null) {
-        return [
-          {
-            text: '删除连线', action: function () {
-              var data = graph.getElement(evt);
-              // console.log("data",data)
-              // graph.removeSelectionByInteraction(data);
-              let fromInfStr = data.from.properties.uniqueId.slice(0, 15)
-              let toInfStr = data.to.properties.uniqueId.slice(0, 15)
-              if (fromInfStr === toInfStr) {
-                return
-              }
-              graph.removeElement(data);
-            }
-          },
-        ];
-      }
-    }
-  }
+  // graph.popupmenu.getMenuItems = function (graph, data, evt) {
+  //   if (data) {
+  //     if (data.from != null) {
+  //       return [
+  //         {
+  //           text: '删除连线', action: function () {
+  //             var data = graph.getElement(evt);
+  //             // console.log("data",data)
+  //             // graph.removeSelectionByInteraction(data);
+  //             let fromInfStr = data.from.properties.uniqueId.slice(0, 15)
+  //             let toInfStr = data.to.properties.uniqueId.slice(0, 15)
+  //             if (fromInfStr === toInfStr) {
+  //               return
+  //             }
+  //             graph.removeElement(data);
+  //           }
+  //         },
+  //       ];
+  //     }
+  //   }
+  // }
 
   //删除
   graph.removeSelectionByInteraction = false;
@@ -1103,6 +1104,13 @@ function initEditor(editor) {
             }
           }
           caseID--
+          //删除map中存在的ip
+          checkIPMap.forEach((value, key) => {
+            if (key.indexOf(selection[0].properties.uniqueId) !== -1) {
+              checkIPMap.delete(key)
+            }
+          })
+
           // console.log("backAllCaseJsonTemp", backAllCaseJsonTemp)
           // console.log("caseList", caseList)
           // console.log("graphList", graphList)
@@ -1357,9 +1365,9 @@ function initEditor(editor) {
         var edge = evt.data;
         // console.log("edge",edge)
         //校验只能接口连线
-        if(evt.data.from.host.host.host.host == evt.data.to.host.host.host.host){
-          graph.removeElement(edge);
-        }
+        // if(evt.data.from.host.host.host.host == evt.data.to.host.host.host.host){
+        //   graph.removeElement(edge);
+        // }
         if (evt.data.from.image != 'images/OpticalFiberMouth.svg' && evt.data.from.image != 'images/RoundMouth.svg' &&
           evt.data.from.image != 'images/InternetAccess.svg' && evt.data.from.image != 'images/SerialPort.svg'
         ) {

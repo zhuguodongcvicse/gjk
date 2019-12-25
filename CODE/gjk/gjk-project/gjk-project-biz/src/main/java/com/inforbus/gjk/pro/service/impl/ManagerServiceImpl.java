@@ -2698,7 +2698,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		List<String> structIdList = structlibsList.stream().map(Structlibs::getId).collect(Collectors.toList());
 		List<Structlibs> list = new ArrayList<>();
 		if (structIdList.size() > 0) {
-			list = baseMapper.getStructlibsByIdList(structIdList);
+			list = baseMapper.getStructlibsByParentIdList(structIdList);
 		}
 		if (list.size() > 0) {
 			resList.addAll(list);
