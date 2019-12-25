@@ -16,15 +16,12 @@
  */
 package com.inforbus.gjk.libs.controller;
 
-import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.R;
-import com.inforbus.gjk.libs.api.dto.ThreeLibsDTO;
 import com.inforbus.gjk.libs.api.dto.ThreeLibsFilePathDTO;
 import com.inforbus.gjk.libs.api.entity.Software;
 import com.inforbus.gjk.libs.api.entity.SoftwareDetail;
 import com.inforbus.gjk.libs.api.entity.SoftwareFile;
 import com.inforbus.gjk.libs.service.CommonComponentDetailService;
-import com.inforbus.gjk.libs.service.CommonComponentService;
 import com.inforbus.gjk.libs.service.ThreeLibsService;
 
 import lombok.AllArgsConstructor;
@@ -32,14 +29,6 @@ import lombok.AllArgsConstructor;
 import java.io.*;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.poi.hwpf.extractor.WordExtractor;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -58,8 +47,6 @@ public class ThreeLibsController {
 
 	private final ThreeLibsService threeLibsService;
 	private final CommonComponentDetailService commonComponentDetailService;
-	private static final String softwarePath = JGitUtil.getLOCAL_REPO_PATH();
-	private static final String defaultEncoding = JGitUtil.getDefaultEncoding();
 
 	/**
 	 *
@@ -164,101 +151,8 @@ public class ThreeLibsController {
 	 */
 
 	@PostMapping("/readAlgorithmfile")
-	public R fileRead(@RequestBody ThreeLibsFilePathDTO threeLibsFilePathDTO) throws Exception {
-		String fileName = threeLibsFilePathDTO.getFilePathName();
-		// 获取文件编码格式
-		String code = "";
-		if (StringUtils.isEmpty(threeLibsFilePathDTO.getCode())) {
-			code = defaultEncoding;
-		} else {
-			code = threeLibsFilePathDTO.getCode();
-		}
-		if (StringUtils.isEmpty(fileName)) {
-			return new R<>();
-		}
-		File isFile = new File(fileName);
-		// 获取文件编码格式
-		// 获得文件编码
-//		String fileEncode=EncodingDetect.getJavaEncode(filePath);
-//		if(threeLibsFilePathDTO.getEditorCode()!=null) {
-//			code = threeLibsFilePathDTO.getEditorCode();
-//		}else {
-//			code = this.codeString(fileName);
-//		}
-		String prefix = fileName.substring(fileName.lastIndexOf(".") + 1);
-
-		String str = "";
-		ThreeLibsDTO dto = new ThreeLibsDTO();
-		if (isFile.exists() && isFile.isFile()) {
-
-			// 读取excel文件
-			if ("xlsx".equals(prefix) || "xls".equals(prefix)) {
-				try {
-
-					XSSFWorkbook xssfWorkbook = new XSSFWorkbook(fileName);
-					// 循环工作表sheet
-					XSSFSheet xssfSheet = xssfWorkbook.getSheetAt(0);
-					int firstRowIndex = xssfSheet.getFirstRowNum(); // 第一行是列名，所以不读
-					int lastRowIndex = xssfSheet.getLastRowNum();
-					// 循环行row
-					XSSFRow xssfRow = xssfSheet.getRow(0);
-					// 循环列cell
-					// 用stringbuffer得到excel表格一行的内容并用逗号分隔
-					StringBuffer sbs = new StringBuffer();
-					for (int rIndex = firstRowIndex; rIndex <= lastRowIndex; rIndex++) {// 遍历行
-						Row row = xssfSheet.getRow(rIndex);
-						if (row != null) {
-							int firstCellIndex = row.getFirstCellNum();
-							int lastCellIndex = row.getLastCellNum();
-							for (int cIndex = firstCellIndex; cIndex < lastCellIndex; cIndex++) {// 遍历列
-								Cell cell = row.getCell(cIndex);
-								sbs.append(cell);
-								if (cell != null) {
-									sbs.append(",");
-									System.out.println(cell.toString());
-								}
-							}
-						}
-
-					}
-					str = sbs.toString();
-				} catch (Exception e) {
-					System.out.println("读取文件内容出错");
-					e.printStackTrace();
-				}
-				// 读取word文件
-			} else if ("doc".equals(prefix) || "docx".equals(prefix)) {
-				try {
-
-					FileInputStream in = new FileInputStream(fileName);
-					WordExtractor extractor = new WordExtractor(in);
-					str = extractor.getText();
-//				dto.setTextContext(str);
-				} catch (Exception e) {
-					System.out.println("读取文件内容出错");
-					e.printStackTrace();
-				}
-			}
-			// 读取//.h .m .c .o等客户 文件
-			else {
-				// 获得文件编码
-//				String fileEncode=EncodingDetect.getJavaEncode(fileName);
-				// String encoding = "utf-8";
-				try {
-					str = FileUtils.readFileToString(new File(fileName), code);
-					System.out.println("sss:::" + str);
-				} catch (Exception e) {
-					System.out.println("读取文件内容出错");
-					e.printStackTrace();
-				}
-			}
-			System.out.println("**************************code::::" + code);
-			dto.setTextContext(prefix + "@%#@*+-+@" + str + "@%#@*+-+@" + code);
-		} else {
-			System.out.println("找不到指定的文件");
-		}
-		return new R<>(dto);
-
+	public R fileRead(@RequestBody ThreeLibsFilePathDTO threeLibsFilePathDTO) {
+		return threeLibsService.fileRead(threeLibsFilePathDTO);
 	}
 
 	public String codeString(String fileName) throws Exception {
@@ -346,27 +240,29 @@ public class ThreeLibsController {
 			}
 		}
 	}
-/**
- * 根据libsid查询到已入库的表中是否选中三个库
- * @param platfromId
- * @return
- */
+
+	/**
+	 * 根据libsid查询到已入库的表中是否选中三个库
+	 * 
+	 * @param platfromId
+	 * @return
+	 */
 	@PostMapping("/findThreeLibsId/{platformId}")
 	public boolean findThreeLibsId(@PathVariable("platformId") String platformId) {
 		boolean bool = false;
-		if(((threeLibsService.findBSPDetailByPlatformId(platformId)).size()) > 0) {
+		if (((threeLibsService.findBSPDetailByPlatformId(platformId)).size()) > 0) {
 			bool = true;
 		}
-		if(((threeLibsService.findSoftwareDetailByPlatformId(platformId)).size()) > 0) {
+		if (((threeLibsService.findSoftwareDetailByPlatformId(platformId)).size()) > 0) {
 			bool = true;
 		}
-		if(((threeLibsService.findComponentDetailByPlatformId(platformId)).size()) > 0) {
+		if (((threeLibsService.findComponentDetailByPlatformId(platformId)).size()) > 0) {
 			bool = true;
 		}
-		if(((threeLibsService.findCompframeDetailByPlatformId(platformId)).size()) > 0) {
+		if (((threeLibsService.findCompframeDetailByPlatformId(platformId)).size()) > 0) {
 			bool = true;
 		}
-		if(((commonComponentDetailService.findCommonComponentDetailByLibsId(platformId)).size()) > 0) {
+		if (((commonComponentDetailService.findCommonComponentDetailByLibsId(platformId)).size()) > 0) {
 			bool = true;
 		}
 		return bool;

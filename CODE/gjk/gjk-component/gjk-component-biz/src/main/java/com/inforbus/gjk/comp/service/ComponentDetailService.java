@@ -171,7 +171,7 @@ public interface ComponentDetailService extends IService<ComponentDetail> {
 	 * @param ufile
 	 * @return
 	 */
-	List<CompFilesVO> getUploadFilesUrl(MultipartFile[] ufile, Map<String,String> bean);
+	List<CompFilesVO> getUploadFilesUrl(MultipartFile[] ufile, String userName);
 
 	/**
 	 * @Title: saveCompfiles
@@ -213,5 +213,7 @@ public interface ComponentDetailService extends IService<ComponentDetail> {
 	 * @return
 	 */
 	public List<String> findPlatformByName(String frameName);
+
+	String getUploadFilesUrl(MultipartFile ufile,String userName);
 
 }

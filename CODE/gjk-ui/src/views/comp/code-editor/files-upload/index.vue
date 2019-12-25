@@ -263,7 +263,7 @@ export default {
         this.filePathList.push(fileEntity);
         formData.append("file", e.file);
       });
-      formData.append("filesPath", JSON.stringify({ path: "gjk/upload" }));
+      formData.append("userName", this.userInfo.username);
       console.log("每个文件的路径", formData);
       //上传文件
       uploadFilesPath(formData).then(res => {

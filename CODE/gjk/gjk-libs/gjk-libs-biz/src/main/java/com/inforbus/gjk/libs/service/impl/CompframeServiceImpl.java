@@ -39,6 +39,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -50,7 +51,9 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Service("compframeService")
 public class CompframeServiceImpl extends ServiceImpl<CompframeMapper, Compframe> implements CompframeService {
-	private static final String compframePath = JGitUtil.getLOCAL_REPO_PATH();
+
+	@Value("${git.local.path}")
+	private String gitFilePath;
 	private static final Logger logger = LoggerFactory.getLogger(CompframeServiceImpl.class);
 
 	/**
@@ -88,7 +91,7 @@ public class CompframeServiceImpl extends ServiceImpl<CompframeMapper, Compframe
 		}
 		String fileName = "构件框架库_" + version;
 		String targetPathStr = new String(
-				(compframePath + resMap.get("filePath") + File.separator + version + File.separator + fileName)
+				(gitFilePath + resMap.get("filePath") + File.separator + version + File.separator + fileName)
 						.replace("/", File.separator));
 		if (ObjectUtils.isNotEmpty(ufile)) {
 			File uploadFile = null;
@@ -125,7 +128,7 @@ public class CompframeServiceImpl extends ServiceImpl<CompframeMapper, Compframe
 	@Override
 	public List<CompframeTree> compframeToTree(Compframe compframe) {
 		List<CompframeTree> trees = Lists.newArrayList();
-		compframe.setFilePath(compframePath + compframe.getFilePath());
+		compframe.setFilePath(gitFilePath + compframe.getFilePath());
 		trees.add(new CompframeTree(compframe, "-1"));
 		compframe.getFilePath();
 		File file = new File(compframe.getFilePath());
