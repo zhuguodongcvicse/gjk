@@ -62,10 +62,10 @@ export function getAllDetailByCompId(compId) {
   })
 }
 /* 得到基本文件的路径 */
-export function getUploadFilesUrl(param) {
+export function getUploadFilesUrl(param,userInfo) {
   let params = new FormData();
   params.append("file", param.file);
-  params.append("operation", "upload_file");
+  params.append("userName", userInfo.username);
   return request({
     method: "post",
     url: param.action,

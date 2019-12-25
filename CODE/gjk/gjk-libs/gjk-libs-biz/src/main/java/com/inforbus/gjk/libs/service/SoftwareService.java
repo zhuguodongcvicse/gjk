@@ -16,9 +16,13 @@
  */
 package com.inforbus.gjk.libs.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -133,4 +137,13 @@ public interface SoftwareService extends IService<Software> {
 	 * @return
 	 */
 	List<SoftwareTree> getTreeById(String id);
+
+	/**
+	 * 上传文件
+	 * 
+	 * @param files
+	 * @param versionDisc
+	 * @return
+	 */
+	String uploadFiles(@RequestParam(value = "file") MultipartFile[] files, @PathVariable String versionDisc);
 }

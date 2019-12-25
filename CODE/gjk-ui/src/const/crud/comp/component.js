@@ -26,6 +26,10 @@ export const tableOption = {
   editBtn: false,
   delBtn: false,
   selection: true,
+  menuWidth:"210",
+  selectable:(row)=>{
+   return !(row.applyState ==='2' || row.applyState ==='1');
+  },
   addBtn: false,
   column: [
     {

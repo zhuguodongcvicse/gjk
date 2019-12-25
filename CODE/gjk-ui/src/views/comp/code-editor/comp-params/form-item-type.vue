@@ -83,7 +83,7 @@
       :disabled="disabled"
       v-on:blur="onBlurNative"
     >
-      <template slot="append" size="mini">
+      <template slot="append" size="mini" v-if="!disabled">
         <el-upload
           ref="upload"
           action="/comp/componentdetail/uploadUrl"
@@ -160,7 +160,7 @@ export default {
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["selectBindValue"])
+    ...mapGetters(["selectBindValue",'userInfo'])
   },
   //监控data中的数据变化
   watch: {
@@ -189,7 +189,7 @@ export default {
                       this.selectOptions.push({
                         value: item.value,
                         label: item.label,
-                        rightName: "V"+item.version.toFixed(1)
+                        rightName: "V" + item.version.toFixed(1)
                       });
                     }
                   });
@@ -203,6 +203,8 @@ export default {
                     });
                   });
                 }
+              } else if (this.dictKey === "[]") {
+                this.selectOptions = this.dictKey;
               } else {
                 //从字典中查询
                 remote(this.dictKey).then(res => {
@@ -276,7 +278,7 @@ export default {
     },
     //自定义上传
     customFileUpload(param) {
-      getUploadFilesUrl(param).then(res => {
+      getUploadFilesUrl(param,this.userInfo).then(res => {
         let file = {
           name: param.file.name,
           relativePath: res.data.data,

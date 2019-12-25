@@ -389,9 +389,11 @@
           </el-col>
           <!--标签粘贴的位置-->
           <el-col :span="3">
-            <el-radio v-model="lablePosition" label="up">上</el-radio>
-            <el-radio v-model="lablePosition" label="in">中</el-radio>
-            <el-radio v-model="lablePosition" label="down">下</el-radio>
+            <div>
+              <el-radio v-model="lablePosition" label="up">上</el-radio>
+              <el-radio v-model="lablePosition" label="in">中</el-radio>
+              <el-radio v-model="lablePosition" label="down">下</el-radio>
+            </div>
           </el-col>
         </el-row>
         <el-row class="addtemplate_dialogbtn_14s text_align_right_14s">

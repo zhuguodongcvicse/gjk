@@ -115,13 +115,13 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column fixed="right" label="操作" header-align="left" width="55">
+          <el-table-column fixed="right" label="操作" header-align="left" width="55" v-if="!disabled">
             <template slot-scope="{row,$index}">
               <el-button type="text" v-if="$index > 0" @click="delTableRow(cjTableData,$index)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
-        <div align="center" style="height:40px;line-height:40px;padding-left:10px">
+        <div align="center" style="height:40px;line-height:40px;padding-left:10px" v-if="!disabled">
           <el-button type="text" @click="addTableRow(cjTableData,cjTableOption)">添加</el-button>
         </div>
       </template>
@@ -157,7 +157,7 @@
           </template>
         </el-table-column>
       </template>
-      <el-table-column fixed="right" label="操作" header-align="left" width="55">
+      <el-table-column fixed="right" label="操作" header-align="left" width="55" v-if="!disabled">
         <template slot-scope="{row,$index}">
           <el-button style="padding:0" type="text" @click="delTableRow(xnTableData,$index)">删除</el-button>
         </template>
@@ -167,6 +167,7 @@
       align="center"
       style="height:40px;line-height:40px;padding-left:10px"
       v-show="isShowXnTableData"
+      v-if="!disabled"
     >
       <el-button type="text" @click="addTableRow(xnTableData,xnTableOption)">添加</el-button>
     </div>
@@ -742,6 +743,7 @@ export default {
     //将基础模板的配置方式写到解析后的参数中
     itemTypeChangeAssignmenDataParam(toParam, formParam) {
       if (toParam.lableName === formParam.lableName) {
+        console.log("将基础模板的配置方式写到解析后的参数中",toParam.lableName,deepClone(formParam))
         if (toParam.attributeMap === null) {
           toParam.attributeMap = formParam.attributeMap;
         } else {

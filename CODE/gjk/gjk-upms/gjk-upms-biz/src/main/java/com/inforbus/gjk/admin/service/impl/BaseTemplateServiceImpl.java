@@ -32,6 +32,7 @@ import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
@@ -47,9 +48,11 @@ import java.util.List;
  */
 @Service("baseTemplateService")
 public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, BaseTemplate> implements BaseTemplateService {
-    private static String LOCALPATH = JGitUtil.getLOCAL_REPO_PATH();
+    //private static String LOCALPATH = JGitUtil.getLOCAL_REPO_PATH();
     private static final Logger logger = LoggerFactory.getLogger(BaseTemplateServiceImpl.class);
 
+    @Value("${git.local.path}")
+    private String LOCALPATH;
     /**
      * 基础模板简单分页查询
      *

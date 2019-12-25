@@ -44,14 +44,12 @@
             plain
             @click="storageApplys(scope.row,scope.index)"
           >入库</el-button>
-          <!-- <el-button
+          <el-button
             type="primary"
-            :disabled="true"
-            v-if="scope.row.storageFlag=='1'"
             size="small"
             plain
-            @click="handleRku(scope.row,scope.index)"
-          >已入库</el-button>-->
+            v-if="scope.row.storageFlag=='0'|| scope.row.storageFlag==null?false:true"
+          >{{scope.row.storageFlag=='1'?"已申请":scope.row.storageFlag=='2'?"已入库":scope.row.storageFlag=='3'?"已驳回":"未处理"}}</el-button>
         </template>
       </avue-crud>
     </basic-container>
@@ -188,11 +186,15 @@ export default {
     },
     rowDel: function(row, index) {
       var _this = this;
-      this.$confirm("是否确认删除数据类型为 " + row.dataType + " 的记录", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
+      this.$confirm(
+        "是否确认删除数据类型为 " + row.dataType + " 的记录",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      )
         .then(function() {
           return delObj(row.id);
         })

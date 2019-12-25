@@ -1,19 +1,21 @@
 <!--  -->
 <template>
-  <el-row>
-    <el-col :span="6">
-      <el-tree
-        style="margin-top: 10px;margin-left: 10px"
-        ref="tree"
-        accordion
-        :data="treeData"
-        node-key="id"
-        :default-expand-all="false"
-        :auto-expand-parent="true"
-        :default-expanded-keys="defaultExpandIds"
-        :highlight-current="true"
-        @node-click="handleNodeClick"
-      ></el-tree>
+  <el-row class="comp_component_showcomp_tree_14s">
+    <el-col :span="6" >
+      <div >
+        <el-tree
+          style="margin-top: 10px;margin-left: 10px;height:100%;overflow-y: auto;"
+          ref="tree"
+          accordion
+          :data="treeData"
+          node-key="id"
+          :default-expand-all="false"
+          :auto-expand-parent="true"
+          :default-expanded-keys="defaultExpandIds"
+          :highlight-current="true"
+          @node-click="handleNodeClick"
+        ></el-tree>
+      </div>
     </el-col>
     <el-col :span="18">
       <params-define
@@ -23,6 +25,23 @@
         :disabled="true"
       />
       <!-- 程序文本编辑器 -->
+      <el-form ref="form" label-width="80px"  v-if="defineOrEditor==='editor'">
+        <el-form-item label="编码格式">
+          <el-select
+            v-model="editorData"
+            placeholder="请选择编码格式(默认UTF-8)"
+            @change="editorChange"
+            style="width:300px"
+            size="mini"
+          >
+            <el-option label="UTF-8" value="UTF-8"></el-option>
+            <el-option label="Unicode" value="Unicode"></el-option>
+            <el-option label="UTF-16BE" value="UTF-16BE"></el-option>
+            <el-option label="GBK" value="GBK"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+
       <monaco-editor class="editor" v-model="textContext" v-if="defineOrEditor==='editor'"></monaco-editor>
       <div class="block" v-if="defineOrEditor==='image'">
         <el-image :src="src"></el-image>
@@ -71,7 +90,8 @@ export default {
       treeData: [],
       defaultExpandIds: [],
       textContext: "",
-      filePathDto: {}
+      filePathDto: {},
+      editorData: ""
     };
   },
   //监听属性 类似于data概念
@@ -80,6 +100,18 @@ export default {
   },
   //方法集合
   methods: {
+    //文件编码格式改变时调用后台方法
+    editorChange(item) {
+      //文件路徑
+      let compData = this.$refs.tree.getCurrentNode();
+      this.filePathDto.filePathName = compData.filePath + "/" + compData.label;
+      this.filePathDto.code = item;
+      console.log(this.filePathDto, compData);
+      readAlgorithmfile(this.filePathDto).then(response => {
+        //文件内容
+        this.textContext = response.data.data.textContext.split("@%#@*+-+@")[1];
+      });
+    },
     handleNodeClick(data) {
       if (data.children.length === 0) {
         //Component20191017170238.xml

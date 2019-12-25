@@ -15,6 +15,7 @@ import './assets/icon/iconfont.css'
 import './assets/icon/font/font_567566_qo5lxgtishg.css'
 import './assets/icon/font/font_667895_vf6hgm08ubf.css'
 import './assets/icon/font/font_1z5ciav5/iconfont.css'
+import './assets/icon/font/font_8n4i35ok7f/iconfont.css'
 import './util/dd.js'
 
 

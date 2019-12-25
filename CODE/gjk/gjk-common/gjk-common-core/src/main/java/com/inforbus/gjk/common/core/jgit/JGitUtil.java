@@ -60,11 +60,6 @@ public class JGitUtil {
 	private static String headerTemplateFile;
 	@Getter
 	private static String srcTemplateFile;
-	@Getter
-	private static String IDEPath1;
-	@Getter
-	private static String IDEPath2;
-
 	private static String INIT_LOCAL_CODE_DIR;
 	private static String LOCAL_CODE_CT_SQL_DIR;
 	private static String BRANCH_NAME;
@@ -117,8 +112,6 @@ public class JGitUtil {
 			defaultEncoding = father.get("gjk.code.encodeing").toString();
 			headerTemplateFile = father.get("gjk.pro.templateFile.header").toString();
 			srcTemplateFile = father.get("gjk.pro.templateFile.src").toString();
-			IDEPath1 = father.get("sylixos.idepath1").toString();
-			IDEPath2 = father.get("sylixos.idepath2").toString();
 			SONAR_SCANNER_PATH = father.get("sonar.scanner.path").toString();
 			CTRL_TAB_FILE_PATH = father.get("ctrl.tab.file.path").toString();
 		} catch (Exception e) {

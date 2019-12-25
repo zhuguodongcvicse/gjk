@@ -10,7 +10,7 @@
   >
     <el-form :model="mappedModel" label-width="80px" ref="mappedModel">
       <el-form-item label="导入" :label-width="formLabelWidth" prop="filePath">
-        <el-input v-model="filePath" autocomplete="off" placeholder="请选择结构体文件路径">
+        <el-input v-model="filePath" autocomplete="off" readonly placeholder="请选择结构体文件路径">
           <template slot="append">
             <el-upload
               ref="upload"

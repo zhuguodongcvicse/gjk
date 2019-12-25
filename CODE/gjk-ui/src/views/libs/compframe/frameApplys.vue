@@ -131,7 +131,7 @@ export default {
               saveData.applyDesc = "已提交申请，请等待库管理员审批";
               //修改软件框架审批状态成已提交申请
               putObj(saveData).then(Response => {
-                this.$message({
+                this.$notify({
                   message: "已提交申请，请等待库管理员审批",
                   type: "success"
                 });
@@ -152,7 +152,7 @@ export default {
                 saveData.applyDesc = "已提交申请，请等待库管理员审批";
                 //修改状态成被驳回后提交申请
                 putObj(saveData).then(() => {
-                  this.$message({
+                  this.$notify({
                     message: "已提交申请，请等待库管理员审批",
                     type: "success"
                   });

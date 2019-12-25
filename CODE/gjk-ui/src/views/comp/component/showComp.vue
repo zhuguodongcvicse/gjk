@@ -12,16 +12,18 @@
           :auto-expand-parent="true"
           :default-expanded-keys="defaultExpandIds"
           :highlight-current="true"
+          :allow-drag="allowDrag"
+          :allow-drop="allowDrop"
           @node-click="handleNodeClick"
           @node-contextmenu="nodeContextmenu"
-          @node-drag-start="handleDragStart"
-          @node-drag-enter="handleDragEnter"
-          @node-drag-leave="handleDragLeave"
-          @node-drag-over="handleDragOver"
-          @node-drag-end="handleDragEnd"
           @node-drop="handleDrop"
           draggable
         ></el-tree>
+        <!-- @node-drag-start="handleDragStart"
+          @node-drag-enter="handleDragEnter"
+          @node-drag-leave="handleDragLeave"
+          @node-drag-over="handleDragOver"
+        @node-drag-end="handleDragEnd"-->
         <!-- 右键菜单 -->
         <div
           v-if="contextmenuFlag"
@@ -66,7 +68,7 @@ import {
   moveNioFile
 } from "@/api/comp/componentdetail";
 import SplitPane from "@/page/components/split-pane";
-import { getTreeDefaultExpandIds, findParent } from "@/util/util";
+import { getTreeDefaultExpandIds, findParent, deepClone } from "@/util/util";
 import { getPlatformName } from "@/api/pro/app";
 import { staticInspect } from "@/api/pro/project";
 import { getPath } from "@/api/compile/devenv";
@@ -89,7 +91,13 @@ export default {
       contentmenuY: "",
       contextmenuFlag: false,
       nodeClickData: {},
-      nodeData: ["平台文件", "测试文件", "算法文件", "图标文件"]
+      nodeData: [
+        "platformfile",
+        "component",
+        "imgfile",
+        "testfile",
+        "algorithmfile"
+      ]
     };
   },
   //监听属性 类似于data概念
@@ -115,39 +123,41 @@ export default {
     this.getCompList();
   },
   methods: {
-    handleDragStart(node, ev) {
-      console.log("drag start", node, ev);
-      node.childNodes.forEach(childNode => {
-        if (this.nodeData.includes(childNode.label)) {
-          console.log("11111111111", childNode.label);
-        } else {
-          console.log("3333", childNode.label);
+    //判断节点能否被拖拽
+    allowDrag(node) {
+      //当前节点为"平台文件", "测试文件", "算法文件", "图标文件"以及构件时不让拖拽
+      if (this.nodeData.includes(node.data.type)) {
+        return false;
+      }
+      return true;
+    },
+    //拖拽时判定目标节点能否被放置。type 参数有三种情况：'prev'、'inner' 和 'next'，分别表示放置在目标节点前、插入至目标节点和放置在目标节点后
+    allowDrop(draggingNode, dropNode, type) {
+      //相同的目录不让其拖拽,只能插入至目标节点里面
+      if (draggingNode.level === dropNode.level) {
+        if (draggingNode.parent.id === dropNode.parent.id) {
+          return type === "inner";
         }
-      });
-      if (this.nodeData.includes(node.label)) {
-        console.log("应该不让拖动树上数据。。。。", node.label);
+      } else {
+        // 不同级进行处理 如果放置的节点是文件就不让拖拽的节点放置
+        if (dropNode.data.type == "file") {
+          return type === "prev" || type === "next";
+        } else {
+          return true;
+        }
       }
     },
-    handleDragEnter(draggingNode, dropNode, ev) {
-      console.log("tree drag enter: ", dropNode.label);
-    },
-    handleDragLeave(draggingNode, dropNode, ev) {
-      console.log("tree drag leave: ", dropNode.label);
-    },
-    handleDragOver(draggingNode, dropNode, ev) {
-      console.log("tree drag over: ", dropNode.label);
-    },
-    handleDragEnd(draggingNode, dropNode, dropType, ev) {
+    handleDrop(draggingNode, dropNode, dropType, ev) {
       let source = draggingNode.data.filePath + "\\" + draggingNode.data.label;
-      let destin = dropNode.data.filePath;
+      let destin = dropNode.data.filePath + "\\";
       if (dropType === "inner") {
         destin += dropNode.data.label;
       }
-      moveNioFile({ source: source, destin: destin }).then(res => {});
-      console.log("要移动到哪去的文件夹路径 ", path);
-    },
-    handleDrop(draggingNode, dropNode, dropType, ev) {
-      console.log("tree drop: ", dropNode.label, dropType);
+      // console.log("要移动到哪去的文件夹路径 source", source);
+      // console.log("要移动到哪去的文件夹路径 destin", destin);
+      moveNioFile({ source: source, destin: destin }).then(res => {
+        this.getCompList();
+      });
     },
     changeCount() {
       setTimeout(() => {
@@ -168,12 +178,40 @@ export default {
           let defaultExpandIds = [];
           getTreeDefaultExpandIds(response.data.data, defaultExpandIds, 0, 2);
           this.defaultExpandIds = defaultExpandIds;
-          this.treeData = response.data.data;
-          // console.log("1234567890-=-098723456789098", defaultExpandIds);
+          // this.treeData = response.data.data;
+          console.log("1234567890-=-098723456789098", deepClone(this.treeData));
+          let tree = [];
+          let tmpTreeData = deepClone(response.data.data);
+          for (let item of tmpTreeData) {
+            let trees = {};
+            this.getTreeDefault(item, trees, false);
+            tree.push(trees);
+          }
+          console.log("1234567890-=-1111111111111111", deepClone(tree));
+          this.treeData = tree;
         });
       }
     },
-
+    getTreeDefault(formParams, toParams, isRight) {
+      //用于判断哪些有编译和静态检查
+      let treeType = deepClone(this.nodeData);
+      treeType.splice(0, 1);
+      treeType.splice(0, 1);
+      isRight = isRight
+        ? true
+        : treeType.includes(formParams.type)
+        ? true
+        : false;
+      let tmpFormParams = deepClone(formParams);
+      this.$set(tmpFormParams, "isRight", isRight);
+      this.$set(tmpFormParams, "children", []);
+      Object.assign(toParams, tmpFormParams);
+      formParams.children.forEach((item, index) => {
+        let to = {};
+        this.getTreeDefault(item, to, isRight);
+        toParams.children.push(to);
+      });
+    },
     handleNodeClick(data) {
       console.log("PPPPPPP:", data);
       var reg = new RegExp("\\\\", "g");
@@ -215,13 +253,24 @@ export default {
       }
     },
     nodeContextmenu(event, data) {
-      if (true) {
-        this.contextMenus = ["构件编译", "静态检查", "删除"];
+      console.log(
+        "event, data",
+        event,
+        deepClone(data).label,
+        deepClone(data).isRight,
+        deepClone(data).type
+      );
+      if (!this.nodeData.includes(data.type)) {
+        if (!data.isRight) {
+          this.contextMenus = ["构件编译", "静态检查", "删除"];
+        } else {
+          this.contextMenus = ["删除"];
+        }
+        this.nodeClickData = data;
+        this.contentmenuX = event.clientX;
+        this.contentmenuY = event.clientY;
+        this.contextmenuFlag = true;
       }
-      this.nodeClickData = data;
-      this.contentmenuX = event.clientX;
-      this.contentmenuY = event.clientY;
-      this.contextmenuFlag = true;
     },
     handleMoving(e) {
       console.log(e.atMin, e.atMax);
@@ -288,16 +337,31 @@ export default {
         const label = this.nodeClickData.label;
         let tmpName = (await findPlatformByName(label)).data.data;
         tmpName.forEach(item => {
-          getPath({
+          let obj = {
             path: path,
             fileName: "Component_" + platformName[item],
             platformType: platformName[item],
             token: this.$store.getters.access_token
+          };
+          getPath(obj).then(msg => {
+            this.$message({
+              type: "success",
+              message: msg.data.data
+            });
           });
         });
       }
       this.contextmenuFlag = false;
     }
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.getCompList();
+    });
+  },
+  beforeRouteUpdate(to, from, next) {
+    next();
+    this.getCompList();
   }
 };
 </script>

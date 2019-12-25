@@ -132,27 +132,31 @@ export default {
     getTreeData(modelMap, cmpXml, coefXmlMap) {
       getCoeffNodeTree(this.$route.query.sysId).then(Response => {
         let treeData = [];
-        for (let node of Response.data.data) {
-          let nodeItem = JSON.parse(JSON.stringify(modelMap));
-          nodeItem.attributeMap.id = node.nodeName;
-          this.$set(nodeItem, "children", []);
-          if (node.rootPart.length > 0) {
-            for (let rootPartItem of node.rootPart) {
-              let cmp = JSON.parse(JSON.stringify(cmpXml));
-              cmp.attributeMap.cmpName = rootPartItem.partName;
-              nodeItem.children.push(cmp);
+        if (Response.data.data == null) {
+          this.$message.error("缺少流程建模配置，请先配置流程建模");
+        } else {
+          for (let node of Response.data.data) {
+            let nodeItem = JSON.parse(JSON.stringify(modelMap));
+            nodeItem.attributeMap.id = node.nodeName;
+            this.$set(nodeItem, "children", []);
+            if (node.rootPart.length > 0) {
+              for (let rootPartItem of node.rootPart) {
+                let cmp = JSON.parse(JSON.stringify(cmpXml));
+                cmp.attributeMap.cmpName = rootPartItem.partName;
+                nodeItem.children.push(cmp);
+              }
             }
-          }
-          if (node.backupParts.length > 0) {
-            for (let backupPartItem of node.backupParts) {
-              let cmp = JSON.parse(JSON.stringify(cmpXml));
-              cmp.attributeMap.cmpName = backupPartItem.partName;
-              nodeItem.children.push(cmp);
+            if (node.backupParts.length > 0) {
+              for (let backupPartItem of node.backupParts) {
+                let cmp = JSON.parse(JSON.stringify(cmpXml));
+                cmp.attributeMap.cmpName = backupPartItem.partName;
+                nodeItem.children.push(cmp);
+              }
             }
+            treeData.push(nodeItem);
           }
-          treeData.push(nodeItem);
+          this.setTreeCpu(treeData, coefXmlMap);
         }
-        this.setTreeCpu(treeData, coefXmlMap);
       });
     },
     //3:获取硬件数据chipsOfHardwarelibs，修改cpu数据
@@ -234,7 +238,7 @@ export default {
         JSON.parse(JSON.stringify(coefXmlMap))
       );
       getChipsfromhardwarelibs(this.$route.query.sysId).then(Response => {
-        if (Response.data.chips) {
+        if (Response.data) {
           let chipsData = JSON.parse(Response.data.chips);
           for (let node of treeData) {
             for (let chip of chipsData) {
@@ -250,94 +254,100 @@ export default {
             }
             this.setStrToCordId(node, node.coreNum);
           }
+          this.setTreeCmp(treeData);
+        } else {
+          this.$message.error("缺少硬件建模配置，请先配置硬件建模。");
         }
-        this.setTreeCmp(treeData);
       });
     },
     //4:调用api return获取cmp数据
     setTreeCmp(treeData) {
-      getSysConfigApiReturn(this.$route.query.sysId).then(Response => {
-        let cmpObj = Response.data.data;
-        for (let node of treeData) {
-          if (node.children.length > 0) {
-            for (let cmpItem of node.children) {
-              for (let key in cmpObj) {
-                let element = cmpObj[key];
-                if (key == cmpItem.attributeMap.cmpName) {
-                  cmpItem.attributeMap.funcName = element[1];
-                  cmpItem.attributeMap.id = element[2];
-                  this.selectXmlMapByLableNameOrLableType(
-                    cmpItem,
-                    null,
-                    "dataKey",
-                    "API Return"
-                  );
-                  if (this.returnXmlEntityMap != null) {
-                    for (let returnXmlAttr of parseStrToObj(
-                      this.returnXmlEntityMap.attributeMap.configureType
-                    ).attrs) {
-                      if (returnXmlAttr.attrConfigType == "length") {
-                        this.returnXmlEntityMap.attributeMap[
-                          returnXmlAttr.attrName
-                        ] = element[3];
-                      } else if (returnXmlAttr.attrConfigType == "selectComm") {
-                        this.returnXmlEntityMap.attributeMap[
-                          returnXmlAttr.attrName
-                        ] = element[4];
+      getSysConfigApiReturn(this.$route.query.sysId)
+        .then(Response => {
+          let cmpObj = Response.data.data;
+          for (let node of treeData) {
+            if (node.children.length > 0) {
+              for (let cmpItem of node.children) {
+                for (let key in cmpObj) {
+                  let element = cmpObj[key];
+                  if (key == cmpItem.attributeMap.cmpName) {
+                    cmpItem.attributeMap.funcName = element[1];
+                    cmpItem.attributeMap.id = element[2];
+                    this.selectXmlMapByLableNameOrLableType(
+                      cmpItem,
+                      null,
+                      "dataKey",
+                      "API Return"
+                    );
+                    if (this.returnXmlEntityMap != null) {
+                      for (let returnXmlAttr of parseStrToObj(
+                        this.returnXmlEntityMap.attributeMap.configureType
+                      ).attrs) {
+                        if (returnXmlAttr.attrConfigType == "length") {
+                          this.returnXmlEntityMap.attributeMap[
+                            returnXmlAttr.attrName
+                          ] = element[3];
+                        } else if (
+                          returnXmlAttr.attrConfigType == "selectComm"
+                        ) {
+                          this.returnXmlEntityMap.attributeMap[
+                            returnXmlAttr.attrName
+                          ] = element[4];
+                        }
                       }
                     }
-                  }
-                  if (
-                    cmpItem.xmlEntityMaps != null &&
-                    cmpItem.xmlEntityMaps.length > 0
-                  ) {
-                    for (let cmpXmlMap of cmpItem.xmlEntityMaps) {
-                      let attrConfig = parseStrToObj(
-                        cmpXmlMap.attributeMap.configureType
-                      );
-                      if (
-                        attrConfig.lableType == "networkTable" ||
-                        attrConfig.lableType == "treeTable"
-                      ) {
-                        let flag = false;
-                        for (let index in element) {
-                          let item = element[index];
-                          // console.log(
-                          //   "1111111111111111111111",
-                          //   JSON.parse(JSON.stringify(item))
-                          // );
-                          if (index > 4 && item.msg == cmpXmlMap.lableName) {
-                            flag = true;
-                            this.selectXmlMapByLableNameOrLableType(
-                              this.sysModelXmlMap,
-                              item.msg,
-                              null,
-                              null
-                            );
-                            if (this.returnXmlEntityMap != null) {
-                              this.setXmlentityMapsByApiReturn(
-                                item,
-                                cmpXmlMap,
-                                this.returnXmlEntityMap
+                    if (
+                      cmpItem.xmlEntityMaps != null &&
+                      cmpItem.xmlEntityMaps.length > 0
+                    ) {
+                      for (let cmpXmlMap of cmpItem.xmlEntityMaps) {
+                        let attrConfig = parseStrToObj(
+                          cmpXmlMap.attributeMap.configureType
+                        );
+                        if (
+                          attrConfig.lableType == "networkTable" ||
+                          attrConfig.lableType == "treeTable"
+                        ) {
+                          let flag = false;
+                          for (let index in element) {
+                            let item = element[index];
+                            // console.log(
+                            //   "element"+index,
+                            //   JSON.parse(JSON.stringify(item))
+                            // );
+                            if (index > 4 && item.msg == cmpXmlMap.lableName) {
+                              flag = true;
+                              this.selectXmlMapByLableNameOrLableType(
+                                this.sysModelXmlMap,
+                                item.msg,
+                                null,
+                                null
                               );
+                              if (this.returnXmlEntityMap != null) {
+                                this.setXmlentityMapsByApiReturn(
+                                  item,
+                                  cmpXmlMap,
+                                  this.returnXmlEntityMap
+                                );
+                              }
                             }
                           }
-                        }
-                        if (!flag) {
-                          cmpXmlMap.xmlEntityMaps = [];
+                          if (!flag) {
+                            cmpXmlMap.xmlEntityMaps = [];
+                          }
                         }
                       }
                     }
                   }
                 }
+                this.setCNENMapping(cmpItem);
+                this.setStrToCordId(cmpItem, cmpItem.coreNum);
               }
-              this.setCNENMapping(cmpItem);
-              this.setStrToCordId(cmpItem, cmpItem.coreNum);
             }
           }
-        }
-        this.$set(this.tablePane[0], "modelXmlMap", treeData);
-      });
+          this.$set(this.tablePane[0], "modelXmlMap", treeData);
+        })
+        .catch(error => {});
     },
 
     setXmlentityMapsByApiReturn(item, xmlentityMap, modelMap) {

@@ -7,40 +7,80 @@
           <el-button slot="append" icon="el-icon-search" @click="sendMessage"></el-button>
         </el-input>
 
-        <!-- <el-tooltip class="item" effect="dark" content="Bottom Center 提示文字" placement="bottom">
-           <el-button>下边</el-button>
-         </el-tooltip>
-
-          <el-tooltip class="item" effect="dark" content="Bottom Center 提示文字" placement="bottom">
-                <i class="el-icon-user"></i>
-          </el-tooltip> -->
-
-
          
-        <el-button-group>
-          
-              <el-button type="primary"  plain size="small" @click="sendMessage('save')">保存</el-button>
-         
-          <el-button
+        <!-- <el-button-group> -->
+          <el-tooltip class="item" effect="dark" content="保存" placement="bottom">
+              <el-button type="primary" style="padding:4px 4px" icon = "icon-baocun1" @click="sendMessage('save')"></el-button>
+          </el-tooltip>
+           
+           <el-tooltip class="item" effect="dark" content="导出" placement="bottom">
+              <el-button type="primary" style="padding:4px 4px" icon = "icon-daochu1" @click="sendMessage('exportJSON')"></el-button>
+          </el-tooltip>
+            &nbsp;
+           <el-tooltip class="item" effect="dark" content="导入" placement="bottom">
+           <el-upload
+            class="upload-demo inline-block"
+            action="/pro/manager/importFile"
+            multiple
+            :show-file-list="false"
+            :http-request="customFileUpload"
+            accept=".zip"
+            >
+            <el-button type="primary" style="padding:4px 4px" icon = "icon-daoru"></el-button>
+            <!-- <el-button type="primary" plain size="small">导入</el-button> -->
+            </el-upload>
+           </el-tooltip>
+             &nbsp;
+            <!-- 检查更新 -->
+           <el-tooltip class="item" effect="dark" v-bind:content="checkUpdateTxt" placement="bottom">
+            <el-button
+            style="padding:4px 4px"
+            type="primary"
+            @click="bottonCheckComp = !bottonCheckComp"
+            v-bind:icon="checkUpdate"
+          ></el-button>
+          </el-tooltip>
+            <!-- 完备性检查 -->
+          <el-tooltip class="item" effect="dark" v-bind:content="completeCheckText" placement="bottom">
+           <el-button
+            style = "padding:4px 4px"
+            type="primary"
+            @click="completeCheck = !completeCheck"
+            v-bind:icon="completeCheckIcon"
+          ></el-button>
+          </el-tooltip>
+          <!-- 开始仿真/结束仿真 -->
+          <el-tooltip class = "item" effect="dark" v-bind:content="simulationText" placement="bottom">
+            <el-button 
+            style="padding:4px 4px" 
+            type="primary" 
+            v-bind:icon="simulationIcon" 
+            @click="simulationState = !simulationState"></el-button>
+          </el-tooltip>
+
+          <!-- <el-button
             type="primary"
             plain
             size="small"
             @click="bottonCheckComp = !bottonCheckComp"
-          >{{bottonCheckComp?'检查更新':'还原'}}</el-button>
-          <!-- <el-button type="primary" plain size="small" @click="sendMessage('completeCheck')">完备性检查</el-button> -->
-           <el-button
+          >{{bottonCheckComp?'检查更新':'还原'}}</el-button> -->
+
+           <!-- <el-button
             type="primary"
             plain
             size="small"
             @click="completeCheck = !completeCheck"
-          >{{completeCheck?'完备性检查':'还原'}}</el-button>
+          >{{completeCheck?'完备性检查':'还原'}}</el-button> -->
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('loading')">加载</el-button> -->
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('simulation')">仿真</el-button> -->
-           <el-button type="primary" plain size="small" @click="sendMessage('startSimulation')">开始仿真</el-button>
+
+
+           <!-- <el-button type="primary" plain size="small" @click="sendMessage('startSimulation')">开始仿真</el-button>
             <el-button type="primary" plain size="small" @click="sendMessage('endSimulation')">结束仿真</el-button>
-          <el-button type="primary" plain size="small" @click="sendMessage('exportJSON')">导出</el-button>
-          <!-- &nbsp; -->
-          <el-upload
+          <el-button type="primary" plain size="small" @click="sendMessage('exportJSON')">导出</el-button> -->
+
+          <!-- <input type="file" @change="getFile($event)"> -->
+          <!-- <el-upload
             class="upload-demo inline-block"
             action="/pro/manager/importFile"
             multiple
@@ -49,15 +89,17 @@
             accept=".zip"
           >
             <el-button type="primary" plain size="small">导入</el-button>
-          </el-upload>
-        </el-button-group>
+          </el-upload> -->
+
+        <!-- </el-button-group> -->
         <el-select
           v-model="alignmentValue"
           style="width:13%; margin-left:10px"
           @change="sendMessage('alignment')"
+          placeholder="对齐方式"
         >
           <!-- size="mini" v-bind:style="'display:block'" -->
-          <el-option value="0" label="请选择">请选择</el-option>
+          <!-- <el-option value="0" label="对齐方式">对齐方式</el-option> -->
           <el-option value="1" label="上对齐">上对齐</el-option>
           <el-option value="2" label="左对齐">左对齐</el-option>
           <el-option value="3" label="右对齐">右对齐</el-option>
@@ -201,7 +243,14 @@ export default {
       dialogNext: "",
       flowFilePath: "" ,//流程建模文件路径
       simulationData :[], //存放仿真数据
-      completeCheck:true
+      completeCheck:true,
+      checkUpdate:"icon-jianchagengxin",
+      checkUpdateTxt :"检查更新",
+      completeCheckIcon:"icon-wanbei",
+      completeCheckText:"完备性检查",
+      simulationText:"开始仿真",
+      simulationIcon:"icon-kaishifangzhen",
+      simulationState:true
     };
   },
   //监听属性 类似于data概念
@@ -219,6 +268,42 @@ export default {
       deep: true, //对象内部的属性监听，也叫深度监听
       handler: function(param) {
         this.isShow_14s = param.length > 0 ? true : false;
+      }
+    },
+    //开始仿真结束仿真
+    simulationState:{
+      handler:function(){
+        if(!this.simulationState){
+          //开始仿真
+          this.simulationIcon = "icon-jieshu"
+          this.simulationText = "结束仿真"
+          this.postMessageData.cmd = "startSimulation";
+          this.postMessageData.params = "";
+          this.$refs.gjkIframe.sendMessage(this.postMessageData);
+        }else{
+          //结束仿真
+          this.simulationIcon = "icon-kaishifangzhen"
+          this.simulationText = "开始仿真"
+          this.postMessageData.cmd = "endSimulation";
+          this.postMessageData.params = "";
+          this.$refs.gjkIframe.sendMessage(this.postMessageData);
+          stopSimulation(this.userInfo.username).then(req=>{
+                if(req.data.data){
+                    this.$message({
+                        showClose: true,
+                        message: "成功",
+                        type: "success"
+                    });
+                }else{
+                    this.$message({
+                        showClose: true,
+                        message: "未开启仿真",
+                        type: "warning"
+                    });
+                }
+            })
+
+        }
       }
     },
     simulationData:{
@@ -239,10 +324,9 @@ export default {
     //检查更新
     bottonCheckComp: {
       handler: function() {
-        console.log(this.bottonCheckComp)
-        console.log(this.bottonCheckComp)
         if (!this.bottonCheckComp) {
-          //  console.log(this.dtos)
+          this.checkUpdate = "icon-huanyuan1"
+          this.checkUpdateTxt = "还原"
           let checkList = [];
           let compList = {};
           for (var value of this.tempDtos) {
@@ -262,6 +346,8 @@ export default {
             this.$refs.gjkIframe.sendMessage(this.postMessageData);
           });
         }else{
+            this.checkUpdate = "icon-jianchagengxin"
+            this.checkUpdateTxt = "检查更新"
             this.postMessageData.cmd = "bottonCheckComp";
             this.postMessageData.params = this.bottonCheckComp;
             this.postMessageData.compUpdateState = this.compUpdateState;
@@ -274,6 +360,8 @@ export default {
     completeCheck:{
        handler: function() {
          if(!this.completeCheck){
+           this.completeCheckIcon = "icon-huanyuan1"
+           this.completeCheckText = "还原"
            console.log("完备性检查状态",this.completeCheck)
            completeCheck(this.$route.query.processId,this.$store.getters.access_token).then(res => {
            //console.log("返回数据", res.data.data);
@@ -283,6 +371,8 @@ export default {
            this.$refs.gjkIframe.sendMessage(this.postMessageData);
           });
          }else{
+           this.completeCheckIcon = "icon-wanbei"
+           this.completeCheckText = "完备性检查"
            this.postMessageData.cmd = "completeCheck";
            this.postMessageData.params = "";
            this.postMessageData.state = this.completeCheck
@@ -740,9 +830,9 @@ export default {
                 let compId = data.params;
               // console.log("id",compId)
                 let projectId = this.$route.query.proId;
-                removeCompApproval(compId, projectId).then(res => {
+               // removeCompApproval(compId, projectId).then(res => {
                   removeCompProject(compId, projectId);
-                });
+               // });
 
                 this.postMessageData.cmd = "returnRemoveComp";
                 this.postMessageData.params = compId;
@@ -933,7 +1023,7 @@ export default {
       setTimeout(() => {
         next();
       }, 1000);
-    }
+    },
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {

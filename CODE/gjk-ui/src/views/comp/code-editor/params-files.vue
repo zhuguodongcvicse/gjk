@@ -8,7 +8,7 @@
     size="mini"
     :rules="compFilesFormRules"
   >
-    <el-form-item label="文件选择" v-if="show" prop="filesPath.length"  style="margin-bottom: 25px;">
+    <el-form-item label="文件选择" v-if="show" prop="filesPath.length" style="margin-bottom: 25px;">
       <files-upload
         ref="saveFiles"
         v-model="formLabelAlign.filesPath"
@@ -18,12 +18,13 @@
       <el-input v-model="formLabelAlign.filesPath.length" v-if="false"></el-input>
     </el-form-item>
     <el-form-item label="所属分支" v-if="show" prop="algorithm">
-      <el-col :span="13">
+      <el-col :span="disabled?24:13">
         <el-input v-model="formLabelAlign.algorithm" :placeholder="tigPlaceholder" :readonly="true"></el-input>
       </el-col>
-      <el-col :span="11">
+      <el-col :span="11" v-if="!disabled">
         <!-- 弹出框 -->
         <el-popover v-model="visible2" placement="bottom" trigger="click">
+          <!-- //是否禁用点击按钮、查看时使用 -->
           <el-button type="info" slot="reference" plain>选择分支</el-button>
           <!-- default-expand-all -->
           <el-tree
@@ -80,24 +81,28 @@ export default {
   },
   data() {
     var compCheckFile = (rule, value, callback) => {
-      if (this.formLabelAlign.filesPath.length == 0) {
-        callback();
+      if (this.fileType === "platform") {
+        value == "" ? callback("请选择所属分支") : callback();
       } else {
-        if (value == "") {
-          callback("请选择所属分支");
-        } else {
-          callback();
-        }
+        this.formLabelAlign.filesPath.length == 0
+          ? callback()
+          : value == ""
+          ? callback("请选择所属分支")
+          : callback();
       }
     };
     var compCheckLength = (rule, value, callback) => {
-      if (this.formLabelAlign.algorithm == "") {
-        callback();
+      if (this.fileType === "platform") {
+        value == "" ? callback("请添加文件") : callback();
       } else {
-        if (this.formLabelAlign.filesPath.length == 0) {
-          callback("请添加文件");
-        } else {
+        if (this.formLabelAlign.algorithm == "") {
           callback();
+        } else {
+          if (this.formLabelAlign.filesPath.length == 0) {
+            callback("请添加文件");
+          } else {
+            callback();
+          }
         }
       }
     };
@@ -377,7 +382,10 @@ export default {
       }
     },
     imgContextmenu() {
-      this.imgValue.dialogVisible = true;
+      //查看时禁用图片选择
+      if (!this.disabled) {
+        this.imgValue.dialogVisible = true;
+      }
     },
     nodeContextmenu(event, data) {},
     getList() {
