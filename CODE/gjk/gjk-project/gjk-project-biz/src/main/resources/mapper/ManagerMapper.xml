@@ -872,6 +872,15 @@
             #{item}
         </foreach>
     </select>
+    <select id="getStructlibsByParentIdList" resultMap="structlibsMap">
+        select *
+        from gjk_structlibs
+        where parent_id in
+        <foreach collection="parentIdList" item="item" index="index"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
     <select id="getStructlibsById" resultMap="structlibsMap">
 		select *
 		from gjk_structlibs
