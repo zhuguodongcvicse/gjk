@@ -281,6 +281,19 @@
           };
           items.push(mode)
         }
+        items.push({
+          text: '删除', action: function (evt, item) {
+            if(data.image == "images/Chip.svg" || data.image == "images/OpticalFiberMouth.svg"
+            || data.image == "images/InternetAccess.svg" || data.image == "images/RoundMouth.svg"
+            || data.image == "images/SerialPort.svg"
+            ){
+              graph.removeElement(data);
+              //删除逻辑
+            
+            }   
+            console.log(data)
+          }
+        });
        /*  items.push(Q.PopupMenu.Separator);
         items.push({html: '<a href="http://qunee.com" target="_blank">Qunee' + ' - ' + Q.version + '</a>'}); */
         return items;
