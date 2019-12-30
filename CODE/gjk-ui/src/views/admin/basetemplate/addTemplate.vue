@@ -70,7 +70,7 @@
                 v-if="attribute.attrConfigType=='selectComm'"
               >
                 <el-option
-                  v-for="item in selectDatas"
+                  v-for="item in attribute.selectData"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
@@ -389,11 +389,17 @@
           </el-col>
           <!--标签粘贴的位置-->
           <el-col :span="3">
-            <div>
-              <el-radio v-model="lablePosition" label="up">上</el-radio>
-              <el-radio v-model="lablePosition" label="in">中</el-radio>
-              <el-radio v-model="lablePosition" label="down">下</el-radio>
-            </div>
+            <el-row>
+              <el-col>
+                <el-radio v-model="lablePosition" label="up">上</el-radio>
+              </el-col>
+              <el-col>
+                <el-radio v-model="lablePosition" label="in">中</el-radio>
+              </el-col>
+              <el-col>
+                <el-radio v-model="lablePosition" label="down">下</el-radio>
+              </el-col>
+            </el-row>
           </el-col>
         </el-row>
         <el-row class="addtemplate_dialogbtn_14s text_align_right_14s">
@@ -548,8 +554,8 @@ export default {
       attribute: undefined, //使用公式编辑器时对应的属性
       lablePosition: "in", //添加标签的位置
       node: undefined,
-      checkBox: ["选项1", "选项2", "选项3", "选项4"], //复选框
-      selectDatas: [], //下拉列表中的数据
+      //checkBox: ["选项1", "选项2", "选项3", "选项4"], //复选框
+      //selectDatas: [], //下拉列表中的数据
       dicts: [], //标签名映射使用
       dictValues: [], //映射的标签名集合
       configureType: {
@@ -563,12 +569,12 @@ export default {
       },
       getMethods: [
         {
-          value: "selectComm",
-          label: "下拉框"
-        },
-        {
           value: "inputComm",
           label: "输入框"
+        },
+        {
+          value: "selectComm",
+          label: "下拉框"
         },
         {
           value: "uploadComm",
@@ -782,22 +788,19 @@ export default {
 
             if (attrs[i].attrConfigType == "selectComm") {
               //匹配下拉框中的数据来源
-              if (attrs[i].dataKey == "dict") {
-                this.selectDatas = this.dictValues;
+              if (attrs[i].dataKey == "[]") {
+                attrs[i].selectData = [];
               } else if (attrs[i].dataKey == "dbtab_structlibs") {
-              } else if (attrs[i].dataKey == "[]") {
-                this.selectDatas = [];
-              } else {
+                attrs[i].selectData = [];
+              } else if(attrs[i].dataKey == "API Return"){
+                attrs[i].selectData = [];
+              }else {
                 //其他配置方式获取字典表数据
-                getDictValue(attrs[i].dataKey).then(res => {
-                  this.selectDatas = res.data.data;
+                await getDictValue(attrs[i].dataKey).then(res => {
+                  var data = res.data.data;
+                  attrs[i].selectData = data;
                 });
               }
-            }
-            if (attrs[i].attrConfigType == "checkBoxComm") {
-              //待定
-
-              this.currentXmlMap.attributeMap[attrs[i].attrName];
             }
           }
         }
@@ -851,7 +854,8 @@ export default {
         attrConfigType: "inputComm",
         dataKey: "[]",
         multiple: false,
-        mappingData: []
+        mappingData: [],
+        selectData: []
       });
     },
 
@@ -859,12 +863,6 @@ export default {
       //添加对话框删除属性
       var index = this.configureType.attrs.indexOf(attribute);
       this.configureType.attrs.splice(index, 1);
-    },
-    removeEidtAttribute(attribute) {
-      //编辑对话框删除属性
-      var index = this.configureType.attrs.indexOf(attribute);
-      this.configureType.attrs.splice(index, 1);
-      Vue.delete(this.currentXmlMap.attributeMap, attribute.attributename);
     },
 
     AddLable2() {
@@ -1027,19 +1025,14 @@ export default {
               }
               if (attrs[i].attrConfigType == "selectComm") {
                 //匹配下拉框中的数据来源
-                if (attrs[i].dataKey == "dict") {
-                  this.selectDatas = this.dictValues;
+                if (attrs[i].dataKey == "[]") {
+                  attrs[i].selectData = [];
                 } else if (attrs[i].dataKey == "dbtab_structlibs") {
-                } else if (attrs[i].dataKey == "[]") {
                 } else {
                   getDictValue(attrs[i].dataKey).then(res => {
-                    this.selectDatas = res.data.data;
+                    attrs[i].selectData = res.data.data;
                   });
                 }
-              }
-              if (attrs[i].attrConfigType == "checkBoxComm") {
-                //待定
-                Vue.set(currentXmlMap.attributeMap, attrs[i].attrName, "[]"); //遍历添加属性
               }
             }
           });
@@ -1248,13 +1241,12 @@ export default {
               }
               if (i.attrConfigType == "selectComm") {
                 //匹配下拉框中的数据来源
-                if (i.dataKey == "dict") {
-                  this.selectDatas = this.dictValues;
+                if (i.dataKey == "[]") {
+                  i.selectData = [];
                 } else if (i.dataKey == "dbtab_structlibs") {
-                } else if (i.dataKey == "[]") {
                 } else {
                   getDictValue(i.dataKey).then(res => {
-                    this.selectDatas = res.data.data;
+                    i.selectData = res.data.data;
                   });
                 }
               }
@@ -1367,6 +1359,7 @@ export default {
             for (let i of attrs) {
               //遍历属性
               Vue.delete(i, "mappingData");
+              Vue.delete(i, "selectData");
             }
           }
           var str = parseObjToStr(configureType);
@@ -1395,9 +1388,11 @@ export default {
         Vue.set(this.BaseTemplateBTO, "xmlEntityMap", this.XmlEntityMap);
         addObj(this.BaseTemplateBTO).then(repsonse => {
           if (repsonse.data.data) {
-            this.$message({
-              message: "模板保存成功",
-              type: "success"
+            this.$notify({
+              title: "成功",
+              message: "保存成功",
+              type: "success",
+              duration: 2000
             });
             this.$router.replace("/admin/basetemplate"); //保存成功后.跳转到首页
             var tag1 = this.tag;
@@ -1406,9 +1401,6 @@ export default {
         });
       });
     },
-
-    ////////////////////////////////////////////////////////////////////////////////////
-    isCheckBox(attribute) {}, //复选框待用
 
     /* 上传文件 */
     UploadImage(attr, param) {
@@ -1425,10 +1417,6 @@ export default {
       this.formulaDialogParams.dialogFormVisible = true;
       this.attribute = attr;
     },
-
-    // onFileSuccess(rootFile, file, response, chunk) {
-    //   //上传文件夹
-    // },
 
     //上传文件夹
     saveLeftData(paths) {
@@ -1651,7 +1639,8 @@ export default {
                     attrKeys: undefined,
                     attrConfigType: "inputComm",
                     multiple: false,
-                    mappingData: []
+                    mappingData: [],
+                    selectData: []
                   });
                 }
               }
@@ -1751,6 +1740,7 @@ export default {
                 Vue.set(i, "attrMappingName", i.attrName); //否则显示原始属性名
               }
               Vue.set(i, "mappingData", []);
+              Vue.set(i, "selectData", []);
             }
             Vue.set(configureType, "lableName", XmlEntityMap.lableName);
           }
@@ -1776,7 +1766,8 @@ export default {
               isShow: true,
               attrKeys: undefined,
               attrConfigType: "inputComm",
-              mappingData: []
+              mappingData: [],
+              selectData: []
             });
           }
           Vue.set(XmlEntityMap, "lableMappingName", XmlEntityMap.lableName);

@@ -439,6 +439,12 @@ export default {
                   //   this.fileData.fileName + "===@@@===" + val.data.data
                   // );
                   //this.$store.dispatch("saveTextLog",val.data.data)
+                  //     this.$notify({
+                  //   title: "成功",
+                  //   message: val.data.data,
+                  //   type: "success",
+                  //   duration: 2000
+                  // });
                   this.$message({
                     message: val.data.data
                   });
@@ -473,6 +479,12 @@ export default {
               // this.$store.dispatch("saveTextLog",val.data.data)
               console.log("响应了");
               //this.connect();
+              // this.$notify({
+              //   title: "成功",
+              //   message: val.data.data,
+              //   type: "success",
+              //   duration: 2000
+              // });
               this.$message({
                 message: val.data.data
               });
