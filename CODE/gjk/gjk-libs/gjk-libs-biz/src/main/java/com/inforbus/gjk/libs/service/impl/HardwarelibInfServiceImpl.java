@@ -28,6 +28,7 @@ import com.inforbus.gjk.libs.service.HardwarelibInfService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -47,8 +48,19 @@ public class HardwarelibInfServiceImpl extends ServiceImpl<HardwarelibInfMapper,
      * @return
      */
     @Override
-    public IPage<HardwarelibInf> getHardwarelibInfPage(Page<HardwarelibInf> page, HardwarelibInf hardwarelibInf) {
+    public IPage<HardwarelibInf> getHardwarelibInfPage(Page<HardwarelibInf> page, String userName, HardwarelibInf hardwarelibInf) {
         IPage<HardwarelibInf> hardwarelibInfPage = baseMapper.getHardwarelibInfPage(page, hardwarelibInf);
+        List<HardwarelibInf> hardwarelibInfs = new ArrayList<>();
+        for (HardwarelibInf record : hardwarelibInfPage.getRecords()) {
+            if (record.getUserId() != null && record.getUserId().equals(userName)) {
+                hardwarelibInfs.add(record);
+            } else if ("2".equals(record.getApplyState())){
+                hardwarelibInfs.add(record);
+            }
+        }
+        hardwarelibInfPage.setTotal(hardwarelibInfs.size());
+        hardwarelibInfPage.setRecords(hardwarelibInfs);
+        System.out.println("hardwarelibInfPage-----------------------> " + hardwarelibInfPage);
         return hardwarelibInfPage;
     }
 

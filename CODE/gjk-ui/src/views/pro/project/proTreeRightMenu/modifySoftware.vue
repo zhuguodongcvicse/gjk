@@ -142,7 +142,7 @@ export default {
       console.log("修改软件构件库保存：", prodetail);
       updatePartSoftwareAndPlatform(prodetail).then(response => {
         if (response.data.data) {
-          this.$message({
+          this.$notify({
             message: "修改成功",
             type: "success"
           });

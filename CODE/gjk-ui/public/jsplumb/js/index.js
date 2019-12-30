@@ -1309,7 +1309,7 @@ function getSimulationData() {
 	let index = 0;
 	$.each(jsPlumb.getConnections(), function (idx, connection) {
 		console.log("connection.getLabel()",connection.getLabel())
-		if (connection.getLabel() != '') {
+		if (connection.getLabel() != null &&  connection.getLabel() != "") {
 			index++
 			// let simulation = {}
 			// simulation.startId = connection.sourceId

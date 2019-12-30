@@ -153,7 +153,6 @@ import {
   addObj,
   putObj,
   delObj,
-  getCompDict,
   importCompZipUpload,
   analysisXmlFile,
   isSelectLibs

@@ -19,6 +19,9 @@ package com.inforbus.gjk.libs.service;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -130,5 +133,14 @@ public interface BSPService extends IService<BSP> {
 	 * @return
 	 */
 	List<BSPTree> getTreeById(String id);
+
+	/**
+	 * 文件上传
+	 * 
+	 * @param files
+	 * @param versionDisc
+	 * @return
+	 */
+	String uploadFiles(MultipartFile files, @PathVariable String versionDisc);
 
 }
