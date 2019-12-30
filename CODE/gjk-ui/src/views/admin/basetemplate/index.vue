@@ -331,7 +331,7 @@ export default {
   },
   mounted: function() {},
   computed: {
-    ...mapGetters(["permissions"])
+    ...mapGetters(["permissions",'userInfo'])
   },
   methods: {
     getList() {
@@ -426,7 +426,7 @@ export default {
     //上传模板文件方法
     UploadImage(param) {
       //发送请求至后台接口上传文件
-      getUploadFilesUrl(param).then(res => {
+      getUploadFilesUrl(param,this.userInfo).then(res => {
         /* 给文本框赋值 */
         var filePath = res.data.data;
         this.BaseTemplate.baseTemplatePath = filePath; //获取上传后的文件的路径

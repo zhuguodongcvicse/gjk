@@ -136,7 +136,7 @@ export default {
               this.currentNodeData.fileName),
               uploadFiles(folderPathDTO)
                 .then(res => {
-                  this.$notify({
+                  this.$message({
                     message: res.data.data,
                     type: "success"
                   });

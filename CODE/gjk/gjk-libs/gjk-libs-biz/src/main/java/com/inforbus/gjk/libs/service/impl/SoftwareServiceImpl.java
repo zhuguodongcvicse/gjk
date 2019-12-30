@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
-import com.inforbus.gjk.common.core.util.UnZipFilesUtils;
+import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.libs.api.dto.SelectFolderDTO;
 import com.inforbus.gjk.libs.api.dto.SoftwareDTO;
 import com.inforbus.gjk.libs.api.dto.SoftwareTree;
@@ -38,9 +38,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 软件框架库表
@@ -51,8 +49,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service("softwareService")
 public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> implements SoftwareService {
 
-	@Value("${git.local.path}")
-	private String gitFilePath;
+	private static final String gitFilePath = JGitUtil.getLOCAL_REPO_PATH();
 
 	/**
 	 * 软件框架库表简单分页查询
@@ -130,8 +127,7 @@ public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> i
 			SoftwareDTO dto = new SoftwareDTO(soft);
 			softwareDTOs.add(dto);
 		}
-		Page<SoftwareDTO> softwareDTOPage = new Page<SoftwareDTO>(softwarePage.getCurrent(), softwarePage.getSize(),
-				softwarePage.getTotal());
+		Page<SoftwareDTO> softwareDTOPage = new Page<SoftwareDTO>(softwarePage.getCurrent(), softwarePage.getSize(),softwarePage.getTotal());
 		softwareDTOPage.setRecords(softwareDTOs);
 		return softwareDTOPage;
 	}
@@ -180,44 +176,6 @@ public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> i
 				addSoftwareTree(tree, childFile, fileId);
 			}
 		}
-	}
-
-	@Override
-	public String uploadFiles(MultipartFile[] files, String versionDisc) {
-		String path = gitFilePath;
-		String res = path + ",";
-		for (MultipartFile file : files) {
-			System.out.println("file.getOriginalFilename():" + file.getOriginalFilename());
-			if (file != null) {
-				String p = path + "gjk/software/" + versionDisc + ".0" + File.separator + file.getOriginalFilename();
-				String bb = p.replaceAll("\\\\", "/");
-				String ss = p.substring(0, bb.lastIndexOf("/")) + File.separator;
-				File zipfile = new File(bb);
-				File ff = new File(ss);
-				if (ff.exists()) {
-					ff.delete();
-				}
-				// 创建文件夹
-				ff.mkdirs();
-				// 如果文件已经存在，则删除创建新文件
-				if (new File(p).exists()) {
-					new File(p).delete();
-				}
-				try {
-					// 上传文件
-					file.transferTo(new File(p));
-					// 调用解压方法：zipPath 压缩文件地址（全路径） descDir 指定目录（全路径）
-					UnZipFilesUtils.unZipFile(bb, ss);
-					// 解压完删除压缩包
-					zipfile.delete();
-				} catch (Exception e) {
-					res += "文件 " + file.getOriginalFilename() + " 上传失败\n";
-					e.printStackTrace();
-				}
-				res += "文件 " + file.getOriginalFilename() + " 上传成功\n";
-			}
-		}
-		return res;
 	}
 
 }

@@ -7,9 +7,9 @@
     :before-close="closeDialog"
     :modal-append-to-body="false"
   >
-    <!--    <el-select v-model="bspSelectString" placeholder="请选择">-->
-    <!--      <el-option v-for="item in bspTreeData" :key="item.id" :label="item.label" :value="item.id"></el-option>-->
-    <!--    </el-select>-->
+<!--    <el-select v-model="bspSelectString" placeholder="请选择">-->
+<!--      <el-option v-for="item in bspTreeData" :key="item.id" :label="item.label" :value="item.id"></el-option>-->
+<!--    </el-select>-->
     <el-form ref="form" :model="form" :rules="rules">
       <el-form-item prop="bspSelectString">
         <el-select
@@ -43,9 +43,9 @@
 //例如：import 《组件名称》 from '《组件路径》';
 
 import {
-  updatePartBSPAndPlatform,
-  showPartBSPAndPlatform,
-  getBSPSelect
+    updatePartBSPAndPlatform,
+    showPartBSPAndPlatform,
+    getBSPSelect
 } from "@/api/pro/manager";
 
 export default {
@@ -56,30 +56,30 @@ export default {
   components: {},
   data() {
     var changeSelectArr = (rule, value, callback) => {
-      let length = this.form.bspSelectString.length;
-      this.selectPlatformStrList = [];
-      if (length > 0) {
-        for (let item of this.form.bspSelectString) {
-          let index = this.form.bspSelectString.indexOf(item);
-          let bsp = this.bspTreeData.find(sfItem => {
-            return sfItem.id === this.form.bspSelectString[index];
-          });
-          this.changeSelectArray(bsp);
-        }
-        let newArr = [];
-        for (let selectItem of this.selectPlatformStrList) {
-          let flag = true;
-          for (let str of newArr) {
-            if (str == selectItem.bspId) {
-              flag = false;
+        let length = this.form.bspSelectString.length;
+        this.selectPlatformStrList = [];
+        if (length > 0) {
+            for (let item of this.form.bspSelectString) {
+                let index = this.form.bspSelectString.indexOf(item);
+                let bsp = this.bspTreeData.find(sfItem => {
+                    return sfItem.id === this.form.bspSelectString[index];
+                });
+                this.changeSelectArray(bsp);
             }
-          }
-          if (flag) {
-            newArr.push(selectItem.bspId);
-          }
+            let newArr = [];
+            for (let selectItem of this.selectPlatformStrList) {
+                let flag = true;
+                for (let str of newArr) {
+                    if (str == selectItem.bspId) {
+                        flag = false;
+                    }
+                }
+                if (flag) {
+                    newArr.push(selectItem.bspId);
+                }
+            }
+            this.form.bspSelectString = newArr;
         }
-        this.form.bspSelectString = newArr;
-      }
     };
     //这里存放数据
     return {
@@ -87,12 +87,14 @@ export default {
       bspTreeData: [],
 
       form: {
-        bspSelectString: []
+          bspSelectString: []
       },
       selectPlatformStrList: [],
 
       rules: {
-        bspSelectString: [{ validator: changeSelectArr, trigger: "change" }]
+          bspSelectString: [
+              { validator: changeSelectArr, trigger: "change" }
+          ]
       }
     };
   },
@@ -109,68 +111,68 @@ export default {
       this.$emit("closeDialog");
     },
     changeSelectArray(bsp) {
-      let platformNameArr = bsp.description.split(";");
-      for (let str of platformNameArr) {
-        if (str !== "") {
-          let selectItem = this.selectPlatformStrList.find(select => {
-            return select.platformName === str;
-          });
-          if (selectItem !== undefined) {
-            if (selectItem.bspId !== "") {
-              let oldId = selectItem.bspId;
-              selectItem.bspId = bsp.id;
-              if (oldId !== bsp.id) {
-                let newArray = [];
-                for (let select of this.selectPlatformStrList) {
-                  if (select.bspId !== oldId) {
-                    newArray.push(select);
-                  }
+        let platformNameArr = bsp.description.split(";");
+        for (let str of platformNameArr) {
+            if (str !== "") {
+                let selectItem = this.selectPlatformStrList.find(select => {
+                    return select.platformName === str;
+                });
+                if (selectItem !== undefined) {
+                    if (selectItem.bspId !== "") {
+                        let oldId = selectItem.bspId;
+                        selectItem.bspId = bsp.id;
+                        if (oldId !== bsp.id) {
+                            let newArray = [];
+                            for (let select of this.selectPlatformStrList) {
+                                if (select.bspId !== oldId) {
+                                    newArray.push(select);
+                                }
+                            }
+                            this.selectPlatformStrList = newArray;
+                        }
+                    }
+                } else {
+                    let i = { platformName: str, bspId: bsp.id };
+                    this.selectPlatformStrList.push(i);
                 }
-                this.selectPlatformStrList = newArray;
-              }
             }
-          } else {
-            let i = { platformName: str, bspId: bsp.id };
-            this.selectPlatformStrList.push(i);
-          }
         }
-      }
     },
     changeProcedureBspId() {
-      let prodetail = {};
-      prodetail.id = this.procedure.id;
-      prodetail.description = this.form.bspSelectString.join(";");
-      console.log("修改bsp库保存：", prodetail);
-      updatePartBSPAndPlatform(prodetail).then(response => {
-        if (response.data.data) {
-          this.$notify({
-            message: "修改成功",
-            type: "success"
-          });
-        } else {
-          this.$message.error("修改失败");
-        }
-      });
-      this.closeDialog();
-      this.reload();
+        let prodetail = {};
+        prodetail.id = this.procedure.id;
+        prodetail.description = this.form.bspSelectString.join(";");
+        console.log("修改bsp库保存：", prodetail);
+        updatePartBSPAndPlatform(prodetail).then(response => {
+            if (response.data.data) {
+                this.$message({
+                    message: "修改成功",
+                    type: "success"
+                });
+            } else {
+                this.$message.error("修改失败");
+            }
+        });
+        this.closeDialog();
+        this.reload();
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    getBSPSelect().then(Response => {
-      this.bspTreeData = [];
-      for (let bsp of Response.data.data) {
-        if (bsp.description != "") {
-          this.bspTreeData.push(bsp);
-        }
-      }
-      showPartBSPAndPlatform(this.procedure.id).then(Response => {
-        this.form.bspSelectString = [];
-        for (let item of Response.data.data) {
-          this.form.bspSelectString.push(item.bspId);
-        }
+      getBSPSelect().then(Response => {
+          this.bspTreeData = [];
+          for (let bsp of Response.data.data) {
+              if (bsp.description != "") {
+                  this.bspTreeData.push(bsp);
+              }
+          }
+          showPartBSPAndPlatform(this.procedure.id).then(Response => {
+              this.form.bspSelectString = [];
+              for (let item of Response.data.data) {
+                  this.form.bspSelectString.push(item.bspId);
+              }
+          });
       });
-    });
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},

@@ -150,13 +150,13 @@
                             //如果申请状态为已提交，不可以提交审批
                         } else if (this.infWillToStorage.applyState === "1") {
                             this.$message({
-                                message: "已提交审批，请勿重复提交！",
+                                message: "该构件已提交审批，请勿重复提交！",
                                 type: "warning"
                             });
                             //如果申请状态为审批已通过，不可以提交审批
                         } else if (this.infWillToStorage.applyState === "2") {
                             this.$message({
-                                message: "已通过审批！",
+                                message: "该构件已通过审批！",
                                 type: "warning"
                             });
                         }

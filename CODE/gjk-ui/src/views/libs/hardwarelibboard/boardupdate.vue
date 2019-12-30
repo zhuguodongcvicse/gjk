@@ -123,16 +123,11 @@
                         this.params.cpuNum = event.data.params[1]
                         updateBoard(this.params).then(response => {
                             //console.log("this.params[1]",this.params[1])
-                            this.$notify({
-                                title: '成功',
-                                message: '更新成功',
-                                type: 'success'
-                            });
-                            /*this.$message({
+                            this.$message({
                                 showClose: true,
                                 message: "更新成功",
                                 type: "success"
-                            })*/
+                            })
                             this.refreshListFlag = Math.random()
                             this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
                         })
@@ -145,16 +140,11 @@
                         this.params.cpuNum = event.data.params[1]
                         saveBoard(this.params).then(response => {
                             //console.log("this.params[1]",this.params[1])
-                            this.$notify({
-                                title: '成功',
-                                message: '复制成功',
-                                type: 'success'
-                            });
-                            /*this.$message({
+                            this.$message({
                                 showClose: true,
                                 message: "复制成功",
                                 type: "success"
-                            })*/
+                            })
                             this.refreshListFlag = Math.random()
                             this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
                         })

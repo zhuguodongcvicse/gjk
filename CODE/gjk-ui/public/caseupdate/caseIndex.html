@@ -185,9 +185,9 @@
                                 frontBoardJson = graph.toJSON()
                             }
                             //console.log("frontBoardJson", frontBoardJson)
-                            // console.log("bJson", bJson)
+                            console.log("bJson", bJson)
                             if (typeof (bJson) != "undefined") {
-                                // console.log("fSlotNum", fSlotNum)
+                                console.log("fSlotNum", fSlotNum)
                                 for (const i in bJson.datas) {
                                     if (bJson.datas[i].json.properties != null && bJson.datas[i].json.properties.boardType != null && bJson.datas[i].json.properties.ID == fSlotNum + 10) {
                                         oppositeBoard = bJson.datas[i]
@@ -203,13 +203,13 @@
                                 alert("背面无板卡，请添加板卡！")
                                 return
                             }
-                            // console.log("oppositeBoard", oppositeBoard)
+                            console.log("oppositeBoard", oppositeBoard)
                             $("#selectId").empty();
                             var selectHtml = '';
                             var ifExistInfofBackBoard = []
                             if (typeof (oppositeBoard) != "undefined") {
                                 for (const i in oppositeBoard.json.properties.backBoardInfList) {
-                                    // console.log("allInfOfBackBoard", allInfOfBackBoard)
+                                    console.log("allInfOfBackBoard", allInfOfBackBoard)
                                     for (const j in allInfOfBackBoard) {
                                         if (allInfOfBackBoard[j].uniqueId == oppositeBoard.json.properties.backBoardInfList[i].uniqueId) {
                                             ifExistInfofBackBoard.push(allInfOfBackBoard[j])
@@ -290,8 +290,7 @@
             for (const i in showCpuInfList) {
                 outLinkArrTemp.push(showCpuList[i], showCpuInfList[i], linkTypeList[i], showBackBoardInfList[i])
             }
-            // console.log("currentBoard",currentBoard)
-            if (currentBoard.outLinkArr === undefined) {
+            if(currentBoard.outLinkArr === undefined) {
                 currentBoard.outLinkArr = []
             }
             currentBoard.outLinkArr.push(outLinkArrTemp)
@@ -325,8 +324,6 @@
             var tr = this.getRowObj(obj);
             // console.log("tr.children[0].innerText",tr.children[0].innerText)
             // console.log("tr.children",tr.children)
-            // console.log("tr",tr)
-            // console.log("clickBoardList",clickBoardList)
             if (tr != null) {
                 tr.parentNode.removeChild(tr);
                 for (const i in clickBoardList) {

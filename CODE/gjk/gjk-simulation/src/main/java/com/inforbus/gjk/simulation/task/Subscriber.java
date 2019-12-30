@@ -39,7 +39,7 @@ public class Subscriber extends JedisPubSub {
         //处理message
         Map jsonObject = JSONUtil.parseObj(message);
         //获取标识
-        String symbol = (String)jsonObject.get("symbol");
+        String symbol = (String)jsonObject.get("id");
 
         String key = "Simulator:"+username+":"+symbol;
         //根据标识放redis list队列

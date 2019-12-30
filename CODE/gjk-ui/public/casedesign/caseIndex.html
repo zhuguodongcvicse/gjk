@@ -297,7 +297,6 @@
         for (const i in showCpuInfList) {
             outLinkArrTemp.push(showCpuList[i], showCpuInfList[i], linkTypeList[i], showBackBoardInfList[i])
         }
-        // console.log("currentBoard",currentBoard)
         currentBoard.outLinkArr.push(outLinkArrTemp)
         //深拷贝
         currentBoard = JSON.parse(JSON.stringify(currentBoard))

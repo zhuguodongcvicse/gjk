@@ -486,7 +486,7 @@
                     }
                     // this.rejectDialog = false
                     this.isButtonUse = true
-                    this.$notify({
+                    this.$message({
                         showClose: true,
                         message: "已通过",
                         type: "success"
@@ -652,7 +652,7 @@
                             }
                             this.rejectDialog = false
                             this.isButtonUse = true
-                            this.$notify({
+                            this.$message({
                                 showClose: true,
                                 message: "已驳回",
                                 type: "success"

@@ -153,6 +153,7 @@ import {
   addObj,
   putObj,
   delObj,
+  getCompDict,
   importCompZipUpload,
   analysisXmlFile,
   isSelectLibs
@@ -599,6 +600,10 @@ export default {
     next(vm => {
       vm.refreshChange();
     });
+  },
+  beforeRouteUpdate(to, from, next) {
+    next();
+    this.refreshChange();
   }
 };
 </script>

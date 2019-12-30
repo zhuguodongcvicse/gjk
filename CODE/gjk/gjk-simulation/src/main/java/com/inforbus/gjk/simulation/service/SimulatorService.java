@@ -34,14 +34,8 @@ public interface SimulatorService {
      */
     Map<String,Object> getData(String username, SimulationDTO simulationDTO);
 
-    /**
-     * 仿真暂停获取帧号集合
-     * @param username 用户名
-     * @param symbols 标识集合
-     * @return
-     */
-    Map<String, List<String>> suspend(String username, List<String> symbols);
+    Map<String, List<String>> stop(String username, List<String> symbols);
 
-    List<String> getDataSource(String username, SimulationDTO simulationDTO);
+    List<String> getDataSource(String username,SimulationDTO simulationDTO);
 
 }

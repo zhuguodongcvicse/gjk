@@ -281,16 +281,8 @@
           };
           items.push(mode)
         }
-        items.push({
-          text: '删除', action: function (evt, item) {
-            if(data.image === 'images/BeforeTheBoard.svg' || data.image === 'images/AfterTheBoard.svg' || data.name == ' '){
-              graph.removeElement(data);
-              //删除逻辑
-            }   
-          
-          }
-        });
-   
+       /*  items.push(Q.PopupMenu.Separator);
+        items.push({html: '<a href="http://qunee.com" target="_blank">Qunee' + ' - ' + Q.version + '</a>'}); */
         return items;
       }
     }

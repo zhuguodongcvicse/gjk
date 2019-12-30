@@ -198,7 +198,7 @@ function creatbakedge(startId, endId) {
 	var edgejson = {
 		"_className": "Q.Edge",
 		"json": {
-			"zIndex": 250,
+			"zIndex": 5000,
 			"styles": {
 				"edge.color": "#03b6ff",
 				"arrow.to": true,
@@ -226,7 +226,7 @@ function createdge(startId, endId) {
 	var edgejson = {
 		"_className": "Q.Edge",
 		"json": {
-			"zIndex": 250,
+			"zIndex": 5000,
 			"styles": {
 				"edge.color": "#5bf000",
 				"arrow.to": true,
@@ -903,6 +903,7 @@ function initEditor(editor) {
 		var dragInfo = {};
 		var startData;
 		graph.interactionDispatcher.addListener(function (evt) {
+			console.log(111,evt.data)
 			if (evt.kind === EVENT_CREATE_ELEMENT_BY_JSON) {
 				if (evt.roots.length === 1) {
 					var element = evt.roots[0];
@@ -914,6 +915,7 @@ function initEditor(editor) {
 				return;
 			}
 			var data = evt.data;
+		
 			if (evt.kind == Q.InteractionEvent.ELEMENT_CREATED && evt.data instanceof Q.Node) {
 				var slot = findSlot(data, evt);
 				if (slot) {

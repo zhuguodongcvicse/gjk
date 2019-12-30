@@ -141,7 +141,7 @@ public class GjkTestController {
 	}
 
 	/**
-	 * 导出测试库
+	 * 导出测试库、平台库、算法库
 	 * @param request
 	 * @param response
 	 * @param libs
@@ -182,87 +182,4 @@ public class GjkTestController {
 		return new R<>(gjkTestService.analysisZipFile(ufile, importType));
 	}
 
-	/**
-	 * 导出平台库
-	 * @param request
-	 * @param response
-	 * @param libs
-	 */
-	@PostMapping("/createZipFilePlatform")
-	@PreAuthorize("@pms.hasPermission('sys_platform_export')")
-	public void createZipFilePlatform(HttpServletRequest request, HttpServletResponse response,
-							  @RequestBody List<String> libs) {
-		try {
-			byte[] data = gjkTestService.createZip(libs);
-
-			String zipFileName = (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date()) + ".zip";
-			response.reset();
-			response.setHeader("Content-Disposition", String.format("attachment; filename=%s.zip", zipFileName));
-			response.setHeader("FileName", zipFileName);
-			response.setHeader("Content-Length", "" + data.length);
-			response.setContentType("application/octet-stream; charset=UTF-8");
-
-			IoUtil.write(response.getOutputStream(), Boolean.TRUE, data);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * @Title: uploadReturnUrll
-	 * @Description: 单文件上传
-	 * @Author xiaohe
-	 * @DateTime 2019年5月13日 下午3:41:10
-	 * @param ufile
-	 * @return
-	 */
-	@ResponseBody
-	@PostMapping(path = "/importLibsZipUploadPlatform", consumes = { "multipart/mixed", "multipart/form-data" })
-	@PreAuthorize("@pms.hasPermission('sys_platform_import')")
-	public R importLibsZipUploadPlatform(@RequestParam(value = "file", required = false) MultipartFile ufile,
-							@RequestParam(value = "importType", required = false) String importType) {
-		return new R<>(gjkTestService.analysisZipFile(ufile, importType));
-	}
-	
-	/**
-	 * 导出算法库
-	 * @param request
-	 * @param response
-	 * @param libs
-	 */
-	@PostMapping("/createZipFileAlgorithm")
-	@PreAuthorize("@pms.hasPermission('sys_algorithm_export')")
-	public void createZipFileAlgorithm(HttpServletRequest request, HttpServletResponse response,
-							  @RequestBody List<String> libs) {
-		try {
-			byte[] data = gjkTestService.createZip(libs);
-
-			String zipFileName = (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date()) + ".zip";
-			response.reset();
-			response.setHeader("Content-Disposition", String.format("attachment; filename=%s.zip", zipFileName));
-			response.setHeader("FileName", zipFileName);
-			response.setHeader("Content-Length", "" + data.length);
-			response.setContentType("application/octet-stream; charset=UTF-8");
-
-			IoUtil.write(response.getOutputStream(), Boolean.TRUE, data);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * @Title: uploadReturnUrll
-	 * @Description: 单文件上传
-	 * @Author xiaohe
-	 * @DateTime 2019年5月13日 下午3:41:10
-	 * @param ufile
-	 * @return
-	 */
-	@ResponseBody
-	@PostMapping(path = "/importLibsZipUploadAlgorithm", consumes = { "multipart/mixed", "multipart/form-data" })
-	@PreAuthorize("@pms.hasPermission('sys_algorithm_import')")
-	public R importLibsZipUploadAlgorithm(@RequestParam(value = "file", required = false) MultipartFile ufile,
-							@RequestParam(value = "importType", required = false) String importType) {
-		return new R<>(gjkTestService.analysisZipFile(ufile, importType));
-	}
 }

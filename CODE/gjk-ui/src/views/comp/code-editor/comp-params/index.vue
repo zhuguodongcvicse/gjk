@@ -79,7 +79,7 @@
             />
           </el-card>
           <el-card class="box-card" :body-style="{padding: '10px'}">
-            <div slot="header" class="clearfix">平台文件</div>
+            <div slot="header" class="clearfix">工程文件</div>
             <params-files
               :fileLists="fileList"
               :comp="component"

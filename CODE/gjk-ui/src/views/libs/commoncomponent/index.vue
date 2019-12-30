@@ -16,59 +16,20 @@
         @selection-change="selectionChange"
       >
         <template slot="menuLeft">
-          <el-row :gutter="15">
-            <el-form label-width="40px" size="mini">
-              <el-col :span="5">
-                <el-form-item label="算法">
-                  <select-tree
-                    multiple
-                    size="mini"
-                    :treeData="algorithmTreeData"
-                    :id.sync="algorithmSelectArray"
-                  ></select-tree>
-                </el-form-item>
-              </el-col>
-              <el-col :span="5">
-                <el-form-item label="测试">
-                  <select-tree
-                    multiple
-                    size="mini"
-                    :treeData="testTreeData"
-                    :id.sync="testSelectArray"
-                  ></select-tree>
-                </el-form-item>
-              </el-col>
-              <el-col :span="5">
-                <el-form-item label="平台">
-                  <select-tree
-                    multiple
-                    size="mini"
-                    :treeData="platformTreeData"
-                    :id.sync="platformSelectArray"
-                  ></select-tree>
-                </el-form-item>
-              </el-col>
-              <el-col :span="5">
-                <el-form-item label="搜索">
-                  <el-input v-model="selectString" size="mini" clearable></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="4">
-                <el-button
-                  type="primary"
-                  size="mini"
-                  style="padding:6px 6px;margin:2px 10px"
-                  @click="exportCompFunc"
-                >导出申请</el-button>
-                <el-button
-                  type="primary"
-                  size="mini"
-                  style="padding:6px 6px"
-                  @click="vatchExportList"
-                >申请列表</el-button>
-              </el-col>
-            </el-form>
-          </el-row>
+          <el-form :inline="true">
+            <el-form-item label="筛选:">
+              <select-tree :treeData="screenLibsTreeData" multiple :id.sync="screenLibsSelectArray"></select-tree>
+            </el-form-item>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <el-form-item label="搜索:">
+              <el-input v-model="selectString" size="mini" clearable></el-input>
+            </el-form-item>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <el-form-item label>
+              <el-button type="primary" @click="exportCompFunc">导出申请</el-button>
+            </el-form-item>
+            <el-form-item label>
+              <el-button type="primary" @click="vatchExportList">申请列表</el-button>
+            </el-form-item>
+          </el-form>
         </template>
 
         <template slot="version" slot-scope="scope">
@@ -174,13 +135,6 @@ export default {
       ],
       screenLibsSelectArray: [],
 
-      algorithmTreeData: [],
-      algorithmSelectArray: [],
-      testTreeData: [],
-      testSelectArray: [],
-      platformTreeData: [],
-      platformSelectArray: [],
-
       storageApplyDialog: false,
       loading: false,
       isShowHistoricVersion: true,
@@ -211,15 +165,6 @@ export default {
   },
   mounted: function() {},
   watch: {
-    algorithmSelectArray() {
-      this.selectArrayChange();
-    },
-    testSelectArray() {
-      this.selectArrayChange();
-    },
-    platformSelectArray() {
-      this.selectArrayChange();
-    },
     screenLibsSelectArray() {
       for (let item of this.screenLibsSelectArray) {
         if (item == "0") {
@@ -240,19 +185,6 @@ export default {
     }
   },
   methods: {
-    selectArrayChange() {
-      let array = [];
-      this.algorithmSelectArray.forEach((element, index) => {
-        array.push(element);
-      });
-      this.testSelectArray.forEach((element, index) => {
-        array.push(element);
-      });
-      this.platformSelectArray.forEach((element, index) => {
-        array.push(element);
-      });
-      this.screenLibsSelectArray = array;
-    },
     exportCompFunc() {
       // if (this.exportCompList.length > 0) {
       //   createZipFile(this.exportCompList);
@@ -292,13 +224,13 @@ export default {
     },
     getLibsTree() {
       fetchAlgorithmTree(this.listQuery).then(algorithmTree => {
-        this.algorithmTreeData = algorithmTree.data.data;
+        this.screenLibsTreeData[0].children = algorithmTree.data.data;
       });
       fetchTestTree(this.listQuery).then(testTree => {
-        this.testTreeData = testTree.data.data;
+        this.screenLibsTreeData[1].children = testTree.data.data;
       });
       fetchPlatformTrees(this.listQuery).then(platformTree => {
-        this.platformTreeData = platformTree.data.data;
+        this.screenLibsTreeData[2].children = platformTree.data.data;
       });
     },
     showScreen() {
@@ -311,6 +243,7 @@ export default {
       this.currDialogId = row.id;
       this.showAllVersionDia = true;
       getAllVersionByCompId({ compId: row.compId }).then(Response => {
+        // console.log(Response.data.data);
         this.allVersionTableData = Response.data.data;
 
         // 默认勾选之前选择的行
@@ -374,6 +307,7 @@ export default {
       } else {
         list.push(select);
       }
+      console.log("11111111111111111", list);
       getCompListByString(this.listQuery, list).then(Response => {
         this.tableData = Response.data.data.records;
         this.page.total = Response.data.data.total;

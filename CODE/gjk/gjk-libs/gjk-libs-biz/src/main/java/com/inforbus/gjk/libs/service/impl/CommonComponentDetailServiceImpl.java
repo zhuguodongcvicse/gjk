@@ -24,22 +24,24 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
+import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.FileUtil;
 import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
 import com.inforbus.gjk.libs.api.entity.CommonComponent;
 import com.inforbus.gjk.libs.api.entity.CommonComponentDetail;
 import com.inforbus.gjk.libs.api.vo.CommCompDetailVO;
+import com.inforbus.gjk.libs.api.vo.TreeUtil;
 import com.inforbus.gjk.libs.mapper.CommonComponentDetailMapper;
 import com.inforbus.gjk.libs.service.CommonComponentDetailService;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -52,8 +54,7 @@ import org.springframework.stereotype.Service;
 public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponentDetailMapper, CommonComponentDetail>
 		implements CommonComponentDetailService {
 
-	@Value("${git.local.path}")
-	private String gitFilePath;
+	private static final String gitFilePath = JGitUtil.getLOCAL_REPO_PATH();
 
 	/**
 	 * 公共构件库表简单分页查询
@@ -157,7 +158,8 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 			File file = null;
 			String path = parent.getFileName();
 			if ("xml".equals(parent.getFileType())) {
-				file = new File(gitFilePath + File.separator + parent.getFilePath() + File.separator + path);
+				file = new File(
+						JGitUtil.getLOCAL_REPO_PATH() + File.separator + parent.getFilePath() + File.separator + path);
 				fileMap.put("compBasicMap", XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file));
 			}
 
@@ -198,8 +200,8 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 					|| parent.getFileName().endsWith("jpg")) {
 				String base64 = "";
 				try {
-					base64 = UploadFilesUtils.fileToEncodeBase64(
-							new File(gitFilePath + parent.getFilePath() + File.separator + parent.getFileName()));
+					base64 = UploadFilesUtils.fileToEncodeBase64(new File(JGitUtil.getLOCAL_REPO_PATH()
+							+ parent.getFilePath() + File.separator + parent.getFileName()));
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -207,13 +209,15 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 						"data:image/png;base64," + base64, parent.getParaentId(), parent.getVersion()));
 			} else {
 				tree.add(new CommCompDetailVO(parent.getId(), parent.getFileName(), parent.getFileType(),
-						gitFilePath + parent.getFilePath(), parent.getParaentId(), parent.getVersion()));
+						JGitUtil.getLOCAL_REPO_PATH() + parent.getFilePath(), parent.getParaentId(),
+						parent.getVersion()));
 			}
 			// ②查询构件详情转树形
 			String[] fileType = new String[] { "algorithmfile", "testfile", "platformfile" };
 			File file = null;
 			if (Arrays.asList(fileType).contains(parent.getFileType())) {
-				file = new File(gitFilePath + parent.getFilePath() + File.separator + parent.getFileName());
+				file = new File(
+						JGitUtil.getLOCAL_REPO_PATH() + parent.getFilePath() + File.separator + parent.getFileName());
 				if (file.isDirectory()) {
 					File[] childFileList = file.listFiles();
 					for (File childFile : childFileList) {
@@ -224,13 +228,11 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 		}
 		return tree;
 	}
-
-	/**
-	 * 根据libsid查询到已入库的表中是否选中三个库
-	 * 
-	 * @param libsId
-	 * @return
-	 */
+/**
+ * 根据libsid查询到已入库的表中是否选中三个库
+ * @param libsId
+ * @return
+ */
 	public List<CommonComponentDetail> findCommonComponentDetailByLibsId(String libsId) {
 		return baseMapper.selectList(
 				Wrappers.<CommonComponentDetail>query().lambda().eq(CommonComponentDetail::getLibsId, libsId));

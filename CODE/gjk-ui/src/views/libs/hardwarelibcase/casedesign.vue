@@ -127,16 +127,11 @@
                         this.params.bdNum = event.data.params[2];
                         this.ifSave = 0;
                         saveCase(this.params).then(response => {
-                            this.$notify({
-                                title: '成功',
-                                message: '保存成功',
-                                type: 'success'
-                            });
-                            /*this.$message({
+                            this.$message({
                                 showClose: true,
                                 message: "保存成功",
                                 type: "success"
-                            });*/
+                            });
                             this.refreshListFlag = Math.random()
                             this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
                         });

@@ -124,16 +124,11 @@
                 switch (event.data.cmd) {
                     case "edit":
                         updateChip(this.params).then(response => {
-                            this.$notify({
-                                title: '成功',
-                                message: '修改成功',
-                                type: 'success'
-                            });
-                            /*this.$message({
+                            this.$message({
                                 showClose: true,
                                 message: "修改成功",
                                 type: "success"
-                            });*/
+                            });
                             this.refreshListFlag = Math.random()
                             this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
                         });
@@ -143,16 +138,11 @@
                     case "copy":
                         // console.log("this.params", this.params);
                         saveChip(this.params).then(response => {
-                            this.$notify({
-                                title: '成功',
-                                message: '复制成功',
-                                type: 'success'
-                            });
-                            /*this.$message({
+                            this.$message({
                                 showClose: true,
                                 message: "复制成功",
                                 type: "success"
-                            });*/
+                            });
                             this.refreshListFlag = Math.random()
                             this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
                         });

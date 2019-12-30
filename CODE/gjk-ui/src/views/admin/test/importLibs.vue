@@ -38,9 +38,7 @@
 
 <script>
     import {
-        importLibsZipUpload,
-        importLibsZipUploadPlatform,
-        importLibsZipUploadAlgorithm
+        importLibsZipUpload
     } from "@/api/admin/test";
 
     export default {
@@ -50,7 +48,7 @@
                 importLibsRadio: 'addImport',
             };
         },
-        props: ["showInfo","whichLib"],
+        props: ["showInfo"],
         created() { },
         computed: { },
         methods: {
@@ -94,8 +92,7 @@
                     let params = new FormData();
                     params.append("file", this.importLibsFileList[0]);
                     params.append("importType", this.importLibsRadio);
-                    if(this.whichLib === "algorithm"){
-                         importLibsZipUploadAlgorithm(params).then(Response => {
+                    importLibsZipUpload(params).then(Response => {
                         if (Response.data.data == -1) {
                             this.$message.warning("上传的压缩包内容错误，请重新选择文件上传。");
                         } else {
@@ -104,28 +101,6 @@
                             this.closeImportLibsDialog();
                         }
                     });
-                    }else if(this.whichLib === "test"){
-                         importLibsZipUpload(params).then(Response => {
-                        if (Response.data.data == -1) {
-                            this.$message.warning("上传的压缩包内容错误，请重新选择文件上传。");
-                        } else {
-                            this.$message.success("导入成功。");
-                            this.$emit("callback");
-                            this.closeImportLibsDialog();
-                        }
-                    });
-                    }else if(this.whichLib === "platform"){
-                         importLibsZipUploadPlatform(params).then(Response => {
-                        if (Response.data.data == -1) {
-                            this.$message.warning("上传的压缩包内容错误，请重新选择文件上传。");
-                        } else {
-                            this.$message.success("导入成功。");
-                            this.$emit("callback");
-                            this.closeImportLibsDialog();
-                        }
-                    });
-                    }
-                   
                 }
             }
         }

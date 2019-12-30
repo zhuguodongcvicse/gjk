@@ -121,7 +121,7 @@ export default {
       xzblPaeam: "选择变量",
       numIndexParam: "序号",
       lengthParam: "长度",
-      nameParam: "variable", //名称
+      nameParam: "名称", //名称
       paramType: "",
 
       //
@@ -322,7 +322,7 @@ export default {
     setShowLableName(labelKey, labelValue) {
       for (let key in labelValue) {
         if (labelValue[key].isShow || labelValue[key].attrMappingName !== "") {
-          if (["structType", "structId"].includes(labelValue[key].attrName)) {
+          if (["structType", "structId","paramRemarks"].includes(labelValue[key].attrName)) {
           } else {
             this.$set(labelValue[key], "labelKey", labelKey);
           }

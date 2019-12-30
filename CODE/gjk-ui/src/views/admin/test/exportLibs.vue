@@ -1,5 +1,8 @@
 <template>
-  <el-dialog width="35%" title="选择导出项" :visible.sync="showInfo.dialogExportVisible">
+  <el-dialog
+    width="35%"
+    title="选择导出项"
+    :visible.sync="showInfo.dialogExportVisible">
     <el-checkbox v-model="exportLibsCheckbox" label="testLib">测试库结构</el-checkbox>
     <el-checkbox v-model="exportLibsCheckbox" label="algorithmLib">算法库结构</el-checkbox>
     <el-checkbox v-model="exportLibsCheckbox" label="platformLib">平台库结构</el-checkbox>
@@ -11,37 +14,27 @@
 </template>
 
 <script>
-import {
-  createZipFile,
-  createZipFileAlgorithm,
-  createZipFilePlatform
-} from "@/api/admin/test";
+    import { createZipFile } from "@/api/admin/test";
 
-export default {
-  data() {
-    return {
-      exportLibsCheckbox: ["testLib", "algorithmLib", "platformLib"]
+    export default {
+        data() {
+            return {
+                exportLibsCheckbox: ['testLib', 'algorithmLib', 'platformLib'],
+            };
+        },
+        props: ["showInfo"],
+        created() { },
+        computed: { },
+        methods: {
+            exportLibDirectory(){
+                if(this.exportLibsCheckbox.length == 0){
+                    this.$message.warning("请选择导出项");
+                    return
+                }
+                createZipFile(this.exportLibsCheckbox)
+                this.showInfo.dialogExportVisible = false
+            },
+        }
     };
-  },
-  props: ["showInfo", "whichLib"],
-  created() {},
-  computed: {},
-  methods: {
-    exportLibDirectory() {
-      if (this.exportLibsCheckbox.length == 0) {
-        this.$message.warning("请选择导出项");
-        return;
-      }
-      if (this.whichLib === "algorithm") {
-        createZipFileAlgorithm(this.exportLibsCheckbox);
-      } else if (this.whichLib === "test") {
-        createZipFile(this.exportLibsCheckbox);
-      } else if (this.whichLib === "platform") {
-        createZipFilePlatform(this.exportLibsCheckbox);
-      }
-      this.showInfo.dialogExportVisible = false;
-    }
-  }
-};
 </script>
 

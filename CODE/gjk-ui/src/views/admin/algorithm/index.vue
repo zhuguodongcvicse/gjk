@@ -23,12 +23,12 @@
           >删除</el-button>
           <el-button
             type="primary"
-            v-if="algorithmManager_btn_export"
+            v-if="testManager_btn_export"
             @click="showInfo.dialogExportVisible = true"
           >导出</el-button>
           <el-button
             type="primary"
-            v-if="algorithmManager_btn_import"
+            v-if="testManager_btn_import"
             @click="showInfo.importLibsDialogVisible = true"
           >导入</el-button>
         </el-button-group>
@@ -68,10 +68,9 @@
             </el-form>
           </el-card>
         </el-col>
-            
       </el-row>
-      <export-libs :showInfo="showInfo" :whichLib = "whichLib"></export-libs>
-      <import-libs :showInfo="showInfo" :whichLib = "whichLib" @callback="getList"></import-libs>
+      <export-libs :showInfo="showInfo"></export-libs>
+      <import-libs :showInfo="showInfo" @callback="getList"></import-libs>
     </basic-container>
   </div>
 </template>
@@ -99,7 +98,6 @@ export default {
         importLibsDialogVisible: false,
         dialogExportVisible: false
       },
-      whichLib:"algorithm",
       list: null,
       total: null,
       formEdit: true,
@@ -138,9 +136,8 @@ export default {
       algorithmManager_btn_add: false,
       algorithmManager_btn_edit: false,
       algorithmManager_btn_del: false,
-      algorithmManager_btn_sel: false,
-      algorithmManager_btn_export: false,
-      algorithmManager_btn_import: false
+      testManager_btn_export: false,
+      testManager_btn_import: false
     };
   },
 
@@ -150,9 +147,8 @@ export default {
     this.algorithmManager_btn_add = this.permissions["sys_algorithm_add"];
     this.algorithmManager_btn_edit = this.permissions["sys_algorithm_edit"];
     this.algorithmManager_btn_del = this.permissions["sys_algorithm_del"];
-    this.algorithmManager_btn_sel = this.permissions["sys_algorithm_select"];
-    this.algorithmManager_btn_export = this.permissions["sys_algorithm_export"];
-    this.algorithmManager_btn_import = this.permissions["sys_algorithm_import"];
+    this.testManager_btn_export = this.permissions["sys_test_export"];
+    this.testManager_btn_import = this.permissions["sys_test_import"];
   },
   computed: {
     ...mapGetters(["elements", "permissions"])

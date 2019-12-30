@@ -45,7 +45,7 @@ export default {
       deleteProcedureById(this.procedureId).then(Response => {
         this.closeDialog();
         if (Response.data.data) {
-          this.$notify({
+          this.$message({
             message: "此流程删除成功",
             type: "success"
           });

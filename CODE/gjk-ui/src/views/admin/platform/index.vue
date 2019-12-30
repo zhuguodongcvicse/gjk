@@ -23,12 +23,12 @@
           >删除</el-button>
           <el-button
             type="primary"
-            v-if="platformManager_btn_export"
+            v-if="testManager_btn_export"
             @click="showInfo.dialogExportVisible = true"
           >导出</el-button>
           <el-button
             type="primary"
-            v-if="platformManager_btn_import"
+            v-if="testManager_btn_import"
             @click="showInfo.importLibsDialogVisible = true"
           >导入</el-button>
         </el-button-group>
@@ -70,8 +70,8 @@
           </el-card>
         </el-col>
       </el-row>
-      <export-libs :showInfo="showInfo" :whichLib="whichLib"></export-libs>
-      <import-libs :showInfo="showInfo" :whichLib="whichLib" @callback="getList"></import-libs>
+      <export-libs :showInfo="showInfo"></export-libs>
+      <import-libs :showInfo="showInfo" @callback="getList"></import-libs>
     </basic-container>
   </div>
 </template>
@@ -99,7 +99,6 @@ export default {
         importLibsDialogVisible: false,
         dialogExportVisible: false
       },
-      whichLib:"platform",
       list: null,
       total: null,
       formEdit: true,
@@ -138,10 +137,8 @@ export default {
       platformManager_btn_add: false,
       platformManager_btn_edit: false,
       platformManager_btn_del: false,
-      platformManager_btn_sel: false,
-      platformManager_btn_export: false,
-      platformManager_btn_import: false,
-
+      testManager_btn_export: false,
+      testManager_btn_import: false
     };
   },
   components: { importLibs, exportLibs },
@@ -150,9 +147,8 @@ export default {
     this.platformManager_btn_add = this.permissions["sys_platform_add"];
     this.platformManager_btn_edit = this.permissions["sys_platform_edit"];
     this.platformManager_btn_del = this.permissions["sys_platform_del"];
-    this.platformManager_btn_sel = this.permissions["sys_platform_select"];
-    this.platformManager_btn_export = this.permissions["sys_platform_export"];
-    this.platformManager_btn_import = this.permissions["sys_platform_import"];
+    this.testManager_btn_export = this.permissions["sys_test_export"];
+    this.testManager_btn_import = this.permissions["sys_test_import"];
   },
   computed: {
     ...mapGetters(["elements", "permissions"])

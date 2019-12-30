@@ -23,7 +23,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
-import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.libs.api.dto.BSPDTO;
 import com.inforbus.gjk.libs.api.dto.BSPTree;
 import com.inforbus.gjk.libs.api.dto.SelectFolderDTO;
@@ -35,15 +34,11 @@ import com.inforbus.gjk.libs.mapper.BSPMapper;
 import com.inforbus.gjk.libs.service.BSPService;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 软件框架库表
@@ -54,8 +49,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service("BSPService")
 public class BSPServiceImpl extends ServiceImpl<BSPMapper, BSP> implements BSPService {
 
-	@Value("${git.local.path}")
-	private String gitFilePath;
+	private static final String gitFilePath = JGitUtil.getLOCAL_REPO_PATH();
 
 	/**
 	 * 软件框架库表简单分页查询
@@ -184,35 +178,6 @@ public class BSPServiceImpl extends ServiceImpl<BSPMapper, BSP> implements BSPSe
 				addBSPTree(tree, childFile, fileId);
 			}
 		}
-	}
-
-	@Override
-	public String uploadFiles(MultipartFile files, String versionDisc) {
-		String path = gitFilePath;
-		String res = "上传成功！！！";
-		String p = path + "gjk/bsp/" + versionDisc + ".0" + File.separator + files.getOriginalFilename();
-		String bb = p.replaceAll("\\\\", "/");
-		String ss = p.substring(0, bb.lastIndexOf("/"));
-		try {
-			final InputStream inputStream = files.getInputStream();
-			// 启动线程，保存后，后台继续解压文件
-			new Thread(() -> {
-				File file = new File(ss);
-				if (!file.exists()) {
-					file.mkdir();
-				}
-				try {
-					UploadFilesUtils.decompression(inputStream, ss);
-					JGitUtil.commitAndPush(ss, "多个文件上传");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}).start();
-			;
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		return res;
 	}
 
 }

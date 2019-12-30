@@ -17,13 +17,11 @@
 
 import request from '@/router/axios'
 
-export function fetchList(page, userName) {
-  console.log("page",page)
+export function fetchList(query) {
   return request({
-    url: '/libs/hardwarelibinf/page/' + userName,
+    url: '/libs/hardwarelibinf/page',
     method: 'get',
-    // params: {page, userName}
-    params: page
+    params: query
   })
 }
 
@@ -72,7 +70,6 @@ export function updateInf(obj) {
     data: obj
   })
 }
-
 //获取所有用户
 export function getAllUser() {
   return request({
@@ -80,7 +77,6 @@ export function getAllUser() {
     method: 'get'
   })
 }
-
 //返回接口数据
 export function getInfList() {
   return request({

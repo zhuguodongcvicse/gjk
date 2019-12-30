@@ -290,7 +290,6 @@
             sizeChange(val) {
                 this.page.size = val;
                 this.listQuery.size = val;
-                this.listQuery.current = 1;
                 this.getList();
             },
             /**

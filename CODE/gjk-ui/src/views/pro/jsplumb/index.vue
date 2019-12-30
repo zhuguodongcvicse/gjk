@@ -50,12 +50,12 @@
           ></el-button>
           </el-tooltip>
           <!-- 开始仿真/结束仿真 -->
-          <el-tooltip class = "item" effect="dark" v-bind:content="simulationText" placement="bottom">
-            <el-button 
-            style="padding:4px 4px" 
-            type="primary" 
-            v-bind:icon="simulationIcon" 
-            @click="simulationState = !simulationState"></el-button>
+          <el-tooltip class = "item" effect="dark" content="开始仿真" placement="bottom">
+            <el-button  style = "padding:4px 4px" type="primary" icon="icon-kaishifangzhen" @click="sendMessage('startSimulation')"></el-button>
+          </el-tooltip>
+
+           <el-tooltip class = "item" effect="dark" content="结束仿真" placement="bottom">
+           <el-button style = "padding:4px 4px" type="primary" icon="icon-jieshu" @click="sendMessage('endSimulation')"></el-button>
           </el-tooltip>
 
           <!-- <el-button
@@ -793,6 +793,7 @@ export default {
                 console.log("流程建模文件路径", this.flowFilePath)
                 this.postMessageData.cmd = "clickCompLoading";
                 this.postMessageData.params = res.data.data.json;
+                  console.log("流程建模json文件", res.data.data.json)
                 this.$refs.gjkIframe.sendMessage(this.postMessageData);
               }
             }

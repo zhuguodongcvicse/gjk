@@ -15,7 +15,7 @@
         @row-del="rowDel"
       >
         <template slot="menuLeft">
-          <el-button v-if="permissions.libs_hardwarelibinf_add" type="primary" @click="showdialog">新增</el-button>
+          <el-button type="primary" @click="showdialog">新增</el-button>
         </template>
 
         <template slot-scope="scope" slot="menu">
@@ -45,7 +45,7 @@
           </el-button>
           <el-button
             type="primary"
-            v-if="permissions.libs_hardwarelibinf_add && permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="goStorage(scope.row,scope.index)"
@@ -238,9 +238,10 @@
             },
             getList() {
                 this.tableLoading = true;
-                fetchList(this.listQuery, this.userInfo.name).then(response => {
+                fetchList(this.listQuery).then(response => {
                     this.tableData = []
-                    if (this.tableData.length !== 0) {
+                    this.tableData = response.data.data.records;
+                    if (this.tableData != null && this.tableData.length != 0) {
                         if (this.tableData[0].updateTime != null) {
                             this.tableData = this.sortKey(this.tableData, 'updateTime')
                         } else {
@@ -251,11 +252,18 @@
                     if (this.allInfs.length !== 0) {
                         //清空数据
                         this.allInfs = []
-                    }
-                    for (const i in this.tableData) {
-                        //如果接口用户名和登录用户名相同，则将该接口放到接口数据
-                        if (this.tableData[i].userId === this.userInfo.name) {
-                            this.allInfs.push(this.tableData[i])
+                        for (const i in this.tableData) {
+                            //如果接口用户名和登录用户名相同，则将该接口放到接口数据
+                            if (this.tableData[i].userId === this.userInfo.name) {
+                                this.allInfs.push(this.tableData[i])
+                            }
+                        }
+                    } else {
+                        //接口数据为空则将用户名相同的接口放到接口数组
+                        for (const i in this.tableData) {
+                            if (this.tableData[i].userId === this.userInfo.name) {
+                                this.allInfs.push(this.tableData[i])
+                            }
                         }
                     }
                     this.allInfs = JSON.parse(JSON.stringify(this.allInfs))
@@ -320,16 +328,11 @@
                     if (valid) {
                         this.dialogFormVisible = false;
                         updateInf(form).then(response => {
-                            this.$notify({
-                                title: '成功',
-                                message: '更新成功',
-                                type: 'success'
-                            });
-                            /*this.$message({
+                            this.$message({
                                 showClose: true,
                                 message: "更新成功",
                                 type: "success"
-                            });*/
+                            });
                             //更新后重新刷新列表
                             this.getList();
                             // console.log("this",this)
@@ -360,16 +363,11 @@
                         form.applyState = '0'
                         form.applyDesc = null
                         saveInf(form).then(response => {
-                            this.$notify({
-                                title: '成功',
-                                message: '复制成功',
-                                type: 'success'
-                            });
-                            /*this.$message({
+                            this.$message({
                                 showClose: true,
                                 message: "复制成功",
                                 type: "success"
-                            });*/
+                            });
                             //更新后重新刷新列表
                             this.getList();
                             // console.log("this",this)
@@ -405,9 +403,8 @@
                 this.getList();
             },
             sizeChange(val) {
-                this.page.pageSize = val;
+                this.page.size = val;
                 this.listQuery.size = val;
-                this.listQuery.current = 1;
                 this.getList();
             },
             /**
@@ -498,7 +495,6 @@
              */
             refreshChange() {
                 this.getList();
-                // console.log("tableOption",this.tableOption)
             }
         }
     };

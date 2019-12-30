@@ -720,7 +720,7 @@ export default {
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["tmpStructLength"]),
+    ...mapGetters(["tmpStructLength","userInfo"]),
     ...mapGetters(["tagWel", "tagList", "tag", "website"])
   },
   //方法集合
@@ -1412,7 +1412,7 @@ export default {
 
     /* 上传文件 */
     UploadImage(attr, param) {
-      getUploadFilesUrl(param).then(res => {
+      getUploadFilesUrl(param,this.userInfo).then(res => {
         /* 给文本框赋值 */
         var filePath = res.data.data;
         var attributeMap = this.currentXmlMap.attributeMap;
