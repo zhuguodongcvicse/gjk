@@ -597,6 +597,7 @@ export default {
                   if (tmpIfArr.includes(param.lableName)) {
                     //使用"输入"还是 "输出"
                     let tmpParam = param.lableName === "输入" ? input : output;
+                    console.log("输入输入输入", deepClone(tmpParam));
                     //获取基础模板的配置
                     let fromParam = this.baseXmlParamsData.find(item => {
                       return item.lableName === param.lableName;
@@ -616,7 +617,6 @@ export default {
                           tmpParam,
                           cacheParams
                         );
-                      } else {
                       }
                     }
                     console.log("设置值：***************", deepClone(tmpParam));
@@ -711,6 +711,7 @@ export default {
                 this.itemTypeChangeHeaderValueParams(to, form);
               } else if (
                 ////完全包含时进入直接添加给toParam
+                //TODO 这有问题，，，，formName 可能为undefined
                 form.lableName === "variable" &&
                 formName.includes(toName)
               ) {
@@ -742,8 +743,8 @@ export default {
     },
     //将基础模板的配置方式写到解析后的参数中
     itemTypeChangeAssignmenDataParam(toParam, formParam) {
+      console.log("方式写到解析后的参数中", toParam, formParam);
       if (toParam.lableName === formParam.lableName) {
-        console.log("将基础模板的配置方式写到解析后的参数中",toParam.lableName,deepClone(formParam))
         if (toParam.attributeMap === null) {
           toParam.attributeMap = formParam.attributeMap;
         } else {
@@ -765,21 +766,27 @@ export default {
               );
             });
           } else {
-            formParam.xmlEntityMaps.forEach((form, index) => {
-              // console.log("itemTypeChangeAssignmenDataParam*******************formParam.xmlEntityMaps.forEach",form)
-              if (toParam.xmlEntityMaps[index] !== undefined) {
-                if (form.lableName === toParam.xmlEntityMaps[index].lableName) {
+            for (let item of formParam.xmlEntityMaps) {
+              let toParamIndex;
+              //查找名字是否存在标签名字的节点以及下标
+              let tmpTo = toParam.xmlEntityMaps.find((res, index) => {
+                toParamIndex = index;
+                return item.lableName === res.lableName;
+              });
+              //
+              if (tmpTo !== undefined) {
+                if (item.lableName === tmpTo.lableName) {
                   this.itemTypeChangeAssignmenDataParam(
-                    toParam.xmlEntityMaps[index],
-                    form
+                    toParam.xmlEntityMaps[toParamIndex],
+                    item
                   );
                 }
               } else {
                 //设置默认值
-                let data = deepClone(form);
-                this.$set(toParam.xmlEntityMaps, index, data);
+                let data = deepClone(item);
+                this.$set(toParam.xmlEntityMaps, toParam.xmlEntityMaps.length, data);
               }
-            });
+            }
           }
         }
       }

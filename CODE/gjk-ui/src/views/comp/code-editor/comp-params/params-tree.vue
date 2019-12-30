@@ -121,7 +121,7 @@ export default {
       xzblPaeam: "选择变量",
       numIndexParam: "序号",
       lengthParam: "长度",
-      nameParam: "名称", //名称
+      nameParam: "variable", //名称
       paramType: "",
 
       //
@@ -193,7 +193,7 @@ export default {
           let tmpblParamOld = {};
           for (let key1 in nodeCol) {
             for (let key2 in nodeCol[key1]) {
-              if (nodeCol[key1][key2].attrMappingName === this.lbParam) {
+              if (nodeCol[key1][key2].labelKey === this.lbParam) {
                 (k1 = key1), (k2 = key2);
                 tmpblParam = nodeCol[key1][key2];
                 tmpblParamOld = param.nodeData[key1][key2];
@@ -320,38 +320,13 @@ export default {
   //方法集合
   methods: {
     setShowLableName(labelKey, labelValue) {
-      //       bllxParam: "变量类型",
-      // lbParam: "类别",
-      // fzParam: "赋值",
-      // xzblPaeam: "选择变量",
-      // numIndexParam: "序号",
-      // lengthParam: "长度",
-      // nameParam: "名称", //名称
-      let label = labelValue.find(item => {
-        return item.isShow || item.attrMappingName !== "";
-      });
-      switch (labelKey) {
-        case "变量类型":
-          this.bllxParam = label.attrMappingName;
-          break;
-        case "类别":
-          this.lbParam = label.attrMappingName;
-          break;
-        case "赋值":
-          this.fzParam = label.attrMappingName;
-          break;
-        case "选择变量":
-          this.xzblPaeam = label.attrMappingName;
-          break;
-        case "序号":
-          this.numIndexParam = label.attrMappingName;
-          break;
-        case "长度":
-          this.lengthParam = label.attrMappingName;
-          break;
-        case "名称":
-          this.nameParam = label.attrMappingName;
-          break;
+      for (let key in labelValue) {
+        if (labelValue[key].isShow || labelValue[key].attrMappingName !== "") {
+          if (["structType", "structId"].includes(labelValue[key].attrName)) {
+          } else {
+            this.$set(labelValue[key], "labelKey", labelKey);
+          }
+        }
       }
     },
     //返回lableName的值
@@ -359,7 +334,7 @@ export default {
       let tmpblParam = {};
       nodeCol.forEach(items => {
         items.forEach(item => {
-          if (item.attrMappingName === name) {
+          if (item.labelKey === name) {
             tmpblParam = item;
           }
         });
@@ -487,9 +462,9 @@ export default {
       data.forEach(items => {
         items.forEach(item => {
           // 如果是变量类型，将变量类型当前内容赋入
-          if (item.attrMappingName === this.bllxParam) {
+          if (item.labelKey === this.bllxParam) {
             bllxName = item.lableName;
-          } else if (item.attrMappingName === this.lbParam) {
+          } else if (item.labelKey === this.lbParam) {
             lbName = item.lableName;
           }
         });
@@ -497,25 +472,25 @@ export default {
       data.forEach(items => {
         items.forEach(item => {
           // 如果是长度，根据变量类型内容判断是否显示
-          if (item.attrMappingName === this.lengthParam) {
+          if (item.labelKey === this.lengthParam) {
             let isx = bllxName.includes("*");
             if (bllxName === null || bllxName === undefined) {
               return;
             }
-            if (item.attrMappingName === this.lengthParam) {
+            if (item.labelKey === this.lengthParam) {
               item.isShow = isx ? true : false;
               item.lableName = isx ? item.lableName : "";
             }
           }
           // 如果是类别，根据变量类型内容处理选择内容
-          if (item.attrMappingName === this.lbParam) {
+          if (item.labelKey === this.lbParam) {
             let name = item.lableName;
             data.forEach(data1 => {
               data1.forEach(data2 => {
-                if (data2.attrMappingName === this.fzParam) {
+                if (data2.labelKey === this.fzParam) {
                   data2.lableName = name === "IMMEDIATE" ? data2.lableName : "";
                   data2.isShow = name === "IMMEDIATE" ? true : false;
-                } else if (data2.attrMappingName === this.xzblPaeam) {
+                } else if (data2.labelKey === this.xzblPaeam) {
                   data2.isShow =
                     name === "IMMEDIATE"
                       ? false
@@ -591,7 +566,7 @@ export default {
     },
     //每个框的改变该表事件
     itemTypeChange(col, row) {
-      if (col.attrMappingName === this.bllxParam) {
+      if (col.labelKey === this.bllxParam) {
         let isStruct = col.lableName.replace("*", "");
         //在不在头文件中
         let isokStrDH =
@@ -641,7 +616,7 @@ export default {
         for (let key in row) {
           //查找名称的一组数据
           let mcParam = row[key].find(item => {
-            return item.attrMappingName === this.nameParam;
+            return item.labelKey === this.nameParam;
           });
           if (mcParam) {
             //循环给名称中的ID struct赋值
@@ -659,14 +634,14 @@ export default {
             this.changeCol(col, item, row);
           });
         });
-      } else if (col.attrMappingName === this.lbParam) {
+      } else if (col.labelKey === this.lbParam) {
         let lableName = col.lableName;
         row.forEach(items => {
           items.forEach(item => {
-            if (item.attrMappingName === this.fzParam) {
+            if (item.labelKey === this.fzParam) {
               item.lableName = lableName === "IMMEDIATE" ? item.lableName : "";
               item.isShow = lableName === "IMMEDIATE" ? true : false;
-            } else if (item.attrMappingName === this.xzblPaeam) {
+            } else if (item.labelKey === this.xzblPaeam) {
               item.isShow =
                 lableName === "IMMEDIATE"
                   ? false
@@ -686,16 +661,16 @@ export default {
             this.$refs.tree.updateKeyChildren(this.aCheckedKeys[0], []);
           }
         }
-      } else if (col.attrMappingName === this.nameParam) {
+      } else if (col.labelKey === this.nameParam) {
         //更改树上显示值
         if (this.$refs.tree !== undefined) {
           this.$refs.tree.getCheckedNodes()[0].lableName = col.lableName;
         }
-      } else if (col.attrMappingName === this.xzblPaeam) {
+      } else if (col.labelKey === this.xzblPaeam) {
         for (let key in row) {
           //查找名称的一组数据
           let mcParam = row[key].find(item => {
-            return item.attrMappingName === this.xzblPaeam;
+            return item.labelKey === this.xzblPaeam;
           });
           if (mcParam) {
             //循环给名称中的ID struct赋值
@@ -781,11 +756,11 @@ export default {
       console.log("structType", strc);
       rows.forEach(cols => {
         cols.forEach(col => {
-          if (col.attrMappingName === this.nameParam) {
+          if (col.labelKey === this.nameParam) {
             name = col.lableName;
-          } else if (col.attrMappingName === this.bllxParam) {
+          } else if (col.labelKey === this.bllxParam) {
             id = col.lableName;
-          } else if (col.attrMappingName === this.numIndexParam) {
+          } else if (col.labelKey === this.numIndexParam) {
             numIndex = col.lableName;
           }
         });
@@ -910,14 +885,14 @@ export default {
         return;
       }
       let isx = col.lableName.includes("*");
-      if (item.attrMappingName === this.lengthParam) {
+      if (item.labelKey === this.lengthParam) {
         if (isx) {
           item.isShow = true;
         } else {
           item.lableName = "";
           item.isShow = false;
         }
-      } else if (item.attrMappingName === this.lbParam) {
+      } else if (item.labelKey === this.lbParam) {
         item.dataKey = [];
         // if (isx) {
         item.dataKey.push(
@@ -1000,11 +975,10 @@ export default {
           let treeParam = [];
           const { labelKey, attrs } = this.analysisMapping(deepClone(xml));
           treeParam.push(attrs);
+          //设置固定配置
+          this.setShowLableName(labelKey, attrs);
           let paramRemarks = "";
           for (let item of attrs) {
-            if (item.attrName == "name") {
-              this.nameParam = item.attrMappingName;
-            }
             if (item.attrName == "paramRemarks") {
               paramRemarks = item.lableName;
             }
@@ -1024,7 +998,7 @@ export default {
                 for (let key in attrs) {
                   //类别和data
                   if (
-                    attrs[key].attrMappingName === this.lbParam &&
+                    attrs[key].labelKey === this.lbParam &&
                     attrs[key].lableName === "DATA"
                   ) {
                     if (this.paramType === "input") {
@@ -1164,7 +1138,7 @@ export default {
         //处理树上所带参数
         child.nodeData.forEach(nodes => {
           nodes.forEach(node => {
-            if (node.attrMappingName === this.nameParam) {
+            if (node.labelKey === this.nameParam) {
               node.lableName = endKey;
             }
           });
@@ -1178,20 +1152,14 @@ export default {
           for (let key1 in parentArr) {
             for (let key2 in parentArr[key1]) {
               //设置名字"名称"
-              if (parentArr[key1][key2].attrMappingName === this.nameParam) {
+              if (parentArr[key1][key2].labelKey === this.nameParam) {
                 parent.lableName = parentArr[key1][key2].lableName = key;
-              } else if (
-                parentArr[key1][key2].attrMappingName === this.bllxParam
-              ) {
+              } else if (parentArr[key1][key2].labelKey === this.bllxParam) {
                 parentArr[key1][key2].lableName = parent.assigStructType;
-              } else if (
-                parentArr[key1][key2].attrMappingName === this.bllxParam
-              ) {
+              } else if (parentArr[key1][key2].labelKey === this.bllxParam) {
                 parentArr[key1][key2].lableName = parent.assigStructType;
-              } else if (parentArr[key1][key2].attrMappingName === "序号") {
-              } else if (
-                parentArr[key1][key2].attrMappingName === this.lbParam
-              ) {
+              } else if (parentArr[key1][key2].labelKey === "序号") {
+              } else if (parentArr[key1][key2].labelKey === this.lbParam) {
                 parentArr[key1][key2].lableName = "STRUCTTYPE";
               } else {
                 // parentArr[key1][key2].lableName = "";
@@ -1366,7 +1334,7 @@ export default {
     analysisSaveXmlParam(params) {
       params.nodeData.forEach(nodes => {
         nodes.forEach(item => {
-          if (item.attrMappingName === this.nameParam) {
+          if (item.labelKey === this.nameParam) {
             let dbId = nodes[1].lableName;
             item.lableName = params.assigParamName;
           }
@@ -1377,7 +1345,7 @@ export default {
     attributeAssignmen(tabParam, formParam, tabs, index) {
       formParam.forEach(form => {
         let param = tabs[index].find(item => {
-          return item.attrMappingName === form.attrMappingName;
+          return item.labelKey === form.labelKey;
         });
         if (param !== undefined) {
           tabParam.attributeMap[param.attrName] = param.lableName; // === undefined ? "" : param.lableName;
@@ -1387,9 +1355,7 @@ export default {
   },
 
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {
-
-  },
+  created() {},
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   beforeCreate() {}, //生命周期 - 创建之前
