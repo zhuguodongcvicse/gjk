@@ -106,6 +106,7 @@ function handleMessageFromParent(event) {
 		allInfList[i].ifShowInSelect = 0
 	}
 	infArr = event.data.params[1]
+  console.log("infArr", infArr)
 	chipArr = event.data.params[0]
 	boardArr = event.data.params[2]
 	calculateBoardLinkType = event.data.params[3]
@@ -115,7 +116,7 @@ function handleMessageFromParent(event) {
 			infOfChip.push(infArr[i])
 		}
 	} */
-	// console.log("chipArr", chipArr)
+	// console.log("calculateBoardIoType", calculateBoardIoType)
 	switch (event.data.cmd) {
 		case 'boarddesign':
 			//芯片json
@@ -740,7 +741,7 @@ function initEditor(editor) {
 					return
 				}
 				var currentElement = graph.getElement(evt.event);
-				 console.log("currentElement", node)
+				 // console.log("currentElement", node)
 				if (currentElement && currentElement.image === 'images/BeforeTheBoard.svg') {
 						node.host = currentElement;
 						node.zIndex = '500';
@@ -789,7 +790,6 @@ function initEditor(editor) {
 					evt.data.properties.ID = infIDNum++
 					backBoardInfList.push(evt.data.properties)
 				}
-
 				var slot = findSlot(data, evt);
 				if (slot) {
 					adaptBounds(data, slot);
@@ -909,7 +909,7 @@ function initEditor(editor) {
 
 	//自定义属性面板
 	propertySheet.getCustomPropertyDefinitions = function (data) {
-		//	console.log("data", data)
+			// console.log("data", data)
 		//	console.log("propertySheet", propertySheet)
 		var type = data.get('type');
 		var image = data.image;
@@ -945,12 +945,13 @@ function initEditor(editor) {
 					data.set('infName', data.properties.infName);
 					data.set('infRate', data.properties.infRate);
 					data.set('opticalNum', data.properties.opticalNum);
-					for (const i in calculateBoardIoType) {
-						if(calculateBoardIoType[i].value === data.properties.ioType) {
-							data.set('ioType', calculateBoardIoType[i].label);
-							break
-						}
-					}
+          // console.log("data.properties", data.properties)
+          for (const i in calculateBoardIoType) {
+            if (calculateBoardIoType[i].value === data.properties.ioType) {
+              data.set('ioType', calculateBoardIoType[i].label);
+              break
+            }
+          }
 				}
 				// console.log("data", data);
 			}
