@@ -291,7 +291,6 @@
               //删除逻辑
             
             }   
-            console.log(data)
           }
         });
        /*  items.push(Q.PopupMenu.Separator);
