@@ -134,7 +134,13 @@
                   :key="col.attrName"
                   v-if="col.isShow"
                 >
-                  <template slot-scope="{row}">{{row.attributeMap[col.attrName]}}</template>
+                  <!-- <template slot-scope="{row}">{{row.attributeMap[col.attrName]}}</template> -->
+                  <template slot-scope="{row}">
+                    <form-item-type
+                      v-model="row.attributeMap[col.attrName]"
+                      :lableType="col.attrConfigType"
+                    ></form-item-type>
+                  </template>
                 </el-table-column>
               </template>
             </el-table>
@@ -161,7 +167,13 @@
                       :key="col.attrName"
                       v-if="col.isShow"
                     >
-                      <template slot-scope="{row}">{{row.attributeMap[col.attrName]}}</template>
+                      <!-- <template slot-scope="{row}">{{row.attributeMap[col.attrName]}}</template> -->
+                      <template slot-scope="{row}">
+                        <form-item-type
+                          v-model="row.attributeMap[col.attrName]"
+                          :lableType="col.attrConfigType"
+                        ></form-item-type>
+                      </template>
                     </el-table-column>
                   </template>
                 </div>

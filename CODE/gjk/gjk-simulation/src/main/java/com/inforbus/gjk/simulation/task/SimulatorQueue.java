@@ -28,19 +28,16 @@ public class SimulatorQueue extends Thread {
     }
     @Override
     public void run() {
-    	int i = 1;
         while (flag) {
-        	
             //生成数据
             Jedis jedis = new Jedis(jedisHost);
             Map<String, Object> map = Maps.newHashMap();
             map.put("data",getData());
             map.put("frameNum",i++);
-            map.put("id",i%2==0?"symbol1":"sumbol2");
+            map.put("symbol","link1");
             String s = JSONUtil.toJsonStr(map);
             jedis.publish(channelName,s);
             jedis.close();
-            i++;
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {

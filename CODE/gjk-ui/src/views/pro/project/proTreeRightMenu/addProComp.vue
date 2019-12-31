@@ -140,7 +140,7 @@ export default {
                 this.addProCompForm.compSelectArray
               );
               this.dialogBeforeClose();
-              this.$message({
+              this.$notify({
                 message: "申请成功，请等候审批。",
                 type: "success"
               });

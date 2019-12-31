@@ -50,7 +50,7 @@
             <el-tooltip class="item" effect="dark" content="复制模板" placement="top">
               <el-button
                 type="success"
-                v-if="permissions.admin_basetemplate_copy"
+                v-if="permissions.admin_basetemplate_edit"
                 icon="el-icon-document-copy"
                 size="medium"
                 plain
@@ -73,13 +73,7 @@
       <!-- <add-comm :rowParam="rowParam"></add-comm> -->
     </basic-container>
     <!--新增基础模板的弹窗-->
-    <el-dialog
-      title="新增模板"
-      :visible.sync="isAddTemplate"
-      width="40%"
-      v-if="isAddTemplate"
-      :before-close="cancelAdd"
-    >
+    <el-dialog title="新增模板" :visible.sync="isAddTemplate" width="40%" v-if="isAddTemplate" :before-close="cancelAdd">
       <el-form label-width="80px" :model="BaseTemplate" :rules="rules" ref="BaseTemplate">
         <!--新增模板的名称,不可重复-->
         <el-form-item label="模板名称" prop="tempName">
@@ -131,13 +125,7 @@
       </span>
     </el-dialog>
     <!--编辑表格对话框-->
-    <el-dialog
-      title="编辑"
-      :visible.sync="isEidtTemplate"
-      width="50%"
-      v-if="isEidtTemplate"
-      :before-close="cancelEidt"
-    >
+    <el-dialog title="编辑" :visible.sync="isEidtTemplate" width="50%" v-if="isEidtTemplate" :before-close="cancelEidt">
       <el-form label-width="80px" :model="baseTemplateVO" :rules="eidtRules" ref="baseTemplateRef">
         <!--新增模板的名称,不可重复-->
         <el-form-item label="模板名称" prop="tempName">
@@ -223,23 +211,23 @@ export default {
         callback(
           "模板类型错误,模板类型1-32个字符,可包含汉字、字母、数字、—、_、()"
         );
-        ("/^[0-9a-zA-Z+-?()\u4e00-\u9fa5]+.[x|X][m|M][l|L]$/");
+       "/^[0-9a-zA-Z+-?()\u4e00-\u9fa5]+\.[x|X][m|M][l|L]$/"
       } else {
         callback();
       }
     };
     var validateFileName = (rule, value, callback) => {
-      if (
-        /^[0-9a-zA-Z+-?()-_ \u4e00-\u9fa5]+\.[x|X][m|M][l|L]$/.test(value) ==
-        false
-      ) {
-        callback("请选择不含特殊字符的xml文件");
+      if (/^[0-9a-zA-Z+-?()-_ \u4e00-\u9fa5]+\.[x|X][m|M][l|L]$/.test(value) == false) {
+        callback(
+          "请选择不含特殊字符的xml文件"
+        );
+       
       } else {
         callback();
       }
     };
     return {
-      localPath: "",
+      localPath:"",
       baseTemplateVO: {
         //模板对象
         tempName: "",
@@ -293,19 +281,16 @@ export default {
           { validator: validateTempName, trigger: "blur" }
         ],
         tempType: [
-          {
-            required: true,
-            message: "请选择或输入模板类型",
-            trigger: "change"
-          },
+          { required: true, message: "请选择或输入模板类型", trigger: "change" },
           { validator: validateTempType, trigger: "change" }
         ],
         fileName: [
           { required: true, message: "请选择模板文件", trigger: "change" },
           { validator: validateFileName, trigger: "change" }
         ],
-        remarks: [
-          { required: true, message: "请填写备注信息", trigger: "blur" }
+         remarks: [
+          { required: true, message: "请填写备注信息", trigger: "blur" },
+      
         ]
         // tempVersion: [
         //   { required: true, message: "请输入版本号", trigger: "blur" }
@@ -317,13 +302,9 @@ export default {
           { validator: validateTempName, trigger: "blur" }
         ],
         tempType: [
-          {
-            required: true,
-            message: "请选择或输入模板类型",
-            trigger: "change"
-          },
+          { required: true, message: "请选择或输入模板类型", trigger: "change" },
           { validator: validateTempType, trigger: "change" }
-        ]
+        ],
       },
       rowParam: {
         commVisible: false
@@ -344,13 +325,13 @@ export default {
   },
   created() {
     this.getList();
-    getLocalPath().then(res => {
+    getLocalPath().then(res=>{
       this.localPath = res.data.data;
-    });
+    })
   },
   mounted: function() {},
   computed: {
-    ...mapGetters(["permissions","userInfo"])
+    ...mapGetters(["permissions"])
   },
   methods: {
     getList() {
@@ -445,7 +426,7 @@ export default {
     //上传模板文件方法
     UploadImage(param) {
       //发送请求至后台接口上传文件
-      getUploadFilesUrl(param,this.userInfo).then(res => {
+      getUploadFilesUrl(param).then(res => {
         /* 给文本框赋值 */
         var filePath = res.data.data;
         this.BaseTemplate.baseTemplatePath = filePath; //获取上传后的文件的路径
@@ -475,16 +456,10 @@ export default {
         })
         .then(data => {
           _this.tableData.splice(index, 1);
-          // _this.$message({
-          //   showClose: true,
-          //   message: "删除成功",
-          //   type: "success"
-          // });
-          _this.$notify({
-            title: "成功",
+          _this.$message({
+            showClose: true,
             message: "删除成功",
-            type: "success",
-            duration: 2000
+            type: "success"
           });
         })
         .catch(function(err) {});
@@ -503,16 +478,10 @@ export default {
           putObj(this.baseTemplateVO).then(res => {
             //this.tableData.splice(index, 1, Object.assign({}, row)); //删除数组中指定索引的数据
             if (res.data.data) {
-              // this.$message({
-              //   showClose: true,
-              //   message: res.data.msg,
-              //   type: "success"
-              // });
-              this.$notify({
-                title: "成功",
+              this.$message({
+                showClose: true,
                 message: res.data.msg,
-                type: "success",
-                duration: 2000
+                type: "success"
               });
             } else {
               this.$message.error(res.data.msg);
@@ -553,16 +522,10 @@ export default {
     handleSave: function(row, done) {
       addObj(row).then(data => {
         this.tableData.push(Object.assign({}, row));
-        // this.$message({
-        //   showClose: true,
-        //   message: "添加成功",
-        //   type: "success"
-        // });
-        this.$notify({
-          title: "成功",
+        this.$message({
+          showClose: true,
           message: "添加成功",
-          type: "success",
-          duration: 2000
+          type: "success"
         });
         done();
       });
@@ -601,21 +564,15 @@ export default {
             Vue.set(BaseTemplateBTO, "baseTemplate", row);
             Vue.set(BaseTemplateBTO, "xmlEntityMap", XmlEntityMap);
             addObj(BaseTemplateBTO).then(repsonse => {
-              this.$notify({
-                title: "成功",
-                message: "复制成功",
-                type: "success",
-                duration: 2000
-              });
               this.refreshChange();
             });
           }
         });
       });
     },
-    cancelAdd() {
+    cancelAdd(){
       //this.BaseTemplate = {};
-      (this.BaseTemplate = {
+      this.BaseTemplate =  {
         //模板对象
         tempName: "",
         tempType: "",
@@ -623,11 +580,11 @@ export default {
         remarks: "",
         fileName: "",
         baseTemplatePath: ""
-      }),
-        (this.isAddTemplate = false);
+      },
+      this.isAddTemplate = false;
       this.refreshChange();
     },
-    cancelEidt() {
+    cancelEidt(){
       this.isEidtTemplate = false;
       //this.reload();
       this.refreshChange();

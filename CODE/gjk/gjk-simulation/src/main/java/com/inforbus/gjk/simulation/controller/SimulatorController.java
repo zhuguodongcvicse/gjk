@@ -39,7 +39,7 @@ public class SimulatorController {
 	}
 
 	@PostMapping("/getDataSource/{username}")
-	public R getDataSource(@PathVariable("username") String username,@RequestBody SimulationDTO simulationDTO){
+	public R getDataSource(@PathVariable("username") String username, @RequestBody SimulationDTO simulationDTO){
 		return new R<>(simulatorService.getDataSource(username,simulationDTO));
 	}
 
@@ -56,7 +56,7 @@ public class SimulatorController {
 	@PostMapping("/stop/{username}")
 	public R stop(@PathVariable("username") String username,@RequestBody Object obj){
 		Map parse = JSON.parseObject(JSONUtil.toJsonStr(obj));
-		return new R<>(simulatorService.stop(username,(List<String>) parse.get("symbols")));
+		return new R<>(simulatorService.suspend(username,(List<String>) parse.get("symbols")));
 	}
 }
 

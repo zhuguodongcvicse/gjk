@@ -55,9 +55,9 @@
                   </el-select>
                 </el-form-item>
                 <el-form-item label="数据处理类型:">
-                  <el-select placeholder="请选择" v-model="formData.dataCLType">
+                  <el-select placeholder="请选择" v-model="formData.symbol">
                     <el-option
-                      v-for="(attribute,index) in dataCLType"
+                      v-for="(attribute,index) in datasource"
                       :key="index"
                       :label="attribute.label"
                       :value="attribute.value"></el-option>
@@ -95,7 +95,7 @@
             <div style="padding: 3px;height: 30px; width: 30%; margin:auto">
               <span style="margin: auto;font-weight: bold;font-size: 16px;">结构体数据</span>
             </div>
-            <el-table border max-height="100%" :data="tableData1">
+            <el-table border max-height="100%" :data="tableData">
               <el-table-column type="index" width="50px" label="序号"></el-table-column>
               <el-table-column label="名称" prop="name"></el-table-column>
               <el-table-column label="值" prop="value"></el-table-column>
@@ -106,7 +106,7 @@
             <div style="padding: 3px;height: 30px; width: 30%; margin:auto">
               <span style="font-weight: bold;font-size: 16px;">结构体数据</span>
             </div>
-            <el-table border max-height="100%" :data="tableData2">
+            <el-table border max-height="100%" :data="tableData">
               <el-table-column type="index" width="50px" label="序号"></el-table-column>
               <el-table-column label="名称" prop="name"></el-table-column>
               <el-table-column label="值" prop="value"></el-table-column>
@@ -151,7 +151,6 @@ export default {
         attr3: "",
         select: ""
       },
-      dataCLType: [],
       selectData:[{label:"展示区域一", value: "myChart"},{label:"展示区域二", value: "myChart1"}  ],
       msg: "Welcome to Your Vue.js App",
       simulationData: {
@@ -167,8 +166,7 @@ export default {
       myCharts1SelectData: [{label: '178',value: '178'}],
       myChartsSelectValue: '',
       myCharts1SelectValue: '',
-      tableData1: [],
-      tableData2: [],
+      tableData: [],
       datasource:[],
       tableHeight: "100%",//表格显示区域固定高度
       myCharts: null,//定时器执行次数变量
@@ -216,7 +214,7 @@ export default {
         if(this.flag){
           return;
         }
-        this.tableData1 = response.data.data.tableData
+        this.tableData = [{name:"test1",value: "test1",remark: "test1"},{name: "test2",value: "test2",remark: "test1"}]
         let self = this;
         if (self && !self._isDestroyed) {//循环发送请求解决路由页面依旧发请求问题
           this.myCharts = setTimeout(() => {
@@ -224,84 +222,11 @@ export default {
           }, 1);
         }
         this.simulationData = response.data.data;
-        var option = {
-          title: {
-            text: data.symbol+"仿真监测",
-            x: "center"
-          },
-
-          tooltip: {
-            trigger: "axis",
-            axisPointer: {
-              animation: false
-            }
-          },
-          legend: {
-            data: ["仿真曲线"],
-            x: "left"
-          },
-          axisPointer: {
-            link: { xAxisIndex: "all" }
-          },
-          dataZoom: [
-            {
-              show: true,
-              realtime: true,
-              start: 30,
-              end: 31 //,
-              //xAxisIndex: [0, 1]
-            },
-            {
-              type: "inside",
-              realtime: true,
-              start: 30,
-              end: 31 //,
-              //xAxisIndex: [0, 1]
-            }
-          ],
-          grid: [
-            {
-              left: 50,
-              right: 50,
-              height: "67%"
-            }
-            // , {
-            //     left: 50,
-            //     right: 50,
-            //     top: '55%',
-            //     height: '35%'
-            // }
-          ],
-          xAxis: [
-            {
-              name: "数据",
-              type: "category",
-              boundaryGap: false,
-              // axisLine: {onZero: true},
-              data: this.simulationData.xaxisData
-            }
-          ],
-          yAxis: [
-            {
-              name: "数据流量",
-              type: "value",
-              max: 500
-            }
-          ],
-          series: [
-            {
-              name: "仿真曲线",
-              type: "line",
-              symbolSize: 8,
-              hoverAnimation: false,
-              data: this.simulationData.yaxisData
-            }
-          ]
-        };
+        var data = {"symol": data.symol,"xaxisData": response.data.data.xaxisData, "yaxisData": response.data.data.yaxisData}
         // 基于准备好的dom，初始化echarts实例
         let myChart = this.$echarts.init(document.getElementById("myChart"));
         // 绘制图表
-        myChart.setOption(option);
+        myChart.setOption(this.getOption(data));
       });
     },
     drawLine2(data) {
@@ -310,7 +235,6 @@ export default {
         if(this.flag){
           return;
         }
-        this.tableData2 = response.data.data.tableData
         let self = this;
         if (self && !self._isDestroyed) {//循环发送请求解决路由页面依旧发请求问题
           this.myCharts1 = setTimeout(() => {
@@ -318,85 +242,89 @@ export default {
           }, 1);
         }
         this.simulationData = response.data.data;
-        var option = {
-          title: {
-            text: data.symbol+"仿真监测",
-            x: "center"
-          },
-
-          tooltip: {
-            trigger: "axis",
-            axisPointer: {
-              animation: false
-            }
-          },
-          legend: {
-            data: ["仿真曲线"],
-            x: "left"
-          },
-          axisPointer: {
-            link: { xAxisIndex: "all" }
-          },
-          dataZoom: [
-            {
-              show: true,
-              realtime: true,
-              start: 30,
-              end: 31 //,
-              //xAxisIndex: [0, 1]
-            },
-            {
-              type: "inside",
-              realtime: true,
-              start: 30,
-              end: 31 //,
-              //xAxisIndex: [0, 1]
-            }
-          ],
-          grid: [
-            {
-              left: 50,
-              right: 50,
-              height: "67%"
-            }
-            // , {
-            //     left: 50,
-            //     right: 50,
-            //     top: '55%',
-            //     height: '35%'
-            // }
-          ],
-          xAxis: [
-            {
-              name: "数据",
-              type: "category",
-              boundaryGap: true,
-              // axisLine: {onZero: true},
-              data: this.simulationData.xaxisData
-            }
-          ],
-          yAxis: [
-            {
-              name: "数据流量",
-              type: "value",
-              max: 500
-            }
-          ],
-          series: [
-            {
-              name: "仿真曲线",
-              type: "line",
-              symbolSize: 8,
-              hoverAnimation: false,
-              data: this.simulationData.yaxisData
-            }
-          ]
-        };
+        var data = {"symol": data.symol,"xaxisData": response.data.data.xaxisData, "yaxisData": response.data.data.yaxisData}
         // 基于准备好的dom，初始化echarts实例
         let myChart = this.$echarts.init(document.getElementById("myChart1"));
         // 绘制图表
-        myChart.setOption(option);
+        myChart.setOption(this.getOption(data));
       });
+    },
+    getOption(data){
+        var option = {
+            title: {
+                text: data.symbol+"仿真监测",
+                x: "center"
+            },
+
+            tooltip: {
+                trigger: "axis",
+                axisPointer: {
+                    animation: false
+                }
+            },
+            legend: {
+                data: ["仿真曲线"],
+                x: "left"
+            },
+            axisPointer: {
+                link: { xAxisIndex: "all" }
+            },
+            dataZoom: [
+                {
+                    show: true,
+                    realtime: true,
+                    start: 30,
+                    end: 31 //,
+                    //xAxisIndex: [0, 1]
+                },
+                {
+                    type: "inside",
+                    realtime: true,
+                    start: 30,
+                    end: 31 //,
+                    //xAxisIndex: [0, 1]
+                }
+            ],
+            grid: [
+                {
+                    left: 50,
+                    right: 50,
+                    height: "67%"
+                }
+                // , {
+                //     left: 50,
+                //     right: 50,
+                //     top: '55%',
+                //     height: '35%'
+                // }
+            ],
+            xAxis: [
+                {
+                    name: "数据",
+                    type: "category",
+                    boundaryGap: true,
+                    // axisLine: {onZero: true},
+                    data: data.xaxisData
+                }
+            ],
+            yAxis: [
+                {
+                    name: "数据流量",
+                    type: "value",
+                    max: 500
+                }
+            ],
+            series: [
+                {
+                    name: "仿真曲线",
+                    type: "line",
+                    symbolSize: 8,
+                    hoverAnimation: false,
+                    data: data.yaxisData
+                }
+            ]
+        };
+        return option;
     },
     start(){
         if(this.myChartsFormData!=undefined){
@@ -423,7 +351,7 @@ export default {
     },
     getDataSource(flowFilePath, startId, endId){
       var simulationDto = {"flowFilePath":flowFilePath,"startId":startId, "endId":endId}
-      getDataSource(this.userInfo.username,simulationDto).then(req=>{
+      getDataSource(simulationDto).then(req=>{
         for (let i = 0; i < req.data.data.length; i++) {
           const element = req.data.data[i];
           var data = {

@@ -6,7 +6,6 @@
         :data="list"
         ref="crud"
         :page="page"
-        v-model="form"
         :table-loading="listLoading"
         :before-open="handleOpenBefore"
         @on-load="getList"
@@ -15,6 +14,7 @@
         @row-update="update"
         @row-save="create"
       >
+<!--        v-model="form"-->
         <template slot="menuLeft">
           <el-button
             icon="el-icon-plus"
@@ -170,7 +170,6 @@ export default {
         })
         .then(response => {
           this.treeData = response.data.data;
-          console.log(response);
           // 解析出所有的太监节点
           this.checkedKeys = this.resolveAllEunuchNodeId(
             this.treeData,
@@ -246,7 +245,7 @@ export default {
       });
     },
     create(row, done, loading) {
-      addObj(this.form)
+      addObj(row)
         .then(() => {
           this.getList(this.page);
           done();
@@ -262,7 +261,7 @@ export default {
         });
     },
     update(row, index, done, loading) {
-      putObj(this.form)
+      putObj(row)
         .then(() => {
           this.getList(this.page);
           done();
@@ -288,7 +287,7 @@ export default {
         this.dialogPermissionVisible = false;
         fetchMenuTree()
           .then(response => {
-            this.form = response.data.data;
+              // this.form = response.data.data;
             return fetchRoleTree(roleId);
           })
           .then(response => {

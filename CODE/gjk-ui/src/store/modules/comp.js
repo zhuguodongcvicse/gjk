@@ -12,7 +12,7 @@ const comp = {
         allBaseTemplate: getStore({ name: 'allBaseTemplate' }) || [],
         fileListOfComponent: getStore({ name: 'fileListOfComponent' }) || [],
         currentIODate: getStore({ name: 'currentIODate' }) || [],
-        cacheHeaderValueParams: getStore({ name: 'cacheHeaderValueParams' }) || {},
+        cacheHeaderValueParams:getStore({ name: 'cacheHeaderValueParams' }) || {},
     },
     actions: {
         //保存头文件值
@@ -59,34 +59,34 @@ const comp = {
             })
         },
         setAllBaseTemplate({ commit }, allBaseTemplate) {
-            return new Promise((resolve, reject) => {
-                try {
-                    commit('SET_ALLBASETEMPLATE', allBaseTemplate);
-                    resolve();
-                } catch (e) {
-                    reject(e)
-                }
-            })
+          return new Promise((resolve, reject) => {
+            try {
+              commit('SET_ALLBASETEMPLATE', allBaseTemplate);
+              resolve();
+            } catch (e) {
+              reject(e)
+            }
+          })
         },
         saveCurrentIODate({ commit }, currentIODate) {
-            return new Promise((resolve, reject) => {
-                try {
-                    commit('SET_CURRENTIODATE', currentIODate);
-                    resolve();
-                } catch (e) {
-                    reject(e)
-                }
-            })
+          return new Promise((resolve, reject) => {
+            try {
+              commit('SET_CURRENTIODATE', currentIODate);
+              resolve();
+            } catch (e) {
+              reject(e)
+            }
+          })
         },
         setFileListOfComponent({ commit }, fileListOfComponent) {
-            return new Promise((resolve, reject) => {
-                try {
-                    commit('SET_FILELISTOFCOMPONENT', fileListOfComponent);
-                    resolve();
-                } catch (e) {
-                    reject(e)
-                }
-            })
+          return new Promise((resolve, reject) => {
+            try {
+              commit('SET_FILELISTOFCOMPONENT', fileListOfComponent);
+              resolve();
+            } catch (e) {
+              reject(e)
+            }
+          })
         },
         setChineseMapping({ commit }, param) {
             return new Promise((resolve, reject) => {
@@ -115,7 +115,7 @@ const comp = {
         },
     },
     mutations: {
-        SET_CACHEHEADERVALUEPARAMS: (state, headerValue) => {
+        SET_CACHEHEADERVALUEPARAMS:(state,headerValue)=>{
             state.cacheHeaderValueParams = headerValue
             setStore({
                 name: 'cacheHeaderValueParams',
@@ -124,7 +124,6 @@ const comp = {
             })
         },
         SET_SAVEXMLMAPS: (state, xmlMaps) => {
-            state.saveXmlMaps = {}
             state.saveXmlMaps = xmlMaps
             setStore({
                 name: 'saveXmlMaps',
@@ -133,28 +132,28 @@ const comp = {
             })
         },
         SET_ALLBASETEMPLATE: (state, allBaseTemplate) => {
-            state.allBaseTemplate = allBaseTemplate
-            setStore({
-                name: 'allBaseTemplate',
-                content: state.allBaseTemplate,
-                type: "session"
-            })
+          state.allBaseTemplate = allBaseTemplate
+          setStore({
+            name: 'allBaseTemplate',
+            content: state.allBaseTemplate,
+            type: "session"
+          })
         },
         SET_CURRENTIODATE: (state, currentIODate) => {
-            state.currentIODate = currentIODate
-            setStore({
-                name: 'currentIODate',
-                content: state.currentIODate,
-                type: "session"
-            })
+          state.currentIODate = currentIODate
+          setStore({
+            name: 'currentIODate',
+            content: state.currentIODate,
+            type: "session"
+          })
         },
         SET_FILELISTOFCOMPONENT: (state, fileListOfComponent) => {
-            state.fileListOfComponent = fileListOfComponent
-            setStore({
-                name: 'fileListOfComponent',
-                content: state.fileListOfComponent,
-                type: "session"
-            })
+          state.fileListOfComponent = fileListOfComponent
+          setStore({
+            name: 'fileListOfComponent',
+            content: state.fileListOfComponent,
+            type: "session"
+          })
         },
         SET_CHINESEMAPPING: (state, param) => {
             state.compChineseMapping = param

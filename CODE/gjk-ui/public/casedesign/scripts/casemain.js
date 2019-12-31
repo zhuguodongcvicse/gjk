@@ -192,7 +192,7 @@ function ondropLoadJSON(evt, graph, center, options) {
         //给芯片的唯一标识拼接上板卡的唯一标识
         jsonObj.datas[i].json.properties.uniqueId = uuidRandom + '_' + jsonObj.datas[i].json.properties.uniqueId
       }
-
+    
     }
     // console.log("jsonObj",jsonObj)
     //在自定义数据中添加唯一表示

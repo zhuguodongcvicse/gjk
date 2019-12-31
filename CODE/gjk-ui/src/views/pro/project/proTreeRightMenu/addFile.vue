@@ -89,7 +89,7 @@ export default {
           uploadFile(FilePathDTO)
             .then(res => {
               if (res.data.data) {
-                this.$message({
+                this.$notify({
                   message: "文件增加成功",
                   type: "success"
                 });

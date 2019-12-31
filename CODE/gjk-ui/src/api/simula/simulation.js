@@ -1,9 +1,9 @@
 import request from '@/router/axios'
 
 
-export function getDataSource(username,query) {
+export function getDataSource(query) {
   return request({
-    url: '/simula/simulation/getDataSource/'+username,
+    url: '/simula/simulation/getDataSource',
     method: 'post',
     data: query
   })

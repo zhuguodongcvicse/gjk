@@ -348,7 +348,7 @@ export default {
           Vue.set(node, "isComplie", true);
           this.appComponentId = node.id;
         } else if (node.parentId == this.appComponentId) {
-          if (node.label == "bsp" || node.label == "Image" || node.label == ".sonar") {
+          if (node.label == "bsp" || node.label == "Image") {
             Vue.set(node, "isComplie", false);
           } else {
             Vue.set(node, "isComplie", true);
@@ -439,13 +439,7 @@ export default {
                   //   this.fileData.fileName + "===@@@===" + val.data.data
                   // );
                   //this.$store.dispatch("saveTextLog",val.data.data)
-                  //     this.$notify({
-                  //   title: "成功",
-                  //   message: val.data.data,
-                  //   type: "success",
-                  //   duration: 2000
-                  // });
-                  this.$message({
+                  this.$notify({
                     message: val.data.data
                   });
                 });
@@ -479,13 +473,7 @@ export default {
               // this.$store.dispatch("saveTextLog",val.data.data)
               console.log("响应了");
               //this.connect();
-              // this.$notify({
-              //   title: "成功",
-              //   message: val.data.data,
-              //   type: "success",
-              //   duration: 2000
-              // });
-              this.$message({
+              this.$notify({
                 message: val.data.data
               });
             });
@@ -834,7 +822,7 @@ export default {
       };
       updateBaseTemplateIDs(project).then(res => {
         if (res.data.data) {
-          this.$message({
+          this.$notify({
             message: "修改模板成功",
             type: "success"
           });
@@ -911,7 +899,7 @@ export default {
                 "上传的压缩包内容错误，请重新选择文件上传。"
               );
             } else {
-              this.$message.success("导入成功。");
+              this.$notify.success("导入成功。");
               this.getProjects();
               this.closeImportProjectDialog();
             }

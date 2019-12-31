@@ -5,7 +5,7 @@
       var bounds = new Q.Rect(window.pageXOffset, window.pageYOffset, body.clientWidth - 2, body.clientHeight - 2);
       var width = div.offsetWidth;
       var height = div.offsetHeight;
-
+  
       if (x + width > bounds.x + bounds.width) {
         x = bounds.x + bounds.width - width;
       }
@@ -21,7 +21,7 @@
       div.style.left = x + 'px';
       div.style.top = y + 'px';
     }
-
+  
     function isDescendant(parent, child) {
       var node = child.parentNode;
       while (node != null) {
@@ -32,14 +32,14 @@
       }
       return false;
     }
-
+  
     var PopupMenu = function (items) {
       this.items = items || [];
     }
-
+  
     var menuClassName = 'dropdown-menu';
     PopupMenu.Separator = 'divider';
-
+  
     PopupMenu.prototype = {
       dom: null,
       _invalidateFlag: true,
@@ -76,7 +76,7 @@
           this.dom.setAttribute("role", "menu");
           this.dom.className = menuClassName;
           var startEventName = Q.isTouchSupport ? "touchstart" : "mousedown";
-
+  
           if (!this.stopEditWhenClickOnWindow) {
             this.stopEditWhenClickOnWindow = function (evt) {
               if (this.isShowing() && !isDescendant(this.dom, evt.target)) {
@@ -123,7 +123,7 @@
         a.setAttribute("tabindex", "-1");
         a.setAttribute("href", "javascript:void(0)");
         dom.appendChild(a);
-
+  
         if (menuItem.html) {
           a.innerHTML = menuItem.html;
         } else {
@@ -138,7 +138,7 @@
         }
         var call = menuItem.action;
         var self = this;
-
+  
         var onclick = function (evt) {
           if (call) {
             call.call(menuItem.scope, evt, menuItem);
@@ -171,7 +171,7 @@
           var isGroup = data instanceof Q.Group;
           var isNode = !isShapeNode && data instanceof Q.Node;
           var isEdge = data instanceof Q.Edge;
-
+  
    /*        items.push({
             text: getI18NString('Rename'), action: function (evt, item) {
               Q.prompt(getI18NString('Input Element Name'), data.name || '', function (name) {
@@ -246,7 +246,7 @@
           }
         }) */
      //   items.push(Q.PopupMenu.Separator);
-
+  
         items.push({
           text: getI18NString('Zoom In'), action: function (evt, item) {
             var localXY = graph.globalToLocal(evt);
@@ -286,12 +286,11 @@
             if(data.image === 'images/BeforeTheBoard.svg' || data.image === 'images/AfterTheBoard.svg' || data.name == ' '){
               graph.removeElement(data);
               //删除逻辑
-              console.log("data",data)
-            }
-
+            }   
+          
           }
         });
-
+   
         return items;
       }
     }
@@ -306,7 +305,7 @@
         }
       }
     });
-
+  
     var _contextmenuListener = {
       onstart: function (evt, graph) {
         graph._popupmenu.hide();
@@ -318,20 +317,20 @@
       }
       return {x: evt.pageX, y: evt.pageY};
     }
-
+  
     function showMenu(evt, graph) {
       var menu = graph.popupmenu;
       var xy = getPageXY(evt);
       var x = xy.x, y = xy.y;
-
+  
       var items = menu.getMenuItems(graph, graph.getElement(evt), evt);
-
+  
       if(!items){
         return;
       }
       menu.items = items;
       menu.showAt(x, y);
-
+  
       Q.stopEvent(evt);
     }
     if(Q.isTouchSupport){
@@ -339,7 +338,7 @@
         showMenu(evt, graph);
       }
     }
-
+  
     Object.defineProperties(Q.Graph.prototype, {
       popupmenu: {
         get: function(){
@@ -350,7 +349,7 @@
             return;
           }
           this._popupmenu = v;
-
+  
           if(!this._contextmenuListener){
             this._contextmenuListener = _contextmenuListener;
             this.addCustomInteraction(this._contextmenuListener);
@@ -366,3 +365,4 @@
     });
     Q.PopupMenu = PopupMenu;
   })(Q, jQuery);
+  

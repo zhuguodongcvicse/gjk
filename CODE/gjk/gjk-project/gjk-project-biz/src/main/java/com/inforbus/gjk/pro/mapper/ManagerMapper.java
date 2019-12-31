@@ -468,12 +468,11 @@ public interface ManagerMapper extends BaseMapper<ProjectFile> {
 	 * @return
 	 */
 	int updateHardwarelibById(@Param("hardware") Hardwarelibs hardware);
-	
+
 	/**
 	 * 得到子结构体数据，根据id集合
 	 * @param parentIdList
 	 * @return
 	 */
 	List<Structlibs> getStructlibsByParentIdList(@Param("parentIdList") List<String> parentIdList);
-
 }

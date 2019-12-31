@@ -23,7 +23,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.inforbus.gjk.common.core.entity.CompStruct;
 import com.inforbus.gjk.common.core.entity.Structlibs;
-import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.libs.api.dto.CompTree;
 import com.inforbus.gjk.libs.api.entity.CommonComponent;
@@ -66,6 +65,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -78,7 +78,8 @@ import org.springframework.stereotype.Service;
 public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMapper, CommonComponent>
 		implements CommonComponentService {
 
-	private static final String gitFilePath = JGitUtil.getLOCAL_REPO_PATH();
+	@Value("${git.local.path}")
+	private String gitFilePath;
 
 	@Autowired
 	private StructlibsMapper structlibsMapper;

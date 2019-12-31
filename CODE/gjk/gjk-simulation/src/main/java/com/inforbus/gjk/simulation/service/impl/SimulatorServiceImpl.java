@@ -25,16 +25,26 @@ import java.util.Set;
 
 /**
  * 仿真业务实现
+ * @Auth l_tf
  */
 @Service
 public class SimulatorServiceImpl implements SimulatorService {
 
+    /**
+     * redis连接工具模板
+     */
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
+    /**
+     * reidsIP
+     */
     @Value("${simulation.jedisHost}")
     private String host;
 
+    /**
+     * 队列长度
+     */
     @Value("${simulation.queueSize}")
     private String queueSize;
 
@@ -51,25 +61,20 @@ public class SimulatorServiceImpl implements SimulatorService {
         subscriber.setRedisTemplate(redisTemplate);
         //启动监听线程
         new SubscriberThread(subscriber,channelName,host).start();
-//        //启用客户线程，传入参数
-//        MoniRecvDataThread startMoniRecvDataThread = ExternalIOTransUtils.startMoniRecvDataThread(host, channelName, componentLinks, filePath, JGitUtil.getCTRL_TAB_FILE_PATH());
-//        Global.USERS_SIMULATOR_THREAD.put(username,startMoniRecvDataThread);
-        //模拟数据
-        SimulatorQueue simulatorQueue = new SimulatorQueue(host, channelName);
-        simulatorQueue.start();
-        Global.USERS_SIMULATOR_THREAD.put(username, simulatorQueue);
+        //启用客户线程，传入参数
+        MoniRecvDataThread startMoniRecvDataThread = ExternalIOTransUtils.startMoniRecvDataThread(host, channelName, componentLinks, filePath, JGitUtil.getCTRL_TAB_FILE_PATH());
         //放入全局变量
+        Global.USERS_SIMULATOR_THREAD.put(username,startMoniRecvDataThread);
         return true;
     }
 
     @Override
     public boolean stopSimulator(String username) {
-    	SimulatorQueue simulatorQueues = (SimulatorQueue) Global.USERS_SIMULATOR_THREAD.get(username);
-        if(simulatorQueues == null){
+        MoniRecvDataThread moniRecvDataThread = (MoniRecvDataThread) Global.USERS_SIMULATOR_THREAD.get(username);
+        if(moniRecvDataThread == null){
             return false;
         }
-//        ExternalIOTransUtils.stopMoniRecvDataThread(simulatorQueues);
-        simulatorQueues.close();
+        ExternalIOTransUtils.stopMoniRecvDataThread(moniRecvDataThread);
         Global.USERS_SIMULATOR_THREAD.remove(username);
         Set<String> keys = redisTemplate.keys("Simulator:" + username + ":*");
         for (String key : keys) {
@@ -84,39 +89,32 @@ public class SimulatorServiceImpl implements SimulatorService {
 
     @Override
     public Map<String,Object> getData(String username, SimulationDTO simulationDTO) {
-        //修改初始化状态
+        //修改队列初始化状态
         redisTemplate.opsForValue().set(username+":initState:"+simulationDTO.getSymbol(),"1");
+        //拼接队列key
         String key = "Simulator:" + username+ ":" + simulationDTO.getSymbol();
+        //从队列右侧弹出一个元素
         String str = redisTemplate.opsForList().rightPop(key);
-        //调用客户接口解析
+
         JSONObject objects = JSONUtil.parseObj(str);
-        List<Object> data = (List<Object>) objects.get("data");
-        if(data==null || data.isEmpty()){
-            return null;
-        }
-//        String[] tabNames = ((String) objects.get("tabNameList")).split("\\|");
+
+        //获取结构体表格数据
+        String[] tabNames = ((String) objects.get("tabNameList")).split("\\|");
         List<SimulationTableDataDTO> tableData = Lists.newArrayList();
-//        tableData.addAll(tableDataMaptoList((Map)objects.get(tabNames[0])));
-//        tableData.addAll(tableDataMaptoList((Map)objects.get(tabNames[1])));
-        //模拟结构体数据
-        tableData.addAll(tableDataMaptoList(null));
-        Map<String, Object> req = Maps.newHashMap();
-        req.put("tableData", tableData);
-        
-        List<String> xaxisData = Lists.newArrayList();
-        List<String> yaxisData = Lists.newArrayList();
-        for (int i = 0; i < data.size(); i++) {
-            xaxisData.add((i+1)+"");
-            yaxisData.add(data.get(i)+"");
-        }
-        req.put("xaxisData", xaxisData);
-        req.put("yaxisData", yaxisData);
-        req.put("select",simulationDTO.getSelect());
-        return req;
+        //解析表格数据，得到表格对象集合
+        tableData.addAll(forEachGetSimulationTableData((Map) objects.get(tabNames[0])));
+        tableData.addAll(forEachGetSimulationTableData((Map) objects.get(tabNames[1])));
+
+        //调用客户接口解析 接口待确认 把这组数据扔到接口拿返回值就OK
+
+        Map<String, Object> dataMap = Maps.newHashMap();
+        //表格数据
+        dataMap.put("tableData", tableData);
+        return dataMap;
     }
 
     @Override
-    public Map<String, List<String>> stop(String username,List<String> symbols) {
+    public Map<String, List<String>> suspend(String username,List<String> symbols) {
         ListOperations<String, String> operations = redisTemplate.opsForList();
         Map<String, List<String>> symbolFrameSelect = Maps.newHashMap();
         List<String> selectData = Lists.newArrayList();
@@ -134,44 +132,31 @@ public class SimulatorServiceImpl implements SimulatorService {
     }
 
     @Override
-    public List<String> getDataSource(String username,SimulationDTO simulationDto) {
-//    	MoniRecvDataThread thread = (MoniRecvDataThread)Global.USERS_SIMULATOR_THREAD.get(username);
-//        //调用用户接口
-//        return thread.getArrowIdList(simulationDto.getStartId()+"|"+simulationDto.getEndId());
-    	
-    	return this.getSymbol(simulationDto.getFlowFilePath(), simulationDto.getStartId()+"|"+simulationDto.getEndId());
+    public List<String> getDataSource(String username, SimulationDTO simulationDto) {
+
+        MoniRecvDataThread moniRecvDataThread = (MoniRecvDataThread) Global.USERS_SIMULATOR_THREAD.get(username);
+        //调用客户接口 获取数据源
+        return moniRecvDataThread.getArrowIdList(simulationDto.getStartId() + "|" + simulationDto.getEndId());
     }
 
-    public List<SimulationTableDataDTO> tableDataMaptoList(Map<String, String> tabNameDataMap){
-    	List<SimulationTableDataDTO> simulationDTOs = Lists.newArrayList();
-    	SimulationTableDataDTO simulationTableDTO = null;
-//    	for (String key : tabNameDataMap.keySet()) {
-//    		simulationTableDTO = new SimulationTableDataDTO();
-//          simulationTableDTO.setName(key);
-//          String[] split = tabNameDataMap.get(key).split("\\|");
-//          simulationTableDTO.setValue(split.length > 0?split[0]:"");
-//          simulationTableDTO.setRemark(split.length == 2 ? split[1]: "");
-//          simulationDTOs.add(simulationTableDTO);
-//		}
-    	
-    	String [] strs = {"iC","fC","dC","strC","stC"};
-    	//模拟结构体数据
-    	for (int i = 0; i < 5; i++) {
-    		simulationTableDTO = new SimulationTableDataDTO();
-          simulationTableDTO.setName(strs[i]);
-          simulationTableDTO.setValue((int)(Math.random()*100)+"");
-          simulationTableDTO.setRemark("无");
-          simulationDTOs.add(simulationTableDTO);
-		}
-		return simulationDTOs;
-    }
-    
-    public List<String> getSymbol(String filePath, String componentIds){
-
-        List<String> list = Lists.newArrayList();
-        list.add("symbol1");
-        list.add("symbol2");
-        return list;
-
+    /**
+     * 解析表格Map
+     * @param tableDataMap 表格数据Map 【key: name, value: 值|备注】
+     * @return
+     */
+    public List<SimulationTableDataDTO> forEachGetSimulationTableData(Map<String, String> tableDataMap){
+        List<SimulationTableDataDTO> simulationTableDataDTOS = Lists.newArrayList();
+        SimulationTableDataDTO simulationTableDataDTO = null;
+        for (String key : tableDataMap.keySet()) {
+            simulationTableDataDTO = new SimulationTableDataDTO();
+            simulationTableDataDTO.setName(key);
+            //根据“|”截取值和备注
+            String[] valueAndRemake = tableDataMap.get(key).split("\\|");
+            simulationTableDataDTO.setValue(valueAndRemake.length > 0 ? valueAndRemake[0] : "");
+            //如果截取数组长度超过等于2
+            simulationTableDataDTO.setRemark(valueAndRemake.length == 2 ? valueAndRemake[1] : "");
+            simulationTableDataDTOS.add(simulationTableDataDTO);
+        }
+        return simulationTableDataDTOS;
     }
 }

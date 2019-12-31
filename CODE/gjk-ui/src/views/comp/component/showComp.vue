@@ -187,7 +187,7 @@ export default {
             this.getTreeDefault(item, trees, false);
             tree.push(trees);
           }
-          console.log("判断是新增构件还是编辑构件1234567890-=-1111111111111111", deepClone(tree));
+          console.log("1234567890-=-1111111111111111", deepClone(tree));
           this.treeData = tree;
         });
       }
@@ -361,7 +361,6 @@ export default {
   },
   beforeRouteUpdate(to, from, next) {
     next();
-    console.log("beforeRouteUpdate","beforeRouteUpdate")
     this.getCompList();
   }
 };
