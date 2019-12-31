@@ -331,16 +331,6 @@
                 ></el-switch>
               </template>
             </el-table-column>
-             <!--在流程建模页面是否显示-->
-            <el-table-column label="流程显示">
-              <template slot-scope="scope">
-                <el-switch
-                  v-model="scope.row.isProcessShow"
-                  active-color="#13ce66"
-                  inactive-color="#ff4949"
-                ></el-switch>
-              </template>
-            </el-table-column>
             <!--属性的动作-->
             <el-table-column label="动作">
               <template slot-scope="scope">
@@ -855,7 +845,6 @@ export default {
         attrMappingName: "",
         actionType: "",
         isShow: true,
-        isProcessShow:false,
         attrKeys: undefined,
         attrConfigType: "inputComm",
         dataKey: "[]",
@@ -1657,7 +1646,6 @@ export default {
                     attrMappingName: i,
                     actionType: "",
                     isShow: true,
-                    isProcessShow:false,
                     attrKeys: undefined,
                     attrConfigType: "inputComm",
                     multiple: false,
@@ -1705,10 +1693,6 @@ export default {
                 //如果有attrs对象,判断是否有multiple字段
                 if (i.multiple == undefined) {
                   Vue.set(i, "multiple", false);
-                }
-                //如果有attrs对象,判断是否有isProcessShow字段
-                if (i.isProcessShow == undefined) {
-                  Vue.set(i, "isProcessShow", false);
                 }
               }
             }
@@ -1788,7 +1772,6 @@ export default {
               attrMappingName: attribute,
               actionType: "",
               isShow: true,
-              isProcessShow:false,
               attrKeys: undefined,
               attrConfigType: "inputComm",
               mappingData: []
