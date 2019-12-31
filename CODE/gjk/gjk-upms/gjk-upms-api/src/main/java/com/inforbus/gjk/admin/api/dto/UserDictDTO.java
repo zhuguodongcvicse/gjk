@@ -17,10 +17,12 @@ public class UserDictDTO implements Serializable {
 	public UserDictDTO(SysUser sysUser) {
 		this.userId = sysUser.getUserId() + "";
 		this.name = sysUser.getName();
+		this.showName=sysUser.getName()+"("+sysUser.getUsername()+")";
 	}
 
 	private String userId;
 
 	private String name;
+	private String showName;
 
 }
