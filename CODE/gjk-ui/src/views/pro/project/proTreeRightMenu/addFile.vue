@@ -35,6 +35,7 @@
 //例如：import 《组件名称》 from '《组件路径》';
 import { getUploadFilesUrl } from "@/api/comp/componentdetail";
 import { uploadFile } from "@/api/pro/project";
+import { mapGetters } from "vuex";
 export default {
   props: ["currentNodeData", "dialog"],
   //注入依赖，调用this.reload();用于刷新页面
@@ -54,7 +55,9 @@ export default {
     };
   },
   //监听属性 类似于data概念
-  computed: {},
+  computed: {
+    ...mapGetters(["userInfo"])
+  },
   //监控data中的数据变化
   watch: {},
   //方法集合
@@ -68,7 +71,7 @@ export default {
     },
     /* 上传文件 */
     UploadFile(param) {
-      getUploadFilesUrl(param).then(res => {
+      getUploadFilesUrl(param,this.userInfo).then(res => {
         this.filePath = res.data.data;
         this.file.fileName = param.file.name;
         // console.log("fileName", this.file.fileName);

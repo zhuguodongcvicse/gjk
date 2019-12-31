@@ -348,7 +348,7 @@ export default {
           Vue.set(node, "isComplie", true);
           this.appComponentId = node.id;
         } else if (node.parentId == this.appComponentId) {
-          if (node.label == "bsp" || node.label == "Image") {
+          if (node.label == "bsp" || node.label == "Image" || node.label == ".sonar") {
             Vue.set(node, "isComplie", false);
           } else {
             Vue.set(node, "isComplie", true);
@@ -439,7 +439,7 @@ export default {
                   //   this.fileData.fileName + "===@@@===" + val.data.data
                   // );
                   //this.$store.dispatch("saveTextLog",val.data.data)
-                  this.$notify({
+                  this.$message({
                     message: val.data.data
                   });
                 });
@@ -473,7 +473,7 @@ export default {
               // this.$store.dispatch("saveTextLog",val.data.data)
               console.log("响应了");
               //this.connect();
-              this.$notify({
+              this.$message({
                 message: val.data.data
               });
             });
@@ -646,6 +646,7 @@ export default {
     handleNodeClick(data) {
       //根据 . 判断是否是文件 待确认
       // console.log(data);
+      console.log("项目树数据", data);
       if (data.label.indexOf(".") >= 0) {
         var d = data.label.length - ".pdf".length;
         if (d >= 0 && data.label.lastIndexOf(".pdf") == d) {
