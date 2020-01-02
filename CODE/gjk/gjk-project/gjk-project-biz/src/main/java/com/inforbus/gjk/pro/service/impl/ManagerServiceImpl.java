@@ -1362,7 +1362,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		for (ProjectFile projectFile : getProFileListByModelId(this.getById(id).getParentId())) {
 			if ("11".equals(projectFile.getFileType())) {
 				Path = projectFile.getFilePath();
-				local_REPO_PATH = JGitUtil.getLOCAL_REPO_PATH();
+				local_REPO_PATH = gitDetailPath;
 				break;
 			}
 		}
@@ -1465,7 +1465,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 					}
 				}
 			}
-			System.out.println(entityMap.getXmlEntityMaps());
 			createXmlFile(entityMap, procedureId);
 
 		}
@@ -1552,7 +1551,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		for (ProjectFile projectFile : getProFileListByModelId(model.getId())) {
 			if ("11".equals(projectFile.getFileType())) {
 				Path = projectFile.getFilePath();
-				local_REPO_PATH = JGitUtil.getLOCAL_REPO_PATH();
+				local_REPO_PATH = gitDetailPath;
 				break;
 			}
 		}
