@@ -992,7 +992,7 @@ function initEditor(editor) {
           }
         }
         // console.log("linkList", linkList)
-        //删除机箱内部连线
+       // 删除机箱内部连线
         for (const i in graphList.bJson) {
           for (let j = 0; j < graphList.bJson[i].datas.length; j++) {
             if (graphList.bJson[i].datas[j].json.properties == null) {
@@ -1445,7 +1445,7 @@ function initEditor(editor) {
 
     var dragInfo = {};
     graph.interactionDispatcher.addListener(function (evt) {
-       console.log('evt',evt)
+      // console.log('evt',evt)
       // console.log('evt',evt.kind == Q.InteractionEvent.ELEMENT_MOVE_END)
       if (evt.kind === EVENT_CREATE_ELEMENT_BY_JSON) {
         if (evt.roots.length === 1) {
@@ -1490,13 +1490,14 @@ function initEditor(editor) {
         edge.setStyle(Q.Styles.ARROW_TO, true);
         if (edge.from.edgeCount > 1 || edge.to.edgeCount > 1) {
           graph.removeElement(edge);
+    
         }
         if (edgeBundle.length > 1) {
           graph.removeElement(edge);
         }
-        if (edgeBundle.node1 == edgeBundle.node2) {
-          graph.removeElement(edge);
-        }
+        // if (edgeBundle.node1 == edgeBundle.node2) {
+        //   graph.removeElement(edge);
+        // }
       }
       if (evt.kind == Q.InteractionEvent.ELEMENT_MOVE_START) {
         var type = data.get('type');
