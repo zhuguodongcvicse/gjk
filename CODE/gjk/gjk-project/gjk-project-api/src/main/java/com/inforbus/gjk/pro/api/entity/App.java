@@ -41,6 +41,10 @@ public class App extends Model<App> {
 	@TableId
 	private String id;
 	/**
+	 * 主键id
+	 */
+	private int userId;
+	/**
 	 * app文件全路径
 	 */
 	private String filePath;

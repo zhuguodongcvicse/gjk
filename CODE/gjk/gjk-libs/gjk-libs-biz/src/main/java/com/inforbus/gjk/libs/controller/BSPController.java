@@ -109,6 +109,7 @@ public class BSPController {
 	public R removeById(@PathVariable String id) {
 		bspService.removeBspFile(id);
 		bspService.removeBspDetail(id);
+		bspService.deleteFolderByFilePath(this.getById(id).getData().getFilePath());
 		return new R<>(bspService.removeById(id));
 	}
 

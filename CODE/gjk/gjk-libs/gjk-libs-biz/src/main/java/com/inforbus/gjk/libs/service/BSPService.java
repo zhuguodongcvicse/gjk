@@ -148,4 +148,9 @@ public interface BSPService extends IService<BSP> {
 	 */
 	String uploadFiles(MultipartFile files, @PathVariable String versionDisc, @PathVariable String userName);
 
+	/**
+	 * 通过id删除本地文件夹 
+	 * @param filePath
+	 */
+	void deleteFolderByFilePath(String filePath);
 }
