@@ -15,12 +15,12 @@ public class UserDictDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	public UserDictDTO(SysUser sysUser) {
-		this.userId = sysUser.getUserId() + "";
+		this.userId = sysUser.getUserId();
 		this.name = sysUser.getName();
 		this.showName=sysUser.getName()+"("+sysUser.getUsername()+")";
 	}
 
-	private String userId;
+	private Integer userId;
 
 	private String name;
 	private String showName;
