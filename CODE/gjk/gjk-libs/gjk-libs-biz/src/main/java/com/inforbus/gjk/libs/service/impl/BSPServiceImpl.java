@@ -248,5 +248,11 @@ public class BSPServiceImpl extends ServiceImpl<BSPMapper, BSP> implements BSPSe
 		}
 		return res;
 	}
+	
+	@Override
+	public void deleteFolderByFilePath(String filePath) {
+		String folderPath = filePath = gitFilePath + filePath;
+		UploadFilesUtils.delFolder(folderPath);
+	}
 
 }

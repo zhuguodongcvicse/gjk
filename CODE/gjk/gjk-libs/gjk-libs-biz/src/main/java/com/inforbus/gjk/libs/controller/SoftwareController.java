@@ -110,6 +110,7 @@ public class SoftwareController {
 	public R removeById(@PathVariable String id) {
 		softwareService.removeSoftwareFile(id);
 		softwareService.removeSoftwareDetail(id);
+		softwareService.deleteFolderByFilePath(this.getById(id).getData().getFilePath());
 		return new R<>(softwareService.removeById(id));
 	}
 

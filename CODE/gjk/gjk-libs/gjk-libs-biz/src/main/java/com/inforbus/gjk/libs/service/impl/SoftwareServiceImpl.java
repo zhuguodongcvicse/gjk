@@ -24,6 +24,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.util.UnZipFilesUtils;
+import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.libs.api.dto.SelectFolderDTO;
 import com.inforbus.gjk.libs.api.dto.SoftwareDTO;
 import com.inforbus.gjk.libs.api.dto.SoftwareTree;
@@ -250,6 +251,12 @@ public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> i
 			}
 		}
 		return res;
+	}
+
+	@Override
+	public void deleteFolderByFilePath(String filePath) {
+		String folderPath = filePath = gitFilePath + filePath;
+		UploadFilesUtils.delFolder(folderPath);
 	}
 
 }
