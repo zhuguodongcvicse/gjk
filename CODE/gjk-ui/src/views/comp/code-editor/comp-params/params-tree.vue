@@ -498,14 +498,24 @@ export default {
               data1.forEach(data2 => {
                 if (data2.labelKey === this.fzParam) {
                   data2.lableName = name === "IMMEDIATE" ? data2.lableName : "";
-                  data2.isShow = name === "IMMEDIATE" ? true : false;
+                  //用于判断是否显示
+                  let isNodeShow = name === "IMMEDIATE" ? true : false;
+                  //用于判断构件显示还是流程显示
+                  this.moduleType === "comp"
+                    ? (data2.isShow = isNodeShow)
+                    : (data2.isProcessShow = isNodeShow);
                 } else if (data2.labelKey === this.xzblPaeam) {
-                  data2.isShow =
+                  //用于判断是否显示
+                  let isNodeShow =
                     name === "IMMEDIATE"
                       ? false
                       : name === "DATA"
                       ? false
                       : true;
+                  //用于判断构件显示还是流程显示
+                  this.moduleType === "comp"
+                    ? (data2.isShow = isNodeShow)
+                    : (data2.isProcessShow = isNodeShow);
                   data2.lableName = name === "IMMEDIATE" ? "" : data2.lableName;
                 }
               });
@@ -651,15 +661,25 @@ export default {
           items.forEach(item => {
             if (item.labelKey === this.fzParam) {
               item.lableName = lableName === "IMMEDIATE" ? item.lableName : "";
-              item.isShow = lableName === "IMMEDIATE" ? true : false;
+              //用于判断是否显示
+              let isNodeShow = lableName === "IMMEDIATE" ? true : false;
+              //用于判断构件显示还是流程显示
+              this.moduleType === "comp"
+                ? (item.isShow = isNodeShow)
+                : (item.isProcessShow = isNodeShow);
             } else if (item.labelKey === this.xzblPaeam) {
-              item.isShow =
+              item.lableName = lableName === "IMMEDIATE" ? "" : item.lableName;
+              //用于判断是否显示
+              let isNodeShow =
                 lableName === "IMMEDIATE"
                   ? false
                   : lableName === "DATA"
                   ? false
                   : true;
-              item.lableName = lableName === "IMMEDIATE" ? "" : item.lableName;
+              //用于判断构件显示还是流程显示
+              this.moduleType === "comp"
+                ? (item.isShow = isNodeShow)
+                : (item.isProcessShow = isNodeShow);
             }
           });
         });
@@ -903,10 +923,16 @@ export default {
       let isx = col.lableName.includes("*");
       if (item.labelKey === this.lengthParam) {
         if (isx) {
-          item.isShow = true;
+          //用于判断构件显示还是流程显示
+          this.moduleType === "comp"
+            ? (item.isShow = true)
+            : (item.isProcessShow = true);
         } else {
           item.lableName = "";
-          item.isShow = false;
+          //用于判断构件显示还是流程显示
+          this.moduleType === "comp"
+            ? (item.isShow = false)
+            : (item.isProcessShow = false);
         }
       } else if (item.labelKey === this.lbParam) {
         item.dataKey = [];
