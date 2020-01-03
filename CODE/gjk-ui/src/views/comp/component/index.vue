@@ -21,6 +21,7 @@
             type="primary"
             icon="el-icon-plus"
             size="small"
+            v-show="permissions.comp_component_add"
             @click="goToAddCompPage()"
           >新增</el-button>
           <!-- @click="templateData.templateVisible = true" -->
@@ -29,6 +30,7 @@
             type="primary"
             icon="el-icon--left"
             size="small"
+            v-show="permissions.comp_component_apply"
             @click="batchStorageApply()"
           >批量入库</el-button>
           <!-- @click="templateData.templateVisible = true" -->
@@ -36,7 +38,12 @@
           <!-- <el-button size="small">
             <i class="el-icon-download el-icon--left"></i>导出
           </el-button>-->
-          <el-button size="small" @click="importComp" type="primary">
+          <el-button
+            size="small"
+            @click="importComp"
+            v-show="permissions.comp_component_import"
+            type="primary"
+          >
             <i class="el-icon-upload el-icon--left"></i>导入
           </el-button>
         </template>
@@ -48,7 +55,7 @@
             <el-tooltip class="item" effect="dark" content="复制" placement="top">
               <el-button
                 type="primary"
-                v-if="permissions.comp_component_edit"
+                v-if="permissions.comp_component_add"
                 size="mini"
                 plain
                 @click="handleCopy(scope.row,scope.index)"
@@ -57,7 +64,7 @@
             <el-tooltip class="item" effect="dark" content="查看" placement="top">
               <el-button
                 type="primary"
-                v-if="permissions.comp_component_edit"
+                v-if="permissions.comp_component_view"
                 size="mini"
                 plain
                 @click="handleShow(scope.row,scope.index)"
@@ -90,6 +97,7 @@
                 plain
                 size="mini"
                 @click="storageApply(scope.row,scope.index)"
+                v-show="permissions.comp_component_apply"
                 v-if="scope.row.applyState=='1'?false:scope.row.applyState=='2'?false:true"
               >入库</el-button>
             </el-tooltip>
@@ -415,7 +423,8 @@ export default {
       this.tableLoading = true;
       this.listQuery = {
         current: page.currentPage,
-        size: page.pageSize
+        size: page.pageSize,
+        userId: this.userInfo.userId
       };
       fetchList(this.listQuery).then(response => {
         this.tableData = response.data.data.records;

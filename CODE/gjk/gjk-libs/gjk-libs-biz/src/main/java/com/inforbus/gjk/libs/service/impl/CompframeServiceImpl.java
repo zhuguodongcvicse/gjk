@@ -80,7 +80,7 @@ public class CompframeServiceImpl extends ServiceImpl<CompframeMapper, Compframe
 	 */
 	@Override
 	public R<?> saveCompFrame(MultipartFile ufile, Map<String, Object> resMap) {
-		R retR = new R();
+		R<?> retR = new R();
 		double version = 1.0;
 		// 新增
 		if (StringUtils.isEmpty(resMap.get("frameId").toString())) {
@@ -114,7 +114,7 @@ public class CompframeServiceImpl extends ServiceImpl<CompframeMapper, Compframe
 			}
 		};
 		fileThread.start();
-		Compframe frame = new Compframe(IdGenerate.uuid(), fileName, version,
+		Compframe frame = new Compframe(IdGenerate.uuid(), fileName,Integer.parseInt(resMap.get("userId").toString()), version,
 				resMap.get("filePath") + "/" + version + "/" + fileName, resMap.get("description").toString());
 		baseMapper.insertCompframe(frame);
 		@SuppressWarnings("unchecked")

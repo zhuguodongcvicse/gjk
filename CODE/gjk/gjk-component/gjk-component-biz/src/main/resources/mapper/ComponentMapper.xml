@@ -184,7 +184,7 @@
 				AND comp_funcname = #{component.compFuncname}
 			</if>
 			<if
-				test="component.userId != null and component.userId.trim() != ''">
+				test="component.userId != null">
 				AND user_id = #{component.userId}
 			</if>
 			<if

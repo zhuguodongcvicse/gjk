@@ -144,5 +144,9 @@ public class ParamTreeVO {
 	 * 参数注释
 	 */
 	private String paramRemarks;
+	/**
+	 * 用户编号
+	 */
+	private Integer userId;
 
 }

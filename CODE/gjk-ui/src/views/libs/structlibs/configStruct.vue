@@ -9,7 +9,7 @@
     class="libs_structlibs_configstruct_14s_25s"
   >
     <el-form :model="mappedModel" label-width="80px" ref="mappedModel">
-      <el-form-item label="导入" :label-width="formLabelWidth" prop="filePath">
+      <el-form-item label="导入" :label-width="formLabelWidth" prop="filePath" v-show="!isUpdate">
         <el-input v-model="filePath" autocomplete="off" readonly placeholder="请选择结构体文件路径">
           <template slot="append">
             <el-upload
@@ -131,7 +131,7 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-
+import { mapGetters } from "vuex";
 import {
   getStructByFile,
   saveOneStruct,
@@ -141,6 +141,7 @@ import {
 } from "@/api/libs/structlibs";
 import { getObjType, deepClone, randomLenNum } from "@/util/util";
 import { getUploadFilesUrl } from "@/api/comp/componentdetail";
+import { nextTick } from "q";
 
 export default {
   //import引入的组件需要注入到对象中才能使用
@@ -168,7 +169,8 @@ export default {
         fparamName: "",
         fparamType: "",
         structClassify: "",
-        children: []
+        children: [],
+        userId: ""
       },
       //表当前选中行
       fTableCurrentRow: "",
@@ -177,7 +179,9 @@ export default {
     };
   },
   //监听属性 类似于data概念
-  computed: {},
+  computed: {
+    ...mapGetters(["userInfo"])
+  },
   //监控data中的数据变化
   watch: {
     showStruct: function() {
@@ -223,6 +227,7 @@ export default {
       console.log("父组件传参：", row);
       this.initialize();
       this.initGetAllStructs();
+      this.mappedModel.userId = this.userInfo.userId;
       if (row != null) {
         this.isUpdate = true;
         this.mappedModel.dbId = row.id;
@@ -365,7 +370,7 @@ export default {
     },
 
     structFileDisp(param) {
-      getUploadFilesUrl(param).then(res => {
+      getUploadFilesUrl(param, this.userInfo).then(res => {
         this.filePath = res.data.data;
         console.log("sdfghjk", res.data.data);
         getStructByFile({ path: this.filePath }).then(res => {
@@ -384,7 +389,8 @@ export default {
                 id: randomLenNum(6, true)
               };
               this.fparamTypeData.push(val);
-              const element = proMaps[prop];
+              let element = proMaps[prop];
+              element["userId"] = this.userInfo.userId;
               console.log("原始数据sfdsd：" + prop, element);
               this.importMap.set(prop, element);
             }
@@ -468,7 +474,7 @@ export default {
     },
     saveStruct() {
       let res = true;
-
+      console.log("数据userId", deepClone(this.mappedModel));
       //如果不是导入是新建，则保存一个结构体，否则保存importmap
       if (!this.isImport) {
         if (this.mappedModel.fparamName === "") {
@@ -504,14 +510,6 @@ export default {
         let tmpimportMap = this.importMap;
         let tmpimportMap2 = this.importMap;
         tmpimportMap.forEach((tmpimportMapValue, key) => {
-          // let children = tmpimportMapValue.children;
-          // for (let i = 0; i < children.length; i++) {
-          //   const ch = children[i];
-          //   var dataType = ch.fparamType;
-          //   if (tmpimportMap2.has(dataType)) {
-          //     tmpimportMapValue.children[i].childrenIds = tmpimportMap2.get(dataType).id;
-          //   }
-          // }
           saveOneStruct(tmpimportMapValue);
         });
       }
@@ -545,6 +543,7 @@ export default {
     },
     submit(formName) {
       let res = true;
+      console.log("数据userId", deepClone(this.mappedModel));
       const loading = this.$loading({
         lock: true,
         text: "结构体保存中。。。",
@@ -590,39 +589,6 @@ export default {
         this.structList = res.data.data;
         console.log("初始化得到所有结构体", res);
       });
-    },
-    //生成UUID
-    get_uuid() {
-      var len = 19,
-        radix = 8;
-      var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".split(
-        ""
-      );
-      var uuid = [],
-        i;
-      radix = radix || chars.length;
-
-      if (len) {
-        // Compact form
-        for (i = 0; i < len; i++) uuid[i] = chars[0 | (Math.random() * radix)];
-      } else {
-        // rfc4122, version 4 form
-        var r;
-
-        // rfc4122 requires these characters
-        uuid[8] = uuid[13] = uuid[18] = uuid[23] = "-";
-        uuid[14] = "4";
-
-        // Fill in random data.  At i==19 set the high bits of clock sequence as
-        // per rfc4122, sec. 4.1.5
-        for (i = 0; i < 36; i++) {
-          if (!uuid[i]) {
-            r = 0 | (Math.random() * 16);
-            uuid[i] = chars[i == 19 ? (r & 0x3) | 0x8 : r];
-          }
-        }
-      }
-      return uuid.join("");
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）

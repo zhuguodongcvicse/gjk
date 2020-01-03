@@ -181,7 +181,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	 * @see com.inforbus.gjk.comp.service.ComponentService#getCompByUserId(java.lang.String)
 	 */
 	@Override
-	public List<CompDetailVO> getCompByUserId(String userId) {
+	public List<CompDetailVO> getCompByUserId(Integer userId) {
 		List<Component> comps = baseMapper.listCompByUserId(userId);
 		List<CompDetailVO> tree = Lists.newArrayList();
 		for (Component comp : comps) {
@@ -219,8 +219,8 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		for (ComponentDetail v : vos) {
 			if (!isShowCompXml) {
 				if (!v.getFileType().equalsIgnoreCase("xml")) {
-					addTree(tree, v);
 				}
+				addTree(tree, v);
 			} else {
 				addTree(tree, v);
 			}
@@ -759,7 +759,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 					+ File.separator + comp.getCompId() + File.separator + comp.getVersion() + File.separator;
 			String compVersion = comp.getVersion();
 
-			comp.setUserId(userId);
+			comp.setUserId(Integer.parseInt(userId));
 			comp.setApplyState("0");
 			comp.setApplyDesc("未申请入库");
 			comp.setCreateTime(LocalDateTime.now());
@@ -990,7 +990,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	 * @param userId 用户Id
 	 */
 	@Override
-	public List<Component> listCompByUserId(String userId) {
+	public List<Component> listCompByUserId(Integer userId) {
 		return baseMapper.listCompByUserId(userId);
 	}
 

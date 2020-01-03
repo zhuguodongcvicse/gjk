@@ -44,9 +44,10 @@
               size="mini"
               @click="compFrameApplysClick(row,index)"
               v-if="row.applyState=='0'||row.applyState==null?true:false"
+              v-show="permissions.libs_compframe_apply"
             >入 库</el-button>
           </el-tooltip>
-          <el-button plain  size="mini" type="primary" v-if="row.applyState=='0'||row.applyState=='3'||row.applyState==null?false:true">
+          <el-button plain  size="mini" type="primary" v-show="permissions.libs_compframe_apply" v-if="row.applyState=='0'||row.applyState=='3'||row.applyState==null?false:true">
             {{row.applyState=='1'?"已申请":row.applyState=='2'?"已入库":row.applyState=='3'?"已驳回":row.applyState=='4'?"驳回再申请":"未处理"}}
             </el-button>
         </template>
@@ -99,10 +100,16 @@ export default {
   },
   created() {
     this.getList(this.page);
+    for(let key in this.permissions){
+      if(key.includes("libs_compframe_")){
+        console.log("权限标识",key,this.permissions[key])
+      }
+    }
+   
   },
   mounted: function() {},
   computed: {
-    ...mapGetters(["permissions"])
+    ...mapGetters(["permissions","userInfo"])
   },
   watch: {
     innerVisible: {
@@ -129,7 +136,8 @@ export default {
       this.tableLoading = true;
       this.listQuery = {
         current: page.currentPage,
-        size: page.pageSize
+        size: page.pageSize,
+        userId:this.userInfo.userId
       };
       fetchList(this.listQuery).then(response => {
         this.tableData = response.data.data.records;

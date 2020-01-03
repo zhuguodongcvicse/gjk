@@ -309,7 +309,7 @@ public class ComponentController {
 	}
 
 	@PostMapping("/compByUserId")
-	public R listCompByUserId(@RequestParam(value = "userId") String userId) {
+	public R listCompByUserId(@RequestParam(value = "userId") Integer userId) {
 		return new R<>(componentService.listCompByUserId(userId));
 	}
 }

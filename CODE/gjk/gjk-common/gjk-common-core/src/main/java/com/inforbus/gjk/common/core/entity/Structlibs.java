@@ -109,6 +109,10 @@ public class Structlibs extends Model<Structlibs> {
 	 * 结构体注释
 	 */
 	private String paramRemarks;
+	/**
+	 * 用户编号
+	 */
+	private Integer userId;
 	
 
 }

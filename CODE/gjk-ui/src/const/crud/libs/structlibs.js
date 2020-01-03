@@ -26,6 +26,16 @@ export const tableOption = {
       prop: 'dataType'
     },
     {
+      label: '用户',
+      prop: 'userId',
+      type: 'select',
+      props: {
+        label: 'showName',
+        value: 'userId'
+      },
+      dicUrl: '/admin/user/info/getUserDict'
+    },
+    {
       label: '结构体类型',
       prop: 'structType',
       dicData: [{

@@ -24,37 +24,6 @@
           </el-button>
         </el-upload>
       </el-form-item>
-      <!-- <uploader :key="uploaderkey" ref="uploader" :autoStart="false" @file-success="onFileSuccess">
-        <el-form-item
-          label="文件选择"
-          label-width="90px"
-          prop="compChooseFiles"
-          style="margin-bottom: 0px;"
-        >
-          <el-button-group>
-            <uploader-btn :directory="true" class="uploaderbtn uploaderbtn2">选择文件</uploader-btn>
-          </el-button-group>
-        </el-form-item>
-        <uploader-files>
-          <template slot-scope="filess">
-            <avue-crud :data="filess.files" :option="uploadOption">
-              <template slot="formatedSize" slot-scope="scope">{{printSize(scope.row.size)}}</template>
-              <template slot-scope="scope" slot="menu">
-                <el-button
-                  size="mini"
-                  type="danger"
-                  plain
-                  @click="remove(scope.row,filess.files)"
-                >移除</el-button>
-              </template>
-            </avue-crud>
-            <div class="control-container comp_upload_btn_14s">
-              <el-button ref="removeUpload" type="danger" @click="removeAll(filess.files)">全部取消</el-button>
-              <el-button ref="fileUpload" hidden @click="resumes(filess.files)">全部上传</el-button>
-            </div>
-          </template>
-        </uploader-files>
-      </uploader>-->
       <el-form-item label="平台选择" label-width="90px" prop="compSelectArray">
         <el-select v-model="compFormParam.compSelectArray" placeholder="请选择平台。。" multiple>
           <el-option
@@ -80,6 +49,7 @@
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
 import uploader from "vue-simple-uploader";
+import { mapGetters } from "vuex";
 import selectTree from "@/views/pro/project/selectTree";
 import { getPrintSize, deepClone } from "@/util/util";
 import { fetchPlatformTree } from "@/api/admin/platform";
@@ -115,7 +85,8 @@ export default {
       compFormParam: {
         fileName: "",
         compSelectArray: [],
-        description: ""
+        description: "",
+        userId:""
       },
       compTreeData: [],
       //所选择的的审批人
@@ -135,7 +106,9 @@ export default {
     };
   },
   //监听属性 类似于data概念
-  computed: {},
+  computed: {
+     ...mapGetters(["userInfo"])
+  },
   //监控data中的数据变化
   watch: {
     itemValue: {
@@ -197,9 +170,11 @@ export default {
           if (!this.compFormParam.description) {
             this.$set(this.compFormParam, "description", "");
           }
-          if (!this.compFormParam.idle) {
+          if (!this.compFormParam.frameId) {
             this.$set(this.compFormParam, "frameId", "");
           }
+          this.$set(this.compFormParam,"userId",this.userInfo.userId)
+          console.log(" JSON.stringify(this.compFormParam)", JSON.stringify(this.compFormParam))
           formData.append("dataParams", JSON.stringify(this.compFormParam));
           saveCompFrame(formData).then(res => {
             loading.close();
@@ -210,7 +185,6 @@ export default {
             });
             this.innerVisible = false;
           });
-          // this.$refs.fileUpload.$el.click();
         }
       });
     },
