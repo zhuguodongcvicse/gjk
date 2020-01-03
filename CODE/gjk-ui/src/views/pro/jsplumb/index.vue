@@ -1,61 +1,89 @@
 <!--  -->
 <template>
-  <el-container class="pro_jsplumb_14s">
-    <el-header v-bind:style="'height:90px'">
-      <el-form :inline="true">
-        <el-input placeholder="请输入内容" v-bind:style="'width:20%'">
-          <el-button slot="append" icon="el-icon-search" @click="sendMessage"></el-button>
-        </el-input>
+  <div ref="box" id="outBox" style="height:100%">
+    <el-container class="pro_jsplumb_14s">
+      <el-header v-bind:style="'height:90px'">
+        <el-form :inline="true">
+          <el-input placeholder="请输入内容" v-bind:style="'width:20%'">
+            <el-button slot="append" icon="el-icon-search" @click="sendMessage"></el-button>
+          </el-input>
 
-         
-        <!-- <el-button-group> -->
+          <!-- <el-button-group> -->
           <el-tooltip class="item" effect="dark" content="保存" placement="bottom">
-              <el-button type="primary" style="padding:4px 4px" icon = "icon-baocun1" @click="sendMessage('save')"></el-button>
-          </el-tooltip>
-           
-           <el-tooltip class="item" effect="dark" content="导出" placement="bottom">
-              <el-button type="primary" style="padding:4px 4px" icon = "icon-daochu1" @click="sendMessage('exportJSON')"></el-button>
-          </el-tooltip>
-            &nbsp;
-           <el-tooltip class="item" effect="dark" content="导入" placement="bottom">
-           <el-upload
-            class="upload-demo inline-block"
-            action="/pro/manager/importFile"
-            multiple
-            :show-file-list="false"
-            :http-request="customFileUpload"
-            accept=".zip"
-            >
-            <el-button type="primary" style="padding:4px 4px" icon = "icon-daoru"></el-button>
-            <!-- <el-button type="primary" plain size="small">导入</el-button> -->
-            </el-upload>
-           </el-tooltip>
-             &nbsp;
-            <!-- 检查更新 -->
-           <el-tooltip class="item" effect="dark" v-bind:content="checkUpdateTxt" placement="bottom">
             <el-button
-            style="padding:4px 4px"
-            type="primary"
-            @click="bottonCheckComp = !bottonCheckComp"
-            v-bind:icon="checkUpdate"
-          ></el-button>
+              type="primary"
+              style="padding:4px 4px"
+              icon="icon-baocun"
+              @click="sendMessage('save')"
+            ></el-button>
           </el-tooltip>
-            <!-- 完备性检查 -->
-          <el-tooltip class="item" effect="dark" v-bind:content="completeCheckText" placement="bottom">
-           <el-button
-            style = "padding:4px 4px"
-            type="primary"
-            @click="completeCheck = !completeCheck"
-            v-bind:icon="completeCheckIcon"
-          ></el-button>
+
+          <el-tooltip class="item" effect="dark" content="导出" placement="bottom">
+            <el-button
+              type="primary"
+              style="padding:4px 4px"
+              icon="icon-daochu1"
+              @click="sendMessage('exportJSON')"
+            ></el-button>
+          </el-tooltip>&nbsp;
+          <el-tooltip class="item" effect="dark" content="导入" placement="bottom">
+            <el-upload
+              class="upload-demo inline-block"
+              action="/pro/manager/importFile"
+              multiple
+              :show-file-list="false"
+              :http-request="customFileUpload"
+              accept=".zip"
+            >
+              <el-button type="primary" style="padding:4px 4px" icon="icon-daoru"></el-button>
+              <!-- <el-button type="primary" plain size="small">导入</el-button> -->
+            </el-upload>
+          </el-tooltip>&nbsp;
+          <!-- 检查更新 -->
+          <el-tooltip class="item" effect="dark" v-bind:content="checkUpdateTxt" placement="bottom">
+            <el-button
+              style="padding:4px 4px"
+              type="primary"
+              @click="bottonCheckComp = !bottonCheckComp"
+              v-bind:icon="checkUpdate"
+            ></el-button>
+          </el-tooltip>
+          <!-- 完备性检查 -->
+          <el-tooltip
+            class="item"
+            effect="dark"
+            v-bind:content="completeCheckText"
+            placement="bottom"
+          >
+            <el-button
+              style="padding:4px 4px"
+              type="primary"
+              @click="completeCheck = !completeCheck"
+              v-bind:icon="completeCheckIcon"
+            ></el-button>
           </el-tooltip>
           <!-- 开始仿真/结束仿真 -->
-          <el-tooltip class = "item" effect="dark" v-bind:content="simulationText" placement="bottom">
-            <el-button 
+          <el-tooltip class="item" effect="dark" content="开始仿真" placement="bottom">
+            <!-- <el-button 
             style="padding:4px 4px" 
             type="primary" 
             v-bind:icon="simulationIcon" 
-            @click="simulationState = !simulationState"></el-button>
+            @click="simulationState = !simulationState"></el-button>-->
+            <el-button
+              style="padding:4px 4px"
+              icon="icon-kaishifangzhen"
+              type="primary"
+              @click="sendMessage('startSimulation')"
+            ></el-button>
+          </el-tooltip>
+
+          <el-tooltip class="item" effect="dark" content="结束仿真" placement="bottom">
+            <el-button
+              type="primary"
+              style="padding:4px 4px"
+              icon="icon-jieshu"
+              @click="sendMessage('endSimulation')"
+            ></el-button>
           </el-tooltip>
 
           <!-- <el-button
@@ -63,21 +91,20 @@
             plain
             size="small"
             @click="bottonCheckComp = !bottonCheckComp"
-          >{{bottonCheckComp?'检查更新':'还原'}}</el-button> -->
+          >{{bottonCheckComp?'检查更新':'还原'}}</el-button>-->
 
-           <!-- <el-button
+          <!-- <el-button
             type="primary"
             plain
             size="small"
             @click="completeCheck = !completeCheck"
-          >{{completeCheck?'完备性检查':'还原'}}</el-button> -->
+          >{{completeCheck?'完备性检查':'还原'}}</el-button>-->
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('loading')">加载</el-button> -->
           <!-- <el-button type="primary" plain size="small" @click="sendMessage('simulation')">仿真</el-button> -->
 
-
-           <!-- <el-button type="primary" plain size="small" @click="sendMessage('startSimulation')">开始仿真</el-button>
+          <!-- <el-button type="primary" plain size="small" @click="sendMessage('startSimulation')">开始仿真</el-button>
             <el-button type="primary" plain size="small" @click="sendMessage('endSimulation')">结束仿真</el-button>
-          <el-button type="primary" plain size="small" @click="sendMessage('exportJSON')">导出</el-button> -->
+          <el-button type="primary" plain size="small" @click="sendMessage('exportJSON')">导出</el-button>-->
 
           <!-- <input type="file" @change="getFile($event)"> -->
           <!-- <el-upload
@@ -89,96 +116,105 @@
             accept=".zip"
           >
             <el-button type="primary" plain size="small">导入</el-button>
-          </el-upload> -->
+          </el-upload>-->
 
-        <!-- </el-button-group> -->
-        <el-select
-          v-model="alignmentValue"
-          style="width:13%; margin-left:10px"
-          @change="sendMessage('alignment')"
-          placeholder="对齐方式"
-        >
-          <!-- size="mini" v-bind:style="'display:block'" -->
-          <!-- <el-option value="0" label="对齐方式">对齐方式</el-option> -->
-          <el-option value="1" label="上对齐">上对齐</el-option>
-          <el-option value="2" label="左对齐">左对齐</el-option>
-          <el-option value="3" label="右对齐">右对齐</el-option>
-          <el-option value="4" label="下对齐">下对齐</el-option>
-          <el-option value="5" label="水平居中">水平居中</el-option>
-          <el-option value="6" label="垂直居中">垂直居中</el-option>
-        </el-select>
-        <el-button-group v-if="showSimulation" class="jsplumb_group1">
+          <!-- </el-button-group> -->
+          <el-select
+            v-model="alignmentValue"
+            style="width:13%; margin-left:10px"
+            @change="sendMessage('alignment')"
+            placeholder="对齐方式"
+          >
+            <!-- size="mini" v-bind:style="'display:block'" -->
+            <!-- <el-option value="0" label="对齐方式">对齐方式</el-option> -->
+            <el-option value="1" label="上对齐">上对齐</el-option>
+            <el-option value="2" label="左对齐">左对齐</el-option>
+            <el-option value="3" label="右对齐">右对齐</el-option>
+            <el-option value="4" label="下对齐">下对齐</el-option>
+            <el-option value="5" label="水平居中">水平居中</el-option>
+            <el-option value="6" label="垂直居中">垂直居中</el-option>
+          </el-select>
+          <el-button-group v-if="showSimulation" class="jsplumb_group1">
+            <el-button
+              type="primary"
+              size="small"
+              icon="el-icon-caret-right"
+              @click="sendMessage('simRun')"
+            ></el-button>
+            <el-button
+              type="primary"
+              size="small"
+              icon="el-icon-thirdpause"
+              @click="sendMessage('timeOut')"
+            ></el-button>
+            <el-button
+              type="primary"
+              size="small"
+              icon="el-icon-thirdminus-square-fill"
+              @click="sendMessage('simStop')"
+            ></el-button>
+          </el-button-group>
+        </el-form>
+      </el-header>
+      <el-main class="pro_jsplumb_index_14s">
+        <div class="below" ref="iframe">
+          <gjk-iframe
+            ref="gjkIframe"
+            src="jsplumb/index.html?lang=zh-CN"
+            @on-sendMessage="sendMessage"
+            @on-handleMessage="handleMessage"
+          ></gjk-iframe>
+        </div>
+        <div id="jsplumb_none_14s" class="zz" ref="zz"></div>
+        <div ref="slider" v-show="isShow_14s" class="sliderc" @mousedown="slidercDown($event)">
+          <!-- <img
+            ref="to_left"
+            src="/img/to_left.png"
+            alt="收缩"
+            v-bind:style="{cursor:'pointer','vertical-align':'middle','position': 'absolute','top': '50%','left': '50%','transform': 'translate(-50%, -50%)'}"
+          />-->
+        </div>
+        <div class="above" ref="right" id="rightDiv">
           <el-button
             type="primary"
+            class="compdiv_btn"
             size="small"
-            icon="el-icon-caret-right"
-            @click="sendMessage('simRun')"
-          ></el-button>
-          <el-button
-            type="primary"
-            size="small"
-            icon="el-icon-thirdpause"
-            @click="sendMessage('timeOut')"
-          ></el-button>
-          <el-button
-            type="primary"
-            size="small"
-            icon="el-icon-thirdminus-square-fill"
-            @click="sendMessage('simStop')"
-          ></el-button>
-        </el-button-group>
-      </el-form>
-    </el-header>
-    <el-main class="pro_jsplumb_index_14s">
-      <div class="below">
-        <gjk-iframe
-          ref="gjkIframe"
-          src="jsplumb/index.html?lang=zh-CN"
-          @on-sendMessage="sendMessage"
-          @on-handleMessage="handleMessage"
-        ></gjk-iframe>
-      </div>
-
-      <div class="above">
-        <el-button
-          type="primary"
-          class="compdiv_btn"
-          size="small"
-          plain
-          @click.native="isShow_14s=isShow_14s===true?false:true"
-        >{{isShow_14s===true?"隐藏":"显示"}}</el-button>
-        <!-- <div ref="sliderc" v-show="isShow_14s" class="sliderc">
+            plain
+            @click.native="isShow_14s=isShow_14s===true?false:true"
+          >{{isShow_14s===true?"隐藏":"显示"}}</el-button>
+          <!-- <div ref="slider" v-show="isShow_14s" class="sliderc" @mousedown="slidercDown($event)">
           <img
             ref="to_left"
             src="/img/to_left.png"
             alt="收缩"
             v-bind:style="{cursor:'pointer','vertical-align':'middle','position': 'absolute','top': '50%','left': '50%','transform': 'translate(-50%, -50%)'}"
           />
-        </div>-->
-        <params-define
-          ref="paramsDefine"
-          v-show="isShow_14s"
-          :paramsDefineXmlParams="saveXmlMaps.xmlEntityMaps"
-          moduleType="jsplumb"
-          @change="changeSaveDBXmlMaps"
-          @jsplumbUidsChange="jsplumbUidsChange"
-        />
-      </div>
-    </el-main>
-    <el-dialog
-      title="提示"
-      :visible.sync="dialogVisibleOfCloseRouter"
-      class="libs_hardwarelibinf_addinf_14s"
-      width="30%"
-    >
-      <!--  :before-close="handleClose" -->
-      <span>是否保存当前模型？</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="closeRouter()">不保存</el-button>
-        <el-button type="primary" @click="saveFlowData()">保存</el-button>
-      </span>
-    </el-dialog>
-  </el-container>
+          </div>-->
+          <params-define
+            ref="paramsDefine"
+            v-show="isShow_14s"
+            :paramsDefineXmlParams="saveXmlMaps.xmlEntityMaps"
+            moduleType="jsplumb"
+            @change="changeSaveDBXmlMaps"
+            @jsplumbUidsChange="jsplumbUidsChange"
+          />
+        </div>
+      </el-main>
+      <el-dialog
+        title="提示"
+        :visible.sync="dialogVisibleOfCloseRouter"
+        class="libs_hardwarelibinf_addinf_14s"
+        width="30%"
+      >
+        <!--  :before-close="handleClose" -->
+        <span>是否保存当前模型？</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="closeRouter()">不保存</el-button>
+          <el-button type="primary" @click="saveFlowData()">保存</el-button>
+        </span>
+      </el-dialog>
+    </el-container>
+  </div>
 </template>
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
@@ -194,12 +230,13 @@ import {
   removeCompProject,
   completeCheck
 } from "@/api/pro/project";
-import {startSimulator,stopSimulation} from "@/api/simula/simulation";
+import { startSimulator, stopSimulation } from "@/api/simula/simulation";
 import { handlerSaveSysXml } from "@/api/pro/manager";
 import { remote } from "@/api/admin/dict";
 import { randomLenNum, randomUuid, deepClone, getObjType } from "@/util/util";
 import { removeCompApproval, checkApproval } from "@/api/libs/approval";
 import { menuTag } from "@/util/closeRouter";
+import elementResizeDetectorMaker from "element-resize-detector";
 // import screenfull from 'screenfull'
 //例如：import 《组件名称》 from '《组件路径》';
 export default {
@@ -221,7 +258,7 @@ export default {
       xmlMaps: [], //所有基础构件xmlEntityMap
       ctrlXmlParam: new Map(), //存储Ctrl+C 的数据
       dtos: [], //传值给iframe
-      tempDtos:[], //临时存放构件列表数据用于检查更新功能
+      tempDtos: [], //临时存放构件列表数据用于检查更新功能
       iframeParams: "", //iframe返回的信息及状态
       tmp: new Map(), //tmp xmlEntity临时值
       tmpMaps: new Map(), //tmpMaps xmlEntityMaps临时值
@@ -241,21 +278,23 @@ export default {
       bottonState: "",
       dialogVisibleOfCloseRouter: false,
       dialogNext: "",
-      flowFilePath: "" ,//流程建模文件路径
-      simulationData :[], //存放仿真数据
-      completeCheck:true,
-      checkUpdate:"icon-jianchagengxin",
-      checkUpdateTxt :"检查更新",
-      completeCheckIcon:"icon-wanbei",
-      completeCheckText:"完备性检查",
-      simulationText:"开始仿真",
-      simulationIcon:"icon-kaishifangzhen",
-      simulationState:true
+      flowFilePath: "", //流程建模文件路径
+      simulationData: [], //存放仿真数据
+      completeCheck: true,
+      checkUpdate: "icon-jianchagengxin",
+      checkUpdateTxt: "检查更新",
+      completeCheckIcon: "icon-wanbei",
+      completeCheckText: "完备性检查",
+      simulationText: "开始仿真",
+      simulationIcon: "icon-kaishifangzhen",
+      simulationState: true,
+      boxWidth: "",
+      newBoxWidth: ""
     };
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["isSave", "tag", "tagList",'userInfo'])
+    ...mapGetters(["isSave", "tag", "tagList", "userInfo"])
   },
   components: {
     "gjk-iframe": gjkIframe,
@@ -271,44 +310,47 @@ export default {
       }
     },
     //开始仿真结束仿真
-    simulationState:{
-      handler:function(){
-        if(!this.simulationState){
+    simulationState: {
+      handler: function() {
+        if (!this.simulationState) {
           //开始仿真
-          this.simulationIcon = "icon-jieshu"
-          this.simulationText = "结束仿真"
+          this.simulationIcon = "icon-jieshu";
+          this.simulationText = "结束仿真";
           this.postMessageData.cmd = "startSimulation";
           this.postMessageData.params = "";
           this.$refs.gjkIframe.sendMessage(this.postMessageData);
-        }else{
+        } else {
           //结束仿真
-          this.simulationIcon = "icon-kaishifangzhen"
-          this.simulationText = "开始仿真"
+          this.simulationIcon = "icon-kaishifangzhen";
+          this.simulationText = "开始仿真";
           this.postMessageData.cmd = "endSimulation";
           this.postMessageData.params = "";
           this.$refs.gjkIframe.sendMessage(this.postMessageData);
-          stopSimulation(this.userInfo.username).then(req=>{
-                if(req.data.data){
-                    this.$message({
-                        showClose: true,
-                        message: "成功",
-                        type: "success"
-                    });
-                }else{
-                    this.$message({
-                        showClose: true,
-                        message: "未开启仿真",
-                        type: "warning"
-                    });
-                }
-            })
-
+          stopSimulation(this.userInfo.username).then(req => {
+            if (req.data.data) {
+              this.$message({
+                showClose: true,
+                message: "成功",
+                type: "success"
+              });
+            } else {
+              this.$message({
+                showClose: true,
+                message: "未开启仿真",
+                type: "warning"
+              });
+            }
+          });
         }
       }
     },
-    simulationData:{
-      handler:function(){
-        startSimulator({username:this.userInfo.username,componentLinks:this.simulationData,filePath:this.flowFilePath})
+    simulationData: {
+      handler: function() {
+        startSimulator({
+          username: this.userInfo.username,
+          componentLinks: this.simulationData,
+          filePath: this.flowFilePath
+        });
       }
     },
 
@@ -325,8 +367,8 @@ export default {
     bottonCheckComp: {
       handler: function() {
         if (!this.bottonCheckComp) {
-          this.checkUpdate = "icon-huanyuan1"
-          this.checkUpdateTxt = "还原"
+          this.checkUpdate = "icon-huanyuan1";
+          this.checkUpdateTxt = "还原";
           let checkList = [];
           let compList = {};
           for (var value of this.tempDtos) {
@@ -345,40 +387,42 @@ export default {
             this.postMessageData.compUpdateState = this.compUpdateState;
             this.$refs.gjkIframe.sendMessage(this.postMessageData);
           });
-        }else{
-            this.checkUpdate = "icon-jianchagengxin"
-            this.checkUpdateTxt = "检查更新"
-            this.postMessageData.cmd = "bottonCheckComp";
-            this.postMessageData.params = this.bottonCheckComp;
-            this.postMessageData.compUpdateState = this.compUpdateState;
-            this.$refs.gjkIframe.sendMessage(this.postMessageData);
+        } else {
+          this.checkUpdate = "icon-jianchagengxin";
+          this.checkUpdateTxt = "检查更新";
+          this.postMessageData.cmd = "bottonCheckComp";
+          this.postMessageData.params = this.bottonCheckComp;
+          this.postMessageData.compUpdateState = this.compUpdateState;
+          this.$refs.gjkIframe.sendMessage(this.postMessageData);
         }
-       
       }
     },
     //完备性检查
-    completeCheck:{
-       handler: function() {
-         if(!this.completeCheck){
-           this.completeCheckIcon = "icon-huanyuan1"
-           this.completeCheckText = "还原"
-           console.log("完备性检查状态",this.completeCheck)
-           completeCheck(this.$route.query.processId,this.$store.getters.access_token).then(res => {
-           //console.log("返回数据", res.data.data);
-           this.postMessageData.cmd = "completeCheck";
-           this.postMessageData.params = res.data.data;
-           this.postMessageData.state = this.completeCheck
-           this.$refs.gjkIframe.sendMessage(this.postMessageData);
+    completeCheck: {
+      handler: function() {
+        if (!this.completeCheck) {
+          this.completeCheckIcon = "icon-huanyuan1";
+          this.completeCheckText = "还原";
+          console.log("完备性检查状态", this.completeCheck);
+          completeCheck(
+            this.$route.query.processId,
+            this.$store.getters.access_token
+          ).then(res => {
+            //console.log("返回数据", res.data.data);
+            this.postMessageData.cmd = "completeCheck";
+            this.postMessageData.params = res.data.data;
+            this.postMessageData.state = this.completeCheck;
+            this.$refs.gjkIframe.sendMessage(this.postMessageData);
           });
-         }else{
-           this.completeCheckIcon = "icon-wanbei"
-           this.completeCheckText = "完备性检查"
-           this.postMessageData.cmd = "completeCheck";
-           this.postMessageData.params = "";
-           this.postMessageData.state = this.completeCheck
-           this.$refs.gjkIframe.sendMessage(this.postMessageData);
-         }
-       }
+        } else {
+          this.completeCheckIcon = "icon-wanbei";
+          this.completeCheckText = "完备性检查";
+          this.postMessageData.cmd = "completeCheck";
+          this.postMessageData.params = "";
+          this.postMessageData.state = this.completeCheck;
+          this.$refs.gjkIframe.sendMessage(this.postMessageData);
+        }
+      }
     },
     /* 监听iframeParams数据 */
     iframeParams: {
@@ -475,7 +519,7 @@ export default {
         } else if (newParam.state === 5) {
           this.saveXmlMaps.xmlEntityMaps = [];
         }
-        console.log("itemitemitemitemitem",this.tmpMaps)
+        console.log("itemitemitemitemitem", this.tmpMaps);
       },
       deep: true //对象内部的属性监听，也叫深度监听
     },
@@ -546,7 +590,7 @@ export default {
           //保存流程模型
           this.saveProcessModel(xmlEntityMap);
         }
-                console.log("itemitemitemitemitem",this.tmpMaps)
+        console.log("itemitemitemitemitem", this.tmpMaps);
       }
     }
   },
@@ -628,10 +672,10 @@ export default {
       getCompList(this.$route.query.proId).then(response => {
         // console.log("// 根据用户编号查询构件及文件列表");
         //所有构件已更新未更新状态
-       // this.compUpdateState = response.data.data.compUpdate;
+        // this.compUpdateState = response.data.data.compUpdate;
         // 所有文件DTO
         this.dtos = response.data.data.dtos;
-        this.tempDtos = deepClone(response.data.data.dtos)
+        this.tempDtos = deepClone(response.data.data.dtos);
         console.log("dtos列表", this.dtos);
         // 设置所有构件XML
         this.xmls = response.data.data.xmls;
@@ -702,7 +746,7 @@ export default {
         this.postMessageData.params = "save";
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
         //exportFile(this.$route.query.processId);
-      } 
+      }
       // else if (state === "completeCheck") {
       //   completeCheck(this.$route.query.processId,this.$store.getters.access_token).then(res => {
       //     //console.log("返回数据", res.data.data);
@@ -710,30 +754,31 @@ export default {
       //     this.postMessageData.params = res.data.data;
       //     this.$refs.gjkIframe.sendMessage(this.postMessageData);
       //   });
-      // } 
-      else if(state === "startSimulation"){  //开始仿真
+      // }
+      else if (state === "startSimulation") {
+        //开始仿真
         this.postMessageData.cmd = "startSimulation";
         this.postMessageData.params = "";
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
-      } else if(state === "endSimulation"){
+      } else if (state === "endSimulation") {
         this.postMessageData.cmd = "endSimulation";
         this.postMessageData.params = "";
         this.$refs.gjkIframe.sendMessage(this.postMessageData);
-        stopSimulation(this.userInfo.username).then(req=>{
-              if(req.data.data){
-                  this.$message({
-                      showClose: true,
-                      message: "成功",
-                      type: "success"
-                  });
-              }else{
-                  this.$message({
-                      showClose: true,
-                      message: "未开启仿真",
-                      type: "warning"
-                  });
-              }
-          })
+        stopSimulation(this.userInfo.username).then(req => {
+          if (req.data.data) {
+            this.$message({
+              showClose: true,
+              message: "成功",
+              type: "success"
+            });
+          } else {
+            this.$message({
+              showClose: true,
+              message: "未开启仿真",
+              type: "warning"
+            });
+          }
+        });
       }
       // else if(state === "checkComp"){
       //   console.log(this.dtos)
@@ -758,7 +803,7 @@ export default {
           this.postMessageData.connectionData = val.data.data;
           // console.log("连线关系数据", this.postMessageData);
           this.$refs.gjkIframe.sendMessage(this.postMessageData);
-          console.log("构件列表",this.dtos)
+          console.log("构件列表", this.dtos);
         });
         this.index++;
         if (this.index == 1) {
@@ -773,24 +818,26 @@ export default {
                     // this.tempParam.push(tmp);
                     // 使用map将 数据对应上
                     this.tmpMaps.set(tmp.attributeMap.id, tmp);
-                    tmp.xmlEntityMaps.forEach(tempData =>{
-                      if(tempData.lableName == "层级属性"){
-                        tempData.xmlEntityMaps.forEach(item =>{
-                          if(item.lableName == "所属部件"){
-                             this.postMessageData.cmd = "sendCompFzData";
-                             this.postMessageData.params = {
-                               compId: tmp.attributeMap.id,
-                               compData: item.attributeMap.name
-                             };
-                            this.$refs.gjkIframe.sendMessage(this.postMessageData);
+                    tmp.xmlEntityMaps.forEach(tempData => {
+                      if (tempData.lableName == "层级属性") {
+                        tempData.xmlEntityMaps.forEach(item => {
+                          if (item.lableName == "所属部件") {
+                            this.postMessageData.cmd = "sendCompFzData";
+                            this.postMessageData.params = {
+                              compId: tmp.attributeMap.id,
+                              compData: item.attributeMap.name
+                            };
+                            this.$refs.gjkIframe.sendMessage(
+                              this.postMessageData
+                            );
                           }
-                        })
+                        });
                       }
-                    })
+                    });
                   }
                 });
                 this.flowFilePath = res.data.data.flowFilePath;
-                console.log("流程建模文件路径", this.flowFilePath)
+                console.log("流程建模文件路径", this.flowFilePath);
                 this.postMessageData.cmd = "clickCompLoading";
                 this.postMessageData.params = res.data.data.json;
                 this.$refs.gjkIframe.sendMessage(this.postMessageData);
@@ -821,29 +868,28 @@ export default {
           }
           break;
         case "removeComp":
-           this.$confirm("是否删除此构件?", "提示", {
-              confirmButtonText: "确定",
-              cancelButtonText: "取消",
-              type: "warning"
-            })
-              .then(() => {
-                let compId = data.params;
-              // console.log("id",compId)
-                let projectId = this.$route.query.proId;
-               // removeCompApproval(compId, projectId).then(res => {
-                  removeCompProject(compId, projectId);
-               // });
+          this.$confirm("是否删除此构件?", "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning"
+          }).then(() => {
+            let compId = data.params;
+            // console.log("id",compId)
+            let projectId = this.$route.query.proId;
+            // removeCompApproval(compId, projectId).then(res => {
+            removeCompProject(compId, projectId);
+            // });
 
-                this.postMessageData.cmd = "returnRemoveComp";
-                this.postMessageData.params = compId;
-                this.$refs.gjkIframe.sendMessage(this.postMessageData);
+            this.postMessageData.cmd = "returnRemoveComp";
+            this.postMessageData.params = compId;
+            this.$refs.gjkIframe.sendMessage(this.postMessageData);
 
-                for(let index in this.tempDtos){
-                    if(this.tempDtos[index].id == compId){
-                      this.tempDtos.splice(index,1)
-                    }
-                }
-              })
+            for (let index in this.tempDtos) {
+              if (this.tempDtos[index].id == compId) {
+                this.tempDtos.splice(index, 1);
+              }
+            }
+          });
           //console.log("构件列表",this.tempDtos)
           break;
         case "nodeTypeNotMatch":
@@ -863,12 +909,18 @@ export default {
         case "returnFZ":
           this.$router.push({
             path: "/comp/manager/simulator",
-            query: { flowFilePath: this.flowFilePath, startId: data.params.startId,endId:data.params.endId,startName:data.params.startName,endName:data.params.endName}
+            query: {
+              flowFilePath: this.flowFilePath,
+              startId: data.params.startId,
+              endId: data.params.endId,
+              startName: data.params.startName,
+              endName: data.params.endName
+            }
           });
           break;
         case "returnSimulationData":
-          console.log("vue接收数据",data.params)
-          this.simulationData = data.params
+          console.log("vue接收数据", data.params);
+          this.simulationData = data.params;
       }
     },
     //保存流程模型
@@ -882,7 +934,7 @@ export default {
       });
       handlerSaveSysXml(param, this.$route.query.processId).then(res => {
         // console.log("handlerSaveSysXml", res.data.data);
-        this.flowFilePath = res.data.data
+        this.flowFilePath = res.data.data;
         editProJSON(
           JSON.parse(this.saveParams.saveflowChartJson),
           this.$route.query.processId
@@ -1024,6 +1076,68 @@ export default {
         next();
       }, 1000);
     },
+
+    // slidercDown:function(event){
+    //   let targetDiv = document.getElementsByClassName("above")
+    //   let targetDivWidth = targetDiv[0].clientWidth
+    //   console.log("属性栏width",targetDivWidth)
+    //   let slidercDiv = document.getElementsByClassName("sliderc")
+    //   console.log("right",slidercDiv)
+    //   document.onmousemove = function(event){
+    //     event.preventDefault();
+
+    //   }
+    //   document.οnmοuseup=function(){
+    //     document.οnmοusemοve=null;
+    //   }
+    // },
+
+    //获取鼠标坐标
+    getPos(ev) {
+      let scrollTop =
+        document.documentElement.scrollTop || document.body.scrollTop;
+      let scrollLeft =
+        document.documentElement.scrollLeft || document.body.scrollLeft;
+      return { x: ev.clientX + scrollLeft, y: ev.clientY + scrollTop };
+    },
+    //移动
+    slidercDown(ev) {
+      let that = this;
+      let boxWidth = that.$refs.box.offsetWidth;
+      let oEvent = ev || event;
+      let pos = that.getPos(oEvent); //获取鼠标位置
+      //获取托拽条当前的left
+      let sliderLeft = this.$refs.slider.offsetLeft;
+      let disX = pos.x - this.$refs.slider.offsetLeft;
+      console.log("条的left", this.$refs.slider.offsetLeft);
+      this.pointerevents = "auto";
+      // this.$refs.iframe.style.
+      let iframe = this.$refs.iframe.style;
+      //iframe.display = "none";  //右侧属性配置20190823
+      document.getElementById("jsplumb_none_14s").style.display = "block";
+      console.log("this.$refs.iframe.style", iframe);
+      document.onmousemove = function(ev) {
+        let oEvent = ev || event;
+        let pos = that.getPos(oEvent); //获取鼠标位置
+        that.$refs.slider.style.left = pos.x - disX + "px";
+        //that.$refs.right.style.right = "0px";
+        that.$refs.right.style.width = boxWidth - (pos.x - disX) + "px";
+        that.$refs.right.style.left = pos.x - disX + 4 + "px";
+        that.$refs.zz.style.width =
+          boxWidth - (boxWidth - (pos.x - disX)) + "px";
+      };
+      document.onmouseup = function() {
+        //iframe.display = "block";  //右侧属性配置20190823
+        console.log("this.$refs.iframe.style", iframe);
+        document.getElementById("jsplumb_none_14s").style.display = "none";
+        document.onmousemove = null;
+        document.onmouseup = null;
+      };
+      return false;
+    },
+    chartResize() {
+      alert(111);
+    }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
@@ -1041,6 +1155,29 @@ export default {
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
     this.getCompAndDetail();
+    var boxWidth = this.$refs.box.clientWidth;
+    //var elementResizeDetectorMaker = require("element-resize-detector");
+    var erd = elementResizeDetectorMaker();
+    let _this = this;
+    this.$nextTick(vm => {
+      erd.listenTo(document.getElementById("outBox"), function(element) {
+        var newBoxWidth = element.offsetWidth;
+        console.log("888888888888高",element.offsetHeight)
+        _this.$refs.slider.style.height = element.offsetHeight+"px";
+
+        if(newBoxWidth != boxWidth){
+           let w = Number(
+            new String(_this.$refs.right.style.width).replace("px", "")
+          );
+          _this.$refs.right.style.left = newBoxWidth - w + "px";
+          _this.$refs.slider.style.left = newBoxWidth - w - 5 + "px"
+        }
+       
+      });
+    });
+
+    // this.erd = elementResizeDetectorMaker()
+    // this.erd.listenTo(this.$refs.box.$el, this.chartResize)
   },
   beforeCreate() {}, //生命周期 - 创建之前
   beforeMount() {}, //生命周期 - 挂载之前
@@ -1141,25 +1278,35 @@ export default {
   width: 100%;
   background: #999;
 }
-.above {
-  position: relative;
-  float: right;
-  right: 0px;
-  top: 0px;
-  width: 350px;
+
+.zz {
+  position: absolute;
+  width: calc(100% - 350px);
+  height: 100%;
+  /* top: 0; */
   background: #fff;
-  z-index: 1;
+  left: 0;
+  opacity: 0.2;
+  z-index: 10;
+  display: none;
+}
+.above {
+  position: absolute;
+  //float: right;
+  //left: 65%;
+  right: 0;
+  // top: 0px;
+  width: 34.5%;
+  background: #fff;
+  z-index: 10;
 }
 .sliderc {
-  border: red 1px solid;
-  height: 98%;
-  padding-left: 5px;
+  background: #a1a1a1;
+  left: calc(65.5% - 3px);
+  padding: 0 2px;
+  z-index: 10;
   position: absolute;
-  top: 0;
   cursor: w-resize;
-  right: 0;
-  background: #fff;
-  z-index: 25;
 }
 .inline-block {
   display: inline-block;

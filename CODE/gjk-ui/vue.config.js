@@ -7,7 +7,7 @@ module.exports = {
       process: true,
     },
     plugins: [
-      new MonocoEditorPlugin()
+      new MonocoEditorPlugin(),
     ]
   }
 }
