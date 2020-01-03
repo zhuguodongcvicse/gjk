@@ -276,7 +276,7 @@ export default {
     console.log("this.array::::--", this.banArray);
     //获取app数据库列表
     getAllApp().then(val => {
-      this.total = val.data.data.length;
+      // this.total = val.data.data.length;
     });
   },
 
@@ -300,8 +300,11 @@ export default {
       this.dynamicValidateForm.domains = [];
       this.appArray = [];
       this.appData = [];
-      fetchList(query).then(Response => {
-        this.page.total = Response.data.data.total;
+      var app = {
+        userId: this.userInfo.userId
+      };
+      fetchList(query.current, query.size, app).then(Response => {
+        this.total = Response.data.data.total;
         this.appArray.push(Response.data.data.records);
         this.dynamicValidateForm.domains.push(Response.data.data.records);
         this.appData.push(Response.data.data.records);
@@ -876,7 +879,7 @@ export default {
         this.searchAppName != null &&
         this.searchAppName != undefined
       ) {
-        getAppVosPage(this.searchAppName).then(val => {
+        getAppVosPage(this.searchAppName, this.userInfo.userId).then(val => {
           this.dynamicValidateForm.domains.push(val.data.data);
           this.total = val.data.data.length;
         });

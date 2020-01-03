@@ -17,11 +17,11 @@
 
 import request from '@/router/axios'
 
-export function fetchList(query) {
+export function fetchList(current, size, obj) {
   return request({
-    url: '/pro/app/page',
-    method: 'get',
-    params: query
+    url: '/pro/app/page/' + current + "/" + size,
+    method: 'post',
+    data: obj
   })
 }
 
@@ -63,9 +63,9 @@ export function getAllApp(obj) {
   })
 }
 
-export function getAppVosPage(fileName) {
+export function getAppVosPage(fileName, userId) {
   return request({
-    url: '/pro/app/getAppVosPage/' + fileName,
+    url: '/pro/app/getAppVosPage/' + fileName + "/" + userId,
     method: 'get',
   })
 }

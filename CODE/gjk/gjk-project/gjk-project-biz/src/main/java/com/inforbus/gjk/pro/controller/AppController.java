@@ -90,8 +90,11 @@ public class AppController {
 	 * @param app
 	 * @return
 	 */
-	@GetMapping("/page")
-	public R<IPage<App>> getAppPage(Page<App> page, App app) {
+	@PostMapping("/page/{current}/{size}")
+	public R<IPage<App>> getAppPage(@PathVariable Long current, @PathVariable Long size,@RequestBody App app) {
+		Page<App> page = new Page<App>();
+		page.setCurrent(current);
+		page.setSize(size);
 		return new R<>(appService.getAppPage(page, app));
 	}
 
@@ -202,9 +205,9 @@ public class AppController {
 	 * 
 	 * @return
 	 */
-	@GetMapping(value = "/getAppVosPage/{fileName}")
-	public R getAppVosPage(@PathVariable String fileName) {
-		return new R<>(appService.getAppVosPage(fileName));
+	@GetMapping(value = "/getAppVosPage/{fileName}/{userId}")
+	public R getAppVosPage(@PathVariable String fileName, @PathVariable String userId) {
+		return new R<>(appService.getAppVosPage(fileName, userId));
 	}
 
 	@PostMapping(value = "/returnFilePath")
