@@ -16,6 +16,7 @@
  */
 package com.inforbus.gjk.libs.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -26,11 +27,13 @@ import com.inforbus.gjk.common.core.util.UnZipFilesUtils;
 import com.inforbus.gjk.libs.api.dto.SelectFolderDTO;
 import com.inforbus.gjk.libs.api.dto.SoftwareDTO;
 import com.inforbus.gjk.libs.api.dto.SoftwareTree;
+import com.inforbus.gjk.libs.api.entity.BSP;
 import com.inforbus.gjk.libs.api.entity.Software;
 import com.inforbus.gjk.libs.api.entity.SoftwareDetail;
 import com.inforbus.gjk.libs.api.entity.SoftwareFile;
 import com.inforbus.gjk.libs.api.util.SoftwareTreeUtil;
 import com.inforbus.gjk.libs.mapper.SoftwareMapper;
+import com.inforbus.gjk.libs.service.BSPGetRoleCodeService;
 import com.inforbus.gjk.libs.service.SoftwareService;
 
 import java.io.File;
@@ -38,6 +41,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,6 +58,9 @@ public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> i
 	@Value("${git.local.path}")
 	private String gitFilePath;
 
+	@Autowired
+	private BSPGetRoleCodeService bspGetRoleCodeService;
+
 	/**
 	 * 软件框架库表简单分页查询
 	 * 
@@ -62,7 +69,15 @@ public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> i
 	 */
 	@Override
 	public IPage<Software> getSoftwarePage(Page<Software> page, Software software) {
-		return baseMapper.getSoftwarePage(page, software);
+
+		String roleCode = bspGetRoleCodeService.getSysRoleCodeByRoleId(software.getUserId());
+		if ("ROLE_ADMIN".equals(roleCode)) {
+			software.setUserId(0);
+			return baseMapper.getSoftwarePage(page, software);
+		}
+
+		return baseMapper.selectPage(page, new QueryWrapper<Software>(software));
+
 	}
 
 	/**
@@ -123,17 +138,34 @@ public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> i
 
 	@Override
 	public IPage<SoftwareDTO> getSoftwareDTOPage(Page<Software> softwarePage, Software software) {
-		List<Software> softwares = getSoftwarePage(softwarePage, software).getRecords();
+		if ("ROLE_ADMIN".equals(bspGetRoleCodeService.getSysRoleCodeByRoleId(software.getUserId()))) {
+			List<Software> softwares = getSoftwarePage(softwarePage, software).getRecords();
 
-		List<SoftwareDTO> softwareDTOs = new ArrayList<>();
-		for (Software soft : softwares) {
-			SoftwareDTO dto = new SoftwareDTO(soft);
-			softwareDTOs.add(dto);
+			List<SoftwareDTO> softwareDTOs = new ArrayList<>();
+			for (Software soft : softwares) {
+				SoftwareDTO dto = new SoftwareDTO(soft);
+				if ("2".equals(soft.getApplyState())
+						|| "ROLE_ADMIN".equals(bspGetRoleCodeService.getSysRoleCodeByRoleId(soft.getUserId()))) {
+					softwareDTOs.add(dto);
+				}
+			}
+			Page<SoftwareDTO> softwareDTOPage = new Page<SoftwareDTO>(softwarePage.getCurrent(), softwarePage.getSize(),
+					softwarePage.getTotal());
+			softwareDTOPage.setRecords(softwareDTOs);
+			return softwareDTOPage;
+		} else {
+			List<Software> softwares = getSoftwarePage(softwarePage, software).getRecords();
+
+			List<SoftwareDTO> softwareDTOs = new ArrayList<>();
+			for (Software soft : softwares) {
+				SoftwareDTO dto = new SoftwareDTO(soft);
+				softwareDTOs.add(dto);
+			}
+			Page<SoftwareDTO> softwareDTOPage = new Page<SoftwareDTO>(softwarePage.getCurrent(), softwarePage.getSize(),
+					softwarePage.getTotal());
+			softwareDTOPage.setRecords(softwareDTOs);
+			return softwareDTOPage;
 		}
-		Page<SoftwareDTO> softwareDTOPage = new Page<SoftwareDTO>(softwarePage.getCurrent(), softwarePage.getSize(),
-				softwarePage.getTotal());
-		softwareDTOPage.setRecords(softwareDTOs);
-		return softwareDTOPage;
 	}
 
 	@Override
@@ -183,13 +215,13 @@ public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> i
 	}
 
 	@Override
-	public String uploadFiles(MultipartFile[] files, String versionDisc) {
+	public String uploadFiles(MultipartFile[] files, String versionDisc, String userName) {
 		String path = gitFilePath;
 		String res = path + ",";
 		for (MultipartFile file : files) {
 			System.out.println("file.getOriginalFilename():" + file.getOriginalFilename());
 			if (file != null) {
-				String p = path + "gjk/software/" + versionDisc + ".0" + File.separator + file.getOriginalFilename();
+				String p = path + "gjk/software/" + userName + File.separator  + versionDisc + ".0" + File.separator + file.getOriginalFilename();
 				String bb = p.replaceAll("\\\\", "/");
 				String ss = p.substring(0, bb.lastIndexOf("/")) + File.separator;
 				File zipfile = new File(bb);

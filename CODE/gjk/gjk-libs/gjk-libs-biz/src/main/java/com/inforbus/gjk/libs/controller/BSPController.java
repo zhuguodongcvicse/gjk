@@ -52,8 +52,11 @@ public class BSPController {
 	 * @param bsp  软件框架库表
 	 * @return
 	 */
-	@GetMapping("/page")
-	public R<IPage<BSPDTO>> getBSPPage(Page<BSP> page, BSP bsp) {
+	@PostMapping("/page/{current}/{size}")
+	public R<IPage<BSPDTO>> getBSPPage(@PathVariable Long current, @PathVariable Long size,@RequestBody BSP bsp) {
+		Page<BSP> page = new Page<BSP>();
+		page.setCurrent(current);
+		page.setSize(size);
 		return new R<>(bspService.getBSPDTOPage(page, bsp));
 	}
 
@@ -165,9 +168,9 @@ public class BSPController {
 		return new R<>(bspService.setVersionSize());
 	}
 
-	@PostMapping("/uploadFiles/{versionDisc}")
-	public String uploadFiles(@RequestParam(value = "file") MultipartFile files, @PathVariable String versionDisc) {
-		return bspService.uploadFiles(files, versionDisc);
+	@PostMapping("/uploadFiles/{versionDisc}/{userName}")
+	public String uploadFiles(@RequestParam(value = "file") MultipartFile files, @PathVariable String versionDisc, @PathVariable String userName) {
+		return bspService.uploadFiles(files, versionDisc, userName);
 	}
 
 	@GetMapping("/getBSPTree")

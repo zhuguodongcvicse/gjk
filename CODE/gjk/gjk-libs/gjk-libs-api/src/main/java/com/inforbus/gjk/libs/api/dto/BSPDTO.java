@@ -33,6 +33,7 @@ public class BSPDTO {
 
 	public BSPDTO(BSP bsp) {
 		this.id = bsp.getId();
+		this.userId = bsp.getUserId();
 		this.bspName = bsp.getBspName();
 		this.version = bsp.getVersion() + "";
 		this.filePath = bsp.getFilePath();
@@ -49,6 +50,11 @@ public class BSPDTO {
 	 */
 	@TableId
 	private String id;
+	
+	/**
+	 * 用戶id
+	 */
+	private int userId;
 
 	/**
 	 * 软件框架库名字

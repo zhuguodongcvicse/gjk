@@ -16,6 +16,7 @@
  */
 package com.inforbus.gjk.libs.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -32,6 +33,7 @@ import com.inforbus.gjk.libs.api.entity.BSPDetail;
 import com.inforbus.gjk.libs.api.entity.BSPFile;
 import com.inforbus.gjk.libs.api.util.BSPTreeUtil;
 import com.inforbus.gjk.libs.mapper.BSPMapper;
+import com.inforbus.gjk.libs.service.BSPGetRoleCodeService;
 import com.inforbus.gjk.libs.service.BSPService;
 
 import java.io.File;
@@ -41,8 +43,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -57,6 +61,9 @@ public class BSPServiceImpl extends ServiceImpl<BSPMapper, BSP> implements BSPSe
 	@Value("${git.local.path}")
 	private String gitFilePath;
 
+	@Autowired
+	private BSPGetRoleCodeService bspGetRoleCodeService;
+
 	/**
 	 * 软件框架库表简单分页查询
 	 * 
@@ -64,8 +71,14 @@ public class BSPServiceImpl extends ServiceImpl<BSPMapper, BSP> implements BSPSe
 	 * @return
 	 */
 	@Override
-	public IPage<BSP> getBSPPage(Page<BSP> page, BSP bsp) {
-		return baseMapper.getBSPPage(page, bsp);
+	public IPage<BSP> getBSPPage(Page<BSP> page, @RequestBody BSP bsp) {
+		String roleCode = bspGetRoleCodeService.getSysRoleCodeByRoleId(bsp.getUserId());
+		if ("ROLE_ADMIN".equals(roleCode)) {
+			bsp.setUserId(0);
+			return baseMapper.getBSPPage(page, bsp);
+		}
+//		
+		return baseMapper.selectPage(page, new QueryWrapper<BSP>(bsp));
 	}
 
 	/**
@@ -118,19 +131,40 @@ public class BSPServiceImpl extends ServiceImpl<BSPMapper, BSP> implements BSPSe
 
 	@Override
 	public IPage<BSPDTO> getBSPDTOPage(Page<BSP> bspPage, BSP bsp) {
-		IPage<BSP> iPage = getBSPPage(bspPage, bsp);
-		List<BSP> bsps = iPage.getRecords();
+		if ("ROLE_ADMIN".equals(bspGetRoleCodeService.getSysRoleCodeByRoleId(bsp.getUserId()))) {
+			IPage<BSP> iPage = getBSPPage(bspPage, bsp);
+			List<BSP> bsps = iPage.getRecords();
 
-		List<BSPDTO> bspDTOs = new ArrayList<>();
-		for (BSP soft : bsps) {
-			BSPDTO dto = new BSPDTO(soft);
-			bspDTOs.add(dto);
+			List<BSPDTO> bspDTOs = new ArrayList<>();
+			for (BSP soft : bsps) {
+				BSPDTO dto = new BSPDTO(soft);
+				if ("2".equals(soft.getApplyState())
+						|| "ROLE_ADMIN".equals(bspGetRoleCodeService.getSysRoleCodeByRoleId(soft.getUserId()))) {
+					bspDTOs.add(dto);
+				}
+			}
+			Page<BSPDTO> bspDTOPage = new Page<BSPDTO>(bspPage.getCurrent(), bspPage.getSize());
+			bspDTOPage.setRecords(bspDTOs);
+			bspDTOPage.setPages(iPage.getPages());
+			bspDTOPage.setTotal(iPage.getTotal());
+			return bspDTOPage;
+		} else {
+			IPage<BSP> iPage = getBSPPage(bspPage, bsp);
+			List<BSP> bsps = iPage.getRecords();
+
+			List<BSPDTO> bspDTOs = new ArrayList<>();
+			for (BSP soft : bsps) {
+				BSPDTO dto = new BSPDTO(soft);
+				bspDTOs.add(dto);
+
+			}
+			Page<BSPDTO> bspDTOPage = new Page<BSPDTO>(bspPage.getCurrent(), bspPage.getSize());
+			bspDTOPage.setRecords(bspDTOs);
+			bspDTOPage.setPages(iPage.getPages());
+			bspDTOPage.setTotal(iPage.getTotal());
+			return bspDTOPage;
 		}
-		Page<BSPDTO> bspDTOPage = new Page<BSPDTO>(bspPage.getCurrent(), bspPage.getSize());
-		bspDTOPage.setRecords(bspDTOs);
-		bspDTOPage.setPages(iPage.getPages());
-		bspDTOPage.setTotal(iPage.getTotal());
-		return bspDTOPage;
+
 	}
 
 	@Override
@@ -187,10 +221,10 @@ public class BSPServiceImpl extends ServiceImpl<BSPMapper, BSP> implements BSPSe
 	}
 
 	@Override
-	public String uploadFiles(MultipartFile files, String versionDisc) {
+	public String uploadFiles(MultipartFile files, String versionDisc,String userName) {
 		String path = gitFilePath;
 		String res = "上传成功！！！";
-		String p = path + "gjk/bsp/" + versionDisc + ".0" + File.separator + files.getOriginalFilename();
+		String p = path + "gjk/bsp/" + userName + File.separator + versionDisc + ".0" + File.separator + files.getOriginalFilename();
 		String bb = p.replaceAll("\\\\", "/");
 		String ss = p.substring(0, bb.lastIndexOf("/"));
 		try {

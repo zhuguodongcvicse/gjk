@@ -45,6 +45,15 @@ export const tableOption = {
       label: '文件路径',
       prop: 'filePath'
     },
+    {
+      label: '用户',
+      prop: 'userId',
+      props: {
+        label: 'showName',
+        value: 'userId'
+      },
+      dicUrl: '/admin/user/info/getUserDict'
+    },
 	  {
       // label: '审批状态0：未审批，1：已审批',
       label: '审批状态',

@@ -56,33 +56,18 @@
               </el-tooltip>
               <el-tooltip content="编译" placement="bottom" effect="light">
                 <i
-                  class="el-icon-thirdplay-circle-fill"
+                  class="el-icon-thirdwrench"
                   @click="banArray[index].plClick && playClick(domain,index)"
                   v-bind:style="{cursor: banArray[index].playBan }"
                 ></i>
               </el-tooltip>
               <el-tooltip content="加载" placement="bottom" effect="light">
                 <i
-                  class="el-icon-sunny"
+                  class="el-icon-refresh"
                   @click="banArray[index].lClick && loadingClick(domain,index)"
                   v-bind:style="{cursor: banArray[index].loadingBan }"
                 ></i>
               </el-tooltip>
-              <el-tooltip content="更新加载" placement="bottom" effect="light">
-                <i
-                  class="el-icon-refresh"
-                  @click="banArray[index].refClick && refreshClick(domain,index)"
-                  v-bind:style="{cursor: banArray[index].refreshBan }"
-                ></i>
-              </el-tooltip>
-              <el-tooltip content="配置" placement="bottom" effect="light">
-                <i
-                  class="el-icon-thirdwrench"
-                  @click="banArray[index].wClick && wrenchClick(domain,index)"
-                  v-bind:style="{cursor: banArray[index].wrenchBan }"
-                ></i>
-              </el-tooltip>
-              <br>
               <el-tooltip content="启动" placement="bottom" effect="light">
                 <i
                   class="el-icon-caret-right"
@@ -90,6 +75,7 @@
                   v-bind:style="{cursor: banArray[index].startBan }"
                 ></i>
               </el-tooltip>
+              <br>
               <el-tooltip content="暂停" placement="bottom" effect="light">
                 <i
                   class="el-icon-thirdpause"

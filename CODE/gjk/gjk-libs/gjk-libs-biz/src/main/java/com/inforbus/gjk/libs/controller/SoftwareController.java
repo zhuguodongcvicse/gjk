@@ -22,6 +22,7 @@ import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.TreeUtil;
 import com.inforbus.gjk.common.log.annotation.SysLog;
 import com.inforbus.gjk.libs.api.dto.SoftwareDTO;
+import com.inforbus.gjk.libs.api.entity.BSP;
 import com.inforbus.gjk.libs.api.entity.Software;
 import com.inforbus.gjk.libs.api.entity.SoftwareDetail;
 import com.inforbus.gjk.libs.api.entity.SoftwareFile;
@@ -52,8 +53,11 @@ public class SoftwareController {
 	 * @param software 软件框架库表
 	 * @return
 	 */
-	@GetMapping("/page")
-	public R<IPage<SoftwareDTO>> getSoftwarePage(Page<Software> page, Software software) {
+	@PostMapping("/page/{current}/{size}")
+	public R<IPage<SoftwareDTO>> getSoftwarePage(@PathVariable Long current, @PathVariable Long size,@RequestBody Software software) {
+		Page<Software> page = new Page<Software>();
+		page.setCurrent(current);
+		page.setSize(size);
 		return new R<>(softwareService.getSoftwareDTOPage(page, software));
 	}
 
@@ -165,9 +169,9 @@ public class SoftwareController {
 		return new R<>(softwareService.setVersionSize());
 	}
 
-	@PostMapping("/uploadFiles/{versionDisc}")
-	public String uploadFiles(@RequestParam(value = "file") MultipartFile[] files, @PathVariable String versionDisc) {
-		return softwareService.uploadFiles(files, versionDisc);
+	@PostMapping("/uploadFiles/{versionDisc}/{userName}")
+	public String uploadFiles(@RequestParam(value = "file") MultipartFile[] files, @PathVariable String versionDisc, @PathVariable String userName) {
+		return softwareService.uploadFiles(files, versionDisc, userName);
 	}
 
 	@GetMapping("/getSoftwareTree")

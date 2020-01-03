@@ -145,5 +145,5 @@ public interface SoftwareService extends IService<Software> {
 	 * @param versionDisc
 	 * @return
 	 */
-	String uploadFiles(@RequestParam(value = "file") MultipartFile[] files, @PathVariable String versionDisc);
+	String uploadFiles(@RequestParam(value = "file") MultipartFile[] files, @PathVariable String versionDisc, @PathVariable String userName);
 }
