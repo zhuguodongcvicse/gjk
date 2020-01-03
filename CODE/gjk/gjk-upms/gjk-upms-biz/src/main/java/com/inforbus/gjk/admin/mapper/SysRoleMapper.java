@@ -70,4 +70,11 @@ public interface SysRoleMapper extends BaseMapper<SysRole> {
 	SysRole getRoleByRoleCode(@Param("query") SysRole sysRole);
 
 	int getSysUserRoleByRoleId(@Param("roleId")String roleId);
+	
+	/**
+	 * 根據用戶id查找到系統管理員
+	 * @param userId
+	 * @return
+	 */
+	String getSysRoleCodeByRoleId(@Param("userId") int userId);
 }

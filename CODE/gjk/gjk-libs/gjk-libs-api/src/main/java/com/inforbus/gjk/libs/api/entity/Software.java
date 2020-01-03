@@ -43,6 +43,11 @@ private static final long serialVersionUID = 1L;
     private String id;
     
     /**
+     *用户id
+     */
+    private int userId;
+    
+    /**
      * 软件框架库名字
      */
       private String softwareName;

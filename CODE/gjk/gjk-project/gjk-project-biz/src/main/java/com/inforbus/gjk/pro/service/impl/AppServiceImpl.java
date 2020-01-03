@@ -16,6 +16,7 @@
  */
 package com.inforbus.gjk.pro.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -48,6 +49,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.ibatis.annotations.Param;
 import org.apache.tools.ant.taskdefs.Zip;
 import org.apache.tools.ant.types.FileSet;
 import org.slf4j.Logger;
@@ -88,7 +90,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	 * @return
 	 */
 	@Override
-	public IPage<App> getAppPage(Page<App> page, App app) {
+	public IPage<App> getAppPage(Page<App> page,@RequestBody App app) {
 		return baseMapper.getAppPage(page, app);
 	}
 
@@ -123,8 +125,8 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	}
 
 	@Override
-	public List<App> getAppVosPage(String fileName) {
-		return baseMapper.getAppVosPage(fileName);
+	public List<App> getAppVosPage(String fileName, String userId) {
+		return baseMapper.getAppVosPage(fileName, userId);
 	}
 
 	@Override

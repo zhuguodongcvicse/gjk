@@ -39,6 +39,7 @@ public interface BSPMapper extends BaseMapper<BSP> {
     */
   IPage<BSP> getBSPPage(Page page, @Param("bsp") BSP bsp);
   
+  
   /**
    * 
    * @Title: saveBSP  保存软件框架库信息

@@ -17,11 +17,11 @@
 
 import request from '@/router/axios'
 
-export function fetchList(query) {
+export function fetchList(current, size, obj) {
   return request({
-    url: '/libs/software/page',
-    method: 'get',
-    params: query
+    url: '/libs/software/page/' + current + "/" + size,
+    method: 'post',
+    data: obj
   })
 }
 
@@ -102,9 +102,9 @@ export function upload(obj) {
   })
 }
 
-export function uploadFiles(obj, versionDisc) {
+export function uploadFiles(obj, versionDisc, userName) {
   return request({
-    url: '/libs/software/uploadFiles/' + versionDisc,
+    url: '/libs/software/uploadFiles/' + versionDisc +"/" + userName,
     method: 'post',
     data: obj,
     headers: { "Content-Type": "multipart/form-data" },

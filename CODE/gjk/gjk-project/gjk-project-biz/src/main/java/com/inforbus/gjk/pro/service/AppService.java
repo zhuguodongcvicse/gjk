@@ -82,7 +82,7 @@ public interface AppService extends IService<App> {
 	 * @param roleDTO 查询参数
 	 * @return list
 	 */
-	List<App> getAppVosPage(@Param("fileName") String fileName);
+	List<App> getAppVosPage(@Param("fileName") String fileName, @Param("userId") String userId);
 
 	/**
 	 * 根据流程ID查询是否生成app组件工程

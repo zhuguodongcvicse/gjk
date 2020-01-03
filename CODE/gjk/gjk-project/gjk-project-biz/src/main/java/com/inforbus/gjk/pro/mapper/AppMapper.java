@@ -74,7 +74,7 @@ public interface AppMapper extends BaseMapper<App> {
 	 * @param roleDTO 查询参数
 	 * @return list
 	 */
-	List<App> getAppVosPage(@Param("fileName") String fileName);
+	List<App> getAppVosPage(@Param("fileName") String fileName, @Param("userId") String userId);
 
 	/**
 	 * 根据流程Id查询是否生成app组件工程

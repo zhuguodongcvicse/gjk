@@ -292,18 +292,17 @@
 		FROM gjk_hardwarelibs
 	</select>
 	
-	<update id="removeCompProject">
-		UPDATE gjk_project_comp SET can_use = '1'
+	<delete id="removeCompProject">
+		delete FROM gjk_project_comp where comp_id = #{compId}
+		AND
+		project_id = #{projectId}
+	</delete>
+
+	<update id="updateCompProjectByCompIdAndProId">
+		UPDATE gjk_project_comp SET can_use = #{canUse}
 		where comp_id = #{compId}
 		AND
 		project_id = #{projectId}
 	</update>
-
-	<delete id="updateCompProjectByCompIdAndProId">
-		delete FROM gjk_project_comp where comp_id = #{compId}
-		AND
-		project_id = #{projectId}
-		
-	</delete>
 
 </mapper>

@@ -283,7 +283,7 @@
         }
         items.push({
           text: '删除', action: function (evt, item) {
-            if(data.image === "rack" || data.name == ' '){
+            if(data.image === "rack" || data.name == " "){
               graph.removeElement(data);
               //删除逻辑
             }   

@@ -32,6 +32,7 @@
 			column="local_deployment_plan" />
 		<result property="description" column="description" />
 		<result property="delFlag" column="del_flag" />
+		<result property="userId" column="user_id" />
 	</resultMap>
 
 	<resultMap type="com.inforbus.gjk.pro.api.entity.ProjectFile"
@@ -63,6 +64,7 @@
 
 	<sql id="appSql">
 		id,
+		user_id,
 		file_path,
 		file_name,
 		process_id,
@@ -98,6 +100,9 @@
 		<where>
 			<if test="app.id != null and app.id.trim() != ''">
 				AND id = #{app.id}
+			</if>
+			<if test="app.userId != 0">
+				AND user_id = #{app.userId}
 			</if>
 			<if test="app.filePath != null and app.filePath.trim() != ''">
 				AND file_path = #{app.filePath}
@@ -169,6 +174,7 @@
 			<if test="fileName != null and fileName != ''">
 				and r.file_path LIKE CONCAT('%',#{fileName},'%')
 			</if>
+			and r.user_id = #{userId}
 			and r.del_flag = '0'
 		</where>
 		ORDER BY r.create_time DESC

@@ -23,7 +23,7 @@
             icon="el-icon-plus"
             @click="dialogTableVisible = true"
             size="small"
-            v-if="permissions.libs_bsp_add"
+            v-if="libsBSP_btn_add"
           >新 增</el-button>
 
           <el-dialog
@@ -111,8 +111,8 @@
               </div>
             </el-form>
           </el-dialog>
-          <br />
-          <br />
+          <br>
+          <br>
         </template>
         <template slot-scope="scope" slot="menu">
           <!-- <el-button
@@ -127,15 +127,16 @@
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
-            v-if="scope.row.applyState=='0'||scope.row.applyState==null||scope.row.applyState=='3'?true:false"
-          >删除</el-button>
+            v-if="libsBSP_btn_del && (scope.row.applyState=='0'||scope.row.applyState==null||scope.row.applyState=='3'?true:false)"
+          >删 除</el-button>
           <el-tooltip class="item" effect="dark" content="入库" placement="top">
             <el-button
               type="primary"
               plain
               size="mini"
               @click="storageApply(scope.row,scope.index)"
-              v-if="scope.row.applyState=='0'||scope.row.applyState==null?true:false"
+              v-if="scope.row.applyState=='0'||scope.row.applyState==null?true:false "
+              v-show="libsBSP_btn_import"
             >入 库</el-button>
           </el-tooltip>
           <span
@@ -245,17 +246,23 @@ export default {
           },
           { validator: valiaFilePath, trigger: "change" }
         ]
-      }
+      },
+      libsBSP_btn_add: false,
+      libsBSP_btn_del: false,
+      libsBSP_btn_import: false
     };
   },
   created() {
     this.getList(this.page);
 
     this.getPlatformSelectTree();
+    this.libsBSP_btn_add = this.permissions["libs_bsp_add"];
+    this.libsBSP_btn_del = this.permissions["libs_bsp_del"];
+    this.libsBSP_btn_import = this.permissions["libs_bsp_import"];
   },
   mounted: function() {},
   computed: {
-    ...mapGetters(["permissions"])
+    ...mapGetters(["permissions", "userInfo"])
   },
 
   watch: {
@@ -343,20 +350,22 @@ export default {
               ) {
                 this.software.filePath =
                   "gjk/bsp/" +
+                   this.userInfo.username +
+                  "/" +
                   parseFloat(this.versionSize).toFixed(1) +
                   "/" +
                   this.folderName.substring(
                     0,
                     this.folderName.lastIndexOf(".")
-                  ) +
-                  "/";
+                  );
               } else {
                 this.software.filePath =
                   "gjk/bsp/" +
+                   this.userInfo.username +
+                  "/" +
                   parseFloat(this.versionSize).toFixed(1) +
                   "/" +
-                  this.folderName +
-                  "/";
+                  this.folderName;
               }
               //保持软件框架库信息
               this.software.version = this.versionSize;
@@ -364,6 +373,7 @@ export default {
               //软件框架库名
               this.software.bspName =
                 "BSP" + "_" + parseFloat(this.versionSize).toFixed(1);
+              this.software.userId = this.userInfo.userId;
               //保存软件框架库信息
               saveBSP(this.software).then(response => {
                 softId = response.data.data.id;
@@ -389,7 +399,7 @@ export default {
               });
             })
             .then(() => {
-              uploadFiles(formData, Object.assign(this.software.version)).then(
+              uploadFiles(formData, Object.assign(this.software.version), Object.assign(this.userInfo.username)).then(
                 response => {
                   // let resData = response.data.split(",");
                   setTimeout(() => {
@@ -439,12 +449,17 @@ export default {
         current: page.currentPage,
         size: page.pageSize
       };
-      fetchList(this.listQuery).then(response => {
-        this.tableData = response.data.data.records;
-        // this.page.total = response.data.data.records.length;
-        this.page.total = response.data.data.total;
-        this.tableLoading = false;
-      });
+      var bsp = {
+        userId: this.userInfo.userId
+      };
+      fetchList(this.listQuery.current, this.listQuery.size, bsp).then(
+        response => {
+          this.tableData = response.data.data.records;
+          // this.page.total = response.data.data.records.length;
+          this.page.total = response.data.data.total;
+          this.tableLoading = false;
+        }
+      );
     },
     currentChange(currentPage) {
       this.page.currentPage = currentPage;

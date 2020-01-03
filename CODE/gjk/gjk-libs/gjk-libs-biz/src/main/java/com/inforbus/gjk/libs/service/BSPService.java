@@ -19,13 +19,17 @@ package com.inforbus.gjk.libs.service;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.inforbus.gjk.admin.api.entity.BaseTemplate;
+import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.libs.api.dto.BSPDTO;
 import com.inforbus.gjk.libs.api.dto.BSPTree;
 import com.inforbus.gjk.libs.api.dto.SelectFolderDTO;
@@ -49,6 +53,7 @@ public interface BSPService extends IService<BSP> {
 	 * @return
 	 */
 	IPage<BSP> getBSPPage(Page<BSP> page, BSP bsp);
+	
 
 	/**
 	 * 保存软件框架库信息
@@ -141,6 +146,11 @@ public interface BSPService extends IService<BSP> {
 	 * @param versionDisc
 	 * @return
 	 */
-	String uploadFiles(MultipartFile files, @PathVariable String versionDisc);
+	String uploadFiles(MultipartFile files, @PathVariable String versionDisc, @PathVariable String userName);
 
+	/**
+	 * 通过id删除本地文件夹 
+	 * @param filePath
+	 */
+	void deleteFolderByFilePath(String filePath);
 }

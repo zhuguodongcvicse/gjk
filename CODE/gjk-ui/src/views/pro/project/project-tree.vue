@@ -348,7 +348,7 @@ export default {
           Vue.set(node, "isComplie", true);
           this.appComponentId = node.id;
         } else if (node.parentId == this.appComponentId) {
-          if (node.label == "bsp" || node.label == "Image" || node.label == ".sonar") {
+          if (node.label == "bsp" || node.label == "Image" || node.label == ".sonar" || node.isDirectory == "1") {
             Vue.set(node, "isComplie", false);
           } else {
             Vue.set(node, "isComplie", true);

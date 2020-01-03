@@ -1007,7 +1007,7 @@ function initEditor(editor) {
   // }
 
   //删除
-  graph.removeSelectionByInteraction = false;
+  graph.removeSelectionByInteraction = true;
   graph.removeSelectionByInteraction = function (evt) {
     var selection = this.selectionModel.datas;
     // console.log("selection",selection)

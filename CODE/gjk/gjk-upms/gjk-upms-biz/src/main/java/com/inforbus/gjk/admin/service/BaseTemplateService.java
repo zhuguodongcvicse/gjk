@@ -96,4 +96,11 @@ public interface BaseTemplateService extends IService<BaseTemplate> {
 	 */
     String getLocalPath();
 
+	/**
+	 * 基础模板删除功能
+	 * @param tempId 根据id删除模板
+	 * @return boolean
+	 */
+	boolean removeById(String tempId);
+
 }
