@@ -115,7 +115,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 //	private static final String gitDetailPath = JGitUtil.getLOCAL_REPO_PATH();// gitlu路径
 //	private static final String generateCodeResult = JGitUtil.getGenerateCodeResult();// 集成代码生成结果存放路径
 //	private static final String softToHardResult = JGitUtil.getSoftToHardResult();// 软硬件映射结果文件存放路径
-	
+
 	@Value("${git.local.path}")
 	private String proDetailPath;
 	@Value("${integer.code.file.name}")
@@ -134,7 +134,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	// 软硬件映射结果文件存放路径
 	@Value("${gjk.pro.process.softToHardResult}")
 	private String softToHardResult;
-	
 
 	/**
 	 * @getTreeByProjectId
@@ -873,6 +872,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 				app.setId(IdGenerate.uuid());
 				app.setBackPath(appDirPath.substring(proDetailPath.length()));
+				app.setUserId(Integer.parseInt(messageMap.get("userId")));
 			} catch (IOException e) {
 				e.printStackTrace();
 				return r.setException(new Exception("保存App组件工程img失败。"));
@@ -3106,14 +3106,14 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			return new R<>(new Exception("集成代码生成失败，请联系管理员。"));
 		}
 	}
-	
+
 	/**
 	 * 根据当前软硬件映射配置的id，查找当前流程下的所有模块的文件路径，从而截取想要的路径
 	 * 
 	 * @param id
 	 * @return
 	 */
-	public String getSoftProcessFilePath( String id) {
+	public String getSoftProcessFilePath(String id) {
 		List<ProjectFile> lists = this.getFilePathListById(id);
 		// 流程建模路径（赋给软硬件映射配置xml的流程文件标签）
 		String workModeFilePath = "";
@@ -3135,7 +3135,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		}
 		return str;
 	}
-	
 
 	/**
 	 * 根据当前软硬件映射配置的id，查找当前流程下的所有模块的文件路径
@@ -3149,8 +3148,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		List<ProjectFile> lists = this.getFilePathListById(id);
 		// 当前项目id
 		String projectId = lists.size() > 0 ? lists.get(0).getProjectId() : "0";
-		ProjectFile processFile = this
-				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, id));
+		ProjectFile processFile = this.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, id));
 		ProjectFile flowFile = this
 				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, processFile.getParentId()));
 		// 流程模型文件
@@ -3263,7 +3261,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		}
 		return new R<>(simplePlanFile);
 	}
-	
+
 	/*
 	 * 函数名：getFile 作用：使用递归，输出指定文件夹内的所有文件 参数：path：文件夹路径 deep：表示文件的层次深度，控制前置空格的个数
 	 * 前置空格缩进，显示文件层次结构
@@ -3305,9 +3303,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		}
 		return fileNamelist;
 	}
-	
+
 	// 调回写部署方案接口
-	public void writeBackDeploySchemeById( Map<String, Object> map) {
+	public void writeBackDeploySchemeById(Map<String, Object> map) {
 		// 流程模型文件
 		String workModeFilePath = "";
 		String simplePlanFiles = "";
@@ -3344,7 +3342,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			e.printStackTrace();
 		}
 	}
-	
+
 	public boolean createXmlFiles(XmlEntity entity, String proDetailId) {
 		ProjectFile processFile = this
 				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, proDetailId));
