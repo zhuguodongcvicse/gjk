@@ -21,7 +21,7 @@
         <template slot-scope="scope" slot="menu">
           <el-button
             type="primary"
-            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId == userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="editInf(scope.row,scope.index)"
@@ -37,7 +37,7 @@
           </el-button>
           <el-button
             type="danger"
-            v-if="permissions.libs_hardwarelibinf_del && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            v-if="permissions.libs_hardwarelibinf_del && scope.row.userId == userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
@@ -45,7 +45,7 @@
           </el-button>
           <el-button
             type="primary"
-            v-if="permissions.libs_hardwarelibinf_add && permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            v-if="permissions.libs_hardwarelibinf_add && permissions.libs_hardwarelibinf_edit && scope.row.userId == userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="goStorage(scope.row,scope.index)"
@@ -213,8 +213,9 @@
             };
         },
         created() {
+            // console.log("this.userInfo",this.userInfo)
             this.getList();
-            this.getAllUsers();
+            // this.getAllUsers();
             // console.log("permissions",this.permissions)
         },
         mounted: function () {
@@ -239,7 +240,7 @@
             getList() {
                 this.tableLoading = true;
                 fetchList(this.listQuery, this.userInfo.name).then(response => {
-                    this.tableData = []
+                    /*this.tableData = []
                     if (this.tableData.length !== 0) {
                         if (this.tableData[0].updateTime != null) {
                             this.tableData = this.sortKey(this.tableData, 'updateTime')
@@ -258,7 +259,9 @@
                             this.allInfs.push(this.tableData[i])
                         }
                     }
-                    this.allInfs = JSON.parse(JSON.stringify(this.allInfs))
+                    this.allInfs = JSON.parse(JSON.stringify(this.allInfs))*/
+                    this.allInfs = response.data.data.records;
+                    this.tableData = response.data.data.records;
                     this.page.total = response.data.data.total;
                     this.tableLoading = false;
                 });
@@ -307,7 +310,8 @@
                 // console.log("this.form",this.form)
             },
             copyInf(row) {
-                // console.log("row", row)
+                console.log("row", row)
+                console.log("this.userInfo", this.userInfo)
                 //复制或弹窗标志赋值
                 this.clickCopyOrEdit = 'copy'
                 this.dialogFormVisible = true;
@@ -332,7 +336,6 @@
                             });*/
                             //更新后重新刷新列表
                             this.getList();
-                            // console.log("this",this)
                         });
                         // this.$refs[formName].resetFields();
                     } else {
@@ -356,7 +359,7 @@
                     if (valid) {
                         this.dialogFormVisible = false;
                         //接口的用户名改为本用户
-                        form.userId = this.userInfo.name
+                        form.userId = this.userInfo.userId
                         form.applyState = '0'
                         form.applyDesc = null
                         saveInf(form).then(response => {
@@ -417,18 +420,12 @@
              **/
             handleAdd: function () {
                 // this.$refs.crud.rowAdd()
-                //this.$router.push({ path: "/libs/hardwarelibinf/addinf" });
-                console.log(this.form.infName);
-                //  console.log(this.form.infRate);
-                //  console.log(this.form.region);
                 this.dialogFormVisible = false;
                 saveInf(this.form).then(request => {
                 });
             },
 
             handleEdit(row, index) {
-                console.log(row);
-                //console.log(index);
                 // this.$refs.crud.rowEdit(row, index);
                 this.showInf.dialogFormVisible = true;
                 this.$refs.pram.getPram(row);

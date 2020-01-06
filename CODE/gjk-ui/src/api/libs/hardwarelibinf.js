@@ -17,12 +17,10 @@
 
 import request from '@/router/axios'
 
-export function fetchList(page, userName) {
-  console.log("page",page)
+export function fetchList(page) {
   return request({
-    url: '/libs/hardwarelibinf/page/' + userName,
+    url: '/libs/hardwarelibinf/page',
     method: 'get',
-    // params: {page, userName}
     params: page
   })
 }

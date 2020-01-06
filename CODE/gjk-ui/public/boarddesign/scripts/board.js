@@ -106,7 +106,7 @@ function handleMessageFromParent(event) {
 		allInfList[i].ifShowInSelect = 0
 	}
 	infArr = event.data.params[1]
-  console.log("infArr", infArr)
+  // console.log("infArr", infArr)
 	chipArr = event.data.params[0]
 	boardArr = event.data.params[2]
 	calculateBoardLinkType = event.data.params[3]
@@ -542,7 +542,6 @@ function createCard(slot) {
 
 //设置绘画芯片
 function createPort(slot) {
-	console.log("***")
 	var bounds = slot.getBounds();
 	var port = createNode({
 		image: 'cell',
@@ -849,7 +848,7 @@ function initEditor(editor) {
 		for (var i in selection) {
 			if (selection[i].properties.type == "port") {
 		Q.confirm("是否删除？", function () {
-			var selection = this.removeSelection();
+			/*var selection = this.removeSelection();
 			// console.log("selection[0].properties", JSON.stringify(selection[0].properties))
 			for (const i in chipList) {
 				if (chipList[i].uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
@@ -898,7 +897,7 @@ function initEditor(editor) {
 				if (dragCpuList[i].uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
 					removeByValue(dragCpuList, dragCpuList[i])
 				}
-			}
+			}*/
 			//  console.log("infOfExchangeCpuArr",infOfExchangeCpuArr)
 		}, this);
 	}}

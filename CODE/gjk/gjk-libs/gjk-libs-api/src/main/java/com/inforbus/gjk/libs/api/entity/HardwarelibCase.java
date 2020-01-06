@@ -59,7 +59,7 @@ public class HardwarelibCase extends Model<HardwarelibCase> {
     /**
      * 用户id
      */
-    private String userId;
+    private Integer userId;
     /**
      * 板子数量
      */

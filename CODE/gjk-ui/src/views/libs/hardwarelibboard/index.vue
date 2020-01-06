@@ -167,7 +167,7 @@
         },
         created() {
             this.getList();
-            this.getAllUsers();
+            // this.getAllUsers();
             //获取字典表板卡类型的下拉菜单值
             remote("hardwarelib_board_type").then(response => {
                 this.boardTypeList = response.data.data
@@ -209,9 +209,10 @@
                 this.tableLoading = true;
                 fetchList(this.listQuery).then(response => {
                     this.tableData = response.data.data.records;
-                    this.tableData = this.sortKey(this.tableData, 'createTime')
+                    this.allBoards = response.data.data.records;
+                    // this.tableData = this.sortKey(this.tableData, 'createTime')
                     //判断板卡数据是否为空
-                    if (this.allBoards.length !== 0) {
+                    /*if (this.allBoards.length !== 0) {
                         //清空数据
                         this.allBoards = []
                         for (const i in this.tableData) {
@@ -228,7 +229,7 @@
                             }
                         }
                     }
-                    this.allBoards = JSON.parse(JSON.stringify(this.allBoards))
+                    this.allBoards = JSON.parse(JSON.stringify(this.allBoards))*/
                     this.page.total = response.data.data.total;
                     this.tableLoading = false;
                 });
@@ -236,7 +237,7 @@
             getAllUsers() {
                 //查询所有用户
                 getAllUser().then(response => {
-                    console.log("response",response)
+                    // console.log("response",response)
                     //如果数组中有数据
                     if (this.allUsersOfLibs.length !== 0) {
                         //清空数组
@@ -333,7 +334,7 @@
                             calculateBoardLinkType = res1.data.data;
                             remote("hardware_inf_io_type").then(res2 => {
                                 calculateBoardIoType = res2.data.data;
-                                form.userId = this.userInfo.name
+                                form.userId = this.userInfo.userId
                                 form.applyState = '0'
                                 form.applyDesc = null
                                 this.$router.push({

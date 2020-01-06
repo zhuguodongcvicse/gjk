@@ -56,7 +56,7 @@ public class HardwarelibChipServiceImpl extends ServiceImpl<HardwarelibChipMappe
 		//设置芯片id
 		if (hardwarelibChip.getChipId() ==null) {
 			long currentTime = System.currentTimeMillis();
-			hardwarelibChip.setChipId(hardwarelibChip.getUserId() + currentTime);
+			hardwarelibChip.setChipId(hardwarelibChip.getUserId().toString() + currentTime);
 		}
 		//设置创建时间和更新时间
 		hardwarelibChip.setCreateTime(LocalDateTime.now());
