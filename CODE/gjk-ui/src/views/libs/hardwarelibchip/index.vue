@@ -198,7 +198,7 @@
         created() {
             // location.reload()
             this.getList();
-            this.getAllUsers();
+            // this.getAllUsers();
             this.getPlatformSelectTree();
         },
         mounted() {
@@ -281,7 +281,7 @@
                 this.$refs[formName].validate(valid => {
                     if (valid) {
                         this.dialogFormVisible = false;
-                        form.userId = this.userInfo.name
+                        form.userId = this.userInfo.userId
                         form.applyState = '0'
                         form.applyDesc = null
                         //跳转到画布
@@ -339,9 +339,11 @@
             getList() {
                 this.tableLoading = true;
                 fetchList(this.listQuery).then(response => {
-                    this.tableData = []
+                    // this.tableData = []
+                    this.allChips = response.data.data.records;
                     this.tableData = response.data.data.records;
-                    this.tableData = this.sortKey(this.tableData, 'createTime')
+                    // console.log("response.data.data",response.data.data)
+                    /*this.tableData = this.sortKey(this.tableData, 'createTime')
                     //所有判断芯片数据是否为空
                     if (this.allChips.length !== 0) {
                         //清空数据
@@ -360,7 +362,7 @@
                             }
                         }
                     }
-                    this.allChips = JSON.parse(JSON.stringify(this.allChips))
+                    this.allChips = JSON.parse(JSON.stringify(this.allChips))*/
                     this.page.total = response.data.data.total;
                     this.tableLoading = false;
                 });

@@ -158,7 +158,7 @@
                     if (valid) {
                         // console.log("this.$store.state.infList",this.$store.state.infList)
                         this.showInf.dialogFormVisible = false;
-                        this.form.userId = this.userInfo.name
+                        this.form.userId = this.userInfo.userId
                         // console.log("this.form",this.form)
                         saveInf(this.form).then(request => {
                             this.$notify({

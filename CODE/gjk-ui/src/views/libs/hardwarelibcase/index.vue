@@ -168,7 +168,8 @@
                 fetchList(this.listQuery).then(response => {
                     //console.log(response.data.data.records)
                     this.tableData = response.data.data.records;
-                    this.tableData = this.sortKey(this.tableData, 'createTime')
+                    this.allCases = response.data.data.records;
+                    /*this.tableData = this.sortKey(this.tableData, 'createTime')
                     //判断板卡数据是否为空
                     if (this.allCases.length !== 0) {
                         //清空数据
@@ -187,7 +188,7 @@
                             }
                         }
                     }
-                    this.allCases = JSON.parse(JSON.stringify(this.allCases))
+                    this.allCases = JSON.parse(JSON.stringify(this.allCases))*/
                     this.page.total = response.data.data.total;
                     this.tableLoading = false;
                 });
@@ -270,6 +271,7 @@
                     if (valid) {
                         this.dialogFormVisible = false;
                         remote("hardware_FpgaBoard_inf_linkType").then(res1 => {
+                            form.userId = this.userInfo.userId
                             this.$router.push({
                                 path: "/libs/hardwarelibcase/caseupdate",
                                 query: [form, res1.data.data, this.clickCopyOrEdit]
