@@ -165,10 +165,11 @@
             },
             getList() {
                 this.tableLoading = true;
+                this.listQuery.userId = this.userInfo.userId
                 fetchList(this.listQuery).then(response => {
                     //console.log(response.data.data.records)
                     this.tableData = response.data.data.records;
-                    this.allCases = response.data.data.records;
+                    this.allCases = JSON.parse(JSON.stringify(response.data.data.records));
                     /*this.tableData = this.sortKey(this.tableData, 'createTime')
                     //判断板卡数据是否为空
                     if (this.allCases.length !== 0) {

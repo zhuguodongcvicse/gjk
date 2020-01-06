@@ -104,7 +104,7 @@
             <if test="hardwarelibChip.chipId != null and hardwarelibChip.chipId.trim() != ''">
                 AND chip_id = #{hardwarelibChip.chipId}
             </if>
-            <if test="hardwarelibChip.userId != null and hardwarelibChip.userId.trim() != ''">
+            <if test="hardwarelibChip.userId != null">
                 AND user_id = #{hardwarelibChip.userId}
             </if>
             <if test="hardwarelibChip.coreNum != null and hardwarelibChip.coreNum.trim() != ''">

@@ -65,7 +65,7 @@
             <if test="hardwarelibBoard.boardId != null and hardwarelibBoard.boardId.trim() != ''">
                 AND board_id = #{hardwarelibBoard.boardId}
             </if>
-            <if test="hardwarelibBoard.userId != null and hardwarelibBoard.userId.trim() != ''">
+            <if test="hardwarelibBoard.userId != null">
                 AND user_id = #{hardwarelibBoard.userId}
             </if>
             <if test="hardwarelibBoard.boardType != null and hardwarelibBoard.boardType.trim() != ''">

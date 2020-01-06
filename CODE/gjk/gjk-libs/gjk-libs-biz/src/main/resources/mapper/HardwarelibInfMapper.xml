@@ -111,7 +111,7 @@
             <if test="hardwarelibInf.infType != null and hardwarelibInf.infType.trim() != ''">
                 AND inf_type = #{hardwarelibInf.infType}
             </if>
-            <if test="hardwarelibInf.userId != null and hardwarelibInf.userId.trim() != ''">
+            <if test="hardwarelibInf.userId != null">
                 AND user_id = #{hardwarelibInf.userId}
             </if>
             <if test="hardwarelibInf.createTime != null and hardwarelibInf.createTime.trim() != ''">

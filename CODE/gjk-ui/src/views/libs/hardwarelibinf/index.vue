@@ -239,6 +239,7 @@
             },
             getList() {
                 this.tableLoading = true;
+                this.listQuery.userId = this.userInfo.userId
                 fetchList(this.listQuery, this.userInfo.name).then(response => {
                     /*this.tableData = []
                     if (this.tableData.length !== 0) {
@@ -260,7 +261,7 @@
                         }
                     }
                     this.allInfs = JSON.parse(JSON.stringify(this.allInfs))*/
-                    this.allInfs = response.data.data.records;
+                    this.allInfs = JSON.parse(JSON.stringify(response.data.data.records));
                     this.tableData = response.data.data.records;
                     this.page.total = response.data.data.total;
                     this.tableLoading = false;
@@ -346,7 +347,7 @@
             },
             copyOneInf(formName, form) {
                 //接口名称不能重复
-                // console.log("this.allInfs", this.allInfs)
+                console.log("this.allInfs", this.allInfs)
                 // console.log("form", form)
                 //复制不能与本用户的接口库同名
                 for (const i in this.allInfs) {
