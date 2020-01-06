@@ -144,6 +144,7 @@
                 AND del_flag = #{hardwarelibChip.delFlag}
             </if>
         </where>
+        order by update_time DESC
     </select>
 
 

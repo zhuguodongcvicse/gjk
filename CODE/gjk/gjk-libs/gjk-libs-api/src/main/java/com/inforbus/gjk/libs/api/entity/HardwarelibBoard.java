@@ -54,7 +54,7 @@ public class HardwarelibBoard extends Model<HardwarelibBoard> {
     /**
      * 用户名
      */
-    private String userId;
+    private Integer userId;
     /**
      * CPU数量
      */

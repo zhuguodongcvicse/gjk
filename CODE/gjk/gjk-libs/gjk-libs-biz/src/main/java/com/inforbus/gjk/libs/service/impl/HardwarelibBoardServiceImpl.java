@@ -56,7 +56,7 @@ public class HardwarelibBoardServiceImpl extends ServiceImpl<HardwarelibBoardMap
         //设置板卡id
         if (hardwarelibBoard.getBoardId() ==null) {
             long currentTime = System.currentTimeMillis();
-            hardwarelibBoard.setBoardId(hardwarelibBoard.getUserId() + currentTime);
+            hardwarelibBoard.setBoardId(hardwarelibBoard.getUserId().toString() + currentTime);
         }
         //设置创建时间和更新时间
         hardwarelibBoard.setCreateTime(LocalDateTime.now());

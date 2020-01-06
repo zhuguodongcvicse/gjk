@@ -89,6 +89,7 @@
                 AND del_flag = #{hardwarelibCase.delFlag}
             </if>
         </where>
+        order by update_time DESC
     </select>
 
 

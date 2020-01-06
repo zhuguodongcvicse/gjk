@@ -53,7 +53,7 @@ public class HardwarelibCaseServiceImpl extends ServiceImpl<HardwarelibCaseMappe
         //设置芯片id
         if (hardwarelibCase.getCaseId() ==null) {
             long currentTime = System.currentTimeMillis();
-            hardwarelibCase.setCaseId(hardwarelibCase.getUserId() + currentTime);
+            hardwarelibCase.setCaseId(hardwarelibCase.getUserId().toString() + currentTime);
         }
         //设置创建时间和更新时间
         hardwarelibCase.setCreateTime(LocalDateTime.now());

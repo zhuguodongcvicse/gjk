@@ -472,11 +472,11 @@ function initEditor(editor) {
         Q.confirm("是否 确认删除", function () {
           var selection = this.removeSelection();
           // console.log("selection",selection)
-          for (const i in infOfChipList) {
+          /*for (const i in infOfChipList) {
             if (infOfChipList[i].uniqueId == selection[0].properties.uniqueId) {
               removeByValue(infOfChipList, infOfChipList[i])
             }
-          }
+          }*/
           /* if (selection) {
             var event = new InteractionEvent(this, InteractionEvent.ELEMENT_REMOVED, evt, selection);
             this.onInteractionEvent(event);

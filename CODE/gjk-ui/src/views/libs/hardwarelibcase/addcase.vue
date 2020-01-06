@@ -67,7 +67,7 @@
                 this.$refs[formName].validate(valid => {
                     if (valid) {
                         this.showInf.dialogFormVisible = false;
-                        this.form.userId = this.userInfo.name
+                        this.form.userId = this.userInfo.userId
                         this.$router.push({
                             path: "/libs/hardwarelibcase/casedesign",
                             query: this.form

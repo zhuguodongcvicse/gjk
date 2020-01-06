@@ -133,12 +133,14 @@
                 AND optical_num = #{hardwarelibInf.opticalNum}
             </if>
             <if test="hardwarelibInf.applyState != null and hardwarelibInf.applyState.trim() != ''">
-                AND apply_state = #{hardwarelibInf.applyState}
+--                 AND apply_state = #{hardwarelibInf.applyState}
+                or apply_state in ('2')
             </if>
             <if test="hardwarelibInf.applyDesc != null and hardwarelibInf.applyDesc.trim() != ''">
                 AND apply_desc = #{hardwarelibInf.applyDesc}
             </if>
         </where>
+        order by update_time DESC
     </select>
 
 

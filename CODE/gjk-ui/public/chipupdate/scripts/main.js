@@ -1,11 +1,11 @@
 var inf_json = [];
 var chipArr;
 var infArr;
-var infListTemp = []
 var selectCurrentChip
 var ioTypeList = ["输入", "输出", "输入/输出"]
 var ioValList = ["0", "1", "2"]
 var operateSymbol
+var infOfChipList = []
 Q.registerImage('rack', 'images/Case.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
 Q.registerImage('card', 'images/BeforeTheBoard.svg');
 Q.registerImage('behindcard', 'images/AfterTheBoard.svg');
@@ -72,11 +72,14 @@ function handleMessageFromParent(event) {
   infArr = event.data.params[0]
   chipArr = event.data.params[1]
   operateSymbol = event.data.params[2]
-  console.log("event.data.params", event.data.params);
+  // console.log("event.data.params", event.data.params);
   let chipTemp = JSON.parse(JSON.stringify(chipArr))
-  console.log("chipTemp", chipTemp)
+  let chipObj = JSON.parse(chipTemp.chipData)
+  console.log("chipObj", chipObj)
   switch (event.data.cmd) {
     case 'updateChip':
+      infOfChipList = infOfChipList.concat(chipObj.datas[0].json.properties.infOfChipList)
+      infOfChipList = JSON.parse(JSON.stringify(infOfChipList))
       for (var i = 0; i < infArr.length; i++) {
         if (infArr[i].infType == 3) {
           //		console.log("infArr[i].chipInf",infArr[i].chipInf)
@@ -277,7 +280,7 @@ function createCard(slot) {
   port.set('coreNum', chipArr.coreNum);
   port.set('memSize', chipArr.memSize);
   port.set('recvRate', chipArr.recvRate);
-  port.set('infOfChipList', infOfChipList);
+  // port.set('infOfChipList', infOfChipList);
   port.name = 'DSP芯片';
   port.setStyle(Q.Styles.LABEL_ANCHOR_POSITION, Q.Position.CENTER_MIDDLE);
   //	port.setStyle(Q.Styles.LABEL_POSITION, Q.Position.CENTER_MIDDLE);
@@ -334,12 +337,8 @@ function initEditor(editor) {
   toolbarDiv.appendChild(button)
   button.onclick = function () {
     var json = graph.toJSON()
-    //console.log("infListTemp", JSON.stringify(infListTemp))
-    //如果用户拖拽添加了接口，则将合并后的数组赋值给json
-    if (infListTemp.length != 0) {
-      json.datas[0].json.properties.infOfChipList = []
-      json.datas[0].json.properties.infOfChipList = infListTemp
-    }
+    console.log("json",json)
+    json.datas[0].json.properties.infOfChipList = infOfChipList
     //遍历芯片上所有的接口，给接口赋自增ID和默认iotype
     let IDNum = 0
     for (const i in json.datas[0].json.properties.infOfChipList) {
@@ -477,10 +476,11 @@ function initEditor(editor) {
         //拖拽触发
         //data.datas[0]._refId = 6666
         evt.data.properties.uniqueId = uuid(15, 62)
-        console.log("graph.toJSON()", graph.toJSON())
-        infListTemp = deepClone(graph.toJSON().datas[0].json.properties.infOfChipList)
-        infListTemp = deepClone(infListTemp.concat(evt.data.properties))
-        console.log("infListTemp", infListTemp)
+        // console.log("graph.toJSON()", graph.toJSON())
+        // infListTemp = deepClone(graph.toJSON().datas[0].json.properties.infOfChipList)
+        // infListTemp = deepClone(infListTemp.concat(evt.data.properties))
+        infOfChipList.push(evt.data.properties)
+        infOfChipList = JSON.parse(JSON.stringify(infOfChipList))
         var node = evt.data;
         if (!(node instanceof Q.Node)) {
           return
@@ -548,7 +548,7 @@ function initEditor(editor) {
     for (var i in selection) {
       if (selection[i].properties.type == "inf") {
         Q.confirm("是否 确认删除", function () {
-          var selection = this.removeSelection();
+          // var selection = this.removeSelection();
           /* for (const i in graph.toJSON().datas[0].json.properties.infOfChipList) {
             if (selection[0].) {
               const element = object[i];

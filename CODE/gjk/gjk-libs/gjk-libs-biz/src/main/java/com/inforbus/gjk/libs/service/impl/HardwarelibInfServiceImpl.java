@@ -48,9 +48,9 @@ public class HardwarelibInfServiceImpl extends ServiceImpl<HardwarelibInfMapper,
      * @return
      */
     @Override
-    public IPage<HardwarelibInf> getHardwarelibInfPage(Page<HardwarelibInf> page, String userName, HardwarelibInf hardwarelibInf) {
+    public IPage<HardwarelibInf> getHardwarelibInfPage(Page<HardwarelibInf> page, HardwarelibInf hardwarelibInf) {
         IPage<HardwarelibInf> hardwarelibInfPage = baseMapper.getHardwarelibInfPage(page, hardwarelibInf);
-        List<HardwarelibInf> hardwarelibInfs = new ArrayList<>();
+        /*List<HardwarelibInf> hardwarelibInfs = new ArrayList<>();
         for (HardwarelibInf record : hardwarelibInfPage.getRecords()) {
             if (record.getUserId() != null && record.getUserId().equals(userName)) {
                 hardwarelibInfs.add(record);
@@ -60,7 +60,7 @@ public class HardwarelibInfServiceImpl extends ServiceImpl<HardwarelibInfMapper,
         }
         hardwarelibInfPage.setTotal(hardwarelibInfs.size());
         hardwarelibInfPage.setRecords(hardwarelibInfs);
-        System.out.println("hardwarelibInfPage-----------------------> " + hardwarelibInfPage);
+        System.out.println("hardwarelibInfPage-----------------------> " + hardwarelibInfPage);*/
         return hardwarelibInfPage;
     }
 
@@ -69,7 +69,7 @@ public class HardwarelibInfServiceImpl extends ServiceImpl<HardwarelibInfMapper,
         //如果InfId为空，则是新增，用用户名和时间戳新拼一个id
         if (hardwarelibInf.getInfId() == null) {
             long currentTime = System.currentTimeMillis();
-            hardwarelibInf.setInfId(hardwarelibInf.getUserId() + currentTime);
+            hardwarelibInf.setInfId(hardwarelibInf.getUserId().toString() + currentTime);
         }
         hardwarelibInf.setDelFlag("0");
         //如果审批状态为空，则设置为0，即未处理

@@ -124,6 +124,7 @@ export default {
       });
       if (procedureXml != undefined) {
         this.$set(allMessage, "procedureXmlId", procedureXml.id);
+        this.$set(allMessage, "userId", "" + this.userInfo.userId);
         if (this.localDeploymentPlan) {
           this.$set(allMessage, "localDeploymentPlan", "0");
         } else {
