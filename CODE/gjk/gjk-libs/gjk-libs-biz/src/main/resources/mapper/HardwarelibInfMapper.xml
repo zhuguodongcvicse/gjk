@@ -95,7 +95,8 @@
         apply_state,
         apply_desc
         FROM gjk_hardwarelib_inf
-        <where>
+        where user_id = #{hardwarelibInf.userId} or apply_state = '2' order by update_time DESC
+        <!--<where>
             <if test="hardwarelibInf.id != null and hardwarelibInf.id.trim() != ''">
                 AND id = #{hardwarelibInf.id}
             </if>
@@ -111,8 +112,8 @@
             <if test="hardwarelibInf.infType != null and hardwarelibInf.infType.trim() != ''">
                 AND inf_type = #{hardwarelibInf.infType}
             </if>
-            <if test="hardwarelibInf.userId != null and hardwarelibInf.userId.trim() != ''">
-                AND user_id = #{hardwarelibInf.userId}
+            <if test="hardwarelibInf.userId != null">
+                or user_id = #{hardwarelibInf.userId}
             </if>
             <if test="hardwarelibInf.createTime != null and hardwarelibInf.createTime.trim() != ''">
                 AND create_time = #{hardwarelibInf.createTime}
@@ -123,9 +124,9 @@
             <if test="hardwarelibInf.backupInfo != null and hardwarelibInf.backupInfo.trim() != ''">
                 AND backup_info = #{hardwarelibInf.backupInfo}
             </if>
-            <!--<if test="hardwarelibInf.version != null ">
+            &lt;!&ndash;<if test="hardwarelibInf.version != null ">
         AND version = #{hardwarelibInf.version}
-      </if>-->
+      </if>&ndash;&gt;
             <if test="hardwarelibInf.delFlag != null and hardwarelibInf.delFlag.trim() != ''">
                 AND del_flag = #{hardwarelibInf.delFlag}
             </if>
@@ -133,14 +134,14 @@
                 AND optical_num = #{hardwarelibInf.opticalNum}
             </if>
             <if test="hardwarelibInf.applyState != null and hardwarelibInf.applyState.trim() != ''">
---                 AND apply_state = #{hardwarelibInf.applyState}
-                or apply_state in ('2')
+&#45;&#45;                 AND apply_state = #{hardwarelibInf.applyState}
+                or apply_state = '2'
             </if>
             <if test="hardwarelibInf.applyDesc != null and hardwarelibInf.applyDesc.trim() != ''">
                 AND apply_desc = #{hardwarelibInf.applyDesc}
             </if>
         </where>
-        order by update_time DESC
+        order by update_time DESC-->
     </select>
 
 

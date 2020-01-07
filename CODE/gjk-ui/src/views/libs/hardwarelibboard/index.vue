@@ -30,7 +30,7 @@
         <template slot-scope="scope" slot="menu">
           <el-button
             type="primary"
-            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="editBoard(scope.row,scope.index)"
@@ -46,7 +46,7 @@
           </el-button>
           <el-button
             type="danger"
-            v-if="permissions.libs_hardwarelibinf_del && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            v-if="permissions.libs_hardwarelibinf_del && scope.row.userId === userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
@@ -54,7 +54,7 @@
           </el-button>
           <el-button
             type="primary"
-            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="goStorage(scope.row,scope.index)"
@@ -207,9 +207,10 @@
             },
             getList() {
                 this.tableLoading = true;
+                this.listQuery.userId = this.userInfo.userId
                 fetchList(this.listQuery).then(response => {
                     this.tableData = response.data.data.records;
-                    this.allBoards = response.data.data.records;
+                    this.allBoards = JSON.parse(JSON.stringify(response.data.data.records));
                     // this.tableData = this.sortKey(this.tableData, 'createTime')
                     //判断板卡数据是否为空
                     /*if (this.allBoards.length !== 0) {

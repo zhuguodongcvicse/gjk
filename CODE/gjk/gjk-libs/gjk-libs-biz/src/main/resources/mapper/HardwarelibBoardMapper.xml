@@ -55,7 +55,9 @@
         del_flag,
         board_json
         FROM gjk_hardwarelib_board
-        <where>
+        where user_id = #{hardwarelibBoard.userId} or apply_state = '2'
+        order by update_time DESC
+        <!--<where>
             <if test="hardwarelibBoard.id != null and hardwarelibBoard.id.trim() != ''">
                 AND id = #{hardwarelibBoard.id}
             </if>
@@ -65,8 +67,8 @@
             <if test="hardwarelibBoard.boardId != null and hardwarelibBoard.boardId.trim() != ''">
                 AND board_id = #{hardwarelibBoard.boardId}
             </if>
-            <if test="hardwarelibBoard.userId != null and hardwarelibBoard.userId.trim() != ''">
-                AND user_id = #{hardwarelibBoard.userId}
+            <if test="hardwarelibBoard.userId != null">
+                or user_id = #{hardwarelibBoard.userId}
             </if>
             <if test="hardwarelibBoard.boardType != null and hardwarelibBoard.boardType.trim() != ''">
                 AND board_type = #{hardwarelibBoard.boardType}
@@ -78,7 +80,7 @@
                 AND backup_info = #{hardwarelibBoard.backupInfo}
             </if>
             <if test="hardwarelibBoard.applyState != null and hardwarelibBoard.applyState.trim() != ''">
-                AND apply_state = #{hardwarelibBoard.applyState}
+                or apply_state = '2'
             </if>
             <if test="hardwarelibBoard.applyDesc != null and hardwarelibBoard.applyDesc.trim() != ''">
                 AND apply_desc = #{hardwarelibBoard.applyDesc}
@@ -99,7 +101,7 @@
                 AND del_flag = #{hardwarelibBoard.delFlag}
             </if>
         </where>
-        order by update_time DESC
+        order by update_time DESC-->
     </select>
 
 
