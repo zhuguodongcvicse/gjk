@@ -125,7 +125,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
 	 * @param userId
 	 * @return
 	 */
-	SysUser getUsernameByUserId(@Param("userId") String userId);
+	SysUser getUsernameByUserId(@Param("userId") Integer userId);
 
 	void removeCompProject(@Param("compId")String compId, @Param("projectId")String projectId);
 

@@ -48,7 +48,7 @@ export const tableOption = {
       prop: 'userId',
       type: 'select',
       props: {
-        label: 'name',
+        label: 'showName',
         value: 'userId'
       },
       dicUrl: '/admin/user/info/getUserDict'
