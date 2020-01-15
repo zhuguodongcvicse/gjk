@@ -628,7 +628,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// String parentFilePath = map.get("parentFilePath");
 		File file = new File(sb.toString());
 		if (file.exists()) {
-			String str = sb.toString() + "/" + map.get("fileName") + ".xml";
+			String str = sb.toString() + map.get("fileName") + ".xml";
 			File file1 = new File(str);
 			if (file1.exists()) {
 				XmlEntityMap xmlJson = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file1);
