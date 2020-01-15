@@ -67,18 +67,18 @@ public class BSPServiceImpl extends ServiceImpl<BSPMapper, BSP> implements BSPSe
 	/**
 	 * 软件框架库表简单分页查询
 	 * 
-	 * @param BSP 软件框架库表
+//	 * @param BSP 软件框架库表
 	 * @return
 	 */
 	@Override
 	public IPage<BSP> getBSPPage(Page<BSP> page, @RequestBody BSP bsp) {
-		String roleCode = bspGetRoleCodeService.getSysRoleCodeByRoleId(bsp.getUserId());
-		if ("ROLE_ADMIN".equals(roleCode)) {
-			bsp.setUserId(0);
+//		String roleCode = bspGetRoleCodeService.getSysRoleCodeByRoleId(bsp.getUserId());
+//		if ("ROLE_ADMIN".equals(roleCode)) {
+//			bsp.setUserId(0);
 			return baseMapper.getBSPPage(page, bsp);
-		}
-//		
-		return baseMapper.selectPage(page, new QueryWrapper<BSP>(bsp));
+//		}
+//
+//		return baseMapper.selectPage(page, new QueryWrapper<BSP>(bsp));
 	}
 
 	/**
@@ -131,24 +131,24 @@ public class BSPServiceImpl extends ServiceImpl<BSPMapper, BSP> implements BSPSe
 
 	@Override
 	public IPage<BSPDTO> getBSPDTOPage(Page<BSP> bspPage, BSP bsp) {
-		if ("ROLE_ADMIN".equals(bspGetRoleCodeService.getSysRoleCodeByRoleId(bsp.getUserId()))) {
-			IPage<BSP> iPage = getBSPPage(bspPage, bsp);
-			List<BSP> bsps = iPage.getRecords();
-
-			List<BSPDTO> bspDTOs = new ArrayList<>();
-			for (BSP soft : bsps) {
-				BSPDTO dto = new BSPDTO(soft);
-				if ("2".equals(soft.getApplyState())
-						|| "ROLE_ADMIN".equals(bspGetRoleCodeService.getSysRoleCodeByRoleId(soft.getUserId()))) {
-					bspDTOs.add(dto);
-				}
-			}
-			Page<BSPDTO> bspDTOPage = new Page<BSPDTO>(bspPage.getCurrent(), bspPage.getSize());
-			bspDTOPage.setRecords(bspDTOs);
-			bspDTOPage.setPages(iPage.getPages());
-			bspDTOPage.setTotal(iPage.getTotal());
-			return bspDTOPage;
-		} else {
+//		if ("ROLE_ADMIN".equals(bspGetRoleCodeService.getSysRoleCodeByRoleId(bsp.getUserId()))) {
+//			IPage<BSP> iPage = getBSPPage(bspPage, bsp);
+//			List<BSP> bsps = iPage.getRecords();
+//
+//			List<BSPDTO> bspDTOs = new ArrayList<>();
+//			for (BSP soft : bsps) {
+//				BSPDTO dto = new BSPDTO(soft);
+//				if ("2".equals(soft.getApplyState())
+//						|| "ROLE_ADMIN".equals(bspGetRoleCodeService.getSysRoleCodeByRoleId(soft.getUserId()))) {
+//					bspDTOs.add(dto);
+//				}
+//			}
+//			Page<BSPDTO> bspDTOPage = new Page<BSPDTO>(bspPage.getCurrent(), bspPage.getSize());
+//			bspDTOPage.setRecords(bspDTOs);
+//			bspDTOPage.setPages(iPage.getPages());
+//			bspDTOPage.setTotal(iPage.getTotal());
+//			return bspDTOPage;
+//		} else {
 			IPage<BSP> iPage = getBSPPage(bspPage, bsp);
 			List<BSP> bsps = iPage.getRecords();
 
@@ -163,7 +163,7 @@ public class BSPServiceImpl extends ServiceImpl<BSPMapper, BSP> implements BSPSe
 			bspDTOPage.setPages(iPage.getPages());
 			bspDTOPage.setTotal(iPage.getTotal());
 			return bspDTOPage;
-		}
+//		}
 
 	}
 

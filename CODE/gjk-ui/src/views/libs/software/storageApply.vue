@@ -161,6 +161,7 @@ export default {
             saveApproval(approval).then(Response => {
               let software = {};
               software.id = this.softwareItemMsg.id;
+              software.userId = this.userInfo.userId;
               software.applyState = "1";
               software.applyDesc = "已提交申请，请等待库管理员审批";
               //修改软件框架审批状态成已提交申请
