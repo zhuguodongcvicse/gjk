@@ -161,6 +161,7 @@ export default {
             //提交记录到审批管理库
             saveApproval(approval).then(Response => {
               let bsp = {};
+              bsp.userId = this.userInfo.userId
               bsp.id = this.bspItemMsg.id;
               bsp.applyState = "1";
               bsp.applyDesc = "已提交申请，请等待库管理员审批";

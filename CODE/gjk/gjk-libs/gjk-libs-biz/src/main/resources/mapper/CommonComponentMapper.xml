@@ -85,8 +85,7 @@
 				test="commonComponent.compFuncname != null and commonComponent.compFuncname.trim() != ''">
 				AND comp_funcname = #{commonComponent.compFuncname}
 			</if>
-			<if
-				test="commonComponent.userId != null and commonComponent.userId.trim() != ''">
+			<if test="commonComponent.userId != null">
 				AND user_id = #{commonComponent.userId}
 			</if>
 			<if
@@ -211,13 +210,15 @@
 		<where>
 			<foreach collection="selectStringList" item="item"
 				index="index" open="(" separator=")and(" close=")">
-				lower(comp_id) LIKE '%${item}%'
+				lower(comp_id) LIKE
+				'%${item}%'
 				OR
 				lower(comp_name) LIKE '%${item}%'
 				OR
 				lower(comp_funcname) LIKE '%${item}%'
 				OR
-				lower(description) LIKE '%${item}%'
+				lower(description) LIKE
+				'%${item}%'
 			</foreach>
 		</where>
 	</select>
@@ -246,13 +247,15 @@
 		<where>
 			<foreach collection="selectStringList" item="item"
 				index="index" open="(" separator=")and(" close=")">
-				lower(comp_id) LIKE '%${item}%'
+				lower(comp_id) LIKE
+				'%${item}%'
 				OR
 				lower(comp_name) LIKE '%${item}%'
 				OR
 				lower(comp_funcname) LIKE '%${item}%'
 				OR
-				lower(description) LIKE '%${item}%'
+				lower(description) LIKE
+				'%${item}%'
 			</foreach>
 		</where>
 		)b

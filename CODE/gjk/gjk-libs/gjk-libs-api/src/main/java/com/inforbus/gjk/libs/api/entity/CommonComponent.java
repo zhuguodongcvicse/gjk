@@ -56,7 +56,7 @@ public class CommonComponent extends Model<CommonComponent> {
 	/**
 	 * 用户
 	 */
-	private String userId;
+	private Integer userId;
 	/**
 	 * 版本
 	 */

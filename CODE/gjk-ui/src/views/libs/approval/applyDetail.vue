@@ -1,11 +1,4 @@
 <template>
-  <!-- <el-dialog
-    class="libs_approval_applydetail_14s"
-    title="审批详情"
-    :visible.sync="dialog"
-    width="50%"
-    :before-close="handleClose"
-  >-->
   <div>
     <el-row :gutter="10">
       <el-col :span="11">
@@ -136,7 +129,6 @@
         <el-button type="primary" @click="rejectDialog=false">取 消</el-button>
       </span>
     </el-dialog>
-    <!-- </el-dialog> -->
   </div>
 </template>
 
@@ -273,6 +265,49 @@
                     this.treeNodeArray.push(item.id);
                 });
             },
+            saveComp(comp){
+                //将通过审批的构件提交到公共构件库
+                let commonComp = {};
+                commonComp.id = comp.id;
+                commonComp.compId = comp.compId;
+                commonComp.compName = comp.compName;
+                commonComp.compFuncname = comp.compFuncname;
+                commonComp.userId = comp.userId;
+                commonComp.compImg = comp.compImg;
+                commonComp.description = comp.compBackupinfo;
+                commonComp.delFlag = "0";
+                saveCommonComp(commonComp).then(Response => {
+                    let compVersion = Response.data.data.version;
+                    getAllDetailByCompId(comp.id).then(Response => {
+                        let compDetail = [];
+                        for (let item of Response.data.data) {
+                            let commonCompDetail = {};
+                            commonCompDetail.id = item.id;
+                            commonCompDetail.compId = item.compId;
+                            commonCompDetail.fileName = item.fileName;
+                            commonCompDetail.fileType = item.fileType;
+                            commonCompDetail.filePath = item.filePath;
+                            commonCompDetail.version = compVersion;
+                            commonCompDetail.paraentId = item.paraentId;
+                            commonCompDetail.paraentIds = item.paraentIds;
+                            commonCompDetail.libsId = item.libsId;
+                            compDetail.push(commonCompDetail);
+                        }
+                        saveCompDetailList(compDetail, this.userInfo.username);
+                    });
+
+                    //修改构件中审批状态
+                    let modifyComponent = {};
+                    modifyComponent.id = comp.id;
+                    modifyComponent.applyState = "2";
+                    modifyComponent.applyDesc = "入库申请已通过";
+                    modifyComp(modifyComponent).then(Response => {
+                        this.dialogStateShow(false);
+                        //刷新页面
+                        this.$emit("refresh");
+                    });
+                });
+            },
             //审批通过调用方法
             approvedFunc() {
                 //将审批状态改为已通过
@@ -283,87 +318,12 @@
                 putObj(modifyApply).then(Response => {
                     switch (this.applyItemMsg.libraryType) {
                         case "1":
-                            //将通过审批的构件提交到公共构件库
-                            let commonComp = {};
-                            commonComp.id = this.component.id;
-                            commonComp.compId = this.component.compId;
-                            commonComp.compName = this.component.compName;
-                            commonComp.compFuncname = this.component.compFuncname;
-                            commonComp.userId = this.component.userId;
-                            commonComp.compImg = this.component.compImg;
-                            commonComp.description = this.component.compBackupinfo;
-                            commonComp.delFlag = "0";
                             if (this.applyItemMsg.applyType != "3" && this.applyItemMsg.applyType != "4") {
-                                saveCommonComp(commonComp).then(Response => {
-                                    let compVersion = Response.data.data.version;
-                                    getAllDetailByCompId(this.applyItemMsg.applyId).then(Response => {
-                                        let compDetail = [];
-                                        for (let item of Response.data.data) {
-                                            let commonCompDetail = {};
-                                            commonCompDetail.id = item.id;
-                                            commonCompDetail.compId = item.compId;
-                                            commonCompDetail.fileName = item.fileName;
-                                            commonCompDetail.fileType = item.fileType;
-                                            commonCompDetail.filePath = item.filePath;
-                                            commonCompDetail.version = compVersion;
-                                            commonCompDetail.paraentId = item.paraentId;
-                                            commonCompDetail.paraentIds = item.paraentIds;
-                                            commonCompDetail.libsId = item.libsId;
-                                            compDetail.push(commonCompDetail);
-                                        }
-                                        saveCompDetailList(compDetail, this.userInfo.username);
-                                    });
-
-                                    //修改构件中审批状态
-                                    let modifyComponent = {};
-                                    modifyComponent.id = this.component.id;
-                                    modifyComponent.applyState = "2";
-                                    modifyComponent.applyDesc = "入库申请已通过";
-                                    modifyComp(modifyComponent).then(Response => {
-                                        this.dialogStateShow(false);
-                                        //刷新页面
-                                        this.$emit("refresh");
-                                    });
-                                });
+                                this.saveComp(this.component);
                             } else if (this.applyItemMsg.applyType == "4") {
-                                let commonComps = []
                                 for (let item of this.componentlists) {
-                                    let commonComp = {};
-                                    commonComp.id = item.id;
-                                    commonComp.compId = item.compId;
-                                    commonComp.compName = item.compName;
-                                    commonComp.compFuncname = item.compFuncname;
-                                    commonComp.userId = item.userId;
-                                    commonComp.compImg = item.compImg;
-                                    commonComp.description = item.description;
-                                    commonComp.delFlag = "0";
-                                    let compVersion = item.version;
-                                    getAllDetailByCompId(item.id).then(Response => {
-                                        let compDetail = [];
-                                        for (let item of Response.data.data) {
-                                            let commonCompDetail = {};
-                                            commonCompDetail.id = item.id;
-                                            commonCompDetail.compId = item.compId;
-                                            commonCompDetail.fileName = item.fileName;
-                                            commonCompDetail.fileType = item.fileType;
-                                            commonCompDetail.filePath = item.filePath;
-                                            commonCompDetail.version = compVersion;
-                                            commonCompDetail.paraentId = item.paraentId;
-                                            commonCompDetail.paraentIds = item.paraentIds;
-                                            commonCompDetail.libsId = item.libsId;
-                                            console.log(commonCompDetail)
-                                            compDetail.push(commonCompDetail);
-                                        }
-                                        saveCompDetailList(compDetail, this.userInfo.username);
-                                    });
-                                    let modifyComponent = {};
-                                    modifyComponent.id = item.id;
-                                    modifyComponent.applyState = "2";
-                                    modifyComponent.applyDesc = "入库申请已通过";
-                                    modifyComp(modifyComponent)
-                                    commonComps.push(commonComp)
+                                    this.saveComp(item);
                                 }
-                                saveCompList(commonComps)
                             }
                             break;
                         case "2-1":
@@ -416,6 +376,7 @@
                             break;
                         case "3":
                             let software = {};
+                            software.userId = this.userInfo.userId
                             software.id = this.applyItemMsg.applyId;
                             software.applyState = "2";
                             software.applyDesc = "已通过";
@@ -427,6 +388,7 @@
                             break;
                         case "5":
                             let bsp = {};
+                            bsp.userId = this.userInfo.userId
                             bsp.id = this.applyItemMsg.applyId;
                             bsp.applyState = "2";
                             bsp.applyDesc = "已通过";
@@ -578,6 +540,7 @@
                                     break;
                                 case "3":
                                     let software = {};
+                                    software.userId = this.userInfo.userId
                                     software.id = this.applyItemMsg.applyId;
                                     software.applyState = "3";
                                     software.applyDesc = this.rejectForm.rejectMassage;
@@ -591,6 +554,7 @@
                                 case "5":
                                     let bsp = {};
                                     bsp.id = this.applyItemMsg.applyId;
+                                    bsp.userId = this.userInfo.userId
                                     bsp.applyState = "3";
                                     bsp.applyDesc = this.rejectForm.rejectMassage;
                                     modifyBSP(bsp).then(Response => {
