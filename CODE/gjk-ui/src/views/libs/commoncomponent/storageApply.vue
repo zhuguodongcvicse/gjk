@@ -119,7 +119,7 @@ export default {
                   approval.applyUserId = this.form.applyUser
                   approval.approvalState = "0"
                   saveApproval(approval).then(Response=>{
-                    this.$message({
+                    this.$notify({
                         message: "已提交申请，请等待库管理员审批",
                         type: "success"
                     });
@@ -132,7 +132,7 @@ export default {
                 approval.approvalState = "4"
                 console.log(approval)
                 putapproval(approval).then(Response=>{
-                  this.$message({
+                  this.$notify({
                       message: "已提交申请，请等待库管理员审批",
                       type: "success"
                   });

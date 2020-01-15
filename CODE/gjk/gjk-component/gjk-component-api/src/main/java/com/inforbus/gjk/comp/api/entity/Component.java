@@ -38,7 +38,7 @@ public class Component extends Model<Component> {
 	/**
 	 * 用户ID
 	 */
-	private String userId;
+	private Integer userId;
 	/**
 	 * 版本
 	 */

@@ -67,24 +67,27 @@ export const tableOption = {
       prop: 'opticalNum'
     },
     /*{
-      label: 'io类型',
-      prop: 'ioType'
-    }*/
-    /*{
       label: '用户',
-      prop: 'userId'
-    }*/
+      prop: 'userId',
+      type: 'select',
+      filter: true,
+      dicData:[/!*{ label: '男', value: '男' },
+        { label: '女', value: '女' }*!/],
+      /!*filterMethod:function(value, row, column) {
+        console.log("row",row)
+        return row.userId === value;
+      }*!/
+    },*/
     {
       label: '用户',
       prop: 'userId',
       type: 'select',
       filter: true,
-      dicData:[/*{ label: '男', value: '男' },
-        { label: '女', value: '女' }*/],
-      /*filterMethod:function(value, row, column) {
-        console.log("row",row)
-        return row.userId === value;
-      }*/
+      props: {
+        label: 'showName',
+        value: 'userId'
+      },
+      dicUrl: '/admin/user/info/getUserDict'
     },
     {
       label: '版本',

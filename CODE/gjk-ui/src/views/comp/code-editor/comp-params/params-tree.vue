@@ -52,8 +52,12 @@
               <el-col
                 :span="moduleType==='comp'? 12 : 24"
                 :key="node.attrMappingName"
-                v-show="node.isShow"
+                v-show="moduleType==='comp'?node.isShow:node.isProcessShow"
               >
+                <!-- 用于判断在哪个模块该显示  moduleType===comp 为构件建模 
+              node.isShow 构件建模显示|| 
+              node.isProcessShow 流程建模显示
+                -->
                 <el-form-item :label="node.attrMappingName" style="margin-bottom: 0px;">
                   <form-item-type
                     v-model="node.lableName"
@@ -61,7 +65,7 @@
                     placeholder="请选择"
                     :dictKey="node.dataKey"
                     :readonly="readonly"
-                    :disabled="disabled"
+                    :disabled="disabled || moduleType==='comp'?false :processDisabled.includes(node.labelKey)?true:false "
                     @change="itemTypeChange(deepClone(node),nodeFormParam)"
                     @selectChangeData="selectChangeData"
                     @retStructChange="retStructChange"
@@ -121,9 +125,9 @@ export default {
       xzblPaeam: "选择变量",
       numIndexParam: "序号",
       lengthParam: "长度",
-      nameParam: "名称", //名称
+      nameParam: "variable", //名称
       paramType: "",
-
+      processDisabled: [],
       //
       filterText: "",
       treeData: [],
@@ -193,7 +197,7 @@ export default {
           let tmpblParamOld = {};
           for (let key1 in nodeCol) {
             for (let key2 in nodeCol[key1]) {
-              if (nodeCol[key1][key2].attrMappingName === this.lbParam) {
+              if (nodeCol[key1][key2].labelKey === this.lbParam) {
                 (k1 = key1), (k2 = key2);
                 tmpblParam = nodeCol[key1][key2];
                 tmpblParamOld = param.nodeData[key1][key2];
@@ -291,6 +295,7 @@ export default {
             : this.tableXmlParams.lableName === "输出"
             ? "output"
             : "";
+        console.log("tableXmlParams", this.tableXmlParams);
         this.analysisAttrConfigType(this.tableXmlParams);
       }
     },
@@ -298,6 +303,7 @@ export default {
       immediate: true,
       handler: function(treeData) {
         let saveTreeData = [];
+        //根据基础模板配置信息回写数据
         this.analysisByBaseXmlOptionData(deepClone(treeData), saveTreeData);
         this.tableXmlParams.xmlEntityMaps = saveTreeData;
         let { headerKey, headerValue } = this.cacheHeaderValueParams;
@@ -319,47 +325,25 @@ export default {
   },
   //方法集合
   methods: {
+    //设置标签名
     setShowLableName(labelKey, labelValue) {
-      //       bllxParam: "变量类型",
-      // lbParam: "类别",
-      // fzParam: "赋值",
-      // xzblPaeam: "选择变量",
-      // numIndexParam: "序号",
-      // lengthParam: "长度",
-      // nameParam: "名称", //名称
-      let label = labelValue.find(item => {
-        return item.isShow || item.attrMappingName !== "";
-      });
-      switch (labelKey) {
-        case "变量类型":
-          this.bllxParam = label.attrMappingName;
-          break;
-        case "类别":
-          this.lbParam = label.attrMappingName;
-          break;
-        case "赋值":
-          this.fzParam = label.attrMappingName;
-          break;
-        case "选择变量":
-          this.xzblPaeam = label.attrMappingName;
-          break;
-        case "序号":
-          this.numIndexParam = label.attrMappingName;
-          break;
-        case "长度":
-          this.lengthParam = label.attrMappingName;
-          break;
-        case "名称":
-          this.nameParam = label.attrMappingName;
-          break;
+      for (let key in labelValue) {
+        if (labelValue[key].isShow || labelValue[key].attrMappingName !== "") {
+          let isNotAttr = ["structType", "structId", "paramRemarks"];
+          if (isNotAttr.includes(labelValue[key].attrName)) {
+          } else {
+            this.$set(labelValue[key], "labelKey", labelKey);
+          }
+        }
       }
+      this.processDisabled = [this.nameParam, this.bllxParam];
     },
     //返回lableName的值
     retNodeDataLableName(nodeCol, name) {
       let tmpblParam = {};
       nodeCol.forEach(items => {
         items.forEach(item => {
-          if (item.attrMappingName === name) {
+          if (item.labelKey === name) {
             tmpblParam = item;
           }
         });
@@ -487,9 +471,9 @@ export default {
       data.forEach(items => {
         items.forEach(item => {
           // 如果是变量类型，将变量类型当前内容赋入
-          if (item.attrMappingName === this.bllxParam) {
+          if (item.labelKey === this.bllxParam) {
             bllxName = item.lableName;
-          } else if (item.attrMappingName === this.lbParam) {
+          } else if (item.labelKey === this.lbParam) {
             lbName = item.lableName;
           }
         });
@@ -497,31 +481,41 @@ export default {
       data.forEach(items => {
         items.forEach(item => {
           // 如果是长度，根据变量类型内容判断是否显示
-          if (item.attrMappingName === this.lengthParam) {
+          if (item.labelKey === this.lengthParam) {
             let isx = bllxName.includes("*");
             if (bllxName === null || bllxName === undefined) {
               return;
             }
-            if (item.attrMappingName === this.lengthParam) {
+            if (item.labelKey === this.lengthParam) {
               item.isShow = isx ? true : false;
               item.lableName = isx ? item.lableName : "";
             }
           }
           // 如果是类别，根据变量类型内容处理选择内容
-          if (item.attrMappingName === this.lbParam) {
+          if (item.labelKey === this.lbParam) {
             let name = item.lableName;
             data.forEach(data1 => {
               data1.forEach(data2 => {
-                if (data2.attrMappingName === this.fzParam) {
+                if (data2.labelKey === this.fzParam) {
                   data2.lableName = name === "IMMEDIATE" ? data2.lableName : "";
-                  data2.isShow = name === "IMMEDIATE" ? true : false;
-                } else if (data2.attrMappingName === this.xzblPaeam) {
-                  data2.isShow =
+                  //用于判断是否显示
+                  let isNodeShow = name === "IMMEDIATE" ? true : false;
+                  //用于判断构件显示还是流程显示
+                  this.moduleType === "comp"
+                    ? (data2.isShow = isNodeShow)
+                    : (data2.isProcessShow = isNodeShow);
+                } else if (data2.labelKey === this.xzblPaeam) {
+                  //用于判断是否显示
+                  let isNodeShow =
                     name === "IMMEDIATE"
                       ? false
                       : name === "DATA"
                       ? false
                       : true;
+                  //用于判断构件显示还是流程显示
+                  this.moduleType === "comp"
+                    ? (data2.isShow = isNodeShow)
+                    : (data2.isProcessShow = isNodeShow);
                   data2.lableName = name === "IMMEDIATE" ? "" : data2.lableName;
                 }
               });
@@ -591,7 +585,8 @@ export default {
     },
     //每个框的改变该表事件
     itemTypeChange(col, row) {
-      if (col.attrMappingName === this.bllxParam) {
+      //如果发生变化的是变量类型
+      if (col.labelKey === this.bllxParam) {
         let isStruct = col.lableName.replace("*", "");
         //在不在头文件中
         let isokStrDH =
@@ -641,7 +636,7 @@ export default {
         for (let key in row) {
           //查找名称的一组数据
           let mcParam = row[key].find(item => {
-            return item.attrMappingName === this.nameParam;
+            return item.labelKey === this.nameParam;
           });
           if (mcParam) {
             //循环给名称中的ID struct赋值
@@ -659,21 +654,32 @@ export default {
             this.changeCol(col, item, row);
           });
         });
-      } else if (col.attrMappingName === this.lbParam) {
+      } //如果发生变化的是的类别
+      else if (col.labelKey === this.lbParam) {
         let lableName = col.lableName;
         row.forEach(items => {
           items.forEach(item => {
-            if (item.attrMappingName === this.fzParam) {
+            if (item.labelKey === this.fzParam) {
               item.lableName = lableName === "IMMEDIATE" ? item.lableName : "";
-              item.isShow = lableName === "IMMEDIATE" ? true : false;
-            } else if (item.attrMappingName === this.xzblPaeam) {
-              item.isShow =
+              //用于判断是否显示
+              let isNodeShow = lableName === "IMMEDIATE" ? true : false;
+              //用于判断构件显示还是流程显示
+              this.moduleType === "comp"
+                ? (item.isShow = isNodeShow)
+                : (item.isProcessShow = isNodeShow);
+            } else if (item.labelKey === this.xzblPaeam) {
+              item.lableName = lableName === "IMMEDIATE" ? "" : item.lableName;
+              //用于判断是否显示
+              let isNodeShow =
                 lableName === "IMMEDIATE"
                   ? false
                   : lableName === "DATA"
                   ? false
                   : true;
-              item.lableName = lableName === "IMMEDIATE" ? "" : item.lableName;
+              //用于判断构件显示还是流程显示
+              this.moduleType === "comp"
+                ? (item.isShow = isNodeShow)
+                : (item.isProcessShow = isNodeShow);
             }
           });
         });
@@ -686,21 +692,24 @@ export default {
             this.$refs.tree.updateKeyChildren(this.aCheckedKeys[0], []);
           }
         }
-      } else if (col.attrMappingName === this.nameParam) {
+      } //如果发生变化的是的名称
+      else if (col.labelKey === this.nameParam) {
         //更改树上显示值
         if (this.$refs.tree !== undefined) {
+          // console.log("更改树上显示值", col.lableName);
           this.$refs.tree.getCheckedNodes()[0].lableName = col.lableName;
         }
-      } else if (col.attrMappingName === this.xzblPaeam) {
+      } //如果发生变化的是的选择变量
+      else if (col.labelKey === this.xzblPaeam) {
         for (let key in row) {
           //查找名称的一组数据
           let mcParam = row[key].find(item => {
-            return item.attrMappingName === this.xzblPaeam;
+            return item.labelKey === this.xzblPaeam;
           });
           if (mcParam) {
             //循环给名称中的ID struct赋值
-            //row[key][1].lableName = this.structChange.dbId; //"structId"
-            //row[key][2].lableName = this.structChange.fparamType; //"structType"
+            row[key][1].lableName = this.structChange.dbId; //"structId"
+            row[key][2].lableName = this.structChange.fparamType; //"structType"
           }
         }
       } else {
@@ -768,6 +777,8 @@ export default {
         }
         // //处理合并子数据
         const { labelKey, attrs } = this.analysisMapping(xml);
+        //设置固定配置
+        this.setShowLableName(labelKey, attrs);
         treeData.push(attrs);
       });
       node["nodeData"] = deepClone(treeData);
@@ -778,14 +789,14 @@ export default {
     getStructType(rows) {
       let id, name, numIndex;
       let strc = deepClone(this.structType);
-      console.log("structType", strc);
+      // console.log("structType", strc);
       rows.forEach(cols => {
         cols.forEach(col => {
-          if (col.attrMappingName === this.nameParam) {
+          if (col.labelKey === this.nameParam) {
             name = col.lableName;
-          } else if (col.attrMappingName === this.bllxParam) {
+          } else if (col.labelKey === this.bllxParam) {
             id = col.lableName;
-          } else if (col.attrMappingName === this.numIndexParam) {
+          } else if (col.labelKey === this.numIndexParam) {
             numIndex = col.lableName;
           }
         });
@@ -819,7 +830,7 @@ export default {
       if (isok === "dbStruct") {
         //先去数据库找
         struct = strc.find(str => {
-          console.log("11111111111", str.dbId, id);
+          // console.log("11111111111", str.dbId, id);
           return str.dbId === id.replace("_*", "");
         });
         if (struct !== undefined) {
@@ -845,7 +856,7 @@ export default {
         let dataVal = [];
         let arrData = deepClone(this.findArrayTmpMap.get(key));
         //TODO
-        console.log("arrDataarrData", arrData);
+        // console.log("arrDataarrData", arrData);
         for (let key in arrData) {
           dataVal.push(deepClone(arrData[key]));
         }
@@ -856,7 +867,7 @@ export default {
         this.$refs.tree.updateKeyChildren(this.aCheckedKeys[0], dataVal);
       } else {
         let typeParam = this.getStructType(params);
-        console.log("测试结构体数据", typeParam);
+        // console.log("测试结构体数据", typeParam);
         if (typeParam.isok === "shStruct") {
           let dataVal = [];
           //①父级结构体，
@@ -880,7 +891,7 @@ export default {
           getStructTree(typeParam.struct).then(r => {
             let nodes = {};
             nodes = this.getBaseXmlOptionDataTree(typeParam.struct);
-            console.log("测试数据0111", nodes);
+            // console.log("测试数据0111", nodes);
             this.$set(nodes, "children", []);
             //设置序号
             this.xmlTreeShowTabValues(
@@ -910,14 +921,20 @@ export default {
         return;
       }
       let isx = col.lableName.includes("*");
-      if (item.attrMappingName === this.lengthParam) {
+      if (item.labelKey === this.lengthParam) {
         if (isx) {
-          item.isShow = true;
+          //用于判断构件显示还是流程显示
+          this.moduleType === "comp"
+            ? (item.isShow = true)
+            : (item.isProcessShow = true);
         } else {
           item.lableName = "";
-          item.isShow = false;
+          //用于判断构件显示还是流程显示
+          this.moduleType === "comp"
+            ? (item.isShow = false)
+            : (item.isProcessShow = false);
         }
-      } else if (item.attrMappingName === this.lbParam) {
+      } else if (item.labelKey === this.lbParam) {
         item.dataKey = [];
         // if (isx) {
         item.dataKey.push(
@@ -941,6 +958,7 @@ export default {
     },
     //处理属性是否显示
     analysisAttrConfigType(attr) {
+      // console.log("将查询得到的数据用基础配置转成数组", this.paramType);
       var attrObj = eval("(" + attr.attributeMap.configureType + ")");
       //非层级的树
       let retDataAll = [];
@@ -955,8 +973,11 @@ export default {
         tmpMaps = this.reduceObject(tmpMaps, "lableName");
         //组装基础
         tmpData.xmlEntityMaps = tmpMaps;
-        // console.log("储存基础模板数据tmpTabOptionData", tmpData, tmpMaps);
         this.baseXmlOptionData = tmpData;
+        console.log(
+          "储存基础模板数据tmpTabOptionData",
+          deepClone(this.baseXmlOptionData)
+        );
         let dataTree = [];
         //处理返回树形结构,此处没有问题
         // console.log("处理返回树形结构,", retDataAll);
@@ -975,6 +996,13 @@ export default {
           //当前节点
           this.aCheckedKeys = [this.treeData[0].id];
         }
+        // console.log(
+        //   " this.aCheckedKeys",
+        //   this.paramType,
+        //   this.aCheckedKeys,
+        //   this.treeData,
+        //   this.treeData[0].nodeData[0][0].lableName
+        // );
       }
     },
     //循环所有节点
@@ -1000,16 +1028,22 @@ export default {
           let treeParam = [];
           const { labelKey, attrs } = this.analysisMapping(deepClone(xml));
           treeParam.push(attrs);
+
+          //设置固定配置
+          this.setShowLableName(labelKey, attrs);
+
           let paramRemarks = "";
-          for (let item of attrs) {
-            if (item.attrName == "name") {
-              this.nameParam = item.attrMappingName;
-            }
-            if (item.attrName == "paramRemarks") {
-              paramRemarks = item.lableName;
+          //判断是否variable层级
+          if (labelKey === this.nameParam) {
+            //查找注释的对象
+            let remarks = attrs.find(item => {
+              return item.attrName == "paramRemarks";
+            });
+            if (remarks) {
+              //给paramRemarks赋值
+              paramRemarks = remarks.lableName;
             }
           }
-          // console.log("lableName", lableName,treeParam,xml);
           let regExp = /\w+\[[0-9]+\]/i;
           let xmlChild = xml.xmlEntityMaps;
           tmpData = xml; //添加基础配置
@@ -1024,7 +1058,7 @@ export default {
                 for (let key in attrs) {
                   //类别和data
                   if (
-                    attrs[key].attrMappingName === this.lbParam &&
+                    attrs[key].labelKey === this.lbParam &&
                     attrs[key].lableName === "DATA"
                   ) {
                     if (this.paramType === "input") {
@@ -1086,6 +1120,7 @@ export default {
             node["paramRemarks"] = paramRemarks;
             node["assigStructType"] = xml.attributeMap.structType;
           }
+          // console.log("给树赋值显示值", node);
           if (JSON.stringify(node) !== "{}") {
             retDataAll.push(node);
           }
@@ -1095,7 +1130,7 @@ export default {
           let nodes = [];
           //循环map
           arrayTmpMap.forEach((parent, key) => {
-            console.log("arrayTmpMaparrayTmpMaparrayTmpMap", key);
+            // console.log("arrayTmpMaparrayTmpMaparrayTmpMap", key);
             //组装树形数据
             let node = {};
             let childArr = deepClone(parent.children);
@@ -1115,7 +1150,7 @@ export default {
                 children.push(param);
               }
               node.children = children;
-              console.log("大于1个节点", node);
+              // console.log("大于1个节点", node);
               this.findArrayTmpMap.set(node.id, children);
             } else {
               node = deepClone(parent);
@@ -1123,7 +1158,7 @@ export default {
               node.lableName = node.nodeData[0][0].lableName =
                 key + "[" + node.tmpLength + "]";
               node.children = [];
-              console.log("等于1个节点", node.tmpLength);
+              // console.log("等于1个节点", node.tmpLength);
               let saveMapValue = [];
               for (let index = 0; index < node.tmpLength; index++) {
                 let param = deepClone(childArr[0]);
@@ -1164,7 +1199,7 @@ export default {
         //处理树上所带参数
         child.nodeData.forEach(nodes => {
           nodes.forEach(node => {
-            if (node.attrMappingName === this.nameParam) {
+            if (node.labelKey === this.nameParam) {
               node.lableName = endKey;
             }
           });
@@ -1178,20 +1213,14 @@ export default {
           for (let key1 in parentArr) {
             for (let key2 in parentArr[key1]) {
               //设置名字"名称"
-              if (parentArr[key1][key2].attrMappingName === this.nameParam) {
+              if (parentArr[key1][key2].labelKey === this.nameParam) {
                 parent.lableName = parentArr[key1][key2].lableName = key;
-              } else if (
-                parentArr[key1][key2].attrMappingName === this.bllxParam
-              ) {
+              } else if (parentArr[key1][key2].labelKey === this.bllxParam) {
                 parentArr[key1][key2].lableName = parent.assigStructType;
-              } else if (
-                parentArr[key1][key2].attrMappingName === this.bllxParam
-              ) {
+              } else if (parentArr[key1][key2].labelKey === this.bllxParam) {
                 parentArr[key1][key2].lableName = parent.assigStructType;
-              } else if (parentArr[key1][key2].attrMappingName === "序号") {
-              } else if (
-                parentArr[key1][key2].attrMappingName === this.lbParam
-              ) {
+              } else if (parentArr[key1][key2].labelKey === "序号") {
+              } else if (parentArr[key1][key2].labelKey === this.lbParam) {
                 parentArr[key1][key2].lableName = "STRUCTTYPE";
               } else {
                 // parentArr[key1][key2].lableName = "";
@@ -1292,6 +1321,7 @@ export default {
       // console.log("treeDatatreeDatatreeData", treeData);
       treeData.forEach(tree => {
         let baseData = deepClone(this.baseXmlOptionData);
+        console.log("baseData", baseData);
         let saveRow = deepClone(this.baseXmlOptionData);
         if (tree.hasOwnProperty("children") && tree.children.length > 0) {
           //用于处理多个层级的时候处理
@@ -1333,9 +1363,9 @@ export default {
             }
           }
           //递归调用
+          console.log("递归调用");
           this.analysisByBaseXmlOptionData(tree.children, saveTreeData, tree);
         } else {
-          // console.log("1111111111111", tree);
           //保存处理子数据
           if (parentTree) {
             // 给结构体赋值 structId structName
@@ -1347,9 +1377,14 @@ export default {
             tree.nodeData[0][0].lableName = tree.lableName;
           }
           const { labelKey, attrs } = this.analysisMapping(baseData);
+          //设置固定配置
+          this.setShowLableName(labelKey, attrs);
+          //给对应的属性赋值
           this.attributeAssignmen(saveRow, attrs, tree.nodeData, 0);
           baseData.xmlEntityMaps.forEach((entityMaps, index) => {
             const { labelKey, attrs } = this.analysisMapping(entityMaps);
+            //设置固定配置
+            this.setShowLableName(labelKey, attrs);
             //保存处理子数据
             this.attributeAssignmen(
               saveRow.xmlEntityMaps[index],
@@ -1366,7 +1401,7 @@ export default {
     analysisSaveXmlParam(params) {
       params.nodeData.forEach(nodes => {
         nodes.forEach(item => {
-          if (item.attrMappingName === this.nameParam) {
+          if (item.labelKey === this.nameParam) {
             let dbId = nodes[1].lableName;
             item.lableName = params.assigParamName;
           }
@@ -1377,7 +1412,7 @@ export default {
     attributeAssignmen(tabParam, formParam, tabs, index) {
       formParam.forEach(form => {
         let param = tabs[index].find(item => {
-          return item.attrMappingName === form.attrMappingName;
+          return item.labelKey === form.labelKey && item.labelKey != undefined;
         });
         if (param !== undefined) {
           tabParam.attributeMap[param.attrName] = param.lableName; // === undefined ? "" : param.lableName;
@@ -1387,9 +1422,7 @@ export default {
   },
 
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {
-
-  },
+  created() {},
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   beforeCreate() {}, //生命周期 - 创建之前

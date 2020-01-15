@@ -30,6 +30,7 @@ import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
+import com.sun.xml.bind.v2.model.core.ID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,6 +54,7 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
 
     @Value("${git.local.path}")
     private String LOCALPATH;
+
     /**
      * 基础模板简单分页查询
      *
@@ -76,8 +78,8 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
         String path = LOCALPATH + baseTemplate.getTempPath();//获取将要解析的xml文件的路径
         File localPath = new File(path);
         if (!localPath.exists()) {//如果xml文件不存在,返回null
-            logger.error(path+"文件不存在");
-            throw  new FileNotFoundException(path+"文件不存在");
+            logger.error(path + "文件不存在");
+            throw new FileNotFoundException(path + "文件不存在");
         }
         return XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(localPath);//通过工具类按照路径解析xml文件,返回XmlEntityMap对象
     }
@@ -90,23 +92,23 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
      * @return boolean
      */
     @Override
-    public boolean editBaseTemplate(BaseTemplateDTO baseTemplateDTO){
+    public boolean editBaseTemplate(BaseTemplateDTO baseTemplateDTO) {
         BaseTemplate baseTemplate = baseTemplateDTO.getBaseTemplate();
         XmlEntityMap xmlEntityMap = baseTemplateDTO.getXmlEntityMap();
         String path = LOCALPATH + baseTemplate.getTempPath();//xml文件被保存的位置
         File localPath = new File(path);
         if (!localPath.exists()) {//判断文件是否存在
-            logger.error("请检查"+path+"是否存在");
+            logger.error("请检查" + path + "是否存在");
             return false;
         }
         try {
             boolean b = XmlFileHandleUtil.createXmlFile(xmlEntityMap, localPath);
-            if (b){
+            if (b) {
                 baseTemplate.setUpdateTime(LocalDateTime.now());
                 baseMapper.updateById(baseTemplate);
                 return true;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("数据保存失败,请联系管理员");
             e.printStackTrace();
         }
@@ -125,7 +127,7 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
         BaseTemplate baseTemplate = baseTemplateDTO.getBaseTemplate();
         XmlEntityMap xmlEntityMap = baseTemplateDTO.getXmlEntityMap();
         long millis = System.currentTimeMillis();//获取日期毫秒值
-        File localPath = new File(LOCALPATH + "gjk"+ File.separator+"baseTemplate"+File.separator + baseTemplate.getTempName() + String.valueOf(millis) + ".xml");//保存的位置,文件名称由模板名称+时间毫秒值组成
+        File localPath = new File(LOCALPATH + "gjk" + File.separator + "baseTemplate" + File.separator + baseTemplate.getTempName() + String.valueOf(millis) + ".xml");//保存的位置,文件名称由模板名称+时间毫秒值组成
         if (!localPath.exists()) {
             try {
                 File parentFile = localPath.getParentFile();//文件如果不存在,创建文件
@@ -147,17 +149,17 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
                 baseTemplate.setCreateTime(LocalDateTime.now());
                 baseTemplate.setUpdateTime(null);
                 baseTemplate.setDelFlag("0");
-                baseTemplate.setTempPath("gjk"+File.separator+"baseTemplate" + File.separator+ baseTemplate.getTempName() + String.valueOf(millis) + ".xml");
+                baseTemplate.setTempPath("gjk" + File.separator + "baseTemplate" + File.separator + baseTemplate.getTempName() + String.valueOf(millis) + ".xml");
                 Integer version = baseMapper.getMaxVersion(baseTemplate.getTempType());
-                if (version == null){
+                if (version == null) {
                     baseTemplate.setTempVersion(1);
-                }else {
-                    baseTemplate.setTempVersion(version+1);
+                } else {
+                    baseTemplate.setTempVersion(version + 1);
                 }
                 baseMapper.insert(baseTemplate);//xml文件生成成功后,数据库存储一条数据
                 return true;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("模板保存失败,请检查相关配置是否正确");
             e.printStackTrace();
             throw new Exception();
@@ -175,7 +177,7 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
     @Override
     public XmlEntityMap parseXml(String baseTemplatePath) throws FileNotFoundException {
         File localPath = new File(baseTemplatePath);//根据文件路径创建file对象
-        if (!localPath.exists()){
+        if (!localPath.exists()) {
             throw new FileNotFoundException();
         }
         return XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(localPath);//根据指定路径解析xml文件
@@ -198,7 +200,7 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
         File oldPath = new File(LOCALPATH + baseTemplate.getTempPath());//保存的位置,文件名称由模板名称+时间毫秒值组成
         if (oldPath.exists()) {
             long millis = System.currentTimeMillis();
-            String path = "gjk"+ File.separator+"baseTemplate"+File.separator + baseTemplate.getTempName() + String.valueOf(millis) + ".xml";
+            String path = "gjk" + File.separator + "baseTemplate" + File.separator + baseTemplate.getTempName() + String.valueOf(millis) + ".xml";
             File newPath = new File(LOCALPATH + path);//保存的位置,文件名称由模板名称+时间毫秒值组成
             FileInputStream in = null;//输入流对象
             FileOutputStream out = null;//输出流对象
@@ -212,20 +214,20 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
                 }
 
                 BaseTemplate oldBT = baseMapper.selectById(baseTemplate.getTempId());
-                if (oldBT!=null){
-                    if (!oldBT.getTempType().equals(baseTemplate.getTempType())){
+                if (oldBT != null) {
+                    if (!oldBT.getTempType().equals(baseTemplate.getTempType())) {
                         Integer version = baseMapper.getMaxVersion(baseTemplate.getTempType());//获取最新版本
-                        if (version == null){
+                        if (version == null) {
                             baseTemplate.setTempVersion(1);
-                        }else {
-                            baseTemplate.setTempVersion(version+1);
+                        } else {
+                            baseTemplate.setTempVersion(version + 1);
                         }
                     }
                 }
                 baseTemplate.setTempPath(path);//更改新的路径
                 baseTemplate.setUpdateTime(LocalDateTime.now());
                 int i = baseMapper.updateById(baseTemplate);//把新的数据更细至数据库
-                if (i>0){
+                if (i > 0) {
                     if (in != null) {
                         try {
                             in.close();//关闭输入流
@@ -234,7 +236,7 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
                             e.printStackTrace();
                         }
                     }
-                    if(out!=null){
+                    if (out != null) {
                         try {
                             out.close();//关闭输出流
                         } catch (IOException e) {
@@ -245,7 +247,7 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
                     oldPath.delete();
                     return true;
                 }
-            }catch (IOException e) {
+            } catch (IOException e) {
                 logger.error("IO出现错误,请联系管理员");
                 e.printStackTrace();
 
@@ -258,7 +260,7 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
                         e.printStackTrace();
                     }
                 }
-                if(out!=null){
+                if (out != null) {
                     try {
                         out.close();//关闭输出流
                     } catch (IOException e) {
@@ -278,6 +280,7 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
 
     /**
      * 根据模板类型获取基础模板数据
+     *
      * @param tempType
      * @return List<BaseTemplate>
      */
@@ -290,11 +293,32 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
 
     /**
      * 基础模板获取本地地址
+     *
      * @param
      * @return String
      */
     @Override
     public String getLocalPath() {
         return LOCALPATH;
+    }
+
+    /**
+     * 根据模板id删除模板
+     *
+     * @param tempId
+     * @return boolean
+     */
+    @Override
+    public boolean removeById(String tempId) {
+        BaseTemplate baseTemplate = baseMapper.selectById(tempId);
+        int b = baseMapper.deleteById(tempId);
+        if (b != -1) {
+            File file = new File(LOCALPATH + baseTemplate.getTempPath());
+            if (file.exists()) {
+                file.delete();
+                return true;
+            }
+        }
+        return false;
     }
 }

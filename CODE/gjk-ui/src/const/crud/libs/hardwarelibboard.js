@@ -35,13 +35,24 @@ export const tableOption = {
       prop: 'userId',
       type: 'select',
       filter: true,
-      dicData:[/*{ label: '男', value: '男' },
-        { label: '女', value: '女' }*/],
-      /*filterMethod:function(value, row, column) {
+      props: {
+        label: 'showName',
+        value: 'userId'
+      },
+      dicUrl: '/admin/user/info/getUserDict'
+    },
+    /*{
+      label: '用户',
+      prop: 'userId',
+      type: 'select',
+      filter: true,
+      dicData:[/!*{ label: '男', value: '男' },
+        { label: '女', value: '女' }*!/],
+      /!*filterMethod:function(value, row, column) {
         console.log("row",row)
         return row.userId === value;
-      }*/
-    },
+      }*!/
+    },*/
 	   {
       label: 'CPU数量',
       prop: 'cpuNum'

@@ -26,10 +26,12 @@
 		<result property="updateTime" column="update_time" />
 		<result property="description" column="description" />
 		<result property="delFlag" column="del_flag" />
+		<result property="userId" column="user_id" />
 	</resultMap>
 
 	<sql id="bspSql">
 		id,
+		user_id,
 		bsp_name,
 		version,
 		file_path,
@@ -43,6 +45,7 @@
 
 	<sql id="saveBSPSql">
 		id,
+		user_id,
 		bsp_name,
 		version,
 		file_path,
@@ -74,6 +77,9 @@
 		<where>
 			<if test="bsp.id != null and bsp.id.trim() != ''">
 				AND id = #{bsp.id}
+			</if>
+			<if test="bsp.userId != 0">
+				AND user_id = #{bsp.userId}
 			</if>
 			<if test="bsp.bspName != null and bsp.bspName.trim() != ''">
 				AND bsp_name = #{bsp.bspName}
@@ -111,6 +117,7 @@
 		INSERT INTO gjk_bsp (
 		<include refid="saveBSPSql" />
 		) VALUES (#{bs.id},
+		#{bs.userId},
 		#{bs.bspName},
 		#{bs.version},
 		#{bs.filePath},

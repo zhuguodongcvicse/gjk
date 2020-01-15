@@ -94,7 +94,9 @@
         update_time,
         del_flag
         FROM gjk_hardwarelib_chip
-        <where>
+        where user_id = #{hardwarelibChip.userId} or apply_state = '2'
+        order by update_time DESC
+        <!--<where>
             <if test="hardwarelibChip.id != null and hardwarelibChip.id.trim() != ''">
                 AND id = #{hardwarelibChip.id}
             </if>
@@ -104,7 +106,7 @@
             <if test="hardwarelibChip.chipId != null and hardwarelibChip.chipId.trim() != ''">
                 AND chip_id = #{hardwarelibChip.chipId}
             </if>
-            <if test="hardwarelibChip.userId != null and hardwarelibChip.userId.trim() != ''">
+            <if test="hardwarelibChip.userId != null">
                 AND user_id = #{hardwarelibChip.userId}
             </if>
             <if test="hardwarelibChip.coreNum != null and hardwarelibChip.coreNum.trim() != ''">
@@ -120,7 +122,7 @@
                 AND hr_type_name = #{hardwarelibChip.hrTypeName}
             </if>
             <if test="hardwarelibChip.applyState != null and hardwarelibChip.applyState.trim() != ''">
-                AND apply_state = #{hardwarelibChip.applyState}
+                or apply_state = '2'
             </if>
             <if test="hardwarelibChip.applyDesc != null and hardwarelibChip.applyDesc.trim() != ''">
                 AND apply_desc = #{hardwarelibChip.applyDesc}
@@ -144,6 +146,7 @@
                 AND del_flag = #{hardwarelibChip.delFlag}
             </if>
         </where>
+        order by update_time DESC-->
     </select>
 
 

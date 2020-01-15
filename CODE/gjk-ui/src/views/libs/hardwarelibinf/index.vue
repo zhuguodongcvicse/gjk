@@ -15,13 +15,13 @@
         @row-del="rowDel"
       >
         <template slot="menuLeft">
-          <el-button type="primary" @click="showdialog">新增</el-button>
+          <el-button v-if="permissions.libs_hardwarelibinf_add" type="primary" @click="showdialog">新增</el-button>
         </template>
 
         <template slot-scope="scope" slot="menu">
           <el-button
             type="primary"
-            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId == userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="editInf(scope.row,scope.index)"
@@ -37,7 +37,7 @@
           </el-button>
           <el-button
             type="danger"
-            v-if="permissions.libs_hardwarelibinf_del && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            v-if="permissions.libs_hardwarelibinf_del && scope.row.userId == userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
@@ -45,7 +45,7 @@
           </el-button>
           <el-button
             type="primary"
-            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            v-if="permissions.libs_hardwarelibinf_add && permissions.libs_hardwarelibinf_edit && scope.row.userId == userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="goStorage(scope.row,scope.index)"
@@ -213,8 +213,9 @@
             };
         },
         created() {
+            // console.log("this.userInfo",this.userInfo)
             this.getList();
-            this.getAllUsers();
+            // this.getAllUsers();
             // console.log("permissions",this.permissions)
         },
         mounted: function () {
@@ -238,10 +239,10 @@
             },
             getList() {
                 this.tableLoading = true;
-                fetchList(this.listQuery).then(response => {
-                    this.tableData = []
-                    this.tableData = response.data.data.records;
-                    if (this.tableData != null && this.tableData.length != 0) {
+                this.listQuery.userId = this.userInfo.userId
+                fetchList(this.listQuery, this.userInfo.name).then(response => {
+                    /*this.tableData = []
+                    if (this.tableData.length !== 0) {
                         if (this.tableData[0].updateTime != null) {
                             this.tableData = this.sortKey(this.tableData, 'updateTime')
                         } else {
@@ -252,21 +253,16 @@
                     if (this.allInfs.length !== 0) {
                         //清空数据
                         this.allInfs = []
-                        for (const i in this.tableData) {
-                            //如果接口用户名和登录用户名相同，则将该接口放到接口数据
-                            if (this.tableData[i].userId === this.userInfo.name) {
-                                this.allInfs.push(this.tableData[i])
-                            }
-                        }
-                    } else {
-                        //接口数据为空则将用户名相同的接口放到接口数组
-                        for (const i in this.tableData) {
-                            if (this.tableData[i].userId === this.userInfo.name) {
-                                this.allInfs.push(this.tableData[i])
-                            }
+                    }
+                    for (const i in this.tableData) {
+                        //如果接口用户名和登录用户名相同，则将该接口放到接口数据
+                        if (this.tableData[i].userId === this.userInfo.name) {
+                            this.allInfs.push(this.tableData[i])
                         }
                     }
-                    this.allInfs = JSON.parse(JSON.stringify(this.allInfs))
+                    this.allInfs = JSON.parse(JSON.stringify(this.allInfs))*/
+                    this.allInfs = JSON.parse(JSON.stringify(response.data.data.records));
+                    this.tableData = response.data.data.records;
                     this.page.total = response.data.data.total;
                     this.tableLoading = false;
                 });
@@ -315,7 +311,8 @@
                 // console.log("this.form",this.form)
             },
             copyInf(row) {
-                // console.log("row", row)
+                console.log("row", row)
+                console.log("this.userInfo", this.userInfo)
                 //复制或弹窗标志赋值
                 this.clickCopyOrEdit = 'copy'
                 this.dialogFormVisible = true;
@@ -328,14 +325,18 @@
                     if (valid) {
                         this.dialogFormVisible = false;
                         updateInf(form).then(response => {
-                            this.$message({
+                            this.$notify({
+                                title: '成功',
+                                message: '更新成功',
+                                type: 'success'
+                            });
+                            /*this.$message({
                                 showClose: true,
                                 message: "更新成功",
                                 type: "success"
-                            });
+                            });*/
                             //更新后重新刷新列表
                             this.getList();
-                            // console.log("this",this)
                         });
                         // this.$refs[formName].resetFields();
                     } else {
@@ -346,7 +347,7 @@
             },
             copyOneInf(formName, form) {
                 //接口名称不能重复
-                // console.log("this.allInfs", this.allInfs)
+                console.log("this.allInfs", this.allInfs)
                 // console.log("form", form)
                 //复制不能与本用户的接口库同名
                 for (const i in this.allInfs) {
@@ -359,15 +360,20 @@
                     if (valid) {
                         this.dialogFormVisible = false;
                         //接口的用户名改为本用户
-                        form.userId = this.userInfo.name
+                        form.userId = this.userInfo.userId
                         form.applyState = '0'
                         form.applyDesc = null
                         saveInf(form).then(response => {
-                            this.$message({
+                            this.$notify({
+                                title: '成功',
+                                message: '复制成功',
+                                type: 'success'
+                            });
+                            /*this.$message({
                                 showClose: true,
                                 message: "复制成功",
                                 type: "success"
-                            });
+                            });*/
                             //更新后重新刷新列表
                             this.getList();
                             // console.log("this",this)
@@ -403,8 +409,9 @@
                 this.getList();
             },
             sizeChange(val) {
-                this.page.size = val;
+                this.page.pageSize = val;
                 this.listQuery.size = val;
+                this.listQuery.current = 1;
                 this.getList();
             },
             /**
@@ -414,18 +421,12 @@
              **/
             handleAdd: function () {
                 // this.$refs.crud.rowAdd()
-                //this.$router.push({ path: "/libs/hardwarelibinf/addinf" });
-                console.log(this.form.infName);
-                //  console.log(this.form.infRate);
-                //  console.log(this.form.region);
                 this.dialogFormVisible = false;
                 saveInf(this.form).then(request => {
                 });
             },
 
             handleEdit(row, index) {
-                console.log(row);
-                //console.log(index);
                 // this.$refs.crud.rowEdit(row, index);
                 this.showInf.dialogFormVisible = true;
                 this.$refs.pram.getPram(row);
@@ -495,6 +496,7 @@
              */
             refreshChange() {
                 this.getList();
+                // console.log("tableOption",this.tableOption)
             }
         }
     };

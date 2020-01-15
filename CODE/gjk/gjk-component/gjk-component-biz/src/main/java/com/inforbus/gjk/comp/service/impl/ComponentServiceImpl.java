@@ -25,6 +25,7 @@ import com.google.common.collect.Maps;
 import com.inforbus.gjk.admin.api.entity.GjkAlgorithm;
 import com.inforbus.gjk.admin.api.entity.GjkPlatform;
 import com.inforbus.gjk.admin.api.entity.GjkTest;
+import com.inforbus.gjk.admin.api.entity.SysUser;
 import com.inforbus.gjk.common.core.entity.CompStruct;
 import com.inforbus.gjk.common.core.entity.Structlibs;
 import com.inforbus.gjk.common.core.entity.XmlEntity;
@@ -32,6 +33,8 @@ import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.FileUtil;
+import com.inforbus.gjk.common.core.util.R;
+import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
 import com.inforbus.gjk.comp.api.dto.CompTree;
 import com.inforbus.gjk.comp.api.dto.ComponentDTO;
@@ -52,8 +55,8 @@ import com.inforbus.gjk.comp.mapper.ComponentDetailMapper;
 import com.inforbus.gjk.comp.mapper.ComponentMapper;
 import com.inforbus.gjk.comp.service.ComponentDetailService;
 import com.inforbus.gjk.comp.service.ComponentService;
+import com.inforbus.gjk.comp.service.SysUserService;
 
-import cn.hutool.db.sql.Wrapper;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -91,10 +94,14 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -113,6 +120,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component> implements ComponentService {
 
 	@Autowired
+	private SysUserService sysUserService;
+	@Autowired
 	protected ComponentDetailMapper compDetailMapper;
 	@Autowired
 	private CompImgMapper compImgMapper;
@@ -122,6 +131,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	private AmqpTemplate rabbitmqTemplate;
 	@Value("${git.local.path}")
 	private String compDetailPath;
+	private static final Logger logger = LoggerFactory.getLogger(ComponentServiceImpl.class);
 
 	/**
 	 * 构件简单分页查询
@@ -135,25 +145,34 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	}
 
 	@Override
+	@Transactional(rollbackFor = { Exception.class })
 	public boolean deleteCompAndCompDetail(String compId) {
 		List<ComponentDetail> details = compDetailMapper.listCompDetailByCompId(compId);
 		try {
 			Component comp = this.getById(compId);
+			// 获取当前用户信息
+//			R<SysUser> su=	sysUserService.user(comp.getUserId());
 			String filePath = this.compDetailPath + "gjk" + File.separator + "component" + File.separator
-					+ comp.getCompId() + File.separator + comp.getVersion() + File.separator;
+					+ comp.getCompId() + File.separator
+					+ comp.getCreateTime().toString().replaceAll("[[\\s-T:punct:]]", "") + File.separator;
 
 			// 删除构件
 			this.removeById(compId);
 			// 删除构件详细信息
 			for (ComponentDetail detail : details) {
+				// 当文件详细信息是图片时删除图片
+				if ("img".equals(detail.getFileType())) {
+					compImgMapper.delete(Wrappers.<CompImg>query().lambda().eq(CompImg::getCompDetid, detail.getId()));
+				}
 				componentDetailService.removeById(detail.getId());
 			}
 			// 删除构件相关文件
-			cn.hutool.core.io.FileUtil.del(filePath);
-
+//			cn.hutool.core.io.FileUtil.del(filePath);
+			UploadFilesUtils.delFolder(filePath);
 			return true;
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("删除构件 ", e);
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly(); // 手动开启事务回滚
 			return false;
 		}
 	}
@@ -181,7 +200,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	 * @see com.inforbus.gjk.comp.service.ComponentService#getCompByUserId(java.lang.String)
 	 */
 	@Override
-	public List<CompDetailVO> getCompByUserId(String userId) {
+	public List<CompDetailVO> getCompByUserId(Integer userId) {
 		List<Component> comps = baseMapper.listCompByUserId(userId);
 		List<CompDetailVO> tree = Lists.newArrayList();
 		for (Component comp : comps) {
@@ -219,8 +238,8 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		for (ComponentDetail v : vos) {
 			if (!isShowCompXml) {
 				if (!v.getFileType().equalsIgnoreCase("xml")) {
-					addTree(tree, v);
 				}
+				addTree(tree, v);
 			} else {
 				addTree(tree, v);
 			}
@@ -314,7 +333,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 				String path = vo.getFileName();
 				File file = null;
 				if (path.startsWith("Component") && path.toUpperCase().endsWith(".XML")) {
-					file = new File(this.compDetailPath+File.separator+ vo.getFilePath() + "/" + path);
+					file = new File(this.compDetailPath + File.separator + vo.getFilePath() + "/" + path);
 				}
 				if (file.exists()) {
 					// 将构件文件放入map
@@ -492,7 +511,8 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			List<CompFilesVO> filesVOs = Lists.newArrayList();
 			if ("algorithmfile".equals(parent.getFileType()) || "testfile".equals(parent.getFileType())
 					|| "platformfile".equals(parent.getFileType())) {
-				File file = new File(this.compDetailPath + parent.getFilePath() + File.separator + parent.getFileName());
+				File file = new File(
+						this.compDetailPath + parent.getFilePath() + File.separator + parent.getFileName());
 				if (file.isDirectory()) {
 					File[] childFileList = file.listFiles();
 					for (File childFile : childFileList) {
@@ -530,7 +550,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 				String path = parent.getFileName();
 				File file = null;
 				if (path.startsWith("Component") && path.toUpperCase().endsWith(".XML")) {
-					file = new File(this.compDetailPath+File.separator+ parent.getFilePath() + "/" + path);
+					file = new File(this.compDetailPath + File.separator + parent.getFilePath() + "/" + path);
 					fileMap.put("compBasic", XmlFileHandleUtil.analysisXmlFile(file));
 					fileMap.put("compBasicMap", XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file));
 				}
@@ -759,7 +779,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 					+ File.separator + comp.getCompId() + File.separator + comp.getVersion() + File.separator;
 			String compVersion = comp.getVersion();
 
-			comp.setUserId(userId);
+			comp.setUserId(Integer.parseInt(userId));
 			comp.setApplyState("0");
 			comp.setApplyDesc("未申请入库");
 			comp.setCreateTime(LocalDateTime.now());
@@ -990,7 +1010,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	 * @param userId 用户Id
 	 */
 	@Override
-	public List<Component> listCompByUserId(String userId) {
+	public List<Component> listCompByUserId(Integer userId) {
 		return baseMapper.listCompByUserId(userId);
 	}
 

@@ -18,23 +18,15 @@ package com.inforbus.gjk.libs.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.TreeUtil;
-import com.inforbus.gjk.common.core.util.UnZipFilesUtils;
-import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.common.log.annotation.SysLog;
 import com.inforbus.gjk.libs.api.dto.BSPDTO;
 import com.inforbus.gjk.libs.api.entity.BSP;
 import com.inforbus.gjk.libs.api.entity.BSPDetail;
 import com.inforbus.gjk.libs.api.entity.BSPFile;
-import com.inforbus.gjk.libs.mapper.BSPMapper;
 import com.inforbus.gjk.libs.service.BSPService;
 import lombok.AllArgsConstructor;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +44,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class BSPController {
 
 	private final BSPService bspService;
-	private static final String softwarePath = JGitUtil.getLOCAL_REPO_PATH();
 
 	/**
 	 * 简单分页查询
@@ -61,8 +52,11 @@ public class BSPController {
 	 * @param bsp  软件框架库表
 	 * @return
 	 */
-	@GetMapping("/page")
-	public R<IPage<BSPDTO>> getBSPPage(Page<BSP> page, BSP bsp) {
+	@PostMapping("/page/{current}/{size}")
+	public R<IPage<BSPDTO>> getBSPPage(@PathVariable Long current, @PathVariable Long size,@RequestBody BSP bsp) {
+		Page<BSP> page = new Page<BSP>();
+		page.setCurrent(current);
+		page.setSize(size);
 		return new R<>(bspService.getBSPDTOPage(page, bsp));
 	}
 
@@ -115,6 +109,7 @@ public class BSPController {
 	public R removeById(@PathVariable String id) {
 		bspService.removeBspFile(id);
 		bspService.removeBspDetail(id);
+		bspService.deleteFolderByFilePath(this.getById(id).getData().getFilePath());
 		return new R<>(bspService.removeById(id));
 	}
 
@@ -174,32 +169,9 @@ public class BSPController {
 		return new R<>(bspService.setVersionSize());
 	}
 
-	@PostMapping("/uploadFiles/{versionDisc}")
-	public String uploadFiles(@RequestParam(value = "file") MultipartFile files, @PathVariable String versionDisc) {
-		String path = softwarePath;
-		String res = "上传成功！！！";
-		String p = path + "gjk/bsp/" + versionDisc + ".0" + File.separator + files.getOriginalFilename();
-		String bb = p.replaceAll("\\\\", "/");
-		String ss = p.substring(0, bb.lastIndexOf("/")) ;
-		try {
-			final InputStream inputStream = files.getInputStream();
-			//启动线程，保存后，后台继续解压文件
-			new Thread(()-> {
-				File file = new File(ss);
-				if(!file.exists()) {
-					file.mkdir();
-				}
-				try {
-					UploadFilesUtils.decompression(inputStream, ss);
-					JGitUtil.commitAndPush(ss, "多个文件上传");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}).start();;
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		return res;
+	@PostMapping("/uploadFiles/{versionDisc}/{userName}")
+	public String uploadFiles(@RequestParam(value = "file") MultipartFile files, @PathVariable String versionDisc, @PathVariable String userName) {
+		return bspService.uploadFiles(files, versionDisc, userName);
 	}
 
 	@GetMapping("/getBSPTree")

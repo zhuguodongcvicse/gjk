@@ -20,6 +20,7 @@
 		<result property="name" column="name" />
 		<result property="version" column="version" />
 		<result property="filePath" column="file_path" />
+		<result property="userId" column="user_id" />
 		<result property="applyState" column="apply_state" />
 		<result property="applyDesc" column="apply_desc" />
 		<result property="createTime" column="create_time" />
@@ -35,6 +36,7 @@
 		name,
 		version,
 		file_path,
+		user_id,
 		apply_state,
 		apply_desc,
 		create_time,
@@ -43,6 +45,7 @@
 		del_flag
 		FROM gjk_compframe
 		<where>
+			( user_id = #{compframe.userId}
 			<if test="compframe.id != null and compframe.id.trim() != ''">
 				AND id = #{compframe.id}
 			</if>
@@ -57,6 +60,7 @@
 				test="compframe.filePath != null and compframe.filePath.trim() != ''">
 				AND file_path = #{compframe.filePath}
 			</if>
+
 			<if
 				test="compframe.applyState != null and compframe.applyState.trim() != ''">
 				AND apply_state = #{compframe.applyState}
@@ -81,8 +85,9 @@
 				test="compframe.delFlag != null and compframe.delFlag.trim() != ''">
 				AND del_flag = #{compframe.delFlag}
 			</if>
+			) OR apply_state = '2'
 		</where>
-		ORDER BY version DESC
+		ORDER BY version DESC ,create_time DESC
 	</select>
 	<!-- 保存关系 -->
 	<insert id="insertCompframePlatform">
@@ -96,6 +101,7 @@
 		parameterType="com.inforbus.gjk.libs.api.entity.Compframe">
 		INSERT INTO
 		gjk_compframe(id, name,
+		user_id,
 		version,
 		file_path,
 		apply_desc,
@@ -103,6 +109,7 @@
 		VALUES
 		(#{compframe.id},
 		#{compframe.name},
+		#{compframe.userId},
 		#{compframe.version},
 		#{compframe.filePath},
 		#{compframe.applyDesc},

@@ -30,7 +30,7 @@
         <template slot-scope="scope" slot="menu">
           <el-button
             type="primary"
-            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="editChip(scope.row,scope.index)"
@@ -46,7 +46,7 @@
           </el-button>
           <el-button
             type="danger"
-            v-if="permissions.libs_hardwarelibinf_del && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            v-if="permissions.libs_hardwarelibinf_del && scope.row.userId === userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
@@ -54,7 +54,7 @@
           </el-button>
           <el-button
             type="primary"
-            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="goStorage(scope.row,scope.index)"
@@ -198,7 +198,7 @@
         created() {
             // location.reload()
             this.getList();
-            this.getAllUsers();
+            // this.getAllUsers();
             this.getPlatformSelectTree();
         },
         mounted() {
@@ -281,7 +281,7 @@
                 this.$refs[formName].validate(valid => {
                     if (valid) {
                         this.dialogFormVisible = false;
-                        form.userId = this.userInfo.name
+                        form.userId = this.userInfo.userId
                         form.applyState = '0'
                         form.applyDesc = null
                         //跳转到画布
@@ -338,10 +338,13 @@
             },
             getList() {
                 this.tableLoading = true;
+                this.listQuery.userId = this.userInfo.userId
                 fetchList(this.listQuery).then(response => {
-                    this.tableData = []
+                    // this.tableData = []
+                    this.allChips = JSON.parse(JSON.stringify(response.data.data.records));
                     this.tableData = response.data.data.records;
-                    this.tableData = this.sortKey(this.tableData, 'createTime')
+                    // console.log("response.data.data",response.data.data)
+                    /*this.tableData = this.sortKey(this.tableData, 'createTime')
                     //所有判断芯片数据是否为空
                     if (this.allChips.length !== 0) {
                         //清空数据
@@ -360,7 +363,7 @@
                             }
                         }
                     }
-                    this.allChips = JSON.parse(JSON.stringify(this.allChips))
+                    this.allChips = JSON.parse(JSON.stringify(this.allChips))*/
                     this.page.total = response.data.data.total;
                     this.tableLoading = false;
                 });
@@ -407,6 +410,7 @@
             sizeChange(val) {
                 this.page.size = val;
                 this.listQuery.size = val;
+                this.listQuery.current = 1;
                 this.getList();
             },
             /**

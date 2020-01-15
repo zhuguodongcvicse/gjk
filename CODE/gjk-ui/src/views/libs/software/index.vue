@@ -23,7 +23,7 @@
             icon="el-icon-plus"
             @click="dialogTableVisible = true"
             size="small"
-            v-if="permissions.libs_software_add"
+            v-if="libsSoftware_btn_add"
           >新 增</el-button>
 
           <el-dialog
@@ -111,8 +111,8 @@
               </div>
             </el-form>
           </el-dialog>
-          <br />
-          <br />
+          <br>
+          <br>
         </template>
         <template slot-scope="scope" slot="menu">
           <el-button
@@ -120,8 +120,8 @@
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
-            v-if="scope.row.applyState=='0'||scope.row.applyState==null||scope.row.applyState=='3'?true:false"
-          >删除</el-button>
+            v-if="libsSoftware_btn_del && (scope.row.applyState=='0'||scope.row.applyState==null||scope.row.applyState=='3'?true:false)"
+          >删 除</el-button>
           <el-tooltip class="item" effect="dark" content="入库" placement="top">
             <el-button
               type="primary"
@@ -129,6 +129,7 @@
               size="mini"
               @click="storageApply(scope.row,scope.index)"
               v-if="scope.row.applyState=='0'||scope.row.applyState==null?true:false"
+              v-show="libsSoftware_btn_import"
             >入 库</el-button>
           </el-tooltip>
           <span
@@ -165,7 +166,6 @@ import { fetchPlatformTrees } from "@/api/admin/platform";
 import Vue from "vue";
 import uploader from "vue-simple-uploader";
 import storageApply from "@/views/libs/software/storageApply";
-import { deepClone } from "../../../util/util";
 export default {
   name: "software",
   //刷新
@@ -239,17 +239,23 @@ export default {
           },
           { validator: valiaFilePath, trigger: "change" }
         ]
-      }
+      },
+      libsSoftware_btn_add: false,
+      libsSoftware_btn_del: false,
+      libsSoftware_btn_import: false
     };
   },
   created() {
     this.getList(this.page);
 
     this.getPlatformSelectTree();
+    this.libsSoftware_btn_add = this.permissions["libs_software_add"];
+    this.libsSoftware_btn_del = this.permissions["libs_software_del"];
+    this.libsSoftware_btn_import = this.permissions["libs_software_import"];
   },
   mounted: function() {},
   computed: {
-    ...mapGetters(["permissions"])
+    ...mapGetters(["permissions", "userInfo"])
   },
 
   watch: {
@@ -337,20 +343,22 @@ export default {
               ) {
                 this.software.filePath =
                   "gjk/software/" +
+                  this.userInfo.username +
+                  "/" +
                   parseFloat(this.versionSize).toFixed(1) +
                   "/" +
                   this.folderName.substring(
                     0,
                     this.folderName.lastIndexOf(".")
-                  ) +
-                  "/";
+                  );
               } else {
                 this.software.filePath =
                   "gjk/software/" +
+                  this.userInfo.username +
+                  "/" +
                   parseFloat(this.versionSize).toFixed(1) +
                   "/" +
-                  this.folderName +
-                  "/";
+                  this.folderName;
               }
               //保持软件框架库信息
               this.software.version = this.versionSize;
@@ -358,6 +366,7 @@ export default {
               //软件框架库名
               this.software.softwareName =
                 "软件框架库" + "_" + parseFloat(this.versionSize).toFixed(1);
+              this.software.userId = this.userInfo.userId;
               //保存软件框架库信息
               saveSoftware(this.software).then(response => {
                 softId = response.data.data.id;
@@ -383,32 +392,33 @@ export default {
               });
             })
             .then(() => {
-              uploadFiles(formData, Object.assign(this.software.version)).then(
-                response => {
-                  // let resData = response.data.split(",");
-                  setTimeout(() => {
-                    loading.close();
-                    // alert(resData[1]);
-                    //保存到数据库中的文件路径
-                    // this.softFilePath = resData[0];
-                    //显示在页面上的文件路径
-                    // this.frameFilePath = resData[0] + this.folderName + "/";
-                    this.$notify({
-                      title: "成功",
-                      message: "保存成功",
-                      type: "success",
-                      duration: 2000
-                    });
-                    // this.$message({
-                    //   showClose: true,
-                    //   message: "保存成功",
-                    //   type: "success"
-                    // });
-                    this.dialogTableVisible = false;
-                  }, 500);
-                  this.reload();
-                }
-              );
+              uploadFiles(
+                formData,
+                Object.assign(this.software.version),
+                Object.assign(this.userInfo.username)
+              ).then(response => {
+                setTimeout(() => {
+                  loading.close();
+                  // alert(resData[1]);
+                  //保存到数据库中的文件路径
+                  // this.softFilePath = resData[0];
+                  //显示在页面上的文件路径
+                  // this.frameFilePath = resData[0] + this.folderName + "/";
+                  this.$notify({
+                    title: "成功",
+                    message: "保存成功",
+                    type: "success",
+                    duration: 2000
+                  });
+                  // this.$message({
+                  //   showClose: true,
+                  //   message: "保存成功",
+                  //   type: "success"
+                  // });
+                  this.dialogTableVisible = false;
+                }, 500);
+                this.reload();
+              });
               this.isAble = true;
             });
           // }
@@ -438,13 +448,18 @@ export default {
         current: page.currentPage,
         size: page.pageSize
       };
-      fetchList(this.listQuery).then(response => {
-        this.tableData = response.data.data.records;
-        // this.page.total = response.data.data.records.length;
-        this.page.total = response.data.data.total;
-        console.lo;
-        this.tableLoading = false;
-      });
+      var software = {
+        userId: this.userInfo.userId
+      };
+      fetchList(this.listQuery.current, this.listQuery.size, software).then(
+        response => {
+          this.tableData = response.data.data.records;
+          // this.page.total = response.data.data.records.length;
+          this.page.total = response.data.data.total;
+          console.lo;
+          this.tableLoading = false;
+        }
+      );
     },
     currentChange(currentPage) {
       this.page.currentPage = currentPage;

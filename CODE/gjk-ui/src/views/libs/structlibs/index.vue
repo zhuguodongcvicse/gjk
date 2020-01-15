@@ -16,7 +16,12 @@
         @row-del="rowDel"
       >
         <template slot="menuLeft">
-          <el-button type="primary" icon="el-icon-plus" @click="showdialog">新增</el-button>
+          <el-button
+            type="primary"
+            icon="el-icon-plus"
+            v-if="permissions.libs_structlibs_add"
+            @click="showdialog"
+          >新增</el-button>
         </template>
         <template slot="version" slot-scope="scope">
           <el-tag>V{{parseFloat(scope.row.version).toFixed(1)}}</el-tag>
@@ -35,6 +40,7 @@
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
+            v-show="permissions.libs_structlibs_del"
           >删除</el-button>
           <!--  @click="handleRku(scope.row,scope.index)"-->
           <el-button
@@ -42,12 +48,14 @@
             v-if="scope.row.storageFlag=='1'?false:scope.row.storageFlag=='2'?false:true"
             size="small"
             plain
+            v-show="permissions.libs_structlibs_apply"
             @click="storageApplys(scope.row,scope.index)"
           >入库</el-button>
           <el-button
             type="primary"
             size="small"
             plain
+            v-show="permissions.libs_structlibs_apply"
             v-if="scope.row.storageFlag=='0'|| scope.row.storageFlag==null?false:true"
           >{{scope.row.storageFlag=='1'?"已申请":scope.row.storageFlag=='2'?"已入库":scope.row.storageFlag=='3'?"已驳回":"未处理"}}</el-button>
         </template>
@@ -97,10 +105,6 @@ export default {
         currentPage: 1, // 当前页数
         pageSize: 20 // 每页显示多少条
       },
-      listQuery: {
-        current: 1,
-        size: 20
-      },
       storageApplyDialog: false,
       tableLoading: false,
       tableOption: tableOption
@@ -111,7 +115,7 @@ export default {
   },
   mounted: function() {},
   computed: {
-    ...mapGetters(["permissions"])
+    ...mapGetters(["permissions", "userInfo"])
   },
   watch: {
     "showStruct.dialogFormVisible": function(isVisible) {
@@ -148,6 +152,10 @@ export default {
     },
     getList(page, params) {
       this.tableLoading = true;
+      if (!params) {
+        params = {};
+      }
+      this.$set(params, "userId", this.userInfo.userId);
       fetchList(
         Object.assign(
           {
@@ -164,12 +172,10 @@ export default {
     },
     currentChange(val) {
       this.page.currentPage = val;
-      this.listQuery.current = val;
       this.getList(this.page);
     },
     sizeChange(val) {
       this.page.pageSize = val;
-      this.listQuery.size = val;
       console.log("1234567890-=-098765432", this.page);
       this.getList(this.page);
     },

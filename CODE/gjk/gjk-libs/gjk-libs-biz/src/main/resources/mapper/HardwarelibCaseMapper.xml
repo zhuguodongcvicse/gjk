@@ -61,7 +61,7 @@
             <if test="hardwarelibCase.caseId != null and hardwarelibCase.caseId.trim() != ''">
                 AND case_id = #{hardwarelibCase.caseId}
             </if>
-            <if test="hardwarelibCase.userId != null and hardwarelibCase.userId.trim() != ''">
+            <if test="hardwarelibCase.userId != null">
                 AND user_id = #{hardwarelibCase.userId}
             </if>
             <if test="hardwarelibCase.bdNum != null and hardwarelibCase.bdNum.trim() != ''">
@@ -89,6 +89,7 @@
                 AND del_flag = #{hardwarelibCase.delFlag}
             </if>
         </where>
+        order by update_time DESC
     </select>
 
 

@@ -30,7 +30,7 @@
         <template slot-scope="scope" slot="menu">
           <el-button
             type="primary"
-            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="editBoard(scope.row,scope.index)"
@@ -46,7 +46,7 @@
           </el-button>
           <el-button
             type="danger"
-            v-if="permissions.libs_hardwarelibinf_del && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            v-if="permissions.libs_hardwarelibinf_del && scope.row.userId === userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
@@ -54,7 +54,7 @@
           </el-button>
           <el-button
             type="primary"
-            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.name && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
             size="small"
             plain
             @click="goStorage(scope.row,scope.index)"
@@ -167,7 +167,7 @@
         },
         created() {
             this.getList();
-            this.getAllUsers();
+            // this.getAllUsers();
             //获取字典表板卡类型的下拉菜单值
             remote("hardwarelib_board_type").then(response => {
                 this.boardTypeList = response.data.data
@@ -207,11 +207,13 @@
             },
             getList() {
                 this.tableLoading = true;
+                this.listQuery.userId = this.userInfo.userId
                 fetchList(this.listQuery).then(response => {
                     this.tableData = response.data.data.records;
-                    this.tableData = this.sortKey(this.tableData, 'createTime')
+                    this.allBoards = JSON.parse(JSON.stringify(response.data.data.records));
+                    // this.tableData = this.sortKey(this.tableData, 'createTime')
                     //判断板卡数据是否为空
-                    if (this.allBoards.length !== 0) {
+                    /*if (this.allBoards.length !== 0) {
                         //清空数据
                         this.allBoards = []
                         for (const i in this.tableData) {
@@ -228,7 +230,7 @@
                             }
                         }
                     }
-                    this.allBoards = JSON.parse(JSON.stringify(this.allBoards))
+                    this.allBoards = JSON.parse(JSON.stringify(this.allBoards))*/
                     this.page.total = response.data.data.total;
                     this.tableLoading = false;
                 });
@@ -236,7 +238,7 @@
             getAllUsers() {
                 //查询所有用户
                 getAllUser().then(response => {
-                    console.log("response",response)
+                    // console.log("response",response)
                     //如果数组中有数据
                     if (this.allUsersOfLibs.length !== 0) {
                         //清空数组
@@ -333,7 +335,7 @@
                             calculateBoardLinkType = res1.data.data;
                             remote("hardware_inf_io_type").then(res2 => {
                                 calculateBoardIoType = res2.data.data;
-                                form.userId = this.userInfo.name
+                                form.userId = this.userInfo.userId
                                 form.applyState = '0'
                                 form.applyDesc = null
                                 this.$router.push({
@@ -380,6 +382,7 @@
             sizeChange(val) {
                 this.page.size = val;
                 this.listQuery.size = val;
+                this.listQuery.current = 1;
                 this.getList();
             },
             /**

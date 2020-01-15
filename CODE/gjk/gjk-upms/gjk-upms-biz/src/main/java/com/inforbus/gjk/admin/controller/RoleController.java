@@ -149,4 +149,10 @@ public class RoleController {
 	public R roleCheck(@PathVariable("roleId") String roleId) {
 		return this.sysRoleService.getSysUserRoleByRoleId(roleId);
 	}
+	
+	@PostMapping("/getRoleCode/{userId}")
+	public String getSysRoleCodeByRoleId(@PathVariable("userId") int userId) {
+		return sysRoleService.getSysRoleCodeByRoleId(userId);
+	}
+	
 }

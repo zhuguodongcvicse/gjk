@@ -34,57 +34,64 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @TableName("gjk_compframe")
 public class Compframe extends Model<Compframe> {
-private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    /**
-   * 主键id
-   */
-    @TableId
-    private String id;
-    /**
-   * 构件框架库名字
-   */
-    private String name;
-    /**
-   * 版本
-   */
-    private Double version;
-    /**
-   * 文件路径
-   */
-    private String filePath;
-    /**
-   * 审批状态0：未审批，1：已审批
-   */
-    private String applyState;
-    /**
-   * 审批描述
-   */
-    private String applyDesc;
-    /**
-   * 创建时间
-   */
-    private LocalDateTime createTime;
-    /**
-   * 修改时间
-   */
-    private LocalDateTime updateTime;
-    /**
-   * 描述
-   */
-    private String description;
-    /**
-   * 删除标识0-正常，1-删除
-   */
-    private String delFlag;
-	public Compframe(String id, String name, Double version, String filePath, String description) {
+	/**
+	 * 主键id
+	 */
+	@TableId
+	private String id;
+	/**
+	 * 构件框架库名字
+	 */
+	private String name;
+	/**
+	 * 用户编号
+	 */
+	private Integer userId;
+	/**
+	 * 版本
+	 */
+	private Double version;
+	/**
+	 * 文件路径
+	 */
+	private String filePath;
+	/**
+	 * 审批状态0：未审批，1：已审批
+	 */
+	private String applyState;
+	/**
+	 * 审批描述
+	 */
+	private String applyDesc;
+	/**
+	 * 创建时间
+	 */
+	private LocalDateTime createTime;
+	/**
+	 * 修改时间
+	 */
+	private LocalDateTime updateTime;
+	/**
+	 * 描述
+	 */
+	private String description;
+	/**
+	 * 删除标识0-正常，1-删除
+	 */
+	private String delFlag;
+
+	public Compframe(String id, String name, Integer userId, Double version, String filePath, String description) {
 		super();
 		this.id = id;
 		this.name = name;
+		this.userId = userId;
 		this.version = version;
 		this.filePath = filePath;
 		this.description = description;
 	}
+
 	public Compframe() {
 		super();
 	}

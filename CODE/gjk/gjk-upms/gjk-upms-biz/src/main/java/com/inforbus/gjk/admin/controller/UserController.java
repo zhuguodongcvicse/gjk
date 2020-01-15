@@ -184,7 +184,6 @@ public class UserController {
 	@GetMapping("/info/getUserDict")
 	@Cacheable(value = "users")
 	public R getDictByType() {
-		System.out.println("7878878787");
 		List<SysUser> users = userService.list(Wrappers.<SysUser>query().lambda());
 		List<UserDictDTO> dictDTOs = new ArrayList<UserDictDTO>();
 		for (SysUser user : users) {

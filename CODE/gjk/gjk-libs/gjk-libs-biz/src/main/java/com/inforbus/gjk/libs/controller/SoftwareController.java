@@ -18,20 +18,16 @@ package com.inforbus.gjk.libs.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.TreeUtil;
-import com.inforbus.gjk.common.core.util.UnZipFilesUtils;
 import com.inforbus.gjk.common.log.annotation.SysLog;
 import com.inforbus.gjk.libs.api.dto.SoftwareDTO;
+import com.inforbus.gjk.libs.api.entity.BSP;
 import com.inforbus.gjk.libs.api.entity.Software;
 import com.inforbus.gjk.libs.api.entity.SoftwareDetail;
 import com.inforbus.gjk.libs.api.entity.SoftwareFile;
 import com.inforbus.gjk.libs.service.SoftwareService;
 import lombok.AllArgsConstructor;
-
-import java.io.File;
-import java.io.IOException;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -49,7 +45,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class SoftwareController {
 
 	private final SoftwareService softwareService;
-	private static final String softwarePath = JGitUtil.getLOCAL_REPO_PATH();
 
 	/**
 	 * 简单分页查询
@@ -58,8 +53,11 @@ public class SoftwareController {
 	 * @param software 软件框架库表
 	 * @return
 	 */
-	@GetMapping("/page")
-	public R<IPage<SoftwareDTO>> getSoftwarePage(Page<Software> page, Software software) {
+	@PostMapping("/page/{current}/{size}")
+	public R<IPage<SoftwareDTO>> getSoftwarePage(@PathVariable Long current, @PathVariable Long size,@RequestBody Software software) {
+		Page<Software> page = new Page<Software>();
+		page.setCurrent(current);
+		page.setSize(size);
 		return new R<>(softwareService.getSoftwareDTOPage(page, software));
 	}
 
@@ -112,6 +110,7 @@ public class SoftwareController {
 	public R removeById(@PathVariable String id) {
 		softwareService.removeSoftwareFile(id);
 		softwareService.removeSoftwareDetail(id);
+		softwareService.deleteFolderByFilePath(this.getById(id).getData().getFilePath());
 		return new R<>(softwareService.removeById(id));
 	}
 
@@ -171,46 +170,9 @@ public class SoftwareController {
 		return new R<>(softwareService.setVersionSize());
 	}
 
-	@PostMapping("/uploadFiles/{versionDisc}")
-	public String uploadFiles(@RequestParam(value = "file") MultipartFile[] files, @PathVariable String versionDisc) throws IOException {
-//		String path = "E:/tmp/";
-		String path = softwarePath;
-		String res = path + ",";
-		for (MultipartFile file : files) {
-			System.out.println("file.getOriginalFilename():" + file.getOriginalFilename());
-			if (file != null) {
-				String p = path + "gjk/software/" + versionDisc + ".0" + File.separator + file.getOriginalFilename();
-				String bb = p.replaceAll("\\\\", "/");
-				String ss = p.substring(0, bb.lastIndexOf("/")) + File.separator;
-				File zipfile = new File(bb);
-				File ff = new File(ss);
-				if (ff.exists()) {
-					ff.delete();
-				}
-				// 创建文件夹
-				ff.mkdirs();
-				// 如果文件已经存在，则删除创建新文件
-				if (new File(p).exists()) {
-					new File(p).delete();
-				}
-				try {
-					// 上传文件
-					file.transferTo(new File(p));
-					//调用解压方法：zipPath 压缩文件地址（全路径）      descDir 指定目录（全路径）
-					UnZipFilesUtils.unZipFile(bb, ss);
-					//解压完删除压缩包
-					zipfile.delete();
-//					return p;
-				} catch (Exception e) {
-					res += "文件 " + file.getOriginalFilename() + " 上传失败\n";
-					e.printStackTrace();
-				}
-				res += "文件 " + file.getOriginalFilename() + " 上传成功\n";
-			}
-
-		}
-
-		return res;
+	@PostMapping("/uploadFiles/{versionDisc}/{userName}")
+	public String uploadFiles(@RequestParam(value = "file") MultipartFile[] files, @PathVariable String versionDisc, @PathVariable String userName) {
+		return softwareService.uploadFiles(files, versionDisc, userName);
 	}
 
 	@GetMapping("/getSoftwareTree")

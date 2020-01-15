@@ -158,13 +158,18 @@
                     if (valid) {
                         // console.log("this.$store.state.infList",this.$store.state.infList)
                         this.showInf.dialogFormVisible = false;
-                        this.form.userId = this.userInfo.name
+                        this.form.userId = this.userInfo.userId
                         // console.log("this.form",this.form)
                         saveInf(this.form).then(request => {
-                            this.$message({
+                            this.$notify({
+                                title: '成功',
+                                message: '添加成功',
+                                type: 'success'
+                            });
+                            /*this.$message({
                                 message: "添加成功",
                                 type: "success"
-                            });
+                            });*/
                             this.$parent.getList();
                             this.$refs[formName].resetFields();
                         });

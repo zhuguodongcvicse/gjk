@@ -18,12 +18,17 @@ package com.inforbus.gjk.pro.service;
 
 import java.io.FileInputStream;
 import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.inforbus.gjk.pro.api.dto.AppDataDTO;
 import com.inforbus.gjk.pro.api.entity.App;
 import com.inforbus.gjk.pro.api.entity.Project;
 import com.inforbus.gjk.pro.api.entity.ProjectFile;
@@ -77,7 +82,7 @@ public interface AppService extends IService<App> {
 	 * @param roleDTO 查询参数
 	 * @return list
 	 */
-	List<App> getAppVosPage(@Param("fileName") String fileName);
+	List<App> getAppVosPage(@Param("fileName") String fileName, @Param("userId") String userId);
 
 	/**
 	 * 根据流程ID查询是否生成app组件工程
@@ -135,5 +140,36 @@ public interface AppService extends IService<App> {
 	 * @return
 	 */
 	App selectAPPByAPPId(@Param("id") String id);
+	
+	//注册
+	boolean appInstall( AppDataDTO appDataDTO);
+	
+	//加载、更新加载
+	boolean appLoadStart( AppDataDTO appDataDTO);
+	
+	//卸载
+	boolean appUnload( AppDataDTO appDataDTO);
+	
+	//启动
+	boolean appTaskRestart( AppDataDTO appDataDTO);
+	
+	//停止
+	boolean appStop( AppDataDTO appDataDTO);
+	
+	//暂停
+	boolean appPause( AppDataDTO appDataDTO);
+	
+	//注销
+	boolean appDelete( AppDataDTO appDataDTO);
+	
+	//导出
+	boolean appTaskExport( AppDataDTO appDataDTO);
+	
+	//返回文件路径
+	String returnFilePath();
+	
+	//压缩文件
+	void createZipFile(HttpServletRequest request, HttpServletResponse response,
+			 Map<String, String> map);
 
 }

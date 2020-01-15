@@ -28,6 +28,7 @@ import com.inforbus.gjk.libs.service.HardwarelibInfService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -49,6 +50,17 @@ public class HardwarelibInfServiceImpl extends ServiceImpl<HardwarelibInfMapper,
     @Override
     public IPage<HardwarelibInf> getHardwarelibInfPage(Page<HardwarelibInf> page, HardwarelibInf hardwarelibInf) {
         IPage<HardwarelibInf> hardwarelibInfPage = baseMapper.getHardwarelibInfPage(page, hardwarelibInf);
+        /*List<HardwarelibInf> hardwarelibInfs = new ArrayList<>();
+        for (HardwarelibInf record : hardwarelibInfPage.getRecords()) {
+            if (record.getUserId() != null && record.getUserId().equals(userName)) {
+                hardwarelibInfs.add(record);
+            } else if ("2".equals(record.getApplyState())){
+                hardwarelibInfs.add(record);
+            }
+        }
+        hardwarelibInfPage.setTotal(hardwarelibInfs.size());
+        hardwarelibInfPage.setRecords(hardwarelibInfs);
+        System.out.println("hardwarelibInfPage-----------------------> " + hardwarelibInfPage);*/
         return hardwarelibInfPage;
     }
 
@@ -57,7 +69,7 @@ public class HardwarelibInfServiceImpl extends ServiceImpl<HardwarelibInfMapper,
         //如果InfId为空，则是新增，用用户名和时间戳新拼一个id
         if (hardwarelibInf.getInfId() == null) {
             long currentTime = System.currentTimeMillis();
-            hardwarelibInf.setInfId(hardwarelibInf.getUserId() + currentTime);
+            hardwarelibInf.setInfId(hardwarelibInf.getUserId().toString() + currentTime);
         }
         hardwarelibInf.setDelFlag("0");
         //如果审批状态为空，则设置为0，即未处理

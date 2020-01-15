@@ -51,7 +51,7 @@ public class HardwarelibInfController {
    */
   @GetMapping("/page")
   public R<IPage<HardwarelibInf>> getHardwarelibInfPage(Page<HardwarelibInf> page, HardwarelibInf hardwarelibInf) {
-    return  new R<>(hardwarelibInfService.getHardwarelibInfPage(page,hardwarelibInf));
+    return  new R<>(hardwarelibInfService.getHardwarelibInfPage(page, hardwarelibInf));
   }
 
 

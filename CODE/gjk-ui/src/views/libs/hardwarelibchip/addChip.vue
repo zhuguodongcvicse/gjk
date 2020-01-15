@@ -139,7 +139,7 @@
                 this.$refs[formName].validate(valid => {
                     if (valid) {
                         this.showInf.dialogFormVisible = false;
-                        this.form.userId = this.userInfo.name
+                        this.form.userId = this.userInfo.userId
                         //跳转到画布
                         this.$router.push({
                             path: "/libs/hardwarelibchip/chipdesign",

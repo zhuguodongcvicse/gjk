@@ -122,6 +122,7 @@ public class CompframeController {
 	 * @return
 	 */
 	@ResponseBody
+	@PreAuthorize("@pms.hasPermission('libs_compframe_add')")
 	@PostMapping(path = "/saveCompFrame", consumes = { "multipart/mixed", "multipart/form-data" })
 	public R saveCompFrame(@RequestParam(value = "files", required = false) MultipartFile ufile,
 			@RequestParam(value = "dataParams", required = false) String dataParams) {

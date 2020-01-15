@@ -1,46 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~  Copyright (c) 2019-2020, 冷冷 (wangiegie@gmail.com).
-  ~  <p>
-  ~  Licensed under the GNU Lesser General Public License 3.0 (the "License");
-  ~  you may not use this file except in compliance with the License.
-  ~  You may obtain a copy of the License at
-  ~  <p>
-  ~ https://www.gnu.org/licenses/lgpl.html
-  ~  <p>
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
+<!-- ~ Copyright (c) 2019-2020, 冷冷 (wangiegie@gmail.com). ~ <p> ~ Licensed 
+	under the GNU Lesser General Public License 3.0 (the "License"); ~ you may 
+	not use this file except in compliance with the License. ~ You may obtain 
+	a copy of the License at ~ <p> ~ https://www.gnu.org/licenses/lgpl.html ~ 
+	<p> ~ Unless required by applicable law or agreed to in writing, software 
+	~ distributed under the License is distributed on an "AS IS" BASIS, ~ WITHOUT 
+	WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. ~ See the 
+	License for the specific language governing permissions and ~ limitations 
+	under the License. -->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.inforbus.gjk.admin.mapper.SysRoleMapper">
 
 	<!-- 通用查询映射结果 -->
-	<resultMap id="BaseResultMap" type="com.inforbus.gjk.admin.api.entity.SysRole">
-		<id column="role_id" property="roleId"/>
-		<result column="role_name" property="roleName"/>
-		<result column="role_code" property="roleCode"/>
-		<result column="role_desc" property="roleDesc"/>
-		<result column="create_time" property="createTime"/>
-		<result column="update_time" property="updateTime"/>
-		<result column="del_flag" property="delFlag"/>
+	<resultMap id="BaseResultMap"
+		type="com.inforbus.gjk.admin.api.entity.SysRole">
+		<id column="role_id" property="roleId" />
+		<result column="role_name" property="roleName" />
+		<result column="role_code" property="roleCode" />
+		<result column="role_desc" property="roleDesc" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="del_flag" property="delFlag" />
 	</resultMap>
 
-	<!-- 通过用户ID，查询角色信息-->
+	<!-- 通过用户ID，查询角色信息 -->
 	<select id="listRolesByUserId" resultMap="BaseResultMap">
-        SELECT
-            r.*
-        FROM
-        sys_role r, sys_user_role ur WHERE r.role_id = ur.role_id AND r.del_flag = 0 and  ur.user_id IN (#{userId})
-    </select>
-    
-    <!-- 通过角色名称模糊查询角色信息列表 -->
-    <select id="getRoleVosPage" resultMap="BaseResultMap">
 		SELECT
-			r.*
+		r.*
+		FROM
+		sys_role r, sys_user_role ur WHERE r.role_id = ur.role_id AND r.del_flag = 0
+		and ur.user_id IN (#{userId})
+	</select>
+
+	<!-- 通过角色名称模糊查询角色信息列表 -->
+	<select id="getRoleVosPage" resultMap="BaseResultMap">
+		SELECT
+		r.*
 		FROM
 		sys_role AS r
 		<where>
@@ -51,7 +47,7 @@
 		</where>
 		ORDER BY r.create_time DESC
 	</select>
-    <select id="getRoleByRoleCode" resultMap="BaseResultMap">
+	<select id="getRoleByRoleCode" resultMap="BaseResultMap">
 		SELECT
 		r.*
 		FROM
@@ -68,6 +64,14 @@
 	</select>
 
 	<select id="getSysUserRoleByRoleId" resultType="int">
-		select count(*) from sys_user_role where role_id=#{roleId}
+		select count(*)
+		from sys_user_role where role_id=#{roleId}
+	</select>
+
+	<!-- 根據用戶id查找到系統管理員 -->
+	<select id="getSysRoleCodeByRoleId" resultType="java.lang.String">
+		select role_code
+		from sys_role where role_id=( SELECT role_id FROM sys_user_role
+		where user_id = #{userId})
 	</select>
 </mapper>

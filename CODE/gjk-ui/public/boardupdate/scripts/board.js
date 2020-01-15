@@ -794,7 +794,7 @@ function initEditor(editor) {
         // console.log("selection",selection[0].properties)
         //Q.confirm("Delete Elements - " + selection.length, function () {
         Q.confirm("是否删除？", function () {
-          var selection = this.removeSelection();
+          /*var selection = this.removeSelection();
           // console.log("selection[0].properties", JSON.stringify(selection[0].properties))
           for (const i in chipList) {
             if (chipList[i].uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
@@ -843,7 +843,7 @@ function initEditor(editor) {
             if (dragCpuList[i].uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
               removeByValue(dragCpuList, dragCpuList[i])
             }
-          }
+          }*/
           //  console.log("infOfExchangeCpuArr",infOfExchangeCpuArr)
         }, this);
       }
@@ -890,7 +890,12 @@ function initEditor(editor) {
           data.set('infName', data.properties.infName);
           data.set('infRate', data.properties.infRate);
           data.set('opticalNum', data.properties.opticalNum);
-          data.set('ioType', data.properties.ioType);
+          for (const i in calculateBoardIoType) {
+            if (calculateBoardIoType[i].value === data.properties.ioType) {
+              data.set('ioType', calculateBoardIoType[i].label);
+              break
+            }
+          }
         }
         // console.log("data", data);
       }

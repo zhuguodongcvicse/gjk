@@ -73,6 +73,16 @@ export const tableOption = {
       label: '描述',
       prop: 'description'
     },
+    {
+      label: '用户',
+      prop: 'userId',
+      type: 'select',
+      props: {
+        label: 'showName',
+        value: 'userId'
+      },
+      dicUrl: '/admin/user/info/getUserDict'
+    },
   ]
 }
 //构件框架addframe的配置

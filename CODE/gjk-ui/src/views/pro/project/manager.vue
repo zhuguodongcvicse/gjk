@@ -119,7 +119,7 @@
                     "box-sizing": "border-box",
                     overflow: "hidden",
                     "text-align": "center",
-                    "z-index": 50,
+                    "z-index": 10,
                     cursor: "w-resize",
                     "background-color": "rgba(145, 145, 145, 0.315)"
                 },

@@ -33,6 +33,7 @@ public class SoftwareDTO {
 
 	public SoftwareDTO(Software software) {
 		this.id = software.getId();
+		this.userId = software.getUserId();
 		this.softwareName = software.getSoftwareName();
 		this.version = software.getVersion() + "";
 		this.filePath = software.getFilePath();
@@ -49,6 +50,11 @@ public class SoftwareDTO {
 	 */
 	@TableId
 	private String id;
+	
+	/**
+	 * 用戶id
+	 */
+	private int userId;
 
 	/**
 	 * 软件框架库名字

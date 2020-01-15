@@ -114,6 +114,7 @@ public class StructlibsServiceImpl extends ServiceImpl<StructlibsMapper, Structl
 		if (paramTreeVO.getChildren().size() <= 0)
 			return;
 		for (ParamTreeVO entity : paramTreeVO.getChildren()) {
+			entity.setUserId(paramTreeVO.getUserId());
 			entity.setVersion(paramTreeVO.getVersion());
 			saveStructToDb(entity, flag);
 		}
@@ -177,6 +178,7 @@ public class StructlibsServiceImpl extends ServiceImpl<StructlibsMapper, Structl
 		entity.setPermission("");
 		entity.setStorageFlag(paramTreeVO.getStorageFlag());
 		entity.setParamRemarks(paramTreeVO.getParamRemarks());
+		entity.setUserId(paramTreeVO.getUserId());
 
 		// 调用mapper层方法保存到数据库
 		if (flag) {

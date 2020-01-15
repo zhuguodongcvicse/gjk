@@ -89,7 +89,7 @@
                 this.$refs[formName].validate(valid => {
                     if (valid) {
                         this.showInf.dialogFormVisible = false;
-                        this.form.userId = this.userInfo.name
+                        this.form.userId = this.userInfo.userId
                         this.form.applyState = "0"
                         this.$router.push({
                             path: "/libs/hardwarelibboard/boarddesign",

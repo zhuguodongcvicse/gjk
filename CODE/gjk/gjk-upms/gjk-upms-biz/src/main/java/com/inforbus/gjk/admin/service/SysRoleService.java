@@ -26,6 +26,8 @@ import com.inforbus.gjk.common.core.util.R;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 /**
  * <p>
  * 服务类
@@ -75,4 +77,11 @@ public interface SysRoleService extends IService<SysRole> {
 	 * @return
 	 */
 	R getSysUserRoleByRoleId(String roleId);
+	
+	/**
+	 * 根據用戶id查找到系統管理員
+	 * @param userId
+	 * @return
+	 */
+	String getSysRoleCodeByRoleId(@Param("userId") int userId);
 }

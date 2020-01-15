@@ -348,7 +348,7 @@ export default {
           Vue.set(node, "isComplie", true);
           this.appComponentId = node.id;
         } else if (node.parentId == this.appComponentId) {
-          if (node.label == "bsp" || node.label == "Image") {
+          if (node.label == "bsp" || node.label == "Image" || node.label == ".sonar" || node.isDirectory == "1") {
             Vue.set(node, "isComplie", false);
           } else {
             Vue.set(node, "isComplie", true);
@@ -646,6 +646,7 @@ export default {
     handleNodeClick(data) {
       //根据 . 判断是否是文件 待确认
       // console.log(data);
+      console.log("项目树数据", data);
       if (data.label.indexOf(".") >= 0) {
         var d = data.label.length - ".pdf".length;
         if (d >= 0 && data.label.lastIndexOf(".pdf") == d) {
@@ -822,7 +823,7 @@ export default {
       };
       updateBaseTemplateIDs(project).then(res => {
         if (res.data.data) {
-          this.$message({
+          this.$notify({
             message: "修改模板成功",
             type: "success"
           });
@@ -899,7 +900,7 @@ export default {
                 "上传的压缩包内容错误，请重新选择文件上传。"
               );
             } else {
-              this.$message.success("导入成功。");
+              this.$notify.success("导入成功。");
               this.getProjects();
               this.closeImportProjectDialog();
             }

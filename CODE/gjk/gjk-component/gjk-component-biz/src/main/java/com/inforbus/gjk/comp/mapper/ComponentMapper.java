@@ -66,7 +66,7 @@ public interface ComponentMapper extends BaseMapper<Component> {
 	 * @param userId 用户编号
 	 * @return
 	 */
-	List<Component> listCompByUserId(@Param("userId") String userId);
+	List<Component> listCompByUserId(@Param("userId") Integer userId);
 
 	/**
 	 * @Title: getComponentCompDetailById

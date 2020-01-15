@@ -55,7 +55,7 @@ private static final long serialVersionUID = 1L;
     /**
      * 用户ID
      */
-    private String userId;
+    private Integer userId;
     /**
      * 内核数量
      */

@@ -32,6 +32,7 @@
 			column="local_deployment_plan" />
 		<result property="description" column="description" />
 		<result property="delFlag" column="del_flag" />
+		<result property="userId" column="user_id" />
 	</resultMap>
 
 	<resultMap type="com.inforbus.gjk.pro.api.entity.ProjectFile"
@@ -63,6 +64,7 @@
 
 	<sql id="appSql">
 		id,
+		user_id,
 		file_path,
 		file_name,
 		process_id,
@@ -80,6 +82,7 @@
 
 	<sql id="saveAppSql">
 		id,
+		user_id,
 		file_path,
 		file_name,
 		process_id,
@@ -98,6 +101,9 @@
 		<where>
 			<if test="app.id != null and app.id.trim() != ''">
 				AND id = #{app.id}
+			</if>
+			<if test="app.userId != 0">
+				AND user_id = #{app.userId}
 			</if>
 			<if test="app.filePath != null and app.filePath.trim() != ''">
 				AND file_path = #{app.filePath}
@@ -137,6 +143,7 @@
 		<include refid="saveAppSql" />
 		) VALUES (
 		#{app.id},
+		#{app.userId},
 		#{app.filePath},
 		#{app.fileName},
 		#{app.processId},
@@ -169,6 +176,7 @@
 			<if test="fileName != null and fileName != ''">
 				and r.file_path LIKE CONCAT('%',#{fileName},'%')
 			</if>
+			and r.user_id = #{userId}
 			and r.del_flag = '0'
 		</where>
 		ORDER BY r.create_time DESC
@@ -206,8 +214,10 @@
 
 	<!-- 通过流程id拿到当前流程建模信息，用于app控制的展开功能 -->
 	<select id="getProcessByProcessId" resultMap="projectFileMap">
-		SELECT * FROM gjk_project_detail WHERE file_type = '11' AND parent_id =
-		(SELECT b.id FROM gjk_project_detail b WHERE b.parent_id = #{parentId}) 
+		SELECT * FROM
+		gjk_project_detail WHERE file_type = '11' AND parent_id =
+		(SELECT b.id
+		FROM gjk_project_detail b WHERE b.parent_id = #{parentId})
 	</select>
 
 	<!-- 根据appid删除app数据 -->

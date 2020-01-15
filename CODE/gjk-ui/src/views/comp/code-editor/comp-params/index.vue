@@ -79,7 +79,7 @@
             />
           </el-card>
           <el-card class="box-card" :body-style="{padding: '10px'}">
-            <div slot="header" class="clearfix">平台文件</div>
+            <div slot="header" class="clearfix">工程文件</div>
             <params-files
               :fileLists="fileList"
               :comp="component"
@@ -405,7 +405,11 @@ export default {
                 }
               });
               if (this.headerFile.structParams) {
-                saveStructMap(this.headerFile.structParams).then(() => {
+                let strcutArr = this.headerFile.structParams;
+                for (let key in strcutArr) {
+                  this.$set(strcutArr[key], "userId", this.userInfo.userId);
+                }
+                saveStructMap(strcutArr).then(() => {
                   this.$store.dispatch("clearParseHeaderObj");
                 });
               }

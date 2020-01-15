@@ -93,7 +93,7 @@ public interface ComponentService extends IService<Component> {
 	 * @param userId 用户编号
 	 * @return 构件树（包含文件列表）
 	 */
-	List<CompDetailVO> getCompByUserId(String userId);
+	List<CompDetailVO> getCompByUserId(Integer userId);
 
 	/**
 	 * @Title: getCompByCompId
@@ -214,7 +214,7 @@ public interface ComponentService extends IService<Component> {
 	 * @DateTime 2019年5月23日 上午11:34:43
 	 * @param userId 用户Id
 	 */
-	List<Component> listCompByUserId(String userId);
+	List<Component> listCompByUserId(Integer userId);
 
 	/**
 	 * 判断选择的库目录文件是否存在
