@@ -49,7 +49,7 @@ public class Project extends Model<Project> {
 	/**
 	 * 用户ID
 	 */
-	private String userId;
+	private Integer userId;
 	/**
 	 * 项目图标
 	 */
