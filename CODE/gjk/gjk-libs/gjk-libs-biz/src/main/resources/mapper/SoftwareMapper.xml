@@ -70,48 +70,50 @@
 		del_flag
 		FROM
 		gjk_software
-		<where>
-			<if test="software.id != null and software.id.trim() != ''">
-				AND id = #{software.id}
-			</if>
-			<if test="software.userId != 0">
-				AND user_id = #{software.userId}
-			</if>
-			<if
-				test="software.softwareName != null and software.softwareName.trim() != ''">
-				AND software_name = #{software.softwareName}
-			</if>
-			<if
-				test="software.version != null and software.version.trim() != ''">
-				AND version = #{software.version}
-			</if>
-			<if
-				test="software.filePath != null and software.filePath.trim() != ''">
-				AND file_path = #{software.filePath}
-			</if>
-			<if
-				test="software.applyState != null and software.applyState.trim() != ''">
-				AND apply_state = #{software.applyState}
-			</if>
-			<if
-				test="software.applyDesc != null and software.applyDesc.trim() != ''">
-				AND apply_desc = #{software.applyDesc}
-			</if>
-			<if
-				test="software.createTime != null and software.createTime.trim() != ''">
-				AND create_time = #{software.createTime}
-			</if>
-			<if
-				test="software.updateTime != null and software.updateTime.trim() != ''">
-				AND update_time = #{software.updateTime}
-			</if>
-			<if
-				test="software.description != null and software.description.trim() != ''">
-				AND description = #{software.description}
-			</if>
-			and del_flag = '0'
-			ORDER BY create_time desc
-		</where>
+		where user_id = #{software.userId} or apply_state = '2'
+		order by update_time DESC
+<!--		<where>-->
+<!--			<if test="software.id != null and software.id.trim() != ''">-->
+<!--				AND id = #{software.id}-->
+<!--			</if>-->
+<!--			<if test="software.userId != 0">-->
+<!--				AND user_id = #{software.userId}-->
+<!--			</if>-->
+<!--			<if-->
+<!--				test="software.softwareName != null and software.softwareName.trim() != ''">-->
+<!--				AND software_name = #{software.softwareName}-->
+<!--			</if>-->
+<!--			<if-->
+<!--				test="software.version != null and software.version.trim() != ''">-->
+<!--				AND version = #{software.version}-->
+<!--			</if>-->
+<!--			<if-->
+<!--				test="software.filePath != null and software.filePath.trim() != ''">-->
+<!--				AND file_path = #{software.filePath}-->
+<!--			</if>-->
+<!--			<if-->
+<!--				test="software.applyState != null and software.applyState.trim() != ''">-->
+<!--				AND apply_state = #{software.applyState}-->
+<!--			</if>-->
+<!--			<if-->
+<!--				test="software.applyDesc != null and software.applyDesc.trim() != ''">-->
+<!--				AND apply_desc = #{software.applyDesc}-->
+<!--			</if>-->
+<!--			<if-->
+<!--				test="software.createTime != null and software.createTime.trim() != ''">-->
+<!--				AND create_time = #{software.createTime}-->
+<!--			</if>-->
+<!--			<if-->
+<!--				test="software.updateTime != null and software.updateTime.trim() != ''">-->
+<!--				AND update_time = #{software.updateTime}-->
+<!--			</if>-->
+<!--			<if-->
+<!--				test="software.description != null and software.description.trim() != ''">-->
+<!--				AND description = #{software.description}-->
+<!--			</if>-->
+<!--			and del_flag = '0'-->
+<!--			ORDER BY create_time desc-->
+<!--		</where>-->
 	</select>
 
 	<!-- 保存软件框架信息 -->

@@ -74,41 +74,43 @@
 		<include refid="bspSql" />
 		FROM
 		gjk_bsp
-		<where>
-			<if test="bsp.id != null and bsp.id.trim() != ''">
-				AND id = #{bsp.id}
-			</if>
-			<if test="bsp.userId != 0">
-				AND user_id = #{bsp.userId}
-			</if>
-			<if test="bsp.bspName != null and bsp.bspName.trim() != ''">
-				AND bsp_name = #{bsp.bspName}
-			</if>
-			<if test="bsp.version != null and bsp.version.trim() != ''">
-				AND version = #{bsp.version}
-			</if>
-			<if test="bsp.filePath != null and bsp.filePath.trim() != ''">
-				AND file_path = #{bsp.filePath}
-			</if>
-			<if test="bsp.applyState != null and bsp.applyState.trim() != ''">
-				AND apply_state = #{bsp.applyState}
-			</if>
-			<if test="bsp.applyDesc != null and bsp.applyDesc.trim() != ''">
-				AND apply_desc = #{bsp.applyDesc}
-			</if>
-			<if test="bsp.createTime != null and bsp.createTime.trim() != ''">
-				AND create_time = #{bsp.createTime}
-			</if>
-			<if test="bsp.updateTime != null and bsp.updateTime.trim() != ''">
-				AND update_time = #{bsp.updateTime}
-			</if>
-			<if
-				test="bsp.description != null and bsp.description.trim() != ''">
-				AND description = #{bsp.description}
-			</if>
-			and del_flag = '0'
-			ORDER BY create_time DESC
-		</where>
+		where user_id = #{bsp.userId} or apply_state = '2'
+		order by update_time DESC
+<!--		<where>-->
+<!--			<if test="bsp.id != null and bsp.id.trim() != ''">-->
+<!--				AND id = #{bsp.id}-->
+<!--			</if>-->
+<!--			<if test="bsp.userId != 0">-->
+<!--				AND user_id = #{bsp.userId}-->
+<!--			</if>-->
+<!--			<if test="bsp.bspName != null and bsp.bspName.trim() != ''">-->
+<!--				AND bsp_name = #{bsp.bspName}-->
+<!--			</if>-->
+<!--			<if test="bsp.version != null and bsp.version.trim() != ''">-->
+<!--				AND version = #{bsp.version}-->
+<!--			</if>-->
+<!--			<if test="bsp.filePath != null and bsp.filePath.trim() != ''">-->
+<!--				AND file_path = #{bsp.filePath}-->
+<!--			</if>-->
+<!--			<if test="bsp.applyState != null and bsp.applyState.trim() != ''">-->
+<!--				AND apply_state = #{bsp.applyState}-->
+<!--			</if>-->
+<!--			<if test="bsp.applyDesc != null and bsp.applyDesc.trim() != ''">-->
+<!--				AND apply_desc = #{bsp.applyDesc}-->
+<!--			</if>-->
+<!--			<if test="bsp.createTime != null and bsp.createTime.trim() != ''">-->
+<!--				AND create_time = #{bsp.createTime}-->
+<!--			</if>-->
+<!--			<if test="bsp.updateTime != null and bsp.updateTime.trim() != ''">-->
+<!--				AND update_time = #{bsp.updateTime}-->
+<!--			</if>-->
+<!--			<if-->
+<!--				test="bsp.description != null and bsp.description.trim() != ''">-->
+<!--				AND description = #{bsp.description}-->
+<!--			</if>-->
+<!--			and del_flag = '0'-->
+<!--			ORDER BY create_time DESC-->
+<!--		</where>-->
 	</select>
 
 	<!-- 保存bsp信息 -->

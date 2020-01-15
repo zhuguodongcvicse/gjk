@@ -71,13 +71,13 @@ public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> i
 	@Override
 	public IPage<Software> getSoftwarePage(Page<Software> page, Software software) {
 
-		String roleCode = bspGetRoleCodeService.getSysRoleCodeByRoleId(software.getUserId());
-		if ("ROLE_ADMIN".equals(roleCode)) {
-			software.setUserId(0);
+//		String roleCode = bspGetRoleCodeService.getSysRoleCodeByRoleId(software.getUserId());
+//		if ("ROLE_ADMIN".equals(roleCode)) {
+//			software.setUserId(0);
 			return baseMapper.getSoftwarePage(page, software);
-		}
+//		}
 
-		return baseMapper.selectPage(page, new QueryWrapper<Software>(software));
+//		return baseMapper.selectPage(page, new QueryWrapper<Software>(software));
 
 	}
 
@@ -139,22 +139,22 @@ public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> i
 
 	@Override
 	public IPage<SoftwareDTO> getSoftwareDTOPage(Page<Software> softwarePage, Software software) {
-		if ("ROLE_ADMIN".equals(bspGetRoleCodeService.getSysRoleCodeByRoleId(software.getUserId()))) {
-			List<Software> softwares = getSoftwarePage(softwarePage, software).getRecords();
-
-			List<SoftwareDTO> softwareDTOs = new ArrayList<>();
-			for (Software soft : softwares) {
-				SoftwareDTO dto = new SoftwareDTO(soft);
-				if ("2".equals(soft.getApplyState())
-						|| "ROLE_ADMIN".equals(bspGetRoleCodeService.getSysRoleCodeByRoleId(soft.getUserId()))) {
-					softwareDTOs.add(dto);
-				}
-			}
-			Page<SoftwareDTO> softwareDTOPage = new Page<SoftwareDTO>(softwarePage.getCurrent(), softwarePage.getSize(),
-					softwarePage.getTotal());
-			softwareDTOPage.setRecords(softwareDTOs);
-			return softwareDTOPage;
-		} else {
+//		if ("ROLE_ADMIN".equals(bspGetRoleCodeService.getSysRoleCodeByRoleId(software.getUserId()))) {
+//			List<Software> softwares = getSoftwarePage(softwarePage, software).getRecords();
+//
+//			List<SoftwareDTO> softwareDTOs = new ArrayList<>();
+//			for (Software soft : softwares) {
+//				SoftwareDTO dto = new SoftwareDTO(soft);
+//				if ("2".equals(soft.getApplyState())
+//						|| "ROLE_ADMIN".equals(bspGetRoleCodeService.getSysRoleCodeByRoleId(soft.getUserId()))) {
+//					softwareDTOs.add(dto);
+//				}
+//			}
+//			Page<SoftwareDTO> softwareDTOPage = new Page<SoftwareDTO>(softwarePage.getCurrent(), softwarePage.getSize(),
+//					softwarePage.getTotal());
+//			softwareDTOPage.setRecords(softwareDTOs);
+//			return softwareDTOPage;
+//		} else {
 			List<Software> softwares = getSoftwarePage(softwarePage, software).getRecords();
 
 			List<SoftwareDTO> softwareDTOs = new ArrayList<>();
@@ -166,7 +166,7 @@ public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> i
 					softwarePage.getTotal());
 			softwareDTOPage.setRecords(softwareDTOs);
 			return softwareDTOPage;
-		}
+//		}
 	}
 
 	@Override
