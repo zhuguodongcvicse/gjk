@@ -26,6 +26,9 @@ import com.inforbus.gjk.admin.service.SysRoleService;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.log.annotation.SysLog;
 import lombok.AllArgsConstructor;
+
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,6 +64,7 @@ public class RoleController {
 	 */
 	@SysLog("添加角色")
 	@PostMapping
+	@CacheEvict(value = "applyAutoUser", key = "'applyAutoUser'")
 	@PreAuthorize("@pms.hasPermission('sys_role_add')")
 	public R save(@Valid @RequestBody SysRole sysRole) {
 		return new R<>(sysRoleService.save(sysRole));
@@ -74,6 +78,7 @@ public class RoleController {
 	 */
 	@SysLog("修改角色")
 	@PutMapping
+	@CacheEvict(value = "applyAutoUser", key = "'applyAutoUser'")
 	@PreAuthorize("@pms.hasPermission('sys_role_edit')")
 	public R update(@Valid @RequestBody SysRole sysRole) {
 		return new R<>(sysRoleService.updateById(sysRole));
@@ -87,6 +92,7 @@ public class RoleController {
 	 */
 	@SysLog("删除角色")
 	@DeleteMapping("/{id}")
+	@CacheEvict(value = "applyAutoUser", key = "'applyAutoUser'")
 	@PreAuthorize("@pms.hasPermission('sys_role_del')")
 	public R removeById(@PathVariable Integer id) {
 		return new R<>(sysRoleService.removeRoleById(id));
@@ -124,7 +130,6 @@ public class RoleController {
 		return new R<>(sysRoleService.getRolePage(page, roleDTO));
 	}
 
-	
 	/**
 	 * 更新角色菜单
 	 *
@@ -134,6 +139,7 @@ public class RoleController {
 	 */
 	@SysLog("更新角色菜单")
 	@PutMapping("/menu")
+	@CacheEvict(value = "applyAutoUser", key = "'applyAutoUser'")
 	@PreAuthorize("@pms.hasPermission('sys_role_perm')")
 	public R saveRoleMenus(Integer roleId, @RequestParam(value = "menuIds", required = false) String menuIds) {
 		SysRole sysRole = sysRoleService.getById(roleId);
@@ -149,10 +155,11 @@ public class RoleController {
 	public R roleCheck(@PathVariable("roleId") String roleId) {
 		return this.sysRoleService.getSysUserRoleByRoleId(roleId);
 	}
-	
+
 	@PostMapping("/getRoleCode/{userId}")
+	@CacheEvict(value = "applyAutoUser", key = "'applyAutoUser'")
 	public String getSysRoleCodeByRoleId(@PathVariable("userId") int userId) {
 		return sysRoleService.getSysRoleCodeByRoleId(userId);
 	}
-	
+
 }

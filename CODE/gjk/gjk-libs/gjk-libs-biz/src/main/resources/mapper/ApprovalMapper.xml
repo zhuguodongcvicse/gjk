@@ -75,8 +75,7 @@
 			<if test="approval.id != null and approval.id.trim() != ''">
 				AND id = #{approval.id}
 			</if>
-			<if
-				test="approval.userId != null and approval.userId.trim() != ''">
+			<if test="approval.userId != null">
 				AND user_id = #{approval.userId}
 			</if>
 			<if
@@ -95,8 +94,7 @@
 				test="approval.applyTime != null and approval.applyTime.trim() != ''">
 				AND apply_time = #{approval.applyTime}
 			</if>
-			<if
-				test="approval.applyUserId != null and approval.applyUserId.trim() != ''">
+			<if test="approval.applyUserId != null">
 				AND apply_user_id = #{approval.applyUserId}
 			</if>
 			<if
@@ -247,8 +245,7 @@
 		<include refid="approvalSql" />
 		FROM gjk_approval
 		<where>
-			<if
-				test="approval.applyUserId != null and approval.applyUserId.trim() != ''">
+			<if test="approval.applyUserId != null">
 				AND apply_user_id = #{approval.applyUserId}
 			</if>
 			AND approval_state in ('0','1','4')
