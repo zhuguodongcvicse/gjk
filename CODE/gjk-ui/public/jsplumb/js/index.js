@@ -1312,9 +1312,11 @@ function getSimulationData() {
 		if (connection.getLabel() != null &&  connection.getLabel() != "") {
 			index++
 			// let simulation = {}
-			// simulation.startId = connection.sourceId
-			// simulation.endId = connection.targetId
-			let simulation = connection.sourceId +"|" + connection.targetId
+			let startId = connection.sourceId
+			let endId = connection.targetId
+			let startName = endpointMap.get(connection.endpoints[0].getUuid()).variableName
+			let endName = endpointMap.get(connection.endpoints[1].getUuid()).variableName
+			let simulation = startId +":"+ startName +"|" + endId + ":" + endName
 			if (index == 1) {
 				simulationData.push(simulation)
 			} else {
