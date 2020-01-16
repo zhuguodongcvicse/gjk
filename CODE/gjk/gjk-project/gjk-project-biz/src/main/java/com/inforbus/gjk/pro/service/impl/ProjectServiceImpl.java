@@ -117,7 +117,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 	 * @Author cvics
 	 * @DateTime 2019年5月8日 下午8:58:51
 	 */
-	private SysUser getUsernameByUserId(String userId) {
+	private SysUser getUsernameByUserId(Integer userId) {
 		return baseMapper.getUsernameByUserId(userId);
 	}
 

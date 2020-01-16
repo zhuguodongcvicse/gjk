@@ -324,7 +324,7 @@ export default {
           this.$delete(this.compSelectArray, index);
         }
       }
-      console.log("compSelectArray:", this.compSelectArray);
+      // console.log("compSelectArray:", this.compSelectArray);
     },
     "formLabelAlign.applyUser": function() {
       // console.log("formLabelAlign.applyUser:", this.formLabelAlign.applyUser);
@@ -338,7 +338,7 @@ export default {
           );
         }
       }
-      console.log("screenLibsIdArray", this.screenLibsIdArray);
+      // console.log("screenLibsIdArray", this.screenLibsIdArray);
       this.getTableData();
       this.compSelectArray = [];
     }
@@ -473,9 +473,7 @@ export default {
                           approval.applyId = this.project.id;
                           approval.applyType = "2";
                           approval.libraryType = "7";
-                          if (this.formLabelAlign.applyUser != "") {
-                            approval.applyUserId = this.formLabelAlign.applyUser;
-                          }
+                          approval.applyUserId = this.formLabelAlign.applyUser;
                           approval.approvalState = "0";
                           //提交记录到审批管理库
                           saveApproval(approval).then(Response => {

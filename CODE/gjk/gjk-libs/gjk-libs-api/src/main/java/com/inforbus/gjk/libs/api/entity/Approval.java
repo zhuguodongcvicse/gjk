@@ -43,7 +43,7 @@ public class Approval extends Model<Approval> {
 	/**
 	 * 用户
 	 */
-	private String userId;
+	private Integer userId;
 	/**
 	 * 申请编号
 	 */
@@ -63,7 +63,7 @@ public class Approval extends Model<Approval> {
 	/**
 	 * 审批ID
 	 */
-	private String applyUserId;
+	private Integer applyUserId;
 	/**
 	 * 审批状态
 	 */

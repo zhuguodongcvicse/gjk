@@ -1,5 +1,5 @@
 <template>
-  <el-dialog class="libs_software_storageapply_14s" title="构件库批量导出" :visible.sync="dialog" width="30%" :before-close="handleClose">
+  <el-dialog class="libs_software_storageapply_14s" title="构件库批量入库" :visible.sync="dialog" width="30%" :before-close="handleClose">
     <el-container>
       <el-main>
         <el-form size="mini" label-position="right" label-width="120px" ref="form" :model="form" :rules="projectRules">

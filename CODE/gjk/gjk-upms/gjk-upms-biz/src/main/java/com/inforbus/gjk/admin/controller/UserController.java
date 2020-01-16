@@ -29,7 +29,9 @@ import com.inforbus.gjk.common.security.annotation.Inner;
 import com.inforbus.gjk.common.security.util.SecurityUtils;
 import lombok.AllArgsConstructor;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -110,6 +112,8 @@ public class UserController {
 	 */
 	@SysLog("删除用户信息")
 	@DeleteMapping("/{id}")
+	@Caching(evict = { @CacheEvict(value = "users", key = "'users'"),
+			@CacheEvict(value = "applyAutoUser", key = "'applyAutoUser'") })
 	@PreAuthorize("@pms.hasPermission('sys_user_del')")
 	public R userDel(@PathVariable Integer id) {
 		SysUser sysUser = userService.getById(id);
@@ -124,6 +128,8 @@ public class UserController {
 	 */
 	@SysLog("添加用户")
 	@PostMapping
+	@Caching(evict = { @CacheEvict(value = "users", key = "'users'"),
+			@CacheEvict(value = "applyAutoUser", key = "'applyAutoUser'") })
 	@PreAuthorize("@pms.hasPermission('sys_user_add')")
 	public R user(@RequestBody UserDTO userDto) {
 		return new R<>(userService.saveUser(userDto));
@@ -137,6 +143,8 @@ public class UserController {
 	 */
 	@SysLog("更新用户信息")
 	@PutMapping
+	@Caching(evict = { @CacheEvict(value = "users", key = "'users'"),
+			@CacheEvict(value = "applyAutoUser", key = "'applyAutoUser'") })
 	@PreAuthorize("@pms.hasPermission('sys_user_edit')")
 	public R updateUser(@Valid @RequestBody UserDTO userDto) {
 		return new R<>(userService.updateUser(userDto));
@@ -162,6 +170,8 @@ public class UserController {
 	 */
 	@SysLog("修改个人信息")
 	@PutMapping("/edit")
+	@Caching(evict = { @CacheEvict(value = "users", key = "'users'"),
+			@CacheEvict(value = "applyAutoUser", key = "'applyAutoUser'") })
 	public R updateUserInfo(@Valid @RequestBody UserDTO userDto) {
 		return userService.updateUserInfo(userDto);
 	}
@@ -182,8 +192,9 @@ public class UserController {
 	 * @return 同类型字典
 	 */
 	@GetMapping("/info/getUserDict")
-	@Cacheable(value = "users")
+	@Cacheable(value = "users", key = "'users'")
 	public R getDictByType() {
+		System.out.println("执行查询用户字典方法了哦，没有走缓存哦。");
 		List<SysUser> users = userService.list(Wrappers.<SysUser>query().lambda());
 		List<UserDictDTO> dictDTOs = new ArrayList<UserDictDTO>();
 		for (SysUser user : users) {
@@ -200,9 +211,9 @@ public class UserController {
 	 * @return 同类型字典
 	 */
 	@GetMapping("/info/getUserhasApplyAuto")
-	@Cacheable(value = "applyAutoUser")
+	@Cacheable(value = "applyAutoUser", key = "'applyAutoUser'")
 	public R getUserhasApplyAuto() {
-		System.out.println("7878878787");
+		System.out.println("执行查询审批用户方法了哦，没有走缓存哦。");
 		List<SysUser> users = userService.getUserHasMenuId("3100");
 		return new R<>(users);
 	}
@@ -215,12 +226,14 @@ public class UserController {
 	 */
 	@SysLog("注册用户")
 	@PostMapping("/registered")
+	@Caching(evict = { @CacheEvict(value = "users", key = "'users'"),
+			@CacheEvict(value = "applyAutoUser", key = "'applyAutoUser'") })
 	public R registered(@RequestBody UserDTO userDto) {
 		return new R<>(userService.saveUser(userDto));
 	}
 
 	@GetMapping("getAllUser")
-	public List getAllUser(){
+	public List getAllUser() {
 		return userService.list(null);
 	}
 }
