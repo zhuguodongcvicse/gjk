@@ -94,6 +94,7 @@ public class StructlibsServiceImpl extends ServiceImpl<StructlibsMapper, Structl
 		// 获取结构体版本
 		Double ver = getLatestVersionByStruct(paramTreeVO.getFparamType());
 		paramTreeVO.setVersion(ver);
+		paramTreeVO.setSort(0);
 		saveFirstChildren(paramTreeVO, true);
 		return 0;
 	}

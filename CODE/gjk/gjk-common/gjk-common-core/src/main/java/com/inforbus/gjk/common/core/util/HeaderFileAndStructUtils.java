@@ -24,11 +24,24 @@ public class HeaderFileAndStructUtils {
 	 * @param structMap 原始类型结构体map
 	 * @return
 	 */
-	public static Map<String, ParamTreeVO> convertStruct(Map<String, List<String>> structMap) {
+	@SafeVarargs
+	public static Map<String, ParamTreeVO> convertStruct(Map<String, List<String>> structMap,
+			Map<String, String>... structName) {
 		Map<String, ParamTreeVO> resStructMap = Maps.newHashMap();
+
 		for (Map.Entry<String, List<String>> entry : structMap.entrySet()) {
+			String fparamName = "";
+			//加载默认名称
+			if (structName.length > 0) {
+				for (Map.Entry<String, String> map : structName[0].entrySet()) {
+					if (entry.getKey().equals(map.getValue().replace("*", ""))) {
+						fparamName = map.getKey();
+						break;
+					}
+				}
+			}
 			ParamTreeVO paramTreeVO = new ParamTreeVO(IdGenerate.millsAndRandomId(), IdGenerate.millsAndRandomId(), "0",
-					"", "", entry.getKey(), 0, 0.0, "1", "");
+					"", fparamName, entry.getKey(), 0, 0.0, "1", "");
 			resStructMap.put(entry.getKey(), paramTreeVO);
 		}
 
@@ -58,7 +71,9 @@ public class HeaderFileAndStructUtils {
 		}
 		// 结构体Map解析
 		Map<String, List<String>> structTypeToMember = headerFileTransVO.getStructTypeToMember();
-		headerFileShowVO.setStructParams(convertStruct(structTypeToMember));
+		HashMap<String, String> scructName = paramsToStrcutName(headerFileTransVO.getInputParaNameToType(),
+				headerFileTransVO.getOutputParaNameToType());
+		headerFileShowVO.setStructParams(convertStruct(structTypeToMember, scructName));
 
 		// 输入参数解析
 		headerFileShowVO.getInputXmlParams().setXmlEntitys(new ArrayList<XmlEntity>());
@@ -104,8 +119,8 @@ public class HeaderFileAndStructUtils {
 			StringBuilder sRemarks = new StringBuilder();
 			if (splitParamTypeAndName(strItem, sType, sRemarks)) {
 				// 参数赋值
-				ParamTreeVO paramTreeVO = new ParamTreeVO(IdGenerate.millsAndRandomId(), IdGenerate.millsAndRandomId(), "0",
-						"", paramName,  sType.toString(), sRemarks.toString(), 0, 0.0, "1", "");
+				ParamTreeVO paramTreeVO = new ParamTreeVO(IdGenerate.millsAndRandomId(), IdGenerate.millsAndRandomId(),
+						"0", "", paramName, sType.toString(), sRemarks.toString(), 0, 0.0, "1", "");
 				paramTreeVO.setIndex(paramIndex);
 				paramList.add(paramTreeVO);
 				// XmlEntity
@@ -147,7 +162,7 @@ public class HeaderFileAndStructUtils {
 			StringBuilder sName = new StringBuilder();
 			StringBuilder sType = new StringBuilder();
 			StringBuilder sRemarks = new StringBuilder();
-			if (splitParamTypeAndName(strItem, sType,sName, sRemarks)) {
+			if (splitParamTypeAndName(strItem, sType, sName, sRemarks)) {
 				ParamTreeVO structChild = new ParamTreeVO(IdGenerate.millsAndRandomId(), IdGenerate.millsAndRandomId(),
 						fatherParam.getDbId(), "", sName.toString(), sType.toString(), sRemarks.toString(), i + 1, 0.0,
 						"1", "");
@@ -241,15 +256,38 @@ public class HeaderFileAndStructUtils {
 	private static boolean splitParamTypeAndName(String strItem, StringBuilder... params) {
 		String[] strArray = strItem.split("\\|");
 		for (int i = 0; i < strArray.length; i++) {
-			System.out.println(strArray[i] + "  " + i + "  " + params.length);
+//			System.out.println(strArray[i] + "  " + i + "  " + params.length);
 			if (i < params.length) {
 //				params[i] = new StringBuilder();
 				params[i].append(strArray[i]);
 			} else {
-			
+
 			}
 		}
 		return true;
+	}
+
+	private static HashMap<String, String> paramsToStrcutName(Map<String, String> inputParams,
+			Map<String, String> outputParams) {
+		HashMap<String, String> retMap = Maps.newHashMap();
+		// 循环输入参数存名称
+		inputParams.entrySet().forEach(input -> {
+			String strItem = input.getValue();
+			StringBuilder sType = new StringBuilder();
+			StringBuilder sRemarks = new StringBuilder();
+			splitParamTypeAndName(strItem, sType, sRemarks);
+			retMap.put(input.getKey(), sType.toString());
+		});
+		// 循环输入参数存名称
+		outputParams.entrySet().forEach(output -> {
+			String strItem = output.getValue();
+			StringBuilder sType = new StringBuilder();
+			StringBuilder sRemarks = new StringBuilder();
+			splitParamTypeAndName(strItem, sType, sRemarks);
+			retMap.put(output.getKey(), sType.toString());
+		});
+		return retMap;
+
 	}
 
 	/**
