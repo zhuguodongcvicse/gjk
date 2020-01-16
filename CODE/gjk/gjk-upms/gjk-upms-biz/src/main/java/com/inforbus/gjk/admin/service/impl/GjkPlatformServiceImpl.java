@@ -201,8 +201,9 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 			gjkPlatforms.add(gjkPlatform);
 
 			// 解析文件夹
-			File file = new File(libsPath + File.separator + "gjk/software/" + File.separator
-					+ String.valueOf(software.getVersion()));
+//			File file = new File(libsPath + File.separator + "gjk/software/" + File.separator
+//					+ String.valueOf(software.getVersion()));
+			File file = new File(libsPath + File.separator + software.getFilePath());
 			if (file.isDirectory()) {
 				File[] childFileList = file.listFiles();
 				for (File childFile : childFileList) {
@@ -235,7 +236,7 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 
 			// 解析文件夹
 			File file = new File(
-					libsPath + File.separator + "gjk/bsp/" + File.separator + String.valueOf(software.getVersion()));
+					libsPath + File.separator +  software.getFilePath());
 			if (file.isDirectory()) {
 				File[] childFileList = file.listFiles();
 				for (File childFile : childFileList) {
