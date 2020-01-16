@@ -151,11 +151,10 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		try {
 			Component comp = this.getById(compId);
 			// 获取当前用户信息
-//			R<SysUser> su=	sysUserService.user(comp.getUserId());
+			SysUser su = (sysUserService.user(comp.getUserId())).getData();
 			String filePath = this.compDetailPath + "gjk" + File.separator + "component" + File.separator
-					+ comp.getCompId() + File.separator
+					+ su.getUsername() + File.separator + comp.getCompId() + File.separator
 					+ comp.getCreateTime().toString().replaceAll("[[\\s-T:punct:]]", "") + File.separator;
-
 			// 删除构件
 			this.removeById(compId);
 			// 删除构件详细信息

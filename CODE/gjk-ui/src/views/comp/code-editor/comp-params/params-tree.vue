@@ -151,7 +151,9 @@ export default {
       inputCmpuid: "",
       outputTmpuid: new Map(),
       outputCmpuid: "",
-      findArrayTmpMap: new Map() //用于转换参数中有数组
+      findArrayTmpMap: new Map(), //用于转换参数中有数组
+      //不用于中英文映射的特殊字段
+      isNotAttr: ["structType", "structId", "paramRemarks"]
     };
   },
   //监听属性 类似于data概念
@@ -329,9 +331,9 @@ export default {
     setShowLableName(labelKey, labelValue) {
       for (let key in labelValue) {
         if (labelValue[key].isShow || labelValue[key].attrMappingName !== "") {
-          let isNotAttr = ["structType", "structId", "paramRemarks"];
-          if (isNotAttr.includes(labelValue[key].attrName)) {
-          } else {
+          // let isNotAttr = ["structType", "structId", "paramRemarks"];
+          //当数据中"structType", "structId", "paramRemarks"时不使用标签
+          if (!this.isNotAttr.includes(labelValue[key].attrName)) {
             this.$set(labelValue[key], "labelKey", labelKey);
           }
         }
@@ -1379,12 +1381,16 @@ export default {
           const { labelKey, attrs } = this.analysisMapping(baseData);
           //设置固定配置
           this.setShowLableName(labelKey, attrs);
+          //在保存数据中添加固定配置
+          this.setShowLableName(labelKey, tree.nodeData[0]);
           //给对应的属性赋值
           this.attributeAssignmen(saveRow, attrs, tree.nodeData, 0);
           baseData.xmlEntityMaps.forEach((entityMaps, index) => {
             const { labelKey, attrs } = this.analysisMapping(entityMaps);
             //设置固定配置
             this.setShowLableName(labelKey, attrs);
+            //在保存数据中添加固定配置
+            this.setShowLableName(labelKey, tree.nodeData[index + 1]);
             //保存处理子数据
             this.attributeAssignmen(
               saveRow.xmlEntityMaps[index],
@@ -1412,7 +1418,14 @@ export default {
     attributeAssignmen(tabParam, formParam, tabs, index) {
       formParam.forEach(form => {
         let param = tabs[index].find(item => {
-          return item.labelKey === form.labelKey && item.labelKey != undefined;
+          //当数据中包含"structType", "structId", "paramRemarks"时单独处理
+          if (this.isNotAttr.includes(item.attrName)) {
+            return item.attrName === form.attrName;
+          } else {
+            return (
+              item.labelKey === form.labelKey && item.labelKey != undefined
+            );
+          }
         });
         if (param !== undefined) {
           tabParam.attributeMap[param.attrName] = param.lableName; // === undefined ? "" : param.lableName;

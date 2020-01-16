@@ -31,6 +31,6 @@ import com.inforbus.gjk.common.core.util.R;
  */
 @FeignClient(ServiceNameConstants.UMPS_SERVICE)
 public interface SysUserService {
-	@GetMapping("/{id}")
+	@GetMapping("/user/{id}")
 	public R<SysUser> user(@PathVariable("id") Integer id);
 }

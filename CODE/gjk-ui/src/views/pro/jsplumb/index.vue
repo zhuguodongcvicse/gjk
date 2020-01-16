@@ -367,7 +367,7 @@ export default {
     bottonCheckComp: {
       handler: function() {
         if (!this.bottonCheckComp) {
-          this.checkUpdate = "icon-huanyuan1";
+          this.checkUpdate = "icon-huanyuan";
           this.checkUpdateTxt = "还原";
           let checkList = [];
           let compList = {};
@@ -401,7 +401,7 @@ export default {
     completeCheck: {
       handler: function() {
         if (!this.completeCheck) {
-          this.completeCheckIcon = "icon-huanyuan1";
+          this.completeCheckIcon = "icon-huanyuan";
           this.completeCheckText = "还原";
           console.log("完备性检查状态", this.completeCheck);
           completeCheck(
@@ -914,7 +914,8 @@ export default {
               startId: data.params.startId,
               endId: data.params.endId,
               startName: data.params.startName,
-              endName: data.params.endName
+              endName: data.params.endName,
+              flowId:this.$route.query.processId
             }
           });
           break;
