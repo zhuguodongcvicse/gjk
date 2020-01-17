@@ -257,7 +257,7 @@ export default {
       if (this.temp_currProject != null && this.temp_currProject != undefined) {
         getPassCompByProId(this.temp_currProject.id).then(Response => {
           this.defaultExpandedNodeArray = Response.data.data;
-          this.verbotComp();
+          this.verbotComp();         
           // console.log(
           //   "数据defaultExpandedNodeArray",
           //   this.defaultExpandedNodeArray
