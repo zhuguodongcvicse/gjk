@@ -198,7 +198,25 @@ public class UserController {
 		List<SysUser> users = userService.list(Wrappers.<SysUser>query().lambda());
 		List<UserDictDTO> dictDTOs = new ArrayList<UserDictDTO>();
 		for (SysUser user : users) {
-			UserDictDTO dictDTO = new UserDictDTO(user);
+			UserDictDTO dictDTO = new UserDictDTO(user,user.getUserId());
+			dictDTOs.add(dictDTO);
+		}
+		return new R<>(dictDTOs);
+	}
+	/**
+	 * 通过用户Id查找用户姓名
+	 *
+	 * @param id 类型
+	 * @return 同类型字典
+	 */
+	@GetMapping("/info/getUserDictStr")
+	@Cacheable(value = "usersStr", key = "'usersStr'")
+	public R getDictByTypeStr() {
+		System.out.println("执行查询用户字典方法了哦，没有走缓存哦。");
+		List<SysUser> users = userService.list(Wrappers.<SysUser>query().lambda());
+		List<UserDictDTO> dictDTOs = new ArrayList<UserDictDTO>();
+		for (SysUser user : users) {
+			UserDictDTO dictDTO = new UserDictDTO(user,user.getUserId().toString());
 			dictDTOs.add(dictDTO);
 		}
 		return new R<>(dictDTOs);

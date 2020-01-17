@@ -2,7 +2,7 @@
 <template>
   <el-card>
     <div slot="header" class="clearfix">
-      <span>属性配置</span>
+      <span  style="font-size:18px">属性配置</span>
     </div>
     <el-tabs v-model="activeName">
       <!-- 循环基本属性 -->

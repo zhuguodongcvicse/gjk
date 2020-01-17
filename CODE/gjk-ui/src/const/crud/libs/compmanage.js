@@ -54,10 +54,10 @@ export const tableOption = {
       prop: 'userId',
       type: 'select',
       props: {
-        label: 'name',
-        value: 'userId'
+        label: 'showName',
+        value: 'userIdstr'
       },
-      dicUrl: '/admin/user/info/getUserDict'
+      dicUrl: '/admin/user/info/getUserDictStr'
     },
     {
       label: '提交时间',

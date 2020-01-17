@@ -20,6 +20,7 @@ export const tableOption = {
   stripe: true,
   menu: true,
   menuAlign: 'center',
+  menuWidth:"50",
   align: 'center',
   editBtn: false,
   delBtn: false,
@@ -44,10 +45,10 @@ export const tableOption = {
       prop: 'userId',
       type: 'select',
       props: {
-        label: 'name',
-        value: 'userId'
+        label: 'showName',
+        value: 'userIdstr'
       },
-      dicUrl: '/admin/user/info/getUserDict'
+      dicUrl: '/admin/user/info/getUserDictStr'
     },
     {
       label: '版本',
