@@ -304,7 +304,35 @@ export default [{
         },
     ]
 
-}
+},{
+    path: '/pro/project1',
+    name: "项目列表",
+    component: Layout,
+    children: [
+        {
+            path: '/addProject',
+            name: '新增项目',
+            component: () =>
+                import('@/views/pro/project/addProject/index'),
+        },
+    ]
+
+},
+{
+    path: '/manager/showProject',
+    name: "项目管理器",
+    component: Layout,
+    children: [
+        {
+            path: '/showComponent',
+            name: '再次申请构件',
+            component: () =>
+                import( /* webpackChunkName: "page" */ '@/views/pro/project/proTreeRightMenu/addProComp'),
+        },
+    ]
+
+},
+
     // ,{
     //     path: 'applyDetail',
     //     name: 'applyDetail',

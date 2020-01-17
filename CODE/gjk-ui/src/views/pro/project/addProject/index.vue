@@ -1,123 +1,90 @@
 <template>
-  <div
-    class="app-container pro_project_index_14s pro_project_height_14s pull-auto h100_14s table_cursor_14s_1008"
-  >
-    <basic-container>
-      <avue-crud
-        ref="crud"
-        :page="page"
-        :data="tableData"
-        :table-loading="tableLoading"
-        :option="tableOption"
-        @current-change="currentChange"
-        @refresh-change="refreshChange"
-        @size-change="sizeChange"
-        @row-update="handleUpdate"
-        @row-save="handleSave"
-        @row-del="rowDel"
-        @row-dblclick="handleRowClick"
-      >
-        <!--dialogTableVisible = true,-->
-        <template slot="menuLeft">
-          <el-button
-            type="primary"
-            @click="showStructList()"
-            size="small"
-            icon="el-icon-plus"
-            v-if="permissions.pro_project_add"
-          >新 增</el-button>
-          <el-dialog
-            width="50%"
-            class="libs_bsp_dialog_14s pro_project_index_dialog_14s"
-            :visible.sync="dialogTableVisible"
-            v-if="dialogTableVisible"
+  <div>
+    <div>
+      <el-button type="primary" :disabled="platformFlag" @click.native="handleSaveComp">提交申请</el-button>
+    </div>
+    <div>
+      <el-tabs v-model="activeName">
+        <el-tab-pane label="基本信息" name="first">
+          <el-form
+            :label-position="labelPosition"
+            label-width="120px"
+            :model="formLabelAlign"
+            :rules="projectRules"
+            ref="formLabelAlignRef"
           >
-            <div>
-              <el-tabs v-model="activeName">
-                <el-tab-pane label="基本信息" name="first">
-                  <el-form
-                    :label-position="labelPosition"
-                    label-width="120px"
-                    :model="formLabelAlign"
-                    :rules="projectRules"
-                    ref="formLabelAlignRef"
-                  >
-                    <div class="bsp_tab_14s">
-                      <el-form-item label="项目名称" prop="projectName">
-                        <el-input v-model="formLabelAlign.projectName"></el-input>
-                      </el-form-item>
-                      <el-form-item label="流程名称" prop="processName">
-                        <el-input v-model="formLabelAlign.processName"></el-input>
-                      </el-form-item>
-                      <el-form-item label="请选择审批人" prop="applyUser">
-                        <el-select v-model="formLabelAlign.applyUser" placeholder="请选择">
-                          <el-option
-                            v-for="item in applyUserSelect"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                          ></el-option>
-                        </el-select>
-                      </el-form-item>
-                    </div>
-                  </el-form>
-                </el-tab-pane>
+            <div class="bsp_tab_14s">
+              <el-form-item label="项目名称" prop="projectName">
+                <el-input v-model="formLabelAlign.projectName"></el-input>
+              </el-form-item>
+              <el-form-item label="流程名称" prop="processName">
+                <el-input v-model="formLabelAlign.processName"></el-input>
+              </el-form-item>
+              <el-form-item label="请选择审批人" prop="applyUser">
+                <el-select v-model="formLabelAlign.applyUser" placeholder="请选择">
+                  <el-option
+                    v-for="item in applyUserSelect"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+            </div>
+          </el-form>
+        </el-tab-pane>
 
-                <el-tab-pane label="框架信息" name="second">
-                  <el-form
-                    :label-position="labelPosition"
-                    label-width="120px"
-                    :model="formLabelAlign"
+        <el-tab-pane label="框架信息" name="second">
+          <el-form :label-position="labelPosition" label-width="120px" :model="formLabelAlign">
+            <div class="bsp_tab_14s">
+              <el-form-item label="软件框架选择">
+                <span style="color: red;" v-show="platformFlag">{{platformNameTs}}未选择</span>
+                <el-select
+                  class="text_align_center_14s"
+                  v-model="softwareSelectString"
+                  multiple
+                  placeholder="请选择"
+                  @change="selectSoftwareClk"
+                >
+                  <el-option
+                    v-for="item in softwareTreeData"
+                    :key="item.id"
+                    :label="item.softwareName"
+                    :value="item.id"
                   >
-                    <div class="bsp_tab_14s">
-                      <el-form-item label="软件框架选择">
-                        <span style="color: red;" v-show="platformFlag">{{platformNameTs}}未选择</span>
-                        <el-select
-                          class="text_align_center_14s"
-                          v-model="softwareSelectString"
-                          multiple
-                          placeholder="请选择"
-                          @change="selectSoftwareClk"
-                        >
-                          <el-option
-                            v-for="item in softwareTreeData"
-                            :key="item.id"
-                            :label="item.softwareName"
-                            :value="item.id"
-                          >
-                            <span style="float: left">{{ item.softwareName }}(v{{item.version}}.0)</span>
-                            <span
-                              style="float: right; color: #8492a6; font-size: 13px;margin-right: 30px;"
-                            >{{ item.description }}</span>
-                          </el-option>
-                        </el-select>
-                      </el-form-item>
-                      <el-form-item label="BSP选择">
-                        <el-select
-                          class="text_align_center_14s"
-                          v-model="bspSelectString"
-                          multiple
-                          placeholder="请选择"
-                          @change="selectBSPClk"
-                        >
-                          <el-option
-                            v-for="item in bspTreeData"
-                            :key="item.id"
-                            :label="item.bspName"
-                            :value="item.id"
-                          >
-                            <span style="float: left">{{ item.bspName }}(v{{item.version}}.0)</span>
-                            <span
-                              style="float: right; color: #8492a6; font-size: 13px;margin-right: 30px;"
-                            >{{ item.description }}</span>
-                          </el-option>
-                        </el-select>
-                      </el-form-item>
-                    </div>
-                  </el-form>
-                </el-tab-pane>
+                    <span style="float: left">{{ item.softwareName }}(v{{item.version}}.0)</span>
+                    <span
+                      style="float: right; color: #8492a6; font-size: 13px;margin-right: 30px;"
+                    >{{ item.description }}</span>
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="BSP选择">
+                <el-select
+                  class="text_align_center_14s"
+                  v-model="bspSelectString"
+                  multiple
+                  placeholder="请选择"
+                  @change="selectBSPClk"
+                >
+                  <el-option
+                    v-for="item in bspTreeData"
+                    :key="item.id"
+                    :label="item.bspName"
+                    :value="item.id"
+                  >
+                    <span style="float: left">{{ item.bspName }}(v{{item.version}}.0)</span>
+                    <span
+                      style="float: right; color: #8492a6; font-size: 13px;margin-right: 30px;"
+                    >{{ item.description }}</span>
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </div>
+          </el-form>
+        </el-tab-pane>
 
-                <el-tab-pane label="构件信息" name="third">
+        <!-- <el-tab-pane label="构件信息" name="third">
                   <el-form
                     :label-position="labelPosition"
                     label-width="120px"
@@ -137,38 +104,20 @@
                       </el-form-item>
                     </div>
                   </el-form>
-                </el-tab-pane>
+        </el-tab-pane>-->
+        <!--选择构件-->
+        <el-tab-pane label="构件信息" name="third">
+          <div class="libs_commoncomponent_14s">
+            <common-component @fromChild="getChild"></common-component>
+          </div>
+        </el-tab-pane>
 
-                <!-- <el-tab-pane label="构件信息" name="third">
-  <common-component></common-component>
-                </el-tab-pane>-->
-
-                <!--选择模板-->
-                <el-tab-pane label="模板信息" name="fourth">
-                  <choose-temp :formLabelAlign="formLabelAlign"></choose-temp>
-                </el-tab-pane>
-              </el-tabs>
-            </div>
-
-            <div class="control-container bsp_footer_btn_14s text_align_right_14s">
-              <el-button type="primary" :disabled="platformFlag" @click.native="handleSaveComp">提交申请</el-button>
-              <el-button type="button" @click.native="handleCancleComp">取消</el-button>
-            </div>
-          </el-dialog>
-          <br />
-          <br />
-        </template>
-        <template slot-scope="scope" slot="menu">
-          <el-button
-            type="danger"
-            v-if="permissions.pro_project_del"
-            size="small"
-            plain
-            @click="handleDel(scope.row,scope.index)"
-          >删除</el-button>
-        </template>
-      </avue-crud>
-    </basic-container>
+        <!--选择模板-->
+        <el-tab-pane label="模板信息" name="fourth">
+          <choose-temp :formLabelAlign="formLabelAlign"></choose-temp>
+        </el-tab-pane>
+      </el-tabs>
+    </div>
   </div>
 </template>
 
@@ -177,7 +126,7 @@ import { fetchAlgorithmTree } from "@/api/admin/algorithm";
 import { fetchTestTree } from "@/api/admin/test";
 import { fetchPlatformTrees } from "@/api/admin/platform";
 import addDialog from "@/views/pro/project/addDialog";
-import selectTree from "./selectTree";
+//import selectTree from "@/views/pro/project/selectTree";
 import { getAllComp, screenCompByLibs } from "@/api/libs/commoncomponent";
 import { getSoftwareTree } from "@/api/libs/software";
 import { getBSPTree } from "@/api/libs/bsp";
@@ -208,19 +157,21 @@ import {
 } from "@/api/pro/manager";
 import { mapGetters } from "vuex";
 
-import chooseTemp from "./chooseTemplate";
+import chooseTemp from "@/views/pro/project/chooseTemplate";
 import commonComponent from "@/views/pro/project/commonComponent/index";
+import { menuTag } from "@/util/closeRouter";
 export default {
   //注入依赖，调用this.reload();用于刷新页面
   inject: ["reload"],
   components: {
-    "select-tree": selectTree,
+    // "select-tree": selectTree,
     "el-addDialog": addDialog,
     "choose-temp": chooseTemp,
     "common-component": commonComponent
   },
   computed: {
-    ...mapGetters(["permissions", "userInfo"])
+    ...mapGetters(["permissions", "userInfo"]),
+    ...mapGetters(["tagWel", "tagList", "tag", "website"])
   },
   name: "project",
   //刷新
@@ -250,6 +201,7 @@ export default {
       }
     };
     return {
+      childComData: [], //选择构件子组件数据集合
       activeName: "first",
       projectsTemp: "",
       project: {},
@@ -325,61 +277,50 @@ export default {
     };
   },
   watch: {
-    compSelectArray: function() {
-      for (let i of this.compSelectArray) {
-        if (i == "0") {
-          let index = this.compSelectArray.indexOf(i);
-          this.$delete(this.compSelectArray, index);
-        }
-      }
-      // console.log("compSelectArray:", this.compSelectArray);
-    },
-    "formLabelAlign.applyUser": function() {
-      // console.log("formLabelAlign.applyUser:", this.formLabelAlign.applyUser);
-    },
-    screenLibsIdArray() {
-      for (let item of this.screenLibsIdArray) {
-        if (item == "0") {
-          this.screenLibsIdArray.splice(
-            this.screenLibsIdArray.indexOf(item),
-            1
-          );
-        }
-      }
-      // console.log("screenLibsIdArray", this.screenLibsIdArray);
-      this.getTableData();
-      this.compSelectArray = [];
-    }
+    // screenLibsIdArray() {
+    //   for (let item of this.screenLibsIdArray) {
+    //     if (item == "0") {
+    //       this.screenLibsIdArray.splice(
+    //         this.screenLibsIdArray.indexOf(item),
+    //         1
+    //       );
+    //     }
+    //   }
+    //   console.log("screenLibsIdArray", this.screenLibsIdArray);
+    //   this.getTableData();
+    //   this.compSelectArray = [];
+    // }
   },
   methods: {
-    showStructList() {
-      this.$router.push({
-        path: "/addproject"
-      });
-      //this.getTableData();
+    //从子组件获取值
+    getChild(v) {
+      this.childComData = v;
     },
-    selectAllComp() {
-      let selectArray = [];
-      this.setId(this.compTreeData, selectArray);
-      this.compSelectArray = selectArray;
-    },
-    setId(treeDate, array) {
-      for (let item of treeDate) {
-        array.push(item.id);
-        if (item.children != null && item.children.length != 0) {
-          this.setId(item.children, array);
-        }
-      }
-    },
-    getTableData() {
-      if (this.screenLibsIdArray.length == 0) {
-        this.getCompSelectTree();
-      } else {
-        screenCompByLibs(this.screenLibsIdArray).then(Response => {
-          this.compTreeData = Response.data.data;
-        });
-      }
-    },
+    // showStructList() {
+    //   this.getTableData();
+    // },
+    // selectAllComp() {
+    //   let selectArray = [];
+    //   this.setId(this.compTreeData, selectArray);
+    //   this.compSelectArray = selectArray;
+    // },
+    // setId(treeDate, array) {
+    //   for (let item of treeDate) {
+    //     array.push(item.id);
+    //     if (item.children != null && item.children.length != 0) {
+    //       this.setId(item.children, array);
+    //     }
+    //   }
+    // },
+    // getTableData() {
+    //   if (this.screenLibsIdArray.length == 0) {
+    //     this.getCompSelectTree();
+    //   } else {
+    //     screenCompByLibs(this.screenLibsIdArray).then(Response => {
+    //       this.compTreeData = Response.data.data;
+    //     });
+    //   }
+    // },
     getCreateData() {
       getProNameListByUserId(this.userInfo.userId).then(Response => {
         this.proNameList = Response.data.data;
@@ -469,6 +410,9 @@ export default {
                   //保存软件框架
                   this.changeProcedureSoftwareId();
                   this.changeProcedureBSPId();
+                  for (let i of this.childComData) {
+                    this.compSelectArray.push(i.id);
+                  }
                   if (
                     this.compSelectArray != null &&
                     this.compSelectArray.length > 0
@@ -484,7 +428,9 @@ export default {
                           approval.applyId = this.project.id;
                           approval.applyType = "2";
                           approval.libraryType = "7";
-                          approval.applyUserId = this.formLabelAlign.applyUser;
+                          if (this.formLabelAlign.applyUser != "") {
+                            approval.applyUserId = this.formLabelAlign.applyUser;
+                          }
                           approval.approvalState = "0";
                           //提交记录到审批管理库
                           saveApproval(approval).then(Response => {
@@ -496,7 +442,21 @@ export default {
                               this.formLabelAlign,
                               this.$options.data().formLabelAlign
                             );
-                            this.dialogTableVisible = false;
+                            //this.dialogTableVisible = false;
+                            this.$notify({
+                              title: "成功",
+                              message: "申请成功",
+                              type: "success",
+                              duration: 2000
+                            });
+                            menuTag(
+                              this.$route.path,
+                              "removeOpen",
+                              this.tagList,
+                              {
+                                value: "/pro/project"
+                              }
+                            );
                           });
                         }
                       }
