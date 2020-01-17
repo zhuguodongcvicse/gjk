@@ -5,7 +5,7 @@
       var bounds = new Q.Rect(window.pageXOffset, window.pageYOffset, body.clientWidth - 2, body.clientHeight - 2);
       var width = div.offsetWidth;
       var height = div.offsetHeight;
-  
+
       if (x + width > bounds.x + bounds.width) {
         x = bounds.x + bounds.width - width;
       }
@@ -21,7 +21,7 @@
       div.style.left = x + 'px';
       div.style.top = y + 'px';
     }
-  
+
     function isDescendant(parent, child) {
       var node = child.parentNode;
       while (node != null) {
@@ -32,14 +32,14 @@
       }
       return false;
     }
-  
+
     var PopupMenu = function (items) {
       this.items = items || [];
     }
-  
+
     var menuClassName = 'dropdown-menu';
     PopupMenu.Separator = 'divider';
-  
+
     PopupMenu.prototype = {
       dom: null,
       _invalidateFlag: true,
@@ -76,7 +76,7 @@
           this.dom.setAttribute("role", "menu");
           this.dom.className = menuClassName;
           var startEventName = Q.isTouchSupport ? "touchstart" : "mousedown";
-  
+
           if (!this.stopEditWhenClickOnWindow) {
             this.stopEditWhenClickOnWindow = function (evt) {
               if (this.isShowing() && !isDescendant(this.dom, evt.target)) {
@@ -123,7 +123,7 @@
         a.setAttribute("tabindex", "-1");
         a.setAttribute("href", "javascript:void(0)");
         dom.appendChild(a);
-  
+
         if (menuItem.html) {
           a.innerHTML = menuItem.html;
         } else {
@@ -138,7 +138,7 @@
         }
         var call = menuItem.action;
         var self = this;
-  
+
         var onclick = function (evt) {
           if (call) {
             call.call(menuItem.scope, evt, menuItem);
@@ -171,7 +171,7 @@
           var isGroup = data instanceof Q.Group;
           var isNode = !isShapeNode && data instanceof Q.Node;
           var isEdge = data instanceof Q.Edge;
-  
+
    /*        items.push({
             text: getI18NString('Rename'), action: function (evt, item) {
               Q.prompt(getI18NString('Input Element Name'), data.name || '', function (name) {
@@ -246,7 +246,7 @@
           }
         }) */
      //   items.push(Q.PopupMenu.Separator);
-  
+
         items.push({
           text: getI18NString('Zoom In'), action: function (evt, item) {
             var localXY = graph.globalToLocal(evt);
@@ -283,14 +283,110 @@
         }
         items.push({
           text: '删除', action: function (evt, item) {
-            if(data.image === "rack" || data.name == " "){
+            console.log("data",data)
+            // if(data.image === "rack" || data.name === " "){
+            if(true){
               graph.removeElement(data);
               //删除逻辑
-            }   
-          
+              for (const i in graphList.bJson) {
+                if (graphList.bJson[i].datas[0].json.properties.uniqueId === data.properties.uniqueId) {
+                  removeByValue(caseList, caseList[i])
+                  removeByValue(graphList.fJson, graphList.fJson[i])
+                  removeByValue(graphList.bJson, graphList.bJson[i])
+                }
+              }
+              if (linkList.length != 0) {
+                for (let i = 0; i < linkList.length; i++) {
+                  if (linkList[i] != null && linkList[i][0].json.properties.uniqueId.indexOf(data.properties.uniqueId) !== -1) {
+                    removeByValue(linkList, linkList[i])
+                  }
+                  if (linkList[i] != null && linkList[i][1].json.properties.uniqueId.indexOf(data.properties.uniqueId) !== -1) {
+                    removeByValue(linkList, linkList[i])
+                  }
+                }
+              }
+              if (linkGraphList.datas.length !== 0) {
+                for (let i = 0; i < linkGraphList.datas.length; i++) {
+                  if ((i + 1) % 3 === 0) {
+                    if (linkGraphList.datas[i - 1].json.properties.uniqueId !== undefined && linkGraphList.datas[i - 2].json.properties.uniqueId === data.$from._mg0.uniqueId) {
+                      linkGraphList.datas.splice(i - 2, 3)
+                      i = i - 2
+                    }
+                    /*if (linkGraphList.datas[i - 1].json.properties.uniqueId !== undefined && linkGraphList.datas[i - 1].json.properties.uniqueId === data.$to.properties.uniqueId) {
+                      linkGraphList.datas.splice(i - 2, 3)
+                      i = i - 2
+                    }*/
+                  }
+                }
+                /*for (const i in linkGraphList.datas) {
+                  if (linkGraphList.datas[i]._className === "Q.RectElement" && linkGraphList.datas[i].json.properties.uniqueId.indexOf(data.properties.uniqueId) !== -1) {
+                    for (const j in linkGraphList.datas) {
+                      if (linkGraphList.datas[j]._className === "Q.Edge") {
+                        if (linkGraphList.datas[j].json.from._ref == linkGraphList.datas[i]._refId) {
+                          for (const k in linkGraphList.datas) {
+                            if (linkGraphList.datas[k]._className === "Q.RectElement" && linkGraphList.datas[j].json.to._ref == linkGraphList.datas[k]._refId) {
+                              linkGraphList.datas[k].waitDelete = 0
+                            }
+                          }
+                          linkGraphList.datas[j].waitDelete = 0
+                        }
+                        if (linkGraphList.datas[j].json.to._ref == linkGraphList.datas[i]._refId) {
+                          for (const k in linkGraphList.datas) {
+                            if (linkGraphList.datas[k]._className == "Q.RectElement" && linkGraphList.datas[j].json.from._ref == linkGraphList.datas[k]._refId) {
+                              linkGraphList.datas[k].waitDelete = 0
+                            }
+                          }
+                          linkGraphList.datas[j].waitDelete = 0
+                        }
+                      }
+                    }
+                    linkGraphList.datas[i].waitDelete = 0
+                  }
+                }*/
+              }
+              /*for (let i = 0; i < linkGraphList.datas.length; i++) {
+                if (linkGraphList.datas[i].waitDelete != null) {
+                  removeByValue(linkGraphList.datas, linkGraphList.datas[i])
+                  i--
+                }
+              }*/
+              linkMap.forEach(function (value, key) {
+                if (key.uniqueId.indexOf(data.properties.uniqueId) !== -1 || data.$from.properties.uniqueId === key.uniqueId) {
+                  linkMap.delete(key)
+                }
+                if (value.uniqueId.indexOf(data.properties.uniqueId) !== -1 || data.$to.properties.uniqueId === key.uniqueId) {
+                  linkMap.delete(value)
+                }
+              });
+              //第一次切换回正面
+              if (typeof backAllCaseJsonTemp != 'undefined' && backAllCaseJsonTemp.datas.length !== 0) {
+                for (let i = 0; i < backAllCaseJsonTemp.datas.length; i++) {
+                  if (backAllCaseJsonTemp.datas[i].json.properties == null || backAllCaseJsonTemp.datas[i]._className === "Q.Edge") {
+                    removeByValue(backAllCaseJsonTemp.datas, backAllCaseJsonTemp.datas[i])
+                    i--
+                  }
+                }
+              }
+              if (typeof backAllCaseJsonTemp != 'undefined' && backAllCaseJsonTemp.datas.length !== 0) {
+                for (let i = 0; i < backAllCaseJsonTemp.datas.length; i++) {
+                  if (backAllCaseJsonTemp.datas[i].json.properties != null && backAllCaseJsonTemp.datas[i].json.properties.infName != null
+                    && backAllCaseJsonTemp.datas[i].json.properties.uniqueId.indexOf(data.properties.uniqueId) !== -1) {
+                    removeByValue(backAllCaseJsonTemp.datas, backAllCaseJsonTemp.datas[i])
+                    i--
+                  }
+                }
+              }
+              caseID--
+              //删除map中存在的ip
+              checkIPMap.forEach((value, key) => {
+                if (key.indexOf(data.properties.uniqueId) !== -1) {
+                  checkIPMap.delete(key)
+                }
+              })
+            }
           }
         });
-   
+
         return items;
       }
     }
@@ -305,7 +401,7 @@
         }
       }
     });
-  
+
     var _contextmenuListener = {
       onstart: function (evt, graph) {
         graph._popupmenu.hide();
@@ -317,20 +413,20 @@
       }
       return {x: evt.pageX, y: evt.pageY};
     }
-  
+
     function showMenu(evt, graph) {
       var menu = graph.popupmenu;
       var xy = getPageXY(evt);
       var x = xy.x, y = xy.y;
-  
+
       var items = menu.getMenuItems(graph, graph.getElement(evt), evt);
-  
+
       if(!items){
         return;
       }
       menu.items = items;
       menu.showAt(x, y);
-  
+
       Q.stopEvent(evt);
     }
     if(Q.isTouchSupport){
@@ -338,7 +434,7 @@
         showMenu(evt, graph);
       }
     }
-  
+
     Object.defineProperties(Q.Graph.prototype, {
       popupmenu: {
         get: function(){
@@ -349,7 +445,7 @@
             return;
           }
           this._popupmenu = v;
-  
+
           if(!this._contextmenuListener){
             this._contextmenuListener = _contextmenuListener;
             this.addCustomInteraction(this._contextmenuListener);
@@ -365,4 +461,3 @@
     });
     Q.PopupMenu = PopupMenu;
   })(Q, jQuery);
-  

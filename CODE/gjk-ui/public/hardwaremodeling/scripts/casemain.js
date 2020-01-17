@@ -20,6 +20,7 @@ var ChipsWithIPs = []
 var caseID = -1
 var checkIPMap= new Map()
 var clickChipsList = [] //记录点击的芯片次序
+var linkMap = new Map()
 
 Q.registerImage('rack', 'images/Crate.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
 Q.registerImage('card', 'images/BeforeTheBoard.svg');
@@ -495,7 +496,6 @@ function initEditor(editor) {
      })
      toolbarDiv.appendChild(button) */
   //保存
-  var linkMap = new Map()
   var toolbarDiv = editor.toolbar;
   var buttonOfSave = document.createElement('button');
   var buttonOfDelete = document.createElement('button');
@@ -911,10 +911,10 @@ function initEditor(editor) {
               if (backAllCaseJsonTemp.datas[k].json.properties != null && backAllCaseJsonTemp.datas[i].json.to._ref == backAllCaseJsonTemp.datas[k]._refId) {
                 // console.log("末端接口-机箱外部", backAllCaseJsonTemp.datas[k])
                 //截取两个接口的唯一标识
-                var startStr = backAllCaseJsonTemp.datas[j].json.properties.uniqueId.slice(0, backAllCaseJsonTemp.datas[j].json.properties.uniqueId.length)
-                var endStr = backAllCaseJsonTemp.datas[k].json.properties.uniqueId.slice(0, backAllCaseJsonTemp.datas[k].json.properties.uniqueId.length)
-                //判断是否相等
-                if (startStr != endStr) {
+                // var startStr = backAllCaseJsonTemp.datas[j].json.properties.uniqueId.slice(0, backAllCaseJsonTemp.datas[j].json.properties.uniqueId.length)
+                // var endStr = backAllCaseJsonTemp.datas[k].json.properties.uniqueId.slice(0, backAllCaseJsonTemp.datas[k].json.properties.uniqueId.length)
+                //判断是否是统一机箱
+                // if (startStr != endStr) {
                   //将连线数据转成字符串
                   var linkListStr = JSON.stringify(linkList)
                   //判断该连线数据中是否有起始接口
@@ -925,7 +925,7 @@ function initEditor(editor) {
                     linkMap.set(backAllCaseJsonTemp.datas[j].json.properties, backAllCaseJsonTemp.datas[k].json.properties)
                     break
                   }
-                }
+                // }
               }
             }
             break
@@ -1017,7 +1017,7 @@ function initEditor(editor) {
     for (var i in selection) {
       if (selection[i].properties.type == "case") {
         Q.confirm("是否 确认删除", function () {
-          var selection = this.removeSelection();
+          /*var selection = this.removeSelection();
           // console.log("selection", selection)
           //删除初始机箱数组中的数据
           for (const i in graphList.bJson) {
@@ -1109,7 +1109,7 @@ function initEditor(editor) {
             if (key.indexOf(selection[0].properties.uniqueId) !== -1) {
               checkIPMap.delete(key)
             }
-          })
+          })*/
 
           // console.log("backAllCaseJsonTemp", backAllCaseJsonTemp)
           // console.log("caseList", caseList)

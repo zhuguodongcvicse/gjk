@@ -86,3 +86,11 @@ export function getInfList() {
     method: 'get'
   })
 }
+//用于测试
+export function test() {
+  return request({
+    url: '/libs/hardwarelibinf/test',
+    method: 'get'
+  })
+}
+

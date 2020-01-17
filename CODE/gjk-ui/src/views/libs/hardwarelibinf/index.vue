@@ -17,6 +17,9 @@
         <template slot="menuLeft">
           <el-button v-if="permissions.libs_hardwarelibinf_add" type="primary" @click="showdialog">新增</el-button>
         </template>
+        <template slot="menuLeft">
+          <el-button type="primary" @click="testMethod">测试</el-button>
+        </template>
 
         <template slot-scope="scope" slot="menu">
           <el-button
@@ -112,7 +115,8 @@
         delObj,
         saveInf,
         getAllUser,
-        updateInf
+        updateInf,
+        test
     } from "@/api/libs/hardwarelibinf";
     import {tableOption} from "@/const/crud/libs/hardwarelibinf";
     import infStorageApply from "./infStorageApply";
@@ -224,6 +228,11 @@
             ...mapGetters(["permissions", "userInfo", "refreshListFlag"])
         },
         methods: {
+            testMethod() {
+                test().then(res => {
+                    console.log("res", res)
+                })
+            },
             showdialog() {
                 this.showInf.dialogFormVisible = true;
             },

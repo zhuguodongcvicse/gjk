@@ -82,14 +82,14 @@
         },
         created() {
             // console.log("this.hardwarelibObj",this.hardwarelibObj)
-            console.log("this.$route",this.$route)
+            // console.log("this.$route",this.$route)
             NProgress.configure({showSpinner: false});
             let allHardwarelibs = this.hardwarelibObj //JSON.parse(JSON.stringify())
             let currentHardwarelibId = this.$route.query.flowId
             if (allHardwarelibs.hasOwnProperty(currentHardwarelibId)) {
                 this.params = allHardwarelibs[currentHardwarelibId]
             }
-            console.log("this.params",this.params)
+            // console.log("this.params",this.params)
             // console.log("this.hardwarelibObj",this.hardwarelibObj)
             //this.sendMessage()
         },
@@ -181,8 +181,6 @@
                                         message: "修改成功",
                                         type: "success"
                                     });
-                                    var tag1 = this.tag;
-                                    menuTag(this.$route.path, "remove", this.tagList, tag1);
                                 }
                             });
 
@@ -204,6 +202,7 @@
                 }
             },
             createXml() {
+                // console.log("this.params",this.params)
                 var paramsList = [
                     this.params.frontJson,
                     this.params.backJson,
@@ -220,6 +219,8 @@
                             message: "生成xml成功",
                             type: "success"
                         });
+                        var tag1 = this.tag;
+                        menuTag(this.$route.path, "remove", this.tagList, tag1);
                     }
                 );
             },
