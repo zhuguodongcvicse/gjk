@@ -4,6 +4,7 @@ import com.inforbus.gjk.common.security.annotation.EnableGjkFeignClients;
 import com.inforbus.gjk.common.security.annotation.EnableGjkResourceServer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.client.SpringCloudApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
@@ -12,6 +13,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 @EnableGjkResourceServer
 @EnableGjkFeignClients
+@EnableDiscoveryClient
 @SpringCloudApplication
 public class GjkSimulationApplication {
 	public static ConfigurableApplicationContext applicationContext;
