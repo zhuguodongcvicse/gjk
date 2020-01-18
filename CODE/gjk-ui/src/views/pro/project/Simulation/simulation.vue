@@ -210,19 +210,22 @@ export default {
   methods: {
     drawLine1(data) {
       this.myChartsShow = true;
-      simulation(data).then(response => {
+   var tmdata = JSON.parse(JSON.stringify(data));
+   this.$set(data,"username",this.userInfo.username)
+   this.$set(data,"projectId",this.$route.query.flowId)
+      simulation(tmdata).then(response => {
         if(this.flag){
           return;
         }
-        this.tableData = [{name:"test1",value: "test1",remark: "test1"},{name: "test2",value: "test2",remark: "test1"}]
+        this.tableData = response.data.data.tableData;
         let self = this;
         if (self && !self._isDestroyed) {//循环发送请求解决路由页面依旧发请求问题
           this.myCharts = setTimeout(() => {
             self.drawLine1(data);
-          }, 1);
+          }, 1000);
         }
         this.simulationData = response.data.data;
-        var data = {"symol": data.symol,"xaxisData": response.data.data.xaxisData, "yaxisData": response.data.data.yaxisData}
+        var data = {"symol": tmdata.symol,"xaxisData": response.data.data.xaxisData, "yaxisData": response.data.data.yaxisData}
         // 基于准备好的dom，初始化echarts实例
         let myChart = this.$echarts.init(document.getElementById("myChart"));
         // 绘制图表
@@ -231,6 +234,8 @@ export default {
     },
     drawLine2(data) {
       this.myCharts1Show = true;
+      var data = JSON.parse(JSON.stringify(data));
+      this.$set(Temdata,"username",this.userInfo.username)
       simulation(data).then(response => {
         if(this.flag){
           return;
@@ -239,7 +244,7 @@ export default {
         if (self && !self._isDestroyed) {//循环发送请求解决路由页面依旧发请求问题
           this.myCharts1 = setTimeout(() => {
             self.drawLine2(data);
-          }, 1);
+          }, 1000);
         }
         this.simulationData = response.data.data;
         var data = {"symol": data.symol,"xaxisData": response.data.data.xaxisData, "yaxisData": response.data.data.yaxisData}
@@ -350,7 +355,8 @@ export default {
         })
     },
     getDataSource(flowFilePath, startId, endId){
-      var simulationDto = {"flowFilePath":flowFilePath,"startId":startId, "endId":endId}
+        var username = this.userInfo.username;
+      var simulationDto = {"flowFilePath":flowFilePath,"startId":startId, "endId":endId,"username":username}  
       getDataSource(simulationDto).then(req=>{
         for (let i = 0; i < req.data.data.length; i++) {
           const element = req.data.data[i];
@@ -378,11 +384,13 @@ export default {
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
      var flowFilePath = this.$route.query.flowFilePath
+
      var startId = this.$route.query.startId
      var endId = this.$route.query.endId
      var list = [startId+"|"+endId]
-     var data = {"username":"admin", componentLinks: list, filePath: flowFilePath}
+     var data = {"username":"admin", componentLinks: list, filePath: flowFilePath,projectId:projectId}
      this.getDataSource(flowFilePath,startId,endId);
+     var projectId =this.$route.query.flowId;
   },
 
   //生命周期 - 挂载完成（可以访问DOM元素）
