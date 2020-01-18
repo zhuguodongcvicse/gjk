@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.inforbus.gjk.libs.api.entity.HardwarelibInf;
+import org.dom4j.DocumentException;
 
 import java.util.List;
 
@@ -43,4 +44,6 @@ public interface HardwarelibInfService extends IService<HardwarelibInf> {
   List<HardwarelibInf> getInfList();
 
   void updateInfById(HardwarelibInf hardwarelibInf);
+
+  void test();
 }

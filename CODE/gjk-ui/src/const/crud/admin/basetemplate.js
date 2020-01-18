@@ -65,6 +65,7 @@ export const tableOption = {
     {
       label: '版本',
       prop: 'tempVersion',
+      slot: true
     },
     {
       label: '创建时间',

@@ -297,7 +297,7 @@ export default {
             : this.tableXmlParams.lableName === "输出"
             ? "output"
             : "";
-        console.log("tableXmlParams", this.tableXmlParams);
+        // console.log("tableXmlParams", this.tableXmlParams);
         this.analysisAttrConfigType(this.tableXmlParams);
       }
     },
@@ -789,12 +789,14 @@ export default {
     },
     //得到将结构体名称得到结构体
     getStructType(rows) {
-      let id, name, numIndex;
+      let id, name, numIndex, ids;
       let strc = deepClone(this.structType);
       // console.log("structType", strc);
       rows.forEach(cols => {
+        let strParam = [];
         cols.forEach(col => {
           if (col.labelKey === this.nameParam) {
+            strParam = cols;
             name = col.lableName;
           } else if (col.labelKey === this.bllxParam) {
             id = col.lableName;
@@ -802,8 +804,12 @@ export default {
             numIndex = col.lableName;
           }
         });
+        strParam.forEach(item => {
+          if (item.attrName == "structId") {
+            ids = item.lableName;
+          }
+        });
       });
-
       let struct, isok;
       isok = "shStruct";
       //去头文件中找结构体
@@ -832,12 +838,11 @@ export default {
       if (isok === "dbStruct") {
         //先去数据库找
         struct = strc.find(str => {
-          // console.log("11111111111", str.dbId, id);
-          return str.dbId === id.replace("_*", "");
+          return str.dbId === ids.replace("_*", "");
         });
         if (struct !== undefined) {
-          if (id.includes("_*")) {
-            struct.dbId = id;
+          if (ids.includes("_*")) {
+            struct.dbId = ids;
             struct.fparamType = struct.fparamType + "*";
           }
           struct.fparamName = name;
@@ -852,6 +857,7 @@ export default {
       //根据表单上的参数得到对应结构体
       let regExp = /\w+\[[0-9]+\]/i;
       let paramName = params[0][0].lableName;
+      console.log("给当前节点追加children", params[0]);
       if (regExp.test(paramName)) {
         // console.log("查询数据库返回表单元素", params[0][0].lableName);
         let key = this.$refs.tree.getCurrentNode().id;
@@ -868,8 +874,9 @@ export default {
         }
         this.$refs.tree.updateKeyChildren(this.aCheckedKeys[0], dataVal);
       } else {
+        //从variable取得结构体数据 structId structType
         let typeParam = this.getStructType(params);
-        // console.log("测试结构体数据", typeParam);
+        console.log("测试结构体数据", typeParam);
         if (typeParam.isok === "shStruct") {
           let dataVal = [];
           //①父级结构体，
@@ -976,10 +983,10 @@ export default {
         //组装基础
         tmpData.xmlEntityMaps = tmpMaps;
         this.baseXmlOptionData = tmpData;
-        console.log(
-          "储存基础模板数据tmpTabOptionData",
-          deepClone(this.baseXmlOptionData)
-        );
+        // console.log(
+        //   "储存基础模板数据tmpTabOptionData",
+        //   deepClone(this.baseXmlOptionData)
+        // );
         let dataTree = [];
         //处理返回树形结构,此处没有问题
         // console.log("处理返回树形结构,", retDataAll);
@@ -1188,6 +1195,7 @@ export default {
       let key = varName.substring(0, varName.indexOf("."));
       let endKey = varName.substring(varName.indexOf(".") + 1);
       if (key) {
+        console.log("预处理部分参数0", { params, retArray, parentKey, key });
         let arr = retArray.find(item => {
           return item.lableName === key;
         });
@@ -1244,6 +1252,26 @@ export default {
           }
         }
       } else {
+        let struct = this.getStructType(params.nodeData).struct;
+        for (let key in params.nodeData) {
+          const tmpData = deepClone(params.nodeData[key]);
+          let variableParam = [];
+          tmpData.forEach(col => {
+            if (col.labelKey === this.nameParam) variableParam = tmpData;
+          });
+          if (struct) {
+            variableParam.forEach(item => {
+              if (item.attrName == "structId") {
+                item.lableName = struct.dbId;
+              } else if (item.attrName == "structType") {
+                item.lableName = struct.fparamType;
+              }
+            });
+          }
+          if (variableParam.length > 0) {
+            params.nodeData[key] = variableParam;
+          }
+        }
         retArray.push(deepClone(params));
       }
     },

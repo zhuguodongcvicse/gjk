@@ -1,6 +1,6 @@
 <!--  -->
 <template>
-  <el-dialog title="申请构件" :visible.sync="dialog" width="35%" :before-close="dialogBeforeClose">
+  <!-- <el-dialog title="申请构件" :visible.sync="dialog" width="35%" :before-close="dialogBeforeClose">
     <el-form
       ref="addProCompForm"
       label-width="110px"
@@ -34,7 +34,38 @@
       <el-button @click="closeDialog">取 消</el-button>
       <el-button type="primary" @click="addProComp">确 定</el-button>
     </div>
-  </el-dialog>
+  </el-dialog>-->
+  <div>
+    <div>
+      <el-button type="primary" @click.native="addProComp">提交申请</el-button>
+    </div>
+    <el-tabs v-model="activeName">
+      <el-tab-pane label="审批信息" name="first">
+        <el-form
+          label-width="120px"
+          :model="addProCompForm"
+          :rules="addProCompFormRules"
+          ref="addProCompForm"
+        >
+          <el-form-item label="请选择审批人" prop="applyUser">
+            <el-select v-model="addProCompForm.applyUser" placeholder="请选择">
+              <el-option
+                v-for="item in applyUserSelect"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </el-tab-pane>
+      <el-tab-pane label="构件信息" name="second">
+        <div class="libs_commoncomponent_14s">
+        <common-component @fromChild="getChild" :temp_currProject="temp_currProject"></common-component>
+        </div>
+      </el-tab-pane>
+    </el-tabs>
+  </div>
 </template>
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
@@ -48,17 +79,22 @@ import { fetchTestTree } from "@/api/admin/test";
 import { fetchPlatformTrees } from "@/api/admin/platform";
 import { getUserhasApplyAuto } from "@/api/admin/user";
 import selectTree from "@/views/pro/project/selectTree";
+import commonComponent from "@/views/pro/project/commonComponent/index";
+import { menuTag } from "@/util/closeRouter";
 export default {
-  props: ["temp_currProject", "dialog"],
   //注入依赖，调用this.reload();用于刷新页面
   inject: ["reload"],
   //import引入的组件需要注入到对象中才能使用
   components: {
-    "select-tree": selectTree
+    "common-component": commonComponent
   },
   data() {
     //这里存放数据
     return {
+      childComData: [],
+      temp_currProject: {}, //当前项目数据
+      activeName: "first",
+      //labelPosition:"first",
       addProCompForm: {
         applyUser: "",
         compSelectArray: []
@@ -82,35 +118,41 @@ export default {
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["userInfo"])
+    ...mapGetters(["userInfo"]),
+    ...mapGetters(["tagWel", "tagList", "tag", "website"])
   },
   //监控data中的数据变化
   watch: {
-    screenLibsIdArray() {
-      for (let item of this.screenLibsIdArray) {
-        if (item == "0") {
-          this.screenLibsIdArray.splice(
-            this.screenLibsIdArray.indexOf(item),
-            1
-          );
-        }
-      }
-      console.log("screenLibsIdArray", this.screenLibsIdArray);
-      this.getTableData();
-      this.addProCompForm.compSelectArray = [];
-    },
-    "addProCompForm.compSelectArray": function() {
-      for (let i of this.addProCompForm.compSelectArray) {
-        if (i == "0") {
-          let index = this.addProCompForm.compSelectArray.indexOf(i);
-          this.$delete(this.addProCompForm.compSelectArray, index);
-        }
-      }
-      console.log("compSelectArray:", this.addProCompForm.compSelectArray);
-    }
+    // screenLibsIdArray() {
+    //   for (let item of this.screenLibsIdArray) {
+    //     if (item == "0") {
+    //       this.screenLibsIdArray.splice(
+    //         this.screenLibsIdArray.indexOf(item),
+    //         1
+    //       );
+    //     }
+    //   }
+    //   console.log("screenLibsIdArray", this.screenLibsIdArray);
+    //   this.getTableData();
+    //   this.addProCompForm.compSelectArray = [];
+    // },
+    // "addProCompForm.compSelectArray": function() {
+    //   for (let i of this.addProCompForm.compSelectArray) {
+    //     if (i == "0") {
+    //       let index = this.addProCompForm.compSelectArray.indexOf(i);
+    //       this.$delete(this.addProCompForm.compSelectArray, index);
+    //     }
+    //   }
+    //   console.log("compSelectArray:", this.addProCompForm.compSelectArray);
+    // }
   },
   //方法集合
   methods: {
+    //从子组件获取值
+    getChild(v) {
+      this.childComData = v;
+      console.log("this.childComData", this.childComData);
+    },
     dialogBeforeClose() {
       this.closeDialog();
     },
@@ -120,6 +162,14 @@ export default {
     addProComp() {
       this.$refs.addProCompForm.validate((valid, object) => {
         if (valid) {
+          //this.getChild();
+          console.log("ssssssssssthis.childComData", this.childComData);
+          if (this.childComData != undefined && this.childComData.length > 0) {
+            for (let i of this.childComData) {
+              this.addProCompForm.compSelectArray.push(i.id);
+            }
+          }
+          console.log("this.addProCompForm.compSelectArray",this.addProCompForm.compSelectArray)
           saveProCompList(
             this.temp_currProject.id,
             this.addProCompForm.compSelectArray
@@ -143,6 +193,9 @@ export default {
               this.$notify({
                 message: "申请成功，请等候审批。",
                 type: "success"
+              });
+              menuTag(this.$route.path, "removeOpen", this.tagList, {
+                value: "/pro/manager"
               });
             });
           });
@@ -179,8 +232,12 @@ export default {
       getAllComp().then(Response => {
         let treeDataArray = Response.data.data;
         getPassCompByProId(this.temp_currProject.id).then(Response => {
-          this.setTreeNodedisabled(treeDataArray, Response.data.data);
+          //this.setTreeNodedisabled(treeDataArray, Response.data.data);
           this.defaultExpandedNodeArray = Response.data.data;
+          console.log(
+            "defaultExpandedNodeArray",
+            this.defaultExpandedNodeArray
+          ); //已选择的构件数据
           this.compTreeData = treeDataArray;
         });
       });
@@ -226,8 +283,10 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
+    this.temp_currProject = this.$route.query.temp_currProject;
+    console.log("temp_currProject", this.temp_currProject);
     this.getLibsTree();
-    this.getTableData();
+    //this.getTableData();
     getUserhasApplyAuto().then(Response => {
       // 调用方法获取到所有具有审批权限的用户，将值附到选择器上
       this.applyUserSelect = [];

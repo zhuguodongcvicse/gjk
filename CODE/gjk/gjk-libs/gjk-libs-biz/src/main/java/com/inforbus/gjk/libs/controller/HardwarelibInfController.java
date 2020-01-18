@@ -24,6 +24,7 @@ import com.inforbus.gjk.common.log.annotation.SysLog;
 import com.inforbus.gjk.libs.api.entity.HardwarelibInf;
 import com.inforbus.gjk.libs.service.HardwarelibInfService;
 import lombok.AllArgsConstructor;
+import org.dom4j.DocumentException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -85,7 +86,7 @@ public class HardwarelibInfController {
   @SysLog("修改接口设计")
   @PutMapping
   @PreAuthorize("@pms.hasPermission('libs_hardwarelibinf_edit')")
-  public R update(@RequestBody HardwarelibInf hardwarelibInf){
+  public R update(@RequestBody HardwarelibInf hardwarelibInf) {
     return new R<>(hardwarelibInfService.saveInf(hardwarelibInf));
   }
 
@@ -127,6 +128,11 @@ public class HardwarelibInfController {
   @GetMapping("getInfList")
   public List<HardwarelibInf> getInfList() {
     return hardwarelibInfService.getInfList();
+  }
+
+  @GetMapping("test")
+  public void test() {
+    hardwarelibInfService.test();
   }
 
 }

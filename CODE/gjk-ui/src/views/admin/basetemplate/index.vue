@@ -25,6 +25,9 @@
           <br />
           <br />
         </template>
+        <template slot="tempVersion" slot-scope="scope">
+          <el-tag>V{{scope.row.tempVersion}}.0</el-tag>
+        </template>
         <template slot-scope="scope" slot="menu">
           <el-button-group>
             <el-tooltip class="item" effect="dark" content="编辑" placement="top">
@@ -233,7 +236,7 @@ export default {
         /^[0-9a-zA-Z+-?()-_ \u4e00-\u9fa5]+\.[x|X][m|M][l|L]$/.test(value) ==
         false
       ) {
-        callback("请选择不含特殊字符的xml文件");
+        callback("请选择文件名不含特殊字符的xml文件");
       } else {
         callback();
       }

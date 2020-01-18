@@ -25,11 +25,18 @@ import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.libs.api.entity.HardwarelibInf;
 import com.inforbus.gjk.libs.mapper.HardwarelibInfMapper;
 import com.inforbus.gjk.libs.service.HardwarelibInfService;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -66,6 +73,7 @@ public class HardwarelibInfServiceImpl extends ServiceImpl<HardwarelibInfMapper,
 
     @Override
     public HardwarelibInf saveInf(HardwarelibInf hardwarelibInf) {
+
         //如果InfId为空，则是新增，用用户名和时间戳新拼一个id
         if (hardwarelibInf.getInfId() == null) {
             long currentTime = System.currentTimeMillis();
@@ -136,6 +144,40 @@ public class HardwarelibInfServiceImpl extends ServiceImpl<HardwarelibInfMapper,
         }
         hardwarelibInf.setUpdateTime(LocalDateTime.now());
         baseMapper.updateById(hardwarelibInf);
+    }
+
+    @Override
+    public void test() {
+        String filePath = this.getClass().getResource("/").getPath() + "/USER_QOS_PROFILES.xml";
+        System.out.println(filePath);
+//        String filePath = "resource/USER_QOS_PROFILES.xml";
+        File file = new File(filePath);
+        //1.创建SAXReader对象用于读取xml文件
+        SAXReader reader = new SAXReader();
+        //2.读取xml文件，获得Document对象
+        Document doc = null;
+        try {
+            doc = reader.read(file);
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+        //3.获取根元素
+        Element root = doc.getRootElement();
+        //4.获取根元素下的所有子元素（通过迭代器）
+        Iterator<Element> it = root.elementIterator();
+        while(it.hasNext()){
+            Element e = it.next();
+            getChildElement(e);
+        }
+    }
+
+    public void getChildElement(Element element) {
+        Iterator<Element> elementIterator = element.elementIterator();
+        while (elementIterator.hasNext()) {
+            Element nextElement = elementIterator.next();
+            System.out.println("file-------------------: " + nextElement);
+            getChildElement(nextElement);
+        }
     }
 
 }

@@ -61,12 +61,14 @@
     ></delete-procedure>
 
     <!-- 再次申请构件 -->
-    <add-pro-comp
+    <!-- <add-pro-comp
       v-if="addProCompDialogVisible"
       :temp_currProject="temp_currProject"
       :dialog="addProCompDialogVisible"
       @closeDialog="closeAddProCompDialog"
-    ></add-pro-comp>
+    ></add-pro-comp> -->
+
+    <!-- <common-component></common-component> -->
 
     <!-- 修改流程对应的软件框架 -->
     <modify-software
@@ -184,7 +186,7 @@ export default {
     "modify-software": modifySoftware,
     "create-app-pro": createAppPro,
     "add-file": addFile,
-    "add-dir": addDir
+    "add-dir": addDir,
   },
   //注入依赖，调用this.reload();用于刷新页面
   inject: ["reload"],
@@ -483,7 +485,13 @@ export default {
       } else if (item == "添加流程") {
         this.addProcedureDialogVisible = true;
       } else if (item == "申请构件") {
-        this.addProCompDialogVisible = true;
+        //this.addProCompDialogVisible = true;
+        this.$router.push({
+        path: "/showComponent",
+        query:{
+          "temp_currProject":this.temp_currProject
+        }
+      });
       } else if (item == "导入") {
         this.importProjectDialogVisible = true;
       } else if (item == "删除流程") {

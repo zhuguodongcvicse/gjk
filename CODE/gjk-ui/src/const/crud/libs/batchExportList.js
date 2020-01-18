@@ -22,6 +22,7 @@ export const tableOption = {
     indexLabel: '序号',
     stripe: true,
     menuAlign: 'center',
+    menuWidth:"110",
     align: 'center',
     editBtn: false,
     delBtn: false,
@@ -36,10 +37,10 @@ export const tableOption = {
         prop: 'userId',
         type: 'select',
         props: {
-          label: 'name',
-          value: 'userId'
+          label: 'showName',
+          value: 'userIdstr'
         },
-        dicUrl: '/admin/user/info/getUserDict'
+        dicUrl: '/admin/user/info/getUserDictStr'
       },
       {
         hide: true,
@@ -101,10 +102,10 @@ export const tableOption = {
         prop: 'applyUserId',
         type: 'select',
         props: {
-          label: 'name',
-          value: 'userId'
+          label: 'showName',
+          value: 'userIdstr'
         },
-        dicUrl: '/admin/user/info/getUserDict'
+        dicUrl: '/admin/user/info/getUserDictStr'
       },
       {
         label: '审批状态',

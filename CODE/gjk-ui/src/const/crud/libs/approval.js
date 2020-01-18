@@ -37,9 +37,9 @@ export const tableOption = {
     type: 'select',
     props: {
       label: 'showName',
-      value: 'userId'
+      value: 'userIdstr'
     },
-    dicUrl: '/admin/user/info/getUserDict'
+    dicUrl: '/admin/user/info/getUserDictStr'
   },
   {
     hide: true,
@@ -117,9 +117,9 @@ export const tableOption = {
     type: 'select',
     props: {
       label: 'showName',
-      value: 'userId'
+      value: 'userIdstr'
     },
-    dicUrl: '/admin/user/info/getUserDict'
+    dicUrl: '/admin/user/info/getUserDictStr'
   },
   {
     label: '审批状态',

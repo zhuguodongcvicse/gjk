@@ -57,6 +57,9 @@
         </el-col>
         <el-col :span="6">
           <el-card class="box-card" :body-style="{padding: '10px'}">
+            <div slot="header" class="clearfix" style="font-size:18px">入库配置</div>
+          </el-card>
+          <el-card class="box-card" :body-style="{padding: '10px'}">
             <div slot="header" class="clearfix">算法文件</div>
             <params-files
               :fileLists="fileList"
@@ -329,7 +332,7 @@ export default {
       // console.log("Date.parse(new Date()) - changeSaveDBXmlMaps",Date.parse(new Date()))
     },
     async inputCompBackupInfo() {
-       //校验右侧文件
+      //校验右侧文件
       const isAlgorithm = await this.$refs.saveAlgorithmFiles.checkedCompFilesForm();
       const isTest = await this.$refs.saveTestFiles.checkedCompFilesForm();
       const isPlatform = await this.$refs.savePlatformFiles.checkedCompFilesForm();
