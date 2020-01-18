@@ -32,7 +32,7 @@ public interface SimulatorService {
      * @param simulationDTO
      * @return
      */
-    Map<String,Object> getData(String username, SimulationDTO simulationDTO);
+    Map<String,Object> getData(String username, String projectId,SimulationDTO simulationDTO);
 
     /**
      * 仿真暂停获取帧号集合
