@@ -3,7 +3,7 @@ import request from '@/router/axios'
 
 export function getDataSource(query) {
   return request({
-    url: '/simula/simulation/getDataSource',
+    url: '/simula/simulation/getDataSource/'+query.username,
     method: 'post',
     data: query
   })
@@ -23,7 +23,7 @@ export function startSimulator(query) {
 
 export function simulation(query) {
   return request({
-    url: '/simula/simulation/getData/'+query.username,
+    url: '/simula/simulation/getData/'+query.username+"/"+query.projectId,
     method: 'post',
     data: query
   })
