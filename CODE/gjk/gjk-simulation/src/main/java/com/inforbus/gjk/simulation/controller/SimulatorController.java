@@ -39,13 +39,14 @@ public class SimulatorController {
 	}
 
 	@PostMapping("/getDataSource/{username}")
-	public R getDataSource(@PathVariable("username") String username, @RequestBody SimulationDTO simulationDTO){
+	public R getDataSource(@PathVariable("username") String username,@RequestBody SimulationDTO simulationDTO){
 		return new R<>(simulatorService.getDataSource(username,simulationDTO));
 	}
 
-	@PostMapping("/getData/{username}")
-	public R getData(@PathVariable("username") String username, @RequestBody SimulationDTO simulationDTO){
-		return new R<>(simulatorService.getData(username, simulationDTO));
+	@PostMapping("/getData/{username}/{projectId}")
+	public R getData(@PathVariable("username") String username,@PathVariable("projectId") String projectId, @RequestBody SimulationDTO simulationDTO){
+		System.out.println(projectId+simulationDTO);
+		return new R<>(simulatorService.getData(username,projectId,simulationDTO));
 	}
 
 	@PostMapping("/stopSimulator/{username}")
