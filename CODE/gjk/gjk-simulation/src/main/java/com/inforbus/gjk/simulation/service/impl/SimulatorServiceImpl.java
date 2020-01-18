@@ -2,6 +2,7 @@ package com.inforbus.gjk.simulation.service.impl;
 
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
@@ -9,6 +10,7 @@ import com.inforbus.gjk.common.core.util.ExternalIOTransUtils;
 import com.inforbus.gjk.simulation.dto.SimulationDTO;
 import com.inforbus.gjk.simulation.core.Global;
 import com.inforbus.gjk.simulation.dto.SimulationTableDataDTO;
+import com.inforbus.gjk.simulation.service.ManagerServiceImpl;
 import com.inforbus.gjk.simulation.service.SimulatorService;
 import com.inforbus.gjk.simulation.task.SimulatorQueue;
 import com.inforbus.gjk.simulation.task.Subscriber;
@@ -35,7 +37,8 @@ public class SimulatorServiceImpl implements SimulatorService {
      */
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
-
+    @Autowired
+    ManagerServiceImpl managerServiceImpl;
     /**
      * reidsIP
      */
@@ -47,7 +50,13 @@ public class SimulatorServiceImpl implements SimulatorService {
      */
     @Value("${simulation.queueSize}")
     private String queueSize;
+    // gitlu路径
+    @Value("${git.local.path}")
+    private String gitDetailPath;
 
+    // 集成代码生成结果存放路径
+    @Value("${gjk.pro.process.generateCodeResult}")
+    private String generateCodeResult;
     @Override
     public boolean startSimulator(String username, List<String> componentLinks, String filePath) {
         //定义通道名
@@ -88,7 +97,7 @@ public class SimulatorServiceImpl implements SimulatorService {
     }
 
     @Override
-    public Map<String,Object> getData(String username, SimulationDTO simulationDTO) {
+    public Map<String,Object> getData(String username, String projectId,SimulationDTO simulationDTO) {
         //修改队列初始化状态
         redisTemplate.opsForValue().set(username+":initState:"+simulationDTO.getSymbol(),"1");
         //拼接队列key
@@ -106,6 +115,12 @@ public class SimulatorServiceImpl implements SimulatorService {
         tableData.addAll(forEachGetSimulationTableData((Map) objects.get(tabNames[1])));
 
         //调用客户接口解析 接口待确认 把这组数据扔到接口拿返回值就OK
+
+
+//        ProjectFile processFile = getOne(
+//     Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, this.getById(proDetailId).getParentId()));
+        String FilePath = managerServiceImpl.getprocessFile(projectId);
+        String packinfoFileName = gitDetailPath + FilePath + generateCodeResult + "/packinfo.xml";
 
         Map<String, Object> dataMap = Maps.newHashMap();
         //表格数据
