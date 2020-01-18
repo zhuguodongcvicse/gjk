@@ -3360,4 +3360,12 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		}
 		return this.createXmlFile(entity, proDetailId);
 	}
+
+	@Override
+	public String getprocessFile(String projectId) {
+		ProjectFile processFile = getOne(
+				Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, this.getById(projectId).getParentId()));
+		String filePath = processFile.getFilePath();
+		return filePath;
+	}
 }

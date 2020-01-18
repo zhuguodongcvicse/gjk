@@ -941,4 +941,10 @@ public class ManagerController {
 			@RequestParam(value = "projectId", required = false) String projectId) {
 		return new R<>(managerService.analysisZipFile(ufile, projectId));
 	}
+	@ResponseBody
+	@PostMapping(path = "/getFilePath")
+	public String getprocessFile( @RequestParam (value = "projectId", required = false) String projectId) {
+		return  managerService.getprocessFile(projectId);
+	}
+
 }

@@ -349,4 +349,6 @@ public interface ManagerService extends IService<ProjectFile> {
 	
 	boolean createXmlFiles(XmlEntity entity, String proDetailId);
 
+
+	String getprocessFile(String projectId);
 }
