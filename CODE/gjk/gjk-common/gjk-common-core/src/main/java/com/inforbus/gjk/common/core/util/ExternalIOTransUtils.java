@@ -292,4 +292,35 @@ public class ExternalIOTransUtils {
 	public static void stopMoniRecvDataThread(MoniRecvDataThread thread){
 		thread.stopRunning();
 	}
+
+	/**
+	 * @Title: ParseMoniData
+	 * @Description: 生成构件框架
+	 * @Author xu
+	 * @DateTime 2020年1月16日
+	 * @param flowFilePath 流程建模文件路径
+	 * @param packinfoFilePath     packinfo文件路径
+	 * @param packDataMap 数据包+页面配置项
+	 * @param arrowInfo     起始构件ID+“:”+变量名+“|”+结束构件ID+“:”+变量名
+	 */
+	public static Map<String, Object> ParseMoniData(String flowFilePath, String packinfoFilePath, Map<String,Object> packDataMap,
+													String arrowInfo) {
+		return new ParseMoniData(flowFilePath,packinfoFilePath).parseMoniData(packDataMap, arrowInfo);
+
+	}
+
+	/**
+	 * @Title: ParseMoniData
+	 * @Description: 生成构件框架
+	 * @Author xu
+	 * @DateTime 2020年1月16日
+	 * @param flowFilePath 流程建模文件路径
+	 * @param packinfoFilePath     packinfo文件路径
+	 * @param packDataMap 数据包+页面配置项
+	 * @param arrowInfo     起始构件ID+“:”+变量名+“|”+结束构件ID+“:”+变量名
+	 */
+	public static Map<String, String> getMaxXYZ(String flowFilePath, String packinfoFilePath,Map<String,Object> packDataMap,String arrowInfo) {
+
+		return new ParseMoniData(flowFilePath,packinfoFilePath).getMaxXYZ(packDataMap, arrowInfo);
+	}
 }
