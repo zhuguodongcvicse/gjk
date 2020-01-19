@@ -46,12 +46,13 @@
           </el-button>
           <el-button
             type="danger"
-            v-if="permissions.libs_hardwarelibinf_del && scope.row.userId === userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            v-if="permissions.libs_hardwarelibinf_del"
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
           >删除
           </el-button>
+<!--           && scope.row.userId === userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')-->
           <el-button
             type="primary"
             v-if="permissions.libs_hardwarelibinf_edit && scope.row.userId === userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
