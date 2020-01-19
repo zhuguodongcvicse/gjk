@@ -17,9 +17,9 @@
         <template slot="menuLeft">
           <el-button v-if="permissions.libs_hardwarelibinf_add" type="primary" @click="showdialog">新增</el-button>
         </template>
-        <template slot="menuLeft">
+        <!--<template slot="menuLeft">
           <el-button type="primary" @click="testMethod">测试</el-button>
-        </template>
+        </template>-->
 
         <template slot-scope="scope" slot="menu">
           <el-button
@@ -40,12 +40,13 @@
           </el-button>
           <el-button
             type="danger"
-            v-if="permissions.libs_hardwarelibinf_del && scope.row.userId == userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
+            v-if="permissions.libs_hardwarelibinf_del"
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
           >删除
           </el-button>
+<!--           && scope.row.userId == userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')-->
           <el-button
             type="primary"
             v-if="permissions.libs_hardwarelibinf_add && permissions.libs_hardwarelibinf_edit && scope.row.userId == userInfo.userId && (scope.row.applyState === '0' || scope.row.applyState === '3')"
