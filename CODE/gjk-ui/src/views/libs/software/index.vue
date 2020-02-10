@@ -120,7 +120,7 @@
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
-            v-if="libsSoftware_btn_del && (scope.row.applyState=='0'||scope.row.applyState==null||scope.row.applyState=='3'?true:false)"
+            v-if="libsSoftware_btn_del && (scope.row.applyState=='0'||scope.row.applyState==null||scope.row.applyState=='3'||scope.row.applyState=='2'?true:false)"
           >删 除</el-button>
           <el-tooltip class="item" effect="dark" content="入库" placement="top">
             <el-button
