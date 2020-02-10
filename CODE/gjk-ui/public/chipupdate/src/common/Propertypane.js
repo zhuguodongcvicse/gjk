@@ -102,6 +102,7 @@
           class: "form-control",
           parent: parent
         });
+        input.setAttribute('readonly', 'readonly');
         // console.log("input2",input)
       }
       this.input = input;
