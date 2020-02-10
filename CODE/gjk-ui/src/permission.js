@@ -29,6 +29,7 @@ router.beforeEach((to, from, next) => {
       to.meta.$keepAlive = false
     }
   }
+  // console.log("to",to)
   //移除硬件的缓存
   if (to.path.indexOf("hardwarelib") !== -1) {
     to.meta.$keepAlive = false
@@ -39,6 +40,11 @@ router.beforeEach((to, from, next) => {
     to.meta.$keepAlive = false
     to.meta.keepAlive = false
   }
+  /*//移除bsp、软件框架的缓存
+  if (to.path.indexOf("pro/bsp") !== -1 || to.path.indexOf("pro/software") !== -1) {
+    to.meta.$keepAlive = false
+    to.meta.keepAlive = false
+  }*/
   const meta = to.meta || {}
   if (store.getters.access_token) {
     if (to.path === '/login') {

@@ -548,7 +548,11 @@
                                         this.rejectDialog = false;
                                         this.dialogStateShow(false);
                                         //刷新页面
-                                        this.$emit("refresh");
+                                        // this.$emit("refresh");
+                                        //生成随机数,用来刷新页面
+                                        this.refreshListFlag = Math.random()
+                                        //将随机数放到store
+                                        this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
                                     });
                                     break;
                                 case "5":
@@ -561,7 +565,11 @@
                                         this.rejectDialog = false;
                                         this.dialogStateShow(false);
                                         //刷新页面
-                                        this.$emit("refresh");
+                                        // this.$emit("refresh");
+                                        //生成随机数,用来刷新页面
+                                        this.refreshListFlag = Math.random()
+                                        //将随机数放到store
+                                        this.$store.dispatch("setRefreshListFlag", this.refreshListFlag);
                                     });
                                     break;
                                 case "6":

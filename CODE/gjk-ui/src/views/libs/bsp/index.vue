@@ -262,7 +262,7 @@ export default {
   },
   mounted: function() {},
   computed: {
-    ...mapGetters(["permissions", "userInfo"])
+    ...mapGetters(["permissions", "userInfo", "refreshListFlag"])
   },
 
   watch: {
@@ -273,6 +273,14 @@ export default {
     importCompFileList: {
       handler: function() {},
       immediate: true
+    },
+    //当随机数发生变化时说明已经保存过，此时刷新芯片列表
+    refreshListFlag: {
+        // immediate: true,
+        handler: function (params) {
+            this.getList();
+        },
+        deep: true
     }
   },
 
@@ -445,10 +453,10 @@ export default {
 
     getList(page) {
       this.tableLoading = true;
-      this.listQuery = {
+      /*this.listQuery = {
         current: page.currentPage,
         size: page.pageSize
-      };
+      };*/
       var bsp = {
         userId: this.userInfo.userId
       };
