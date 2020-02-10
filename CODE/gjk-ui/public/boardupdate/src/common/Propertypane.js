@@ -60,6 +60,7 @@
 			if (property.readonly) {
 				input.setAttribute('readonly', 'readonly');
 			}
+			input.setAttribute('readonly', 'readonly');
 			this.update();
 			$(input).on('input', function (evt) {
 				if (this.ajdusting) {

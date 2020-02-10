@@ -57,6 +57,7 @@
 			if(property.readonly) {
 				input.setAttribute('readonly', 'readonly');
 			}
+      input.setAttribute('readonly', 'readonly');
 			this.update();
 			$(input).on('input', function(evt) {
 				if(this.ajdusting) {
@@ -721,7 +722,7 @@
 					parent: group,
 					html: '外部互联'
 				});
-				//表格内容 
+				//表格内容
 				//var arr0=['输入','双路','输入','双路','输入',];
 				var item0='';
 				//console.log("currentBoard", currentBoard)
@@ -748,10 +749,10 @@
 						}
 					}
 				}
-				
+
 				//var html1='<br/><div style="height:200px;overflow-y:auto;"><table class="table table-bordered"><tr><th>接口名称</th><th>接口类型</th></tr><tbody> <tr> <td>接口1</td> <td>输入</td> </tr> <tr> <td>接口2</td> <td>双路</td> </tr> <tr><td>接口2</td> <td>双路</td></tr><tr><td>接口3</td> <td>双路</td></tr><tr><td>接口4</td> <td>双路</td></tr></tbody></table></div>';
 				var html1='<div class="propertypane_table_14s"><table class="table table-bordered table_14s"><tr><th>CPU</th><th>CPU接口</th><th>LinkType</th><th>后板卡接口</th><th>操作</th></tr><tbody class="tbody1_14s" id="tbody1"> '+item0+'</tbody></table></div>';
-				
+
 				Q.createElement({
 					tagName: 'button1',
 					parent: group,
@@ -762,16 +763,16 @@
 					parent: group,
 					html: html1
 				});
-				
+
 
 				//切换CPU时更改接口内容
 				var selectStartCpu = document.getElementById("selectStartCpu");
-			
+
 				selectStartCpu.onchange=function(){
 					selectStartCpuValue = selectStartCpu.value;
 					for (const i in currentBoard.chipList) {
 						switch(selectStartCpuValue){
-							case currentBoard.chipList[i].ID.toString() : 
+							case currentBoard.chipList[i].ID.toString() :
 								$("#selectStartInf").empty();
 								var selectHtml = '';
 								var ifExistInf = []
@@ -790,8 +791,8 @@
 						}
 					}
 				};
-				
-				
+
+
 			}
 		},
 		register: function(options) {
@@ -864,7 +865,7 @@
 						}
 						//window.location.reload();
 					}, 350);
-					
+
 				}
 			}
 		}
