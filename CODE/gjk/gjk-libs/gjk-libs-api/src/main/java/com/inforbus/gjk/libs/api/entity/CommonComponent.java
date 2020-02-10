@@ -82,4 +82,13 @@ public class CommonComponent extends Model<CommonComponent> {
 	 */
 	private String delFlag;
 
+	public CommonComponent() {
+		super();
+	}
+
+	public CommonComponent(String id) {
+		super();
+		this.id = id;
+	}
+
 }

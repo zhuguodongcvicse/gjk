@@ -83,6 +83,13 @@
         </template>
         <template slot-scope="scope" slot="menu">
           <el-button type="primary" size="small" plain @click="handleEdit(scope.row,scope.index)">查看</el-button>
+          <el-button
+            type="danger"
+            v-if="permissions.libs_commoncomponent_del"
+            size="small"
+            plain
+            @click="handleDel(scope.row,scope.index)"
+          >删除</el-button>
         </template>
       </avue-crud>
       <el-dialog
@@ -110,6 +117,13 @@
                 plain
                 @click="handleEdit(scope.row,scope.index)"
               >查看</el-button>
+              <el-button
+                type="danger"
+                v-if="permissions.libs_commoncomponent_del"
+                size="small"
+                plain
+                @click="handleDel(scope.row,scope.index)"
+              >删除</el-button>
             </template>
           </avue-crud>
         </div>
@@ -436,15 +450,24 @@ export default {
       });
     },
     handleDel(row, index) {
+      console.log("11111111111111111111111", row, index);
       this.$refs.crud.rowDel(row, index);
     },
     rowDel: function(row, index) {
       var _this = this;
-      this.$confirm("是否确认删除ID为" + row.id + "的记录", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
+      this.$confirm(
+        "一经删除不可恢复，是否确认删除构件名为 " +
+          row.compName +
+          " 及构件版本为 V" +
+          row.version +
+          " 的记录吗？",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      )
         .then(function() {
           return delObj(row.id);
         })
@@ -455,6 +478,7 @@ export default {
             message: "删除成功",
             type: "success"
           });
+          this.reload();
         })
         .catch(function(err) {});
     },

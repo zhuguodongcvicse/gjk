@@ -17,6 +17,7 @@
 package com.inforbus.gjk.libs.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.log.annotation.SysLog;
@@ -29,6 +30,7 @@ import cn.hutool.core.io.IoUtil;
 import lombok.AllArgsConstructor;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -120,6 +122,10 @@ public class CommonComponentController {
 	@DeleteMapping("/{id}")
 	@PreAuthorize("@pms.hasPermission('libs_commoncomponent_del')")
 	public R removeById(@PathVariable String id) {
+		List<CommonComponentDetail> commonComponentDetails = commonComponentService.deleteCompById(id);
+		for (CommonComponentDetail detail : commonComponentDetails) {
+			commonComponentDetailService.removeById(detail.getId());
+		}
 		return new R<>(commonComponentService.removeById(id));
 	}
 

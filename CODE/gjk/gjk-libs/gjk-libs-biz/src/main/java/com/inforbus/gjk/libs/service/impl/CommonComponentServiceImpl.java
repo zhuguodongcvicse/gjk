@@ -30,6 +30,7 @@ import com.inforbus.gjk.libs.api.entity.CommonComponentDetail;
 import com.inforbus.gjk.libs.api.vo.CompDictVO;
 import com.inforbus.gjk.libs.api.vo.CompVO;
 import com.inforbus.gjk.libs.api.vo.TreeUtil;
+import com.inforbus.gjk.libs.mapper.CommonComponentDetailMapper;
 import com.inforbus.gjk.libs.mapper.CommonComponentMapper;
 import com.inforbus.gjk.libs.mapper.StructlibsMapper;
 import com.inforbus.gjk.libs.service.BatchApprovalService;
@@ -85,6 +86,9 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 	private StructlibsMapper structlibsMapper;
 
 	@Autowired
+	private CommonComponentDetailMapper componentDetailMapper;
+
+	@Autowired
 	private BatchApprovalService batchApprovalService;
 
 	/**
@@ -96,6 +100,20 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 	@Override
 	public IPage<CommonComponent> getCommonComponentPage(Page<CommonComponent> page, CommonComponent commonComponent) {
 		return baseMapper.getCommonComponentPage(page, commonComponent);
+	}
+
+	public List<CommonComponentDetail> deleteCompById(String id) {
+		List<CommonComponent> components = new ArrayList<CommonComponent>();
+		components.add(new CommonComponent(id));
+		List<CommonComponentDetail> commonComponentDetails = componentDetailMapper.getAllCompDetailByCompId(components);
+		for (CommonComponentDetail detail : commonComponentDetails) {
+			if ("xml".equals(detail.getFileType())) {
+				String compPath = gitFilePath + detail.getFilePath();
+				cn.hutool.core.io.FileUtil.del(compPath);
+				break;
+			}
+		}
+		return commonComponentDetails;
 	}
 
 	@Override

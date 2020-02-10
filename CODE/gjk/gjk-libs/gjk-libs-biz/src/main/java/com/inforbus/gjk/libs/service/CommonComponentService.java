@@ -45,6 +45,14 @@ public interface CommonComponentService extends IService<CommonComponent> {
 	IPage<CommonComponent> getCommonComponentPage(Page<CommonComponent> page, CommonComponent commonComponent);
 
 	/**
+	 * 删除构件对应的文件夹
+	 * 
+	 * @param id
+	 * @return
+	 */
+	List<CommonComponentDetail> deleteCompById(String id);
+
+	/**
 	 * @Title: saveCommonComp
 	 * @Description: 保存公共构件
 	 * @Author cvics
@@ -119,10 +127,11 @@ public interface CommonComponentService extends IService<CommonComponent> {
 	IPage<CommonComponent> getCompListByStringAndLibsId(Page page, List<String> libsList,
 			List<String> selectStringList);
 
-	IPage<CommonComponent> findPageByBatchApprovalId(Page page,String applyId);
+	IPage<CommonComponent> findPageByBatchApprovalId(Page page, String applyId);
 
 	/**
 	 * 批量保存
+	 * 
 	 * @param commonComponents
 	 * @return
 	 */
