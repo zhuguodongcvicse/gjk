@@ -376,7 +376,8 @@
                             break;
                         case "3":
                             let software = {};
-                            software.userId = this.userInfo.userId
+                            // software.userId = this.userInfo.userId
+                            software.userId = this.applyItemMsg.userId
                             software.id = this.applyItemMsg.applyId;
                             software.applyState = "2";
                             software.applyDesc = "已通过";
@@ -388,7 +389,8 @@
                             break;
                         case "5":
                             let bsp = {};
-                            bsp.userId = this.userInfo.userId
+                            // bsp.userId = this.userInfo.userId
+                            bsp.userId = this.applyItemMsg.userId
                             bsp.id = this.applyItemMsg.applyId;
                             bsp.applyState = "2";
                             bsp.applyDesc = "已通过";
@@ -540,7 +542,8 @@
                                     break;
                                 case "3":
                                     let software = {};
-                                    software.userId = this.userInfo.userId
+                                    // software.userId = this.userInfo.userId
+                                    software.userId = this.applyItemMsg.userId
                                     software.id = this.applyItemMsg.applyId;
                                     software.applyState = "3";
                                     software.applyDesc = this.rejectForm.rejectMassage;
@@ -558,7 +561,8 @@
                                 case "5":
                                     let bsp = {};
                                     bsp.id = this.applyItemMsg.applyId;
-                                    bsp.userId = this.userInfo.userId
+                                    bsp.userId = this.applyItemMsg.userId
+                                    // bsp.userId = this.userInfo.userId
                                     bsp.applyState = "3";
                                     bsp.applyDesc = this.rejectForm.rejectMassage;
                                     modifyBSP(bsp).then(Response => {
