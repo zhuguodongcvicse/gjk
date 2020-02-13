@@ -118,6 +118,7 @@
         addObj,
         putObj,
         delObj,
+        getChipList
     } from "@/api/libs/hardwarelibchip";
     import {tableOption} from "@/const/crud/libs/hardwarelibchip";
     import {fetchPlatformTree} from "@/api/admin/platform";
@@ -342,7 +343,7 @@
                 this.listQuery.userId = this.userInfo.userId
                 fetchList(this.listQuery).then(response => {
                     // this.tableData = []
-                    this.allChips = JSON.parse(JSON.stringify(response.data.data.records));
+                    // this.allChips = JSON.parse(JSON.stringify(response.data.data.records));
                     this.tableData = response.data.data.records;
                     // console.log("response.data.data",response.data.data)
                     /*this.tableData = this.sortKey(this.tableData, 'createTime')
@@ -368,6 +369,9 @@
                     this.page.total = response.data.data.total;
                     this.tableLoading = false;
                 });
+                getChipList().then(res => {
+                    this.allChips = JSON.parse(JSON.stringify(res.data));
+                })
             },
             getAllUsers() {
                 //查询所有用户

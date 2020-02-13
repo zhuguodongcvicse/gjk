@@ -147,10 +147,12 @@
                     });
                     return
                 }
+                // console.log("this.form",JSON.stringify(this.form))
+                // console.log("this.allInfs",this.allInfs)
                 //接口名称不能重复
                 for (const i in this.allInfs) {
                     if (this.allInfs[i].infName === this.form.infName) {
-                        alert("接口名称不能相同")
+                        alert("接口名称不能相同(可能与其他用户重复)")
                         return
                     }
                 }
@@ -159,7 +161,6 @@
                         // console.log("this.$store.state.infList",this.$store.state.infList)
                         this.showInf.dialogFormVisible = false;
                         this.form.userId = this.userInfo.userId
-                        // console.log("this.form",this.form)
                         saveInf(this.form).then(request => {
                             this.$notify({
                                 title: '成功',

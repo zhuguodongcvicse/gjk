@@ -100,7 +100,7 @@
                 getInfList().then(response => {
                     let infsGoStorage = []
                     for (const i in response.data) {
-                        if (response.data[i].userId === this.userInfo.name || response.data[i].applyState === '2') {
+                        if (response.data[i].userId === this.userInfo.userId || response.data[i].applyState === '2') {
                             infsGoStorage.push(response.data[i])
                         }
                     }

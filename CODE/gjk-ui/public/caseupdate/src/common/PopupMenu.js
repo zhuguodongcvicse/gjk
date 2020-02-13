@@ -5,7 +5,7 @@
       var bounds = new Q.Rect(window.pageXOffset, window.pageYOffset, body.clientWidth - 2, body.clientHeight - 2);
       var width = div.offsetWidth;
       var height = div.offsetHeight;
-  
+
       if (x + width > bounds.x + bounds.width) {
         x = bounds.x + bounds.width - width;
       }
@@ -21,7 +21,7 @@
       div.style.left = x + 'px';
       div.style.top = y + 'px';
     }
-  
+
     function isDescendant(parent, child) {
       var node = child.parentNode;
       while (node != null) {
@@ -32,14 +32,14 @@
       }
       return false;
     }
-  
+
     var PopupMenu = function (items) {
       this.items = items || [];
     }
-  
+
     var menuClassName = 'dropdown-menu';
     PopupMenu.Separator = 'divider';
-  
+
     PopupMenu.prototype = {
       dom: null,
       _invalidateFlag: true,
@@ -76,7 +76,7 @@
           this.dom.setAttribute("role", "menu");
           this.dom.className = menuClassName;
           var startEventName = Q.isTouchSupport ? "touchstart" : "mousedown";
-  
+
           if (!this.stopEditWhenClickOnWindow) {
             this.stopEditWhenClickOnWindow = function (evt) {
               if (this.isShowing() && !isDescendant(this.dom, evt.target)) {
@@ -123,7 +123,7 @@
         a.setAttribute("tabindex", "-1");
         a.setAttribute("href", "javascript:void(0)");
         dom.appendChild(a);
-  
+
         if (menuItem.html) {
           a.innerHTML = menuItem.html;
         } else {
@@ -138,7 +138,7 @@
         }
         var call = menuItem.action;
         var self = this;
-  
+
         var onclick = function (evt) {
           if (call) {
             call.call(menuItem.scope, evt, menuItem);
@@ -171,7 +171,7 @@
           var isGroup = data instanceof Q.Group;
           var isNode = !isShapeNode && data instanceof Q.Node;
           var isEdge = data instanceof Q.Edge;
-  
+
    /*        items.push({
             text: getI18NString('Rename'), action: function (evt, item) {
               Q.prompt(getI18NString('Input Element Name'), data.name || '', function (name) {
@@ -246,7 +246,7 @@
           }
         }) */
      //   items.push(Q.PopupMenu.Separator);
-  
+
         items.push({
           text: getI18NString('Zoom In'), action: function (evt, item) {
             var localXY = graph.globalToLocal(evt);
@@ -286,11 +286,79 @@
             if(data.image === 'images/BeforeTheBoard.svg' || data.image === 'images/AfterTheBoard.svg' || data.name == " "){
               graph.removeElement(data);
               //删除逻辑
-            }   
-          
+              boardNum--
+              //如果是板卡0或者1
+              if (data.properties.boardtype == 0 || data.properties.boardType == 1) {
+                //移除fBoardList数组中的板卡
+                for (const i in fBoardList) {
+                  if (fBoardList[i].uniqueId.indexOf(data.properties.uniqueId) != -1) {
+                    removeByValue(fBoardList, fBoardList[i])
+                  }
+                }
+                //移除allInfOfFrontBoard数组中此板卡上所有芯片的接口
+                for (const i in data.properties.chipList) {
+                  for (const j in data.properties.chipList[i].infOfChipList) {
+                    for (const k in allInfOfFrontBoard) {
+                      if (data.properties.chipList[i].infOfChipList[j].uniqueId.indexOf(allInfOfFrontBoard[k]) != -1) {
+                        removeByValue(allInfOfFrontBoard, allInfOfFrontBoard[k])
+                      }
+                    }
+                  }
+                }
+                //向allInfOfBackBoardt数组中补充添加此板卡对应后板卡上的接口
+                if (typeof (bJson) != "undefined") {
+                  var oppositeBoardTemp
+                  for (const i in bJson.datas) {
+                    if (bJson.datas[i].json.properties != null && bJson.datas[i].json.properties.slotNum == fSlotNum + 10) {
+                      for (const j in bJson.datas) {
+                        if (bJson.datas[j].json.properties != null && bJson.datas[j].json.properties.boardType != null && bJson.datas[j].json.host._ref == bJson.datas[i]._refId) {
+                          //console.log("thisboard",bJson.datas[j].json.properties)
+                          oppositeBoardTemp = bJson.datas[j]
+                        }
+                      }
+                    }
+                  }
+                }
+                // console.log("oppositeBoardTemp",oppositeBoardTemp)
+                for (const i in replenishBackBoardInfList) {
+                  if (replenishBackBoardInfList[i].uniqueId.indexOf(oppositeBoardTemp.json.properties.uniqueId) != -1) {
+                    allInfOfBackBoard.push(replenishBackBoardInfList[i])
+                  }
+                }
+              }
+
+              //如果是后面机箱的板卡
+              if (data.properties.boardType == 3) {
+                //移除bBoardList数组中此板卡
+                for (const i in bBoardList) {
+                  if (bBoardList[i].uniqueId.indexOf(data.properties.uniqueId) != -1) {
+                    removeByValue(bBoardList, bBoardList[i])
+                  }
+                }
+                //向allInfOfFrontBoard数组中补充添加此板卡对应卡槽位置的前板卡上的接口
+                for (const i in replenishBackBoardInfList) {
+                  if (replenishBackBoardInfList[i].uniqueId.indexOf(data.properties.uniqueId) != -1) {
+                    allInfOfFrontBoard.push(replenishCpuInfList[i])
+                    //移除outLinkArr中的外部互联关系
+                    for (const j in clickBoardList) {
+                      if (replenishCpuInfList[i].uniqueId.indexOf(clickBoardList[j]) != -1) {
+                        clickBoardList[j].outLineArr = []
+                      }
+                    }
+                  }
+                }
+              }
+              //移除点击板卡数组中的此板卡
+              for (const i in clickBoardList) {
+                if (clickBoardList[i].uniqueId.indexOf(data.properties.uniqueId) != -1) {
+                  removeByValue(clickBoardList, clickBoardList[i])
+                }
+              }
+            }
+
           }
         });
-   
+
         return items;
       }
     }
@@ -305,7 +373,7 @@
         }
       }
     });
-  
+
     var _contextmenuListener = {
       onstart: function (evt, graph) {
         graph._popupmenu.hide();
@@ -317,20 +385,20 @@
       }
       return {x: evt.pageX, y: evt.pageY};
     }
-  
+
     function showMenu(evt, graph) {
       var menu = graph.popupmenu;
       var xy = getPageXY(evt);
       var x = xy.x, y = xy.y;
-  
+
       var items = menu.getMenuItems(graph, graph.getElement(evt), evt);
-  
+
       if(!items){
         return;
       }
       menu.items = items;
       menu.showAt(x, y);
-  
+
       Q.stopEvent(evt);
     }
     if(Q.isTouchSupport){
@@ -338,7 +406,7 @@
         showMenu(evt, graph);
       }
     }
-  
+
     Object.defineProperties(Q.Graph.prototype, {
       popupmenu: {
         get: function(){
@@ -349,7 +417,7 @@
             return;
           }
           this._popupmenu = v;
-  
+
           if(!this._contextmenuListener){
             this._contextmenuListener = _contextmenuListener;
             this.addCustomInteraction(this._contextmenuListener);
@@ -365,4 +433,3 @@
     });
     Q.PopupMenu = PopupMenu;
   })(Q, jQuery);
-  
