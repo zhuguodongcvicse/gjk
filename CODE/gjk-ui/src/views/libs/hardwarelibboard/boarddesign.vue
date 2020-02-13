@@ -111,14 +111,14 @@
                 getChipList().then(response => {
                     let chipsForBoardDesign = []
                     for (const i in response.data) {
-                        if (response.data[i].userId === this.userInfo.name || response.data[i].applyState === '2') {
+                        if (response.data[i].userId === this.userInfo.userId || response.data[i].applyState === '2') {
                             chipsForBoardDesign.push(response.data[i])
                         }
                     }
                     getInfList().then(res => {
                         let infsForBoardDesign = []
                         for (const i in res.data) {
-                            if (res.data[i].userId === this.userInfo.name || res.data[i].applyState === '2') {
+                            if (res.data[i].userId === this.userInfo.userId || res.data[i].applyState === '2') {
                                 infsForBoardDesign.push(res.data[i])
                             }
                         }

@@ -223,4 +223,49 @@ public interface ComponentService extends IService<Component> {
 	 * @return
 	 */
 	String isSelectLibs(String id);
+
+	// **********************************************************//
+	// upms模块用到的东西，用于展示库管理模块的树级关系
+
+	/**
+	 * 获取构件建模模块的信息
+	 * 
+	 * @return
+	 */
+	List<ComponentDetail> getLibsInfo();
+
+	/**
+	 * 获取构件建模模块选择的文件夹的信息
+	 * 
+	 * @return
+	 */
+	List<ComponentDetail> getLibsFile(@Param("libsId") String libsId);
+
+	/**
+	 * 根据libs_id获取构件建模模块属于哪个库信息
+	 * 
+	 * @return
+	 */
+	List<ComponentDetail> getLibsFileType(String libsId);
+
+	/**
+	 * 根据详细表的comp_id找到主表里的comp_name
+	 * 
+	 * @return
+	 */
+	Component getCompNameById(@Param("id") String id);
+
+	/**
+	 * 获取所有构件
+	 * 
+	 * @param id
+	 * @return
+	 */
+	List<String> getCompIdsGroupCompId();
+
+	ComponentDetail getCompDetailByComponentId(@Param("componentId") String componentId,
+			@Param("fileName") String fileName);
+
+	List<Component> getCompByCompId(@Param("compId") String compId);
+	/*******************************************************************************/
 }

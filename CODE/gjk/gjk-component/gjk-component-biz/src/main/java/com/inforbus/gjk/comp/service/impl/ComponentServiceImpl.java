@@ -151,10 +151,11 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		try {
 			Component comp = this.getById(compId);
 			// 获取当前用户信息
-			SysUser su = (sysUserService.user(comp.getUserId())).getData();
+//			R<SysUser> su=	sysUserService.user(comp.getUserId());
 			String filePath = this.compDetailPath + "gjk" + File.separator + "component" + File.separator
-					+ su.getUsername() + File.separator + comp.getCompId() + File.separator
+					+ comp.getCompId() + File.separator
 					+ comp.getCreateTime().toString().replaceAll("[[\\s-T:punct:]]", "") + File.separator;
+
 			// 删除构件
 			this.removeById(compId);
 			// 删除构件详细信息
@@ -1067,4 +1068,49 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		return res;
 	}
 
+	// **********************************************************//
+		// upms模块用到的东西，用于展示库管理模块的树级关系
+
+	@Override
+	public List<ComponentDetail> getLibsInfo() {
+		// TODO Auto-generated method stub
+		return baseMapper.getLibsInfo();
+	}
+	
+	@Override
+	public List<ComponentDetail> getLibsFile(String libsId) {
+		// TODO Auto-generated method stub
+		return baseMapper.getLibsFile(libsId);
+	}
+
+	@Override
+	public List<ComponentDetail> getLibsFileType(String libsId) {
+		// TODO Auto-generated method stub
+		return baseMapper.getLibsFileType(libsId);
+	}
+
+	@Override
+	public Component getCompNameById(String id) {
+		// TODO Auto-generated method stub
+		return baseMapper.getCompNameById(id);
+	}
+
+	@Override
+	public List<String> getCompIdsGroupCompId() {
+		// TODO Auto-generated method stub
+		return baseMapper.getCompIdsGroupCompId();
+	}
+
+	@Override
+	public ComponentDetail getCompDetailByComponentId(String componentId, String fileName) {
+		// TODO Auto-generated method stub
+		return baseMapper.getCompDetailByComponentId(componentId, fileName);
+	}
+
+	@Override
+	public List<Component> getCompByCompId(String compId) {
+		// TODO Auto-generated method stub
+		return baseMapper.getCompByCompId(compId);
+	}
+	// **********************************************************//
 }

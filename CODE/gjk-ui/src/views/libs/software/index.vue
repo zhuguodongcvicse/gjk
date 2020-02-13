@@ -120,7 +120,7 @@
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
-            v-if="libsSoftware_btn_del && (scope.row.applyState=='0'||scope.row.applyState==null||scope.row.applyState=='3'?true:false)"
+            v-if="libsSoftware_btn_del && (scope.row.applyState=='0'||scope.row.applyState==null||scope.row.applyState=='3'||scope.row.applyState=='2'?true:false)"
           >删 除</el-button>
           <el-tooltip class="item" effect="dark" content="入库" placement="top">
             <el-button
@@ -255,7 +255,7 @@ export default {
   },
   mounted: function() {},
   computed: {
-    ...mapGetters(["permissions", "userInfo"])
+    ...mapGetters(["permissions", "userInfo", "refreshListFlag"])
   },
 
   watch: {
@@ -266,7 +266,15 @@ export default {
     importCompFileList: {
       handler: function() {},
       immediate: true
-    }
+    },
+    //当随机数发生变化时说明已经保存过，此时刷新芯片列表
+    refreshListFlag: {
+        // immediate: true,
+        handler: function (params) {
+            this.getList();
+        },
+        deep: true
+    },
   },
 
   methods: {
@@ -443,11 +451,13 @@ export default {
     },
 
     getList(page) {
+      // console.log("this.listQuery", this.listQuery)
+      // console.log("page", page)
       this.tableLoading = true;
-      this.listQuery = {
+      /*this.listQuery = {
         current: page.currentPage,
         size: page.pageSize
-      };
+      };*/
       var software = {
         userId: this.userInfo.userId
       };
@@ -456,7 +466,6 @@ export default {
           this.tableData = response.data.data.records;
           // this.page.total = response.data.data.records.length;
           this.page.total = response.data.data.total;
-          console.lo;
           this.tableLoading = false;
         }
       );
@@ -553,6 +562,7 @@ export default {
      * 刷新回调
      */
     refreshChange() {
+        console.log("this.page", this.page)
       this.getList(this.page);
     },
 
@@ -562,7 +572,6 @@ export default {
     },
 
     storageApply(row, index) {
-      console.log(row);
       this.storageApplyDialog = true;
       this.softwareItemMsg = row;
     }

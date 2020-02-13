@@ -155,6 +155,7 @@ public interface ComponentMapper extends BaseMapper<Component> {
 	 * @return
 	 */
 	ComponentDetail getImgFile(@Param("imgId") String imgId);
+
 	/**
 	 * @Title: getImgFile
 	 * @Description: 获取构件图片
@@ -164,6 +165,7 @@ public interface ComponentMapper extends BaseMapper<Component> {
 	 * @return
 	 */
 	ComponentDetail getCommImgFile(@Param("imgId") String imgId);
+
 	/**
 	 * 查询表列信息
 	 *
@@ -177,8 +179,8 @@ public interface ComponentMapper extends BaseMapper<Component> {
 	 * @Description: 保存构件与结构体的关系
 	 * @Author xiaohe
 	 * @DateTime 2019年10月10日 下午1:43:04
-	 * @param id 主键
-	 * @param compId 构件编号
+	 * @param id       主键
+	 * @param compId   构件编号
 	 * @param structId 结构体编号
 	 */
 	void saveCompAndStruct(@Param("id") String id, @Param("compId") String compId, @Param("structId") String structId);
@@ -190,7 +192,7 @@ public interface ComponentMapper extends BaseMapper<Component> {
 	 * @DateTime 2019年10月10日 下午3:40:05
 	 * @param compId 构件Id
 	 */
-	void deleteCompAndStruct( @Param("compId") String compId);
+	void deleteCompAndStruct(@Param("compId") String compId);
 
 	/**
 	 * @Title: selectByComms
@@ -198,10 +200,10 @@ public interface ComponentMapper extends BaseMapper<Component> {
 	 * @Author xiaohe
 	 * @DateTime 2019年10月12日 下午5:04:23
 	 * @param proId
-	 * @return 
+	 * @return
 	 */
-	List<Component> selectByComms( @Param("proId") String proId);
-	
+	List<Component> selectByComms(@Param("proId") String proId);
+
 	/**
 	 * 检查更新
 	 */
@@ -209,12 +211,14 @@ public interface ComponentMapper extends BaseMapper<Component> {
 
 	/**
 	 * 保存结构体
+	 * 
 	 * @param structlibs
 	 */
 	void saveStructlibs(@Param("structlibs") Structlibs structlibs);
 
 	/**
 	 * 根据id 查询结构体数据
+	 * 
 	 * @param id
 	 * @return
 	 */
@@ -222,6 +226,7 @@ public interface ComponentMapper extends BaseMapper<Component> {
 
 	/**
 	 * 根据id获取未删除的平台库数据
+	 * 
 	 * @param id
 	 * @return
 	 */
@@ -229,6 +234,7 @@ public interface ComponentMapper extends BaseMapper<Component> {
 
 	/**
 	 * 根据id获取未删除的测试库数据
+	 * 
 	 * @param id
 	 * @return
 	 */
@@ -236,8 +242,54 @@ public interface ComponentMapper extends BaseMapper<Component> {
 
 	/**
 	 * 根据id获取未删除的算法库数据
+	 * 
 	 * @param id
 	 * @return
 	 */
 	GjkAlgorithm getAlgorithmByIdNotDelete(@Param("id") String id);
+
+	// **********************************************************//
+	// upms模块用到的东西，用于展示库管理模块的树级关系
+
+	/**
+	 * 获取构件建模模块的信息
+	 * 
+	 * @return
+	 */
+	List<ComponentDetail> getLibsInfo();
+
+	/**
+	 * 获取构件建模模块选择的文件夹的信息
+	 * 
+	 * @return
+	 */
+	List<ComponentDetail> getLibsFile(@Param("libsId") String libsId);
+
+	/**
+	 * 根据libs_id获取构件建模模块属于哪个库信息
+	 * 
+	 * @return
+	 */
+	List<ComponentDetail> getLibsFileType(String libsId);
+
+	/**
+	 * 根据详细表的comp_id找到主表里的comp_name
+	 * 
+	 * @return
+	 */
+	Component getCompNameById(@Param("id") String id);
+
+	/**
+	 * 获取所有构件
+	 * 
+	 * @param id
+	 * @return
+	 */
+	List<String> getCompIdsGroupCompId();
+
+	ComponentDetail getCompDetailByComponentId(@Param("componentId") String componentId,
+			@Param("fileName") String fileName);
+
+	List<Component> getCompByCompId(@Param("compId") String compId);
+	/*******************************************************************************/
 }

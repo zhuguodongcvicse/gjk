@@ -48,6 +48,7 @@ export const tableOption = {
     {
       label: '用户',
       prop: 'userId',
+      type: 'select',
       props: {
         label: 'showName',
         value: 'userId'
