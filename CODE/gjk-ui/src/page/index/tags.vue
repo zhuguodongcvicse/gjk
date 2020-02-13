@@ -162,12 +162,12 @@
             menuTag(value, action) {
                  // console.log("value", value)
                 // console.log("action", action)
-                if (value.split("?")[0] == "/comp/manager/process"){
-                    this.$store.commit("IS_SAVE", "0");
-                    this.routerPathValue = value
-                    this.routerPathAction = "remove"
-                    this.dialogVisibleOfCloseRouter = true
-                } else {
+                // if (value.split("?")[0] == "/comp/manager/process"){
+                //     this.$store.commit("IS_SAVE", "0");
+                //     this.routerPathValue = value
+                //     this.routerPathAction = "remove"
+                //     this.dialogVisibleOfCloseRouter = true
+                // } else {
                     if (action === "remove") {
                         let {tag, key} = this.findTag(value);
                         this.$store.commit("DEL_TAG", tag);
@@ -176,7 +176,7 @@
                             this.openTag(tag);
                         }
                     }
-                }
+               // }
             },
             openTag(item) {
                 // console.log("item", item)

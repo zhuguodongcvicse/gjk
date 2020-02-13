@@ -97,7 +97,7 @@
                     getBoardList().then(response => {
                         let boardListTemp = []
                         for (const i in response.data) {
-                            if (response.data[i].userId === this.userInfo.name || response.data[i].applyState === '2') {
+                            if (response.data[i].userId === this.userInfo.userId || response.data[i].applyState === '2') {
                                 boardListTemp.push(response.data[i])
                             }
                         }

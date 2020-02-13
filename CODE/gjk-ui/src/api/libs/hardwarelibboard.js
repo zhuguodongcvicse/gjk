@@ -73,7 +73,7 @@ export function updateBoard(obj){
 }
 
 //获取所有板卡
-export function getBoardList(id) {
+export function getBoardList() {
   return request({
     url: '/libs/hardwarelibboard/getBoardList',
     method: 'get'

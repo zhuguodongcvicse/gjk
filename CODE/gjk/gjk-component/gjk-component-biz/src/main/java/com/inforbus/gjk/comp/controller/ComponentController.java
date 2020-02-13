@@ -44,6 +44,7 @@ import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.log.annotation.SysLog;
 import com.inforbus.gjk.comp.api.dto.CompTree;
 import com.inforbus.gjk.comp.api.entity.Component;
+import com.inforbus.gjk.comp.api.entity.ComponentDetail;
 import com.inforbus.gjk.comp.api.util.CompTreeUtil;
 import com.inforbus.gjk.comp.api.vo.ComponentVO;
 import com.inforbus.gjk.comp.service.ComponentService;
@@ -312,4 +313,37 @@ public class ComponentController {
 	public R listCompByUserId(@RequestParam(value = "userId") Integer userId) {
 		return new R<>(componentService.listCompByUserId(userId));
 	}
+
+	// **********************************************************//
+	// upms模块用到的东西，用于展示库管理模块的树级关系
+	@PostMapping("/getLibsFile/{libsId}")
+	public List<ComponentDetail> getLibsFile(@PathVariable("libsId")String libsId) {
+		return componentService.getLibsFile(libsId);
+	}
+
+	@PostMapping("/getLibsFileType")
+	public List<ComponentDetail> getLibsFileType(String libsId) {
+		return componentService.getLibsFileType(libsId);
+	}
+
+	@PostMapping("/getCompNameById/{id}")
+	public Component getCompNameById(@PathVariable("id")String id) {
+		return componentService.getCompNameById(id);
+	}
+
+	@PostMapping("/getCompIdsGroupCompId")
+	public List<String> getCompIdsGroupCompId() {
+		return componentService.getCompIdsGroupCompId();
+	}
+
+	@PostMapping("/getCompDetailByComponentId/{componentId}/{fileName}")
+	public ComponentDetail getCompDetailByComponentId(@PathVariable("componentId")String componentId,@PathVariable("fileName") String fileName) {
+		return componentService.getCompDetailByComponentId(componentId, fileName);
+	}
+
+	@PostMapping("/getCompByCompId/{compId}")
+	public List<Component> getCompByCompId(@PathVariable("compId")String compId) {
+		return componentService.getCompByCompId(compId);
+	}
+	// **********************************************************//
 }

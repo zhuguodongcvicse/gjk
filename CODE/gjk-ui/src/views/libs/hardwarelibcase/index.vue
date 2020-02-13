@@ -84,12 +84,10 @@
         addObj,
         putObj,
         delObj,
-        getBoardData,
-        getCaseJson
+        getCaseData
     } from "@/api/libs/hardwarelibcase";
     import {tableOption} from "@/const/crud/libs/hardwarelibcase";
     import { getAllUser } from "@/api/libs/hardwarelibinf";
-    import {getUserhasApplyAuto} from "@/api/admin/user";
     import {mapGetters} from "vuex";
     import addcase from "@/views/libs/hardwarelibcase/addcase";
 
@@ -129,7 +127,7 @@
         },
         created() {
             this.getList();
-            this.getAllUsers();
+            // this.getAllUsers();
         },
         mounted: function () {
         },
@@ -169,7 +167,7 @@
                 fetchList(this.listQuery).then(response => {
                     //console.log(response.data.data.records)
                     this.tableData = response.data.data.records;
-                    this.allCases = JSON.parse(JSON.stringify(response.data.data.records));
+                    // this.allCases = JSON.parse(JSON.stringify(response.data.data.records));
                     /*this.tableData = this.sortKey(this.tableData, 'createTime')
                     //判断板卡数据是否为空
                     if (this.allCases.length !== 0) {
@@ -193,6 +191,9 @@
                     this.page.total = response.data.data.total;
                     this.tableLoading = false;
                 });
+                getCaseData().then(res => {
+                    this.allCases = JSON.parse(JSON.stringify(res.data));
+                })
             },
             getAllUsers() {
                 //查询所有用户

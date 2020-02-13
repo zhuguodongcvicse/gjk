@@ -289,7 +289,8 @@ export default {
       simulationIcon: "icon-kaishifangzhen",
       simulationState: true,
       boxWidth: "",
-      newBoxWidth: ""
+      newBoxWidth: "",
+      rightWight:""
     };
   },
   //监听属性 类似于data概念
@@ -307,6 +308,11 @@ export default {
       deep: true, //对象内部的属性监听，也叫深度监听
       handler: function(param) {
         this.isShow_14s = param.length > 0 ? true : false;
+        if(this.isShow_14s){
+          this.rightWight = this.$refs.right.clientWidth
+          console.log("99999999999999999999",this.rightWight)
+        }
+        
       }
     },
     //开始仿真结束仿真
@@ -907,12 +913,14 @@ export default {
           });
           break;
         case "returnFZ":
+          console.log(data.params.startId)
+          console.log(data.params.endId)
           this.$router.push({
             path: "/comp/manager/simulator",
             query: {
               flowFilePath: this.flowFilePath,
               startId: data.params.startId,
-              endId: data.params.endId,
+              endId: data.params.endId, 
               startName: data.params.startName,
               endName: data.params.endName,
               flowId:this.$route.query.processId
@@ -1165,11 +1173,13 @@ export default {
         var newBoxWidth = element.offsetWidth;
         console.log("888888888888高",element.offsetHeight)
         _this.$refs.slider.style.height = element.offsetHeight+"px";
-
         if(newBoxWidth != boxWidth){
            let w = Number(
             new String(_this.$refs.right.style.width).replace("px", "")
           );
+          if(w==0){
+            w = this.rightWight;
+          }
           _this.$refs.right.style.left = newBoxWidth - w + "px";
           _this.$refs.slider.style.left = newBoxWidth - w - 5 + "px"
         }
@@ -1302,7 +1312,7 @@ export default {
   z-index: 10;
 }
 .sliderc {
-  background: #a1a1a1;
+  background: rgba(255,255,0,0);
   left: calc(65.5% - 3px);
   padding: 0 2px;
   z-index: 10;

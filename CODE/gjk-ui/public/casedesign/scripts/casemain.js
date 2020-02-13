@@ -192,7 +192,7 @@ function ondropLoadJSON(evt, graph, center, options) {
         //给芯片的唯一标识拼接上板卡的唯一标识
         jsonObj.datas[i].json.properties.uniqueId = uuidRandom + '_' + jsonObj.datas[i].json.properties.uniqueId
       }
-    
+
     }
     // console.log("jsonObj",jsonObj)
     //在自定义数据中添加唯一表示
@@ -865,7 +865,7 @@ function initEditor(editor) {
     for (var i in selection) {
       if (selection[i].properties.type === "card") {
         Q.confirm("是否 确认删除", function () {
-          var selection = this.removeSelection();
+          /*var selection = this.removeSelection();
           // console.log("selection", selection)
           boardNum--
           //如果是板卡0或者1
@@ -936,7 +936,7 @@ function initEditor(editor) {
             if (clickBoardList[i].uniqueId.indexOf(selection[0].properties.uniqueId) != -1) {
               removeByValue(clickBoardList, clickBoardList[i])
             }
-          }
+          }*/
           /* if (selection) {
             var event = new InteractionEvent(this, InteractionEvent.ELEMENT_REMOVED, evt, selection);
             this.onInteractionEvent(event);

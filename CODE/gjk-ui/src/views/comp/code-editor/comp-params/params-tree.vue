@@ -65,7 +65,7 @@
                     placeholder="请选择"
                     :dictKey="node.dataKey"
                     :readonly="readonly"
-                    :disabled="disabled || moduleType==='comp'?false :processDisabled.includes(node.labelKey)?true:false "
+                    :disabled="disabled?true:moduleType==='comp'?false :processDisabled.includes(node.labelKey)?true:false "
                     @change="itemTypeChange(deepClone(node),nodeFormParam)"
                     @selectChangeData="selectChangeData"
                     @retStructChange="retStructChange"
@@ -118,6 +118,11 @@ export default {
   data() {
     //这里存放数据
     return {
+      arrayObject: [
+        { id: 1, name: "aa" },
+        { id: 3, name: "cc" },
+        { id: 2, name: "bb" }
+      ],
       //基础配置
       bllxParam: "变量类型",
       lbParam: "类别",
@@ -305,6 +310,7 @@ export default {
       immediate: true,
       handler: function(treeData) {
         let saveTreeData = [];
+        console.log(this.arrayObject.sort(this.arraySort("id")), "=========");
         //根据基础模板配置信息回写数据
         this.analysisByBaseXmlOptionData(deepClone(treeData), saveTreeData);
         this.tableXmlParams.xmlEntityMaps = saveTreeData;
@@ -327,6 +333,13 @@ export default {
   },
   //方法集合
   methods: {
+    arraySort(field) {
+      return (propA, propB) => {
+        const a1 = propA[field];
+        const b1 = propB[field];
+        return a1 - b1;
+      };
+    },
     //设置标签名
     setShowLableName(labelKey, labelValue) {
       for (let key in labelValue) {
@@ -811,12 +824,19 @@ export default {
         });
       });
       let struct, isok;
+      if (id && getStrType(id).isType) {
+        return { struct, isok, numIndex };
+      }
       isok = "shStruct";
+      console.log("id, name, numIndex, ids",{id, name, numIndex, ids})
       //去头文件中找结构体
       if (isok === "shStruct") {
-        let tmpStruct = this.headerFile.structParams[
-          deepClone(id).replace("*", "")
-        ];
+        let tmpStruct;
+        if (id !== undefined) {
+          tmpStruct = this.headerFile.structParams[
+            deepClone(id).replace("*", "")
+          ];
+        }
         struct = deepClone(tmpStruct);
         if (tmpStruct) {
           if (id.includes("*")) {
@@ -836,10 +856,12 @@ export default {
         }
       }
       if (isok === "dbStruct") {
-        //先去数据库找
-        struct = strc.find(str => {
-          return str.dbId === ids.replace("_*", "");
-        });
+        if (ids !== undefined) {
+          //先去数据库找
+          struct = strc.find(str => {
+            return str.dbId === ids.replace("_*", "");
+          });
+        }
         if (struct !== undefined) {
           if (ids.includes("_*")) {
             struct.dbId = ids;
@@ -858,9 +880,9 @@ export default {
       let regExp = /\w+\[[0-9]+\]/i;
       let paramName = params[0][0].lableName;
       console.log("给当前节点追加children", params[0]);
+      let key = this.$refs.tree.getCurrentNode().id;
       if (regExp.test(paramName)) {
         // console.log("查询数据库返回表单元素", params[0][0].lableName);
-        let key = this.$refs.tree.getCurrentNode().id;
         let dataVal = [];
         let arrData = deepClone(this.findArrayTmpMap.get(key));
         //TODO
@@ -876,8 +898,11 @@ export default {
       } else {
         //从variable取得结构体数据 structId structType
         let typeParam = this.getStructType(params);
-        console.log("测试结构体数据", typeParam);
-        if (typeParam.isok === "shStruct") {
+        //当数据来自修改时取变量中的值
+        let arrData = deepClone(this.findArrayTmpMap.get(key));
+        if (arrData && arrData.length > 0) {
+          this.$refs.tree.updateKeyChildren(this.aCheckedKeys[0], arrData);
+        } else if (typeParam.isok === "shStruct") {
           let dataVal = [];
           //①父级结构体，
           //设置序号
@@ -991,7 +1016,7 @@ export default {
         //处理返回树形结构,此处没有问题
         // console.log("处理返回树形结构,", retDataAll);
         this.convertXmlToRootXml(retDataAll, dataTree);
-        // console.log("处理返回树形结构,", dataTree);
+        console.log("处理返回树形结构,", dataTree);
         this.treeData = dataTree;
         if (this.treeData !== undefined && this.treeData.length > 0) {
           // 当前表单
@@ -1195,16 +1220,12 @@ export default {
       let key = varName.substring(0, varName.indexOf("."));
       let endKey = varName.substring(varName.indexOf(".") + 1);
       if (key) {
-        console.log("预处理部分参数0", { params, retArray, parentKey, key });
+        // console.log("预处理部分参数0", { params, retArray, parentKey, key });
         let arr = retArray.find(item => {
           return item.lableName === key;
         });
         let child = deepClone(params);
         child.assigParamName = parentKey === "" ? params.lableName : parentKey;
-        // console.log(
-        //   "//递归返回树形数据child.assigParamName",
-        //   child.assigParamName
-        // );
         child.lableName = endKey;
         //处理树上所带参数
         child.nodeData.forEach(nodes => {
@@ -1214,6 +1235,7 @@ export default {
             }
           });
         });
+        // console.log("arr*****************",arr)
         if (arr === undefined) {
           let parent = deepClone(params);
           //确保树上显示的和框中显示的一致
@@ -1233,20 +1255,25 @@ export default {
               } else if (parentArr[key1][key2].labelKey === this.lbParam) {
                 parentArr[key1][key2].lableName = "STRUCTTYPE";
               } else {
-                // parentArr[key1][key2].lableName = "";
+                parentArr[key1][key2].lableName = "";
               }
             }
           }
+          this.findArrayTmpMap.set(parent.id, [deepClone(child)]);
           this.$set(parent, "children", [deepClone(child)]);
 
           retArray.push(parent);
         } else {
+          // console.log('this.findArrayTmpMap',this.findArrayTmpMap,arr.id)
           if (endKey.includes(".")) {
             this.handleDialogParam(deepClone(child), arr.children, key);
           } else {
             if (arr.children === undefined) {
+              this.findArrayTmpMap.set(arr.id, [deepClone(child)])
               this.$set(arr, "children", [deepClone(child)]);
             } else {
+              let tmp = this.findArrayTmpMap.get(arr.id);
+              tmp.push(child);
               arr.children.push(deepClone(child));
             }
           }
@@ -1351,7 +1378,7 @@ export default {
       // console.log("treeDatatreeDatatreeData", treeData);
       treeData.forEach(tree => {
         let baseData = deepClone(this.baseXmlOptionData);
-        console.log("baseData", baseData);
+        // console.log("baseData", baseData);
         let saveRow = deepClone(this.baseXmlOptionData);
         if (tree.hasOwnProperty("children") && tree.children.length > 0) {
           //用于处理多个层级的时候处理
@@ -1393,7 +1420,7 @@ export default {
             }
           }
           //递归调用
-          console.log("递归调用");
+          // console.log("递归调用");
           this.analysisByBaseXmlOptionData(tree.children, saveTreeData, tree);
         } else {
           //保存处理子数据

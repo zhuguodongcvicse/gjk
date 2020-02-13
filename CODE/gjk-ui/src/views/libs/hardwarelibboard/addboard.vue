@@ -82,7 +82,7 @@
                 //板卡名称不能重复
                 for (const i in this.allBoards) {
                     if (this.allBoards[i].boardName === this.form.boardName) {
-                        alert("板卡名称不能相同")
+                        alert("板卡名称不能相同(可能与其他用户重复)")
                         return
                     }
                 }

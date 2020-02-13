@@ -22,105 +22,112 @@
         :key="domain.key"
         :prop="'domains[0].' + index + '.value'"
       >
-        <!-- 底层的图片的div -->
-        <div class="father">
-          <!-- 覆盖在图片上面的文字等的div -->
-          <div class="child showapp_child_14s">
-            <div class="showapp_child_tit_14s">
-              <strong>
-                <!-- <span>{{dynamicValidateForm.domains[0][index].fileName}}</span> -->
-                <span>{{dynamicValidateForm.domains[0][index].filePath.split("\\")[2] + "_" + dynamicValidateForm.domains[0][index].filePath.split("\\")[3]}}</span>
-              </strong>
+        <div>
+          <!-- 底层的图片的div -->
+          <div class="father">
+            <!-- 覆盖在图片上面的文字等的div -->
+            <div class="child showapp_child_14s">
+              <div class="showapp_child_tit_14s">
+                <strong>
+                  <!-- <span>{{dynamicValidateForm.domains[0][index].fileName}}</span> -->
+                  <!-- <span>{{dynamicValidateForm.domains[0][index].filePath.split("\\")[2] + "_" + dynamicValidateForm.domains[0][index].filePath.split("\\")[3]}}</span> -->
+                </strong>
 
-              <!-- <span >计算数据</span><br/> -->
-              <div class="child_line_14s">
-                <span>运行状态：</span>
-                <span>{{domain.appState}}</span>
+                <!-- <span >计算数据</span><br/> -->
+                <div class="child_line_14s">
+                  <span>运行状态：</span>
+                  <span>{{domain.appState}}</span>
+                </div>
+              </div>
+              <div class="showapp_tc_14s">
+                <!-- 展开; 导出; 编译; 注册; 删除; 注销; 加载; 更新加载; 卸载; 启动; 暂停; 停止; 配置 -->
+                <el-tooltip content="展开" placement="bottom" effect="light">
+                  <i
+                    class="el-icon-thirdfullscreen"
+                    @click="banArray[index].oClick && openClick(domain,index)"
+                    v-bind:style="{cursor: banArray[index].openBan }"
+                  ></i>
+                </el-tooltip>
+                <el-tooltip content="导出" placement="bottom" effect="light">
+                  <i
+                    class="el-icon-thirdcloud-download"
+                    @click="banArray[index].downClick && downloadClick(domain,index)"
+                    v-bind:style="{cursor: banArray[index].downloadBan }"
+                  ></i>
+                </el-tooltip>
+                <el-tooltip content="编译" placement="bottom" effect="light">
+                  <i
+                    class="el-icon-thirdwrench"
+                    @click="banArray[index].plClick && playClick(domain,index)"
+                    v-bind:style="{cursor: banArray[index].playBan }"
+                  ></i>
+                </el-tooltip>
+                <el-tooltip content="加载" placement="bottom" effect="light">
+                  <i
+                    class="el-icon-refresh"
+                    @click="banArray[index].lClick && loadingClick(domain,index)"
+                    v-bind:style="{cursor: banArray[index].loadingBan }"
+                  ></i>
+                </el-tooltip>
+                <el-tooltip content="启动" placement="bottom" effect="light">
+                  <i
+                    class="el-icon-caret-right"
+                    @click="banArray[index].staClick && startClick(domain,index)"
+                    v-bind:style="{cursor: banArray[index].startBan }"
+                  ></i>
+                </el-tooltip>
+                <br>
+                <el-tooltip content="暂停" placement="bottom" effect="light">
+                  <i
+                    class="el-icon-thirdpause"
+                    @click="banArray[index].paClick && pauseClick(domain,index)"
+                    v-bind:style="{cursor: banArray[index].pauseBan }"
+                  ></i>
+                </el-tooltip>
+                <el-tooltip content="停止" placement="bottom" effect="light">
+                  <i
+                    class="el-icon-thirdminus-square-fill"
+                    @click="banArray[index].stoClick && stopClick(domain,index)"
+                    v-bind:style="{cursor: banArray[index].stopBan }"
+                  ></i>
+                </el-tooltip>
+                <el-tooltip content="卸载" placement="bottom" effect="light">
+                  <i
+                    class="el-icon-delete"
+                    @click="banArray[index].deleClick && deleteClick(domain,index)"
+                    v-bind:style="{cursor: banArray[index].deleteBan }"
+                  ></i>
+                </el-tooltip>
+                <el-tooltip content="注册" placement="bottom" effect="light">
+                  <i
+                    class="el-icon-thirdearth"
+                    @click="banArray[index].eClick && earthClick(domain,index)"
+                    v-bind:style="{cursor: banArray[index].earthBan }"
+                  ></i>
+                </el-tooltip>
+                <el-tooltip content="注销" placement="bottom" effect="light">
+                  <i
+                    class="el-icon-thirdstop"
+                    @click="banArray[index].remoClick && removeClick(domain,index)"
+                    v-bind:style="{cursor: banArray[index].removeBan }"
+                  ></i>
+                </el-tooltip>
+                <el-tooltip content="删除" placement="bottom" effect="light">
+                  <i
+                    class="el-icon-close"
+                    @click="banArray[index].cClick && closeClick(domain,index)"
+                    v-bind:style="{cursor: banArray[index].closeBan }"
+                  ></i>
+                </el-tooltip>
               </div>
             </div>
-            <div class="showapp_tc_14s">
-              <!-- 展开; 导出; 编译; 注册; 删除; 注销; 加载; 更新加载; 卸载; 启动; 暂停; 停止; 配置 -->
-              <el-tooltip content="展开" placement="bottom" effect="light">
-                <i
-                  class="el-icon-thirdfullscreen"
-                  @click="banArray[index].oClick && openClick(domain,index)"
-                  v-bind:style="{cursor: banArray[index].openBan }"
-                ></i>
-              </el-tooltip>
-              <el-tooltip content="导出" placement="bottom" effect="light">
-                <i
-                  class="el-icon-thirdcloud-download"
-                  @click="banArray[index].downClick && downloadClick(domain,index)"
-                  v-bind:style="{cursor: banArray[index].downloadBan }"
-                ></i>
-              </el-tooltip>
-              <el-tooltip content="编译" placement="bottom" effect="light">
-                <i
-                  class="el-icon-thirdwrench"
-                  @click="banArray[index].plClick && playClick(domain,index)"
-                  v-bind:style="{cursor: banArray[index].playBan }"
-                ></i>
-              </el-tooltip>
-              <el-tooltip content="加载" placement="bottom" effect="light">
-                <i
-                  class="el-icon-refresh"
-                  @click="banArray[index].lClick && loadingClick(domain,index)"
-                  v-bind:style="{cursor: banArray[index].loadingBan }"
-                ></i>
-              </el-tooltip>
-              <el-tooltip content="启动" placement="bottom" effect="light">
-                <i
-                  class="el-icon-caret-right"
-                  @click="banArray[index].staClick && startClick(domain,index)"
-                  v-bind:style="{cursor: banArray[index].startBan }"
-                ></i>
-              </el-tooltip>
-              <br>
-              <el-tooltip content="暂停" placement="bottom" effect="light">
-                <i
-                  class="el-icon-thirdpause"
-                  @click="banArray[index].paClick && pauseClick(domain,index)"
-                  v-bind:style="{cursor: banArray[index].pauseBan }"
-                ></i>
-              </el-tooltip>
-              <el-tooltip content="停止" placement="bottom" effect="light">
-                <i
-                  class="el-icon-thirdminus-square-fill"
-                  @click="banArray[index].stoClick && stopClick(domain,index)"
-                  v-bind:style="{cursor: banArray[index].stopBan }"
-                ></i>
-              </el-tooltip>
-              <el-tooltip content="卸载" placement="bottom" effect="light">
-                <i
-                  class="el-icon-delete"
-                  @click="banArray[index].deleClick && deleteClick(domain,index)"
-                  v-bind:style="{cursor: banArray[index].deleteBan }"
-                ></i>
-              </el-tooltip>
-              <el-tooltip content="注册" placement="bottom" effect="light">
-                <i
-                  class="el-icon-thirdearth"
-                  @click="banArray[index].eClick && earthClick(domain,index)"
-                  v-bind:style="{cursor: banArray[index].earthBan }"
-                ></i>
-              </el-tooltip>
-              <el-tooltip content="注销" placement="bottom" effect="light">
-                <i
-                  class="el-icon-thirdstop"
-                  @click="banArray[index].remoClick && removeClick(domain,index)"
-                  v-bind:style="{cursor: banArray[index].removeBan }"
-                ></i>
-              </el-tooltip>
-              <el-tooltip content="删除" placement="bottom" effect="light">
-                <i
-                  class="el-icon-close"
-                  @click="banArray[index].cClick && closeClick(domain,index)"
-                  v-bind:style="{cursor: banArray[index].closeBan }"
-                ></i>
-              </el-tooltip>
-            </div>
+            <img class="appImage" :src="`/pro/app/appImg/${domain.id}`">
           </div>
-          <img class="appImage" :src="`/pro/app/appImg/${domain.id}`">
+          <div style="margin-left:100px">
+          <strong>
+            <span>{{dynamicValidateForm.domains[0][index].filePath.split("\\")[2] + "_" + dynamicValidateForm.domains[0][index].filePath.split("\\")[3]}}</span>
+          </strong>
+          </div>
         </div>
       </el-form-item>
       <br>
@@ -460,11 +467,11 @@ export default {
             proId: res.data.projectId,
             processId: res.data.id,
             proFloName:
-              (res.data.filePath.split("\\")[2] +
+              res.data.filePath.split("\\")[2] +
               "_" +
               res.data.filePath.split("\\")[3] +
               "_" +
-              res.data.fileName)
+              res.data.fileName
           }
         });
       });

@@ -116,6 +116,7 @@
         putObj,
         delObj,
         saveBoard,
+        getBoardList
     } from "@/api/libs/hardwarelibboard";
     import {tableOption} from "@/const/crud/libs/hardwarelibboard";
     import { getAllUser } from "@/api/libs/hardwarelibinf";
@@ -211,7 +212,7 @@
                 this.listQuery.userId = this.userInfo.userId
                 fetchList(this.listQuery).then(response => {
                     this.tableData = response.data.data.records;
-                    this.allBoards = JSON.parse(JSON.stringify(response.data.data.records));
+                    // this.allBoards = JSON.parse(JSON.stringify(response.data.data.records));
                     // this.tableData = this.sortKey(this.tableData, 'createTime')
                     //判断板卡数据是否为空
                     /*if (this.allBoards.length !== 0) {
@@ -235,6 +236,9 @@
                     this.page.total = response.data.data.total;
                     this.tableLoading = false;
                 });
+                getBoardList().then(res => {
+                    this.allBoards = JSON.parse(JSON.stringify(res.data));
+                })
             },
             getAllUsers() {
                 //查询所有用户

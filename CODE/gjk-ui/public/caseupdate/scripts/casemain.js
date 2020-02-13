@@ -955,7 +955,7 @@ function initEditor(editor) {
       if (selection[i].properties.type == "card") {
         Q.confirm("是否 确认删除", function () {
           var selection = this.removeSelection();
-          console.log("selection", selection)
+          // console.log("selection", selection)
           boardNum--
           //如果是板卡0或者1
           if (selection[0].properties.boardtype == 0 || selection[0].properties.boardType == 1) {

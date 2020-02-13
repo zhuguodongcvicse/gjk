@@ -583,6 +583,7 @@ export default {
               this.$store.dispatch("GetParseHeaderObj", path).then(() => {
                 // let base = deepClone(this.paramsFormXmlParams);
                 let headerKey = path.slice(path.lastIndexOf("/") + 1);
+                console.log("headerKey", headerKey);
                 let headerValue = {};
                 this.paramsFormXmlParams = [];
                 let input = this.headerFile.inputXmlMapParams;
@@ -600,18 +601,17 @@ export default {
                     });
                     //文件名字是否箱相同，决定是否需要获取数据
                     if (headerKey === this.cacheHeaderValueParams.headerKey) {
-                      console.log("文件名字是否箱相同", headerKey);
                       let tmpParams = deepClone(tmpParam);
                       //合并数据
-
                       let cacheParams = this.cacheHeaderValueParams.headerValue[
                         param.lableName
                       ];
                       //判断cacheParams中的数据是不是跟模板一样，一样就不赋值
+                      //todo isObjectEqualsy 判断有问题
                       if (!this.isObjectEquals(fromParam, cacheParams)) {
                         this.itemTypeChangeHeaderValueParams(
                           tmpParam,
-                          cacheParams
+                          deepClone(cacheParams)
                         );
                       }
                     }
@@ -643,16 +643,16 @@ export default {
           //文件是否存在标识，默认-1
           let ifExistSameFile = -1;
           if (JSON.stringify(obj) !== "{}") {
-            console.log("文件是否存在标识oooooo", analysisBaseFile);
+            // console.log("文件是否存在标识oooooo", analysisBaseFile);
             for (let key in analysisBaseFile) {
               for (let key2 in analysisBaseFile[key]) {
                 if (key2 === str) {
-                  console.log("文件是否存在标识", analysisBaseFile);
+                  // console.log("文件是否存在标识", analysisBaseFile);
                   analysisBaseFile.splice(key, 1);
                 }
               }
             }
-            console.log("文件是否存在标识oooooo", obj);
+            // console.log("文件是否存在标识oooooo", obj);
             analysisBaseFile.push(obj);
             // if (analysisBaseFile.length != 0) {
             //   for (let i in analysisBaseFile) {
@@ -694,28 +694,69 @@ export default {
         }
         if (formParam.xmlEntityMaps.length > 0) {
           //循环父级
-          formParam.xmlEntityMaps.forEach(form => {
-            let retParam;
+          let arrDataParam = [];
+          let delArrDataIndex = new Set();
+          for (let form of formParam.xmlEntityMaps) {
             for (let to of toParam.xmlEntityMaps) {
-              let formName = form.attributeMap.name;
-              let toName = to.attributeMap.name;
-              //完全相等时进入递归
-              if (formName === toName) {
+              if (form.lableName === "variable") {
+                //得到variable---form差异的数据 如参数1、参数2
+                let chayi = form.xmlEntityMaps.filter(
+                  item =>
+                    !to.xmlEntityMaps.some(
+                      ele => ele.lableName === item.lableName
+                    )
+                );
+                to.xmlEntityMaps = deepClone(to.xmlEntityMaps.concat(chayi));
+              }
+              if (form.lableName === to.lableName) {
+                //判断书否有variable （第一层级）
                 if (form.lableName === "variable") {
-                  to.xmlEntityMaps.concat(this.getParamChaYi(form, to));
+                  let formName = form.attributeMap.name;
+                  let toName = to.attributeMap.name;
+                  let regExp = /\w+\[[0-9]+\]/i;
+                  //完全相等时进入递归
+                  // console.log("formName === toName", { formName, toName });
+                  if (formName === toName) {
+                    // console.log("第一层级的数据", form);
+                    this.itemTypeChangeHeaderValueParams(to, form);
+                  } else if (regExp.test(toName)) {
+                    //完全包含时进入直接添加给toParam
+                    let to1 = deepClone(toName).replace(/\[[0-9]+\]/i, "");
+                    if (formName.includes(to1)) {
+                      // toParam.xmlEntityMaps.findIndex(item => item === to)
+                      //要删除的元素
+                      delArrDataIndex.add(to);
+                      //要添加的元素
+                      arrDataParam.push(deepClone(form));
+                      continue;
+                    }
+                  } else if (formName.includes(toName)) {
+                    // 完全包含时进入直接添加给toParam formName: "pst_Para1->uiNumC1", toName: "pst_Para1"
+                    //要删除的元素
+                    delArrDataIndex.add(to);
+                    //要添加的元素
+                    arrDataParam.push(deepClone(form));
+                  }
+                } else {
+                  // console.log("第二层级的数据", form);
+                  this.itemTypeChangeHeaderValueParams(to, form);
                 }
-                this.itemTypeChangeHeaderValueParams(to, form);
-              } else if (
-                ////完全包含时进入直接添加给toParam
-                //TODO 这有问题，，，，formName 可能为undefined
-                form.lableName === "variable" &&
-                formName.includes(toName)
-              ) {
-                toParam.xmlEntityMaps.push(form);
-                continue;
               }
             }
-          });
+          }
+          //去重
+          if (delArrDataIndex.size > 0) {
+            // console.log("得到数据****下表", deepClone(toParam.xmlEntityMaps));
+            for (let index of [...delArrDataIndex]) {
+              let i = toParam.xmlEntityMaps.findIndex(item => item === index);
+              // console.log("下表****************", i);
+              toParam.xmlEntityMaps.splice(i, 1);
+            }
+          }
+          //在参数中有数组的情况下 合并
+          toParam.xmlEntityMaps = deepClone(
+            toParam.xmlEntityMaps.concat(arrDataParam)
+          );
         }
       }
     },
@@ -753,6 +794,9 @@ export default {
             }
           }
         }
+        toParam.xmlEntityMaps =
+          toParam.xmlEntityMaps == null ? [] : toParam.xmlEntityMaps;
+        // console.log("toParam.xmlEntityMaps", toParam.xmlEntityMaps);
         if (toParam.xmlEntityMaps.length > 0) {
           if (formParam.xmlEntityMaps.length === 1) {
             toParam.xmlEntityMaps.forEach(topm => {
@@ -780,7 +824,11 @@ export default {
               } else {
                 //设置默认值
                 let data = deepClone(item);
-                this.$set(toParam.xmlEntityMaps, toParam.xmlEntityMaps.length, data);
+                this.$set(
+                  toParam.xmlEntityMaps,
+                  toParam.xmlEntityMaps.length,
+                  data
+                );
               }
             }
           }
@@ -1089,6 +1137,18 @@ export default {
     compByUserId("").then(res => {
       this.compListData = res.data.data;
     });
+    let arr1 = [
+      { id: 1, name: "老大" },
+      { id: 3, name: "老二" }
+    ];
+    let arr2 = [
+      { id: 1, name: "老大" },
+      { id: 3, name: "老三" },
+      { id: 4, name: "老四" },
+      { id: 5, name: "老五" }
+    ];
+    let add = arr2.filter(item => !arr1.some(ele => ele.id === item.id));
+    console.log("111111111111111111111", add);
     //清空文件中的数据
     this.$store.dispatch("clearAnalysisBaseFile");
   },

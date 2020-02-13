@@ -127,7 +127,7 @@
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
-            v-if="libsBSP_btn_del && (scope.row.applyState=='0'||scope.row.applyState==null||scope.row.applyState=='3'?true:false)"
+            v-if="libsBSP_btn_del && (scope.row.applyState=='0'||scope.row.applyState==null||scope.row.applyState=='3'||scope.row.applyState=='2'?true:false)"
           >删 除</el-button>
           <el-tooltip class="item" effect="dark" content="入库" placement="top">
             <el-button
@@ -262,7 +262,7 @@ export default {
   },
   mounted: function() {},
   computed: {
-    ...mapGetters(["permissions", "userInfo"])
+    ...mapGetters(["permissions", "userInfo", "refreshListFlag"])
   },
 
   watch: {
@@ -273,6 +273,14 @@ export default {
     importCompFileList: {
       handler: function() {},
       immediate: true
+    },
+    //当随机数发生变化时说明已经保存过，此时刷新芯片列表
+    refreshListFlag: {
+        // immediate: true,
+        handler: function (params) {
+            this.getList();
+        },
+        deep: true
     }
   },
 
@@ -445,10 +453,10 @@ export default {
 
     getList(page) {
       this.tableLoading = true;
-      this.listQuery = {
+      /*this.listQuery = {
         current: page.currentPage,
         size: page.pageSize
-      };
+      };*/
       var bsp = {
         userId: this.userInfo.userId
       };

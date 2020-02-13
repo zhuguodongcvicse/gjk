@@ -117,6 +117,7 @@
         saveInf,
         getAllUser,
         updateInf,
+        getInfList,
         test
     } from "@/api/libs/hardwarelibinf";
     import {tableOption} from "@/const/crud/libs/hardwarelibinf";
@@ -271,11 +272,15 @@
                         }
                     }
                     this.allInfs = JSON.parse(JSON.stringify(this.allInfs))*/
-                    this.allInfs = JSON.parse(JSON.stringify(response.data.data.records));
+                    // this.allInfs = JSON.parse(JSON.stringify(response.data.data.records));
                     this.tableData = response.data.data.records;
                     this.page.total = response.data.data.total;
                     this.tableLoading = false;
                 });
+                getInfList().then(res => {
+                    // console.log("res",res)
+                    this.allInfs = JSON.parse(JSON.stringify(res.data));
+                })
             },
             getAllUsers() {
                 //查询所有用户

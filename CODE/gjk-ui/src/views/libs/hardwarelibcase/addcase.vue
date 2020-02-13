@@ -60,7 +60,7 @@
                 //机箱名称不能重复
                 for (const i in this.allCases) {
                     if (this.allCases[i].caseName === this.form.caseName) {
-                        alert("机箱名称不能相同")
+                        alert("机箱名称不能相同(可能与其他用户重复)")
                         return
                     }
                 }

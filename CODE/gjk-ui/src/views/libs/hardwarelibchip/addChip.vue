@@ -132,7 +132,7 @@
                 //芯片名称不能重复
                 for (const i in this.allChips) {
                     if (this.allChips[i].chipName === this.form.chipName) {
-                        alert("芯片名称不能相同")
+                        alert("芯片名称不能相同(可能与其他用户重复)")
                         return
                     }
                 }
