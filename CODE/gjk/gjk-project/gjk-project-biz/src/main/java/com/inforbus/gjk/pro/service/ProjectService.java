@@ -19,6 +19,8 @@ package com.inforbus.gjk.pro.service;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -164,4 +166,21 @@ public interface ProjectService extends IService<Project> {
 	 * @return
 	 */
 	List<String> getProjectCompByProId(@Param("projectId") String projectId);
+
+	/**
+	 * 删除项目对应构件集合的记录
+	 * 
+	 * @param projectId
+	 * @param compIdList
+	 * @return
+	 */
+	boolean removeProIdCompIdList(String projectId, List<String> compIdList);
+
+	/**
+	 * 获取一个构件在多少项目中使用
+	 * 
+	 * @param compId
+	 * @return
+	 */
+	int compUseNum(@PathVariable String compId);
 }

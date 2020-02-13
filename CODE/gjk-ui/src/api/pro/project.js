@@ -288,3 +288,18 @@ export function completeCheck(id, userId) {
     method: 'get'
   })
 }
+
+export function removeProIdCompIdList(proId, compIdList) {
+  return request({
+    url: '/pro/project/removeProIdCompIdList/' + proId,
+    method: 'post',
+    data: compIdList,
+  })
+}
+
+export function compUseNum(compId) {
+  return request({
+    url: '/pro/project/compUseNum/' + compId,
+    method: 'get'
+  })
+}

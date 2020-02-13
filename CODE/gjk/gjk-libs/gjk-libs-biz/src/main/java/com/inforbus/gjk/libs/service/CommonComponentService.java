@@ -136,4 +136,12 @@ public interface CommonComponentService extends IService<CommonComponent> {
 	 * @return
 	 */
 	boolean saveCommonCompList(List<CommonComponent> commonComponents);
+
+	/**
+	 * 在构件ID集合中查找所有已被删除的构件
+	 * 
+	 * @param compIdList
+	 * @return
+	 */
+	List<String> getRemoveCompIdList(List<String> compIdList);
 }

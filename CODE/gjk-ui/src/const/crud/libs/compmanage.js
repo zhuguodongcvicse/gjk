@@ -26,42 +26,42 @@ export const tableOption = {
   delBtn: false,
   addBtn: false,
   column: [{
-      label: '主键',
-      prop: 'id'
+    label: '主键',
+    prop: 'id'
+  },
+  {
+    label: '',
+    prop: 'projectId'
+  },
+  {
+    label: '构件id',
+    prop: 'compId'
+  },
+  {
+    label: '构件名称',
+    prop: 'compName'
+  },
+  {
+    label: '构件编号',
+    prop: 'compNumber'
+  },
+  {
+    label: '版本号',
+    prop: 'version'
+  },
+  {
+    label: '提交人',
+    prop: 'userId',
+    type: 'select',
+    props: {
+      label: 'showName',
+      value: 'userId'
     },
-    {
-      label: '',
-      prop: 'projectId'
-    },
-    {
-      label: '构件id',
-      prop: 'compId'
-    },
-    {
-      label: '构件名称',
-      prop: 'compName'
-    },
-    {
-      label: '构件编号',
-      prop: 'compNumber'
-    },
-    {
-      label: '版本号',
-      prop: 'version'
-    },
-    {
-      label: '提交人',
-      prop: 'userId',
-      type: 'select',
-      props: {
-        label: 'showName',
-        value: 'userIdstr'
-      },
-      dicUrl: '/admin/user/info/getUserDictStr'
-    },
-    {
-      label: '提交时间',
-      prop: 'dateTime'
-    },
+    dicUrl: '/admin/user/info/getUserDict'
+  },
+  {
+    label: '提交时间',
+    prop: 'dateTime'
+  },
   ]
 }

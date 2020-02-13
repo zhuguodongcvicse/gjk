@@ -55,12 +55,14 @@
               </el-col>
               <el-col :span="4">
                 <el-button
+                  v-if="permissions.libs_commoncomponent_exportApply"
                   type="primary"
                   size="mini"
                   style="padding:6px 6px;margin:2px 10px"
                   @click="exportCompFunc"
                 >导出申请</el-button>
                 <el-button
+                  v-if="permissions.libs_commoncomponent_applyList"
                   type="primary"
                   size="mini"
                   style="padding:6px 6px"
@@ -82,7 +84,13 @@
           ></el-button>
         </template>
         <template slot-scope="scope" slot="menu">
-          <el-button type="primary" size="small" plain @click="handleEdit(scope.row,scope.index)">查看</el-button>
+          <el-button
+            type="primary"
+            size="small"
+            v-if="permissions.libs_commoncomponent_view"
+            plain
+            @click="handleEdit(scope.row,scope.index)"
+          >查看</el-button>
           <el-button
             type="danger"
             v-if="permissions.libs_commoncomponent_del"
@@ -155,6 +163,7 @@ import { fetchAlgorithmTree } from "@/api/admin/algorithm";
 import { fetchTestTree } from "@/api/admin/test";
 import { fetchPlatformTrees } from "@/api/admin/platform";
 import { tableOption } from "@/const/crud/libs/commoncomponent";
+import { compUseNum } from "@/api/pro/project";
 import { mapGetters } from "vuex";
 import selectTree from "@/views/pro/project/selectTree";
 import storageApply from "@/views/libs/commoncomponent/storageApply";
@@ -450,37 +459,45 @@ export default {
       });
     },
     handleDel(row, index) {
-      console.log("11111111111111111111111", row, index);
+      // console.log("11111111111111111111111", row, index);
       this.$refs.crud.rowDel(row, index);
     },
     rowDel: function(row, index) {
-      var _this = this;
-      this.$confirm(
-        "一经删除不可恢复，是否确认删除构件名为 " +
-          row.compName +
-          " 及构件版本为 V" +
-          row.version +
-          " 的记录吗？",
-        "提示",
-        {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
+      compUseNum(row.id).then(response => {
+        let str = "";
+        if (response.data.data != 0) {
+          str += "该构件已有" + response.data.data + "个项目在使用,";
         }
-      )
-        .then(function() {
-          return delObj(row.id);
-        })
-        .then(data => {
-          _this.tableData.splice(index, 1);
-          _this.$message({
-            showClose: true,
-            message: "删除成功",
-            type: "success"
-          });
-          this.reload();
-        })
-        .catch(function(err) {});
+        // console.log("111111111111111111111111", response.data.data);
+        var _this = this;
+        this.$confirm(
+          str +
+            "构件一经删除不可恢复，是否确认删除构件名为 " +
+            row.compName +
+            " 及构件版本为 V" +
+            row.version +
+            " 的记录吗？",
+          "提示",
+          {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning"
+          }
+        )
+          .then(function() {
+            return delObj(row.id);
+          })
+          .then(data => {
+            _this.tableData.splice(index, 1);
+            _this.$message({
+              showClose: true,
+              message: "删除成功",
+              type: "success"
+            });
+            this.reload();
+          })
+          .catch(function(err) {});
+      });
     },
     /**
      * @title 数据更新

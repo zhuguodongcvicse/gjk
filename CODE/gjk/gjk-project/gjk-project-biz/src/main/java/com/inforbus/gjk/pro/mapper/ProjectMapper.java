@@ -103,6 +103,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
 
 	/**
 	 * 根据项目ID获取 项目和构件关系数据
+	 * 
 	 * @param projectId
 	 * @return
 	 */
@@ -127,8 +128,17 @@ public interface ProjectMapper extends BaseMapper<Project> {
 	 */
 	SysUser getUsernameByUserId(@Param("userId") Integer userId);
 
-	void removeCompProject(@Param("compId")String compId, @Param("projectId")String projectId);
+	void removeCompProject(@Param("compId") String compId, @Param("projectId") String projectId);
 
-	int updateCompProjectByCompIdAndProId(@Param("compId")String compId, @Param("projectId")String projectId, @Param("canUse")String canUse);
+	int updateCompProjectByCompIdAndProId(@Param("compId") String compId, @Param("projectId") String projectId,
+			@Param("canUse") String canUse);
+
+	/**
+	 * 根据构件ID获取所有项目与构件的关联记录
+	 * 
+	 * @param compId
+	 * @return
+	 */
+	List<ProComp> compUse(@Param("compId") String compId);
 
 }

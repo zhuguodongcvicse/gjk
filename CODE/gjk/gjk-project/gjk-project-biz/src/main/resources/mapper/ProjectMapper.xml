@@ -42,9 +42,9 @@
 		<result property="userId" column="user_id" />
 		<result property="name" column="name" />
 	</resultMap>
-	
-	<resultMap type="com.inforbus.gjk.pro.api.entity.Hardwarelibs"
-			   id="hardwarelibs">
+
+	<resultMap
+		type="com.inforbus.gjk.pro.api.entity.Hardwarelibs" id="hardwarelibs">
 		<result property="id" column="id" />
 		<result property="hardwareName" column="hardware_name" />
 		<result property="frontJson" column="front_json" />
@@ -88,7 +88,7 @@
 		comp_id,
 		project_id
 	</sql>
-	
+
 	<sql id="saveHardwarelibs">
 		id,
 		hardware_name,
@@ -142,7 +142,7 @@
 			</if>
 			and del_flag = '0'
 		</where>
-			ORDER  BY create_time DESC
+		ORDER BY create_time DESC
 	</select>
 
 	<!-- listProjectByProjectId 通过项目编号查询项目信息 -->
@@ -226,6 +226,18 @@
 			<if test="projectId != null and projectId.trim() != ''">
 				AND project_id = #{projectId}
 			</if>
+			AND can_use = '0'
+		</where>
+	</select>
+
+	<select id="compUse" resultMap="proCompMap">
+		SELECT
+		<include refid="proComp" />
+		FROM gjk_project_comp
+		<where>
+			<if test="compId != null and compId.trim() != ''">
+				AND comp_id = #{compId}
+			</if>
 		</where>
 	</select>
 
@@ -273,9 +285,9 @@
 			AND del_flag = 0
 		</where>
 	</select>
-	
+
 	<insert id="saveHardwarelibs"
-			parameterType="com.inforbus.gjk.pro.api.entity.Hardwarelibs">
+		parameterType="com.inforbus.gjk.pro.api.entity.Hardwarelibs">
 		INSERT INTO
 		gjk_hardwarelibs (
 		<include refid="saveHardwarelibs" />
@@ -291,16 +303,18 @@
 		<include refid="hardwarelibs" />
 		FROM gjk_hardwarelibs
 	</select>
-	
+
 	<delete id="removeCompProject">
-		delete FROM gjk_project_comp where comp_id = #{compId}
+		delete FROM gjk_project_comp where comp_id =
+		#{compId}
 		AND
 		project_id = #{projectId}
 	</delete>
 
 	<update id="updateCompProjectByCompIdAndProId">
 		UPDATE gjk_project_comp SET can_use = #{canUse}
-		where comp_id = #{compId}
+		where
+		comp_id = #{compId}
 		AND
 		project_id = #{projectId}
 	</update>

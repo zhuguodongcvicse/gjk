@@ -150,6 +150,7 @@ export function createZipFile(commonCompList) {
     }, 0)
   })
 }
+
 export function getCompView(obj) {
   return request({
     url: '/libs/commoncomponentdetail/compView',
@@ -164,19 +165,25 @@ export function compViewTree(compId) {
   })
 }
 
-
-export function findPageByBatchApprovalId(obj){
+export function findPageByBatchApprovalId(obj) {
   return request({
-    url:'/libs/commoncomponent/findPageByBatchApprovalId/'+ obj.applyId+"/"+obj.current+"/"+obj.size,
-    method:'post',
+    url: '/libs/commoncomponent/findPageByBatchApprovalId/' + obj.applyId + "/" + obj.current + "/" + obj.size,
+    method: 'post',
   })
 }
 
-
-export function saveCompList(obj){
+export function saveCompList(obj) {
   return request({
-    url:'/libs/commoncomponent/saveCompList',
-    method:'post',
+    url: '/libs/commoncomponent/saveCompList',
+    method: 'post',
     data: obj
+  })
+}
+
+export function getRemoveCompIdList(compIdList) {
+  return request({
+    url: '/libs/commoncomponent/getRemoveCompIdList',
+    method: 'post',
+    data: compIdList
   })
 }

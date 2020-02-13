@@ -38,12 +38,15 @@ import com.inforbus.gjk.pro.api.util.HttpClientUtil;
 import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
 import com.inforbus.gjk.pro.mapper.ProjectMapper;
 import com.inforbus.gjk.pro.service.ManagerService;
+import com.inforbus.gjk.pro.service.ProCompService;
 import com.inforbus.gjk.pro.service.ProjectService;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import com.inforbus.gjk.pro.thread.StreamManage;
@@ -75,6 +78,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
 	@Autowired
 	private ManagerService managerService;
+
+	@Autowired
+	private ProCompService proCompService;
 
 	private static final String proDetailPath = JGitUtil.getLOCAL_REPO_PATH();
 
@@ -298,6 +304,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 			if (proComp == null) {
 				proComp = new ProComp(IdGenerate.uuid(), compId, projectId);
 				saveProComp(proComp);
+			} else {
+				proComp.setCanUse("1");
+				proCompService.updateById(proComp);
 			}
 			proComps.add(proComp);
 		}
@@ -416,5 +425,30 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 			}
 		}
 		return compIdList;
+	}
+
+	@Override
+	public boolean removeProIdCompIdList(String projectId, List<String> compIdList) {
+		try {
+			for (String compId : compIdList) {
+				removeCompProject(compId, projectId);
+			}
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int compUseNum(String compId) {
+		List<ProComp> proComps = baseMapper.compUse(compId);
+		Set<String> proIds = new HashSet<String>();
+		if (proComps != null && proComps.size() > 0) {
+			for (ProComp comp : proComps) {
+				proIds.add(comp.getProjectId());
+			}
+			return proIds.size();
+		}
+		return 0;
 	}
 }

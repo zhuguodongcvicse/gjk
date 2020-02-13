@@ -210,4 +210,9 @@ public class CommonComponentController {
 		return new R<>(commonComponentService.saveCommonCompList(commonComponents));
 	}
 
+	@PostMapping("/getRemoveCompIdList")
+	public R getRemoveCompIdList(@RequestBody List<String> compIdList) {
+		return new R<>(commonComponentService.getRemoveCompIdList(compIdList));
+	}
+
 }

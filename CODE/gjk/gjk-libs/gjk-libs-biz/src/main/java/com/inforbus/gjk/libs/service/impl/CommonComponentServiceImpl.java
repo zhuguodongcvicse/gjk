@@ -536,4 +536,16 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		return true;
 	}
 
+	@Override
+	public List<String> getRemoveCompIdList(List<String> compIdList) {
+		List<String> removeCompIdList = new ArrayList<String>();
+		for (String id : compIdList) {
+			CommonComponent component = this.getById(id);
+			if (component == null) {
+				removeCompIdList.add(id);
+			}
+		}
+		return removeCompIdList;
+	}
+
 }

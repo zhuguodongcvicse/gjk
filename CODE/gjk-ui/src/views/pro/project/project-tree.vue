@@ -66,7 +66,7 @@
       :temp_currProject="temp_currProject"
       :dialog="addProCompDialogVisible"
       @closeDialog="closeAddProCompDialog"
-    ></add-pro-comp> -->
+    ></add-pro-comp>-->
 
     <!-- <common-component></common-component> -->
 
@@ -155,7 +155,9 @@ import { mapGetters } from "vuex";
 import {
   updateBaseTemplateIDs,
   staticInspect,
-  codeGeneration
+  codeGeneration,
+  getPassCompByProId,
+  removeProIdCompIdList
 } from "@/api/pro/project";
 import {
   fetchProList,
@@ -164,6 +166,7 @@ import {
   createZipFile,
   importProjectZipUpload
 } from "@/api/pro/manager";
+import { getRemoveCompIdList } from "@/api/libs/commoncomponent";
 import { getAppByProcessId } from "@/api/pro/app";
 import { getPath } from "@/api/compile/devenv";
 
@@ -186,7 +189,7 @@ export default {
     "modify-software": modifySoftware,
     "create-app-pro": createAppPro,
     "add-file": addFile,
-    "add-dir": addDir,
+    "add-dir": addDir
   },
   //注入依赖，调用this.reload();用于刷新页面
   inject: ["reload"],
@@ -270,27 +273,31 @@ export default {
         .then(response => {
           // console.log("response.data.data ", response.data.data);
           if (this.$store.state.projectTreeShow.projectTreeShow.length != 0) {
+            //获取存入商店的所有项目数据
             this.projects = this.$store.state.projectTreeShow.projectTreeShow;
             // console.log("this.projects",this.projects)
             if (JSON.stringify(this.temp_currProject) != "{}") {
+              //遍历查询当前项目的实时信息
               let pro = response.data.data.find(item => {
                 return item.id === this.temp_currProject.id;
               });
               if (pro != undefined) {
-                let index = response.data.data.indexOf(pro);
+                // let index = response.data.data.indexOf(pro);
+                //遍历查询当前项目在商店的信息
                 let proItem = this.projects.find(item => {
                   return item.id === this.temp_currProject.id;
                 });
+                //给项目实时信息设置显示标志
                 this.$set(pro, "showFlag", 0);
                 if (proItem != undefined) {
                   let i = this.projects.indexOf(proItem);
                   this.projects[i] = pro;
                 }
-                projectList[index] = this.temp_currProject;
+                // projectList[index] = this.temp_currProject;
                 this.$store.dispatch("setProjectTreeShow", this.projects);
               }
             } else {
-              console.log("11111111111111111", this.projects);
+              // console.log("11111111111111111", this.projects);
               for (const i in this.projects) {
                 if (this.projects[i].showFlag == 0) {
                   this.temp_currProject = this.projects[i];
@@ -299,18 +306,63 @@ export default {
             }
           } else {
             this.projects = response.data.data;
+            this.$store.dispatch("setProjectTreeShow", this.projects);
             this.temp_currProject = response.data.data[0];
           }
           this.getTreeData(this.temp_currProject.id);
           // console.log("this.temp_currProject",this.temp_currProject)
           /* 查询项目树 */
           /* if (JSON.stringify(this.tmpProject) !== "{}") {
-                          this.getTreeData(this.tmpProject.id);
-                          this.temp_currProject = this.tmpProject;
-                        } else {
-                          this.getTreeData(this.temp_currProject.id);
-                          this.temp_currProject = response.data.data[0];
-                        } */
+            this.getTreeData(this.tmpProject.id);
+            this.temp_currProject = this.tmpProject;
+          } else {
+            this.getTreeData(this.temp_currProject.id);
+            this.temp_currProject = response.data.data[0];
+          } */
+          //查询项目所涉及的所有构件
+          let tempProId = this.temp_currProject.id;
+          getPassCompByProId(this.temp_currProject.id).then(compList => {
+            console.log("1111111111111111111111111", this.temp_currProject.id);
+            getRemoveCompIdList(compList.data.data).then(removeCompId => {
+              if (removeCompId.data.data.length > 0) {
+                let str = "";
+                let index = 0;
+                for (let item of removeCompId.data.data) {
+                  if (index === removeCompId.data.data.length - 1) {
+                    str += item;
+                  } else {
+                    str += item + ",";
+                  }
+                }
+                this.$confirm(
+                  "此项目申请的构件：" +
+                    str +
+                    " 已被管理员删除,您是否停止使用此构件？",
+                  "提示",
+                  {
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                    type: "warning"
+                  }
+                )
+                  .then(function() {
+                    return removeProIdCompIdList(
+                      tempProId,
+                      removeCompId.data.data
+                    );
+                  })
+                  .then(data => {
+                    this.$message({
+                      showClose: true,
+                      message: "已停用失效构件。",
+                      type: "success"
+                    });
+                    this.reload();
+                  })
+                  .catch(function(err) {});
+              }
+            });
+          });
         })
         .catch(err => {
           // console.log("err: ", err);
@@ -350,7 +402,12 @@ export default {
           Vue.set(node, "isComplie", true);
           this.appComponentId = node.id;
         } else if (node.parentId == this.appComponentId) {
-          if (node.label == "bsp" || node.label == "Image" || node.label == ".sonar" || node.isDirectory == "1") {
+          if (
+            node.label == "bsp" ||
+            node.label == "Image" ||
+            node.label == ".sonar" ||
+            node.isDirectory == "1"
+          ) {
             Vue.set(node, "isComplie", false);
           } else {
             Vue.set(node, "isComplie", true);
@@ -487,11 +544,11 @@ export default {
       } else if (item == "申请构件") {
         //this.addProCompDialogVisible = true;
         this.$router.push({
-        path: "/showComponent",
-        query:{
-          "temp_currProject":this.temp_currProject
-        }
-      });
+          path: "/showComponent",
+          query: {
+            temp_currProject: this.temp_currProject
+          }
+        });
       } else if (item == "导入") {
         this.importProjectDialogVisible = true;
       } else if (item == "删除流程") {

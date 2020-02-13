@@ -47,9 +47,9 @@ export const tableOption = {
       type: 'select',
       props: {
         label: 'showName',
-        value: 'userIdstr'
+        value: 'userId'
       },
-      dicUrl: '/admin/user/info/getUserDictStr'
+      dicUrl: '/admin/user/info/getUserDict'
     },
     {
       label: '版本',

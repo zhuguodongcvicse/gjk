@@ -332,4 +332,14 @@ public class ProjectController {
 		return new R<>(projectService.getProjectCompByProId(projectId));
 	}
 
+	@PostMapping("/removeProIdCompIdList/{projectId}")
+	public R removeProIdCompIdList(@PathVariable String projectId, @RequestBody List<String> compIdList) {
+		return new R<>(projectService.removeProIdCompIdList(projectId, compIdList));
+	}
+
+	@GetMapping("/compUseNum/{compId}")
+	public R compUseNum(@PathVariable String compId) {
+		return new R<>(projectService.compUseNum(compId));
+	}
+
 }
