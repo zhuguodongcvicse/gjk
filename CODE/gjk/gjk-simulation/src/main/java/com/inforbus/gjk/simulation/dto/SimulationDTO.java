@@ -7,6 +7,9 @@ import lombok.Data;
  */
 @Data
 public class SimulationDTO {
+    private  String startName;
+
+    private  String endName;
 
     private String flowFilePath;
 
@@ -16,12 +19,14 @@ public class SimulationDTO {
 
     private String symbol;
 
-    private String attr1;
+    private String x;
 
-    private String attr2;
+    private String y;
 
-    private String attr3;
+    private String Z;
 
     private String select;
+
+    private String dataProecssingType;
 
 }
