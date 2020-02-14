@@ -303,7 +303,7 @@ public class ExternalIOTransUtils {
 	 * @param packDataMap 数据包+页面配置项
 	 * @param arrowInfo     起始构件ID+“:”+变量名+“|”+结束构件ID+“:”+变量名
 	 */
-	public static Map<String, Object> ParseMoniData(String flowFilePath, String packinfoFilePath, Map<String,Object> packDataMap,
+	public static Map<String, Object> parseMoniData(String flowFilePath, String packinfoFilePath, Map<String,Object> packDataMap,
 													String arrowInfo) {
 		return new ParseMoniData(flowFilePath,packinfoFilePath).parseMoniData(packDataMap, arrowInfo);
 
