@@ -310,7 +310,7 @@ export default {
       immediate: true,
       handler: function(treeData) {
         let saveTreeData = [];
-        console.log(this.arrayObject.sort(this.arraySort("id")), "=========");
+        // console.log(this.arrayObject.sort(this.arraySort("id")), "=========");
         //根据基础模板配置信息回写数据
         this.analysisByBaseXmlOptionData(deepClone(treeData), saveTreeData);
         this.tableXmlParams.xmlEntityMaps = saveTreeData;
@@ -333,11 +333,12 @@ export default {
   },
   //方法集合
   methods: {
+    //数组排序
     arraySort(field) {
       return (propA, propB) => {
         const a1 = propA[field];
         const b1 = propB[field];
-        return a1 - b1;
+        return Number(a1) - Number(b1);
       };
     },
     //设置标签名
@@ -425,6 +426,7 @@ export default {
       treeParam.push(attrs);
       //给树赋值显示值
       node["id"] = randomUuid(); //new Number(randomLenNum(5, false));
+      node["sort"] = "";
       node["lableName"] = base.attributeMap.name;
       // console.log("base.attributeMap.namebase.attributeMap.name",base.attributeMap);
       node["assigParamName"] = "";
@@ -775,6 +777,8 @@ export default {
       const { labelKey, attrs } = this.analysisMapping(attr);
       treeData.push(attrs);
       node["id"] = randomUuid(); //new Number(randomLenNum(5, false));
+      console.log("attrattrattrattrattrattrattrattrattrattr", attr);
+      node["sort"] = "";
       node["lableName"] = attr.attributeMap.name;
       node["assigParamName"] = "";
       node["paramRemarks"] = nodeData.paramRemarks;
@@ -828,7 +832,7 @@ export default {
         return { struct, isok, numIndex };
       }
       isok = "shStruct";
-      console.log("id, name, numIndex, ids",{id, name, numIndex, ids})
+      console.log("id, name, numIndex, ids", { id, name, numIndex, ids });
       //去头文件中找结构体
       if (isok === "shStruct") {
         let tmpStruct;
@@ -1017,7 +1021,8 @@ export default {
         // console.log("处理返回树形结构,", retDataAll);
         this.convertXmlToRootXml(retDataAll, dataTree);
         console.log("处理返回树形结构,", dataTree);
-        this.treeData = dataTree;
+        //将数据排序再给treeData赋值
+        this.treeData = dataTree.sort(this.arraySort("sort"));
         if (this.treeData !== undefined && this.treeData.length > 0) {
           // 当前表单
           this.nodeFormParam = this.treeData[0].nodeData;
@@ -1030,13 +1035,6 @@ export default {
           //当前节点
           this.aCheckedKeys = [this.treeData[0].id];
         }
-        // console.log(
-        //   " this.aCheckedKeys",
-        //   this.paramType,
-        //   this.aCheckedKeys,
-        //   this.treeData,
-        //   this.treeData[0].nodeData[0][0].lableName
-        // );
       }
     },
     //循环所有节点
@@ -1080,12 +1078,18 @@ export default {
           }
           let regExp = /\w+\[[0-9]+\]/i;
           let xmlChild = xml.xmlEntityMaps;
+          let numIndex; //序号---用于添加排序
           tmpData = xml; //添加基础配置
           xmlChild.forEach(child => {
             if (child.attributeMap.configureType !== undefined) {
               const { labelKey, attrs } = this.analysisMapping(child);
               //设置固定配置
               this.setShowLableName(labelKey, attrs);
+              attrs.find(item => {
+                if (item.labelKey === this.numIndexParam) {
+                  numIndex = item.lableName;
+                }
+              });
               //如果再流程建模中就添加data节点（uid）
               if (this.flowUids.length > 0) {
                 //循环所有属性
@@ -1117,6 +1121,7 @@ export default {
               treeParam.push(attrs);
             }
           });
+          console.log("numIndex-------------sort", numIndex);
           //判断是不是有‘[数字]’
           if (regExp.test(lableName)) {
             let arrKey = lableName.replace(/\[[0-9]+\]/i, "");
@@ -1135,6 +1140,7 @@ export default {
               }
             } else {
               parent["id"] = randomUuid();
+              parent["sort"] = numIndex;
               parent["lableName"] = arrKey;
               parent["nodeData"] = deepClone(treeParam);
               parent["assigParamName"] = "";
@@ -1148,6 +1154,7 @@ export default {
           } else {
             //给树赋值显示值
             node["id"] = randomUuid();
+            node["sort"] = numIndex;
             node["lableName"] = lableName;
             node["nodeData"] = deepClone(treeParam);
             node["assigParamName"] = "";
@@ -1269,7 +1276,7 @@ export default {
             this.handleDialogParam(deepClone(child), arr.children, key);
           } else {
             if (arr.children === undefined) {
-              this.findArrayTmpMap.set(arr.id, [deepClone(child)])
+              this.findArrayTmpMap.set(arr.id, [deepClone(child)]);
               this.$set(arr, "children", [deepClone(child)]);
             } else {
               let tmp = this.findArrayTmpMap.get(arr.id);
