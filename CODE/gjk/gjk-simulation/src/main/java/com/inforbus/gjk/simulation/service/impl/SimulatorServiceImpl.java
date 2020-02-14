@@ -5,22 +5,27 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.inforbus.gjk.admin.api.entity.SysDict;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.ExternalIOTransUtils;
 import com.inforbus.gjk.simulation.dto.SimulationDTO;
 import com.inforbus.gjk.simulation.core.Global;
 import com.inforbus.gjk.simulation.dto.SimulationTableDataDTO;
+import com.inforbus.gjk.simulation.mapper.SysDictMapper;
 import com.inforbus.gjk.simulation.service.ManagerServiceImpl;
 import com.inforbus.gjk.simulation.service.SimulatorService;
 import com.inforbus.gjk.simulation.task.SimulatorQueue;
 import com.inforbus.gjk.simulation.task.Subscriber;
 import com.inforbus.gjk.simulation.task.SubscriberThread;
 import flowModel.MoniRecvDataThread;
+import flowModel.ParseMoniData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +44,8 @@ public class SimulatorServiceImpl implements SimulatorService {
     private RedisTemplate<String, String> redisTemplate;
     @Autowired
     ManagerServiceImpl managerServiceImpl;
+    @Autowired
+    SysDictMapper sysDictMapper;
     /**
      * reidsIP
      */
@@ -57,6 +64,11 @@ public class SimulatorServiceImpl implements SimulatorService {
     // 集成代码生成结果存放路径
     @Value("${gjk.pro.process.generateCodeResult}")
     private String generateCodeResult;
+
+    //获取控制表头文件路径
+    @Value("${ctrl.tab.file.path}")
+    private String tabFilePath;
+    //开始仿真客户线程放入全局变量
     @Override
     public boolean startSimulator(String username, List<String> componentLinks, String filePath) {
         //定义通道名
@@ -71,17 +83,18 @@ public class SimulatorServiceImpl implements SimulatorService {
         //启动监听线程
         new SubscriberThread(subscriber,channelName,host).start();
         //启用客户线程，传入参数
-        MoniRecvDataThread startMoniRecvDataThread = ExternalIOTransUtils.startMoniRecvDataThread(host, channelName, componentLinks, filePath, JGitUtil.getCTRL_TAB_FILE_PATH());
+        MoniRecvDataThread startMoniRecvDataThread = ExternalIOTransUtils.startMoniRecvDataThread(host, channelName, componentLinks, filePath, tabFilePath);
         //放入全局变量
         Global.USERS_SIMULATOR_THREAD.put(username,startMoniRecvDataThread);
         return true;
     }
-
+    //停止仿真
     @Override
     public boolean stopSimulator(String username) {
         MoniRecvDataThread moniRecvDataThread = (MoniRecvDataThread) Global.USERS_SIMULATOR_THREAD.get(username);
         if(moniRecvDataThread == null){
             return false;
+
         }
         ExternalIOTransUtils.stopMoniRecvDataThread(moniRecvDataThread);
         Global.USERS_SIMULATOR_THREAD.remove(username);
@@ -107,6 +120,12 @@ public class SimulatorServiceImpl implements SimulatorService {
 
         JSONObject objects = JSONUtil.parseObj(str);
 
+        //拼接流程模型文件路径,packinfo文件路径
+        String FilePath = managerServiceImpl.getprocessFile(projectId);
+        String packinfoFileName = gitDetailPath + FilePath + generateCodeResult + "/packinfo.xml";
+
+        String arrowInfo = simulationDTO.getStartId() +":"+simulationDTO.getStartName()+ "|" + simulationDTO.getEndId()+":"+simulationDTO.getEndName();
+
         //获取结构体表格数据
         String[] tabNames = ((String) objects.get("tabNameList")).split("\\|");
         List<SimulationTableDataDTO> tableData = Lists.newArrayList();
@@ -114,18 +133,35 @@ public class SimulatorServiceImpl implements SimulatorService {
         tableData.addAll(forEachGetSimulationTableData((Map) objects.get(tabNames[0])));
         tableData.addAll(forEachGetSimulationTableData((Map) objects.get(tabNames[1])));
 
-        //调用客户接口解析 接口待确认 把这组数据扔到接口拿返回值就OK
 
 
-//        ProjectFile processFile = getOne(
-//     Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, this.getById(proDetailId).getParentId()));
-        String FilePath = managerServiceImpl.getprocessFile(projectId);
-        String packinfoFileName = gitDetailPath + FilePath + generateCodeResult + "/packinfo.xml";
+    if(simulationDTO.getX() == null){
+        //获取最大xyz维度
 
+        Map<String,String> MaxXYZ =  ExternalIOTransUtils.getMaxXYZ(FilePath,packinfoFileName,objects,arrowInfo);
+        Map<String,Object> packDataMap = null;
+        Map<String, Object>  dataInfo   =ExternalIOTransUtils.parseMoniData(FilePath,packinfoFileName,packDataMap,arrowInfo);
         Map<String, Object> dataMap = Maps.newHashMap();
         //表格数据
         dataMap.put("tableData", tableData);
+        //展示数据
+        dataMap.put("Data", dataInfo);
+        //xyz最大值
+        dataMap.put("MaxXYZ" ,MaxXYZ);
         return dataMap;
+    }else {
+        Map<String,Object> packDataMap = null;
+        Map<String, Object>  dataInfo   =ExternalIOTransUtils.parseMoniData(FilePath,packinfoFileName,packDataMap,arrowInfo);
+        Map<String, Object> dataMap = Maps.newHashMap();
+        //表格数据
+        dataMap.put("tableData", tableData);
+        //展示数据
+        dataMap.put("Data", dataInfo);
+        return dataMap;
+    }
+
+
+
     }
 
     @Override
@@ -145,18 +181,24 @@ public class SimulatorServiceImpl implements SimulatorService {
         }
         return symbolFrameSelect;
     }
-
+    //点击小图标获取数据源获取
     @Override
-    public List<String> getDataSource(String username, SimulationDTO simulationDto) {
+    public Map<String,Object> getDataSource(String username, SimulationDTO simulationDto) {
 
         MoniRecvDataThread moniRecvDataThread = (MoniRecvDataThread) Global.USERS_SIMULATOR_THREAD.get(username);
+
         //调用客户接口 获取数据源
-        return moniRecvDataThread.getArrowIdList(simulationDto.getStartId() + "|" + simulationDto.getEndId());
+        HashMap<String, Object> Data = new HashMap<>();
+        List<SysDict> dataProcessingType = sysDictMapper.getDictTypes();
+     //   Data.put("data",moniRecvDataThread.getArrowIdList(simulationDto.getStartId() + "|" + simulationDto.getEndId()));
+        Data.put("sourceData","数据源");
+        Data.put("dataProcessingType",dataProcessingType);
+        return Data;
     }
 
     /**
      * 解析表格Map
-     * @param tableDataMap 表格数据Map 【key: name, value: 值|备注】
+     * @param. 表格数据Map 【key: name, value: 值|备注】
      * @return
      */
     public List<SimulationTableDataDTO> forEachGetSimulationTableData(Map<String, String> tableDataMap){
