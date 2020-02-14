@@ -75,12 +75,15 @@ function handleMessageFromParent(event) {
 					}
 				}
 			}
-      for (let i = 0; i < graphList.link.datas.length; i++) {
-        if ((i + 1)%3 === 0) {
-          // console.log("graphList.link.datas",graphList.link.datas[i], i)
-          linkMap.set(graphList.link.datas[i - 2].json.properties, graphList.link.datas[i - 1].json.properties)
+      if (graphList.link !== undefined) {
+        for (let i = 0; i < graphList.link.datas.length; i++) {
+          if ((i + 1)%3 === 0) {
+            // console.log("graphList.link.datas",graphList.link.datas[i], i)
+            linkMap.set(graphList.link.datas[i - 2].json.properties, graphList.link.datas[i - 1].json.properties)
+          }
         }
       }
+
 			// console.log("graphList", graphList)
 			// console.log("linkGraphList", linkGraphList)
       // console.log("checkIPMap",checkIPMap)
