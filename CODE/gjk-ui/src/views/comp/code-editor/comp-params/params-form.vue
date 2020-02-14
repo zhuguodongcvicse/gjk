@@ -615,8 +615,15 @@ export default {
                         );
                       }
                     }
-                    console.log("设置值：***************", deepClone(tmpParam));
+                    console.log(
+                      "设置值：***************0000",
+                      deepClone(tmpParam)
+                    );
                     this.itemTypeChangeAssignmenDataParam(tmpParam, fromParam);
+                    console.log(
+                      "设置值：***************1111",
+                      deepClone(tmpParam)
+                    );
                     param = tmpParam;
                     headerValue[param.lableName] = param;
                   }
@@ -696,6 +703,8 @@ export default {
           //循环父级
           let arrDataParam = [];
           let delArrDataIndex = new Set();
+          //处理头文件中有数据项删除的数据
+          let delItemTypeParams = new Set();
           for (let form of formParam.xmlEntityMaps) {
             for (let to of toParam.xmlEntityMaps) {
               if (form.lableName === "variable") {
@@ -717,12 +726,14 @@ export default {
                   //完全相等时进入递归
                   // console.log("formName === toName", { formName, toName });
                   if (formName === toName) {
-                    // console.log("第一层级的数据", form);
+                    // console.log("第一层级的数据", {form,to});
+                    delItemTypeParams.add(form);
                     this.itemTypeChangeHeaderValueParams(to, form);
                   } else if (regExp.test(toName)) {
                     //完全包含时进入直接添加给toParam
                     let to1 = deepClone(toName).replace(/\[[0-9]+\]/i, "");
                     if (formName.includes(to1)) {
+                      delItemTypeParams.add(form);
                       // toParam.xmlEntityMaps.findIndex(item => item === to)
                       //要删除的元素
                       delArrDataIndex.add(to);
@@ -731,6 +742,7 @@ export default {
                       continue;
                     }
                   } else if (formName.includes(toName)) {
+                    delItemTypeParams.add(form);
                     // 完全包含时进入直接添加给toParam formName: "pst_Para1->uiNumC1", toName: "pst_Para1"
                     //要删除的元素
                     delArrDataIndex.add(to);
@@ -757,8 +769,47 @@ export default {
           toParam.xmlEntityMaps = deepClone(
             toParam.xmlEntityMaps.concat(arrDataParam)
           );
+          if (delItemTypeParams.size > 0) {
+            //数据模板
+            let tmpDelItem = [...delItemTypeParams];
+            let baseConfigType = tmpDelItem[0];
+            //从toParam.xmlEntityMaps找到删除的值
+            let delParam = toParam.xmlEntityMaps.filter(
+              item =>
+                !tmpDelItem.some(
+                  ele => ele.attributeMap.name === item.attributeMap.name
+                )
+            );
+            this.setDelParamsVal(toParam.xmlEntityMaps, delParam, baseConfigType);
+          }
         }
       }
+    },
+    setDelParamsVal(toParams, delParam, baseConfigType) {
+      console.log("toParams, delParam", {
+        toParams: deepClone(toParams),
+        delParam: deepClone(delParam)
+      });
+      for (let del of delParam) {
+        let i = toParams.findIndex(item => item === del);
+        console.log("del,item", i);
+        toParams.splice(i, 1);
+        //设置第一层"variable" 的配置
+        del.attributeMap["configureType"] =
+          baseConfigType.attributeMap.configureType;
+        //循环处理第二层的配置
+        for (let delxml of del.xmlEntityMaps) {
+          let basexml = baseConfigType.xmlEntityMaps.find(item => {
+            return item.lableName == delxml.lableName;
+          });
+          delxml.attributeMap["configureType"] =
+            basexml.attributeMap.configureType;
+          console.log("循环处理第二层的配置", { delxml, basexml });
+        }
+        console.log("循环处理第二层的配置", { del, baseConfigType });
+        toParams.push(del);
+      }
+      console.log("toParams, delParam", { toParams, delParam });
     },
     //得到variable下的多余的属性
     getParamChaYi(form, to) {
@@ -1137,18 +1188,6 @@ export default {
     compByUserId("").then(res => {
       this.compListData = res.data.data;
     });
-    let arr1 = [
-      { id: 1, name: "老大" },
-      { id: 3, name: "老二" }
-    ];
-    let arr2 = [
-      { id: 1, name: "老大" },
-      { id: 3, name: "老三" },
-      { id: 4, name: "老四" },
-      { id: 5, name: "老五" }
-    ];
-    let add = arr2.filter(item => !arr1.some(ele => ele.id === item.id));
-    console.log("111111111111111111111", add);
     //清空文件中的数据
     this.$store.dispatch("clearAnalysisBaseFile");
   },
