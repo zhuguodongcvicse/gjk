@@ -75,12 +75,15 @@ function handleMessageFromParent(event) {
 					}
 				}
 			}
-      for (let i = 0; i < graphList.link.datas.length; i++) {
-        if ((i + 1)%3 === 0) {
-          // console.log("graphList.link.datas",graphList.link.datas[i], i)
-          linkMap.set(graphList.link.datas[i - 2].json.properties, graphList.link.datas[i - 1].json.properties)
+      if (graphList.link !== undefined) {
+        for (let i = 0; i < graphList.link.datas.length; i++) {
+          if ((i + 1)%3 === 0) {
+            // console.log("graphList.link.datas",graphList.link.datas[i], i)
+            linkMap.set(graphList.link.datas[i - 2].json.properties, graphList.link.datas[i - 1].json.properties)
+          }
         }
       }
+
 			// console.log("graphList", graphList)
 			// console.log("linkGraphList", linkGraphList)
       // console.log("checkIPMap",checkIPMap)
@@ -1105,7 +1108,7 @@ function initEditor(editor) {
 		}
 		for (var i in selection) {
 			if (selection[i].properties.type == "case") {
-				Q.confirm("是否 确认删除", function () {
+				//Q.confirm("是否 确认删除", function () {
 					/*var selection = this.removeSelection();
 					for (const i in graphList.bJson) {
 						if (graphList.bJson[i].datas[0].json.properties.uniqueId == selection[0].properties.uniqueId) {
@@ -1230,7 +1233,7 @@ function initEditor(editor) {
 							i++
 						}
 					} */
-				}, this);
+		//		}, this);
 			}
 		}
 		}

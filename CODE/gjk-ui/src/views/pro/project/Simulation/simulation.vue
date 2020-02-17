@@ -55,22 +55,44 @@
                   </el-select>
                 </el-form-item>
                 <el-form-item label="数据处理类型:">
-                  <el-select placeholder="请选择" v-model="formData.symbol">
+                  <el-select placeholder="请选择" v-model="formData.dataProcessingType" >
                     <el-option
-                      v-for="(attribute,index) in datasource"
+                     v-bind:disabled="isAble"
+                      v-for="(item,index) in dataProcessingType"
                       :key="index"
-                      :label="attribute.label"
-                      :value="attribute.value"></el-option>
+                      :label="item.label"
+                      :value="item.value"></el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="X维:">
-                  <el-input v-model="formData.attr1"></el-input>
+                  <!-- <el-input v-model="formData.attr1"></el-input> -->
+                    <el-select placeholder="请选择" v-model="formData.x">
+                    <el-option
+                      v-for="(item,index) in formData.x"
+                      :key="index"
+                      :label="item"
+                      :value="item"></el-option>
+                  </el-select>
                 </el-form-item>
                 <el-form-item label="Y维:">
-                  <el-input v-model="formData.attr2"></el-input>
+                  <!-- <el-input v-model="formData.attr2"></el-input> -->
+                      <el-select placeholder="请选择" v-model="formData.y">
+                    <el-option
+                      v-for="(item,index) in formData.y"
+                      :key="index"
+                      :label="item"
+                      :value="item"></el-option>
+                  </el-select>
                 </el-form-item>
                 <el-form-item label="Z维:">
-                  <el-input v-model="formData.attr3"></el-input>
+                  <!-- <el-input v-model="formData.attr3"></el-input> -->
+                      <el-select placeholder="请选择" v-model="formData.z">
+                    <el-option
+                      v-for="(item,index) in formData.z"
+                      :key="index"
+                      :label="item"
+                      :value="item"></el-option>
+                  </el-select>
                 </el-form-item>
                 <el-form-item label="数据展示:">
                   <el-select v-model="formData.select">
@@ -81,9 +103,12 @@
                     :value="attribute.value"></el-option>
                   </el-select>
                 </el-form-item>
-                <el-form-item>
+                <el-form-item  align="left" style="float:left">
                   <el-button type="primary" @click="onSubmit">开始</el-button>
                 </el-form-item>
+                 <el-form-item align="right" style="margin-left:45px" >
+              <el-button type="primary" @click="stop"> 暂停 </el-button>
+                 </el-form-item>
               </el-form>
             </div>
           </el-card>
@@ -144,11 +169,13 @@ export default {
   name: "hello",
   data() {
     return {
-      formData: {
+      isAble: false,//select下拉框是否可用
+    formData: {
         symbol: "",
-        attr1: "",
-        attr2: "",
-        attr3: "",
+        x: "",
+        y: "",
+        z: "",
+        dataProcessingType: "",
         select: ""
       },
       selectData:[{label:"展示区域一", value: "myChart"},{label:"展示区域二", value: "myChart1"}  ],
@@ -168,6 +195,7 @@ export default {
       myCharts1SelectValue: '',
       tableData: [],
       datasource:[],
+      dataProcessingType:[],
       tableHeight: "100%",//表格显示区域固定高度
       myCharts: null,//定时器执行次数变量
       myCharts1: null,
@@ -213,6 +241,13 @@ export default {
    var tmdata = JSON.parse(JSON.stringify(data));
    this.$set(data,"username",this.userInfo.username)
    this.$set(data,"projectId",this.$route.query.flowId)
+   this.$set(data,"startId",this.$route.query.startId)
+   this.$set(data,"endId",this.$route.query.endId)
+   this.$set(data,"startName",this.$route.query.startName)
+   this.$set(data,"endName",this.$route.query.endName)
+   this.$set(data,"symbol",this.formData.symbol)
+   this.$set(data,"dataProcessingType",this.formData.dataProcessingType)
+   console.log("tmdata",tmdata)
       simulation(tmdata).then(response => {
         if(this.flag){
           return;
@@ -233,9 +268,11 @@ export default {
       });
     },
     drawLine2(data) {
+      
       this.myCharts1Show = true;
       var data = JSON.parse(JSON.stringify(data));
       this.$set(Temdata,"username",this.userInfo.username)
+
       simulation(data).then(response => {
         if(this.flag){
           return;
@@ -332,6 +369,7 @@ export default {
         return option;
     },
     start(){
+      
         if(this.myChartsFormData!=undefined){
             this.drawLine1(this.myChartsFormData)
         }
@@ -355,22 +393,46 @@ export default {
         })
     },
     getDataSource(flowFilePath, startId, endId){
+      console.log("startId",startId,endId)
         var username = this.userInfo.username;
       var simulationDto = {"flowFilePath":flowFilePath,"startId":startId, "endId":endId,"username":username}  
       getDataSource(simulationDto).then(req=>{
-        for (let i = 0; i < req.data.data.length; i++) {
-          const element = req.data.data[i];
+        console.log("获取数据源和数据处理类型",req) 
+        for (let i = 0; i < req.data.data.sourceData.length; i++) {
+          const element = req.data.data.sourceData[i];
+      
           var data = {
             "label": element,
             "value": element
           }
           this.datasource.push(data)
         }
-        console.log(this.datasource)
+        if(req.data.data.dataProcessingType.length != 0){
+            for (let i = 0; i < req.data.data.dataProcessingType.length; i++) {
+          const element1 = req.data.data.dataProcessingType[i].value;
+      
+          var data = {
+            "label": element1,
+            "value": element1
+          }
+          this.dataProcessingType.push(data)
+        }
+        }else{
+          //判断下来框不可选择
+           var vm = this; 
+           vm.isAble = true; //不可用 
+            var data = {
+            "label": "无可用类型",
+            "value": "无可用类型"
+          }
+          this.dataProcessingType.push(data)
+        }
+      
       })
     },
     onSubmit(){
       this.formData.username = this.userInfo.username;
+      this.formData.projectId = this.$route.query.flowId;
       var data = JSON.parse(JSON.stringify(this.formData))
       if(data.select=="myChart"){
         this.myChartsFormData = data;
@@ -391,6 +453,7 @@ export default {
      var data = {"username":"admin", componentLinks: list, filePath: flowFilePath,projectId:projectId}
      this.getDataSource(flowFilePath,startId,endId);
      var projectId =this.$route.query.flowId;
+     console.log(6666666666,this.$route.query)
   },
 
   //生命周期 - 挂载完成（可以访问DOM元素）

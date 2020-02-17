@@ -284,7 +284,7 @@
         items.push({
           text: '删除', action: function (evt, item) {
             console.log("data",data)
-            // if(data.image === "rack" || data.name === " "){
+           if(data.image === "rack" || data.name === " "){
             if(true){
               graph.removeElement(data);
               //删除逻辑
@@ -385,7 +385,7 @@
               })
             }
           }
-        });
+         } });
 
         return items;
       }

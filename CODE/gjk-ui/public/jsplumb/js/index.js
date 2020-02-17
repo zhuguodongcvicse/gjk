@@ -1316,8 +1316,8 @@ function getSimulationData() {
 			let endId = connection.targetId
 			let startName = endpointMap.get(connection.endpoints[0].getUuid()).variableName
 			let endName = endpointMap.get(connection.endpoints[1].getUuid()).variableName
-	//		let simulation = startId +":"+ startName +"|" + endId + ":" + endName
-			let simulation = startId +"|" + endId 
+			let simulation = startId +":"+ startName +"|" + endId + ":" + endName
+		//	let simulation = startId +"|" + endId 
 			if (index == 1) {
 				simulationData.push(simulation)
 			} else {
