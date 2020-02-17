@@ -69,6 +69,7 @@ export const tableOption = {
   {
     label: '操作库类型',
     prop: 'libraryType',
+    filter: true,
     dicData: [{
       label: '构件库',
       value: "1"
