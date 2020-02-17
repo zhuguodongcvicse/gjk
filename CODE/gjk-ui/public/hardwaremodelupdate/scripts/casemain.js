@@ -1108,7 +1108,7 @@ function initEditor(editor) {
 		}
 		for (var i in selection) {
 			if (selection[i].properties.type == "case") {
-				Q.confirm("是否 确认删除", function () {
+				//Q.confirm("是否 确认删除", function () {
 					/*var selection = this.removeSelection();
 					for (const i in graphList.bJson) {
 						if (graphList.bJson[i].datas[0].json.properties.uniqueId == selection[0].properties.uniqueId) {
@@ -1233,7 +1233,7 @@ function initEditor(editor) {
 							i++
 						}
 					} */
-				}, this);
+		//		}, this);
 			}
 		}
 		}

@@ -42,6 +42,6 @@ public interface SimulatorService {
      */
     Map<String, List<String>> suspend(String username, List<String> symbols);
 
-    List<String> getDataSource(String username, SimulationDTO simulationDTO);
+    Map<String,Object> getDataSource(String username, SimulationDTO simulationDTO);
 
 }

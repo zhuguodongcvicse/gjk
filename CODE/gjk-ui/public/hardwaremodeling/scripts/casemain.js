@@ -800,7 +800,7 @@ function initEditor(editor) {
     //不可改变形状大小
     graph.editable = false;
     //不可缩放
-    //	graph.enableWheelZoom = false
+  	//graph.enableWheelZoom = false
     var defaultStyles = graph.styles = {};
     defaultStyles[Q.Styles.ARROW_TO] = true;
     var background = new GridBackground(graph);
@@ -1007,7 +1007,7 @@ function initEditor(editor) {
   // }
 
   //删除
-  graph.removeSelectionByInteraction = true;
+  graph.removeSelectionByInteraction = false;
   graph.removeSelectionByInteraction = function (evt) {
     var selection = this.selectionModel.datas;
     // console.log("selection",selection)
@@ -1016,7 +1016,7 @@ function initEditor(editor) {
     }
     for (var i in selection) {
       if (selection[i].properties.type == "case") {
-        Q.confirm("是否 确认删除", function () {
+      //  Q.confirm("是否 确认删除", function () {
           /*var selection = this.removeSelection();
           // console.log("selection", selection)
           //删除初始机箱数组中的数据
@@ -1117,7 +1117,7 @@ function initEditor(editor) {
           // console.log("linkList", linkList)
           // console.log("linkGraphList", linkGraphList)
           // console.log("linkMap", linkMap)
-        }, this);
+      //  }, this);
       }
     }
   }

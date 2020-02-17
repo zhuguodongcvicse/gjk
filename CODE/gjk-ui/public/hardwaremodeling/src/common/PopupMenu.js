@@ -284,7 +284,7 @@
         items.push({
           text: '删除', action: function (evt, item) {
             console.log("data",data)
-            // if(data.image === "rack" || data.name === " "){
+            if(data.image === "rack" || data.name === " "){
               graph.removeElement(data);
               //删除逻辑
               //删除初始机箱数组中的数据
@@ -392,7 +392,7 @@
               })
             // }
           }
-        });
+          }  });
 
         return items;
       }

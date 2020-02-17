@@ -135,6 +135,7 @@
 <script>
     import {mapGetters} from "vuex";
     import componentList from "./componentList";
+    import {delObj} from "@/api/libs/approval";
     import {fetchCompLists, getObj, modifyComp} from "@/api/comp/component";
     import {getAllDetailByCompId} from "@/api/comp/componentdetail";
     import {updateInf, getObj as getInfObj} from "@/api/libs/hardwarelibinf";
@@ -195,6 +196,8 @@
             //这里存放数据
             return {
                 isComp: false,
+                // 判断审批内容是否为空
+                isMessageLost: false,
 
                 batchType: "",
                 batchId: "",
@@ -249,7 +252,35 @@
             };
         },
         //监控data中的数据变化
-        watch: {},
+        watch: {
+            isMessageLost() {
+                if (this.isMessageLost) {
+                    var _this = this;
+                    this.$confirm(
+                        "该审批内容因被删除已失效，是否删除此审批记录？",
+                        "提示",
+                        {
+                        confirmButtonText: "确定",
+                        cancelButtonText: "取消",
+                        type: "warning"
+                        }
+                    )
+                        .then(function() {
+                        return delObj(_this.applyItemMsg.id);
+                        })
+                        .then(data => {
+                        _this.$message({
+                            showClose: true,
+                            message: "删除成功",
+                            type: "success"
+                        });
+                        var tag1 = _this.tag;
+                        menuTag(_this.$route.path, "remove", _this.tagList, tag1);
+                        })
+                        .catch(function(err) {});
+                }
+            }
+        },
         //方法集合
         methods: {
             dialogStateShow(state) {
@@ -666,21 +697,26 @@
                             var that = this
                             getbatch(this.batchId).then(req => {
                                 var idList = JSON.parse(req.data.data.idListJson);
-                                for (let i = 0; i < idList.length; i++) {
-                                    const element = idList[i];
-                                    getObj(element).then(Response => {
-                                        that.componentlists.push(Response.data.data)
+                                for (let item of idList) {
+                                    getObj(item).then(Response => {
+                                        if (Response.data.data) {
+                                            that.componentlists.push(Response.data.data)
+                                        }
                                     })
                                 }
                             })
                         } else {
                             getObj(this.applyItemMsg.applyId).then(Response => {
-                                this.libsNameValue = Response.data.data.compName;
-                                this.component = Response.data.data;
-                            });
-                            this.isComp = true;
-                            fetchCompLists(this.applyItemMsg.applyId, true).then(Response => {
-                                this.compTreeData = Response.data.data;
+                                if (Response.data.data != null && Response.data.data != undefined) {
+                                    this.libsNameValue = Response.data.data.compName;
+                                    this.component = Response.data.data;
+                                    this.isComp = true;
+                                    fetchCompLists(this.applyItemMsg.applyId, true).then(Response => {
+                                        this.compTreeData = Response.data.data;
+                                    });
+                                } else {
+                                    this.isMessageLost = true;
+                                }
                             });
                         }
                         break;
@@ -688,36 +724,51 @@
                         this.libsName = "硬件名称：";
                         this.libsType = "接口库";
                         getInfObj(this.applyItemMsg.applyId).then(response => {
-                            // console.log("response.data.data", response.data.data)
-                            this.libsNameValue = response.data.data.infName
-                            this.hardwareLibData.push(response.data.data)
+                            if (response.data.data != null && response.data.data != undefined) {
+                                this.libsNameValue = response.data.data.infName
+                                this.hardwareLibData.push(response.data.data)
+                            } else {
+                                this.isMessageLost = true;
+                            }
                         })
                         break;
                     case "2-2":
                         this.libsName = "硬件名称：";
                         this.libsType = "芯片库";
                         getChipObj(this.applyItemMsg.applyId).then(response => {
-                            this.libsNameValue = response.data.data.chipName
-                            this.hardwareLibData.push(response.data.data)
+                            if (response.data.data != null && response.data.data != undefined) {
+                                this.libsNameValue = response.data.data.chipName
+                                this.hardwareLibData.push(response.data.data)
+                            } else {
+                                this.isMessageLost = true;
+                            }
                         })
                         break;
                     case "2-3":
                         this.libsName = "硬件名称：";
                         this.libsType = "板卡库";
                         getBoardObj(this.applyItemMsg.applyId).then(response => {
-                            this.libsNameValue = response.data.data.boardName
-                            this.hardwareLibData.push(response.data.data)
+                            if (response.data.data != null && response.data.data != undefined) {
+                                this.libsNameValue = response.data.data.boardName
+                                this.hardwareLibData.push(response.data.data)
+                            } else {
+                                this.isMessageLost = true;
+                            }
                         })
                         break;
                     case "3":
                         this.libsName = "软件框架名称：";
                         this.libsType = "软件框架库";
                         getSoftwareById(this.applyItemMsg.applyId).then(Response => {
-                            this.libsNameValue = Response.data.data.softwareName;
-                        });
-                        this.isComp = true;
-                        getSoftwareTreeById(this.applyItemMsg.applyId).then(Response => {
-                            this.compTreeData = Response.data.data;
+                            if (Response.data.data != null && Response.data.data != undefined) {
+                                this.libsNameValue = Response.data.data.softwareName;
+                                this.isComp = true;
+                                getSoftwareTreeById(this.applyItemMsg.applyId).then(Response => {
+                                    this.compTreeData = Response.data.data;
+                                });
+                            } else {
+                                this.isMessageLost = true;
+                            }
                         });
                         break;
                     case "4":
@@ -727,21 +778,29 @@
                         this.libsName = "BSP名称：";
                         this.libsType = "BSP库";
                         getBSPById(this.applyItemMsg.applyId).then(Response => {
-                            this.libsNameValue = Response.data.data.bspName;
-                        });
-                        this.isComp = true;
-                        getBSPTreeById(this.applyItemMsg.applyId).then(Response => {
-                            this.compTreeData = Response.data.data;
+                            if (Response.data.data != null && Response.data.data != undefined) {
+                                this.libsNameValue = Response.data.data.bspName;
+                                this.isComp = true;
+                                getBSPTreeById(this.applyItemMsg.applyId).then(Response => {
+                                    this.compTreeData = Response.data.data;
+                                });
+                            } else {
+                                this.isMessageLost = true;
+                            }
                         });
                         break;
                     case "6":
                         this.libsName = "结构体名称：";
                         this.libsType = "结构体库";
                         getStructById(this.applyItemMsg.applyId).then(Response => {
-                            this.libsNameValue = Response.data.data.name;
-                            this.showStruct = true;
-                            this.showMessage = false;
-                            this.structData = "结构体类型：" + Response.data.data.dataType;
+                            if (Response.data.data != null && Response.data.data != undefined) {
+                                this.libsNameValue = Response.data.data.name;
+                                this.showStruct = true;
+                                this.showMessage = false;
+                                this.structData = "结构体类型：" + Response.data.data.dataType;
+                            } else {
+                                this.isMessageLost = true;
+                            }
                         });
                         break;
                     case "7":
@@ -749,54 +808,41 @@
                         this.libsType = "项目库";
                         if ((this.applyItemMsg.applyType = "3")) {
                             getProMsgById(this.applyItemMsg.applyId).then(Response => {
-                                this.libsNameValue = Response.data.data.projectName;
-                            });
-                            this.proCompIdListMsg = "项目申请构件出库列表为：";
-                            getAllCompId(this.applyItemMsg.id).then(Response => {
-                                let compIdList = [];
-                                for (let proComp of Response.data.data) {
-                                    compIdList.push(proComp.applyId);
+                                if (Response.data.data != null && Response.data.data != undefined) {
+                                    this.libsNameValue = Response.data.data.projectName;
+                                    this.proCompIdListMsg = "项目申请构件出库列表为：";
+                                    getAllCompId(this.applyItemMsg.id).then(Response => {
+                                        let compIdList = [];
+                                        for (let proComp of Response.data.data) {
+                                            compIdList.push(proComp.applyId);
+                                        }
+                                        getCompDict(compIdList).then(Response => {
+                                            this.proCompIdList = Response.data.data;
+                                        });
+                                    });
+                                } else {
+                                    this.isMessageLost = true;
                                 }
-                                getCompDict(compIdList).then(Response => {
-                                    this.proCompIdList = Response.data.data;
-                                });
-                            });
-                            this.proCompIdListMsg = "项目申请构件出库列表为：";
-                            getAllCompId(this.applyItemMsg.id).then(Response => {
-                                let compIdList = [];
-                                for (let proComp of Response.data.data) {
-                                    compIdList.push(proComp.applyId);
-                                }
-                                getCompDict(compIdList).then(Response => {
-                                    this.proCompIdList = Response.data.data;
-                                });
-                            });
-                            this.proCompIdListMsg = "项目申请构件出库列表为：";
-                            getAllCompId(this.applyItemMsg.id).then(Response => {
-                                let compIdList = [];
-                                for (let proComp of Response.data.data) {
-                                    compIdList.push(proComp.applyId);
-                                }
-                                getCompDict(compIdList).then(Response => {
-                                    this.proCompIdList = Response.data.data;
-                                });
                             });
                         } else {
                             this.batchId = this.applyItemMsg.applyId;
                             this.batch = false;
                             this.libsNameValue = "批量导出";
                         }
-                        console.log("12121212121", this.applyId);
                         break;
                     case "8":
                         this.libsName = "构件框架名称：";
                         this.libsType = "构件框架库";
                         getCompframeById(this.applyItemMsg.applyId).then(res => {
                             let compframe = res.data.data;
-                            this.libsNameValue = compframe.name;
-                            fetchCompframeToTree(compframe).then(Response => {
-                                this.compTreeData = Response.data.data;
-                            });
+                            if (compframe != null && compframe != undefined) {
+                                this.libsNameValue = compframe.name;
+                                fetchCompframeToTree(compframe).then(Response => {
+                                    this.compTreeData = Response.data.data;
+                                });
+                            } else {
+                                this.isMessageLost = true;
+                            }
                         });
                         this.isComp = true;
                         break;
