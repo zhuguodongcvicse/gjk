@@ -132,14 +132,16 @@ public class SimulatorServiceImpl implements SimulatorService {
         //解析表格数据，得到表格对象集合
         tableData.addAll(forEachGetSimulationTableData((Map) objects.get(tabNames[0])));
         tableData.addAll(forEachGetSimulationTableData((Map) objects.get(tabNames[1])));
-
-
-
-    if(simulationDTO.getX() == null){
         //获取最大xyz维度
-
         Map<String,String> MaxXYZ =  ExternalIOTransUtils.getMaxXYZ(FilePath,packinfoFileName,objects,arrowInfo);
+    if(simulationDTO.getX() == null){
+        //获取最大维度值添加到配置页面数据中
         Map<String,Object> packDataMap = null;
+        packDataMap.put("X","1X");
+        packDataMap.put("Y","1Y");
+        packDataMap.put("Z","1Z");
+        packDataMap.put("Symbol",simulationDTO.getSymbol());
+        packDataMap.put("DataProecssingType",simulationDTO.getDataProecssingType());
         Map<String, Object>  dataInfo   =ExternalIOTransUtils.parseMoniData(FilePath,packinfoFileName,packDataMap,arrowInfo);
         Map<String, Object> dataMap = Maps.newHashMap();
         //表格数据
@@ -151,12 +153,19 @@ public class SimulatorServiceImpl implements SimulatorService {
         return dataMap;
     }else {
         Map<String,Object> packDataMap = null;
+        packDataMap.put("X",simulationDTO.getX());
+        packDataMap.put("Y",simulationDTO.getY());
+        packDataMap.put("Z",simulationDTO.getZ());
+        packDataMap.put("Symbol",simulationDTO.getSymbol());
+        packDataMap.put("DataProecssingType",simulationDTO.getDataProecssingType());
         Map<String, Object>  dataInfo   =ExternalIOTransUtils.parseMoniData(FilePath,packinfoFileName,packDataMap,arrowInfo);
         Map<String, Object> dataMap = Maps.newHashMap();
         //表格数据
         dataMap.put("tableData", tableData);
         //展示数据
         dataMap.put("Data", dataInfo);
+        //xyz最大值
+        dataMap.put("MaxXYZ" ,MaxXYZ);
         return dataMap;
     }
 
@@ -205,7 +214,7 @@ public class SimulatorServiceImpl implements SimulatorService {
         List<SimulationTableDataDTO> simulationTableDataDTOS = Lists.newArrayList();
         SimulationTableDataDTO simulationTableDataDTO = null;
         for (String key : tableDataMap.keySet()) {
-            simulationTableDataDTO = new SimulationTableDataDTO();
+             simulationTableDataDTO = new SimulationTableDataDTO();
             simulationTableDataDTO.setName(key);
             //根据“|”截取值和备注
             String[] valueAndRemake = tableDataMap.get(key).split("\\|");
