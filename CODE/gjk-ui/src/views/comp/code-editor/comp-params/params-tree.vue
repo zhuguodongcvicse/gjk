@@ -836,7 +836,7 @@ export default {
       //去头文件中找结构体
       if (isok === "shStruct") {
         let tmpStruct;
-        if (id !== undefined) {
+        if (id !== undefined && id !== "") {
           tmpStruct = this.headerFile.structParams[
             deepClone(id).replace("*", "")
           ];
@@ -860,7 +860,7 @@ export default {
         }
       }
       if (isok === "dbStruct") {
-        if (ids !== undefined) {
+        if (ids !== undefined  && id !== "") {
           //先去数据库找
           struct = strc.find(str => {
             return str.dbId === ids.replace("_*", "");

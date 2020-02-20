@@ -85,7 +85,11 @@ public class ComponentController {
 	 */
 	@GetMapping("/{id}")
 	public R<Component> getById(@PathVariable("id") String id) {
-		return new R<>(componentService.getById(id));
+		Component component = componentService.getById(id);
+		if ("1".equals(component.getDelFlag())) {
+			return new R<>();
+		}
+		return new R<>(component);
 	}
 
 	/**
@@ -317,7 +321,7 @@ public class ComponentController {
 	// **********************************************************//
 	// upms模块用到的东西，用于展示库管理模块的树级关系
 	@PostMapping("/getLibsFile/{libsId}")
-	public List<ComponentDetail> getLibsFile(@PathVariable("libsId")String libsId) {
+	public List<ComponentDetail> getLibsFile(@PathVariable("libsId") String libsId) {
 		return componentService.getLibsFile(libsId);
 	}
 
@@ -327,7 +331,7 @@ public class ComponentController {
 	}
 
 	@PostMapping("/getCompNameById/{id}")
-	public Component getCompNameById(@PathVariable("id")String id) {
+	public Component getCompNameById(@PathVariable("id") String id) {
 		return componentService.getCompNameById(id);
 	}
 
@@ -337,12 +341,13 @@ public class ComponentController {
 	}
 
 	@PostMapping("/getCompDetailByComponentId/{componentId}/{fileName}")
-	public ComponentDetail getCompDetailByComponentId(@PathVariable("componentId")String componentId,@PathVariable("fileName") String fileName) {
+	public ComponentDetail getCompDetailByComponentId(@PathVariable("componentId") String componentId,
+			@PathVariable("fileName") String fileName) {
 		return componentService.getCompDetailByComponentId(componentId, fileName);
 	}
 
 	@PostMapping("/getCompByCompId/{compId}")
-	public List<Component> getCompByCompId(@PathVariable("compId")String compId) {
+	public List<Component> getCompByCompId(@PathVariable("compId") String compId) {
 		return componentService.getCompByCompId(compId);
 	}
 	// **********************************************************//

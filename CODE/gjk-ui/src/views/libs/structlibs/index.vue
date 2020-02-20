@@ -30,6 +30,7 @@
           <el-button
             type="primary"
             v-if="permissions.libs_structlibs_edit"
+            v-show="scope.row.storageFlag==null?true:false||scope.row.storageFlag=='0'"
             size="small"
             plain
             @click="handleEdit(scope.row,scope.index)"
