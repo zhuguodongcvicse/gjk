@@ -41,7 +41,10 @@
 //例如：import 《组件名称》 from '《组件路径》';
 import { mapGetters } from "vuex";
 import { getBSPTree } from "@/api/libs/bsp";
-import { appAssemblyProjectCreate } from "@/api/pro/manager";
+import {
+  appProCreatePretreatment,
+  appAssemblyProjectCreate
+} from "@/api/pro/manager";
 export default {
   props: ["procedure", "dialog"],
   //注入依赖，调用this.reload();用于刷新页面
@@ -114,7 +117,7 @@ export default {
     createAppPro() {
       const loading = this.$loading({
         lock: true,
-        text: "App组件工程生成中......",
+        text: "App组件工程生成预处理中......",
         spinner: "el-icon-loading",
         background: "rgba(0, 0, 0, 0.7)"
       });
@@ -133,9 +136,24 @@ export default {
         let params = new FormData();
         params.append("file", this.appImageFile);
         params.append("allMessage", JSON.stringify(allMessage));
-        appAssemblyProjectCreate(params)
+        appProCreatePretreatment(params)
           .then(Response => {
-            this.reflush(loading);
+            if (Response.data.data === true) {
+              this.reflush(loading);
+              const loadingToo = this.$loading({
+                lock: true,
+                text: "App组件工程生成中......",
+                spinner: "el-icon-loading",
+                background: "rgba(0, 0, 0, 0.7)"
+              });
+              appAssemblyProjectCreate(params)
+                .then(Response => {
+                  this.reflush(loadingToo);
+                })
+                .catch(error => {
+                  this.reflush(loadingToo);
+                });
+            }
           })
           .catch(error => {
             this.reflush(loading);
