@@ -26,6 +26,9 @@ export const tableOption = {
   delBtn: false,
   addBtn: false,
   selection: true,
+  // selectable: (row, index) => {
+  //   return false;
+  // },
   labelWidth: 120,
   column: [
     {

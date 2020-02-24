@@ -342,4 +342,14 @@ public class ProjectController {
 		return new R<>(projectService.compUseNum(compId));
 	}
 
+	/**
+	 * 查找该项目下的构件,用来在再次申请构件时标识是否可选
+	 * @param proId
+	 * @return
+	 */
+	@GetMapping("/getCurrentProApplyedComps/{proId}")
+	public R getCurrentProApplyedComps(@PathVariable String proId) {
+		return new R<>(projectService.getCurrentProApplyedComps(proId));
+	}
+
 }

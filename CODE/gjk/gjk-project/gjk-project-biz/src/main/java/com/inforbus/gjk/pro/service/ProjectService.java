@@ -183,4 +183,6 @@ public interface ProjectService extends IService<Project> {
 	 * @return
 	 */
 	int compUseNum(@PathVariable String compId);
+
+    List getCurrentProApplyedComps(String proId);
 }

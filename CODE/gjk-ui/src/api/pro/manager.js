@@ -168,6 +168,15 @@ export function updateProcedureDetail(proDetail) {
   })
 }
 
+/* app组件工程预处理 */
+export function appProCreatePretreatment(param) {
+  return request({
+    method: "post",
+    url: "/pro/manager/appProCreatePretreatment",
+    data: param
+  })
+}
+
 /* 生成app组件工程 */
 export function appAssemblyProjectCreate(param) {
   return request({

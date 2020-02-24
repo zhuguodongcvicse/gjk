@@ -141,4 +141,5 @@ public interface ProjectMapper extends BaseMapper<Project> {
 	 */
 	List<ProComp> compUse(@Param("compId") String compId);
 
+    List getCurrentProApplyedComps(@Param("projectId") String projectId);
 }

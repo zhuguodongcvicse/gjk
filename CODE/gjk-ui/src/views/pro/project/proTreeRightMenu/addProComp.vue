@@ -40,7 +40,12 @@
       <el-button type="primary" @click.native="addProComp">提交申请</el-button>
     </div>
     <el-tabs v-model="activeName">
-      <el-tab-pane label="审批信息" name="first">
+      <el-tab-pane label="构件信息" name="first">
+        <div class="libs_commoncomponent_14s">
+          <common-component @fromChild="getChild" :temp_currProject="temp_currProject"></common-component>
+        </div>
+      </el-tab-pane>
+      <el-tab-pane label="审批信息" name="second">
         <el-form
           label-width="120px"
           :model="addProCompForm"
@@ -58,11 +63,6 @@
             </el-select>
           </el-form-item>
         </el-form>
-      </el-tab-pane>
-      <el-tab-pane label="构件信息" name="second">
-        <div class="libs_commoncomponent_14s">
-        <common-component @fromChild="getChild" :temp_currProject="temp_currProject"></common-component>
-        </div>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -151,7 +151,7 @@ export default {
     //从子组件获取值
     getChild(v) {
       this.childComData = v;
-      console.log("this.childComData", this.childComData);
+      // console.log("this.childComData", this.childComData);
     },
     dialogBeforeClose() {
       this.closeDialog();
@@ -279,14 +279,16 @@ export default {
           }
         }
       }
-    }
+    },
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
+      // console.log("addProComp")
     this.temp_currProject = this.$route.query.temp_currProject;
-    console.log("temp_currProject", this.temp_currProject);
+    // console.log("temp_currProject", this.temp_currProject);
     this.getLibsTree();
     //this.getTableData();
+
     getUserhasApplyAuto().then(Response => {
       // 调用方法获取到所有具有审批权限的用户，将值附到选择器上
       this.applyUserSelect = [];

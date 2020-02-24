@@ -294,6 +294,7 @@ export default {
   methods: {
     //从子组件获取值
     getChild(v) {
+        console.log("v", v)
       this.childComData = v;
     },
     // showStructList() {
@@ -413,6 +414,7 @@ export default {
                   for (let i of this.childComData) {
                     this.compSelectArray.push(i.id);
                   }
+                  console.log("this.compSelectArray",this.compSelectArray)
                   if (
                     this.compSelectArray != null &&
                     this.compSelectArray.length > 0
@@ -434,6 +436,7 @@ export default {
                           approval.approvalState = "0";
                           //提交记录到审批管理库
                           saveApproval(approval).then(Response => {
+                              console.log("Response.data",Response.data)
                             saveApprovalApply(
                               Response.data.data.id,
                               this.compSelectArray
@@ -442,6 +445,7 @@ export default {
                               this.formLabelAlign,
                               this.$options.data().formLabelAlign
                             );
+                            console.log("this.formLabelAlign", JSON.stringify(this.formLabelAlign))
                             //this.dialogTableVisible = false;
                             this.$notify({
                               title: "成功",

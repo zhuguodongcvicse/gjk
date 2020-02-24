@@ -223,8 +223,21 @@ public class ManagerController {
 	}
 
 	/**
-	 * @Title: uploadReturnUrll
-	 * @Description: 单文件上传
+	 * app组件工程生成预处理
+	 * 
+	 * @param allMessage
+	 * @return
+	 */
+	@ResponseBody
+	@PostMapping(path = "/appProCreatePretreatment")
+	public R<?> appProCreatePretreatment(@RequestParam(value = "allMessage", required = false) String allMessage) {
+		Map<String, String> map = (Map<String, String>) JSONUtil.toBean(allMessage, Map.class);
+		return managerService.appProCreatePretreatment(map);
+	}
+
+	/**
+	 * @Title: appAssemblyProjectCreate
+	 * @Description: app组件工程的生成
 	 * @Author xiaohe
 	 * @DateTime 2019年5月13日 下午3:41:10
 	 * @param ufile
@@ -447,7 +460,7 @@ public class ManagerController {
 //			e.printStackTrace();
 //		}
 //		return new R<>(simplePlanFile);
-		return new R<>(managerService.getworkSpacePathById(id,appDataDTO));
+		return new R<>(managerService.getworkSpacePathById(id, appDataDTO));
 
 	}
 
@@ -941,10 +954,11 @@ public class ManagerController {
 			@RequestParam(value = "projectId", required = false) String projectId) {
 		return new R<>(managerService.analysisZipFile(ufile, projectId));
 	}
+
 	@ResponseBody
 	@PostMapping(path = "/getFilePath")
-	public String getprocessFile( @RequestParam (value = "projectId", required = false) String projectId) {
-		return  managerService.getprocessFile(projectId);
+	public String getprocessFile(@RequestParam(value = "projectId", required = false) String projectId) {
+		return managerService.getprocessFile(projectId);
 	}
 
 }

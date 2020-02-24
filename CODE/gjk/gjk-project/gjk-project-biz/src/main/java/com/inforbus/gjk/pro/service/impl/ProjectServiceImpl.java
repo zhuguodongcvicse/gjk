@@ -451,4 +451,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 		}
 		return 0;
 	}
+
+	@Override
+	public List getCurrentProApplyedComps(String proId) {
+		List comps = baseMapper.getCurrentProApplyedComps(proId);
+		return comps;
+	}
 }

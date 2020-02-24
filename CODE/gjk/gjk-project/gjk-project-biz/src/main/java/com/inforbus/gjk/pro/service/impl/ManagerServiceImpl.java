@@ -718,10 +718,138 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	}
 
 	/**
+	 * app组件工程生成预处理
+	 * 
+	 * @param ufile
+	 * @param messageMap
+	 * @return
+	 */
+	public R appProCreatePretreatment(Map<String, String> messageMap) {
+		String returnStr = "";
+		// 获取流程记录
+		ProjectFile projectFile = this.getById(messageMap.get("procedureXmlId"));
+		// 创建流程xml文件路径
+		String procedureFilePath = proDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml";
+		File file = new File(procedureFilePath);
+
+		String modelId = projectFile.getParentId();
+		String proceId = this.getById(modelId).getParentId();
+
+		List<PartPlatformSoftware> partPlatformSoftwares = partPlatformSoftwareMapper.getByProcedureId(proceId);
+		List<PartPlatformBSP> partPlatformBSPs = partPlatformBSPMapper.getByProcedureId(proceId);
+
+		if (file.exists()) {
+			List<HardwareNode> hardwareNodes = null;
+			try {
+				// 解析流程模型xml获取所有根组件
+				hardwareNodes = ProcedureXmlAnalysis.getHardwareNodeList(file);
+			} catch (Exception e) {
+				logger.error("解析流程文件错误，请确保流程建模配置正确。");
+				returnStr += "解析流程文件错误，请确保流程建模配置正确。";
+			}
+
+			List<Map<String, Object>> maps = null;
+			try {
+				// 获取硬件存入数据库的数据
+				String chipStr = getChipsfromhardwarelibs(messageMap.get("procedureXmlId")).getChips();
+				maps = (List<Map<String, Object>>) JSONArray.parse(chipStr);
+			} catch (Exception e) {
+				logger.error("获取硬件建模数据失败，请确保硬件建模配置正确。");
+				returnStr += "获取硬件建模数据失败，请确保硬件建模配置正确。";
+			}
+
+			Map platformProp = null;
+			// 获取配置文件并解析
+			R prop = getMakefileTypeByProperties();
+			if (CommonConstants.FAIL.equals(prop.getCode())) {
+				returnStr += prop.getMsg();
+			} else {
+				platformProp = (Map) prop.getData();
+			}
+
+			if (hardwareNodes == null || maps == null || platformProp == null) {
+				return new R<>(new Exception(returnStr));
+			}
+
+			// 遍历所有根组件，创建根组件文件夹
+			for (HardwareNode hardwareNode : hardwareNodes) {
+				boolean flag = false;
+				for (Map<String, Object> map : maps) {
+					if (map.containsKey("nodeID") && hardwareNode.getNodeName().equals(map.get("nodeID").toString())) {
+						flag = true;
+						for (Part part : hardwareNode.getRootPart()) {
+							String libsType = map.get("hrTypeName").toString();
+							// 读取配置文件中平台类对应的软件平台类型
+							String platformType = null;
+							try {
+								platformType = platformProp.get(libsType).toString();
+							} catch (Exception e) {
+								e.printStackTrace();
+								logger.error("读取配置文件失败，请检查配置文件中" + libsType + "配置是否正确");
+								returnStr += "读取配置文件失败，请检查配置文件中" + libsType + "配置是否正确";
+							}
+
+							String softwareFilePath = "";
+							for (PartPlatformSoftware software : partPlatformSoftwares) {
+								if (software.getPlatformName().contains(libsType)) {
+									softwareFilePath = software.getSoftwareFilePath();
+								}
+							}
+							if ("".equals(softwareFilePath)) {
+								if (returnStr.contains("请配置" + libsType + "对应的软件框架,")) {
+									String s = "请配置" + libsType + "对应的软件框架,部件";
+									StringBuilder sb = new StringBuilder(returnStr);
+									sb.insert(returnStr.indexOf(s) + s.length(), part.getPartName() + ",");
+									returnStr = sb.toString();
+								} else {
+									returnStr += "请配置" + libsType + "对应的软件框架," + "部件" + part.getPartName() + "缺少的软件框架。";
+								}
+								logger.error("请配置" + libsType + "对应的软件框架," + "部件" + part.getPartName() + "缺少的软件框架。");
+							}
+
+							String bspFilePath = "";
+							for (PartPlatformBSP bsp : partPlatformBSPs) {
+								if (bsp.getPlatformName().contains(libsType)) {
+									bspFilePath = bsp.getBspFilePath();
+								}
+							}
+							if ("".equals(bspFilePath)) {
+								if (returnStr.contains("请配置" + libsType + "对应的bsp,")) {
+									String s = "请配置" + libsType + "对应的bsp,部件";
+									StringBuilder sb = new StringBuilder(returnStr);
+									sb.insert(returnStr.indexOf(s) + s.length(), part.getPartName() + ",");
+									returnStr = sb.toString();
+								} else {
+									returnStr += "请配置" + libsType + "对应的bsp," + "部件" + part.getPartName() + "缺少对应的BSP。";
+								}
+								logger.error("请配置" + libsType + "对应的bsp," + "部件" + part.getPartName() + "缺少对应的BSP。");
+							}
+
+						}
+					}
+				}
+				if (!flag) {
+					logger.error("流程建模与硬件建模" + hardwareNode.getNodeName() + "匹配错误，请重新配置流程建模与硬件建模。");
+					returnStr += "流程建模与硬件建模" + hardwareNode.getNodeName() + "匹配错误，请重新配置流程建模与硬件建模。";
+				}
+			}
+		} else {
+			returnStr += "流程配置xml文件不存在，请重新配置流程。";
+		}
+
+		if ("".equals(returnStr)) {
+			return new R<>(true);
+		} else {
+			return new R<>(new Exception(returnStr));
+		}
+
+	}
+
+	/**
 	 * 创建组件工程文件夹
 	 * 
 	 * @param userName    六位员工号
-	 * @param procedureId 流程ID
+	 * @param procedureId 流程ID`
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
@@ -776,7 +904,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			// 获取配置文件并解析
 			R prop = getMakefileTypeByProperties();
 			if (CommonConstants.FAIL.equals(prop.getCode())) {
-				return r;
+				return prop;
 			} else {
 				platformProp = (Map) prop.getData();
 			}
@@ -1574,8 +1702,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		for (ProjectFile projectFile : getProFileListByModelId(model.getId())) {
 			if ("11".equals(projectFile.getFileType())) {
 				Path = projectFile.getFilePath();
-			//	local_REPO_PATH = JGitUtil.getLOCAL_REPO_PATH();
-				local_REPO_PATH = 	gitDetailPath;
+				// local_REPO_PATH = JGitUtil.getLOCAL_REPO_PATH();
+				local_REPO_PATH = gitDetailPath;
 				break;
 			}
 		}
@@ -3200,8 +3328,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// String workSpacePaths = softwareInterface.softInter(workModeFilePath,
 		// cpuModelFilePath, hardWareFilePath,
 		// mapConfigPath, sysParamFilePath, workSpacePath);
-	//	local_REPO_PATH = JGitUtil.getLOCAL_REPO_PATH();
-		local_REPO_PATH = 	gitDetailPath;
+		// local_REPO_PATH = JGitUtil.getLOCAL_REPO_PATH();
+		local_REPO_PATH = gitDetailPath;
 		// 后期把filepath替换成数据库中的workSpacePaths
 		// getFile(filepath, planId);
 		/**************************************

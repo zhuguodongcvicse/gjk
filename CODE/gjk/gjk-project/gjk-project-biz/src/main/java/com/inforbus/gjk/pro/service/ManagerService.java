@@ -197,6 +197,15 @@ public interface ManagerService extends IService<ProjectFile> {
 	boolean canIntegrationCodeCreate(String modelId);
 
 	/**
+	 * app组件工程生成预处理
+	 * 
+	 * @param ufile
+	 * @param messageMap
+	 * @return
+	 */
+	R appProCreatePretreatment(Map<String, String> messageMap);
+
+	/**
 	 * app组件工程的生成
 	 * 
 	 * @param userName
@@ -337,18 +346,17 @@ public interface ManagerService extends IService<ProjectFile> {
 	 * @return
 	 */
 	R codeGeneration(String projectId, String username);
-	
-	//根据当前软硬件映射配置的id，查找当前流程下的所有模块的文件路径，从而截取想要的路径
-	String getSoftProcessFilePath( String id);
-	
-	//根据当前软硬件映射配置的id，查找当前流程下的所有模块的文件路径
-	R getworkSpacePathById(String id, AppDataDTO appDataDTO);
-	
-	// 调回写部署方案接口
-	void writeBackDeploySchemeById( Map<String, Object> map); 
-	
-	boolean createXmlFiles(XmlEntity entity, String proDetailId);
 
+	// 根据当前软硬件映射配置的id，查找当前流程下的所有模块的文件路径，从而截取想要的路径
+	String getSoftProcessFilePath(String id);
+
+	// 根据当前软硬件映射配置的id，查找当前流程下的所有模块的文件路径
+	R getworkSpacePathById(String id, AppDataDTO appDataDTO);
+
+	// 调回写部署方案接口
+	void writeBackDeploySchemeById(Map<String, Object> map);
+
+	boolean createXmlFiles(XmlEntity entity, String proDetailId);
 
 	String getprocessFile(String projectId);
 }

@@ -303,3 +303,10 @@ export function compUseNum(compId) {
     method: 'get'
   })
 }
+//查找该项目下的构件,用来在再次申请构件时标识是否可选
+export function getCurrentProApplyedComps(proId) {
+  return request({
+    url: '/pro/project/getCurrentProApplyedComps/' + proId,
+    method: 'get'
+  })
+}

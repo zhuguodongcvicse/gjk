@@ -157,7 +157,8 @@ import {
   staticInspect,
   codeGeneration,
   getPassCompByProId,
-  removeProIdCompIdList
+  removeProIdCompIdList,
+    getCurrentProApplyedComps
 } from "@/api/pro/project";
 import {
   fetchProList,
@@ -543,12 +544,15 @@ export default {
         this.addProcedureDialogVisible = true;
       } else if (item == "申请构件") {
         //this.addProCompDialogVisible = true;
-        this.$router.push({
-          path: "/showComponent",
-          query: {
-            temp_currProject: this.temp_currProject
-          }
-        });
+          getCurrentProApplyedComps(this.temp_currProject.id).then(res => {
+              this.$router.push({
+                  path: "/showComponent",
+                  query: {
+                      temp_currProject: this.temp_currProject,
+                      proComps: res.data.data
+                  }
+              });
+          })
       } else if (item == "导入") {
         this.importProjectDialogVisible = true;
       } else if (item == "删除流程") {
@@ -706,7 +710,6 @@ export default {
       this.contentmenuX = event.clientX;
       this.contentmenuY = event.clientY;
       this.contextmenuFlag = true;
-      console.log("");
     },
     handleNodeClick(data) {
       //根据 . 判断是否是文件 待确认

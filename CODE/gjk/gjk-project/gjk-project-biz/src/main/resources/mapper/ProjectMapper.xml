@@ -241,6 +241,18 @@
 		</where>
 	</select>
 
+<!--	查找该项目下的构件,用来在再次申请构件时标识是否可选-->
+	<select id="getCurrentProApplyedComps" resultMap="proCompMap">
+		SELECT
+		<include refid="proComp" />
+		FROM gjk_project_comp
+		<where>
+			<if test="projectId != null and projectId.trim() != ''">
+				AND project_id = #{projectId}
+			</if>
+		</where>
+	</select>
+
 	<insert id="saveProComp"
 		parameterType="com.inforbus.gjk.pro.api.entity.ProComp">
 		INSERT INTO
