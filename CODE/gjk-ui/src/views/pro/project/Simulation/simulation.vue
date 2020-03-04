@@ -10,7 +10,8 @@
                   v-for="(attribute,index) in myChartsSelectData"
                   :key="index"
                   :label="attribute.label"
-                  :value="attribute.value"></el-option>
+                  :value="attribute.value"
+                ></el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="区域二">
@@ -19,19 +20,16 @@
                   v-for="(attribute,index) in myCharts1SelectData"
                   :key="index"
                   :label="attribute.label"
-                  :value="attribute.value"></el-option>
+                  :value="attribute.value"
+                ></el-option>
               </el-select>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="start">
-                开始
-              </el-button>
+              <el-button type="primary" @click="start">展示</el-button>
             </el-form-item>
-            <el-form-item >
-              <el-button type="primary" @click="stop">
-                暂停
-              </el-button>
-            </el-form-item>
+            <!-- <el-form-item>
+              <el-button type="primary" @click="stop">暂停</el-button>
+            </el-form-item> -->
           </el-form>
         </div>
       </el-col>
@@ -51,64 +49,55 @@
                       v-for="(attribute,index) in datasource"
                       :key="index"
                       :label="attribute.label"
-                      :value="attribute.value"></el-option>
+                      :value="attribute.value"
+                    ></el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="数据处理类型:">
-                  <el-select placeholder="请选择" v-model="formData.dataProcessingType" >
+                  <el-select placeholder="请选择" v-model="formData.dataProcessingType">
                     <el-option
-                     v-bind:disabled="isAble"
+                      v-bind:disabled="isAble"
                       v-for="(item,index) in dataProcessingType"
                       :key="index"
                       :label="item.label"
-                      :value="item.value"></el-option>
+                      :value="item.value"
+                    ></el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="X维:">
                   <!-- <el-input v-model="formData.attr1"></el-input> -->
-                    <el-select placeholder="请选择" v-model="formData.x">
-                    <el-option
-                      v-for="(item,index) in formData.x"
-                      :key="index"
-                      :label="item"
-                      :value="item"></el-option>
+                  <el-select placeholder="请选择" v-model="formData.x">
+                    <el-option v-for="(item,index) in X" :key="index" :label="item" :value="item"  :disabled="is_true==1?true:false"></el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="Y维:">
                   <!-- <el-input v-model="formData.attr2"></el-input> -->
-                      <el-select placeholder="请选择" v-model="formData.y">
-                    <el-option
-                      v-for="(item,index) in formData.y"
-                      :key="index"
-                      :label="item"
-                      :value="item"></el-option>
+                  <el-select placeholder="请选择" v-model="formData.y">
+                    <el-option v-for="(item,index) in Y" :key="index" :label="item" :value="item" :disabled="is_true==1?true:false"></el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="Z维:">
                   <!-- <el-input v-model="formData.attr3"></el-input> -->
-                      <el-select placeholder="请选择" v-model="formData.z">
-                    <el-option
-                      v-for="(item,index) in formData.z"
-                      :key="index"
-                      :label="item"
-                      :value="item"></el-option>
+                  <el-select placeholder="请选择" v-model="formData.z">
+                    <el-option v-for="(item,index) in Z" :key="index" :label="item" :value="item" :disabled="is_true==1?true:false"></el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="数据展示:">
                   <el-select v-model="formData.select">
                     <el-option
-                    v-for="(attribute,index) in selectData"
-                    :key="index"
-                    :label="attribute.label"
-                    :value="attribute.value"></el-option>
+                      v-for="(attribute,index) in selectData"
+                      :key="index"
+                      :label="attribute.label"
+                      :value="attribute.value"
+                    ></el-option>
                   </el-select>
                 </el-form-item>
-                <el-form-item  align="left" style="float:left">
+                <el-form-item align="left" style="float:left">
                   <el-button type="primary" @click="onSubmit">开始</el-button>
                 </el-form-item>
-                 <el-form-item align="right" style="margin-left:45px" >
-              <el-button type="primary" @click="stop"> 暂停 </el-button>
-                 </el-form-item>
+                <el-form-item align="right" style="margin-left:45px">
+                  <el-button type="primary" @click="stop">暂停</el-button>
+                </el-form-item>
               </el-form>
             </div>
           </el-card>
@@ -143,18 +132,18 @@
       <el-col :span="12">
         <div style="height: 569px;margin-right: 3px">
           <div style="margin-left: 2px;border: 1px solid rgb(235, 238, 245);height: 50%;">
-              <div style="width: 100%; height: 100%">
-                <div v-if="!myChartsShow" :style="{width: '100%', height: '100%'}">
-                  <span style="font-weight: bold;font-size: 16px;">数据展示区域一</span>
-                </div>
-                <div v-if="myChartsShow" id="myChart" :style="{width: '100%', height: '100%'}"></div>
+            <div style="width: 100%; height: 100%">
+              <div v-if="!myChartsShow" :style="{width: '100%', height: '100%'}">
+                <span style="font-weight: bold;font-size: 16px;">数据展示区域一</span>
               </div>
+              <div v-if="myChartsShow" id="myChart" :style="{width: '100%', height: '100%'}"></div>
+            </div>
           </div>
           <div style="margin-left: 2px;border: 1px solid rgb(235, 238, 245); height: 50%">
-              <div v-if="!myCharts1Show" :style="{width: '100%', height: '100%'}">
-                <span style="font-weight: bold;font-size: 16px;">数据展示区域二</span>
-              </div>
-              <div v-if="myCharts1Show" id="myChart1" :style="{width: '100%', height: '100%'}"></div>
+            <div v-if="!myCharts1Show" :style="{width: '100%', height: '100%'}">
+              <span style="font-weight: bold;font-size: 16px;">数据展示区域二</span>
+            </div>
+            <div v-if="myCharts1Show" id="myChart1" :style="{width: '100%', height: '100%'}"></div>
           </div>
         </div>
       </el-col>
@@ -163,14 +152,18 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import { getDataSource, simulation, stop } from "@/api/simula/simulation"
+import { getDataSource, simulation, stop } from "@/api/simula/simulation";
 
 export default {
   name: "hello",
   data() {
     return {
-      isAble: false,//select下拉框是否可用
-    formData: {
+      is_true: 1,
+      X: [],
+      Y: [],
+      Z: [],
+      isAble: false, //select下拉框是否可用
+      formData: {
         symbol: "",
         x: "",
         y: "",
@@ -178,7 +171,10 @@ export default {
         dataProcessingType: "",
         select: ""
       },
-      selectData:[{label:"展示区域一", value: "myChart"},{label:"展示区域二", value: "myChart1"}  ],
+      selectData: [
+        { label: "展示区域一", value: "myChart" },
+        { label: "展示区域二", value: "myChart1" }
+      ],
       msg: "Welcome to Your Vue.js App",
       simulationData: {
         xaxisData: [],
@@ -189,15 +185,15 @@ export default {
         yaxisData: []
       },
       flag: false,
-      myChartsSelectData: [{label: '156',value: '156'}],
-      myCharts1SelectData: [{label: '178',value: '178'}],
-      myChartsSelectValue: '',
-      myCharts1SelectValue: '',
+      myChartsSelectData: [{ label: "156", value: "156" }],
+      myCharts1SelectData: [{ label: "178", value: "178" }],
+      myChartsSelectValue: "",
+      myCharts1SelectValue: "",
       tableData: [],
-      datasource:[],
-      dataProcessingType:[],
-      tableHeight: "100%",//表格显示区域固定高度
-      myCharts: null,//定时器执行次数变量
+      datasource: [],
+      dataProcessingType: [],
+      tableHeight: "100%", //表格显示区域固定高度
+      myCharts: null, //定时器执行次数变量
       myCharts1: null,
       myChartsShow: false,
       myCharts1Show: false,
@@ -206,61 +202,84 @@ export default {
       tableOption: {
         border: true,
         index: true,
-        indexWidth:"55",
-        indexLabel: '序号',
+        indexWidth: "55",
+        indexLabel: "序号",
         stripe: false,
-        align: 'center',
+        align: "center",
         menu: false,
         editBtn: false,
         delBtn: false,
         addBtn: false,
         column: [
           {
-            label: '名称',
-            prop: 'name'
+            label: "名称",
+            prop: "name"
           },
           {
-            label: '值',
-            prop: 'value'
-          },{
-            label: '备注',
-            prop: 'remark'
-            }
+            label: "值",
+            prop: "value"
+          },
+          {
+            label: "备注",
+            prop: "remark"
+          }
         ]
       }
     };
   },
   computed: {
-      ...mapGetters(["userInfo"])
+    ...mapGetters(["userInfo"])
   },
   watch: {},
 
   methods: {
     drawLine1(data) {
       this.myChartsShow = true;
-   var tmdata = JSON.parse(JSON.stringify(data));
-   this.$set(data,"username",this.userInfo.username)
-   this.$set(data,"projectId",this.$route.query.flowId)
-   this.$set(data,"startId",this.$route.query.startId)
-   this.$set(data,"endId",this.$route.query.endId)
-   this.$set(data,"startName",this.$route.query.startName)
-   this.$set(data,"endName",this.$route.query.endName)
-   this.$set(data,"symbol",this.formData.symbol)
-   this.$set(data,"dataProcessingType",this.formData.dataProcessingType)
-   console.log("tmdata",tmdata)
+      this.is_true = 1;
+      this.$set(data, "username", this.userInfo.username);
+      this.$set(data, "projectId", this.$route.query.flowId);
+      this.$set(data, "startId", this.$route.query.startId);
+      this.$set(data, "endId", this.$route.query.endId);
+      this.$set(data, "startName", this.$route.query.startName);
+      this.$set(data, "endName", this.$route.query.endName);
+      this.$set(data, "symbol", this.formData.symbol);
+      this.$set(data, "dataProcessingType", this.formData.dataProcessingType);
+      this.$set(data, "flowFilePath", this.$route.query.flowFilePath);
+      var tmdata = JSON.parse(JSON.stringify(data));
+      console.log("tmdata", tmdata);
       simulation(tmdata).then(response => {
-        if(this.flag){
+        console.log("*******************************", response);
+        if (this.flag) {
           return;
+        }
+        //xyz维度赋值
+        this.X = response.data.data.maxXYZ.x;
+        this.Y = response.data.data.maxXYZ.y;
+        this.Z = response.data.data.maxXYZ.z;
+        if(!this.formData.x){
+          this.formData.x =  response.data.data.maxXYZ.x[1];
+        }
+        if(!this.formData.y){
+          this.formData.y =  response.data.data.maxXYZ.y[1];
+        }
+        if(!this.formData.z){
+          this.formData.z =  response.data.data.maxXYZ.z[1];
         }
         this.tableData = response.data.data.tableData;
         let self = this;
-        if (self && !self._isDestroyed) {//循环发送请求解决路由页面依旧发请求问题
+        if (self && !self._isDestroyed) {
+          //循环发送请求解决路由页面依旧发请求问题
           this.myCharts = setTimeout(() => {
             self.drawLine1(data);
           }, 1000);
         }
         this.simulationData = response.data.data;
-        var data = {"symol": tmdata.symol,"xaxisData": response.data.data.xaxisData, "yaxisData": response.data.data.yaxisData}
+       
+        var data = {
+          symbol: tmdata.symbol,
+          xaxisData: response.data.data.data,
+          yaxisData: response.data.data.data
+        };
         // 基于准备好的dom，初始化echarts实例
         let myChart = this.$echarts.init(document.getElementById("myChart"));
         // 绘制图表
@@ -268,176 +287,194 @@ export default {
       });
     },
     drawLine2(data) {
-      
       this.myCharts1Show = true;
-      var data = JSON.parse(JSON.stringify(data));
-      this.$set(Temdata,"username",this.userInfo.username)
+      this.$set(data, "username", this.userInfo.username);
+      this.$set(data, "projectId", this.$route.query.flowId);
+      this.$set(data, "startId", this.$route.query.startId);
+      this.$set(data, "endId", this.$route.query.endId);
+      this.$set(data, "startName", this.$route.query.startName);
+      this.$set(data, "endName", this.$route.query.endName);
+      this.$set(data, "symbol", this.formData.symbol);
+      this.$set(data, "dataProcessingType", this.formData.dataProcessingType);
+      this.$set(data, "flowFilePath", this.$route.query.flowFilePath);
+      var tmdata = JSON.parse(JSON.stringify(data));
 
-      simulation(data).then(response => {
-        if(this.flag){
+      simulation(tmdata).then(response => {
+        if (this.flag) {
           return;
         }
         let self = this;
-        if (self && !self._isDestroyed) {//循环发送请求解决路由页面依旧发请求问题
+        if (self && !self._isDestroyed) {
+          //循环发送请求解决路由页面依旧发请求问题
           this.myCharts1 = setTimeout(() => {
             self.drawLine2(data);
           }, 1000);
         }
         this.simulationData = response.data.data;
-        var data = {"symol": data.symol,"xaxisData": response.data.data.xaxisData, "yaxisData": response.data.data.yaxisData}
+        var data = {
+          symbol: tmdata.symbol,
+          xaxisData: response.data.data.data,
+          yaxisData: response.data.data.data
+        };
         // 基于准备好的dom，初始化echarts实例
         let myChart = this.$echarts.init(document.getElementById("myChart1"));
         // 绘制图表
         myChart.setOption(this.getOption(data));
       });
     },
-    getOption(data){
-        var option = {
-            title: {
-                text: data.symbol+"仿真监测",
-                x: "center"
-            },
+    getOption(data) {
+      var option = {
+        title: {
+          text: data.symbol + "仿真监测",
+          x: "center"
+        },
 
-            tooltip: {
-                trigger: "axis",
-                axisPointer: {
-                    animation: false
-                }
-            },
-            legend: {
-                data: ["仿真曲线"],
-                x: "left"
-            },
-            axisPointer: {
-                link: { xAxisIndex: "all" }
-            },
-            dataZoom: [
-                {
-                    show: true,
-                    realtime: true,
-                    start: 30,
-                    end: 31 //,
-                    //xAxisIndex: [0, 1]
-                },
-                {
-                    type: "inside",
-                    realtime: true,
-                    start: 30,
-                    end: 31 //,
-                    //xAxisIndex: [0, 1]
-                }
-            ],
-            grid: [
-                {
-                    left: 50,
-                    right: 50,
-                    height: "67%"
-                }
-                // , {
-                //     left: 50,
-                //     right: 50,
-                //     top: '55%',
-                //     height: '35%'
-                // }
-            ],
-            xAxis: [
-                {
-                    name: "数据",
-                    type: "category",
-                    boundaryGap: true,
-                    // axisLine: {onZero: true},
-                    data: data.xaxisData
-                }
-            ],
-            yAxis: [
-                {
-                    name: "数据流量",
-                    type: "value",
-                    max: 500
-                }
-            ],
-            series: [
-                {
-                    name: "仿真曲线",
-                    type: "line",
-                    symbolSize: 8,
-                    hoverAnimation: false,
-                    data: data.yaxisData
-                }
-            ]
-        };
-        return option;
+        tooltip: {
+          trigger: "axis",
+          axisPointer: {
+            animation: false
+          }
+        },
+        legend: {
+          data: ["仿真曲线"],
+          x: "left"
+        },
+        axisPointer: {
+          link: { xAxisIndex: "all" }
+        },
+        dataZoom: [
+          {
+            show: true,
+            realtime: true,
+            start: 30,
+            end: 31 //,
+            //xAxisIndex: [0, 1]
+          },
+          {
+            type: "inside",
+            realtime: true,
+            start: 30,
+            end: 31 //,
+            //xAxisIndex: [0, 1]
+          }
+        ],
+        grid: [
+          {
+            left: 50,
+            right: 50,
+            height: "67%"
+          }
+          // , {
+          //     left: 50,
+          //     right: 50,
+          //     top: '55%',
+          //     height: '35%'
+          // }
+        ],
+        xAxis: [
+          {
+            name: "数据",
+            type: "category",
+            boundaryGap: true,
+            // axisLine: {onZero: true},
+            data: data.xaxisData
+          }
+        ],
+        yAxis: [
+          {
+            name: "数据流量",
+            type: "value",
+            max: 500
+          }
+        ],
+        series: [
+          {
+            name: "仿真曲线",
+            type: "line",
+            symbolSize: 8,
+            hoverAnimation: false,
+            data: data.yaxisData
+          }
+        ]
+      };
+      return option;
     },
-    start(){
-      
-        if(this.myChartsFormData!=undefined){
-            this.drawLine1(this.myChartsFormData)
-        }
-        if(this.myCharts1FormData!=undefined){
-            this.drawLine2(this.myCharts1FormData)
-        }
-        this.flag = false;
+    start() {
+      if (this.myChartsFormData != undefined) {
+        this.drawLine1(this.myChartsFormData);
+      }
+      if (this.myCharts1FormData != undefined) {
+        this.drawLine2(this.myCharts1FormData);
+      }
+      this.flag = false;
     },
-    stop(){
-        window.clearTimeout(this.myCharts);
-        window.clearTimeout(this.myCharts1);
-        this.myCharts = null
-        this.myCharts1 = null
-        this.flag = true;
-        let symbols = []
-        for (let i = 0; i < this.datasource.length; i++) {
-            symbols.push(this.datasource[i].value)
-        }
-        stop(this.userInfo.username,{"symbols":symbols}).then(req=>{
-            console.log(req.data.data)
-        })
+    stop() {
+       this.is_true = 0;
+      window.clearTimeout(this.myCharts);
+      window.clearTimeout(this.myCharts1);
+      this.myCharts = null;
+      this.myCharts1 = null;
+      this.flag = true;
+      let symbols = [];
+      for (let i = 0; i < this.datasource.length; i++) {
+        symbols.push(this.datasource[i].value);
+      }
+      stop(this.userInfo.username, { symbols: symbols }).then(req => {
+        console.log(req.data.data);
+      });
     },
-    getDataSource(flowFilePath, startId, endId){
-      console.log("startId",startId,endId)
-        var username = this.userInfo.username;
-      var simulationDto = {"flowFilePath":flowFilePath,"startId":startId, "endId":endId,"username":username}  
-      getDataSource(simulationDto).then(req=>{
-        console.log("获取数据源和数据处理类型",req) 
+    getDataSource(flowFilePath, startId, endId) {
+      console.log("startId", startId, endId);
+      var username = this.userInfo.username;
+      var simulationDto = {
+        flowFilePath: flowFilePath,
+        startId: startId,
+        endId: endId,
+        username: username
+      };
+      getDataSource(simulationDto).then(req => {
+        console.log("获取数据源和数据处理类型", req);
         for (let i = 0; i < req.data.data.sourceData.length; i++) {
           const element = req.data.data.sourceData[i];
-      
+
           var data = {
-            "label": element,
-            "value": element
-          }
-          this.datasource.push(data)
+            label: element,
+            value: element
+          };
+          this.datasource.push(data);
         }
-        if(req.data.data.dataProcessingType.length != 0){
-            for (let i = 0; i < req.data.data.dataProcessingType.length; i++) {
-          const element1 = req.data.data.dataProcessingType[i].value;
-      
-          var data = {
-            "label": element1,
-            "value": element1
-          }
-          this.dataProcessingType.push(data)
-        }
-        }else{
-          //判断下来框不可选择
-           var vm = this; 
-           vm.isAble = true; //不可用 
+        if (req.data.data.dataProcessingType.length != 0) {
+          for (let i = 0; i < req.data.data.dataProcessingType.length; i++) {
+            const element1 = req.data.data.dataProcessingType[i].value;
+
             var data = {
-            "label": "无可用类型",
-            "value": "无可用类型"
+              label: element1,
+              value: element1
+            };
+            this.dataProcessingType.push(data);
           }
-          this.dataProcessingType.push(data)
+        } else {
+          //判断下来框不可选择
+          var vm = this;
+          vm.isAble = true; //不可用
+          var data = {
+            label: "无可用类型",
+            value: "无可用类型"
+          };
+          this.dataProcessingType.push(data);
         }
-      
-      })
+      });
     },
-    onSubmit(){
+    onSubmit() {
+      this.flag = false;
       this.formData.username = this.userInfo.username;
       this.formData.projectId = this.$route.query.flowId;
-      var data = JSON.parse(JSON.stringify(this.formData))
-      if(data.select=="myChart"){
+      var data = JSON.parse(JSON.stringify(this.formData));
+      console.log("data", data);
+      if (data.select == "myChart") {
         this.myChartsFormData = data;
         this.drawLine1(data);
-      }else{
+      } else {
         this.myCharts1FormData = data;
         this.drawLine2(data);
       }
@@ -445,20 +482,24 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-     var flowFilePath = this.$route.query.flowFilePath
+    var flowFilePath = this.$route.query.flowFilePath;
 
-     var startId = this.$route.query.startId
-     var endId = this.$route.query.endId
-     var list = [startId+"|"+endId]
-     var data = {"username":"admin", componentLinks: list, filePath: flowFilePath,projectId:projectId}
-     this.getDataSource(flowFilePath,startId,endId);
-     var projectId =this.$route.query.flowId;
-     console.log(6666666666,this.$route.query)
+    var startId = this.$route.query.startId;
+    var endId = this.$route.query.endId;
+    var list = [startId + "|" + endId];
+    var data = {
+      username: "admin",
+      componentLinks: list,
+      filePath: flowFilePath,
+      projectId: projectId
+    };
+    this.getDataSource(flowFilePath, startId, endId);
+    var projectId = this.$route.query.flowId;
+    console.log(6666666666, this.$route.query);
   },
 
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
-
     // this.realDrawLine();
     // this.drawLine();
     //this.tableHeight = window.innerHeight - this.$refs.table.$el.offsetTop - 50; //固定表格的高度
@@ -466,15 +507,13 @@ export default {
 
   beforeCreate() {}, //生命周期 - 创建之前
   beforeMount() {}, //生命周期 - 挂载之前
-  beforeUpdate() {
-
-  }, //生命周期 - 更新之前
+  beforeUpdate() {}, //生命周期 - 更新之前
   updated() {}, //生命周期 - 更新之后
   beforeDestroy() {}, //生命周期 - 销毁之前
   destroyed() {
     window.clearTimeout(this.myCharts); //清除定时器
     window.clearTimeout(this.myCharts1);
-    this.myCharts1 = null
+    this.myCharts1 = null;
     this.myCharts = null;
   }, //生命周期 - 销毁完成
   activated() {} //如果页面有keep-alive缓存功能，这个函数会触发
