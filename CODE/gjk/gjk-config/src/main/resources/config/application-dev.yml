@@ -118,3 +118,15 @@ ctrl:
 sonar:
   scanner:
     path: E:/soft/sonar1024/sonar-scanner-2.8/bin
+ftp:
+  host: 192.168.2.225
+  port: 21
+  username: admin
+  password: admin
+
+  ftpPath: /
+  encoding: utf-8
+  passiveMode: false
+  connectTimeout: 0
+  dataTimeout: 60000
+  keepAliveTimeout: 30
