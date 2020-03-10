@@ -22,7 +22,7 @@
 		<!--upms api、model 模块 -->
 		<dependency>
 			<groupId>com.inforbus</groupId>
-			<artifactId>gjk-upms-api</artifactId>
+			<artifactId>gjk-dataCenter-api</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 		<!--安全模块 -->
