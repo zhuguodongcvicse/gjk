@@ -24,6 +24,7 @@ export default [{
             import( /* webpackChunkName: "page" */ '@/views/admin/user/info'),
     }]
 }, {
+
     path: '/comp/showComp',
     component: Layout,
     redirect: '/comp/showComp/index',
@@ -75,6 +76,13 @@ export default [{
             component: () => import('@/views/pro/jsplumb/index'),
             meta: {
                 // title1: `${pro}`,
+                title: '流程模型'
+            }
+        },{
+            path: 'gojs',
+            name: 'gojs',
+            component: () => import('@/views/pro/gojs/index'),
+            meta: {
                 title: '流程模型'
             }
         }, {
