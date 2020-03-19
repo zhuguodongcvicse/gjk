@@ -99,6 +99,7 @@
                       :default-expand-all="true"
                       :check-on-click-node="true"
                       @check-change="handleCheckChange"
+                      @node-click="handleNodeClick"
                     ></el-tree>
                   </div>
                 </el-scrollbar>
@@ -129,12 +130,14 @@
         <el-button type="primary" @click="rejectDialog=false">取 消</el-button>
       </span>
     </el-dialog>
+    <show-file v-model="showFileData" ></show-file>
   </div>
 </template>
 
 <script>
     import {mapGetters} from "vuex";
     import componentList from "./componentList";
+    import showFile from "./showFile";
     import {delObj} from "@/api/libs/approval";
     import {fetchCompLists, getObj, modifyComp} from "@/api/comp/component";
     import {getAllDetailByCompId} from "@/api/comp/componentdetail";
@@ -186,7 +189,8 @@
         inject: ["reload"],
         //import引入的组件需要注入到对象中才能使用
         components: {
-            "component-list": componentList
+            "component-list": componentList,
+            "show-file": showFile
         },
         //监听属性 类似于data概念
         computed: {
@@ -248,6 +252,11 @@
                     rejectMassage: [
                         {required: true, message: "不能为空", trigger: "blur"}
                     ]
+                },
+                showFileData:{
+                    path:"",
+                    sync:false,
+                    fileType: false
                 }
             };
         },
@@ -288,6 +297,15 @@
             },
             handleClose(done) {
                 this.dialogStateShow(false);
+            },
+            //查看文件
+            handleNodeClick(node){
+                let nodeData = ["platformfile","component","imgfile","testfile","algorithmfile"];
+                if (!nodeData.includes(node.type)) {
+                    this.showFileData.sync = true;
+                    this.showFileData.path = node.filePath +"\\"+ node.label;
+                    this.showFileData.fileType = node.type==="img"?true:false;
+                }
             },
             handleCheckChange() {
                 let res = this.$refs.tree.getCheckedNodes();

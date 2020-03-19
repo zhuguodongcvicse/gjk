@@ -109,6 +109,8 @@ export default {
   created() {
     let _this = this;
     this.$nextTick(vm => {
+      let nodeData = ["platformfile","component","imgfile","testfile","algorithmfile"];
+
       let splitDivWidth = _this.$refs.splitDiv.offsetWidth;
       let compType = _this.$route.query.type;
       console.log("splitDivWidth", compType);
