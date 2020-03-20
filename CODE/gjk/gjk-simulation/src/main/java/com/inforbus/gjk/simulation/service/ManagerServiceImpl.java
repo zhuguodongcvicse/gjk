@@ -11,5 +11,4 @@ public interface ManagerServiceImpl {
     @ResponseBody
     @PostMapping(path = "/manager/getFilePath")
     public String getprocessFile(@RequestParam(value = "projectId", required = false) String projectId);
-
 }
