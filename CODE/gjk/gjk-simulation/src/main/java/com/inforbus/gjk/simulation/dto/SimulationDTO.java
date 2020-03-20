@@ -23,10 +23,10 @@ public class SimulationDTO {
 
     private String y;
 
-    private String Z;
+    private String z;
 
     private String select;
 
-    private String dataProecssingType;
+    private String dataProcessingType;
 
 }

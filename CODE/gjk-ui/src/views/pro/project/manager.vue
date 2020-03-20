@@ -324,8 +324,10 @@
                                     let process = res.data.data;
                                     // console.log("node", node, nodeRoot);
                                     if (node.type == "11") {
+                                        let routerPath ="/comp/manager/process"
+                                        // let routerPath ="/comp/manager/gojs"
                                         this.$router.push({
-                                            path: "/comp/manager/process",
+                                            path: routerPath,
                                             query: {
                                                 proId: process.parentId,
                                                 processId: node.id,

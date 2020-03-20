@@ -31,5 +31,9 @@ public interface ServiceNameConstants {
 	 * UMPS模块
 	 */
 	String UMPS_SERVICE = "gjk-upms";
+	/**
+	 * 数据中心模块
+	 */
+	String DATACENDER_SERVICE = "gjk-dataCenter";
 
 }

@@ -13,8 +13,10 @@ spring:
     username: root
     password: root
     url: jdbc:mysql://127.0.0.1:3306/gjk?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
-  application:
-    name: rabbitmq-dataCenter
+  servlet: #文件上传大小限制，现在是500M
+    multipart: 
+      max-file-size: 500000000
+      max-request-size: 500000000
   rabbitmq: 
     host: localhost
     port: 5672
@@ -24,7 +26,5 @@ spring:
 # 直接放行URL
 ignore:
   urls:
-    - /actuator/**
-    - /log/**
-    - /dataCenter/**
+    - /ftp/**
     - /gjkInterface/**
