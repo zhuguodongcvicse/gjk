@@ -39,6 +39,22 @@
     </el-form-item>
     <el-col :span="10" :offset="6" v-if="!show">
       <div
+        ref="fileDiv"
+        class="avatar-uploader"
+        style="text-align: center; border: 1px dashed #ddd;display: flex; justify-content: center;  align-items: center;"
+        v-bind:style="divStyle"
+        @click="imgContextmenu"
+      >
+        <div style="width:100px;height:90px;">
+          <img v-if="compImg.imgPath" :src="compImg.imgPath" style="width: 100px; height:70px;" />
+          <span
+            v-if="compImg.imgPath"
+            style="display:inline-block;line-height: 18px;font-size: 14px"
+          >{{compImg.imgShowName}}</span>
+          <i v-else class="el-icon-plus" style="font-size:28px;color:#8c939d;line-height:90px;"></i>
+        </div>
+      </div>
+      <!-- <div
         class="avatar-uploader icon_choose_imgdiv_14s"
         v-bind:style="divStyle"
         @click="imgContextmenu"
@@ -46,7 +62,7 @@
         <img v-if="compImg.imgPath" :src="compImg.imgPath" class="icon_choose_img_14s" />
         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         <i class="icon_choose_i_14s"></i>
-      </div>
+      </div>-->
       <!-- 引入图标选择弹出框 -->
       <icon-choose
         :compImg="compImg"
@@ -160,15 +176,6 @@ export default {
       compFilesFormRules: {
         algorithm: [{ validator: compCheckFile, trigger: "change" }],
         "filesPath.length": [{ validator: compCheckLength, trigger: "change" }]
-      },
-      dynamic: {
-        xmlEntitys: [
-          {
-            lableName: "显示名",
-            attributeName: "name",
-            attributeNameValue: ""
-          }
-        ]
       }
     };
   },
@@ -186,6 +193,7 @@ export default {
       // immediate: true,
       deep: true,
       handler: function(comp) {
+        console.log(" this.compImg.imgShowName = comp.compName",comp.compName)
         this.compImg.imgShowName = comp.compName;
       }
     },
@@ -206,20 +214,20 @@ export default {
           compImg.imgBorderradius +
           "px;background-color: " +
           compImg.imgBackcolor +
-          ";display: block;";
+          ";";
 
-        this.compImg.imgHtml =
-          "<div style='text-align:center;" +
-          this.divStyle +
-          "'>" +
-          "<img  src='" +
-          this.compImg.imgPath +
-          "' style='vertical-align: middle;width: 110px; height:80px;border-radius:5px;'>" +
-          // "<i style='display: inline-block;height: 100%;vertical-align: middle;'></i>" +
-          "<div class='desc' id='\" + i + \"'>" +
-          this.compImg.imgShowName +
-          "</div>" +
-          "</div>";
+        // this.compImg.imgHtml =
+        //   "<div style='text-align:center;" +
+        //   this.divStyle +
+        //   "'>" +
+        //   "<img  src='" +
+        //   this.compImg.imgPath +
+        //   "' style='vertical-align: middle;width: 110px; height:80px;border-radius:5px;'>" +
+        //   "<div class='desc' id='\" + i + \"'>" +
+        //   this.compImg.imgShowName +
+        //   "</div>" +
+        //   "</div>";
+        // this.compImg.imgHtml = this.$refs.fileDiv.outerHTML;
       },
       deep: true
     },
@@ -294,7 +302,6 @@ export default {
   }, //方法集合
   methods: {
     visibleCount() {
-      console.log("1111111111visibleCount");
       this.visible2 = false;
     },
     checkedCompFilesForm() {
@@ -341,14 +348,9 @@ export default {
     },
     saveCompImg(param) {
       let imgretStr = deepClone(this.imgValue.saveCompImgStr);
-
+      //设置imgHtml 为页面 fileDiv中 html元素
+      this.compImg.imgHtml = this.$refs.fileDiv.outerHTML;
       imgretStr.compParam.comp = param;
-      // let imgHtml = deepClone(this.compImg.imgHtml);
-      // //设置构件图标中的版本
-      // this.compImg.imgHtml = imgHtml.replace(
-      //   this.compImg.imgShowName,
-      //   this.compImg.imgShowName + "-V" + param.version
-      // );
       imgretStr.compParam.compImg = this.compImg;
       imgretStr.compParam.username = this.userInfo.username;
       // imgretStr.compParam.createTime = param.createTime
@@ -382,6 +384,8 @@ export default {
       }
     },
     imgContextmenu() {
+      console.log("this.$refs.fileDiv", this.$refs.fileDiv.outerHTML);
+      // this.saveCompImg()
       //查看时禁用图片选择
       if (!this.disabled) {
         this.imgValue.dialogVisible = true;
@@ -415,118 +419,7 @@ export default {
       this.formLabelAlign.algorithm = data.name;
       this.compValueType.libsID = data.id;
       this.visible2 = false;
-    },
-    handleRemove(file, fileList) {
-      // 删除时在表单的某个字段里移除一个值
-      let tmp = this.ruleForm.fileList;
-      let url = file.response.result[0].url;
-      if (tmp.includes(url)) {
-        tmp.splice(
-          tmp.findIndex(item => {
-            return item === url;
-          }),
-          1
-        );
-      }
-    },
-    successUpload(response, file, fileList, $event) {
-      // 上传成功在表单的某个字段里加一个值
-      this.ruleForm.fileList.push(file.response.result[0].url);
-    },
-    submitForm(formName) {
-      let fileList = this.ruleForm.fileList;
-      // 使用fileList与服务端交互 该字段只包含服务端数据
-    },
-
-    algorithmOnChange(file, fileList) {
-      let existFile = fileList
-        .slice(0, fileList.length - 1)
-        .find(f => f.name === file.name);
-      if (existFile) {
-        this.$message.error("当前文件已经存在!");
-        fileList.pop();
-      }
-      this.fileList = fileList;
-    },
-
-    algorithmOnRemove(file, fileList) {
-      // console.log(file, fileList);
-    },
-
-    algorithmHandlePreview(file) {
-      // console.log(file);
-    },
-
-    testOnChange(file, fileList) {
-      let existFile = fileList
-        .slice(0, fileList.length - 1)
-        .find(f => f.name === file.name);
-      if (existFile) {
-        this.$message.error("当前文件已经存在!");
-        fileList.pop();
-      }
-      this.fileList = fileList;
-    },
-
-    testOnRemove(file, fileList) {
-      // console.log(file, fileList);
-    },
-
-    testHandlePreview(file) {
-      // console.log(file);
-    },
-
-    platformOnChange(file, fileList) {
-      let existFile = fileList
-        .slice(0, fileList.length - 1)
-        .find(f => f.name === file.name);
-      if (existFile) {
-        this.$message.error("当前文件已经存在!");
-        fileList.pop();
-      }
-      this.fileList = fileList;
-    },
-
-    platformOnRemove(file, fileList) {
-      // console.log(file, fileList);
-    },
-
-    platformHandlePreview(file) {
-      // console.log(file);
     }
-
-    // algorithmSubmitUpload() {
-    //   this.compValueAndType.compValue = this.compValue.id;
-    //   this.compValueAndType.compName = this.comp.compName;
-    //   this.compValueAndType.version = this.compValue.version;
-    //   console.log(this.compValueAndType);
-    //   this.$refs.uploadAlgorithm.submit();
-    // },
-    // testSubmitUpload() {
-    //   this.compValueAndType.compValue = this.compValue.id;
-    //   this.compValueAndType.compName = this.comp.compName;
-    //   this.compValueAndType.version = this.compValue.version;
-    //   console.log(this.compValueAndType);
-    //   this.$refs.uploadTest.submit();
-    // },
-    // platformSubmitUpload() {
-    //   this.compValueAndType.compValue = this.compValue.id;
-    //   this.compValueAndType.compName = this.comp.compName;
-    //   this.compValueAndType.version = this.compValue.version;
-    //   console.log(this.compValueAndType);
-    //   this.$refs.uploadPlatform.submit();
-    // },
-
-    // algorithmOnSuccess(res, file, fileList) {},
-
-    // testOnSuccess(res, file, fileList) {},
-
-    // platformOnSuccess(res, file, fileList) {},
-
-    // algorithmOnProgress(event, file, fileList) {
-    //   this.videoFlag = true;
-    //   this.videoUploadPercent = file.percentage.toFixed();
-    // }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {

@@ -84,7 +84,7 @@
           </el-input>
         </el-col>
       </el-form-item>
-      <el-form-item label="选择图片" style="margin-bottom: 5px;">
+      <el-col :span="24" class>
         <el-upload
           action="/comp/componentdetail/uploadImg"
           :show-file-list="false"
@@ -94,16 +94,43 @@
           :before-upload="beforeAvatarUpload"
           accept="image/jpeg, image/jpg, image/png"
         >
-          <div class="avatar-uploader icon_choose_imgdiv_14s" v-bind:style="divStyle">
+          <div class="icon_choose_imgdiv_14s" v-bind:style="divStyle" ref="imageWrapper">
+            <div class="avatar-uploader" style="width:100px;height:90px;">
+              <img v-if="compImg.imgPath" :src="compImg.imgPath" style="width:100px;height:70px;" />
+              <span
+                v-if="compImg.imgPath"
+                style="display:block;line-height: 18px;font-size:14px"
+              >{{compImg.imgShowName}}</span>
+              <i v-else class="el-icon-plus" style="font-size:28px;color:#8c939d;line-height:90px;"></i>
+            </div>
+          </div>
+        </el-upload>
+      </el-col>
+      <!--<el-form-item label="选择图片" style="margin-bottom: 5px;">
+         <el-upload
+          action="/comp/componentdetail/uploadImg"
+          :show-file-list="false"
+          :on-success="handleAvatarSuccess"
+          :on-change="onchange"
+          :http-request="UploadImage"
+          :before-upload="beforeAvatarUpload"
+          accept="image/jpeg, image/jpg, image/png"
+        >
+           <div
+            class="avatar-uploader icon_choose_imgdiv_14s"
+            ref="imageWrapper"
+            v-bind:style="divStyle"
+          >
             <img v-if="compImg.imgPath" :src="compImg.imgPath" class="icon_choose_img_14s" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             <i class="icon_choose_i_14s"></i>
           </div>
         </el-upload>
-      </el-form-item>
+      </el-form-item>-->
     </el-form>
     <span slot="footer">
       <el-button @click="imgValue.dialogVisible = false">取 消</el-button>
+      <el-button @click="toImage">生成</el-button>
       <el-button type="primary" @click="submitUpload">确 定</el-button>
     </span>
   </el-dialog>
@@ -111,31 +138,60 @@
 
 <script>
 import { randomUuid, deepClone } from "@/util/util";
+//导入html转图片
+import html2canvas from "html2canvas";
 export default {
   props: ["imgValue", "compImg", "divStyle"],
   mounted() {},
   watch: {
-    imgValue: {}
+    imgValue: {},
+    divStyle: {
+      handler: function(val) {
+        // console.log("this.$refs.imgChildren", this.$refs.imgChildren.style.w);
+        // console.log("this.$refs.imgChildren", this.$refs.imgChildren);
+      },
+      deep: true
+    }
   },
   data() {
     return {
       file: {},
       comImgId: "",
       retStr: ""
-      // imgForm: {
-      //   imgsrc: "",
-      //   showName: "",
-      //   height: "80",
-      //   width: "160",
-      //   border_px: "",
-      //   border_so: "solid",
-      //   border_bl: "",
-      //   border_radius: "",
-      //   backColor: ""
-      // }
     };
   },
   methods: {
+    parseToDOM(htmlString) {
+      return new DOMParser().parseFromString(htmlString, "text/html").body
+        .childNodes[0];
+    },
+    toImage() {
+      let template =
+        '<div class="icon_choose_imgdiv_14s"  style="height: 97px; width: 110px; border: 2px solid rgb(24, 172, 225); border-radius: 10px; background-color: rgb(204, 210, 190);" ref="imageWrapper">' +
+        '<div class="avatar-uploader" style="width:100px;height:90px;">' +
+        '<img src="' +
+        this.compImg.imgPath +
+        '" style="width:100px;height:70px;" />' +
+        '<span style="display:block;line-height: 18px;font-size:14px"' +
+        ">" +
+        this.compImg.imgShowName +
+        "</span>" +
+        "</div>" +
+        "</div>";
+
+      let frag = this.parseToDOM(template);
+      console.log("template",template)
+      console.log(
+        "this.$refs.imageWrapper",
+        this.$refs.imageWrapper,
+        typeof this.$refs.imageWrapper
+      );
+      console.log("this.$refs.imageWrapper", frag, typeof frag);
+      html2canvas(frag).then(canvas => {
+        let dataURL = canvas.toDataURL("image/png");
+        console.log("dataURL", dataURL);
+      });
+    },
     handleAvatarSuccess(res, file) {
       this.imageUrl = URL.createObjectURL(file.raw);
     },
@@ -197,5 +253,14 @@ export default {
 };
 </script>
 <style>
+.icon_choose_imgdiv_14s1 {
+  text-align: center;
+  width: 120px;
+  height: 90px;
+  border: 1px dashed #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 </style>
 

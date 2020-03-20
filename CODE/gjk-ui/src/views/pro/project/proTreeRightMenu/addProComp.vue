@@ -161,15 +161,16 @@ export default {
     },
     addProComp() {
       this.$refs.addProCompForm.validate((valid, object) => {
+          // console.log("valid",valid)
         if (valid) {
           //this.getChild();
-          console.log("ssssssssssthis.childComData", this.childComData);
+          // console.log("ssssssssssthis.childComData", this.childComData);
           if (this.childComData != undefined && this.childComData.length > 0) {
             for (let i of this.childComData) {
               this.addProCompForm.compSelectArray.push(i.id);
             }
           }
-          console.log("this.addProCompForm.compSelectArray",this.addProCompForm.compSelectArray)
+          // console.log("this.addProCompForm.compSelectArray",this.addProCompForm.compSelectArray)
           saveProCompList(
             this.temp_currProject.id,
             this.addProCompForm.compSelectArray
@@ -185,6 +186,7 @@ export default {
             approval.approvalState = "0";
             //提交记录到审批管理库
             saveApproval(approval).then(Response => {
+                console.log("approval",approval)
               saveApprovalApply(
                 Response.data.data.id,
                 this.addProCompForm.compSelectArray
