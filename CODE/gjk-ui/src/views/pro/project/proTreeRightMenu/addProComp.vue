@@ -162,7 +162,7 @@ export default {
     addProComp() {
       this.$refs.addProCompForm.validate((valid, object) => {
           // console.log("valid",valid)
-        // if (valid) {
+        if (valid) {
           //this.getChild();
           // console.log("ssssssssssthis.childComData", this.childComData);
           if (this.childComData != undefined && this.childComData.length > 0) {
@@ -180,11 +180,9 @@ export default {
             approval.applyId = this.temp_currProject.id;
             approval.applyType = "2";
             approval.libraryType = "7";
-            //approval.applyUserId取不到，暂时写死系统管理员
-            approval.applyUserId = '1'
-            /*if (this.addProCompForm.applyUser != "") {
+            if (this.addProCompForm.applyUser != "") {
               approval.applyUserId = this.addProCompForm.applyUser;
-            }*/
+            }
             approval.approvalState = "0";
             //提交记录到审批管理库
             saveApproval(approval).then(Response => {
@@ -203,7 +201,7 @@ export default {
               });
             });
           });
-        // }
+        }
       });
     },
     getLibsTree() {
