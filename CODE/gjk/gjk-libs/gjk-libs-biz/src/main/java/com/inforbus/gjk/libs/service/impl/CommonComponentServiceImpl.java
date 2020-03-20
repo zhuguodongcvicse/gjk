@@ -127,7 +127,9 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 			commonComponent.setVersion(1.0 + "");
 		}
 		try {
+			String divId = " id='"+commonComponent.getId()+"'";
 			String img = commonComponent.getCompImg();// >测试构件01-Vnull<
+			img =img.replace("id=\"$divId$\"", divId);
 			String showName = commonComponent.getCompName() + "_V" + commonComponent.getVersion();
 			System.out.println("showName:  " + showName);
 			img = img.replaceAll(">" + commonComponent.getCompName() + "([^<>]*)<", ">" + showName + "<");

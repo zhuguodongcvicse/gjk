@@ -234,7 +234,7 @@ export default {
       simulationState: true,
       boxWidth: "",
       newBoxWidth: "",
-      rightWight: ""
+      rightWight: "0"
     };
   },
   //监听属性 类似于data概念
@@ -254,7 +254,6 @@ export default {
         this.isShow_14s = param.length > 0 ? true : false;
         if (this.isShow_14s) {
           this.rightWight = this.$refs.right.clientWidth;
-          console.log("99999999999999999999", this.rightWight);
         }
       }
     },
@@ -765,6 +764,10 @@ export default {
                 this.postMessageData.params = res.data.data.json;
                 this.$refs.gjkIframe.sendMessage(this.postMessageData);
               }
+            }else{
+               this.postMessageData.cmd = "clickCompLoading";
+                this.postMessageData.params = "";
+                this.$refs.gjkIframe.sendMessage(this.postMessageData);
             }
             // console.log("map数据", this.tmpMaps);
           });
@@ -781,6 +784,7 @@ export default {
           break;
         case "returnSave":
           // 处理业务逻辑
+          console.log("111111111",data.params)
           if (data.params.length <= 0) {
             this.saveState = false;
           } else {

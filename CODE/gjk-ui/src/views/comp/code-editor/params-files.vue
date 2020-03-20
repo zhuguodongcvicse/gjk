@@ -41,11 +41,12 @@
       <div
         ref="fileDiv"
         class="avatar-uploader"
-        style="text-align: center; border: 1px dashed #ddd;display: flex; justify-content: center;  align-items: center;"
+        id="$divId$"
+        style="margin: 10px auto 10px auto;text-align: center; border: 1px dashed #ddd;display: flex; justify-content: center;  align-items: center;"
         v-bind:style="divStyle"
         @click="imgContextmenu"
       >
-        <div style="width:100px;height:90px;">
+        <div >
           <img v-if="compImg.imgPath" :src="compImg.imgPath" style="width: 100px; height:70px;" />
           <span
             v-if="compImg.imgPath"
@@ -474,5 +475,6 @@ export default {
   height: 75px;
   line-height: 75px;
   text-align: center;
+  
 }
 </style>

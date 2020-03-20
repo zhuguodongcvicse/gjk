@@ -94,8 +94,10 @@
           :before-upload="beforeAvatarUpload"
           accept="image/jpeg, image/jpg, image/png"
         >
-          <div class="icon_choose_imgdiv_14s" v-bind:style="divStyle" ref="imageWrapper">
-            <div class="avatar-uploader" style="width:100px;height:90px;">
+          <div class="icon_choose_imgdiv_14s"       
+            style="text-align: center; border: 1px dashed #ddd;display: flex; justify-content: center;  align-items: center;"
+             v-bind:style="divStyle" ref="imageWrapper">
+            <div class="avatar-uploader" >
               <img v-if="compImg.imgPath" :src="compImg.imgPath" style="width:100px;height:70px;" />
               <span
                 v-if="compImg.imgPath"
@@ -139,7 +141,6 @@
 <script>
 import { randomUuid, deepClone } from "@/util/util";
 //导入html转图片
-import html2canvas from "html2canvas";
 export default {
   props: ["imgValue", "compImg", "divStyle"],
   mounted() {},
@@ -164,33 +165,6 @@ export default {
     parseToDOM(htmlString) {
       return new DOMParser().parseFromString(htmlString, "text/html").body
         .childNodes[0];
-    },
-    toImage() {
-      let template =
-        '<div class="icon_choose_imgdiv_14s"  style="height: 97px; width: 110px; border: 2px solid rgb(24, 172, 225); border-radius: 10px; background-color: rgb(204, 210, 190);" ref="imageWrapper">' +
-        '<div class="avatar-uploader" style="width:100px;height:90px;">' +
-        '<img src="' +
-        this.compImg.imgPath +
-        '" style="width:100px;height:70px;" />' +
-        '<span style="display:block;line-height: 18px;font-size:14px"' +
-        ">" +
-        this.compImg.imgShowName +
-        "</span>" +
-        "</div>" +
-        "</div>";
-
-      let frag = this.parseToDOM(template);
-      console.log("template",template)
-      console.log(
-        "this.$refs.imageWrapper",
-        this.$refs.imageWrapper,
-        typeof this.$refs.imageWrapper
-      );
-      console.log("this.$refs.imageWrapper", frag, typeof frag);
-      html2canvas(frag).then(canvas => {
-        let dataURL = canvas.toDataURL("image/png");
-        console.log("dataURL", dataURL);
-      });
     },
     handleAvatarSuccess(res, file) {
       this.imageUrl = URL.createObjectURL(file.raw);
