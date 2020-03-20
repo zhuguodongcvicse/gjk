@@ -1,30 +1,88 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8" />
-		<title></title>
-		<script src="js/go.js"></script>
-		<script src="js/index.js"></script>
-		<link rel="stylesheet" href="css/index.css" />
-		<link rel="stylesheet" href="css/jquery-ui.min.css"/>
-		
-	</head>
-	<body style="width: 100%; height: 100%;" onload="init()">
-		<div style="width: 100%; display: flex; justify-content: space-between;" >
-    <div id="myPaletteDiv" style="width: 120px; margin-right: 2px; background-color: whitesmoke; border: solid 1px yellow">
-    	
-    	<div class="btn" style='text-align:center;height:80px;width:110px;border:1px solid #000;border-radius:5px;display: block;' >
-    		<img src="img/bbb.png" style='vertical-align: middle;width: 110px; height:80px;border-radius:5px;'/>
-    		<div class='desc' >1108</div></br>
-    	</div>
-    	
-    	
-    </div>
-    <div id="myDiagramDiv" style="flex-grow: 1; height: 750px; border: solid 1px black"></div>
-  </div>
-	</body>
+
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<script src="js/go.js"></script>
+	<script src="js/index.js"></script>
+	<script src="js/html2canvas.js"></script>
+	<link rel="stylesheet" href="css/index.css" />
+	<link rel="stylesheet" href="css/jquery-ui.min.css"/>
+	<link rel="stylesheet" type="text/css" href="../jsplumb/css/font-awesome.min.css" />
+	<link rel="stylesheet" type="text/css" href="../jsplumb/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="../jsplumb/css/bootstrap-select.min.css">
+</head>
+
+<body onselectstart = "return false" onload="load()">
+	
+	<!-- <div id="app"> -->
+		<div class="container-fluid public_jsplumb_index_14s">
+			<div class="row">
+				<div id="side-buttons" class="div_left min-height">
+
+					<div id="gjk" class="public_jsplumb_left_14s" >
+						<label>构件列表</label><br/>
+						
+					</div>
+
+					<div class="panel-group" id="accordion" style="display: none;">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title" style="text-align: center;">
+									<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+										已更新
+									</a>
+								</h4>
+							</div>
+							<div id="collapseOne" class="panel-collapse collapse in">
+								<div class="pre-scrollable" id="update">
+					
+								</div>
+							</div>
+						</div>
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title" style="text-align: center;">
+									<a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+										未更新
+									</a>
+								</h4>
+							</div>
+							<div id="collapseTwo" class="panel-collapse collapse">
+								<div class="pre-scrollable" id="notUpdate">
+					
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--中间画布-->
+				<div>
+					<div class="div_right min-height public_jsplumb_right1_14s" id="myDiagramDiv">
+					</div>
+					
+
+				</div>
+				
+				<div class = "border">
+						<div class="line"></div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	</div>
+	</div>
+	<!-- <script>
+		function queryServer(){
+	$( "#accordion" ).accordion({
+	collapsible: true
+});
+}
+	</script> -->
+	<!-- </div> -->
 	<script src="js/jquery.min.js"></script>
 	<script src="js/jquery-ui.min.js"></script>
-		
-		
+</body>
 </html>
