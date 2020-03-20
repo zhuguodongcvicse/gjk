@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
+import javax.validation.constraints.Max;
 import java.util.*;
 
 /**
@@ -73,7 +74,7 @@ public class SimulatorServiceImpl implements SimulatorService {
         redisTemplate.opsForValue().set(username + ":initState", "1");
         //模拟发布
         JedisPool jedisPool = new JedisPool(new JedisPoolConfig(), "127.0.0.1", 6379);
-        Publisher Publisher = new Publisher(jedisPool, host,"Simulator:admin:A");
+        Publisher Publisher = new Publisher(jedisPool, host, "Simulator:admin:A");
         Publisher.start();
         //初始化监听对象
         Subscriber subscriber = new Subscriber();
@@ -83,9 +84,9 @@ public class SimulatorServiceImpl implements SimulatorService {
         //启动监听线程
         new SubscriberThread(subscriber, channelName, host).start();
         //启用客户线程，传入参数
-       MoniRecvDataThread startMoniRecvDataThread = ExternalIOTransUtils.startMoniRecvDataThread(host, channelName, componentLinks, filePath, tabFilePath);
+        MoniRecvDataThread startMoniRecvDataThread = ExternalIOTransUtils.startMoniRecvDataThread(host, channelName, componentLinks, filePath, tabFilePath);
 
-       //放入全局变量
+        //放入全局变量
         Global.USERS_SIMULATOR_THREAD.put(username, startMoniRecvDataThread);
         return true;
     }
@@ -127,133 +128,117 @@ public class SimulatorServiceImpl implements SimulatorService {
         String FilePath = managerServiceImpl.getprocessFile(projectId);
         String packinfoFileName = gitDetailPath + FilePath + generateCodeResult + "/packinfo.xml";
         String XmlFilePath = simulationDTO.getFlowFilePath();
-                String arrowInfo = simulationDTO.getStartId() + ":" + simulationDTO.getStartName() + "|" + simulationDTO.getEndId() + ":" + simulationDTO.getEndName();
+        String arrowInfo = simulationDTO.getStartId() + ":" + simulationDTO.getStartName() + "|" + simulationDTO.getEndId() + ":" + simulationDTO.getEndName();
 
-      /*  //获取结构体表格数据
+        //获取结构体表格数据
         String[] tabNames = ((String) objects.get("tabNameList")).split("\\|");
         List<SimulationTableDataDTO> tableData = Lists.newArrayList();
         //解析表格数据，得到表格对象集合
         tableData.addAll(forEachGetSimulationTableData((Map) objects.get(tabNames[0])));
         tableData.addAll(forEachGetSimulationTableData((Map) objects.get(tabNames[1])));
         //获取最大xyz维度
-        Map<String, String> MaxXYZ = ExternalIOTransUtils.getMaxXYZ(XmlFilePath, packinfoFileName, objects, arrowInfo);*/
-        if (simulationDTO.getX() == null) {
+        Map<String, String> MaxXYZ = ExternalIOTransUtils.getMaxXYZ(XmlFilePath, packinfoFileName, objects, arrowInfo);
+           String xMax =  MaxXYZ.get("xMax");
+           String yMax =  MaxXYZ.get("yMax");
+           String zMax =  MaxXYZ.get("zMax");
+        //模拟数据++++++++++++++++++
+//        int xMax = 10;
+//        int yMax = 9;
+//        int zMax = 8;
             //获取最大维度值添加到配置页面数据中
             HashMap<String, Object> packDataMap = new HashMap<>();
             packDataMap.put("data", objects);
-            packDataMap.put("x", "10");
-            packDataMap.put("y", "9");
-            packDataMap.put("z", "8");
+            //判断是否为第一次加载页面
+            if(simulationDTO.getX() == null){
+                packDataMap.put("x", xMax);
+                packDataMap.put("y", yMax);
+                packDataMap.put("z", zMax);
+            }else{
+                //xyz页面配置
+                packDataMap.put("x", simulationDTO.getX());
+                packDataMap.put("y", simulationDTO.getY());
+                packDataMap.put("z", simulationDTO.getZ());
+            }
+            packDataMap.put("xMax", xMax);
+            packDataMap.put("yMax", yMax);
+            packDataMap.put("zMax", zMax);
             packDataMap.put("symbol", simulationDTO.getSymbol());
-            packDataMap.put("dataProecssingType", simulationDTO.getDataProcessingType());
-          //  Map<String, Object> dataInfo = ExternalIOTransUtils.parseMoniData(XmlFilePath, packinfoFileName, packDataMap, arrowInfo);
+            packDataMap.put("dataHandleType", simulationDTO.getDataProcessingType());
+              Map<String, Object> dataInfo = ExternalIOTransUtils.parseMoniData(XmlFilePath, packinfoFileName, packDataMap, arrowInfo);
             Map<String, Object> dataMap = Maps.newHashMap();
-            //表格数据
-            dataMap.put("tableData", "tableData");
+            //表格数据(表格数据)
+            dataMap.put("tableData", tableData);
             //展示数据
-            dataMap.put("data", objects.get("data"));
-            //模拟数据
-            int maxx = 10;
-            int maxy = 9;
-            int maxz = 8;
-            //重组x维度数据
-            ArrayList<Object> xList = new ArrayList<>();
-            for(int  i=0; i<=maxx ;i++){
-                xList.add(i);
-            }
-            xList.add("All");
-            Collections.reverse(xList);
-            //重组y维度数据
-            ArrayList<Object> yList = new ArrayList<>();
-            for(int  i=0; i<=maxy ;i++){
-                yList.add(i);
-            }
-            yList.add("All");
-            Collections.reverse(yList);
-            //重组z维度数据
-            ArrayList<Object> zList = new ArrayList<>();
-            for(int  i=0; i<=maxz ;i++){
-                zList.add(i);
-            }
-            zList.add("All");
-            Collections.reverse(zList);
-            HashMap<String, Object> x = new HashMap<>();
-            x.put("x",xList);
-            x.put("y",yList);
-            x.put("z",zList);
-            dataMap.put("maxXYZ",x);
+            //dataMap.put("data", objects.get("Data"));
+            dataMap.put("data", dataInfo.get("Data"));
+            //获取最大值最小值
+//            dataMap.put("MaxValue", objects.get("MaxValue"));
+//            dataMap.put("MinValue", objects.get("MinValue"));
+            //重组xyz维度数据
+            HashMap<String, Object> xyz = dataSplitting(Integer.parseInt(xMax), Integer.parseInt(yMax), Integer.parseInt(zMax));
+            dataMap.put("maxXYZ", xyz);
             return dataMap;
-        } else {
-            HashMap<String, Object> packDataMap = new HashMap<>();
-            //数据包
-            packDataMap.put("data", objects);
-            //xyz最大值
-            packDataMap.put("x", simulationDTO.getX());
-            packDataMap.put("y", simulationDTO.getY());
-            packDataMap.put("z", simulationDTO.getZ());
-            //数据源
-            packDataMap.put("symbol", simulationDTO.getSymbol());
-            //数据处理 类型
-            packDataMap.put("dataProecssingType", simulationDTO.getDataProcessingType());
-           //获取展示数据
-            //Map<String, Object> dataInfo = ExternalIOTransUtils.parseMoniData(XmlFilePath, packinfoFileName, packDataMap, arrowInfo);
-
-            Map<String, Object> dataMap = Maps.newHashMap();
-            //表格数据
-            dataMap.put("tableData", "tableData");
-            //展示数据
-            //dataMap.put("Data",dataInfo);
-            dataMap.put("data", objects.get("data"));
-            //模拟数据
-            int maxx = 10;
-            int maxy = 9;
-            int maxz = 8;
-            //重组x维度数据
-            ArrayList<Object> xList = new ArrayList<>();
-            for(int  i=0; i<=maxx ;i++){
-                xList.add(i);
-            }
-            xList.add("All");
-            Collections.reverse(xList);
-            //重组y维度数据
-            ArrayList<Object> yList = new ArrayList<>();
-            for(int  i=0; i<=maxy ;i++){
-                yList.add(i);
-            }
-            yList.add("All");
-            Collections.reverse(yList);
-            //重组z维度数据
-            ArrayList<Object> zList = new ArrayList<>();
-            for(int  i=0; i<=maxz ;i++){
-                zList.add(i);
-            }
-            zList.add("All");
-            Collections.reverse(zList);
-            HashMap<String, Object> x = new HashMap<>();
-            x.put("x",xList);
-            x.put("y",yList);
-            x.put("z",zList);
-            dataMap.put("maxXYZ",x);
-            return dataMap;
-        }
     }
-//暂停获取帧数
+    //重组xyz维度数据
+    public HashMap<String, Object> dataSplitting(Integer xMax, Integer yMax, Integer zMax) {
+        ArrayList<Object> xList = new ArrayList<>();
+        for (int i = 0; i <= xMax; i++) {
+            xList.add(i);
+        }
+        xList.add("All");
+        Collections.reverse(xList);
+        //重组y维度数据
+        ArrayList<Object> yList = new ArrayList<>();
+        for (int i = 0; i <= yMax; i++) {
+            yList.add(i);
+        }
+        yList.add("All");
+        Collections.reverse(yList);
+        //重组z维度数据
+        ArrayList<Object> zList = new ArrayList<>();
+        for (int i = 0; i <= zMax; i++) {
+            zList.add(i);
+        }
+        zList.add("All");
+        Collections.reverse(zList);
+        HashMap<String, Object> maxXYZ = new HashMap<>();
+        maxXYZ.put("x", xList);
+        maxXYZ.put("y", yList);
+        maxXYZ.put("z", zList);
+        return maxXYZ;
+    }
+
+    //暂停获取帧数
     @Override
-    public Map<String, List<String>> suspend(String username, List<String> symbols) {
+    public  ArrayList<Object> suspend(String username, List<String> symbols) {
         ListOperations<String, String> operations = redisTemplate.opsForList();
-        Map<String, List<String>> symbolFrameSelect = Maps.newHashMap();
+
+
+        ArrayList<Object> symbolList = Lists.newArrayList();
         List<String> selectData = Lists.newArrayList();
+       // List<Object> dataList = Lists.newArrayList();
         for (String symbol : symbols) {
             String key = "Simulator:" + username + ":" + symbol;
             Long size = operations.size(key);
             List<String> range = operations.range(key, 0, size - 1);
+            HashMap<String, Object> dataMaps = new HashMap<>();
             for (String s : range) {
                 JSONObject dataMap = JSONUtil.parseObj(s);
-                selectData.add(dataMap.get("frameNum") + "");
+                selectData.add(dataMap.get("FrameId").toString());
+               // dataList.add(dataMap.get("Data").toString());
+               // dataMaps.put(dataMap.get("FrameId").toString(),dataMap.get("Data"));
+              //  dataList.add(dataMap.get("FrameId").toString());
+              //  dataList.add(dataMap.get("Data"));
             }
-            symbolFrameSelect.put(symbol, selectData);
+
+          //  symbolFrameSelect.put(symbol, selectData);
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("symbol",symbol);
+            map.put("selectData",selectData);
+         //   map.put("dataMaps",dataList);
+            symbolList.add(map);
         }
-        return symbolFrameSelect;
+        return symbolList;
     }
 
     //点击小图标获取数据源获取
@@ -265,8 +250,12 @@ public class SimulatorServiceImpl implements SimulatorService {
         //调用客户接口 获取数据源
         HashMap<String, Object> Data = new HashMap<>();
         List<SysDict> dataProcessingType = sysDictMapper.getDictTypes();
-       // Data.put("sourceData",moniRecvDataThread.getArrowIdList(simulationDto.getStartId() + "|" + simulationDto.getEndId()));
-        Data.put("sourceData","A");
+         Data.put("sourceData",moniRecvDataThread.getArrowIdList(simulationDto.getStartId() + "|" + simulationDto.getEndId()));
+        //模拟假数据++++++++++++++++++++++++++++++++++++++++++++++
+//        ArrayList<Object> list = new ArrayList<>();
+//        list.add("A");
+//        list.add("B");
+//        Data.put("sourceData", list);
         Data.put("dataProcessingType", dataProcessingType);
         return Data;
     }

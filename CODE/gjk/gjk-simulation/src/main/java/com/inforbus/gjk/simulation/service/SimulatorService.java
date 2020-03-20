@@ -40,7 +40,7 @@ public interface SimulatorService {
      * @param symbols 标识集合
      * @return
      */
-    Map<String, List<String>> suspend(String username, List<String> symbols);
+    List<Object> suspend(String username, List<String> symbols);
 
     Map<String,Object> getDataSource(String username, SimulationDTO simulationDTO);
 

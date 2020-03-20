@@ -4,17 +4,29 @@
       <el-col>
         <div style="margin-top: 8px">
           <el-form :inline="true" size="mini" label-width="80px">
-            <el-form-item label="区域一">
-              <el-select placeholder="请选择展示帧号" v-model="myChartsSelectValue">
+            <template v-for="(node,index) in stopData1">
+              <el-form-item :label="node.label" :key="index">
+                <el-select :placeholder="node.placeholder" v-model="node.value">
+                  <el-option
+                    v-for="(item,index) in node.frameData"
+                    :key="index"
+                    :label="item"
+                    :value="item"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+            </template>
+            <!-- <el-form-item label="区域一">
+              <el-select placeholder="请选择展示帧号" v-model="stopData.FrameIds">
                 <el-option
-                  v-for="(attribute,index) in myChartsSelectData"
+                  v-for="(item,index) in FrameIds"
                   :key="index"
-                  :label="attribute.label"
-                  :value="attribute.value"
+                  :label="item"
+                  :value="item"
                 ></el-option>
               </el-select>
-            </el-form-item>
-            <el-form-item label="区域二">
+            </el-form-item>-->
+            <!-- <el-form-item label="区域二">
               <el-select placeholder="请选择展示帧号" v-model="myCharts1SelectValue">
                 <el-option
                   v-for="(attribute,index) in myCharts1SelectData"
@@ -23,13 +35,13 @@
                   :value="attribute.value"
                 ></el-option>
               </el-select>
-            </el-form-item>
+            </el-form-item>-->
             <el-form-item>
               <el-button type="primary" @click="start">展示</el-button>
             </el-form-item>
             <!-- <el-form-item>
               <el-button type="primary" @click="stop">暂停</el-button>
-            </el-form-item> -->
+            </el-form-item>-->
           </el-form>
         </div>
       </el-col>
@@ -67,19 +79,37 @@
                 <el-form-item label="X维:">
                   <!-- <el-input v-model="formData.attr1"></el-input> -->
                   <el-select placeholder="请选择" v-model="formData.x">
-                    <el-option v-for="(item,index) in X" :key="index" :label="item" :value="item"  :disabled="is_true==1?true:false"></el-option>
+                    <el-option
+                      v-for="(item,index) in X"
+                      :key="index"
+                      :label="item"
+                      :value="item"
+                      :disabled="is_true==1?true:false"
+                    ></el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="Y维:">
                   <!-- <el-input v-model="formData.attr2"></el-input> -->
                   <el-select placeholder="请选择" v-model="formData.y">
-                    <el-option v-for="(item,index) in Y" :key="index" :label="item" :value="item" :disabled="is_true==1?true:false"></el-option>
+                    <el-option
+                      v-for="(item,index) in Y"
+                      :key="index"
+                      :label="item"
+                      :value="item"
+                      :disabled="is_true==1?true:false"
+                    ></el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="Z维:">
                   <!-- <el-input v-model="formData.attr3"></el-input> -->
                   <el-select placeholder="请选择" v-model="formData.z">
-                    <el-option v-for="(item,index) in Z" :key="index" :label="item" :value="item" :disabled="is_true==1?true:false"></el-option>
+                    <el-option
+                      v-for="(item,index) in Z"
+                      :key="index"
+                      :label="item"
+                      :value="item"
+                      :disabled="is_true==1?true:false"
+                    ></el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="数据展示:">
@@ -153,11 +183,44 @@
 <script>
 import { mapGetters } from "vuex";
 import { getDataSource, simulation, stop } from "@/api/simula/simulation";
-
 export default {
   name: "hello",
   data() {
     return {
+     startData:{
+    username:"",
+    projectId:"",
+    startId:"",
+    endId:"",
+    startName:"",
+    endName:"",
+    symbol:{},
+    dataProcessingType:"",
+    flowFilePath:"",
+    frameId:[]
+     },
+    
+      frameData1:"",
+      frameData2:"",
+      stopData1: [
+        {
+          frameData: [],
+          label: "区域一",
+          value: "",
+          placeholder: "请选择展示帧号"
+        },
+        {
+          frameData: [],
+          label: "区域二",
+          value: "",
+          placeholder: "请选择展示帧号"
+        }
+      ],
+
+      // stopData: {
+      //   FrameIds: ""
+      // },
+      FrameIds: [],
       is_true: 1,
       X: [],
       Y: [],
@@ -228,7 +291,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["userInfo"])
+    ...mapGetters(["userInfo",""])
   },
   watch: {},
 
@@ -246,6 +309,8 @@ export default {
       this.$set(data, "dataProcessingType", this.formData.dataProcessingType);
       this.$set(data, "flowFilePath", this.$route.query.flowFilePath);
       var tmdata = JSON.parse(JSON.stringify(data));
+      this.frameData1 = tmdata;
+
       console.log("tmdata", tmdata);
       simulation(tmdata).then(response => {
         console.log("*******************************", response);
@@ -256,14 +321,14 @@ export default {
         this.X = response.data.data.maxXYZ.x;
         this.Y = response.data.data.maxXYZ.y;
         this.Z = response.data.data.maxXYZ.z;
-        if(!this.formData.x){
-          this.formData.x =  response.data.data.maxXYZ.x[1];
+        if (!this.formData.x) {
+          this.formData.x = response.data.data.maxXYZ.x[1];
         }
-        if(!this.formData.y){
-          this.formData.y =  response.data.data.maxXYZ.y[1];
+        if (!this.formData.y) {
+          this.formData.y = response.data.data.maxXYZ.y[1];
         }
-        if(!this.formData.z){
-          this.formData.z =  response.data.data.maxXYZ.z[1];
+        if (!this.formData.z) {
+          this.formData.z = response.data.data.maxXYZ.z[1];
         }
         this.tableData = response.data.data.tableData;
         let self = this;
@@ -274,12 +339,17 @@ export default {
           }, 1000);
         }
         this.simulationData = response.data.data;
-       
+        var xdata = response.data.data.data;
+        var ydata = [];
+        for(var i=0; i<=xdata.length; i++){
+          ydata.push(i);
+        }
         var data = {
           symbol: tmdata.symbol,
-          xaxisData: response.data.data.data,
-          yaxisData: response.data.data.data
+          xaxisData:xdata,
+          yaxisData: ydata
         };
+        console.log("++++++++++++++++++", data);
         // 基于准备好的dom，初始化echarts实例
         let myChart = this.$echarts.init(document.getElementById("myChart"));
         // 绘制图表
@@ -298,6 +368,7 @@ export default {
       this.$set(data, "dataProcessingType", this.formData.dataProcessingType);
       this.$set(data, "flowFilePath", this.$route.query.flowFilePath);
       var tmdata = JSON.parse(JSON.stringify(data));
+      this.frameData2 = tmdata;
 
       simulation(tmdata).then(response => {
         if (this.flag) {
@@ -311,10 +382,15 @@ export default {
           }, 1000);
         }
         this.simulationData = response.data.data;
+      var xdata = response.data.data.data;
+      var ydata = [];
+        for(var i=0; i<=xdata.length; i++){
+          ydata.push(i);
+        }
         var data = {
           symbol: tmdata.symbol,
-          xaxisData: response.data.data.data,
-          yaxisData: response.data.data.data
+          xaxisData: xdata,
+          yaxisData: ydata
         };
         // 基于准备好的dom，初始化echarts实例
         let myChart = this.$echarts.init(document.getElementById("myChart1"));
@@ -384,7 +460,7 @@ export default {
           {
             name: "数据流量",
             type: "value",
-            max: 500
+            //max: 10
           }
         ],
         series: [
@@ -399,29 +475,63 @@ export default {
       };
       return option;
     },
+    //选择帧数展示
     start() {
+   
+       this.startData.username=this.userInfo.username;
+      this.startData.projectId = this.$route.query.flowId;
+      this.startData.startId = this.$route.query.startId;
+      this.startData.endId = this.$route.query.endId;
+       this.startData.startName = this.$route.query.startName;
+       this.startData.endName =  this.$route.query.endName;
+       this.startData.symbol = this.datasource;
+      this.startData.dataProcessingType = this.$route.query.startName;
+      this.startData.flowFilePath = this.$route.query.flowFilePath;
+      this.startData.frameId = this.stopData1;
+
+      console.log("tmdata++++++++++++++",  this.startData);
+
+
+      // start(tmdata).then(response => {
+
+
+      // })
+       
+     
       if (this.myChartsFormData != undefined) {
-        this.drawLine1(this.myChartsFormData);
+      // this.drawLine1(this.myChartsFormData);
       }
       if (this.myCharts1FormData != undefined) {
-        this.drawLine2(this.myCharts1FormData);
+       // this.drawLine2(this.myCharts1FormData);
       }
       this.flag = false;
     },
     stop() {
-       this.is_true = 0;
+      this.is_true = 0;
       window.clearTimeout(this.myCharts);
       window.clearTimeout(this.myCharts1);
       this.myCharts = null;
       this.myCharts1 = null;
-      this.flag = true;
       let symbols = [];
       for (let i = 0; i < this.datasource.length; i++) {
         symbols.push(this.datasource[i].value);
       }
       stop(this.userInfo.username, { symbols: symbols }).then(req => {
-        console.log(req.data.data);
+        let data = req.data.data;
+       console.log("数据源shuju ", this.datasource);
+        this.stopData1[0].frameData = data[0].selectData;
+        this.stopData1[0].label = data[0].symbol + "展示区一";
+        this.stopData1[0].placeholder = "请选择展示帧号";
+        this.stopData1[0].value = "";
+        console.log("帧数获取", req.data.data);
+
+        this.stopData1[1].frameData = data[1].selectData;
+        this.stopData1[1].label = data[1].symbol  + "展示区二";
+        this.stopData1[1].placeholder = "请选择展示帧号";
+        this.stopData1[1].value = "";
+        console.log("帧数获取", req.data.data);
       });
+        this.flag = true;
     },
     getDataSource(flowFilePath, startId, endId) {
       console.log("startId", startId, endId);
@@ -495,7 +605,6 @@ export default {
     };
     this.getDataSource(flowFilePath, startId, endId);
     var projectId = this.$route.query.flowId;
-    console.log(6666666666, this.$route.query);
   },
 
   //生命周期 - 挂载完成（可以访问DOM元素）
