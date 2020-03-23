@@ -479,15 +479,36 @@ $(".avatar-uploader").draggable({
   myDiagram.addDiagramListener("ClipboardPasted", function(e) {
     e.subject.each(function(part) {
       console.log("复制到画布数据",part.Zd)
-      //此处处理part
+      console.log("新旧id",part.Zd.key.substr(0,part.Zd.key.length-1))
+      var uuidList = new Array()
+      for(let leftPort of part.Zd.leftArray){
+        leftPort.portId = leftPort.portId.split("*")[0]+"*"+leftPort.portId.split("*")[1]+"*"+part.Zd.key
+        uuidList.push(leftPort.portId)
+      }
+      for(let rightPort of part.Zd.rightArray){
+        rightPort.portId = rightPort.portId.split("*")[0]+"*"+rightPort.portId.split("*")[1]+"*"+part.Zd.key
+        uuidList.push(rightPort.portId)
+      }
+      var gjidAndTemid = [];
+      gjidAndTemid.push({
+        //构件ID
+        gjId: part.Zd.compId,
+        //构件模板新ID
+        newTmpId: part.Zd.key,
+        //构件模板旧id
+        oldTmpId: part.Zd.key.substr(0,part.Zd.key.length-1),
+        //状态
+        state: 4,
+        //节点所有锚点uuid
+        uuidList: uuidList
+      });
     })
   })
   //复制/剪切到剪切板
   myDiagram.addDiagramListener("ClipboardChanged", function(e) {
-    console.log("剪切版数据")
+    //console.log("剪切版数据1111",e.subject)
     e.subject.each(function(part) {
       console.log("剪切版数据",part.Zd)
-      //此处处理part
     })
   })
 
@@ -684,9 +705,14 @@ function findPortData(fromPort,toPort){
       }
       linkData.push(con)
     }
+    let canvasAllKey = new Array()
+    for(let node of nodeDataArray){
+      canvasAllKey.push(node.key)
+    }
     var saveData = {
       "saveArrow": JSON.stringify({arrow: linkData }),
-      "saveflowChartJson": myDiagram.model.toJson()
+      "saveflowChartJson": myDiagram.model.toJson(),
+      "canvasAllKey" :canvasAllKey
     };
     handleMessage(saveData, 'returnSave');
     //return JSON.stringify({arrow: linkData });
