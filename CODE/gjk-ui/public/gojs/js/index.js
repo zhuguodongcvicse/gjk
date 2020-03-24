@@ -50,7 +50,11 @@ function handleMessageFromParent(event) {
 		case 'clickCompLoading':
       loadData = data.params
       console.log("加载流程图数据",data.params)
-			break
+      break
+    case 'import':
+      loadData = data.params
+      reduction();
+      break
 		// case 'sendCompFzData':
 		// 	componentMap.set(data.params.compId, data.params.compData)
 		// 	break
@@ -83,9 +87,9 @@ function handleMessageFromParent(event) {
 		// 			break;
 		// 	}
 		// 	break;
-		// case 'cleanCanvas':
-		// 	cleanCanvas();
-		// 	break;
+		case 'cleanCanvas':
+			cleanCanvas();
+			break;
 		// case 'bottonCheckComp':
 		// 	if (!data.params) {
 		// 		$("#accordion").show()
@@ -460,7 +464,6 @@ $(".avatar-uploader").draggable({
 
   //删除节点
   myDiagram.addDiagramListener("SelectionDeleting", function(e) {
-    console.log("删除一个节点",part.Zd)
     e.subject.each(function(part) {
       console.log("删除一个节点",part.Zd)
       //此处处理part
@@ -507,9 +510,17 @@ $(".avatar-uploader").draggable({
   //复制/剪切到剪切板
   myDiagram.addDiagramListener("ClipboardChanged", function(e) {
     //console.log("剪切版数据1111",e.subject)
+    var idList = []
     e.subject.each(function(part) {
-      console.log("剪切版数据",part.Zd)
+      idList.push(part.Zd.key)
     })
+    var gjidAndTemid = []
+		gjidAndTemid.push({
+			gjId: "",
+			tmpId: idList,
+			state: 3
+		})
+		handleMessageToParent("returnFormJson", gjidAndTemid);
   })
 
 //点击画布事件
@@ -608,6 +619,11 @@ function findPortData(fromPort,toPort){
 }
   function reduction(){
     myDiagram.model = go.Model.fromJson(loadData)
+  }
+
+  //清空当前画布
+  function cleanCanvas() {
+    myDiagram.model = go.Model.fromJson({})
   }
 
   //保存arrow集合
