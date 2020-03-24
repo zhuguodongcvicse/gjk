@@ -505,6 +505,7 @@ $(".avatar-uploader").draggable({
         //节点所有锚点uuid
         uuidList: uuidList
       });
+      handleMessageToParent("returnFormJson", gjidAndTemid);
     })
   })
   //复制/剪切到剪切板
