@@ -40,8 +40,8 @@
               <el-button type="primary" @click="start">展示</el-button>
             </el-form-item>
             <!-- <el-form-item>
-              <el-button type="primary" @click="stop">暂停</el-button>
-            </el-form-item>-->
+              <el-button type="primary" @click="stop1">清除</el-button>
+            </el-form-item> -->
           </el-form>
         </div>
       </el-col>
@@ -182,38 +182,37 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import { getDataSource, simulation, stop } from "@/api/simula/simulation";
+import { getDataSource, simulation, stop,start } from "@/api/simula/simulation";
 export default {
   name: "hello",
   data() {
     return {
-     startData:{
-    username:"",
-    projectId:"",
-    startId:"",
-    endId:"",
-    startName:"",
-    endName:"",
-    symbol:{},
-    dataProcessingType:"",
-    flowFilePath:"",
-    frameId:[]
-     },
-    
-      frameData1:"",
-      frameData2:"",
+      startData: {
+        username: "",
+        projectId: "",
+        startId: "",
+        endId: "",
+        startName: "",
+        endName: "",
+      //  symbol: {},
+        dataProcessingType: "",
+        flowFilePath: "",
+        frameId: []
+      },
       stopData1: [
         {
           frameData: [],
           label: "区域一",
           value: "",
-          placeholder: "请选择展示帧号"
+          placeholder: "请选择展示帧号",
+          symbol:""
         },
         {
           frameData: [],
           label: "区域二",
           value: "",
-          placeholder: "请选择展示帧号"
+          placeholder: "请选择展示帧号",
+          symbol:""
         }
       ],
 
@@ -291,7 +290,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["userInfo",""])
+    ...mapGetters(["userInfo", ""])
   },
   watch: {},
 
@@ -309,11 +308,7 @@ export default {
       this.$set(data, "dataProcessingType", this.formData.dataProcessingType);
       this.$set(data, "flowFilePath", this.$route.query.flowFilePath);
       var tmdata = JSON.parse(JSON.stringify(data));
-      this.frameData1 = tmdata;
-
-      console.log("tmdata", tmdata);
       simulation(tmdata).then(response => {
-        console.log("*******************************", response);
         if (this.flag) {
           return;
         }
@@ -330,30 +325,32 @@ export default {
         if (!this.formData.z) {
           this.formData.z = response.data.data.maxXYZ.z[1];
         }
+        //显示表格
         this.tableData = response.data.data.tableData;
-        let self = this;
+       
+        this.simulationData = response.data.data;
+        var ydata = JSON.parse(JSON.stringify(response.data.data.data)) ;
+        var xdata = [];
+        for (var i = 0; i <= ydata.length; i++) {
+          xdata.push(i);
+        }
+        var data = {
+          symbol: tmdata.symbol,
+          xaxisData: xdata,
+          yaxisData: ydata
+        };
+        // 基于准备好的dom，初始化echarts实例
+        let myChart = this.$echarts.init(document.getElementById("myChart"));
+        // 绘制图表
+        myChart.setOption(this.getOption(data));
+
+         let self = this;
         if (self && !self._isDestroyed) {
           //循环发送请求解决路由页面依旧发请求问题
           this.myCharts = setTimeout(() => {
             self.drawLine1(data);
           }, 1000);
         }
-        this.simulationData = response.data.data;
-        var xdata = response.data.data.data;
-        var ydata = [];
-        for(var i=0; i<=xdata.length; i++){
-          ydata.push(i);
-        }
-        var data = {
-          symbol: tmdata.symbol,
-          xaxisData:xdata,
-          yaxisData: ydata
-        };
-        console.log("++++++++++++++++++", data);
-        // 基于准备好的dom，初始化echarts实例
-        let myChart = this.$echarts.init(document.getElementById("myChart"));
-        // 绘制图表
-        myChart.setOption(this.getOption(data));
       });
     },
     drawLine2(data) {
@@ -374,6 +371,7 @@ export default {
         if (this.flag) {
           return;
         }
+
         let self = this;
         if (self && !self._isDestroyed) {
           //循环发送请求解决路由页面依旧发请求问题
@@ -381,11 +379,12 @@ export default {
             self.drawLine2(data);
           }, 1000);
         }
-        this.simulationData = response.data.data;
-      var xdata = response.data.data.data;
-      var ydata = [];
-        for(var i=0; i<=xdata.length; i++){
-          ydata.push(i);
+        //显示表格
+        this.tableData = response.data.data.tableData;
+       var ydata = JSON.parse(JSON.stringify(response.data.data.data)) ;
+        var xdata = [];
+        for (var i = 0; i <= ydata.length; i++) {
+          xdata.push(i);
         }
         var data = {
           symbol: tmdata.symbol,
@@ -397,6 +396,54 @@ export default {
         // 绘制图表
         myChart.setOption(this.getOption(data));
       });
+    },
+        drawLine3(data) {
+      console.log("++++++++++++++++++",data)
+      this.myChartsShow = true;
+      this.is_true = 0;
+        if (this.flag) {
+          return;
+        }
+        this.simulationData = data;
+        var ydata = data.data;
+        var xdata = [];
+        for (var i = 0; i <= ydata.length; i++) {
+          xdata.push(i);
+        }
+        var data = {
+          symbol: data.symbol,
+          xaxisData: xdata,
+          yaxisData: ydata
+        };
+        // 基于准备好的dom，初始化echarts实例
+        let myChart = this.$echarts.init(document.getElementById("myChart"));
+        // 绘制图表
+        myChart.setOption(this.getOption(data));
+    
+    },
+      drawLine4(data) {
+      console.log("++++++++++++++++++",data)
+      this.myChartsShow = true;
+      this.is_true = 0;
+        if (this.flag) {
+          return;
+        }
+        this.simulationData = data;
+        var ydata = data.data;
+        var xdata = [];
+        for (var i = 0; i <= ydata.length; i++) {
+          xdata.push(i);
+        }
+        var data = {
+          symbol: data.symbol,
+          xaxisData: xdata,
+          yaxisData: ydata
+        };
+        // 基于准备好的dom，初始化echarts实例
+        let myChart = this.$echarts.init(document.getElementById("myChart"));
+        // 绘制图表
+        myChart.setOption(this.getOption(data));
+    
     },
     getOption(data) {
       var option = {
@@ -459,7 +506,7 @@ export default {
         yAxis: [
           {
             name: "数据流量",
-            type: "value",
+            type: "value"
             //max: 10
           }
         ],
@@ -477,37 +524,48 @@ export default {
     },
     //选择帧数展示
     start() {
-   
-       this.startData.username=this.userInfo.username;
+      this.is_true = 0;
+      this.startData.x = this.formData.x;
+      this.startData.y = this.formData.y;
+      this.startData.z = this.formData.z;
+      this.startData.username = this.userInfo.username;
       this.startData.projectId = this.$route.query.flowId;
       this.startData.startId = this.$route.query.startId;
       this.startData.endId = this.$route.query.endId;
-       this.startData.startName = this.$route.query.startName;
-       this.startData.endName =  this.$route.query.endName;
-       this.startData.symbol = this.datasource;
+      this.startData.startName = this.$route.query.startName;
+      this.startData.endName = this.$route.query.endName;
+      //this.startData.symbol = this.datasource;
       this.startData.dataProcessingType = this.$route.query.startName;
       this.startData.flowFilePath = this.$route.query.flowFilePath;
-      this.startData.frameId = this.stopData1;
+      console.log("this.stopData1",this.stopData1)
+      var frameIds= [];
+      var stopData1 = this.stopData1;
+      stopData1.forEach(element => {
+        var frameId = {};
+        frameId.symbol = element.symbol;
+        frameId.frameId = element.value;
+        frameIds.push(frameId)
+      });
+       this.startData.frameId = frameIds;
+      console.log("frameIds",frameIds)
 
-      console.log("tmdata++++++++++++++",  this.startData);
-
-
-      // start(tmdata).then(response => {
-
-
-      // })
-       
-     
+           start( this.startData).then(response => {
+             console.log("++++++++++++++++++显示曲波图数据",response)
+           
       if (this.myChartsFormData != undefined) {
-      // this.drawLine1(this.myChartsFormData);
+         this.drawLine3(response.data.data[0]);
+         this.drawLine4(response.data.data[1]);
       }
-      if (this.myCharts1FormData != undefined) {
-       // this.drawLine2(this.myCharts1FormData);
-      }
+
+           });
+
+      console.log("tmdata++++++++++++++", this.startData);
       this.flag = false;
     },
+ 
     stop() {
       this.is_true = 0;
+      this.flag = true;
       window.clearTimeout(this.myCharts);
       window.clearTimeout(this.myCharts1);
       this.myCharts = null;
@@ -518,20 +576,21 @@ export default {
       }
       stop(this.userInfo.username, { symbols: symbols }).then(req => {
         let data = req.data.data;
-       console.log("数据源shuju ", this.datasource);
+        console.log("数据源shuju ", this.datasource);
+        console.log("帧数获取", req.data.data);
         this.stopData1[0].frameData = data[0].selectData;
         this.stopData1[0].label = data[0].symbol + "展示区一";
-        this.stopData1[0].placeholder = "请选择展示帧号";
-        this.stopData1[0].value = "";
-        console.log("帧数获取", req.data.data);
-
+        // this.stopData1[0].placeholder = "请选择展示帧号";
+        // this.stopData1[0].value = "";
+        this.stopData1[0].symbol = data[0].symbol;
+        
         this.stopData1[1].frameData = data[1].selectData;
-        this.stopData1[1].label = data[1].symbol  + "展示区二";
-        this.stopData1[1].placeholder = "请选择展示帧号";
-        this.stopData1[1].value = "";
-        console.log("帧数获取", req.data.data);
+        this.stopData1[1].label = data[1].symbol + "展示区二";
+        // this.stopData1[1].placeholder = "请选择展示帧号";
+        // this.stopData1[1].value = "";
+        this.stopData1[1].symbol = data[1].symbol;
       });
-        this.flag = true;
+     
     },
     getDataSource(flowFilePath, startId, endId) {
       console.log("startId", startId, endId);
@@ -580,7 +639,7 @@ export default {
       this.formData.username = this.userInfo.username;
       this.formData.projectId = this.$route.query.flowId;
       var data = JSON.parse(JSON.stringify(this.formData));
-      console.log("data", data);
+      console.log("this.formData++++++++", this.formData);
       if (data.select == "myChart") {
         this.myChartsFormData = data;
         this.drawLine1(data);
