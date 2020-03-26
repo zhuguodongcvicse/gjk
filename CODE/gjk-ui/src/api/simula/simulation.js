@@ -44,3 +44,10 @@ export function stop(username,data) {
   })
 }
 
+export function start(query) {
+  return request({
+    url: '/simula/simulation/start/',
+    method: 'post',
+    data: query
+  })
+}
