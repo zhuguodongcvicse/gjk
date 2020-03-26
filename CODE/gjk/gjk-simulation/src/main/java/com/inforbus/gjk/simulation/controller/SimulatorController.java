@@ -45,7 +45,6 @@ public class SimulatorController {
 
 	@PostMapping("/getData/{username}/{projectId}")
 	public R getData(@PathVariable("username") String username,@PathVariable("projectId") String projectId, @RequestBody SimulationDTO simulationDTO){
-		System.out.println(projectId+simulationDTO);
 		return new R<>(simulatorService.getData(username,projectId,simulationDTO));
 	}
 
@@ -58,6 +57,11 @@ public class SimulatorController {
 	public R stop(@PathVariable("username") String username,@RequestBody Object obj){
 		Map parse = JSON.parseObject(JSONUtil.toJsonStr(obj));
 		return new R<>(simulatorService.suspend(username,(List<String>) parse.get("symbols")));
+	}
+
+	@PostMapping("/start")
+	public R start(@RequestBody SimulationDTO obj){
+		return new R<>(simulatorService.start(obj));
 	}
 }
 

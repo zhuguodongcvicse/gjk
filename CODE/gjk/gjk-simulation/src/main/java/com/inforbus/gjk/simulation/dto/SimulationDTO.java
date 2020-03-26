@@ -29,4 +29,9 @@ public class SimulationDTO {
 
     private String dataProcessingType;
 
+    private  Object  frameId;
+
+    private String username;
+
+    private  String projectId;
 }

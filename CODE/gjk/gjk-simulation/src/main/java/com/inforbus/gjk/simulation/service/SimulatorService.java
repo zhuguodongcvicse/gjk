@@ -3,6 +3,7 @@ package com.inforbus.gjk.simulation.service;
 
 import com.inforbus.gjk.simulation.dto.SimulationDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,4 +45,5 @@ public interface SimulatorService {
 
     Map<String,Object> getDataSource(String username, SimulationDTO simulationDTO);
 
+    List<Object> start(SimulationDTO obj);
 }

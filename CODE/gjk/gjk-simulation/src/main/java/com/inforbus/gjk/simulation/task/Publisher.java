@@ -43,7 +43,7 @@ public class Publisher extends Thread{
 
                 Map<String, Object> map = Maps.newHashMap();
                 map.put("Data",getData());
-                map.put("FrameId",111);
+                map.put("FrameId",i);
 //                ArrayList<Object> list = new ArrayList<>();
 //                list.add("AAAAAAAA");
 //                list.add("BBBBBBBB");
