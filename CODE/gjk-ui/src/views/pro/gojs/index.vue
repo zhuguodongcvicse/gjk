@@ -267,6 +267,7 @@ export default {
           this.postMessageData.cmd = "startSimulation";
           this.postMessageData.params = "";
           this.$refs.gjkIframe.sendMessage(this.postMessageData);
+          console.log("this.postMessageData",this.postMessageData)
         } else {
           //结束仿真
           this.simulationIcon = "icon-kaishifangzhen";
@@ -299,6 +300,7 @@ export default {
           componentLinks: this.simulationData,
           filePath: this.flowFilePath
         });
+        console.log("仿真数据startSimulator",startSimulator)
       }
     },
 
