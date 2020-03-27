@@ -24,4 +24,4 @@ eureka:
     prefer-ip-address: true
   client:
     service-url:
-      defaultZone: http://inforbus:inforbus@192.168.2.225:8761/eureka/
+      defaultZone: http://inforbus:inforbus@127.0.0.1:8761/eureka/
