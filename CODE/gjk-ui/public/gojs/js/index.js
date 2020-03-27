@@ -199,14 +199,14 @@ function init() {
 
   var simulationData = [];
 
-     myDiagram.contextMenu =
-      $$(go.Adornment, "Vertical",
-          makeButton("开始仿真",
-                     //function(e, obj) { e.diagram.commandHandler.pasteSelection(e.diagram.lastInput.documentPoint); },
-                     //function(o) { return o.diagram.commandHandler.canPasteSelection();
-                    // }
-                     )
-      );
+    //  myDiagram.contextMenu =
+    //   $$(go.Adornment, "Vertical",
+    //       makeButton("开始仿真",
+    //                  //function(e, obj) { e.diagram.commandHandler.pasteSelection(e.diagram.lastInput.documentPoint); },
+    //                  //function(o) { return o.diagram.commandHandler.canPasteSelection();
+    //                 // }
+    //                  )
+    //   );
 
 
   var nodeMenu =  // context menu for each Node
