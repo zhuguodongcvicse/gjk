@@ -25,6 +25,7 @@ ignore:
     - /actuator/**
     - /log/**
     - /libs/**
+    - /commoncomponent/**
     - /software/**
     - /threelibs/getFileStream/**
     
