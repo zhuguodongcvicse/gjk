@@ -21,6 +21,7 @@ import com.inforbus.gjk.common.security.annotation.EnableGjkFeignClients;
 import com.inforbus.gjk.common.security.annotation.EnableGjkResourceServer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.client.SpringCloudApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
@@ -31,6 +32,7 @@ import org.springframework.context.annotation.ComponentScan;
 @EnableGjkResourceServer
 @EnableGjkFeignClients
 @SpringCloudApplication
+@EnableDiscoveryClient
 public class GjkLibsApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(GjkLibsApplication.class, args);
