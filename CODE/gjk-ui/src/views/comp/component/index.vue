@@ -197,11 +197,11 @@ export default {
       page: {
         total: 0, // 总页数
         currentPage: 1, // 当前页数
-        pageSize: 20 // 每页显示多少条
+        pageSize: 10// 每页显示多少条
       },
       listQuery: {
         current: 1,
-        size: 20
+        size: 10
       },
       outerVisible: false,
       storageApplyDialog: false,
