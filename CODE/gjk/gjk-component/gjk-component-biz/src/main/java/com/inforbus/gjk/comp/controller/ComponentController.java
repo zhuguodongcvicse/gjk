@@ -118,8 +118,7 @@ public class ComponentController {
 	 * @return R
 	 */
 	@SysLog("修改构件开发")
-	@PutMapping
-	@RequestMapping("/modifyComp")
+	@PutMapping("/modifyComp")
 	public R modifyComp(@RequestBody Component component) {
 		return new R<>(componentService.updateById(component));
 	}
@@ -350,5 +349,15 @@ public class ComponentController {
 	public List<Component> getCompByCompId(@PathVariable("compId") String compId) {
 		return componentService.getCompByCompId(compId);
 	}
+
 	// **********************************************************//
+	/**
+	 * Jsplumb 转Gojs 图片样式
+	 * 
+	 * @return
+	 */
+	@PostMapping("/jsplumbToGojsImg")
+	public R compJsplumbToGojsImg() {
+		return componentService.compJsplumbToGojsImg();
+	}
 }

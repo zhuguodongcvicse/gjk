@@ -37,12 +37,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
+import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.comp.api.dto.CompTree;
 import com.inforbus.gjk.comp.api.entity.Component;
 import com.inforbus.gjk.comp.api.entity.ComponentDetail;
@@ -268,4 +270,6 @@ public interface ComponentService extends IService<Component> {
 
 	List<Component> getCompByCompId(@Param("compId") String compId);
 	/*******************************************************************************/
+
+	R<T> compJsplumbToGojsImg();
 }

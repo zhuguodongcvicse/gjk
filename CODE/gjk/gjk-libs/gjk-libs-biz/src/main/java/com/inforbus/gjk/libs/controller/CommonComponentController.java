@@ -21,10 +21,12 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.log.annotation.SysLog;
+import com.inforbus.gjk.comp.api.entity.Component;
 import com.inforbus.gjk.libs.api.entity.CommonComponent;
 import com.inforbus.gjk.libs.api.entity.CommonComponentDetail;
 import com.inforbus.gjk.libs.service.CommonComponentDetailService;
 import com.inforbus.gjk.libs.service.CommonComponentService;
+import com.inforbus.gjk.libs.service.ComponentServiceFeign;
 
 import cn.hutool.core.io.IoUtil;
 import lombok.AllArgsConstructor;
@@ -54,6 +56,7 @@ public class CommonComponentController {
 
 	private final CommonComponentService commonComponentService;
 	private final CommonComponentDetailService commonComponentDetailService;
+	private final ComponentServiceFeign componentServiceFeign;
 
 	/**
 	 * 简单分页查询
@@ -122,10 +125,17 @@ public class CommonComponentController {
 	@DeleteMapping("/{id}")
 	@PreAuthorize("@pms.hasPermission('libs_commoncomponent_del')")
 	public R removeById(@PathVariable String id) {
+		// 删除文件
 		List<CommonComponentDetail> commonComponentDetails = commonComponentService.deleteCompById(id);
 		for (CommonComponentDetail detail : commonComponentDetails) {
 			commonComponentDetailService.removeById(detail.getId());
 		}
+//		// 更改构件建模状态
+		Component component = new Component();
+		component.setId(id);
+		component.setApplyDesc("构架库中已删除");
+		component.setApplyState("0");
+		componentServiceFeign.modifyComp(component);
 		return new R<>(commonComponentService.removeById(id));
 	}
 

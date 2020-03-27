@@ -291,5 +291,10 @@ public interface ComponentMapper extends BaseMapper<Component> {
 			@Param("fileName") String fileName);
 
 	List<Component> getCompByCompId(@Param("compId") String compId);
+
 	/*******************************************************************************/
+	/**备份数据库 gjk_common_component  gjk_component
+	 * @param timeStr
+	 */
+	void copyCompAndCommCompDb(@Param("timeStr") String timeStr);
 }

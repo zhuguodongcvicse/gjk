@@ -554,4 +554,11 @@
 		gjk_common_component_detail a WHERE a.id = #{id})
 	</select>
 	<!-- ******************************************************************************************** -->
+	<select id="copyCompAndCommCompDb">
+		<!-- 创建 新的gjk_common_component备份表 -->
+		create table gjk_common_component_${timeStr} select * from
+		gjk_common_component;
+		<!-- 创建 新的 gjk_component 备份表 -->
+		create table gjk_component_${timeStr} select * from gjk_component;
+	</select>
 </mapper>

@@ -18,8 +18,7 @@ package com.inforbus.gjk.common.core.constant;
 
 /**
  * @author lengleng
- * @date 2018年06月22日16:41:01
- * 服务名称
+ * @date 2018年06月22日16:41:01 服务名称
  */
 public interface ServiceNameConstants {
 	/**
@@ -35,5 +34,13 @@ public interface ServiceNameConstants {
 	 * 数据中心模块
 	 */
 	String DATACENDER_SERVICE = "gjk-dataCenter";
+	/**
+	 * 库管理模块
+	 */
+	String LIBS_SERVICE = "gjk-libs";
+	/**
+	 * 构件管理模块
+	 */
+	String COMP_SERVICE = "gjk-component";
 
 }
