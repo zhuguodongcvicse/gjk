@@ -76,10 +76,10 @@ public class SimulatorServiceImpl implements SimulatorService {
         String channelName = username + "SimulatorChannel";
         //队列初始状态
         redisTemplate.opsForValue().set(username + ":initState", "1");
-        //模拟发布***************
-        JedisPool jedisPool = new JedisPool(new JedisPoolConfig(), "127.0.0.1", 6379);
-        Publisher Publisher = new Publisher(jedisPool, host, "Simulator:admin:A");
-        Publisher.start();
+//        //模拟发布***************
+//        JedisPool jedisPool = new JedisPool(new JedisPoolConfig(), "127.0.0.1", 6379);
+//        Publisher Publisher = new Publisher(jedisPool, host, "Simulator:admin:A");
+//        Publisher.start();
         //初始化监听对象
         Subscriber subscriber = new Subscriber();
         subscriber.setQueueSize(Integer.parseInt(queueSize));
@@ -101,7 +101,6 @@ public class SimulatorServiceImpl implements SimulatorService {
         MoniRecvDataThread moniRecvDataThread = (MoniRecvDataThread) Global.USERS_SIMULATOR_THREAD.get(username);
         if (moniRecvDataThread == null) {
             return false;
-
         }
         ExternalIOTransUtils.stopMoniRecvDataThread(moniRecvDataThread);
         Global.USERS_SIMULATOR_THREAD.remove(username);
@@ -138,20 +137,20 @@ public class SimulatorServiceImpl implements SimulatorService {
         String arrowInfo = simulationDTO.getStartId() + ":" + simulationDTO.getStartName() + "|" + simulationDTO.getEndId() + ":" + simulationDTO.getEndName();
 
         //获取结构体表格数据
-//        String[] tabNames = ((String) objects.get("tabNameList")).split("\\|");
-//        List<SimulationTableDataDTO> tableData = Lists.newArrayList();
-        //解析表格数据，得到表格对象集合
-//        tableData.addAll(forEachGetSimulationTableData((Map) objects.get(tabNames[0])));
-//        tableData.addAll(forEachGetSimulationTableData((Map) objects.get(tabNames[1])));
-        //获取最大xyz维度
-        //       Map<String, String> MaxXYZ = ExternalIOTransUtils.getMaxXYZ(XmlFilePath, packinfoFileName, objects, arrowInfo);
-//           String xMax =  MaxXYZ.get("xMax");
-//           String yMax =  MaxXYZ.get("yMax");
-//           String zMax =  MaxXYZ.get("zMax");
-        //模拟数据++++++++++++++++++
-        String xMax = "10";
-        String yMax = "9";
-        String zMax = "8";
+        String[] tabNames = ((String) objects.get("tabNameList")).split("\\|");
+        List<SimulationTableDataDTO> tableData = Lists.newArrayList();
+        // 解析表格数据，得到表格对象集合
+        tableData.addAll(forEachGetSimulationTableData((Map) objects.get(tabNames[0])));
+        tableData.addAll(forEachGetSimulationTableData((Map) objects.get(tabNames[1])));
+        //        //模拟数据++++++++++++++++++
+        //        String xMax = "10";
+        //        String yMax = "9";
+        //        String zMax = "8";
+        // 获取最大xyz维度
+        Map<String, String> MaxXYZ = ExternalIOTransUtils.getMaxXYZ(XmlFilePath, packinfoFileName, objects, arrowInfo);
+        String xMax = MaxXYZ.get("xMax");
+        String yMax = MaxXYZ.get("yMax");
+        String zMax = MaxXYZ.get("zMax");
         //获取最大维度值添加到配置页面数据中
         HashMap<String, Object> packDataMap = new HashMap<>();
         // packDataMap.put("data", objects);
@@ -172,15 +171,15 @@ public class SimulatorServiceImpl implements SimulatorService {
         packDataMap.put("zMax", zMax);
         packDataMap.put("symbol", simulationDTO.getSymbol());
         packDataMap.put("dataHandleType", simulationDTO.getDataProcessingType());
-        //    Map<String, Object> dataInfo = ExternalIOTransUtils.parseMoniData(XmlFilePath, packinfoFileName, packDataMap, arrowInfo);
+        Map<String, Object> dataInfo = ExternalIOTransUtils.parseMoniData(XmlFilePath, packinfoFileName, packDataMap, arrowInfo);
         Map<String, Object> dataMap = Maps.newHashMap();
         //表格数据(表格数据)
-        //dataMap.put("tableData", tableData);
-        dataMap.put("tableData", "tableData");
+        //dataMap.put("tableData", "tableData");//模拟数据
+        dataMap.put("tableData", tableData);
         //展示数据
-        dataMap.put("data", objects.get("Data"));
-        // dataMap.put("data", dataInfo.get("Data"));
-        //获取最大值最小值
+        // dataMap.put("data", objects.get("Data"));//模拟数据
+        dataMap.put("data", dataInfo.get("Data"));
+        //获取最大值最小值(暂时不需要)
 //            dataMap.put("MaxValue", objects.get("MaxValue"));
 //            dataMap.put("MinValue", objects.get("MinValue"));
         //重组xyz维度数据
@@ -222,11 +221,8 @@ public class SimulatorServiceImpl implements SimulatorService {
     @Override
     public ArrayList<Object> suspend(String username, List<String> symbols) {
         ListOperations<String, String> operations = redisTemplate.opsForList();
-
-
         ArrayList<Object> symbolList = Lists.newArrayList();
         List<String> selectData = Lists.newArrayList();
-        // List<Object> dataList = Lists.newArrayList();
         for (String symbol : symbols) {
             String key = "Simulator:" + username + ":" + symbol;
             Long size = operations.size(key);
@@ -235,17 +231,10 @@ public class SimulatorServiceImpl implements SimulatorService {
             for (String s : range) {
                 JSONObject dataMap = JSONUtil.parseObj(s);
                 selectData.add(dataMap.get("FrameId").toString());
-                // dataList.add(dataMap.get("Data").toString());
-                // dataMaps.put(dataMap.get("FrameId").toString(),dataMap.get("Data"));
-                //  dataList.add(dataMap.get("FrameId").toString());
-                //  dataList.add(dataMap.get("Data"));
             }
-
-            //  symbolFrameSelect.put(symbol, selectData);
             Map<String, Object> map = Maps.newHashMap();
             map.put("symbol", symbol);
             map.put("selectData", selectData);
-            //   map.put("dataMaps",dataList);
             symbolList.add(map);
         }
         return symbolList;
@@ -260,18 +249,18 @@ public class SimulatorServiceImpl implements SimulatorService {
         //调用客户接口 获取数据源
         HashMap<String, Object> Data = new HashMap<>();
         List<SysDict> dataProcessingType = sysDictMapper.getDictTypes();
-        //Data.put("sourceData",moniRecvDataThread.getArrowIdList(simulationDto.getStartId() + "|" + simulationDto.getEndId()));
-        //模拟假数据++++++++++++++++++++++++++++++++++++++++++++++
-        ArrayList<Object> list = new ArrayList<>();
-        list.add("A");
-        list.add("B");
-        Data.put("sourceData", list);
+        Data.put("sourceData", moniRecvDataThread.getArrowIdList(simulationDto.getStartId() + "|" + simulationDto.getEndId()));
         Data.put("dataProcessingType", dataProcessingType);
+        //模拟假数据++++++++++++++++++++++++++++++++++++++++++++++
+//        ArrayList<Object> list = new ArrayList<>();
+//        list.add("A");
+//        list.add("B");
+//        Data.put("sourceData", list);
         return Data;
     }
 
     @Override
-    public  List<Object>  start(SimulationDTO obj) {
+    public List<Object> start(SimulationDTO obj) {
 
         ArrayList<Object> frameIds = (ArrayList<Object>) obj.getFrameId();
         ArrayList<Object> frameIdlist = new ArrayList<>();
@@ -293,31 +282,31 @@ public class SimulatorServiceImpl implements SimulatorService {
                     String packinfoFileName = gitDetailPath + FilePath + generateCodeResult + "/packinfo.xml";
                     String XmlFilePath = obj.getFlowFilePath();
                     String arrowInfo = obj.getStartId() + ":" + obj.getStartName() + "|" + obj.getEndId() + ":" + obj.getEndName();
-                  //  Map<String, String> MaxXYZ = ExternalIOTransUtils.getMaxXYZ(XmlFilePath, packinfoFileName, objects, arrowInfo);
-//                    packDataMap.put("xMax",  MaxXYZ.get("xMax"));
-//                    packDataMap.put("yMax", MaxXYZ.get("yMax"));
-//                    packDataMap.put("zMax", MaxXYZ.get("zMax"));
+                    Map<String, String> MaxXYZ = ExternalIOTransUtils.getMaxXYZ(XmlFilePath, packinfoFileName, objects, arrowInfo);
                     //模拟数据++++++++++++++++++
-                    String xMax = "10";
-                    String yMax = "9";
-                    String zMax = "8";
+//                    String xMax = "10";
+//                    String yMax = "9";
+//                    String zMax = "8";
+//                    packDataMap.put("xMax", xMax);
+//                    packDataMap.put("yMax", yMax);
+//                    packDataMap.put("zMax", zMax);
                     HashMap<String, Object> packDataMap = new HashMap<>();
-                    packDataMap.put("xMax", xMax);
-                    packDataMap.put("yMax", yMax);
-                    packDataMap.put("zMax", zMax);
+                    packDataMap.put("xMax", MaxXYZ.get("xMax"));
+                    packDataMap.put("yMax", MaxXYZ.get("yMax"));
+                    packDataMap.put("zMax", MaxXYZ.get("zMax"));
                     packDataMap.put("x", obj.getX());
                     packDataMap.put("y", obj.getY());
                     packDataMap.put("z", obj.getZ());
                     packDataMap.put("symbol", symbol);
                     packDataMap.put("dataHandleType", obj.getDataProcessingType());
 
-                  //  Map<String, Object> dataInfo = ExternalIOTransUtils.parseMoniData(XmlFilePath, packinfoFileName, packDataMap, arrowInfo);
+                    Map<String, Object> dataInfo = ExternalIOTransUtils.parseMoniData(XmlFilePath, packinfoFileName, packDataMap, arrowInfo);
                     HashMap<Object, Object> dataMaps = new HashMap<>();
-                    //展示数据模拟数据+++++++++++++++++++++++++++++++++
-                    dataMaps.put("data", dataMap.get("Data"));
+//                    //展示数据模拟数据+++++++++++++++++++++++++++++++++
+//                    dataMaps.put("data", dataMap.get("Data"));
                     dataMaps.put("symbol", symbol);
+                    dataMap.put("data", dataInfo.get("Data"));
                     frameIdlist.add(dataMaps);
-                    // dataMap.put("data", dataInfo.get("Data"));
                 }
             }
         });
