@@ -486,7 +486,14 @@ export default {
         if (this.saveState) {
           let saveParam = [];
           this.tmpMaps.forEach((value, key) => {
-            saveParam.push(value);
+            //如果保存页面已有的数据（this.tmpMaps）删除没有的数据
+            if (this.saveParams.canvasAllKey.includes(key)) {
+              saveParam.push(value);
+            } else {
+              //将删除的数据存入deleteParamMaps
+              this.deleteParamMaps.set(key, this.tmpMaps.get(key));
+              this.tmpMaps.delete(key);
+            }
           });
           let arw = eval("(" + this.saveParams.saveArrow + ")");
           let xmlarrow = [];
@@ -515,7 +522,7 @@ export default {
                   end: e.end,
                   length: e.length,
                   endId: e.endId,
-                  stateId: e.stateId
+                  startId: e.startId
                 }
               });
             });
