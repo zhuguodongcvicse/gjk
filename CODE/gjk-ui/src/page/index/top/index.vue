@@ -15,6 +15,7 @@
       </div>
     </div>
     <div class="top-bar__right">
+      <el-button type="primary" size="mini" @click="jsplumbToGojs">jsplumb to gojs</el-button>
       <el-tooltip v-if="showLock"
                   effect="dark"
                   content="锁屏"
@@ -53,7 +54,7 @@
   import {mapGetters, mapState} from "vuex";
   import {fullscreenToggel, listenfullscreen} from "@/util/util";
   import topMenu from "./top-menu";
-
+  import { jsplumbToGojs } from "@/api/comp/component";
   export default {
     components: {
       topMenu
@@ -87,6 +88,11 @@
       ])
     },
     methods: {
+      jsplumbToGojs(){
+        jsplumbToGojs().then(res=>{
+          console.log("splumb to gojs转换成功")
+        })
+      },
       handleScreen() {
         fullscreenToggel();
       },

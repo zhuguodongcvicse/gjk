@@ -132,7 +132,6 @@
     </el-form>
     <span slot="footer">
       <el-button @click="imgValue.dialogVisible = false">取 消</el-button>
-      <el-button @click="toImage">生成</el-button>
       <el-button type="primary" @click="submitUpload">确 定</el-button>
     </span>
   </el-dialog>
@@ -192,7 +191,7 @@ export default {
     UploadImage(files) {
       this.file = files.file; //设置行文件（file）
       // this.comImgId = randomUuid();
-      // this.imgForm.imgsrc = "/comp/component/comImg/" ;
+      // this.imgForm.imgsrc = "/comp/component/comImg/";
       // console.log("dfghjiktwertyui", this.imgForm);
     },
     //关闭弹出框

@@ -23,22 +23,24 @@
         </el-input>
         <!-- <el-button type="text" icon="el-icon-circle-plus" style="padding:0px;float:right;">
         </el-button>-->
-        <el-tree
-          ref="tree"
-          class="filter-tree"
-          node-key="id"
-          highlight-current
-          accordion
-          :data="treeData"
-          :default-expanded-keys="aExpandedKeys"
-          :default-checked-keys="aCheckedKeys"
-          :filter-node-method="filterNode"
-          :props="defaultProps"
-          :render-content="renderContent"
-          @node-expand="nodeExpand"
-          @node-collapse="nodeCollapse"
-          @node-click="getNodeData"
-        ></el-tree>
+        <div style="height:300px;overflow-y:auto">
+          <el-tree
+            ref="tree"
+            class="filter-tree"
+            node-key="id"
+            highlight-current
+            accordion
+            :data="treeData"
+            :default-expanded-keys="aExpandedKeys"
+            :default-checked-keys="aCheckedKeys"
+            :filter-node-method="filterNode"
+            :props="defaultProps"
+            :render-content="renderContent"
+            @node-expand="nodeExpand"
+            @node-collapse="nodeCollapse"
+            @node-click="getNodeData"
+          ></el-tree>
+        </div>
       </el-col>
       <el-col :span="moduleType==='comp'? 18 : 14">
         <!-- moduleType==='comp'? '20%' : '10%' -->
@@ -832,7 +834,7 @@ export default {
         return { struct, isok, numIndex };
       }
       isok = "shStruct";
-      console.log("id, name, numIndex, ids", { id, name, numIndex, ids });
+      // console.log("id, name, numIndex, ids", { id, name, numIndex, ids });
       //去头文件中找结构体
       if (isok === "shStruct") {
         let tmpStruct;
@@ -860,7 +862,7 @@ export default {
         }
       }
       if (isok === "dbStruct") {
-        if (ids !== undefined  && id !== "") {
+        if (ids !== undefined && id !== "") {
           //先去数据库找
           struct = strc.find(str => {
             return str.dbId === ids.replace("_*", "");
@@ -1121,7 +1123,7 @@ export default {
               treeParam.push(attrs);
             }
           });
-          console.log("numIndex-------------sort", numIndex);
+          // console.log("numIndex-------------sort", numIndex);
           //判断是不是有‘[数字]’
           if (regExp.test(lableName)) {
             let arrKey = lableName.replace(/\[[0-9]+\]/i, "");
