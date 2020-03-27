@@ -767,7 +767,7 @@ function save() {
   //所有节点的数据
   var nodeDataArray = modelJson.nodeDataArray
   var linkData = []
-  for (var i = 0; i < linkDataArray.length; i++) {
+  for(var i = 0;i<linkDataArray.length;i++){
     //开始端点类型
     var sourDataTypeName = "";
     //开始端点名称
@@ -782,29 +782,33 @@ function save() {
     var tarVariableName = "";
     //结束构件名称
     var tarCompName = ""
-    for (var nodeData of nodeDataArray) {
-      console.log("每个节点的数据", nodeData.key)
-      console.log("port", linkDataArray[i].fromPort.split("*")[1])
-      if (linkDataArray[i].fromPort.split("*")[2] == nodeData.key) {
-        if (linkDataArray[i].fromPort.split("*")[1] == "output") {
-          for (var rightPortData of nodeData.rightArray) {
-            if (linkDataArray[i].fromPort == rightPortData.portId) {
+    for(var nodeData of nodeDataArray){
+      console.log("每个节点的数据",nodeData.key)
+      console.log("port",linkDataArray[i].fromPort.split("*")[1])
+      if(linkDataArray[i].fromPort.split("*")[2] == nodeData.key){ //出口点
+        if(linkDataArray[i].fromPort.split("*")[1] == "output"){
+          for(var rightPortData of nodeData.rightArray){
+            if(linkDataArray[i].fromPort == rightPortData.portId){
               sourDataTypeName = rightPortData.portDat.dataTypeName
               sourVariableName = rightPortData.portDat.variableName
               sourLength = rightPortData.portDat.lengthName
               sourCompName = nodeData.text
             }
           }
-        } else {
-          for (var leftPortData of nodeData.leftArray) {
-            if (linkDataArray[i].fromPort == leftPortData.portId) {
+        }  
+      }
+      if(linkDataArray[i].toPort.split("*")[2] == nodeData.key){ //入口点
+        if(linkDataArray[i].toPort.split("*")[1] == "input"){
+          for(var leftPortData of nodeData.leftArray){
+            console.log("比较",linkDataArray[i].toPort,leftPortData.portId)
+            if(linkDataArray[i].toPort == leftPortData.portId){
               tarDataTypeName = leftPortData.portDat.dataTypeName
               tarVariableName = leftPortData.portDat.variableName
               tarCompName = nodeData.text
             }
           }
-        }
-      }
+        } 
+      } 
     }
     //拼接开始端点数据
     var sourcePrame = sourDataTypeName + " " + sourVariableName + "_" + sourCompName
@@ -812,39 +816,39 @@ function save() {
     if (reg.test(sourVariableName)) {
       let strTemp = sourVariableName.split("[")
       console.log(strTemp)
-      sourcePrame = sourDataTypeName + " " + strTemp[0] + "_" + sourCompName + "[" + strTemp[1]
+      sourcePrame = sourDataTypeName + " " + strTemp[0] + "_"+ sourCompName + "[" + strTemp[1]
     }
-    if (sourVariableName.indexOf("->") != -1) {
+    if(sourVariableName.indexOf("->")!= -1){
       let strTemp = sourVariableName.split("->")
-      sourcePrame = sourDataTypeName + " " + strTemp[0] + "_" + sourCompName + "->" + strTemp[1]
+      sourcePrame = sourDataTypeName + " " + strTemp[0] + "_"+ sourCompName + "->" + strTemp[1]
     }
-    console.log("sourVariableName", sourVariableName)
-    console.log("sourVariableName", sourVariableName.indexOf("->"))
+    console.log("sourVariableName",sourVariableName)
+    console.log("sourVariableName",sourVariableName.indexOf("->"))
     //拼接结束端点数据
     var targetPrame = tarDataTypeName + " " + tarVariableName + "_" + tarCompName
-    console.log("tarVariableName", tarVariableName)
+    console.log("tarVariableName",tarVariableName)
     if (reg.test(tarVariableName)) {
       let strTemp = tarVariableName.split("[")
       console.log(strTemp)
-      targetPrame = tarDataTypeName + " " + strTemp[0] + "_" + tarCompName + "[" + strTemp[1]
+      targetPrame = tarDataTypeName + " " + strTemp[0] + "_"+ tarCompName + "[" + strTemp[1]
     }
-    if (tarVariableName.indexOf("->") != -1) {
+    if(tarVariableName.indexOf("->")!= -1){
       let strTemp = tarVariableName.split("->")
-      targetPrame = tarDataTypeName + " " + strTemp[0] + "_" + tarCompName + "->" + strTemp[1]
+      targetPrame = tarDataTypeName + " " + strTemp[0] + "_"+ tarCompName + "->" + strTemp[1]
     }
     var connect = []
     var conn = []
     var connectionGjId = {
-      startItem: linkDataArray[i].from,
-      endItem: linkDataArray[i].to
+      startItem:linkDataArray[i].from,
+      endItem:linkDataArray[i].to
     }
     var connectionPortData = {
-      start: sourcePrame,
-      end: targetPrame,
-      length: sourLength,
-      id: i,
-      endId: linkDataArray[i].toPort,
-      startId: linkDataArray[i].fromPort
+      start:sourcePrame,
+      end:targetPrame,
+      length:sourLength,
+      id:i,
+      endId:linkDataArray[i].toPort,
+      startId:linkDataArray[i].fromPort
     }
     connect.push(connectionGjId)
     conn.push(connectionPortData)
@@ -855,13 +859,13 @@ function save() {
     linkData.push(con)
   }
   let canvasAllKey = new Array()
-  for (let node of nodeDataArray) {
+  for(let node of nodeDataArray){
     canvasAllKey.push(node.key)
   }
   var saveData = {
-    "saveArrow": JSON.stringify({ arrow: linkData }),
+    "saveArrow": JSON.stringify({arrow: linkData }),
     "saveflowChartJson": myDiagram.model.toJson(),
-    "canvasAllKey": canvasAllKey
+    "canvasAllKey" :canvasAllKey
   };
   handleMessage(saveData, 'returnSave');
   //return JSON.stringify({arrow: linkData });

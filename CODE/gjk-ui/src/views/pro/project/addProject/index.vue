@@ -742,14 +742,14 @@ export default {
       prodetail.id = this.procedureId;
       prodetail.description = this.softwareSelectString.join(";");
       updatePartSoftwareAndPlatform(prodetail).then(response => {
-        if (response.data.data) {
-          this.$message({
-            message: "修改软件框架成功",
-            type: "success"
-          });
-        } else {
-          this.$message.error("修改软件框架失败");
-        }
+        // if (response.data.data) {
+        //   this.$message({
+        //     message: "修改软件框架成功",
+        //     type: "success"
+        //   });
+        // } else {
+        //   this.$message.error("修改软件框架失败");
+        // }
       });
     },
     changeProcedureBSPId() {
@@ -761,14 +761,14 @@ export default {
       prodetail.description = this.bspSelectString.join(";");
       // 保存选择的BSP库
       updatePartBSPAndPlatform(prodetail).then(response => {
-        if (response.data.data) {
-          this.$message({
-            message: "修改BSP库成功",
-            type: "success"
-          });
-        } else {
-          this.$message.error("修改BSP库失败");
-        }
+        // if (response.data.data) {
+        //   this.$message({
+        //     message: "修改BSP库成功",
+        //     type: "success"
+        //   });
+        // } else {
+        //   this.$message.error("修改BSP库失败");
+        // }
       });
     }
   },

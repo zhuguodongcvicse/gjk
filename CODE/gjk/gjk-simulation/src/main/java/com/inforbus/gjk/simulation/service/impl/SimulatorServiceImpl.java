@@ -16,7 +16,6 @@ import com.inforbus.gjk.simulation.service.ManagerServiceImpl;
 import com.inforbus.gjk.simulation.service.SimulatorService;
 import com.inforbus.gjk.simulation.task.*;
 import flowModel.MoniRecvDataThread;
-import org.apache.commons.beanutils.BeanMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ListOperations;
