@@ -201,6 +201,6 @@ export function compByUserId(userId) {
 export function jsplumbToGojs(param) {
   return request({
     url: '/comp/component/jsplumbToGojsImg',
-    method: 'put'
+    method: 'post'
   })
 }

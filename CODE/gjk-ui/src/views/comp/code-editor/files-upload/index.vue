@@ -278,6 +278,7 @@ export default {
         });
         console.log("_leftData", _leftData);
         this.leftData = _leftData;
+        files.splice(0, files.length);
         this.innerVisible = false;
       });
     }

@@ -1,19 +1,19 @@
 <template>
-  <div>
-    <div>
+  <div ref="divRef" style="  margin: 2px 15px;">
+    <!-- <div> -->
       <el-button type="primary" :disabled="platformFlag" @click.native="handleSaveComp">提交申请</el-button>
-    </div>
-    <div>
+    <!-- </div> -->
+    <!-- <div> -->
       <el-tabs v-model="activeName">
         <el-tab-pane label="基本信息" name="first">
           <el-form
             :label-position="labelPosition"
-            label-width="120px"
+            label-width="180px"
             :model="formLabelAlign"
             :rules="projectRules"
             ref="formLabelAlignRef"
           >
-            <div class="bsp_tab_14s">
+            <div>
               <el-form-item label="项目名称" prop="projectName">
                 <el-input v-model="formLabelAlign.projectName"></el-input>
               </el-form-item>
@@ -35,13 +35,14 @@
         </el-tab-pane>
 
         <el-tab-pane label="框架信息" name="second">
-          <el-form :label-position="labelPosition" label-width="120px" :model="formLabelAlign">
-            <div class="bsp_tab_14s">
+          <el-form :label-position="labelPosition" label-width="180px" :model="formLabelAlign">
+            <div>
               <el-form-item label="软件框架选择">
                 <span style="color: red;" v-show="platformFlag">{{platformNameTs}}未选择</span>
                 <el-select
                   class="text_align_center_14s"
                   v-model="softwareSelectString"
+                  size="small"
                   multiple
                   placeholder="请选择"
                   @change="selectSoftwareClk"
@@ -62,6 +63,7 @@
               <el-form-item label="BSP选择">
                 <el-select
                   class="text_align_center_14s"
+                  size="small"
                   v-model="bspSelectString"
                   multiple
                   placeholder="请选择"
@@ -107,9 +109,9 @@
         </el-tab-pane>-->
         <!--选择构件-->
         <el-tab-pane label="构件信息" name="third">
-          <div class="libs_commoncomponent_14s">
+          <!-- <div class="libs_commoncomponent_14s"> -->
             <common-component @fromChild="getChild"></common-component>
-          </div>
+          <!-- </div> -->
         </el-tab-pane>
 
         <!--选择模板-->
@@ -118,7 +120,7 @@
         </el-tab-pane>
       </el-tabs>
     </div>
-  </div>
+  <!-- </div> -->
 </template>
 
 <script>
@@ -294,7 +296,7 @@ export default {
   methods: {
     //从子组件获取值
     getChild(v) {
-        console.log("v", v)
+      console.log("v", v);
       this.childComData = v;
     },
     // showStructList() {
@@ -414,7 +416,7 @@ export default {
                   for (let i of this.childComData) {
                     this.compSelectArray.push(i.id);
                   }
-                  console.log("this.compSelectArray",this.compSelectArray)
+                  console.log("this.compSelectArray", this.compSelectArray);
                   if (
                     this.compSelectArray != null &&
                     this.compSelectArray.length > 0
@@ -436,7 +438,7 @@ export default {
                           approval.approvalState = "0";
                           //提交记录到审批管理库
                           saveApproval(approval).then(Response => {
-                              console.log("Response.data",Response.data)
+                            console.log("Response.data", Response.data);
                             saveApprovalApply(
                               Response.data.data.id,
                               this.compSelectArray
@@ -445,7 +447,10 @@ export default {
                               this.formLabelAlign,
                               this.$options.data().formLabelAlign
                             );
-                            console.log("this.formLabelAlign", JSON.stringify(this.formLabelAlign))
+                            console.log(
+                              "this.formLabelAlign",
+                              JSON.stringify(this.formLabelAlign)
+                            );
                             //this.dialogTableVisible = false;
                             this.$notify({
                               title: "成功",
@@ -784,5 +789,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.cc{
+  margin: 2px 5px;
+}
 </style>
 

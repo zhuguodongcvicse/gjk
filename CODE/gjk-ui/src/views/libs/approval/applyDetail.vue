@@ -254,6 +254,7 @@
                     ]
                 },
                 showFileData:{
+                    component:{},
                     path:"",
                     sync:false,
                     fileType: false
@@ -303,6 +304,7 @@
                 let nodeData = ["platformfile","component","imgfile","testfile","algorithmfile"];
                 if (!nodeData.includes(node.type)) {
                     this.showFileData.sync = true;
+                    this.showFileData.component = this.component;
                     this.showFileData.path = node.filePath +"\\"+ node.label;
                     this.showFileData.fileType = node.type==="img"?true:false;
                 }
@@ -725,6 +727,7 @@
                             })
                         } else {
                             getObj(this.applyItemMsg.applyId).then(Response => {
+                                console.log("this.applyItemMsg",Response)
                                 if (Response.data.data != null && Response.data.data != undefined) {
                                     this.libsNameValue = Response.data.data.compName;
                                     this.component = Response.data.data;

@@ -2,18 +2,19 @@
 <template>
   <!-- 展示文件信息 -->
   <el-dialog
-    title="文件信息"
+    :title="filePathValue.fileType?'构件图片':'文件信息'"
     :visible.sync="filePathValue.sync"
-    width="80%"
-    top="5vh"
+    :width="filePathValue.fileType?'30%':'80%'"
+    :top="filePathValue.fileType?'20vh':'5vh'"
     :before-close="handleClose"
   >
     <div v-if="filePathValue.fileType">
-      <el-image :src="filePathValue.path"></el-image>
+      <div v-html="filePathValue.component.compImg">{{filePathValue.component.compImg}}</div>
+      <!-- <el-image :src="filePathValue.path"></el-image> -->
     </div>
 
     <!-- 程序文本编辑器 -->
-    <div v-else style="height:200px">
+    <div v-else style="height:250px">
       <el-form ref="form" label-width="80px">
         <el-form-item label="编码格式">
           <el-select
@@ -49,7 +50,7 @@ export default {
     filePathValue: {
       type: Object,
       default: () => {
-        return { path: "", sync: false, fileType: false };
+        return { component:{},path: "", sync: false, fileType: false };
       }
     }
   },
@@ -139,6 +140,6 @@ export default {
 }
 .editor {
   width: calc(100.1%);
-  height: 400px;
+  height: 500px;
 }
 </style>

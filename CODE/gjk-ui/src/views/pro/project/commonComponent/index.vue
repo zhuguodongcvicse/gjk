@@ -1,5 +1,4 @@
 <template>
-  <div class="app-container pull-auto libs_commoncomponent_index_14s">
     <!--<div>
       <el-button type="primary" @click.native="testGetComps">提交申请</el-button>
     </div>-->
@@ -119,7 +118,6 @@
         </div>
       </el-dialog>
     </basic-container>
-  </div>
 </template>
 
 <script>
@@ -153,6 +151,12 @@
             temp_currProject: {}
         },
         data() {
+                              // 获取浏览器可视区域高度
+            var clientHeight =   `${document.documentElement.clientHeight}`    
+            console.log("clientHeight", clientHeight);
+            var tmpTableOption = tableOption
+            tmpTableOption["maxHeight"] = clientHeight-350 ;
+            tmpTableOption["height"] = clientHeight-350 ;
             return {
                 proComps: '',
                 defaultExpandedNodeArray: [],
@@ -167,7 +171,7 @@
                     size: 20
                 },
                 tableLoading: false,
-                tableOption: tableOption,
+                tableOption: tmpTableOption,
                 tableHisOption: {},
 
                 showAllVersionDia: false,
@@ -227,7 +231,7 @@
             // this.tableHisOption.menu = false;
         },
         mounted: function () {
-            // console.log("数据temp_currProject", this.temp_currProject);
+
         },
         watch: {
             algorithmSelectArray() {

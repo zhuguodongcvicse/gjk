@@ -44,7 +44,8 @@
 
       <monaco-editor class="editor" v-model="textContext" v-if="defineOrEditor==='editor'"></monaco-editor>
       <div class="block" v-if="defineOrEditor==='image'">
-        <el-image :src="src"></el-image>
+        <div v-html="src">{{src}}</div>
+        <!-- <el-image :src="src"></el-image> -->
       </div>
     </el-col>
   </el-row>
@@ -113,6 +114,7 @@ export default {
       });
     },
     handleNodeClick(data) {
+      console.log("handleNodeClick",data)
       if (data.children.length === 0) {
         //Component20191017170238.xml
         data.label = data.label.toLowerCase();
@@ -122,12 +124,13 @@ export default {
           data.label.endsWith("jpg")
         ) {
           this.defineOrEditor = "image";
+          console.log("data",data)
           this.src = data.filePath;
         } else if (
           data.label.startsWith("component") &&
           data.label.endsWith("xml")
         ) {
-          this.defineOrEditor = "editor";
+          this.defineOrEditor = "define";
         } else {
           this.defineOrEditor = "editor";
           //文件路徑
