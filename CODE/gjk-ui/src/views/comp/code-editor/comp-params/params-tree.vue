@@ -838,7 +838,7 @@ export default {
       //去头文件中找结构体
       if (isok === "shStruct") {
         let tmpStruct;
-        if (id !== undefined && id !== "") {
+        if (JSON.stringify(this.headerFile) !== "{}" && id !== undefined && id !== "") {
           tmpStruct = this.headerFile.structParams[
             deepClone(id).replace("*", "")
           ];

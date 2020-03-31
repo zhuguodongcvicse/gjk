@@ -1169,11 +1169,6 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 					baseMapper.updateById(component);
 				}
 			}
-
-			List<CommonComponent> r =	commonComponentServiceFeign.getCommonComponentPage();
-			
-			
-			System.out.println(r);
 			
 			List<CommonComponent> commonCompPages = commonComponentServiceFeign.getCommonComponentPage();
 			for (CommonComponent commonComponent : commonCompPages) {
