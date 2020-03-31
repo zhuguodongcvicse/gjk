@@ -887,10 +887,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 					} else {
 						tmpPath = this.compDetailPath + File.separator + detfilesPath + File.separator + vo.getName();// 要上传的文件路径
 					}
-					// 删除以前的文件及文件夹
-					if (isUpdate) {
-						UploadFilesUtils.delFolder(this.compDetailPath + File.separator + oldPath);
-					}
+
 					if (StringUtils.isNotEmpty(tmpPath)) {
 						file = new File(tmpPath);
 						if (!file.getParentFile().exists()) {
@@ -901,6 +898,10 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 					FileUtil.copyFilesFromDir(uploadFile, file, true);
 					// 上传文件到 GIT
 					JGitUtil.commitAndPush(file.getPath(), "上传构件xml文件");
+					// 删除以前的文件及文件夹
+					if (isUpdate) {
+						UploadFilesUtils.delFolder(this.compDetailPath + File.separator + oldPath);
+					}
 				}
 
 			} catch (IOException e) {
