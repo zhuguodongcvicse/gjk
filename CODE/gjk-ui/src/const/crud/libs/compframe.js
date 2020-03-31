@@ -26,7 +26,7 @@ export const tableOption = {
   editBtn: false,
   delBtn: false,
   addBtn: false,
-  menuWidth:"109",
+  menuWidth:"120",
   column: [
 	  {
       label: '构件框架名',

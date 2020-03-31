@@ -29,9 +29,9 @@
           <el-tag>V{{parseFloat(scope.row.version).toFixed(1)}}</el-tag>
         </template>
         <template slot-scope="{row,index}" slot="menu">
+            <!-- v-if="row.applyState=='0'||row.applyState==null||row.applyState=='3'?true:false" -->
           <el-button
             type="danger"
-            v-if="row.applyState=='0'||row.applyState==null||row.applyState=='3'?true:false"
             v-show="permissions.libs_compframe_del"
             size="small"
             plain

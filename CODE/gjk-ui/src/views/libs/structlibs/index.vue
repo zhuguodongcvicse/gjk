@@ -35,9 +35,9 @@
             plain
             @click="handleEdit(scope.row,scope.index)"
           >编辑</el-button>
+            <!-- v-if="scope.row.storageFlag=='1'?false:scope.row.storageFlag=='2'?false:true" -->
           <el-button
             type="danger"
-            v-if="scope.row.storageFlag=='1'?false:scope.row.storageFlag=='2'?false:true"
             size="small"
             plain
             @click="handleDel(scope.row,scope.index)"
