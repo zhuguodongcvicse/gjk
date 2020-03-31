@@ -1,7 +1,10 @@
 package com.inforbus.gjk.comp.service;
 
+import java.util.List;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,7 +29,15 @@ public interface CommonComponentServiceFeign {
 	@GetMapping("/commoncomponent/page")
 	public R<IPage<CommonComponent>> getCommonComponentPage(@RequestParam("page")  Page<CommonComponent> page,
 			@RequestParam("commonComponent") CommonComponent commonComponent);
-
+	/**
+	 * @Title: getCommonComponentPage
+	 * @Desc 查询所有数据
+	 * @Author cvics
+	 * @DateTime 2020年3月30日
+	 * @return 
+	 */
+	@PostMapping("/commoncomponent/pageAll")
+	public List<CommonComponent> getCommonComponentPage();
 	/**
 	 * 修改记录
 	 * 

@@ -70,6 +70,17 @@ public class CommonComponentController {
 			CommonComponent commonComponent) {
 		return new R<>(commonComponentService.getCommonComponentPage(page, commonComponent));
 	}
+	/**
+	 * @Title: getCommonComponentPage
+	 * @Desc 查询所有数据
+	 * @Author cvics
+	 * @DateTime 2020年3月30日
+	 * @return 
+	 */
+	@PostMapping("/pageAll")
+	public List<CommonComponent> getCommonComponentPage() {
+		return commonComponentService.getCommonComponentPage(new Page<>(), new CommonComponent()).getRecords();
+	}
 
 	/**
 	 * 通过id查询单条记录

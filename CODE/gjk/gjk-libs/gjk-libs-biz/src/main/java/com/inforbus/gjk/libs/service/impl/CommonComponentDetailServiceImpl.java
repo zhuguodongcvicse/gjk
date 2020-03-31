@@ -204,7 +204,9 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 					e.printStackTrace();
 				}
 				tree.add(new CommCompDetailVO(parent.getId(), parent.getFileName(), parent.getFileType(),
-						"data:image/png;base64," + base64, parent.getParaentId(), parent.getVersion()));
+						comp.getCompImg(), parent.getParaentId(), parent.getVersion()));
+//				tree.add(new CommCompDetailVO(parent.getId(), parent.getFileName(), parent.getFileType(),
+//						"data:image/png;base64," + base64, parent.getParaentId(), parent.getVersion()));
 			} else {
 				tree.add(new CommCompDetailVO(parent.getId(), parent.getFileName(), parent.getFileType(),
 						gitFilePath + parent.getFilePath(), parent.getParaentId(), parent.getVersion()));
