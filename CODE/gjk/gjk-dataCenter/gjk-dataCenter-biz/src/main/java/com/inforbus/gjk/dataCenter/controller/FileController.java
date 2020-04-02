@@ -1,20 +1,19 @@
 package com.inforbus.gjk.dataCenter.controller;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
-import javax.annotation.Resource;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.poi.ss.formula.functions.T;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.inforbus.gjk.common.core.util.R;
+import com.inforbus.gjk.dataCenter.api.entity.FileCenter;
 import com.inforbus.gjk.dataCenter.service.FileService;
 
 /**
@@ -25,11 +24,10 @@ import com.inforbus.gjk.dataCenter.service.FileService;
  */
 @RestController
 @RequestMapping("/fileServe")
-@SuppressWarnings("unchecked")
 public class FileController {
 	@Autowired
 	private FileService fileService;
-
+	private static final Logger logger = LoggerFactory.getLogger(FileController.class);
 	/**
 	 * @Title: uploadLocalFile
 	 * @Desc 多文件上传
@@ -40,9 +38,9 @@ public class FileController {
 	 * @return
 	 */
 	@PostMapping("uploadFile")
-	public R<Object> uploadLocalFile(@RequestParam("localPath") String localPath,
-			@RequestParam("localFile") List<InputStream> localFile) {
-		R<Object> ret = new R<Object>();
+	public R<Boolean> uploadLocalFile(@RequestParam("localPath") String localPath,
+			@RequestParam("localFile") List<FileCenter> localFile) {
+		R<Boolean> ret = new R<Boolean>();
 		try {
 			if (fileService.uploadLocalFile(localPath, localFile)) {
 				ret.setData(true);
@@ -52,9 +50,9 @@ public class FileController {
 				ret.setData(false);
 				ret.setMsg("上传文件失败");
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			return new R<Object>(e);
+		} catch (Exception e) {
+			logger.error("多文件上传",e);
+			return new R<Boolean>(e);
 		}
 		return ret;
 
@@ -70,9 +68,9 @@ public class FileController {
 	 * @param fileName   文件名字
 	 */
 	@PostMapping("downloadFile")
-	public R<Object> downloadFile(@RequestParam("sourcePath") String sourcePath,
+	public R<Boolean> downloadFile(@RequestParam("sourcePath") String sourcePath,
 			@RequestParam("localPath") String localPath, @RequestParam("fileName") String fileName) {
-		R<Object> ret = new R<Object>();
+		R<Boolean> ret = new R<Boolean>();
 		try {
 			if (fileService.downloadFile(sourcePath, localPath, fileName)) {
 				ret.setData(true);
@@ -83,7 +81,38 @@ public class FileController {
 				ret.setMsg("下载文件失败");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("下载文件上传",e);
+			return new R<Boolean>(e);
+		}
+		return ret;
+	};
+
+	/**
+	 * @Title: downloadFile
+	 * @Desc
+	 * @Author cvics
+	 * @DateTime 2020年4月2日
+	 * @param sourcePath
+	 * @param localPath
+	 * @param fileName
+	 * @return
+	 */
+	@PostMapping("downloadLocalFile")
+	public R<List<FileCenter>> downloadFile(@RequestParam("sourcePath") String sourcePath) {
+		R<List<FileCenter>> ret = new R<List<FileCenter>>();
+		try {
+			List<FileCenter> list = fileService.downloadFile(sourcePath);
+			//判断list是否为空
+			if (ObjectUtils.isNotEmpty(list)) {
+				ret.setData(list);
+				ret.setMsg("下载文件成功");
+			} else {
+				ret.setCode(1);
+				ret.setData(null);
+				ret.setMsg("下载文件失败");
+			}
+		} catch (Exception e) {
+			logger.error("下载文件上传",e);
 			return new R<>(e);
 		}
 		return ret;
@@ -111,7 +140,7 @@ public class FileController {
 				ret.setMsg("删除指定文件夹下的所有文件失败");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("删除指定文件夹下的所有文件",e);
 			return new R<Object>(e);
 		}
 		return ret;
@@ -137,7 +166,7 @@ public class FileController {
 				ret.setMsg("删除文件夹失败");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("删除指定文件夹",e);
 			return new R<Object>(e);
 		}
 		return ret;
@@ -154,15 +183,15 @@ public class FileController {
 	 * @throws Exception
 	 */
 	@PostMapping("copylocalFile")
-	public R<Object> copylocalFile(@RequestParam("source") String source, @RequestParam("destin") String destin) {
-		R<Object> ret = new R<Object>();
+	public R<Boolean> copylocalFile(@RequestParam("source") String source, @RequestParam("destin") String destin) {
+		R<Boolean> ret = new R<Boolean>();
 		try {
 			fileService.copylocalFile(source, destin);
 			ret.setData(true);
 			ret.setMsg("拷贝文件成功");
 		} catch (Exception e) {
-			e.printStackTrace();
-			return new R<Object>(e);
+			logger.error("删除指定文件夹",e);
+			return new R<Boolean>(e);
 		}
 		return ret;
 	};
@@ -177,21 +206,21 @@ public class FileController {
 	 * @return
 	 */
 	@PostMapping("readFile")
-	public R<Object> readFile(@RequestParam("localPath") String localPath, @RequestParam("charset") String charset) {
-		R<Object> ret = new R<Object>();
+	public R<Map<String, String>> readFile(@RequestParam("localPath") String localPath) {
+		R<Map<String, String>> ret = new R<Map<String, String>>();
 		try {
-			String data = fileService.readFile(localPath, charset);
-			if (StringUtils.isNotEmpty(data)) {
+			Map<String, String> data = fileService.readFile(localPath);
+			if (ObjectUtils.isNotEmpty(data)) {
 				ret.setData(data);
-				ret.setMsg("上传文件成功");
+				ret.setMsg("读取文件成功");
 			} else {
 				ret.setCode(1);
-				ret.setData(false);
-				ret.setMsg("上传文件失败");
+				ret.setData(null);
+				ret.setMsg("读取文件失败");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			return new R<Object>(e);
+			logger.error("读取文件",e);
+			return new R<Map<String, String>>(e);
 		}
 		return ret;
 	};
@@ -207,23 +236,22 @@ public class FileController {
 	 * @return
 	 */
 	@PostMapping("writeFile")
-	public R<Object> writeFile(@RequestParam("localPath") String localPath, @RequestParam("charset") String charset,
+	public R<Boolean> writeFile(@RequestParam("localPath") String localPath, @RequestParam("charset") String charset,
 			@RequestParam("textContext") String textContext) {
-		R<Object> ret = new R<Object>();
+		R<Boolean> ret = new R<Boolean>();
 		try {
 			if (fileService.writeFile(localPath, charset, textContext)) {
 				ret.setData(true);
-				ret.setMsg("上传文件成功");
+				ret.setMsg("写入文件成功");
 			} else {
 				ret.setCode(1);
 				ret.setData(false);
-				ret.setMsg("编辑文件失败");
+				ret.setMsg("写入文件失败");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			return new R<Object>(e);
+			logger.error("写入文件",e);
+			return new R<Boolean>(e);
 		}
 		return ret;
-
 	};
 }

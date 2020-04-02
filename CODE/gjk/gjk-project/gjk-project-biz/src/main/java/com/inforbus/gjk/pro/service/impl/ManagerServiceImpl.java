@@ -814,15 +814,18 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 								}
 							}
 							if ("".equals(bspFilePath)) {
-								if (returnStr.contains("请配置" + libsType + "对应的bsp,")) {
-									String s = "请配置" + libsType + "对应的bsp,部件";
-									StringBuilder sb = new StringBuilder(returnStr);
-									sb.insert(returnStr.indexOf(s) + s.length(), part.getPartName() + ",");
-									returnStr = sb.toString();
-								} else {
-									returnStr += "请配置" + libsType + "对应的bsp," + "部件" + part.getPartName() + "缺少对应的BSP。";
+								if(libsType.equals("Sylixos")||libsType.equals("Workbench")) {
+									if (returnStr.contains("请配置" + libsType + "对应的bsp,")) {
+										String s = "请配置" + libsType + "对应的bsp,部件";
+										StringBuilder sb = new StringBuilder(returnStr);
+										sb.insert(returnStr.indexOf(s) + s.length(), part.getPartName() + ",");
+										returnStr = sb.toString();
+									} else {
+										returnStr += "请配置" + libsType + "对应的bsp," + "部件" + part.getPartName() + "缺少对应的BSP。";
+									}
+									logger.error("请配置" + libsType + "对应的bsp," + "部件" + part.getPartName() + "缺少对应的BSP。");
 								}
-								logger.error("请配置" + libsType + "对应的bsp," + "部件" + part.getPartName() + "缺少对应的BSP。");
+								
 							}
 
 						}
