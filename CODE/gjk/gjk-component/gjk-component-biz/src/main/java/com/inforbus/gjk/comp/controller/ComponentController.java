@@ -360,4 +360,14 @@ public class ComponentController {
 	public R compJsplumbToGojsImg() {
 		return componentService.compJsplumbToGojsImg();
 	}
+
+	/**
+	 * Jsplumb 转Gojs 图片样式
+	 *
+	 * @return
+	 */
+	@PostMapping("/gojsToJsplumbImg")
+	public R compGojsToJspumbImg() {
+		return componentService.compGojsToJspumbImg();
+	}
 }

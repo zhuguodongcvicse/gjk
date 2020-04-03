@@ -272,4 +272,6 @@ public interface ComponentService extends IService<Component> {
 	/*******************************************************************************/
 
 	R<T> compJsplumbToGojsImg();
+
+    R<T> compGojsToJspumbImg();
 }
