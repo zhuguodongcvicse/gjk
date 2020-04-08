@@ -45,6 +45,7 @@ public class StreamManage extends Thread {
      * @Return: void
      * @Create: 2020/4/8
      */
+    @Override
     public void run() {
         logger.debug("run方法开始运行");
         InputStreamReader inputStreamReader = null;

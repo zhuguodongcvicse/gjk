@@ -29,8 +29,10 @@ import javax.annotation.Resource;
 @RequestMapping("/devenv")
 public class DevenvConntroller {
 
+
     @Resource(name = "taskThread")
-    private TaskThread taskThread;//任务线程类
+    private TaskThread taskThread;
+    //任务线程类
 
     /**
      * @Author wang
@@ -45,17 +47,21 @@ public class DevenvConntroller {
         String fileName = map.get("fileName");
         String platformType = map.get("platformType");
         String token = map.get("token");
-        CompileTask compileTask = (CompileTask) ExtractApplicationContext.getBean("compileTask");// 从spring容器中获取到编译任务类对象
+        // 从spring容器中获取到编译任务类对象
+        CompileTask compileTask = (CompileTask) ExtractApplicationContext.getBean("compileTask");
         compileTask.setFileName(fileName);
         compileTask.setPath1(path);
         compileTask.setPlatformType(platformType);
         compileTask.setToken(token);
         ConcurrentLinkedQueue<Task> compileQueue = taskThread.getCompileQueue();
-        int count = compileQueue.size();//获取到排队人数
-        taskThread.addTask(compileTask);//使用另一条线程执行编译功能
+        //获取到排队人数
+        int count = compileQueue.size();
+        //使用另一条线程执行编译功能
+        taskThread.addTask(compileTask);
         String str = "正在编译...请稍候";
-        if (count > 0)
+        if (count > 0) {
             str = "前面有" + count + "个组件工程在编译......请等候一会";
+        }
         return new R<>(str);
     }
 }

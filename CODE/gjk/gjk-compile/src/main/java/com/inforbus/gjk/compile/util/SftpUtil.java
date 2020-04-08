@@ -117,7 +117,9 @@ public class SftpUtil {
 
         } else {
             File file = new File(saveFile);
-            if (!file.exists()) file.mkdir();
+            if (!file.exists()) {
+                file.mkdir();
+            }
         }
         //文件
         if (src.indexOf(".") > -1) {

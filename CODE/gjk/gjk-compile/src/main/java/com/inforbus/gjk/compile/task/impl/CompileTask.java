@@ -199,8 +199,9 @@ public class CompileTask implements Task {
             } catch (InterruptedException e) {
                 logger.error("vs2010平台编译失败，请检查编译进程。" + e.getMessage());
             }
-            if (p != null)
+            if (p != null) {
                 p.destroy();
+            }
         }
         logger.debug("devenv方法运行结束");
         return false;
@@ -253,8 +254,9 @@ public class CompileTask implements Task {
             } catch (InterruptedException e) {
                 logger.error("sylixos平台编译失败，请检查IO。" + e.getMessage());
             }
-            if (p != null)
+            if (p != null) {
                 p.destroy();
+            }
         }
         logger.debug("sylixos方法运行结束");
         return false;
@@ -299,8 +301,9 @@ public class CompileTask implements Task {
             } catch (InterruptedException e) {
                 logger.error("workbench平台编译失败，请检查编译进程。" + e.getMessage());
             }
-            if (p != null)
+            if (p != null) {
                 p.destroy();
+            }
         }
         logger.debug("workbench方法运行结束");
         return false;
@@ -323,8 +326,9 @@ public class CompileTask implements Task {
         int i = 0;
         while (true) {
             i++;
-            if (i == 500)
+            if (i == 500) {
                 break;
+            }
         }
         if (b) {
             String linuxAimsPath = this.linuxPath + "/AppPro/" + fileName;
