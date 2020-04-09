@@ -13,7 +13,6 @@
         @size-change="sizeChange"
         @row-del="rowDel"
       >
-        <!-- @row-save="rowAdd"-->
         <!--新增基础模板按钮-->
         <template slot="menuLeft">
           <el-button
@@ -73,7 +72,6 @@
           </el-button-group>
         </template>
       </avue-crud>
-      <!-- <add-comm :rowParam="rowParam"></add-comm> -->
     </basic-container>
     <!--新增基础模板的弹窗-->
     <el-dialog
@@ -203,20 +201,6 @@ export default {
         callback(
           "请输入正确的模板名,模板名1-32个字符,可包含汉字、字母、数字、—、_、()"
         );
-        // } else {
-        //   checkTempName(value)
-        //     .then(response => {
-        //       if (window.boxType === "edit") callback();
-        //       let result = response.data.data;
-        //       if (result !== null) {
-        //         callback(new Error("模板名已经存在"));
-        //       } else {
-        //         callback();
-        //       }
-        //     })
-        //     .catch(error => {
-        //       callback(new Error("模板名已经存在"));
-        //     });
       } else {
         callback();
       }
@@ -258,10 +242,7 @@ export default {
           value: "构件模型",
           label: "构件模型"
         },
-        // {
-        //   value: "硬件模型",
-        //   label: "硬件模型"
-        // },
+
         {
           value: "软硬件映射配置模型",
           label: "软硬件映射配置模型"
@@ -310,9 +291,6 @@ export default {
         remarks: [
           { required: true, message: "请填写备注信息", trigger: "blur" }
         ]
-        // tempVersion: [
-        //   { required: true, message: "请输入版本号", trigger: "blur" }
-        // ]
       },
       eidtRules: {
         tempName: [
@@ -353,7 +331,7 @@ export default {
   },
   mounted: function() {},
   computed: {
-    ...mapGetters(["permissions","userInfo"])
+    ...mapGetters(["permissions", "userInfo"])
   },
   methods: {
     getList() {
@@ -448,7 +426,7 @@ export default {
     //上传模板文件方法
     UploadImage(param) {
       //发送请求至后台接口上传文件
-      getUploadFilesUrl(param,this.userInfo).then(res => {
+      getUploadFilesUrl(param, this.userInfo).then(res => {
         /* 给文本框赋值 */
         var filePath = res.data.data;
         this.BaseTemplate.baseTemplatePath = filePath; //获取上传后的文件的路径
@@ -478,11 +456,7 @@ export default {
         })
         .then(data => {
           _this.tableData.splice(index, 1);
-          // _this.$message({
-          //   showClose: true,
-          //   message: "删除成功",
-          //   type: "success"
-          // });
+
           _this.$notify({
             title: "成功",
             message: "删除成功",
@@ -500,17 +474,10 @@ export default {
      *
      **/
     handleUpdate() {
-      //checkTempName(this.baseTemplateVO.tempName).then(res => {
       this.$refs.baseTemplateRef.validate(valid => {
         if (valid) {
           putObj(this.baseTemplateVO).then(res => {
-            //this.tableData.splice(index, 1, Object.assign({}, row)); //删除数组中指定索引的数据
             if (res.data.data) {
-              // this.$message({
-              //   showClose: true,
-              //   message: res.data.msg,
-              //   type: "success"
-              // });
               this.$notify({
                 title: "成功",
                 message: res.data.msg,
@@ -526,26 +493,6 @@ export default {
           });
         }
       });
-
-      // this.$confirm("此模板名称已存在,是否保存修改", "提示", {
-      //   confirmButtonText: "确定",
-      //   cancelButtonText: "取消",
-      //   type: "warning"
-      // }).then(() => {
-      //   putObj(this.baseTemplateVO).then(data => {
-      //     //this.tableData.splice(index, 1, Object.assign({}, row)); //删除数组中指定索引的数据
-      //     this.$message({
-      //       showClose: true,
-      //       message: "修改成功",
-      //       type: "success"
-      //     });
-      //     this.isEidtTemplate = false;
-      //     this.baseTemplateVO = {};
-      //     this.getList();
-      //   });
-      // });
-
-      //});
     },
     /**
      * @title 数据添加
@@ -556,11 +503,7 @@ export default {
     handleSave: function(row, done) {
       addObj(row).then(data => {
         this.tableData.push(Object.assign({}, row));
-        // this.$message({
-        //   showClose: true,
-        //   message: "添加成功",
-        //   type: "success"
-        // });
+
         this.$notify({
           title: "成功",
           message: "添加成功",
@@ -617,7 +560,6 @@ export default {
       });
     },
     cancelAdd() {
-      //this.BaseTemplate = {};
       (this.BaseTemplate = {
         //模板对象
         tempName: "",
@@ -632,7 +574,6 @@ export default {
     },
     cancelEidt() {
       this.isEidtTemplate = false;
-      //this.reload();
       this.refreshChange();
     },
     /**
