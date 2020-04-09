@@ -158,6 +158,30 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-amqp</artifactId>
 		</dependency>
+		<!-- 第三方jar -->
+		<dependency>
+		    <groupId>com.gjk.gjk-softRadarInf</groupId>
+		    <artifactId>softRadarInf</artifactId>
+		    <version>1.0</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.gjk.gjk-nddsjava</groupId>
+		    <artifactId>nddsjava</artifactId>
+		    <version>1.0</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.gjk.gjk-cpdetector</groupId>
+		    <artifactId>cpdetector</artifactId>
+		    <version>1.0</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.gjk.gjk-dom4j</groupId>
+		    <artifactId>dom4j</artifactId>
+		    <version>1.0</version>
+		</dependency>
 	</dependencies>
 
 	<modules>

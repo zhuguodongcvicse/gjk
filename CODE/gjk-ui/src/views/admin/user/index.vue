@@ -158,9 +158,10 @@ export default {
         this.treeDeptData = response.data.data;
       });
     },
-    handleFilter(param) {
+    handleFilter(param,done) {
       this.page.page = 1;
       this.getList(this.page, param);
+      done();
     },
     handleRefreshChange() {
       this.getList(this.page);

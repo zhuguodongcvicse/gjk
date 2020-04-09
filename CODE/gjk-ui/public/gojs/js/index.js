@@ -506,17 +506,23 @@ function init() {
       var random = ''
       random = Math.ceil(Math.random() * 10000000000000000000).toString().substr(0, 9 || 4)
       random = Date.now() + random
-      for (var value of dat) {
-        if (ui.draggable.attr("id") == value.id) {
-          var uuidList = new Array();
-          dropData = value
-          compName = value.compName
-          // path = takeScreenshot(ui.draggable.attr("id"))
-          html2canvas(document.getElementById(ui.draggable.attr("id"))).then(canvas => {
+      // path = takeScreenshot(ui.draggable.attr("id"))
+      html2canvas(document.getElementById(ui.draggable.attr("id"))).then(canvas => {
+        for (var value of dat) {
+          if (ui.draggable.attr("id") == value.id) {
+            //输入锚点集合数据
+            var rightArray = new Array()
+            //输出锚点集合数据
+            var leftArray = new Array()
+            var uuidList = new Array();
+            dropData = value
+            compName = value.compName
             //document.body.appendChild(canvas)
             path = canvas.toDataURL("image/png");
-            inputList = value.inputList.concat()
-            outputList = value.outputList.concat()
+            //inputList = value.inputList.concat()
+            //outputList = value.outputList.concat()
+            console.log(value.compName)
+            console.log("锚点数据", value.inputList)
             for (var i = 0; i < value.inputList.length; i++) {
               var inputData = {}
               let inputStr = ""
@@ -532,6 +538,7 @@ function init() {
               leftArray.push(inputData)
               uuidList.push(i + '*input*' + random)
             }
+            console.log("左边锚点集合", leftArray)
             for (var j = 0; j < value.outputList.length; j++) {
               var outputData = {}
               let outputStr = ""
@@ -547,6 +554,7 @@ function init() {
               rightArray.push(outputData)
               uuidList.push(j + '*output*' + random)
             }
+
             var x = ui.offset.left - $(this).offset().left;
             var y = ui.offset.top - $(this).offset().top;
             var p = new go.Point(x, y);
@@ -577,9 +585,10 @@ function init() {
               uuidList: uuidList
             });
             handleMessageToParent("returnFormJson", gjidAndTemid);
-          });
+
+          }
         }
-      }
+      });
     }
   });
 

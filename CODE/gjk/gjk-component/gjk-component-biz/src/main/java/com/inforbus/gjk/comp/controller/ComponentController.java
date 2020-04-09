@@ -42,12 +42,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.log.annotation.SysLog;
+import com.inforbus.gjk.comp.api.dto.CompIdDTO;
 import com.inforbus.gjk.comp.api.dto.CompTree;
 import com.inforbus.gjk.comp.api.entity.Component;
 import com.inforbus.gjk.comp.api.entity.ComponentDetail;
 import com.inforbus.gjk.comp.api.util.CompTreeUtil;
 import com.inforbus.gjk.comp.api.vo.ComponentVO;
 import com.inforbus.gjk.comp.service.ComponentService;
+import com.inforbus.gjk.libs.api.dto.ThreeLibsFilePathDTO;
 
 import lombok.AllArgsConstructor;
 
@@ -317,40 +319,44 @@ public class ComponentController {
 		return new R<>(componentService.listCompByUserId(userId));
 	}
 
-	// **********************************************************//
 	// upms模块用到的东西，用于展示库管理模块的树级关系
+	//根据libsId获取库文件
 	@PostMapping("/getLibsFile/{libsId}")
 	public List<ComponentDetail> getLibsFile(@PathVariable("libsId") String libsId) {
 		return componentService.getLibsFile(libsId);
 	}
 
+	//根据libsId获取库类型
 	@PostMapping("/getLibsFileType")
 	public List<ComponentDetail> getLibsFileType(String libsId) {
 		return componentService.getLibsFileType(libsId);
 	}
 
+	//根据id获取构件名
 	@PostMapping("/getCompNameById/{id}")
 	public Component getCompNameById(@PathVariable("id") String id) {
 		return componentService.getCompNameById(id);
 	}
 
+	//通过分组compId获取CompIds
 	@PostMapping("/getCompIdsGroupCompId")
 	public List<String> getCompIdsGroupCompId() {
 		return componentService.getCompIdsGroupCompId();
 	}
 
+	//根据构件id、文件名获取构件详细信息
 	@PostMapping("/getCompDetailByComponentId/{componentId}/{fileName}")
 	public ComponentDetail getCompDetailByComponentId(@PathVariable("componentId") String componentId,
 			@PathVariable("fileName") String fileName) {
 		return componentService.getCompDetailByComponentId(componentId, fileName);
 	}
 
-	@PostMapping("/getCompByCompId/{compId}")
-	public List<Component> getCompByCompId(@PathVariable("compId") String compId) {
-		return componentService.getCompByCompId(compId);
+	//根据compId获取构件信息
+	@PostMapping("/getCompByCompId")
+	public List<Component> getCompByCompId(@RequestBody CompIdDTO compIdDTO) {
+		return componentService.getCompByCompId(compIdDTO.getCompId());
 	}
 
-	// **********************************************************//
 	/**
 	 * Jsplumb 转Gojs 图片样式
 	 * 
@@ -359,5 +365,15 @@ public class ComponentController {
 	@PostMapping("/jsplumbToGojsImg")
 	public R compJsplumbToGojsImg() {
 		return componentService.compJsplumbToGojsImg();
+	}
+
+	/**
+	 * Jsplumb 转Gojs 图片样式
+	 *
+	 * @return
+	 */
+	@PostMapping("/gojsToJsplumbImg")
+	public R compGojsToJspumbImg() {
+		return componentService.compGojsToJspumbImg();
 	}
 }
