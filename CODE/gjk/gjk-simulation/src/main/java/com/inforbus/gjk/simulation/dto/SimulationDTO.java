@@ -3,8 +3,14 @@ package com.inforbus.gjk.simulation.dto;
 import lombok.Data;
 
 /**
- * 页面参数封装
- */
+* @Description:    页面参数封装
+* @Author:         ZhangHongXu
+* @CreateDate:     2020/4/9 9:15
+* @UpdateUser:     ZhangHongXu
+* @UpdateDate:     2020/4/9 9:15
+* @UpdateRemark:   修改内容
+* @Version:        1.0
+*/
 @Data
 public class SimulationDTO {
     private  String startName;

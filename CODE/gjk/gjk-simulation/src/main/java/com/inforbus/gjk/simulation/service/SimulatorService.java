@@ -8,8 +8,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 仿真业务接口
- */
+* @Description:    仿真业务接口
+* @Author:         ZhangHongXu
+* @CreateDate:     2020/4/9 9:23
+* @UpdateUser:     ZhangHongXu
+* @UpdateDate:     2020/4/9 9:23
+* @UpdateRemark:   修改内容
+* @Version:        1.0
+*/
 public interface SimulatorService {
     /**
      * 开始仿真
