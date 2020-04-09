@@ -139,7 +139,7 @@ export default {
         appProCreatePretreatment(params)
           .then(Response => {
             if (Response.data.data === true) {
-              this.reflush(loading);
+              // this.reflush(loading);
               const loadingToo = this.$loading({
                 lock: true,
                 text: "App组件工程生成中......",
