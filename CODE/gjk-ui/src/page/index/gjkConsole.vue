@@ -40,9 +40,7 @@
         </button>
       </div>
       <!-- 控制台内容div -->
-      <div id="textedits_log">
-        <!-- <el-input type="textarea" v-model="inputText" rows="10"></el-input> -->
-      </div>
+      <div id="textedits_log"></div>
     </div>
   </div>
 </template>
@@ -71,8 +69,7 @@ export default {
       threeLibsFilePathDTO: {},
       inputText: "",
       client: Stomp.client(MQTT_SERVICE),
-      token: "",
-
+      token: ""
     };
   },
   //监听属性 类似于data概念
@@ -88,23 +85,11 @@ export default {
   },
   //监控data中的数据变化
   watch: {
-    // $route: {
-    //   immediate: true,
-    //   handler: function() {
-    //     this.fileName = this.$route.query.appFileName;
-    //     this.threeLibsFilePathDTO.filePathName = this.$route.query.filePath;
-    //     readAlgorithmfile(this.threeLibsFilePathDTO).then(response => {
-    //       this.textContext = response.data.data.textContext.split("======")[1];
-    //     });
-    //   },
-    //   deep: true
-    // },
     consoleLog: {
       handler: function(newValue, oldValue) {
         //触发后消除消息信息
-        //console.log("控制台对象", this.consoleLog);
+
         if (this.consoleLog == "") {
-          //this.client.disconnect(); //断开连接
           return;
         } else {
           var isRepeat = false;
@@ -122,7 +107,6 @@ export default {
               }
             });
           if (isRepeat) {
-
             $("#textedits_log")
               .find("div[pid=" + consoleLogName + "]")
               .children()
@@ -136,7 +120,7 @@ export default {
               .scrollTop(scrollTop);
           } else {
             //创建新的label
-             $("#textedits_lable").append(
+            $("#textedits_lable").append(
               "<button type='button' class='el-button el-button--primary el-button--mini'><span onclick='project(this)'>" +
                 consoleLogName +
                 "</span>&nbsp;<i onclick='closeConsole(this)' class='el-icon-thirdclose-circle'></i></button>"
@@ -155,8 +139,6 @@ export default {
                 consoleLogVal +
                 "</textarea></div>"
             );
-            //以前的代码
-            //this.inputText = this.textLog;
           }
           //打开控制台
           this.open_console();
@@ -171,8 +153,7 @@ export default {
   created() {
     //连接mq
     this.connect();
-    //console.log("token", this.$store.getters.access_token);
-    this.token = this.$store.getters.access_token;//获取到登录的token
+    this.token = this.$store.getters.access_token; //获取到登录的token
   },
   //方法集合
   methods: {
@@ -212,7 +193,7 @@ export default {
       // console.log("Failed: " + frame);
       //this.client = Stomp.client(MQTT_SERVICE)
       //this.connect();
-        /* this.$message({
+      /* this.$message({
              message: 'MQ连接失败,请确认是否开启MQ服务或者刷新页面',
              type: 'warning'
            });*/
@@ -230,10 +211,7 @@ export default {
         login: MQTT_USERNAME,
         passcode: MQTT_PASSWORD,
         "client-id": clientid
-        // additional header
       };
-      //this.client.heartbeat.incoming = 30000;
-      //this.client.heartbeat.outgoing = 30000;
       this.client.connect(headers, this.onConnected, this.onFailed);
     },
     //清除控制台
@@ -287,20 +265,6 @@ window.closeConsole = function(val) {
     .find("div[pid='" + conosleName + "']")
     .remove();
 };
-// window.textedits_window = function(val){
-//   if($(val).parent().next().is(":hidden")){
-//     $(val).find("i").removeClass("el-icon-thirdup");
-//     $(val).find("i").addClass("el-icon-thirddown");
-//     $(val).parent().parent().css("height","200px");
-//     $(val).parent().next().show();
-//   }else{
-//     $(val).find("i").removeClass("el-icon-thirddown");
-//     $(val).find("i").addClass("el-icon-thirdup");
-//     $(val).parent().parent().css("height",$(val).parent().css("height"));
-//     $(val).parent().next().hide();
-//   }
-
-// }
 </script>
 <style>
 </style>
