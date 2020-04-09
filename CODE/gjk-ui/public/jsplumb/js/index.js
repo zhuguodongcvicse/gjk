@@ -263,7 +263,7 @@ function dropNode(template, position) {
 }
 //获取拖动的构件
 function getGj(template) {
-	var str = template.charAt(template.length - 1);
+	var str = template.replace("tpl-menu","")
 	return str;
 }
 // 初始化节点设置

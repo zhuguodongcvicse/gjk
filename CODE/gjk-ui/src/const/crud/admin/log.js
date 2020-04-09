@@ -21,6 +21,7 @@ export const tableOption = {
     label: '类型',
     prop: 'type',
     type: 'select',
+    searchSpan:12,
     dicUrl: '/admin/dict/type/log_type',
     search: true
   }, {
