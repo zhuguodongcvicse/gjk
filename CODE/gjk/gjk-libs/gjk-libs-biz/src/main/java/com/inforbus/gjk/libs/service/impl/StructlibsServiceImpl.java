@@ -73,14 +73,14 @@ public class StructlibsServiceImpl extends ServiceImpl<StructlibsMapper, Structl
 	@Override
 	public Map<String, ParamTreeVO> parseStructFile(String filePath) {
 		String url = new String(filePath);
-		//判断路径是否为空
+		// 判断路径是否为空
 		if (StringUtils.isNotEmpty(url)) {
 			File file = new File(url);
 			if (!file.exists()) {
 				return null;
 			}
 		}
-		//调用结构体转换方法，解析结构体数据
+		// 调用结构体转换方法，解析结构体数据
 		return HeaderFileAndStructUtils.convertStruct(ExternalIOTransUtils.parseStruct(url));
 	}
 
@@ -275,9 +275,12 @@ public class StructlibsServiceImpl extends ServiceImpl<StructlibsMapper, Structl
 	 */
 	@Override
 	public List<StructDTO> getStructTreeDto(StructDTO structlibs) {
+//		QueryWrapper<Structlibs> query = Wrappers.<Structlibs>query();
+//		query.apply("lower('user_name') like {0}", structlibs.getQueryParam().toLowerCase());
 		List<Structlibs> lists = baseMapper
 				.selectList(Wrappers.<Structlibs>query().lambda().eq(Structlibs::getParentId, structlibs.getDbId())
-						.like(Structlibs::getName, structlibs.getQueryParam()).orderByAsc(Structlibs::getSort));
+						.apply("upper(name) like concat(concat('%',upper({0})),'%')", structlibs.getQueryParam().toUpperCase())
+						.orderByAsc(Structlibs::getSort));
 		List<StructDTO> retList = Lists.newArrayList();
 		for (Structlibs strs : lists) {
 			strs.setRootId(IdGenerate.uuid());
@@ -306,7 +309,8 @@ public class StructlibsServiceImpl extends ServiceImpl<StructlibsMapper, Structl
 			// 根据结构体主键查询数据
 			List<Structlibs> lists = baseMapper.selectList(
 					Wrappers.<Structlibs>query().lambda().eq(Structlibs::getParentId, struct.getChildrenIds())
-							.like(Structlibs::getName, param[0]).orderByAsc(Structlibs::getSort));
+							.apply("upper(name)  like concat(concat('%',upper({0})),'%')", param[0].toUpperCase()).orderByAsc(Structlibs::getSort));
+							// .like(Structlibs::getName, param[0]).orderByAsc(Structlibs::getSort));
 			// 将ChildrenIds处理，用于重新赋值关系 ①
 			struct.setChildrenIds(IdGenerate.uuid());
 			for (Structlibs strs : lists) {
@@ -359,14 +363,11 @@ public class StructlibsServiceImpl extends ServiceImpl<StructlibsMapper, Structl
 
 	@Override
 	public R deleteStructLibById(String id) {
-		Structlibs structLib = baseMapper.selectById(id);
-		// 未入库允许删除
-		if ("0".equals(structLib.getDelFlag())) {
-			baseMapper.deleteStructByParentId(id);
-			baseMapper.deleteStructById(id);
-			return new R<>(true);
-		}
-		return new R<>(false);
+		// 未入库允许删除Structlibs structLib = baseMapper.selectById(id);
+		// 未入库允许删除 "0".equals(structLib.getDelFlag())
+		baseMapper.deleteStructByParentId(id);
+		baseMapper.deleteStructById(id);
+		return new R<>(true);
 	}
 
 	@Override

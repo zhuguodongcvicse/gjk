@@ -838,7 +838,11 @@ export default {
       //去头文件中找结构体
       if (isok === "shStruct") {
         let tmpStruct;
-        if (JSON.stringify(this.headerFile) !== "{}" && id !== undefined && id !== "") {
+        if (
+          JSON.stringify(this.headerFile) !== "{}" &&
+          id !== undefined &&
+          id !== ""
+        ) {
           tmpStruct = this.headerFile.structParams[
             deepClone(id).replace("*", "")
           ];
@@ -886,73 +890,77 @@ export default {
       let regExp = /\w+\[[0-9]+\]/i;
       let paramName = params[0][0].lableName;
       console.log("给当前节点追加children", params[0]);
-      let key = this.$refs.tree.getCurrentNode().id;
-      if (regExp.test(paramName)) {
-        // console.log("查询数据库返回表单元素", params[0][0].lableName);
-        let dataVal = [];
-        let arrData = deepClone(this.findArrayTmpMap.get(key));
-        //TODO
-        // console.log("arrDataarrData", arrData);
-        for (let key in arrData) {
-          dataVal.push(deepClone(arrData[key]));
-        }
-        // console.log("查询数据库返回表单元素", dataVal);
-        if (!this.$refs.tree.getCurrentNode().children) {
-          this.$set(this.$refs.tree.getCurrentNode(), "children", []);
-        }
-        this.$refs.tree.updateKeyChildren(this.aCheckedKeys[0], dataVal);
-      } else {
-        //从variable取得结构体数据 structId structType
-        let typeParam = this.getStructType(params);
-        //当数据来自修改时取变量中的值
-        let arrData = deepClone(this.findArrayTmpMap.get(key));
-        if (arrData && arrData.length > 0) {
-          this.$refs.tree.updateKeyChildren(this.aCheckedKeys[0], arrData);
-        } else if (typeParam.isok === "shStruct") {
+      if (this.$refs.tree.getCurrentNode()) {//新添加的
+        let key = this.$refs.tree.getCurrentNode().id;
+        if (regExp.test(paramName)) {
+          // console.log("查询数据库返回表单元素", params[0][0].lableName);
           let dataVal = [];
-          //①父级结构体，
-          //设置序号
-          this.xmlTreeShowTabValues(
-            typeParam.struct.children,
-            dataVal,
-            typeParam.numIndex
-          );
-          // //设置当前选中节点的子节点
-          this.$refs.tree.getCurrentNode().assigParamName = this.$refs.tree.getCurrentNode().lableName;
-          this.$refs.tree.getCurrentNode().assigStructType =
-            typeParam.struct.fparamType;
+          let arrData = deepClone(this.findArrayTmpMap.get(key));
+          //TODO
+          // console.log("arrDataarrData", arrData);
+          for (let key in arrData) {
+            dataVal.push(deepClone(arrData[key]));
+          }
+          // console.log("查询数据库返回表单元素", dataVal);
           if (!this.$refs.tree.getCurrentNode().children) {
             this.$set(this.$refs.tree.getCurrentNode(), "children", []);
           }
           this.$refs.tree.updateKeyChildren(this.aCheckedKeys[0], dataVal);
-        } else if (typeParam.isok === "dbStruct") {
-          typeParam.struct.dbId = typeParam.struct.dbId.replace("_*", "");
-          this.$set(typeParam.struct, "queryParam", "");
-          getStructTree(typeParam.struct).then(r => {
-            let nodes = {};
-            nodes = this.getBaseXmlOptionDataTree(typeParam.struct);
-            // console.log("测试数据0111", nodes);
-            this.$set(nodes, "children", []);
+        } else {
+          //从variable取得结构体数据 structId structType
+          let typeParam = this.getStructType(params);
+          //当数据来自修改时取变量中的值
+          let arrData = deepClone(this.findArrayTmpMap.get(key));
+          if (arrData && arrData.length > 0) {
+            this.$refs.tree.updateKeyChildren(this.aCheckedKeys[0], arrData);
+          } else if (typeParam.isok === "shStruct") {
+            let dataVal = [];
+            //①父级结构体，
             //设置序号
             this.xmlTreeShowTabValues(
-              r.data.data,
-              nodes.children,
+              typeParam.struct.children,
+              dataVal,
               typeParam.numIndex
             );
+            // //设置当前选中节点的子节点
             this.$refs.tree.getCurrentNode().assigParamName = this.$refs.tree.getCurrentNode().lableName;
             this.$refs.tree.getCurrentNode().assigStructType =
               typeParam.struct.fparamType;
-
-            //设置当前选中节点的子节点
             if (!this.$refs.tree.getCurrentNode().children) {
               this.$set(this.$refs.tree.getCurrentNode(), "children", []);
             }
-            this.$refs.tree.updateKeyChildren(
-              this.aCheckedKeys[0],
-              nodes.children
-            );
-          });
+            this.$refs.tree.updateKeyChildren(this.aCheckedKeys[0], dataVal);
+          } else if (typeParam.isok === "dbStruct") {
+            typeParam.struct.dbId = typeParam.struct.dbId.replace("_*", "");
+            this.$set(typeParam.struct, "queryParam", "");
+            getStructTree(typeParam.struct).then(r => {
+              let nodes = {};
+              nodes = this.getBaseXmlOptionDataTree(typeParam.struct);
+              // console.log("测试数据0111", nodes);
+              this.$set(nodes, "children", []);
+              //设置序号
+              this.xmlTreeShowTabValues(
+                r.data.data,
+                nodes.children,
+                typeParam.numIndex
+              );
+              this.$refs.tree.getCurrentNode().assigParamName = this.$refs.tree.getCurrentNode().lableName;
+              this.$refs.tree.getCurrentNode().assigStructType =
+                typeParam.struct.fparamType;
+
+              //设置当前选中节点的子节点
+              if (!this.$refs.tree.getCurrentNode().children) {
+                this.$set(this.$refs.tree.getCurrentNode(), "children", []);
+              }
+              this.$refs.tree.updateKeyChildren(
+                this.aCheckedKeys[0],
+                nodes.children
+              );
+            });
+          }
         }
+      } else {
+        //可能需要加提示
       }
     },
     //根据变量类型结构体类型更改值

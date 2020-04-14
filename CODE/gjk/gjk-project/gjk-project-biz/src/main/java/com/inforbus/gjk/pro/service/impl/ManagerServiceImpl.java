@@ -814,6 +814,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 								}
 							}
 							if ("".equals(bspFilePath)) {
+								if(libsType.equals("Sylixos")||libsType.equals("Workbench")) {
 								if (returnStr.contains("请配置" + libsType + "对应的bsp,")) {
 									String s = "请配置" + libsType + "对应的bsp,部件";
 									StringBuilder sb = new StringBuilder(returnStr);
@@ -823,8 +824,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 									returnStr += "请配置" + libsType + "对应的bsp," + "部件" + part.getPartName() + "缺少对应的BSP。";
 								}
 								logger.error("请配置" + libsType + "对应的bsp," + "部件" + part.getPartName() + "缺少对应的BSP。");
+							
+								}
 							}
-
 						}
 					}
 				}
@@ -1018,29 +1020,30 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			String softwareFilePath, String softwareName, String bspFilePath) {
 
 		if ("".equals(bspFilePath)) {
-			logger.error("请配置" + libsType + "对应的bsp," + "部件" + partName + "缺少对应的BSP。");
-			r.setException(new Exception("请配置" + libsType + "对应的BSP," + "部件" + partName + "缺少对应的BSP。"));
-			return;
+			if(libsType.equals("Sylixos")||libsType.equals("Workbench")) {
+				logger.error("请配置" + libsType + "对应的bsp," + "部件" + partName + "缺少对应的BSP。");
+				r.setException(new Exception("请配置" + libsType + "对应的BSP," + "部件" + partName + "缺少对应的BSP。"));
+				return;
+			}
 		}
-		Thread thread = new Thread() {
-			@Override
-			public void run() {
-				File file = new File(appFilePath + "bsp" + File.separator + platformType + File.separator
-						+ new File(bspFilePath).getName());
-				if (!file.exists()) {
-					// 拷贝bsp对应的文件夹到app组件工程目录下
-					file.mkdirs();
-					try {
-						FileUtil.copyFile(proDetailPath + bspFilePath, file.getAbsolutePath());
-					} catch (IOException e) {
-						logger.error("复制BSP文件夹错误，请联系系统管理员");
-						r.setException(new Exception("复制BSP文件夹错误，请联系系统管理员"));
-						return;
-					}
+		Thread thread = new Thread(() -> {
+			File file = new File(appFilePath + "bsp" + File.separator + platformType + File.separator
+					+ new File(bspFilePath).getName());
+			if (!file.exists()) {
+				// 拷贝bsp对应的文件夹到app组件工程目录下
+				file.mkdirs();
+				try {
+					FileUtil.copyFile(proDetailPath + bspFilePath, file.getAbsolutePath());
+				} catch (IOException e) {
+					logger.error("复制BSP文件夹错误，请联系系统管理员");
+					r.setException(new Exception("复制BSP文件夹错误，请联系系统管理员"));
+					return;
 				}
 			}
-		};
-		thread.start();
+		});
+		if(libsType.equals("Sylixos")||libsType.equals("Workbench")) {
+			thread.start();
+		}
 
 		if ("".equals(softwareFilePath)) {
 			logger.error(partName + "寻找软件框架错误，请配置" + libsType + "对应的软件框架。");
