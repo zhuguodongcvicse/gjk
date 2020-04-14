@@ -917,7 +917,7 @@ export default {
               this.tmpMaps.set(tmp.attributeMap.id, tmp);
             }
           });
-          this.postMessageData.cmd = "clickCompLoading";
+          this.postMessageData.cmd = "import";
           this.postMessageData.params = res.data.data.json;
           this.$refs.gjkIframe.sendMessage(this.postMessageData);
         });
