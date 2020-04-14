@@ -1,15 +1,12 @@
 package com.inforbus.gjk.dataCenter.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.ss.formula.functions.T;
-import org.springframework.stereotype.Service;
+import com.inforbus.gjk.common.core.entity.XmlEntityMap;
+import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.inforbus.gjk.dataCenter.api.entity.FileCenter;
 
 /**
@@ -23,7 +20,7 @@ public interface FileService {
 
 	/**
 	 * 多文件上传多文件上传
-	 * 
+	 *
 	 * @Title: uploadLocalFile
 	 * @Description 多文件上传多文件上传
 	 * @Author xiaohe
@@ -37,7 +34,7 @@ public interface FileService {
 
 	/**
 	 * 下载文件
-	 * 
+	 *
 	 * @Title: downloadFile
 	 * @Description 下载文件
 	 * @Author cvics
@@ -52,7 +49,7 @@ public interface FileService {
 
 	/**
 	 * 下载文件到本地
-	 * 
+	 *
 	 * @Title: downloadFile
 	 * @Description 下载文件到本地
 	 * @Author cvics
@@ -65,7 +62,7 @@ public interface FileService {
 
 	/**
 	 * 删除指定文件夹下的所有文件
-	 * 
+	 *
 	 * @Title: delAllFile
 	 * @Description: 删除指定文件夹下的所有文件
 	 * @Author xiaohe
@@ -78,7 +75,7 @@ public interface FileService {
 
 	/**
 	 * 删除文件夹
-	 * 
+	 *
 	 * @Title: delFolder
 	 * @Description: 删除文件夹
 	 * @Author xiaohe
@@ -91,7 +88,7 @@ public interface FileService {
 
 	/**
 	 * 拷贝文件
-	 * 
+	 *
 	 * @Title: copylocalFile
 	 * @Description 拷贝文件
 	 * @Author xiaohe
@@ -104,7 +101,7 @@ public interface FileService {
 
 	/**
 	 * 读取 txt.doc,docx,.h .m .c .o xlsx xls文件内容
-	 * 
+	 *
 	 * @Title: readFile
 	 * @Description 读取 txt.doc,docx,.h .m .c .o xlsx xls文件内容
 	 * @Author xiaohe
@@ -118,7 +115,7 @@ public interface FileService {
 
 	/**
 	 * 编辑文件 更改文件内容
-	 * 
+	 *
 	 * @Title: writeFile
 	 * @Description 编辑文件 更改文件内容
 	 * @Author cvics
@@ -129,5 +126,23 @@ public interface FileService {
 	 * @return Boolean
 	 * @throws Exception
 	 */
-	public Boolean writeFile(String localPath, String charset, String textContext) throws Exception;
+	public Boolean writeFile(String localPath,String charset,String textContext);
+
+	/**
+	 * @Author wang
+	 * @Description: 解析xml文件为xmlEntity对象
+	 * @Param: [localPath]
+	 * @Return: boolean
+	 * @Create: 2020/4/13
+	 */
+    XmlEntityMap analysisXmlFileToXMLEntityMap(String localPath) throws FileNotFoundException;
+
+	/**
+	 * @Author wang
+	 * @Description: 早指定路径下生成xml文件
+	 * @Param: xMlEntityMapVO
+	 * @Return: com.inforbus.gjk.common.core.util.R
+	 * @Create: 2020/4/14
+	 */
+    boolean createXMLFile(XMlEntityMapVO xMlEntityMapVO);
 }
