@@ -125,7 +125,7 @@ export default {
       let procedureXml = this.procedure.children[0].children.find(item => {
         return item.type === "11";
       });
-      if (procedureXml != undefined) {
+      if (procedureXml !== undefined) {
         this.$set(allMessage, "procedureXmlId", procedureXml.id);
         this.$set(allMessage, "userId", "" + this.userInfo.userId);
         if (this.localDeploymentPlan) {

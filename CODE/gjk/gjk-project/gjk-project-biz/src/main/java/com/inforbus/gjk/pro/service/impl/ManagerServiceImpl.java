@@ -1094,45 +1094,43 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		selectFileExtensionList.add(".c");
 		selectFileExtensionList.add(".cpp");
 
-		Thread copyFile = new Thread() {
-			@Override
-			public void run() {
-				// 查找组件文件夹下文件夹名为App的文件夹路径
-				String appFilePathName = FileUtil.getSelectStrFilePath(assemblyName, "App");
-				if (appFilePathName == null) {
-					// 如果未找到App文件夹路径，在组件文件夹下创建App文件夹
-					appFilePathName = assemblyName + File.separator + "App";
-				}
-				// 获取集成代码文件夹 文件夹路径规则:../App/Src/
-				String partIntegerCodeFilePath = appFilePathName + File.separator + "Src" + File.separator;
-				// 获取include文件夹 文件夹路径规则:../App/Include/Spb/
-				String includeFilePath = appFilePathName + File.separator + "Include" + File.separator + "Spb"
-						+ File.separator;
-				// 获取src文件夹 文件夹路径规则:../App/Src/Spb/
-				String srcFilePath = appFilePathName + File.separator + "Src" + File.separator + "Spb" + File.separator;
+		Thread copyFile = new Thread(() -> {
+			// 查找组件文件夹下文件夹名为App的文件夹路径
+			String appFilePathName = FileUtil.getSelectStrFilePath(assemblyName, "App");
+			if (appFilePathName == null) {
+				// 如果未找到App文件夹路径，在组件文件夹下创建App文件夹
+				appFilePathName = assemblyName + File.separator + "App";
+			}
+			// 获取集成代码文件夹 文件夹路径规则:../App/Src/
+			String partIntegerCodeFilePath = appFilePathName + File.separator + "Src" + File.separator;
+			// 获取include文件夹 文件夹路径规则:../App/Include/Spb/
+			String includeFilePath = appFilePathName + File.separator + "Include" + File.separator + "Spb"
+					+ File.separator;
+			// 获取src文件夹 文件夹路径规则:../App/Src/Spb/
+			String srcFilePath = appFilePathName + File.separator + "Src" + File.separator + "Spb" + File.separator;
 
-				// 复制集成代码
-				Set<String> integerCodeSet = new HashSet<String>();
-				FileUtil.getSelectStrFilePathList(integerCodeSet, integerCodeFilePath, "Cmp" + part.getPartName(),
-						".c");
-				try {
-					for (String filepath : integerCodeSet) {
-						FileUtil.copyFile(filepath, partIntegerCodeFilePath, "CmpSpbIntg.c");
-					}
-				} catch (IOException e) {
-					logger.error("复制集成代码失败，请联系管理员。");
-					r.setException(new Exception("复制集成代码失败，请联系管理员。"));
-					return;
+			// 复制集成代码
+			Set<String> integerCodeSet = new HashSet<String>();
+			FileUtil.getSelectStrFilePathList(integerCodeSet, integerCodeFilePath, "Cmp" + part.getPartName(),
+					".c");
+			try {
+				for (String filepath : integerCodeSet) {
+					FileUtil.copyFile(filepath, partIntegerCodeFilePath, "CmpSpbIntg.c");
 				}
+			} catch (IOException e) {
+				logger.error("复制集成代码失败，请联系管理员。");
+				r.setException(new Exception("复制集成代码失败，请联系管理员。"));
+				return;
+			}
 
-				getCompCHFileAndSave(r, part, assemblyName, includeFilePath, srcFilePath, hFilePathSet,
-						hMakeFilePathSet, cFilePathSet, cMakeFilePathSet, apiNeedStringSet, compFuncNameList,
-						selectFileExtensionList);
-				if (CommonConstants.FAIL.equals(r.getCode())) {
-					return;
-				}
+			getCompCHFileAndSave(r, part, assemblyName, includeFilePath, srcFilePath, hFilePathSet,
+					hMakeFilePathSet, cFilePathSet, cMakeFilePathSet, apiNeedStringSet, compFuncNameList,
+					selectFileExtensionList);
+			if (CommonConstants.FAIL.equals(r.getCode())) {
+				return;
+			}
 
-				FileUtil.getSelectStrFilePathList(linuxCFilePathSet, partIntegerCodeFilePath, selectFileExtensionList);
+			FileUtil.getSelectStrFilePathList(linuxCFilePathSet, partIntegerCodeFilePath, selectFileExtensionList);
 
 //				try {
 //					// 原始需求调用客户接口,apiFileList中存添加的.c .cpp .h文件不带后缀的文件名
@@ -1156,8 +1154,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 //					r.setException(new Exception("调用客户接口失败，请联系管理员。"));
 //					return;
 //				}
-			}
-		};
+		});
 		copyFile.start();
 
 		Thread modifyFile = new Thread() {
