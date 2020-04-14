@@ -10,9 +10,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
 import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
@@ -20,6 +23,11 @@ import org.apache.poi.POIXMLDocument;
 import org.apache.poi.POIXMLTextExtractor;
 import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +38,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.inforbus.gjk.common.core.constant.enums.FileExtensionEnum;
 import com.inforbus.gjk.common.core.util.FileUtil;
+import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.UploadFilesUtils;
+import com.inforbus.gjk.dataCenter.api.dto.ThreeLibsDTO;
+import com.inforbus.gjk.dataCenter.api.dto.ThreeLibsFilePathDTO;
 import com.inforbus.gjk.dataCenter.api.entity.FileCenter;
 import com.inforbus.gjk.dataCenter.service.FileService;
 
@@ -45,6 +56,8 @@ public class FileServiceImpl implements FileService {
 
     @Value("${git.local.path}")
     private String localBasePath;
+    @Value("${gjk.code.encodeing}")
+	private String defaultEncoding;
 
     private static final Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
 
@@ -576,4 +589,131 @@ public class FileServiceImpl implements FileService {
         }
     }
 
+    /**
+	 * 程序文本编辑器的文件展示
+	 * @param threeLibsFilePathDTO 封装了路径（全路径，从D盘开始）及编码格式
+	 * @return
+	 */
+	public R fileReads(ThreeLibsFilePathDTO threeLibsFilePathDTO) {
+		String fileName = threeLibsFilePathDTO.getFilePathName();
+		// 获取文件编码格式
+		String code = "";
+		if (StringUtils.isEmpty(threeLibsFilePathDTO.getCode())) {
+			code = defaultEncoding;
+		} else {
+			code = threeLibsFilePathDTO.getCode();
+		}
+		if (StringUtils.isEmpty(fileName)) {
+			return new R<>();
+		}
+		File isFile = new File(fileName);
+		//获取文件后缀名
+		String prefix = fileName.substring(fileName.lastIndexOf(".") + 1);
+		String str = "";
+		ThreeLibsDTO dto = new ThreeLibsDTO();
+		if (isFile.exists() && isFile.isFile()) {
+
+			// 读取excel文件
+			if ("xlsx".equals(prefix) || "xls".equals(prefix)) {
+				try {
+
+					XSSFWorkbook xssfWorkbook = new XSSFWorkbook(fileName);
+					// 循环工作表sheet
+					XSSFSheet xssfSheet = xssfWorkbook.getSheetAt(0);
+					int firstRowIndex = xssfSheet.getFirstRowNum(); // 第一行是列名，所以不读
+					int lastRowIndex = xssfSheet.getLastRowNum();
+					// 循环行row
+					XSSFRow xssfRow = xssfSheet.getRow(0);
+					// 循环列cell
+					// 用stringbuffer得到excel表格一行的内容并用逗号分隔
+					StringBuffer sbs = new StringBuffer();
+					for (int rIndex = firstRowIndex; rIndex <= lastRowIndex; rIndex++) {// 遍历行
+						Row row = xssfSheet.getRow(rIndex);
+						if (row != null) {
+							int firstCellIndex = row.getFirstCellNum();
+							int lastCellIndex = row.getLastCellNum();
+							for (int cIndex = firstCellIndex; cIndex < lastCellIndex; cIndex++) {// 遍历列
+								Cell cell = row.getCell(cIndex);
+								sbs.append(cell);
+								if (cell != null) {
+									sbs.append(",");
+								}
+							}
+						}
+
+					}
+					str = sbs.toString();
+				} catch (Exception e) {
+					e.printStackTrace();
+					return new R<>(new Exception("读取" + fileName + "文件内容出错"));
+				}
+				// 读取word文件
+			} else if ("doc".equals(prefix) || "docx".equals(prefix)) {
+				try {
+
+					FileInputStream in = new FileInputStream(fileName);
+					WordExtractor extractor = new WordExtractor(in);
+					str = extractor.getText();
+//				dto.setTextContext(str);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return new R<>(new Exception("读取" + fileName + "文件内容出错"));
+				}
+			}
+			// 读取//.h .m .c .o等客户 文件
+			else {
+				try {
+					str = FileUtils.readFileToString(new File(fileName), code);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return new R<>(new Exception("读取" + fileName + "文件内容出错"));
+				}
+			}
+			dto.setTextContext(prefix + "@%#@*+-+@" + str + "@%#@*+-+@" + code);
+		} else {
+			return new R<>(new Exception("找不到指定的文件"));
+		}
+		return new R<>(dto);
+	}
+
+	/**
+	 * 保存文本编辑器修改的内容（文本编辑器的）
+	 * @param filePath 文件路径
+	 * @param textContext 文本内容
+	 */
+		public void saveFileContext(String filePath, String textContext) {
+			String fileName = filePath;
+			File file = new File(fileName);
+			OutputStream outputStream = null;
+			if (file.exists()) {
+				try {
+					// 如果文件找不到，就new一个
+					file.delete();
+					file.createNewFile();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			try {
+				// 定义输出流，写入文件的流
+				outputStream = new FileOutputStream(file);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			// 定义将要写入文件的数据
+			// 把string转换成byte型的，并存放在数组中
+			byte[] bs = textContext.getBytes();
+			try {
+				// 写入bs中的数据到file中
+				outputStream.write(bs);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				outputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
 }

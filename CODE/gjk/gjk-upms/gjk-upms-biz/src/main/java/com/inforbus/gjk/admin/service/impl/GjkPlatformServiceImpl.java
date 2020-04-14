@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -54,10 +55,12 @@ import lombok.AllArgsConstructor;
  * @since 2019/4/17
  */
 @Service
-@AllArgsConstructor
+//@AllArgsConstructor
 public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPlatform> implements GjkPlatformService {
 
-	private static final String libsPath = JGitUtil.getLOCAL_REPO_PATH();
+//	private static final String libsPath = JGitUtil.getLOCAL_REPO_PATH();
+	@Value("${git.local.path}")
+	private String libsPath;
 
 	@Autowired
 	private FeginComponentService feginComponentService;

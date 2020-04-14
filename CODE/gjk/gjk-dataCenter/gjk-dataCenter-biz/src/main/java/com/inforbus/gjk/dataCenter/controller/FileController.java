@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.*;
 
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.inforbus.gjk.common.core.util.R;
+import com.inforbus.gjk.dataCenter.api.dto.ThreeLibsFilePathDTO;
 import com.inforbus.gjk.dataCenter.api.entity.FileCenter;
 import com.inforbus.gjk.dataCenter.service.FileService;
+import com.inforbus.gjk.dataCenter.service.impl.FileServiceImpl;
 
 /**
  * @ClassName: FileController
@@ -32,6 +34,8 @@ public class FileController {
 
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
 
+    @Autowired
+	private FileServiceImpl fileServiceImpl;
     @Autowired
     private FileService fileService;
 
@@ -322,4 +326,24 @@ public class FileController {
         logger.debug("createXMLFile方法运结束！");
         return r;
     }
+    
+    /**
+	 * 程序文本编辑器的文件展示
+	 * @param threeLibsFilePathDTO 封装了路径（全路径，从D盘开始）及编码格式
+	 * @return
+	 */
+	@PostMapping("readFiles")
+	public R fileReads(@RequestBody ThreeLibsFilePathDTO threeLibsFilePathDTO) {
+		return fileServiceImpl.fileReads(threeLibsFilePathDTO);
+	}
+	
+	/**
+	 * 保存文本编辑器修改的内容（文本编辑器的）
+	 * @param filePath 文件路径
+	 * @param textContext 文本内容
+	 */
+	@PostMapping("saveFileContext")
+	public void saveFileContext(@RequestParam("filePath") String filePath,@RequestParam("textContext") String textContext) {
+		fileServiceImpl.saveFileContext(filePath, textContext);
+	}
 }
