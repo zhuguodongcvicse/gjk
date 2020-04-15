@@ -20,6 +20,7 @@ import com.inforbus.gjk.pro.api.entity.*;
 
 import com.inforbus.gjk.pro.api.entity.GjkPlatform;
 import com.inforbus.gjk.pro.api.entity.Software;
+import com.inforbus.gjk.pro.api.feign.DisposeDataCenterServiceFeign;
 import com.inforbus.gjk.pro.mapper.*;
 import com.inforbus.gjk.pro.service.BaseTemplateService;
 import org.apache.commons.io.FileUtils;
@@ -58,6 +59,7 @@ import com.inforbus.gjk.common.core.util.ExternalIOTransUtils;
 import com.inforbus.gjk.common.core.util.FileUtil;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
+import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 import com.inforbus.gjk.pro.api.entity.App;
 import com.inforbus.gjk.pro.api.entity.Chipsfromhardwarelibs;
 import com.inforbus.gjk.pro.api.entity.Component;
@@ -102,6 +104,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	private BaseTemplateService baseTemplateService;
 	@Autowired
 	protected PartPlatformBSPMapper partPlatformBSPMapper;
+	@Autowired
+	protected DisposeDataCenterServiceFeign dataCenterServiceFeign;
 	@Autowired
 	private AppMapper appMapper;
 	@Autowired
@@ -279,10 +283,13 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 */
 	@Override
 	public synchronized String createXmlFile(XmlEntityMap entity, String proDetailId) {
+		XMlEntityMapVO xMlEntityMapVO = new XMlEntityMapVO();
+		xMlEntityMapVO.setXmlEntityMap(entity);
 		ProjectFile projectFile = this.getById(proDetailId);
 		String filePath = null;
 		if (projectFile != null) {
 			filePath = proDetailPath + projectFile.getFilePath() + File.separator + projectFile.getFileName() + ".xml";
+			xMlEntityMapVO.setLocalPath(filePath);
 		} else {
 			// return false;
 		}
@@ -290,7 +297,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (!file.getParentFile().exists()) {
 			file.getParentFile().mkdirs();
 		}
-		boolean flag = XmlFileHandleUtil.createXmlFile(entity, file);
+		dataCenterServiceFeign.createXMLFile(xMlEntityMapVO);
 		JGitUtil.commitAndPush(file.getAbsolutePath(), "上传项目相关文件");
 		return filePath;
 	}
@@ -540,14 +547,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	public XmlEntityMap getSysConfigXmlEntityMap(String proDetailId) {
 		ProjectFile projectFile = getProDetailById(proDetailId);
 		File hsmLocalFile = new File(gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml");// 老耿代码
-		// XmlEntityMap xmlEntityMap =
-		// XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);//老耿代码
-//		if (projectFile.getFileType().equals("14")) {
-//			file = new File(gitDetailPath+projectFile.getFilePath()+ "方案展示.xml");
-//		}
-//		 if (projectFile.getFileType().equals("11")) {
-//		 file = new File(System.getProperty("user.dir") + "/流程实例.xml");
-//		 }
 		if (hsmLocalFile.exists()) {
 			return XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(hsmLocalFile);
 		}
@@ -558,6 +557,36 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		return getXmlEntityMap(hsmTempId);// 解析软硬件映射xml文件返回数据
 	}
 
+	/**
+	 * @Title: getDisposeXmlEntityMap
+	 * @Description: 解析软硬件映射配置的xml文件进行前台回显
+	 * @Author geng
+	 * @DateTime 20200415
+	 * @param proDetailId
+	 * @return
+	 */
+	public XmlEntityMap getDisposeXmlEntityMap(String proDetailId) {
+		ProjectFile projectFile = getProDetailById(proDetailId);
+		//项目中是否已经存在的文件路径
+		File hsmLocalFile = new File(gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml");
+		String localFilePath = gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml";
+		//如果该项目中已经有该文件，则读取该文件内容显示在页面上；否则读取基础模板里的最新的软硬件映射配置文件
+		if (hsmLocalFile.exists()) {
+			R<XmlEntityMap> r = new R<XmlEntityMap>();
+			r = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(localFilePath);
+			return r.getData();
+			
+		}
+		Project project = projectMapper.getProById(projectFile.getProjectId());
+		// 获取到模板idjson串
+		String json = project.getBasetemplateIds();
+		// 把json串转成json对象
+		BaseTemplateIDsDTO baseTemplateIDsDTO = JSON.parseObject(json, BaseTemplateIDsDTO.class);
+		// 获取到软硬件映射模板id
+		String hsmTempId = baseTemplateIDsDTO.getHsmTempId();
+		// 解析软硬件映射xml文件返回数据
+		return getXmlEntityMap(hsmTempId);
+	}
 	/**
 	 * @editProJSON
 	 * @Description: 保存回显文件

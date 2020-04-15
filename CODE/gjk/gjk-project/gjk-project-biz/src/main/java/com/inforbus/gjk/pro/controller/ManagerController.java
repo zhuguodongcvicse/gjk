@@ -56,6 +56,7 @@ import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
 import com.inforbus.gjk.pro.api.vo.TreeUtil;
 import com.inforbus.gjk.pro.service.AppService;
 import com.inforbus.gjk.pro.service.ManagerService;
+import com.inforbus.gjk.pro.service.impl.ManagerServiceImpl;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.json.JSONUtil;
@@ -83,6 +84,7 @@ public class ManagerController {
 	 * @Fields managerService : 项目管理
 	 */
 	private final ManagerService managerService;
+	private final ManagerServiceImpl managerServiceImpl;
 	private final AppService appService;
 	private static final String proDetailPath = JGitUtil.getLOCAL_REPO_PATH();
 
@@ -153,18 +155,14 @@ public class ManagerController {
 		return new R<>(managerService.createXmlFile(entity, proDetailId));
 	}
 
+	/**
+	 * 解析软硬件映射配置xml
+	 * @param proDetailId 项目id
+	 * @return
+	 */
 	@GetMapping(value = "/dispose/{proDetailId}")
 	public R rollBackDisposeXml(@PathVariable("proDetailId") String proDetailId) {
-//		String filePath = "";
-//		ProjectFile projectFile = managerService.getProDetailById(proDetailId);
-//		Boolean bool = managerService.isXmlFileExist(proDetailId);
-//		// 如果文件存在
-//		if (bool == true) {
-//			filePath = proDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml";
-//		} else {
-//			filePath = System.getProperty("user.dir") + "\\软硬件映射配置.xml";
-//		}
-		return new R<>(managerService.getSysConfigXmlEntityMap(proDetailId));
+		return new R<>(managerServiceImpl.getDisposeXmlEntityMap(proDetailId));
 	}
 
 	@GetMapping("/getCoeffNodeTree/{proDetailId}")
