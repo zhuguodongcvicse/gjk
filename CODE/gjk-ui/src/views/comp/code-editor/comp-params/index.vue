@@ -276,7 +276,7 @@ export default {
               tmpComponent.compFuncname = baseParam.attributeMap.name;
             } else if (baseParam.lableName === "函数路径") {
               let name = baseParam.attributeMap.name;
-              this.functionPathName = name.substring(name.lastIndexOf("/") + 1);
+              this.functionPathName = name.substring(name.replace(/\\/,"/").lastIndexOf("/") + 1);
               // tmpComponent.compName = config.attributeMap.name;
             } else if (baseParam.lableName === "系数文件") {
               // tmpComponent.compName = config.attributeMap.name;

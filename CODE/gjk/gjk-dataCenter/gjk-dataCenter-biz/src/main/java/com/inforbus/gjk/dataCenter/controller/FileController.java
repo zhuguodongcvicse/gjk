@@ -1,18 +1,37 @@
 package com.inforbus.gjk.dataCenter.controller;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipOutputStream;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.http.entity.FileEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.google.common.collect.Lists;
+import com.inforbus.gjk.common.core.constant.CommonConstants;
 import com.inforbus.gjk.common.core.util.R;
+import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.dataCenter.api.entity.FileCenter;
 import com.inforbus.gjk.dataCenter.service.FileService;
 
@@ -28,6 +47,7 @@ public class FileController {
 	@Autowired
 	private FileService fileService;
 	private static final Logger logger = LoggerFactory.getLogger(FileController.class);
+
 	/**
 	 * @Title: uploadLocalFile
 	 * @Desc 多文件上传
@@ -51,7 +71,7 @@ public class FileController {
 				ret.setMsg("上传文件失败");
 			}
 		} catch (Exception e) {
-			logger.error("多文件上传",e);
+			logger.error("多文件上传", e);
 			return new R<Boolean>(e);
 		}
 		return ret;
@@ -81,7 +101,7 @@ public class FileController {
 				ret.setMsg("下载文件失败");
 			}
 		} catch (Exception e) {
-			logger.error("下载文件上传",e);
+			logger.error("下载文件上传", e);
 			return new R<Boolean>(e);
 		}
 		return ret;
@@ -102,7 +122,7 @@ public class FileController {
 		R<List<FileCenter>> ret = new R<List<FileCenter>>();
 		try {
 			List<FileCenter> list = fileService.downloadFile(sourcePath);
-			//判断list是否为空
+			// 判断list是否为空
 			if (ObjectUtils.isNotEmpty(list)) {
 				ret.setData(list);
 				ret.setMsg("下载文件成功");
@@ -112,7 +132,7 @@ public class FileController {
 				ret.setMsg("下载文件失败");
 			}
 		} catch (Exception e) {
-			logger.error("下载文件上传",e);
+			logger.error("下载文件上传", e);
 			return new R<>(e);
 		}
 		return ret;
@@ -140,7 +160,7 @@ public class FileController {
 				ret.setMsg("删除指定文件夹下的所有文件失败");
 			}
 		} catch (Exception e) {
-			logger.error("删除指定文件夹下的所有文件",e);
+			logger.error("删除指定文件夹下的所有文件", e);
 			return new R<Object>(e);
 		}
 		return ret;
@@ -166,7 +186,7 @@ public class FileController {
 				ret.setMsg("删除文件夹失败");
 			}
 		} catch (Exception e) {
-			logger.error("删除指定文件夹",e);
+			logger.error("删除指定文件夹", e);
 			return new R<Object>(e);
 		}
 		return ret;
@@ -190,7 +210,7 @@ public class FileController {
 			ret.setData(true);
 			ret.setMsg("拷贝文件成功");
 		} catch (Exception e) {
-			logger.error("删除指定文件夹",e);
+			logger.error("删除指定文件夹", e);
 			return new R<Boolean>(e);
 		}
 		return ret;
@@ -219,7 +239,7 @@ public class FileController {
 				ret.setMsg("读取文件失败");
 			}
 		} catch (Exception e) {
-			logger.error("读取文件",e);
+			logger.error("读取文件", e);
 			return new R<Map<String, String>>(e);
 		}
 		return ret;
@@ -249,9 +269,113 @@ public class FileController {
 				ret.setMsg("写入文件失败");
 			}
 		} catch (Exception e) {
-			logger.error("写入文件",e);
+			logger.error("写入文件", e);
 			return new R<Boolean>(e);
 		}
 		return ret;
 	};
+
+	/**
+	 * @Title: uploadLocalFile
+	 * @Desc
+	 * @Author cvics
+	 * @DateTime 2020年4月13日
+	 * @param ufile
+	 * @param type
+	 * @return
+	 */
+	@PostMapping(value = "/uploadMultipartFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public R uploadLocalFile(@RequestPart(value = "files") MultipartFile ufile, HttpServletResponse response) {
+		// 临时变量
+		MultipartFile[] ufiles = { ufile };
+		R<FileEntity> ret = new R<FileEntity>();
+		try {
+			List<FileCenter> fileCenters = fileService.uploadLocalFile(ufiles, "aaa/bbb");
+			if (fileCenters.size() > 0) {
+				ret.setCode(CommonConstants.SUCCESS);
+				ret.setData(null);
+				ret.setMsg("上传文件成功。。。");
+			} else {
+				ret.setCode(CommonConstants.FAIL);
+				ret.setData(null);
+				ret.setMsg("上传文件失败。。。");
+			}
+		} catch (Exception e) {
+			logger.error("上传文件失败", e);
+			ret = new R<>(e);
+		}
+		return ret;
+	}
+
+	@PostMapping(value = "/uploadFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public String handleFileUpload(@RequestPart(value = "file") MultipartFile file) {
+		logger.error("上传文件成功", file);
+		return file.getOriginalFilename();
+	}
+
+	/**
+	 * @Title: downloadFile
+	 * @Desc 下载文件返回流
+	 * @Author xiaohe
+	 * @DateTime 2020年4月15日
+	 * @param filePaths 文件全路径
+	 * @param response 返回zip流
+	 */
+	@ResponseBody
+	@PostMapping(value = "/downloadStreamFiles")
+	public void downloadFile(@RequestParam("filePaths") String[] filePaths, HttpServletResponse response) {
+		InputStream in = null;
+		try {
+			ByteArrayOutputStream zps = UploadFilesUtils.toZip(filePaths);
+			OutputStream out = response.getOutputStream();
+			out.write(zps.toByteArray());
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	/**
+	 * @Title: downloadFile
+	 * @Desc 下载文件返回流
+	 * @Author cvics
+	 * @DateTime 2020年4月15日
+	 * @param filePath
+	 * @param response 
+	 */
+	@ResponseBody
+	@PostMapping(value = "/downloadStreamFile")
+	public void downloadFile(@RequestParam("filePath") String filePath, HttpServletResponse response) {
+		File file = new File(filePath);
+		InputStream in = null;
+		if (file.exists()) {
+			try {
+				OutputStream out = response.getOutputStream();
+				in = new FileInputStream(file);
+				byte buffer[] = new byte[1024];
+				int length = 0;
+				while ((length = in.read(buffer)) >= 0) {
+					out.write(buffer, 0, length);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				if (in != null) {
+					try {
+						in.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+
 }

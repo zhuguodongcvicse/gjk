@@ -1,5 +1,6 @@
 package com.inforbus.gjk.dataCenter.service.impl;
 
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -64,27 +65,27 @@ public class FileServiceImpl implements FileService {
 		// 创建文件
 		UploadFilesUtils.createFile(localBasePath + File.separator + localPath);
 		localFile.stream().forEach(fc -> {
-			FileChannel in = null;
-			FileChannel out = null;
-			try {
-				in = fc.getInputStream().getChannel();
-				FileOutputStream fos = new FileOutputStream(
-						localBasePath + File.separator + localPath + File.separator + fc.getAbsolutePath());
-				out = fos.getChannel();
-				// 连接两个通道，并从in通道读取，写入out中
-				in.transferTo(0, in.size(), out);
-			} catch (FileNotFoundException e) {
-				logger.debug("下载本地文件,{}", e);
-			} catch (IOException e) {
-				logger.debug("下载本地文件,{}", e);
-			} finally {
-				try {
-					in.close();
-					out.close();
-				} catch (IOException e) {
-					logger.debug("下载本地文件,{}", e);
-				}
-			}
+//			FileChannel in = null;
+//			FileChannel out = null;
+//			try {
+//				in = fc.getInputStream().getChannel();
+//				FileOutputStream fos = new FileOutputStream(
+//						localBasePath + File.separator + localPath + File.separator + fc.getAbsolutePath());
+//				out = fos.getChannel();
+//				// 连接两个通道，并从in通道读取，写入out中
+//				in.transferTo(0, in.size(), out);
+//			} catch (FileNotFoundException e) {
+//				logger.debug("下载本地文件,{}", e);
+//			} catch (IOException e) {
+//				logger.debug("下载本地文件,{}", e);
+//			} finally {
+//				try {
+//					in.close();
+//					out.close();
+//				} catch (IOException e) {
+//					logger.debug("下载本地文件,{}", e);
+//				}
+//			}
 		});
 		return true;
 	}
@@ -313,29 +314,6 @@ public class FileServiceImpl implements FileService {
 		return buffer;
 	}
 
-	public static void main(String[] args) {
-		try {
-			String filePath = "D:\\输入输出参数赋值说明.docx";
-//			System.out.println(getFilecharset(new File("D:\\输入输出参数赋值说明.docx")));
-//			;
-			String fileType = filePath.substring(filePath.lastIndexOf("."));
-//			FileExtensionEnum.DOC_EXTENSION
-			FileExtensionEnum typeEnum = FileExtensionEnum.containsFileType(fileType);
-			System.out.println(typeEnum);
-			String linList = readWord("D:\\输入输出参数赋值说明.docx");
-//			writeTxt("D:\\123.txt", "GBK");
-//			writeTxt("D:\\1234.txt", "UTF8");
-//			System.out.println(getFilecharset(new File("D:\\123.txt")));
-			System.out.println("fileType:" + fileType + "    " + FileExtensionEnum.DOC_EXTENSION);
-//			for (String string : linList) {
-			System.out.println("string:::::::" + linList);
-//			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 	/**
 	 * @Title: getFilecharset
 	 * @Desc 判断编码格式方法
@@ -344,13 +322,14 @@ public class FileServiceImpl implements FileService {
 	 * @param sourceFile
 	 * @return
 	 */
+	@SuppressWarnings("resource")
 	private static String getFilecharset(File sourceFile) {
 		String charset = "GBK";
-		byte _xff = (byte) 0xFF;
-		byte _xfe = (byte) 0xFE;
-		byte _xef = (byte) 0xEF;
-		byte _xbf = (byte) 0xBF;
-		byte _xbb = (byte) 0xBB;
+		byte xff = (byte) 0xFF;
+		byte xfe = (byte) 0xFE;
+		byte xef = (byte) 0xEF;
+		byte xbf = (byte) 0xBF;
+		byte xbb = (byte) 0xBB;
 		byte[] first3Bytes = new byte[3];
 		try {
 			boolean checked = false;
@@ -360,15 +339,15 @@ public class FileServiceImpl implements FileService {
 			if (read == -1) {
 				// 文件编码为 ANSI
 				return charset;
-			} else if (first3Bytes[0] == _xff && first3Bytes[1] == _xfe) {
+			} else if (first3Bytes[0] == xff && first3Bytes[1] == xfe) {
 				// 文件编码为 Unicode
 				charset = "UTF-16LE";
 				checked = true;
-			} else if (first3Bytes[0] == _xfe && first3Bytes[1] == _xff) {
+			} else if (first3Bytes[0] == xfe && first3Bytes[1] == xff) {
 				// 文件编码为 Unicode big endian
 				charset = "UTF-16BE";
 				checked = true;
-			} else if (first3Bytes[0] == _xef && first3Bytes[1] == _xbb && first3Bytes[2] == _xbf) {
+			} else if (first3Bytes[0] == xef && first3Bytes[1] == xbb && first3Bytes[2] == xbf) {
 				// 文件编码为 UTF-8
 				charset = "UTF-8";
 				checked = true;
@@ -485,12 +464,12 @@ public class FileServiceImpl implements FileService {
 	public List<FileCenter> downloadFile(String sourcePath) throws Exception {
 		List<FileCenter> fileCenters = Lists.newArrayList();
 		// 循环遍历所有文件
-		readfile(fileCenters, sourcePath);
+		readfileStream(fileCenters, sourcePath);
 		return fileCenters;
 	}
 
 	/**
-	 * @Title: readfile
+	 * @Title: readfileStream
 	 * @Desc 读取文件夹下的所有文件
 	 * @Author cvics
 	 * @DateTime 2020年4月7日
@@ -499,7 +478,8 @@ public class FileServiceImpl implements FileService {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	private void readfile(List<FileCenter> fileCenters, String filepath) throws FileNotFoundException, IOException {
+	private void readfileStream(List<FileCenter> fileCenters, String filepath)
+			throws FileNotFoundException, IOException {
 		File file = UploadFilesUtils.createFile(filepath);
 		// 判断是否是文件
 		if (!file.isDirectory()) {
@@ -520,10 +500,9 @@ public class FileServiceImpl implements FileService {
 				} else
 				// 判断是否是文件 如果时文件夹递归遍历文件
 				if (readfile.isDirectory()) {
-					readfile(fileCenters, filepath + File.separator + path);
+					readfileStream(fileCenters, filepath + File.separator + path);
 				}
 			}
 		}
 	}
-
 }
