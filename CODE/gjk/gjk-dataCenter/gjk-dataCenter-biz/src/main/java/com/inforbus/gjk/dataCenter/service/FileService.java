@@ -145,4 +145,13 @@ public interface FileService {
 	 * @Create: 2020/4/14
 	 */
     boolean createXMLFile(XMlEntityMapVO xMlEntityMapVO);
+
+	/**
+	 * @Author wang
+	 * @Description: 根据据对路径删除文件
+	 * @Param: [absolutePath] 文件的绝对路径
+	 * @Return: com.inforbus.gjk.common.core.util.R
+	 * @Create: 2020/4/15
+	 */
+	boolean delFile(String absolutePath);
 }

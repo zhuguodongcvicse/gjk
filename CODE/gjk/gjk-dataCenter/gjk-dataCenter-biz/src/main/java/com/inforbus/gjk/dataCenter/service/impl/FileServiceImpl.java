@@ -334,6 +334,22 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
+     * @Author wang
+     * @Description: 根据据对路径删除文件
+     * @Param: [absolutePath]
+     * @Return: boolean
+     * @Create: 2020/4/15
+     */
+    @Override
+    public boolean delFile(String absolutePath) {
+        File file = new File(absolutePath);
+        if (file.exists()){
+            return file.delete();
+        }
+        return false;
+}
+
+    /**
      * @param filePath
      * @return
      * @throws Exception

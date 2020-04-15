@@ -189,7 +189,32 @@ public class FileController {
         return ret;
     }
 
-    ;
+    /**
+     * @Author wang
+     * @Description: 根据据对路径删除文件
+     * @Param: [absolutePath] 文件的绝对路径
+     * @Return: com.inforbus.gjk.common.core.util.R
+     * @Create: 2020/4/15
+     */
+    @PostMapping("/delFile")
+    public R<Boolean> delFile(@RequestParam("absolutePath") String absolutePath){
+        R<Boolean> ret = new R();
+        try {
+            if (fileService.delFile(absolutePath)) {
+                ret.setData(true);
+                ret.setMsg("删除文件成功");
+            } else {
+                ret.setCode(CommonConstants.FAIL);
+                ret.setData(false);
+                ret.setMsg("删除文件失败");
+            }
+        }catch (Exception e){
+            logger.error("删除指定文件失败", e);
+            return new R(e);
+        }
+        return ret;
+    }
+
 
     /**
      * @param source 源文件路径
@@ -289,8 +314,8 @@ public class FileController {
      * @Create: 2020/4/13
      */
     @PostMapping("/analysisXmlFile")
-    public R analysisXmlFileToXMLEntityMap(@RequestParam("localPath") String localPath) {
-        R ret = new R();
+    public R<XmlEntityMap> analysisXmlFileToXMLEntityMap(@RequestParam("localPath") String localPath) {
+        R<XmlEntityMap> ret = new R();
         try {
             XmlEntityMap xmlEntityMap = fileService.analysisXmlFileToXMLEntityMap(localPath);
             ret.setData(xmlEntityMap);
@@ -311,15 +336,17 @@ public class FileController {
      * @Create: 2020/4/14
      */
     @PostMapping("/createXMLFile")
-    public R createXMLFile(@RequestBody XMlEntityMapVO xMlEntityMapVO) {
+    public R<Boolean> createXMLFile(@RequestBody XMlEntityMapVO xMlEntityMapVO) {
         logger.debug("createXMLFile方法开始运行！");
-        R r = new R();
+        R<Boolean> r = new R();
+        boolean flag = false;
         try {
-            boolean flag = fileService.createXMLFile(xMlEntityMapVO);
+            flag = fileService.createXMLFile(xMlEntityMapVO);
             r.setData(flag);
             r.setMsg("xml文件生成成功!");
         } catch (Exception e) {
-            r.setCode(1);
+            r.setCode(CommonConstants.FAIL);
+            r.setData(flag);
             r.setMsg("xml文件生成失败！");
             logger.error("xml文件生成失败！");
         }
