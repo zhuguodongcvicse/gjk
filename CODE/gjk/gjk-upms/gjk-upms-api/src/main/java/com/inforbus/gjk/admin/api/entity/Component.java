@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-//@TableName("gjk_component")
+@TableName("gjk_component")
 public class Component extends Model<Component> {
 	private static final long serialVersionUID = 1L;
 
@@ -58,7 +58,7 @@ public class Component extends Model<Component> {
 	/**
 	 * 描述
 	 */
-	private String compBackupinfo;
+	private String description;
 	/**
 	 * 审批状态
 	 */

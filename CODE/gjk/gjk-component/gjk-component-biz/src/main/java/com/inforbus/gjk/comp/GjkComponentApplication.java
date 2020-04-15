@@ -21,7 +21,6 @@ import com.inforbus.gjk.common.security.annotation.EnableGjkFeignClients;
 import com.inforbus.gjk.common.security.annotation.EnableGjkResourceServer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.client.SpringCloudApplication;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * @author lengleng
@@ -31,7 +30,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableGjkResourceServer
 @EnableGjkFeignClients
 @SpringCloudApplication
-@EnableTransactionManagement
 public class GjkComponentApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(GjkComponentApplication.class, args);

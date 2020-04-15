@@ -141,10 +141,15 @@ public class ThreeLibsController {
 	}
 
 	/**
-	 * 三个库读取程序文本编辑器文件
-	 * @param threeLibsFilePathDTO 封装了路径（全路径，从D盘开始）及编码格式
-	 * @return
+	 * 根据文件路径取文件内容
+	 *
+	 * @Title: fileRead
+	 * @Description:
+	 * @Author cvicse
+	 * @DateTime 2019年6月10日 上午9:55:30
+	 * @throws Exception
 	 */
+
 	@PostMapping("/readAlgorithmfile")
 	public R fileRead(@RequestBody ThreeLibsFilePathDTO threeLibsFilePathDTO) {
 		return threeLibsService.fileRead(threeLibsFilePathDTO);
@@ -184,6 +189,7 @@ public class ThreeLibsController {
 	 */
 	@GetMapping("/getSoftwarePlatformTree")
 	public R getSoftwarePlatformTree() {
+		System.out.println("ppppppp");
 		try {
 			List<Software> soft = threeLibsService.getSoftware();
 			List<SoftwareDetail> softdetail = threeLibsService.getSoftwarePlatform();
@@ -194,14 +200,10 @@ public class ThreeLibsController {
 		return new R<>();
 	}
 
-	/**
-	 * 保存文本编辑器修改的内容（文本编辑器的）
-	 * @param filePath 文件路径
-	 * @param textContext 文本内容
-	 */
 	@PostMapping("/saveFileContext")
-	public R saveFileContext(@RequestBody ThreeLibsFilePathDTO threeLibsFilePathDTO) {
-		return new R<>(threeLibsService.saveFileContext(threeLibsFilePathDTO.getFilePath(), threeLibsFilePathDTO.getFilePathName()));
+	public void saveFileContext(@RequestBody ThreeLibsFilePathDTO threeLibsFilePathDTO) {
+		System.out.println("uiuiiuiuiui:::" + threeLibsFilePathDTO.getFilePathName());
+		threeLibsService.saveFileContext(threeLibsFilePathDTO.getFilePath(), threeLibsFilePathDTO.getFilePathName());
 	}
 
 	@GetMapping("/getFileStream/{filePath}")

@@ -107,7 +107,7 @@
 		<result property="compImg" column="comp_img" />
 		<result property="createTime" column="create_time" />
 		<result property="updateTime" column="update_time" />
-		<result property="compBackupinfo" column="comp_backupinfo" />
+		<result property="description" column="description" />
 		<result property="applyState" column="apply_state" />
 		<result property="applyDesc" column="apply_desc" />
 		<result property="delFlag" column="del_flag" />

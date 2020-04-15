@@ -889,9 +889,10 @@ export default {
       //根据表单上的参数得到对应结构体
       let regExp = /\w+\[[0-9]+\]/i;
       let paramName = params[0][0].lableName;
-      console.log("给当前节点追加children", params[0]);
-      if (this.$refs.tree.getCurrentNode()) {//新添加的
-        let key = this.$refs.tree.getCurrentNode().id;
+      // console.log("给当前节点追加children");
+      if (this.clickNodeData ) {
+        //新添加的
+        let key = this.clickNodeData.id;
         if (regExp.test(paramName)) {
           // console.log("查询数据库返回表单元素", params[0][0].lableName);
           let dataVal = [];

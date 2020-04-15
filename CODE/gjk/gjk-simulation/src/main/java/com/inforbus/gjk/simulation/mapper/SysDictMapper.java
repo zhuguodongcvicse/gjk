@@ -27,25 +27,20 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
-* @Description:    字典表 Mapper 接口
-* @Author:         ZhangHongXu
-* @CreateDate:     2020/4/9 9:18
-* @UpdateUser:     ZhangHongXu
-* @UpdateDate:     2020/4/9 9:18
-* @UpdateRemark:   修改内容
-* @Version:        1.0
-*/
+ * <p>
+ * 字典表 Mapper 接口
+ * </p>
+ *
+ * @author lengleng
+ * @since 2019/2/1
+ */
 @Mapper
 public interface SysDictMapper extends BaseMapper<SysDict> {
 
-    /**
-     * @param null
-     * @Description      * @Description
-     * @Author ZhangHongXu
-     * @Return
-     * @Exception
-     * @Date 2020/4/9 9:17
-     */
+	/**
+	 * 查询标志字典
+	 */
+
 
     List<SysDict> getDictTypes();
 

@@ -29,24 +29,15 @@ import javax.validation.constraints.Max;
 import java.util.*;
 
 /**
- * @Description: 仿真业务实现
- * @Author: ZhangHongXu
- * @CreateDate: 2020/4/9 9:18
- * @UpdateUser: ZhangHongXu
- * @UpdateDate: 2020/4/9 9:18
- * @UpdateRemark: 修改内容
- * @Version: 1.0
+ * 仿真业务实现
+ *
+ * @Auth l_tf
  */
 @Service
 public class SimulatorServiceImpl implements SimulatorService {
 
     /**
-     * @Description redis连接工具模板
-     * @Author ZhangHongXu
-     * @param null
-     * @Return
-     * @Exception
-     * @Date 2020/4/9 9:19
+     * redis连接工具模板
      */
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
@@ -77,14 +68,7 @@ public class SimulatorServiceImpl implements SimulatorService {
     @Value("${ctrl.tab.file.path}")
     private String tabFilePath;
 
-    /**
-     * @param null
-     * @Description 开始仿真客户线程放入全局变量
-     * @Author ZhangHongXu
-     * @Return
-     * @Exception
-     * @Date 2020/4/9 9:19
-     */
+    //开始仿真客户线程放入全局变量
     @Override
     public boolean startSimulator(String username, List<String> componentLinks, String filePath) {
         //定义通道名
@@ -110,14 +94,7 @@ public class SimulatorServiceImpl implements SimulatorService {
         return true;
     }
 
-    /**
-     * @param null
-     * @Description 停止仿真
-     * @Author ZhangHongXu
-     * @Return
-     * @Exception
-     * @Date 2020/4/9 9:20
-     */
+    //停止仿真
     @Override
     public boolean stopSimulator(String username) {
         MoniRecvDataThread moniRecvDataThread = (MoniRecvDataThread) Global.USERS_SIMULATOR_THREAD.get(username);
@@ -137,14 +114,9 @@ public class SimulatorServiceImpl implements SimulatorService {
         return true;
     }
 
-    /**
-     * @param null
-     * @Description 获取曲波图数据
-     * @Author ZhangHongXu
-     * @Return
-     * @Exception
-     * @Date 2020/4/9 9:20
-     */
+    /*
+     * 获取曲波图数据
+     * */
     @Override
     public Map<String, Object> getData(String username, String projectId, SimulationDTO simulationDTO) {
 
@@ -215,14 +187,7 @@ public class SimulatorServiceImpl implements SimulatorService {
         return dataMap;
     }
 
-    /**
-     * @param null
-     * @Description 重组xyz维度数据
-     * @Author ZhangHongXu
-     * @Return
-     * @Exception
-     * @Date 2020/4/9 9:22
-     */
+    //重组xyz维度数据
     public HashMap<String, Object> dataSplitting(Integer xMax, Integer yMax, Integer zMax) {
         ArrayList<Object> xList = new ArrayList<>();
         for (int i = 0; i <= xMax; i++) {
@@ -251,14 +216,7 @@ public class SimulatorServiceImpl implements SimulatorService {
         return maxXYZ;
     }
 
-    /**
-     * @param null
-     * @Description 暂停获取帧数
-     * @Author ZhangHongXu
-     * @Return
-     * @Exception
-     * @Date 2020/4/9 9:21
-     */
+    //暂停获取帧数
     @Override
     public ArrayList<Object> suspend(String username, List<String> symbols) {
         ListOperations<String, String> operations = redisTemplate.opsForList();
@@ -281,14 +239,7 @@ public class SimulatorServiceImpl implements SimulatorService {
         return symbolList;
     }
 
-    /**
-     * @param null
-     * @Description 点击小图标获取数据源获取
-     * @Author ZhangHongXu
-     * @Return
-     * @Exception
-     * @Date 2020/4/9 9:21
-     */
+    //点击小图标获取数据源获取
     @Override
     public Map<String, Object> getDataSource(String username, SimulationDTO simulationDto) {
 
@@ -307,14 +258,6 @@ public class SimulatorServiceImpl implements SimulatorService {
         return Data;
     }
 
-    /**
-     * @param null
-     * @Description 选择帧数回显数据
-     * @Author ZhangHongXu
-     * @Return
-     * @Exception
-     * @Date 2020/4/9 9:21
-     */
     @Override
     public List<Object> start(SimulationDTO obj) {
 
@@ -369,13 +312,12 @@ public class SimulatorServiceImpl implements SimulatorService {
         return frameIdlist;
     }
 
+
     /**
-     * @param null
-     * @Description 解析表格Map
-     * @Author ZhangHongXu
-     * @Return
-     * @Exception
-     * @Date 2020/4/9 9:22
+     * 解析表格Map
+     *
+     * @return
+     * @param. 表格数据Map 【key: name, value: 值|备注】
      */
     public List<SimulationTableDataDTO> forEachGetSimulationTableData(Map<String, String> tableDataMap) {
         List<SimulationTableDataDTO> simulationTableDataDTOS = Lists.newArrayList();

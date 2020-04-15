@@ -99,10 +99,10 @@
              v-bind:style="divStyle" ref="imageWrapper">
             <div class="avatar-uploader" >
               <img v-if="compImg.imgPath" :src="compImg.imgPath" style="width:100px;height:70px;" />
-              <span
+              <!-- <span
                 v-if="compImg.imgPath"
                 style="display:block;line-height: 18px;font-size:14px"
-              >{{compImg.imgShowName}}</span>
+              >{{compImg.imgShowName}}</span> -->
               <i v-else class="el-icon-plus" style="font-size:28px;color:#8c939d;line-height:90px;"></i>
             </div>
           </div>

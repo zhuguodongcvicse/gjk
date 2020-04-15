@@ -4,7 +4,6 @@ import com.inforbus.gjk.common.security.annotation.EnableGjkFeignClients;
 import com.inforbus.gjk.common.security.annotation.EnableGjkResourceServer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.client.SpringCloudApplication;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 /**
  * @author dong
@@ -13,7 +12,6 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @EnableGjkResourceServer
 @EnableGjkFeignClients
 @SpringCloudApplication
-@EnableDiscoveryClient
 public class GjkDataCenterApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(GjkDataCenterApplication.class, args);

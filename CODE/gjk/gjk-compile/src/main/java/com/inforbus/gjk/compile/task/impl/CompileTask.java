@@ -4,14 +4,15 @@ import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
 import com.inforbus.gjk.common.core.util.FileUtil;
-import com.inforbus.gjk.compile.constant.PlatformType;
 import com.inforbus.gjk.compile.task.Task;
 import com.inforbus.gjk.compile.taskThread.StreamManage;
 import com.inforbus.gjk.compile.util.ChannelSftpSingleton;
 import com.inforbus.gjk.compile.util.SftpUtil;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.SftpException;
 import com.jcraft.jsch.SftpProgressMonitor;
+import javafx.beans.binding.MapBinding;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,31 +22,28 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.imageio.IIOImage;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-/**
- * CompileTask
- *
- * @author wang
- * @date 2020/4/8
- * @Description 编译功能任务实现类
- */
 @Component("compileTask")
 @Scope("prototype")
 public class CompileTask implements Task {
-
     private static final Logger logger = LoggerFactory.getLogger(CompileTask.class);
 
     //配置文件读取路径
     @Value("${VS2010.path}")
     private String vsPath;
 
+//    @Value("${Sylixos.path}")
+//    private String syPath;
+
     @Value("${Workbench.path}")
     private String wbPath;
+
 
     @Value("${Linux.path}")
     private String linuxPath;
@@ -62,17 +60,14 @@ public class CompileTask implements Task {
 
     @Value("${downPath.path}")
     private String dPath;
+    //linux 连接对象
+    private Connection connection;
     @Autowired
     private AmqpTemplate rabbitmqTemplate;
 
-    private Connection connection;//linux服务器连接对象
-
     private String path1;//被编译文件地址
-
     private String fileName;//被编译文件名
-
     private String platformType;//平台
-
     private String token;//登录票据
 
     public String getPath1() {
@@ -107,16 +102,8 @@ public class CompileTask implements Task {
         this.token = token;
     }
 
-    /**
-     * @Author wang
-     * @Description: 编译功能方法，方法中根据平台类型调用对应平台的编译方法
-     * @Param:
-     * @Return: boolean
-     * @Create: 2020/4/8
-     */
     @Override
     public boolean command() {
-        logger.debug("command方法开始运行");
         Set<String> filePathList = new TreeSet<String>();
         //VS编译
         String fileEndName = ".sln";
@@ -126,20 +113,21 @@ public class CompileTask implements Task {
         boolean isFile = false;
         if (file.exists()) {
             File[] childFiles = file.listFiles();
-            if (this.platformType.equals(PlatformType.VS2010)) {
+            if (this.platformType.equals("VS2010")) {
                 //判断是否是VS2010
                 for (File childFile : childFiles) {
                     //判断是否是VS平台
                     if (childFile.getName().endsWith(fileEndName)) {
+                        //filePathList.add(file.getAbsolutePath());
                         isFile = true;
                         return devenv(childFile.getAbsolutePath(), this.fileName, this.token);
                     }
                 }
-            } else if (this.platformType.equals(PlatformType.SYLIXOS)) {
+            } else if (this.platformType.equals("Sylixos")) {
                 //判断是否是Sylixos平台
                 isFile = true;
                 return sylixos(file.getAbsolutePath(), this.fileName, this.token);
-            } else if (this.platformType.equals(PlatformType.WORKBENCH)) {
+            } else if (this.platformType.equals("Workbench")) {
                 //判断是否是Workbench平台
                 isFile = true;
                 Set<String> set = new HashSet<String>();
@@ -147,7 +135,7 @@ public class CompileTask implements Task {
                 FileUtil.getSelectStrFilePathList(set, file.getAbsolutePath(), "Makefile");
                 list.addAll(set);
                 return workbench(list.get(0), this.fileName, this.token);
-            } else if (this.platformType.equals(PlatformType.LINUX)) {
+            } else if (this.platformType.equals("Linux")) {
                 //判断是否是 Linux平台
                 isFile = true;
                 return linux(file.getAbsolutePath(), this.fileName, this.token);
@@ -165,21 +153,16 @@ public class CompileTask implements Task {
                 }
             }
         }
-        logger.debug("command方法运行结束");
         return false;
     }
 
-    /**
-     * @Author wang
-     * @Description: 编译windows平台vs2010
-     * @Param: [slnpath, fileName, token]
-     * @Return: boolean
-     * @Create: 2020/4/8
-     */
+    //编译windows平台vs2010
     private boolean devenv(String slnpath, String fileName, String token) {
-        logger.debug("devenv方法开始运行，Windows平台项目开始编译");
         File dir = new File(this.vsPath);
+        //编译解决方案
+        //String str = "devenv D:\\Build\\CCode\\ConsoleApplication1\\ConsoleApplication1.sln /Rebuild";
         //编译单个项目
+        String str1 = "devenv D:\\CCode\\ConsoleApplication1\\ConsoleApplication1\\ConsoleApplication1.vcxproj /Build 'Release|Win32'/project D:\\CCode\\ConsoleApplication1\\ConsoleApplication1\\ConsoleApplication1.vcxproj";
         String str = "devenv " + slnpath + " /Rebuild";
         String[] cmd = new String[]{"cmd", "/c", str};
         Runtime rt = Runtime.getRuntime();
@@ -192,30 +175,21 @@ public class CompileTask implements Task {
             successThread.start();//开启编译正常流线程
             return true;
         } catch (Exception e) {
-            logger.error("vs2010平台编译失败，请检查编译进程。" + e.getMessage());
+            logger.error("vs2010平台编译失败，请检查编译进程。");
         } finally {
             try {
                 p.waitFor();
             } catch (InterruptedException e) {
-                logger.error("vs2010平台编译失败，请检查编译进程。" + e.getMessage());
+                logger.error("vs2010平台编译失败，请检查编译进程。");
             }
-            if (p != null) {
+            if (p != null)
                 p.destroy();
-            }
         }
-        logger.debug("devenv方法运行结束");
         return false;
     }
 
-    /**
-     * @Author wang
-     * @Description: sylixos平台编译功能实现方法
-     * @Param: [sylixosPath, fileName, token]
-     * @Return: boolean
-     * @Create: 2020/4/8
-     */
+    //编译 sylixos
     private boolean sylixos(String sylixosPath, String fileName, String token) {
-        logger.debug("sylixos方法开始运行，sylixos平台项目开始编译");
         File dir = new File(sylixosPath);
         //拼接 cmd命令
         String str = "make clean";
@@ -231,7 +205,7 @@ public class CompileTask implements Task {
             errorThread.join();//等待线程结束
             successThread.join();//等待线程结束
             str = "make all";
-            cmd = new String[]{"cmd", "/c", str};
+            cmd = new String[]{"cmd","/c",str};
             p = rt.exec(cmd, null, dir);//打开cmd执行make命令
             StreamManage errorThread1 = new StreamManage(p.getErrorStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译错误控制台信息
             StreamManage successThread1 = new StreamManage(p.getInputStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译正常控制台信息
@@ -239,38 +213,29 @@ public class CompileTask implements Task {
             successThread1.start();//开启编译正常流线程
             return true;
         } catch (Exception e) {
-            logger.error("sylixos平台编译失败，请检查编译进程是否阻塞。" + e.getMessage());
+            logger.error("sylixos平台编译失败，请检查编译进程是否阻塞。");
             str = "taskkill /f /im make";
             cmd = new String[]{"cmd", "/c", str};
             try {
                 p = rt.exec(cmd, null, dir);
             } catch (IOException e1) {
-                logger.error("sylixos平台编译失败，请检查IO。" + e.getMessage());
+                logger.error("sylixos平台编译失败，请检查IO。");
             }
             e.printStackTrace();
         } finally {
             try {
                 p.waitFor();
             } catch (InterruptedException e) {
-                logger.error("sylixos平台编译失败，请检查IO。" + e.getMessage());
+                logger.error("sylixos平台编译失败，请检查IO。");
             }
-            if (p != null) {
+            if (p != null)
                 p.destroy();
-            }
         }
-        logger.debug("sylixos方法运行结束");
         return false;
     }
 
-    /**
-     * @Author wang
-     * @Description: workbench平台编译功能实现方法
-     * @Param: [sylixosPath, fileName, token]
-     * @Return: boolean
-     * @Create: 2020/4/8
-     */
+    //编译 workbench
     private boolean workbench(String workbenchPath, String fileName, String token) {
-        logger.debug("workbench方法开始运行，workbench平台项目开始编译");
         File dir = new File(this.wbPath);
         //拼接 cmd命令
         String str = "wrenv -p vxworks-6.8 make -C " + workbenchPath + " --no-print-directory BUILD_SPEC= MIPSI64disable_SMP DEBUG_MODE=1 TRACE=1 clean";
@@ -286,38 +251,29 @@ public class CompileTask implements Task {
             errorThread.join();
             successThread.join();
             str = "wrenv -p vxworks-6.8 make -C " + workbenchPath + " --no-print-directory BUILD_SPEC= MIPSI64disable_SMP DEBUG_MODE=1 TRACE=1";
-            cmd = new String[]{"cmd", "/c", str};
-            p = rt.exec(cmd, null, dir);
+            cmd = new String[]{"cmd","/c",str};
+            p = rt.exec(cmd,null,dir);
             StreamManage errorThread2 = new StreamManage(p.getErrorStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译错误控制台信息
             StreamManage successThread2 = new StreamManage(p.getInputStream(), "GBK", this.rabbitmqTemplate, fileName, token);//编译正常控制台信息
             errorThread2.start();//开启编译错误流线程
             successThread2.start();//开启编译正常流线程
             return true;
         } catch (Exception e) {
-            logger.error("workbench平台编译失败，请检查编译进程。" + e.getMessage());
+            logger.error("workbench平台编译失败，请检查编译进程。");
         } finally {
             try {
                 p.waitFor();
             } catch (InterruptedException e) {
-                logger.error("workbench平台编译失败，请检查编译进程。" + e.getMessage());
+                logger.error("workbench平台编译失败，请检查编译进程。");
             }
-            if (p != null) {
+            if (p != null)
                 p.destroy();
-            }
         }
-        logger.debug("workbench方法运行结束");
         return false;
     }
 
-    /**
-     * @Author wang
-     * @Description: linux平台编译功能实现方法
-     * @Param: [filePath, fileName, token]
-     * @Return: boolean
-     * @Create: 2020/4/8
-     */
+    //编译 linux
     private boolean linux(String filePath, String fileName, String token) {
-        logger.debug("linux方法开始运行，linux平台项目开始编译");
         //执行linux命令编译 项目
         String cmd = null;
         cmd = "mkdir -p " + this.linuxPath + "/AppPro/" + fileName;
@@ -326,9 +282,8 @@ public class CompileTask implements Task {
         int i = 0;
         while (true) {
             i++;
-            if (i == 500) {
+            if (i == 500)
                 break;
-            }
         }
         if (b) {
             String linuxAimsPath = this.linuxPath + "/AppPro/" + fileName;
@@ -345,6 +300,7 @@ public class CompileTask implements Task {
                         cmd = "cd " + makeFilePath + " ; zip -r " + fileName + ".zip " + "*";
                         boolean isZipSuccess = executeCommand(cmd, true);//执行打包命令
                         if (isZipSuccess) {
+
                             //将连接状态设置成null
                             ChannelSftpSingleton.channelSftpNull();
                             //下载压缩包
@@ -369,18 +325,22 @@ public class CompileTask implements Task {
                                     //解压完删除压缩包
                                     rmFile.delete();
                                 } catch (UnsupportedEncodingException e) {
-                                    logger.error("下载失败" + e.getMessage());
+                                    logger.error("下载失败");
+                                    e.printStackTrace();
                                 } catch (IOException e) {
-                                    logger.error("解压失败" + e.getMessage());
+                                    logger.error("解压失败");
+                                    e.printStackTrace();
                                 }
                             } catch (JSchException e) {
-                                logger.error("下载失败，请联系管理员。" + e.getMessage());
+                                logger.error("下载失败，请联系管理员。");
+                                e.printStackTrace();
                             }
 
                             try {
                                 ChannelSftpSingleton.getInstance().closeChannel();
                             } catch (Exception e) {
-                                logger.error("下载失败，请联系管理员。" + e.getMessage());
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
                             }
                             //将连接状态设置成null
                             ChannelSftpSingleton.channelSftpNull();
@@ -396,26 +356,24 @@ public class CompileTask implements Task {
         }
         cmd = "rm -rf " + this.linuxPath + "/AppPro";
         executeCommand(cmd, false);//删除流程文件夹
-        logger.debug("linux方法运行结束");
         return false;
     }
 
     /**
-     * @Author wang
-     * @Description: 解压文件到指定目录
-     * @Param: [zipPath, descDir]
-     * @Return: void
-     * @Create: 2020/4/8
+     * 解压文件到指定目录
+     *
+     * @param zipPath 压缩文件地址
+     * @param descDir 指定目录
+     * @throws IOException
      */
     private static void unZipFiles(String zipPath, String descDir) throws IOException {
-        logger.debug("unZipFiles方法开始运行");
         InputStream in = null;
         ZipFile zip = null;
         OutputStream out = null;
         try {
             File zipFile = new File(zipPath);
             if (!zipFile.exists()) {
-                throw new IOException("需解压文件不存在");
+                throw new IOException("需解压文件不存在.");
             }
             File pathFile = new File(descDir);
             if (!pathFile.exists()) {
@@ -426,10 +384,12 @@ public class CompileTask implements Task {
                 ZipEntry entry = (ZipEntry) entries.nextElement();
                 String zipEntryName = entry.getName();
                 String outPath = descDir + File.separator + zipEntryName;
+
                 // 判断文件全路径是否为文件夹,如果是上面已经上传,不需要解压
                 if (entry.isDirectory()) {
                     continue;
                 }
+
                 // 判断路径是否存在,不存在则创建文件路径
                 File file = new File(outPath);
                 if (!file.exists()) {
@@ -444,6 +404,7 @@ public class CompileTask implements Task {
                     out.write(buf1, 0, len);
                 }
             }
+
         } catch (Exception e) {
             throw new IOException(e);
         } finally {
@@ -457,39 +418,25 @@ public class CompileTask implements Task {
                 zip.close();
             }
         }
-        logger.debug("unZipFiles方法运行结束");
     }
 
-    /**
-     * @Author wang
-     * @Description: linux系统连接方法
-     * @Param: []
-     * @Return: boolean
-     * @Create: 2020/4/8
-     */
+    //linux系统连接方法
     public boolean linuxLogin() {
-        logger.debug("linuxLogin方法开始运行");
         boolean flag = false;
         try {
             this.connection = new Connection(this.ip);
             this.connection.connect();
             flag = this.connection.authenticateWithPassword(this.username, this.password);
         } catch (IOException e) {
-            logger.error("连接linux失败,请检查ip,账户,密码是否正确" + e.getMessage());
+            logger.error("连接linux失败,请检查ip,账户,密码是否正确");
+            e.printStackTrace();
         }
-        logger.debug("linuxLogin方法运行结束");
         return flag;
     }
 
-    /**
-     * @Author wang
-     * @Description: linux 系统执行cmd命令行方法,flag 为是否把执行命令失败的控制台信息推送到mq中
-     * @Param: [cmd, flag]
-     * @Return: boolean
-     * @Create: 2020/4/8
-     */
+
+    //linux 系统执行cmd命令行方法,flag 为是否把执行命令失败的控制台信息推送到mq中
     public boolean executeCommand(String cmd, boolean flag) {
-        logger.debug("executeCommand方法开始运行");
         Session session = null;
         try {
             if (linuxLogin()) {//连接linux服务器
@@ -503,10 +450,12 @@ public class CompileTask implements Task {
                 }
                 return true;
             } else {
+                System.out.println("连接linux系统失败,请检查ip,账号,密码");
                 logger.error("连接linux系统失败,请检查ip,账号,密码");
             }
         } catch (IOException e) {
-            logger.error("IO异常" + e.getMessage());
+            e.printStackTrace();
+            logger.error("IO异常");
         } finally {
             if (this.connection != null) {
                 this.connection.close();
@@ -515,19 +464,11 @@ public class CompileTask implements Task {
                 session.close();
             }
         }
-        logger.debug("executeCommand方法运行结束");
         return false;
     }
 
-    /**
-     * @Author wang
-     * @Description: rabbitmq推送消息
-     * @Param: [in, charset]
-     * @Return: java.lang.String
-     * @Create: 2020/4/8
-     */
+    //rabbitmq推送消息
     public String processStdout(InputStream in, Charset charset) {
-        logger.debug("processStdout方法开始运行");
         InputStream stdout = new StreamGobbler(in);
         BufferedReader reader = null;
         String result = "";
@@ -538,39 +479,36 @@ public class CompileTask implements Task {
                 result = line;
                 this.rabbitmqTemplate.convertAndSend(this.token, this.fileName + "===@@@===\n" + line);
             }
+
         } catch (UnsupportedEncodingException e) {
-            logger.error("获取流对象失败" + e.getMessage());
+            e.printStackTrace();
+            logger.error("获取流对象失败");
         } catch (IOException e) {
-            logger.error("linux系统IO异常" + e.getMessage());
+            e.printStackTrace();
+            logger.error("linux系统IO异常");
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    logger.error("流关闭失败" + e.getMessage());
+                    e.printStackTrace();
+                    logger.error("流关闭失败");
                 }
             }
             if (stdout != null) {
                 try {
                     stdout.close();
                 } catch (IOException e) {
-                    logger.error("流关闭失败" + e.getMessage());
+                    e.printStackTrace();
+                    logger.error("流关闭失败");
                 }
             }
         }
-        logger.debug("processStdout方法运行结束");
         return result;
     }
 
-    /**
-     * @Author wang
-     * @Description: linux 系统执行cmd命令行方法
-     * @Param: [cmd]
-     * @Return: java.lang.String
-     * @Create: 2020/4/8
-     */
+    //linux 系统执行cmd命令行方法
     public String executeCommand2(String cmd) {
-        logger.debug("executeCommand2方法开始运行");
         String str = "";
         Session session = null;
         try {
@@ -582,10 +520,12 @@ public class CompileTask implements Task {
                     str = processStdout2(session.getStderr(), Charset.forName("UTF-8"));
                 }
             } else {
+                System.out.println("连接linux系统失败,请检查ip,账号,密码");
                 logger.error("连接linux系统失败,请检查ip,账号,密码");
             }
         } catch (IOException e) {
-            logger.error("IO异常" + e.getMessage());
+            e.printStackTrace();
+            logger.error("IO异常");
         } finally {
             if (this.connection != null) {
                 this.connection.close();
@@ -594,19 +534,11 @@ public class CompileTask implements Task {
                 session.close();
             }
         }
-        logger.debug("executeCommand2方法运行结束");
         return str;
     }
 
-    /**
-     * @Author wang
-     * @Description: rabbitmq推送消息
-     * @Param: [in, charset]
-     * @Return: java.lang.String
-     * @Create: 2020/4/8
-     */
+    //rabbitmq推送消息
     public String processStdout2(InputStream in, Charset charset) {
-        logger.debug("processStdout2方法开始运行");
         InputStream stdout = new StreamGobbler(in);
         BufferedReader reader = null;
         String result = "";
@@ -617,38 +549,34 @@ public class CompileTask implements Task {
                 result = line.substring(0, line.lastIndexOf("/"));
             }
         } catch (UnsupportedEncodingException e) {
-            logger.error("获取流对象失败" + e.getMessage());
+            e.printStackTrace();
+            logger.error("获取流对象失败");
         } catch (IOException e) {
-            logger.error("linux系统IO异常" + e.getMessage());
+            e.printStackTrace();
+            logger.error("linux系统IO异常");
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    logger.error("流关闭失败" + e.getMessage());
+                    e.printStackTrace();
+                    logger.error("流关闭失败");
                 }
             }
             if (stdout != null) {
                 try {
                     stdout.close();
                 } catch (IOException e) {
-                    logger.error("流关闭失败" + e.getMessage());
+                    e.printStackTrace();
+                    logger.error("流关闭失败");
                 }
             }
         }
-        logger.debug("processStdout2方法运行结束");
         return result;
     }
 
-    /**
-     * @Author wang
-     * @Description: linux 系统执行cmd命令行方法
-     * @Param: [cmd]
-     * @Return: boolean
-     * @Create: 2020/4/8
-     */
+    //linux 系统执行cmd命令行方法,
     public boolean executeCommand3(String cmd) {
-        logger.debug("executeCommand3方法开始运行");
         Session session = null;
         try {
             if (linuxLogin()) {//连接linux服务器
@@ -662,12 +590,14 @@ public class CompileTask implements Task {
                 errorStream.join();
                 return true;
             } else {
+                System.out.println("连接linux系统失败,请检查ip,账号,密码");
                 logger.error("连接linux系统失败,请检查ip,账号,密码");
             }
         } catch (IOException e) {
-            logger.error("IO异常" + e.getMessage());
+            e.printStackTrace();
+            logger.error("IO异常");
         } catch (InterruptedException e) {
-            logger.error("线程被中断异常" + e.getMessage());
+            e.printStackTrace();
         } finally {
             if (this.connection != null) {
                 this.connection.close();
@@ -676,17 +606,11 @@ public class CompileTask implements Task {
                 session.close();
             }
         }
-        logger.debug("executeCommand3方法运行结束");
         return false;
     }
 
-    /**
-     * @Author wang
-     * @Description: 上传文件至linux系统中, 参数1为被上穿文件地址, 参数2为linux系统中上传的目标地址
-     * @Param: [localFilePath, linuxAmisPath]
-     * @Return: boolean
-     * @Create: 2020/4/8
-     */
+
+    //上传文件至linux系统中,参数1为被上穿文件地址,参数2为linux系统中上传的目标地址
     public boolean uploadFileToLinux(String localFilePath, String linuxAmisPath) {
         try {
             SftpUtil.uploadFilesToServer(localFilePath, linuxAmisPath, this.ip, this.username, this.password, new SftpProgressMonitor() {
@@ -699,6 +623,7 @@ public class CompileTask implements Task {
                 @Override
                 public void end() {
                     logger.info("上传成功");
+                    System.out.println("上传成功");
                 }
 
                 @Override
@@ -708,7 +633,8 @@ public class CompileTask implements Task {
             });
             return true;
         } catch (Exception e) {
-            logger.error("上传失败,请检查ip地址,账号,密码是否正确" + e.getMessage());
+            logger.error("上传失败,请检查ip地址,账号,密码是否正确");
+            e.printStackTrace();
         }
         return false;
     }

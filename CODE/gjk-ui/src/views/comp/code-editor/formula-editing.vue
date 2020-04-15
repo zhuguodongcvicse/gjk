@@ -255,15 +255,14 @@ export default {
             // console.log("res",res)
             childrenParam = JSON.parse(JSON.stringify(res.data.data));
             // console.log("childrenParam",childrenParam)
-            // TODO
-            // if (res.data.data.length === 0) {
-            //   let headerFile = this.headerFile;
-            //   if (headerFile) {
-            //     childrenParam = this.headerFile.structParams[
-            //       struct.fparamType.replace("*", "")
-            //     ].children;
-            //   }
-            // }
+            if (res.data.data.length === 0) {
+              let headerFile = this.headerFile;
+              if (headerFile) {
+                childrenParam = this.headerFile.structParams[
+                  struct.fparamType.replace("*", "")
+                ].children;
+              }
+            }
             this.treeStructParam = childrenParam;
           });
         }
