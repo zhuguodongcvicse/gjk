@@ -18,6 +18,10 @@ var nodeOrLinkList;
 var nodeOrLinkFirst
 //仿真数据
 var simulationData = [];
+//保存选中的节点用于复制粘贴
+var selectNode = new Array()
+//保存连线用于复制粘贴
+var selectLink = new Array()
 //子向父传参数
 function handleMessageToParent(cmd, gjIdAndTemId) {
   window.parent.postMessage({
@@ -767,40 +771,124 @@ function init() {
     })
   })
 
+   //重写ctrl+v
+   myDiagram.commandHandler.doKeyDown = function () {
+    var e = myDiagram.lastInput;
+    // Meta（Command）键代替Mac命令的“控制”
+    var control = e.control || e.meta;
+    var key = e.key;
+    //退出任何撤销/重做组合键，具体键值根据需求而定
+    if(control &&(key === 'V')){
+      selectNode = JSON.parse(sessionStorage.getItem("copyNodeData"));
+      selectLink = JSON.parse(sessionStorage.getItem("copyLinkData"));
+      //保存新旧节点的key
+      var linkMap = new Map()
+      for(let selectNodeData of selectNode){
+        console.log("每一个选中的数据",selectNodeData)
+        var random = ''
+        random = Math.ceil(Math.random() * 10000000000000000000).toString().substr(0, 9 || 4)
+        random = Date.now() + random
+        linkMap.set(selectNodeData.key,random)
+        let nodeData = {}
+        nodeData.compId = selectNodeData.compId
+        nodeData.key = random
+        nodeData.text = selectNodeData.text
+        nodeData.loc = selectNodeData.loc
+        nodeData.source = selectNodeData.source
+        nodeData.rightArray = selectNodeData.rightArray
+        nodeData.leftArray = selectNodeData.leftArray
+        var uuidList = new Array()
+        for (let leftPort of nodeData.leftArray) {
+          leftPort.portId = leftPort.portId.split("*")[0] + "*" + leftPort.portId.split("*")[1] + "*" + nodeData.key
+          uuidList.push(leftPort.portId)
+        }
+        for (let rightPort of nodeData.rightArray) {
+          rightPort.portId = rightPort.portId.split("*")[0] + "*" + rightPort.portId.split("*")[1] + "*" + nodeData.key
+          uuidList.push(rightPort.portId)
+        }
+        myDiagram.model.addNodeData(nodeData)
+        var gjidAndTemid = [];
+        gjidAndTemid.push({
+          //构件ID
+          gjId: nodeData.compId,
+          //构件模板新ID
+          newTmpId: nodeData.key,
+          //构件模板旧id
+          oldTmpId: selectNodeData.key,
+          //状态
+          state: 4,
+          //节点所有锚点uuid
+          uuidList: uuidList
+        });
+        handleMessageToParent("returnFormJson", gjidAndTemid);
+      }
+      if(selectLink.length > 0){
+        for(let selectLinkData of selectLink){
+          console.log("每一条连线数据",selectLinkData)
+          let oldFromPort = selectLinkData.fromPort.split("*")
+          let oldToPort = selectLinkData.toPort.split("*")
+          let link = {}
+          link.from = linkMap.get(selectLinkData.from)
+          link.to = linkMap.get(selectLinkData.to)
+          link.fromPort = oldFromPort[0] + "*" + oldFromPort[1] + "*" + linkMap.get(selectLinkData.from)
+          link.toPort = oldToPort[0] + "*" + oldToPort[1] + "*" + linkMap.get(selectLinkData.to)
+          myDiagram.model.addLinkData(link)
+        }
+      }
+    }
+    //调用没有参数的基础方法（默认功能）
+    go.CommandHandler.prototype.doKeyDown.call(this);
+  };
+  //重写复制方法
+    // myDiagram.commandHandler.copySelection = function(e){}
+
+    //使其本身自带ctrl+V失效
+    myDiagram.commandHandler.pasteSelection = function(){}
+
   //粘贴到画布
-  myDiagram.addDiagramListener("ClipboardPasted", function (e) {
-    e.subject.each(function (part) {
-      var uuidList = new Array()
-      for (let leftPort of part.Zd.leftArray) {
-        leftPort.portId = leftPort.portId.split("*")[0] + "*" + leftPort.portId.split("*")[1] + "*" + part.Zd.key
-        uuidList.push(leftPort.portId)
-      }
-      for (let rightPort of part.Zd.rightArray) {
-        rightPort.portId = rightPort.portId.split("*")[0] + "*" + rightPort.portId.split("*")[1] + "*" + part.Zd.key
-        uuidList.push(rightPort.portId)
-      }
-      var gjidAndTemid = [];
-      gjidAndTemid.push({
-        //构件ID
-        gjId: part.Zd.compId,
-        //构件模板新ID
-        newTmpId: part.Zd.key,
-        //构件模板旧id
-        oldTmpId: part.Zd.key.substr(0, part.Zd.key.length - 1),
-        //状态
-        state: 4,
-        //节点所有锚点uuid
-        uuidList: uuidList
-      });
-      handleMessageToParent("returnFormJson", gjidAndTemid);
-    })
-  })
+  // myDiagram.addDiagramListener("ClipboardPasted", function (e) {
+  //   e.subject.each(function (part) {
+  //     var uuidList = new Array()
+  //     for (let leftPort of part.Zd.leftArray) {
+  //       leftPort.portId = leftPort.portId.split("*")[0] + "*" + leftPort.portId.split("*")[1] + "*" + part.Zd.key
+  //       uuidList.push(leftPort.portId)
+  //     }
+  //     for (let rightPort of part.Zd.rightArray) {
+  //       rightPort.portId = rightPort.portId.split("*")[0] + "*" + rightPort.portId.split("*")[1] + "*" + part.Zd.key
+  //       uuidList.push(rightPort.portId)
+  //     }
+  //     var gjidAndTemid = [];
+  //     gjidAndTemid.push({
+  //       //构件ID
+  //       gjId: part.Zd.compId,
+  //       //构件模板新ID
+  //       newTmpId: part.Zd.key,
+  //       //构件模板旧id
+  //       oldTmpId: part.Zd.key.substr(0, part.Zd.key.length - 1),
+  //       //状态
+  //       state: 4,
+  //       //节点所有锚点uuid
+  //       uuidList: uuidList
+  //     });
+  //     handleMessageToParent("returnFormJson", gjidAndTemid);
+  //   })
+  // })
   //复制/剪切到剪切板
   myDiagram.addDiagramListener("ClipboardChanged", function (e) {
+    console.log("剪切版数据1111",e.subject)
     var idList = []
     e.subject.each(function (part) {
-      idList.push(part.Zd.key)
+      if(part.Zd.key != undefined){
+        idList.push(part.Zd.key)
+        //保存节点数据用于粘贴
+        selectNode.push(part.Zd)
+      }else{
+        //保存连线数据用于粘贴
+        selectLink.push(part.Zd) 
+      }
     })
+    sessionStorage.setItem("copyNodeData", JSON.stringify(selectNode));
+    sessionStorage.setItem("copyLinkData", JSON.stringify(selectLink));
     var gjidAndTemid = []
     gjidAndTemid.push({
       gjId: "",
