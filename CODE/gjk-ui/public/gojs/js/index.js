@@ -40,19 +40,16 @@ function handleConnection(connData) {
 // 子接收父参数
 function handleMessageFromParent(event) {
   var data = event.data;
-  //console.log("子接收父参数", data)
   switch (data.cmd) {
     case 'getCompDtos':
       // 处理业务逻辑
       iframeData = data
       dat = eval(JSON.stringify(iframeData.params));
-      connectionData = iframeData.connectionData
-      console.log("构件列表数据", dat)
+      connectionData = iframeData.connectionData;
       break
     case 'getCompDtosData':
       //接收属性栏修改后的数据
       proData = data
-      //console.log(JSON.stringify(proData.params));
       updatePoint(proData.params);
       break
     case 'clickCompSave':
@@ -60,7 +57,6 @@ function handleMessageFromParent(event) {
       break
     case 'clickCompLoading':
       loadData = data.params
-      console.log("加载流程图数据", data.params)
       break
     case 'import':
       loadData = data.params
@@ -160,9 +156,6 @@ function checkDat() {
   $('.row').mousemove(function (e) {
     if (flag) {
       let f = $(".div_left").width();
-      // console.log("1111",e.clientX - iX)
-      // console.log("222",dw - (e.clientX - BR))
-      // console.log("3333",(e.clientX - BR))
       if (e.clientX - iX > 130) {
         $(".border").css("left", e.clientX - iX + "px")
         $(".div_left").css("right", dw - (e.clientX - BR) + "px")
@@ -173,7 +166,6 @@ function checkDat() {
         $(".div_right").css("left", 13 + "%")
       }
       $(".div_right").css("width", 85.5 + "%")
-      //console.log($(".div_right").width()+(e.clientX - BR)-100)
       //根据鼠标事件相对位置计算出div的position
 
       return false;
@@ -228,8 +220,6 @@ function init() {
       // makeButton("开始仿真",
       //   function (e, obj) {
       //     flag = false;
-      //     console.log("***************", e)
-      //     console.log("obj***************", obj)
       //     var nodeOrLinkList = myDiagram.selection;
       //     nodeOrLinkList.each(function (nodeOrLink) {
       //       if (nodeOrLink instanceof go.Node) {
@@ -243,10 +233,6 @@ function init() {
       //           //获取选中的连线
       //           var from = nodeOrLink.data.fromPort;
       //           var to = nodeOrLink.data.toPort;
-      //           //   console.log("from***************",from)
-      //           //   console.log("to***************",to)
-      //           //   console.log("findPortData(from,to)***************",findPortData(from,to))
-      //           //  console.log("_______________",JSON.parse( myDiagram.model.toJson()))
       //           let linkNodeData = findPortData(from, to);
       //           let startId = nodeOrLink.data.from;
       //           let endId = nodeOrLink.data.to;
@@ -256,14 +242,9 @@ function init() {
 
       //           simulationData.push(simulation)
       //         }
-
-
-
       //       }
       //     });
       //     handleMessageToParent("returnSimulationData", simulationData);
-
-      //     console.log("传vue数据linkdata", simulationData)
       //   }),
       makeButton("仿真展示",
         function (e, obj) {
@@ -275,15 +256,12 @@ function init() {
               var from = nodeOrLink.data.fromPort;
               var to = nodeOrLink.data.toPort;
               let linkNodeData = findPortData(from, to);
-              console.log("linkNodeData2222222222222222222222", linkNodeData);
               let startId = nodeOrLink.data.from;
               let endId = nodeOrLink.data.to;
-              console.log("nodeOrLink.data", nodeOrLink)
               // if (componentMap.get(startId) === componentMap.get(endId)) {
               //   handleMessageToParent("returnFZInfo", "所选连线俩端构件属于同一组件");
               // } else 
-
-              var linkList =  nodeOrLinkList.qd
+              var linkList = nodeOrLinkList.qd
               // 设置空数组
               let questionListType = [] // 存储新的数组
               // 遍历arr对象，将数据插入到数组中
@@ -291,35 +269,35 @@ function init() {
                 questionListType.push(linkList[name + ''])
               }
               questionListType.forEach(element => {
-               var fromKey = element.value.Zd.from;
-               var toKey = element.value.Zd.to;
-               var fromPortKey = element.value.Zd.fromPort;
-               var toPortKey = element.value.Zd.toPort;
-              var fromValue = componentMap.get(fromKey);
-              var toValue = componentMap.get(toKey);
-              if(fromValue == toValue){
-               showMessage('不满足要求连线不可进行仿真', 'error', 3000)
-             }
-             if (!flagSimulation && fromValue != toValue) {
-              let startId = nodeOrLink.data.from;
-              let endId = nodeOrLink.data.to;
-              var from = nodeOrLink.data.fromPort;
-              var to = nodeOrLink.data.toPort;
-              let linkNodeData = findPortData(from, to);
-              let startName = linkNodeData.fromNodeData.variableName;
-              let endName = linkNodeData.toNodeData.variableName;
-              let TempData = { startId: startId, endId: endId, startName: startName, endName: endName }
-              handleMessageToParent("returnFZ", TempData);
-            }
-            })
-             
-             if (flagSimulation == true) {
+                var fromKey = element.value.Zd.from;
+                var toKey = element.value.Zd.to;
+                var fromPortKey = element.value.Zd.fromPort;
+                var toPortKey = element.value.Zd.toPort;
+                var fromValue = componentMap.get(fromKey);
+                var toValue = componentMap.get(toKey);
+                if (fromValue == toValue) {
+                  showMessage('不满足要求连线不可进行仿真', 'error', 3000)
+                }
+                if (!flagSimulation && fromValue != toValue) {
+                  let startId = nodeOrLink.data.from;
+                  let endId = nodeOrLink.data.to;
+                  var from = nodeOrLink.data.fromPort;
+                  var to = nodeOrLink.data.toPort;
+                  let linkNodeData = findPortData(from, to);
+                  let startName = linkNodeData.fromNodeData.variableName;
+                  let endName = linkNodeData.toNodeData.variableName;
+                  let TempData = { startId: startId, endId: endId, startName: startName, endName: endName }
+                  handleMessageToParent("returnFZ", TempData);
+                }
+              })
+
+              if (flagSimulation == true) {
                 showMessage('请先开始仿真业务', 'error', 2000)
-              } 
-            } 
+              }
+            }
             //flagSimulation = true
           });
-      }),
+        }),
       //  $$(go.Shape, "LineH", { strokeWidth: 2, height: 1, stretch: go.GraphObject.Horizontal }),
       //  makeButton("Add top port",
       //             function (e, obj) { addPort("top"); }),
@@ -494,7 +472,6 @@ function init() {
         new go.Binding("text", "text"),
       ),
     );
-
   myDiagram.linkTemplate =
     $$(go.Link,
       {
@@ -507,9 +484,25 @@ function init() {
         contextMenu: nodeMenu,
         layerName: "Background"  // 不要在任何节点前面交叉
       },
-      $$(go.Shape, { stroke: "black", strokeWidth: 2 }),
-      $$(go.Shape, { stroke: "black", fill: "black", toArrow: "Standard" }),
 
+      $$(go.Shape,
+        { name: "changeLinkColor", },
+        { stroke: "black", strokeWidth: 2 }),
+      $$(go.TextBlock,  // the label text
+        {
+          name: "changeTextColor",
+          textAlign: "center",
+          text: " ",
+          font: "13px helvetica, arial, sans-serif",
+          stroke: " ",
+          margin: 2
+        }),
+      $$(go.Shape, { name: "changeArrowsColor", stroke: "black", fill: "black", toArrow: "Standard" }),
+      {
+        doubleClick: function (e, node) {// 双击事件
+          handlerDC(e, node);//双击执行的方法
+        }
+      }
     );
 
   myDiagram.linkTemplateMap.add("lineColorred",
@@ -561,16 +554,18 @@ function init() {
     )
   );
 
-  myDiagram.model
-  $$(go.GraphLinksModel,
-    {
-      linkFromPortIdProperty: "fromPort",  // required information:
-      linkToPortIdProperty: "toPort",      // identifies data property names
-      //  nodeDataArray: loadData.nodeDataArray,
-      //  linkDataArray: loadData.linkDataArray
-    }
+  myDiagram.model =
+    $$(go.GraphLinksModel,
+      {
+        linkFromPortIdProperty: "fromPort",  // required information:
+        linkToPortIdProperty: "toPort",      // identifies data property names
+        //  nodeDataArray: loadData.nodeDataArray,
+        //  linkDataArray: loadData.linkDataArray
+      }
 
-  );
+    );
+
+
   //myDiagram.model.addLinkData({"color":"red"});
   //      myDiagram.linkTemplateMap.add("lineColor",
   //             objGo(go.Link,
@@ -597,7 +592,6 @@ function init() {
     if (part instanceof go.Link) {
       msg = "";
     } else if (part instanceof go.Node) {
-      //console.log("999999999",part.data)
       if (portId.split("*")[1] == "input") {
         for (var value of part.data.leftArray) {
           if (portId == value.portId) {
@@ -627,7 +621,6 @@ function init() {
     html2canvas(document.getElementById(id)).then(canvas => {
       document.body.appendChild(canvas)
       var imgUrl = canvas.toDataURL("image/png");
-      console.log("图片信息", imgUrl)
       return imgUrl
     });
   }
@@ -662,8 +655,6 @@ function init() {
       var div = $("#" + ui.draggable.attr("id"));
       var width = div[0].offsetWidth
       var height = div[0].offsetHeight
-      console.log("宽++++++", div[0].offsetHeight)
-
       html2canvas(document.getElementById(ui.draggable.attr("id"))).then(canvas => {
         for (var value of dat) {
           if (ui.draggable.attr("id") == value.id) {
@@ -679,8 +670,6 @@ function init() {
             path = canvas.toDataURL("image/png");
             //inputList = value.inputList.concat()
             //outputList = value.outputList.concat()
-            console.log(value.compName)
-            console.log("锚点数据", value.inputList)
             for (var i = 0; i < value.inputList.length; i++) {
               var inputData = {}
               let inputStr = ""
@@ -696,7 +685,6 @@ function init() {
               leftArray.push(inputData)
               uuidList.push(i + '*input*' + random)
             }
-            console.log("左边锚点集合", leftArray)
             for (var j = 0; j < value.outputList.length; j++) {
               var outputData = {}
               let outputStr = ""
@@ -768,7 +756,6 @@ function init() {
   //删除节点
   myDiagram.addDiagramListener("SelectionDeleting", function (e) {
     e.subject.each(function (part) {
-      console.log("删除一个节点", part.Zd)
       //此处处理part
     })
   })
@@ -776,7 +763,6 @@ function init() {
   //插入了一个新的节点
   myDiagram.addDiagramListener("PartCreated", function (e) {
     e.subject.each(function (part) {
-      console.log("插入新节点", part.Zd)
       //此处处理part
     })
   })
@@ -784,8 +770,6 @@ function init() {
   //粘贴到画布
   myDiagram.addDiagramListener("ClipboardPasted", function (e) {
     e.subject.each(function (part) {
-      console.log("复制到画布数据", part.Zd)
-      console.log("新旧id", part.Zd.key.substr(0, part.Zd.key.length - 1))
       var uuidList = new Array()
       for (let leftPort of part.Zd.leftArray) {
         leftPort.portId = leftPort.portId.split("*")[0] + "*" + leftPort.portId.split("*")[1] + "*" + part.Zd.key
@@ -813,7 +797,6 @@ function init() {
   })
   //复制/剪切到剪切板
   myDiagram.addDiagramListener("ClipboardChanged", function (e) {
-    //console.log("剪切版数据1111",e.subject)
     var idList = []
     e.subject.each(function (part) {
       idList.push(part.Zd.key)
@@ -838,14 +821,11 @@ function init() {
       //状态
       state: 5
     });
-    //console.log(removeTemp);
     handleMessageToParent("returnFormJson", removeTemp);
   })
 
   //画布节点点击监听
   myDiagram.addDiagramListener("ObjectSingleClicked", function (e) {
-    // console.log("当前画布json111",e);
-    console.log("点击监听e111", e.subject.part.Zd);
     let uuidList = new Array()
     if (e.subject.part.Zd.leftArray != undefined || e.subject.part.Zd.rightArray != undefined) {
       for (let leftData of e.subject.part.Zd.leftArray) {
@@ -854,33 +834,31 @@ function init() {
       for (let rightData of e.subject.part.Zd.rightArray) {
         uuidList.push(rightData.portId)
       }
-    var gjidAndTemid = [];
-    gjidAndTemid.push({
-      //构件ID
-      gjId: e.subject.part.Zd.gjId,
-      //构件模板id(nodeID)
-      tmpId: e.subject.part.Zd.key,
-      //状态
-      state: 2,
-      //锚点集合
-      uuidList: uuidList
-    });
-    //gjIdAndTemId = gjidAndTemid;
-    handleMessageToParent("returnFormJson", gjidAndTemid);
-  }
+      var gjidAndTemid = [];
+      gjidAndTemid.push({
+        //构件ID
+        gjId: e.subject.part.Zd.gjId,
+        //构件模板id(nodeID)
+        tmpId: e.subject.part.Zd.key,
+        //状态
+        state: 2,
+        //锚点集合
+        uuidList: uuidList
+      });
+      //gjIdAndTemId = gjidAndTemid;
+      handleMessageToParent("returnFormJson", gjidAndTemid);
+    }
   })
 
 
 
   //监听连线完成事件
   myDiagram.addDiagramListener("LinkDrawn", function (e) {
-    console.log("监听连线完成事件", e.subject.data)
     //输出端口id
     let outputId = e.subject.data.fromPort
     //输入端口id 
     let inputId = e.subject.data.toPort
     var linkPortData = findPortData(outputId, inputId)
-    console.log("55558225484545", linkPortData)
     var sourceType = linkPortData.fromNodeData.dataTypeName.replace("*", "")
     var targetType = linkPortData.toNodeData.dataTypeName.replace("*", "")
     var isConnect = false
@@ -931,7 +909,6 @@ function findPortData(fromPort, toPort) {
       }
     }
   }
-  console.log("****linklist", linkNodeData)
   return linkNodeData
 }
 function reduction() {
@@ -986,8 +963,6 @@ function save() {
     //结束构件名称
     var tarCompName = ""
     for (var nodeData of nodeDataArray) {
-      console.log("每个节点的数据", nodeData.key)
-      console.log("port", linkDataArray[i].fromPort.split("*")[1])
       if (linkDataArray[i].fromPort.split("*")[2] == nodeData.key) { //出口点
         if (linkDataArray[i].fromPort.split("*")[1] == "output") {
           for (var rightPortData of nodeData.rightArray) {
@@ -1003,7 +978,6 @@ function save() {
       if (linkDataArray[i].toPort.split("*")[2] == nodeData.key) { //入口点
         if (linkDataArray[i].toPort.split("*")[1] == "input") {
           for (var leftPortData of nodeData.leftArray) {
-            console.log("比较", linkDataArray[i].toPort, leftPortData.portId)
             if (linkDataArray[i].toPort == leftPortData.portId) {
               tarDataTypeName = leftPortData.portDat.dataTypeName
               tarVariableName = leftPortData.portDat.variableName
@@ -1018,21 +992,16 @@ function save() {
     let reg = /\w+\[[0-9]+\]/i; //
     if (reg.test(sourVariableName)) {
       let strTemp = sourVariableName.split("[")
-      console.log(strTemp)
       sourcePrame = sourDataTypeName + " " + strTemp[0] + "_" + sourCompName + "[" + strTemp[1]
     }
     if (sourVariableName.indexOf("->") != -1) {
       let strTemp = sourVariableName.split("->")
       sourcePrame = sourDataTypeName + " " + strTemp[0] + "_" + sourCompName + "->" + strTemp[1]
     }
-    console.log("sourVariableName", sourVariableName)
-    console.log("sourVariableName", sourVariableName.indexOf("->"))
     //拼接结束端点数据
     var targetPrame = tarDataTypeName + " " + tarVariableName + "_" + tarCompName
-    console.log("tarVariableName", tarVariableName)
     if (reg.test(tarVariableName)) {
       let strTemp = tarVariableName.split("[")
-      console.log(strTemp)
       targetPrame = tarDataTypeName + " " + strTemp[0] + "_" + tarCompName + "[" + strTemp[1]
     }
     if (tarVariableName.indexOf("->") != -1) {
@@ -1076,8 +1045,6 @@ function save() {
 var backupJsonData
 //完备性检查
 function completeCheckFun(data) {
-  console.log("完备性检查数据", data);
-  console.log("当前画布json111", JSON.parse(myDiagram.model.toJson()));
   //获取当前画布json
   backupJsonData = JSON.parse(myDiagram.model.toJson());
   var jsonData = JSON.parse(myDiagram.model.toJson());
@@ -1111,7 +1078,6 @@ function completeCheckFun(data) {
           if (element.m_spbId == e.key && element.m_paramType == "输入") {
             e.leftArray.forEach(l => {
               if (element.m_paramName == l.portDat.variableName) {
-                console.log("77878787878", l)
                 if (element.m_modifyState == 0) {
                   l.portColor = "#0dba34";
                 } else if (element.m_modifyState == 1) {
@@ -1147,8 +1113,6 @@ function completeCheckFun(data) {
           link.category = "lineColorred"
           //连线绿色样式
           link.category = "lineColorgreen"
-
-          
           // if(element.m_spbId ==  e.key){
           //     if(element.m_modifyState == 0){
           //       e.stateText= "构件正常";
@@ -1337,7 +1301,6 @@ function ChangedSelection(e) {//选择事件
 
 //动态增加删除锚点
 function updatePoint(proParam) {
-  console.log("进入增加删除锚点", proParam);
   //构件id
   var nodeId = proParam.compId
   //锚点为输入端口还是输出端口
@@ -1347,7 +1310,6 @@ function updatePoint(proParam) {
   if (proParam.addOrDel == 'add') { //增加锚点
     myDiagram.startTransaction("addPort");
     var nodeData = myDiagram.model.findNodeDataForKey(nodeId);
-    console.log("节点数据", nodeData)
     let str = ""
     if (proParam.data.variableStructType != "" && proParam.data.variableStructType != undefined) {
       str = "参数名称:" + proParam.data.variableName + "\n" + "参数类型:" + proParam.data.dataTypeName + "\n" + "参数长度:" + proParam.data.lengthName + "\n" + "结构体:" + proParam.data.variableStructType
@@ -1373,9 +1335,7 @@ function updatePoint(proParam) {
     for (let val of modelNodeData) {
       if (val.key == proParam.compId) {
         if (proParam.inOrOut == 'input') {
-          //console.log("进入input",pid)
           let inputArr = val.leftArray
-          console.log("输入数组", inputArr)
           for (var i = 0; i < inputArr.length; i++)
             if (inputArr[i].portId === pid) {
               myDiagram.model.removeArrayItem(inputArr, i);
@@ -1395,95 +1355,133 @@ function updatePoint(proParam) {
   myDiagram.commitTransaction("removePort");
 }
 //开始仿真
-var backupJsonData =null ;
-function  getSimulationData(){
-  if(nodeOrLinkList == undefined){
-    showMessage('请选择连线', 'error', 3000)
-  }
-  //备份当前画布json   
-  backupJsonData = JSON.parse(myDiagram.model.toJson());
-  flagSimulation = false;
- var linkList =  nodeOrLinkList.qd
- // 设置空数组
- let questionListType = [] // 存储新的数组
- // 遍历arr对象，将数据插入到数组中
- for (let name in linkList) {
-   questionListType.push(linkList[name + ''])
- }
- questionListType.forEach(element => {
-  var fromKey = element.value.Zd.from;
-  var toKey = element.value.Zd.to;
-  var fromPortKey = element.value.Zd.fromPort;
-  var toPortKey = element.value.Zd.toPort;
- var fromValue = componentMap.get(fromKey);
- var toValue = componentMap.get(toKey);
- if(fromValue == toValue){
-  showMessage('所选连线中存在俩端构件属于同一部件不可进行仿真', 'error', 3000)
-  var linkData=myDiagram.model.findNodeDataForKey(element.value.Zd.__gohashid);
-  myDiagram.model.setDataProperty(linkData, 'color', "#e6005c");
-  drawNode('error',fromKey,toKey);
-  return false;
-}
-if(fromValue != toValue){
-  let linkNodeData = findPortData(fromPortKey, toPortKey);
-  let startId = fromKey;
-  let endId = toKey;
-  let startName = linkNodeData.fromNodeData.variableName;
-  let endName = linkNodeData.toNodeData.variableName
-  let simulation = startId + ":" + startName + "|" + endId + ":" + endName
-  simulationData.push(simulation)
-  drawNode('success',fromKey,toKey);
-  handleMessageToParent("returnSimulationData", simulationData);
-  console.log("传vue数据linkdata", simulationData)
-}
- });
-
-}
-
-
+// var backupJsonData =null ;
+// function  getSimulationData(){
+//   if(nodeOrLinkList == undefined){
+//     showMessage('请选择连线', 'error', 3000)
+//   }
+//   //备份当前画布json   
+//   backupJsonData = JSON.parse(myDiagram.model.toJson());
+//   flagSimulation = false;
+//  var linkList =  nodeOrLinkList.qd
+//  // 设置空数组
+//  let questionListType = [] // 存储新的数组
+//  // 遍历arr对象，将数据插入到数组中
+//  for (let name in linkList) {
+//    questionListType.push(linkList[name + ''])
+//  }
+//  questionListType.forEach(element => {
+//   var fromKey = element.value.Zd.from;
+//   var toKey = element.value.Zd.to;
+//   var fromPortKey = element.value.Zd.fromPort;
+//   var toPortKey = element.value.Zd.toPort;
+//  var fromValue = componentMap.get(fromKey);
+//  var toValue = componentMap.get(toKey);
+//  if(fromValue == toValue){
+//   showMessage('所选连线中存在俩端构件属于同一部件不可进行仿真', 'error', 3000)
+//   var linkData=myDiagram.model.findNodeDataForKey(element.value.Zd.__gohashid);
+//   myDiagram.model.setDataProperty(linkData, 'color', "#e6005c");
+//   drawNode('error',fromKey,toKey);
+//   return false;
+// }
+// if(fromValue != toValue){
+//   let linkNodeData = findPortData(fromPortKey, toPortKey);
+//   let startId = fromKey;
+//   let endId = toKey;
+//   let startName = linkNodeData.fromNodeData.variableName;
+//   let endName = linkNodeData.toNodeData.variableName
+//   let simulation = startId + ":" + startName + "|" + endId + ":" + endName
+//   simulationData.push(simulation)
+//   drawNode('success',fromKey,toKey);
+//   handleMessageToParent("returnSimulationData", simulationData);
+// }
+//  });
+// }
 
 //结束仿真
-function endSimulation(){
-  if(flagSimulation == false){
-    flagSimulation = true;
-    myDiagram.model = go.Model.fromJson({})
-    myDiagram.model = go.Model.fromJson(backupJsonData);
-  }
+function endSimulation() {
+  // if(flagSimulation == false){
+  //   flagSimulation = true;
+  //   myDiagram.model = go.Model.fromJson({})
+  //   myDiagram.model = go.Model.fromJson(backupJsonData);
+  // }
+  simulationData = [];
 }
 
-function drawNode(message,fromKey,toKey){
+function drawNode(message, fromKey, toKey) {
   var jsonData = JSON.parse(myDiagram.model.toJson());
-    cleanCanvas();
-       jsonData.linkDataArray.forEach(link => {
-        if(fromKey ==  link.from && toKey == link.to ){
-          switch(message){
-            case 'success':        
-              link.category = "lineColorgreen"
-            break;
-            case 'error':        
-            link.category = "lineColorred"
+  cleanCanvas();
+  jsonData.linkDataArray.forEach(link => {
+    if (fromKey == link.from && toKey == link.to) {
+      switch (message) {
+        case 'success':
+          link.category = "lineColorgreen"
           break;
-          }
-        };
-        console.log("**************",link)
-        });
-        myDiagram.model = go.Model.fromJson({})
-        myDiagram.model = go.Model.fromJson(jsonData);
+        case 'error':
+          link.category = "lineColorred"
+          break;
+      }
+    };
+  });
+  myDiagram.model = go.Model.fromJson({})
+  myDiagram.model = go.Model.fromJson(jsonData);
+}
+
+
+//双击执行的方法
+function handlerDC(e, obj) {
+  var link = obj.part;//拿到节点的json对象，后面要拿什么值就直接.出来
+  var fromPort = link.Zd.fromPort;
+  var toPort = link.Zd.toPort;
+  var from = link.Zd.from;
+  var to = link.Zd.to;
+  var fromValue = componentMap.get(from);
+  var toValue = componentMap.get(to);
+  if (fromValue != toValue) {
+    //改变连线样式
+    link.findObject("changeLinkColor").stroke = "green";
+    link.findObject("changeArrowsColor").stroke = "green";
+    link.findObject("changeArrowsColor").fill = "green";
+    link.findObject("changeTextColor").text = "可仿真";
+    link.findObject("changeTextColor").stroke = "green";
+    let linkNodeData = findPortData(fromPort, toPort);
+    let startId = from;
+    let endId = to;
+    let startName = linkNodeData.fromNodeData.variableName;
+    let endName = linkNodeData.toNodeData.variableName
+    let simulation = startId + ":" + startName + "|" + endId + ":" + endName
+    simulationData.push(simulation)
+    // drawNode('success',fromKey,toKey);
+
+  } else {
+    link.findObject("changeLinkColor").stroke = "red";
+    link.findObject("changeArrowsColor").stroke = "red";
+    link.findObject("changeArrowsColor").fill = "red";
+    link.findObject("changeTextColor").text = "不可仿真";
+    link.findObject("changeTextColor").stroke = "red";
+
+  }
+
+
+}
+function getSimulationData() {
+  flagSimulation = false;
+  handleMessageToParent("returnSimulationData", simulationData);
 }
 //信息提示
 function showMessage(message, type, time) {
-	let str = ''
-	switch (type) {
-		case 'success':
-			str = '<div class="success-message" style="width: 400px;height: 40px;text-align: center;background-color:#daf5eb;;color: rgba(59,128,58,0.7);position: fixed;left: 43%;top: 10%;line-height: 40px;border-radius: 5px;z-index: 9999">\n' +
-				'    <span class="mes-text">' + message + '</span></div>'
-			break;
-		case 'error':
-			str = '<div class="error-message" style="width: 400px;height: 40px;text-align: center;background-color: #f5f0e5;color: rgba(238,99,99,0.8);position: fixed;left: 43%;top: 10%;line-height: 40px;border-radius: 5px;;z-index: 9999">\n' +
-				'    <span class="mes-text">' + message + '</span></div>'
-	}
-	$('body').append(str)
-	setTimeout(function () {
-		$('.' + type + '-message').remove()
-	}, time)
+  let str = ''
+  switch (type) {
+    case 'success':
+      str = '<div class="success-message" style="width: 400px;height: 40px;text-align: center;background-color:#daf5eb;;color: rgba(59,128,58,0.7);position: fixed;left: 43%;top: 10%;line-height: 40px;border-radius: 5px;z-index: 9999">\n' +
+        '    <span class="mes-text">' + message + '</span></div>'
+      break;
+    case 'error':
+      str = '<div class="error-message" style="width: 400px;height: 40px;text-align: center;background-color: #f5f0e5;color: rgba(238,99,99,0.8);position: fixed;left: 43%;top: 10%;line-height: 40px;border-radius: 5px;;z-index: 9999">\n' +
+        '    <span class="mes-text">' + message + '</span></div>'
+  }
+  $('body').append(str)
+  setTimeout(function () {
+    $('.' + type + '-message').remove()
+  }, time)
 }
