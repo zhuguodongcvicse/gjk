@@ -797,6 +797,8 @@ function init() {
         nodeData.source = selectNodeData.source
         nodeData.rightArray = selectNodeData.rightArray
         nodeData.leftArray = selectNodeData.leftArray
+        nodeData.width = selectNodeData.width
+        nodeData.height = selectNodeData.height
         var uuidList = new Array()
         for (let leftPort of nodeData.leftArray) {
           leftPort.portId = leftPort.portId.split("*")[0] + "*" + leftPort.portId.split("*")[1] + "*" + nodeData.key
