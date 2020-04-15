@@ -59,17 +59,17 @@
         </el-tooltip>
         <!-- 开始仿真/结束仿真 -->
         <el-tooltip class="item" effect="dark" content="开始仿真" placement="bottom">
-          <el-button 
+          <!-- <el-button 
             style="padding:4px 4px" 
             type="primary" 
             v-bind:icon="simulationIcon" 
-          @click="simulationState = !simulationState"></el-button>
-          <!-- <el-button
+          @click="simulationState = !simulationState"></el-button> -->
+          <el-button
             style="padding:4px 4px"
             icon="icon-kaishifangzhen"
             type="primary"
             @click="sendMessage('startSimulation')"
-          ></el-button> -->
+          ></el-button>
         </el-tooltip>
 
         <el-tooltip class="item" effect="dark" content="结束仿真" placement="bottom">
