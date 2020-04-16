@@ -16,50 +16,53 @@
  */
 package com.inforbus.gjk.admin.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.inforbus.gjk.admin.api.dto.BaseTemplateDTO;
 import com.inforbus.gjk.admin.api.entity.BaseTemplate;
+import com.inforbus.gjk.admin.api.feign.RemoteBaseTemplateService;
 import com.inforbus.gjk.admin.mapper.BaseTemplateMapper;
 import com.inforbus.gjk.admin.service.BaseTemplateService;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
-import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.R;
-import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
-import com.sun.xml.bind.v2.model.core.ID;
+import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 基础模板
+ * BaseTemplateServiceImpl
  *
  * @author wang
- * @date 2019-07-16 08:40:33
+ * @date 2020/4/15
+ * @Description 基础模板
  */
 @Service("baseTemplateService")
 public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, BaseTemplate> implements BaseTemplateService {
-    //private static String LOCALPATH = JGitUtil.getLOCAL_REPO_PATH();
+
     private static final Logger logger = LoggerFactory.getLogger(BaseTemplateServiceImpl.class);
 
     @Value("${git.local.path}")
     private String LOCALPATH;
 
+    @Autowired
+    private RemoteBaseTemplateService remoteBaseTemplateService;
+
     /**
-     * 基础模板简单分页查询
-     *
-     * @param baseTemplate 基础模板
-     * @return
+     * @Author wang
+     * @Description: 基础模板简单分页查询
+     * @Param: [page, baseTemplate]
+     * @Return: com.baomidou.mybatisplus.core.metadata.IPage<com.inforbus.gjk.admin.api.entity.BaseTemplate>
+     * @Create: 2020/4/14
      */
     @Override
     public IPage<BaseTemplate> getBaseTemplatePage(Page<BaseTemplate> page, BaseTemplate baseTemplate) {
@@ -67,156 +70,148 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
     }
 
     /**
-     * 基础模板编辑功能解析xml文件
-     * 从数据库读取一条数据,根据路径解析xml文件,返回XmlEntityMap对象至页面
-     *
-     * @param baseTemplate 基础模板对象
-     * @return XmlEntityMap
+     * @Author wang
+     * @Description: 基础模板编辑功能解析xml文件, 从数据库读取一条数据, 根据路径解析xml文件, 返回XmlEntityMap对象至页面
+     * @Param: [baseTemplate]
+     * @Return: com.inforbus.gjk.common.core.util.R<com.inforbus.gjk.common.core.entity.XmlEntityMap>
+     * @Create: 2020/4/14
      */
     @Override
-    public XmlEntityMap editParseXml(BaseTemplate baseTemplate) throws FileNotFoundException {
-        String path = LOCALPATH + baseTemplate.getTempPath();//获取将要解析的xml文件的路径
-        File localPath = new File(path);
-        if (!localPath.exists()) {//如果xml文件不存在,返回null
-            logger.error(path + "文件不存在");
-            throw new FileNotFoundException(path + "文件不存在");
-        }
-        return XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(localPath);//通过工具类按照路径解析xml文件,返回XmlEntityMap对象
+    public R<XmlEntityMap> editParseXml(BaseTemplate baseTemplate) {
+        String path = LOCALPATH + baseTemplate.getTempPath();
+        R r = remoteBaseTemplateService.analysisXmlFileToXMLEntityMap(path);
+        return r;
     }
 
     /**
-     * 基础模板编辑功能保存数据
-     * 编辑页面保存数据,保存xml文件至指定位置,
-     *
-     * @param baseTemplateDTO 基础模板包装对象
-     * @return boolean
+     * @Author wang
+     * @Description: 基础模板编辑功能保存数据, 编辑页面保存数据, 保存xml文件至指定位置
+     * @Param: [baseTemplateDTO]
+     * @Return: boolean
+     * @Create: 2020/4/14
      */
     @Override
     public boolean editBaseTemplate(BaseTemplateDTO baseTemplateDTO) {
+        logger.debug("editBaseTemplate方法开始运行");
         BaseTemplate baseTemplate = baseTemplateDTO.getBaseTemplate();
         XmlEntityMap xmlEntityMap = baseTemplateDTO.getXmlEntityMap();
-        String path = LOCALPATH + baseTemplate.getTempPath();//xml文件被保存的位置
-        File localPath = new File(path);
-        if (!localPath.exists()) {//判断文件是否存在
-            logger.error("请检查" + path + "是否存在");
-            return false;
-        }
         try {
-            boolean b = XmlFileHandleUtil.createXmlFile(xmlEntityMap, localPath);
-            if (b) {
+            //创建xmlEntityMapVO对象
+            XMlEntityMapVO xMlEntityMapVO = new XMlEntityMapVO();
+            xMlEntityMapVO.setLocalPath(LOCALPATH + baseTemplate.getTempPath());
+            xMlEntityMapVO.setXmlEntityMap(xmlEntityMap);
+            //远程调用dataCenter中的生成xml文件的方法
+            R r = remoteBaseTemplateService.createXMLFile(xMlEntityMapVO);
+            //强转数据为boolean类型，
+            if ((Boolean) r.getData()) {
+                //更新数据库更新时间
                 baseTemplate.setUpdateTime(LocalDateTime.now());
                 baseMapper.updateById(baseTemplate);
                 return true;
             }
         } catch (Exception e) {
             logger.error("数据保存失败,请联系管理员");
-            e.printStackTrace();
         }
-        return false;//保存成功返回true
+        logger.debug("editBaseTemplate方法运行结束");
+        //保存成功返回true
+        return false;
     }
 
     /**
-     * 基础模板新增功能保存数据
-     * 新增页面保存数据,保存xml文件至指定位置,
-     *
-     * @param baseTemplateDTO 基础模板包装对象
-     * @return boolean
+     * @Author wang
+     * @Description: 基础模板新增功能保存数据, 新增页面保存数据, 保存xml文件至指定位置
+     * @Param: [baseTemplateDTO]
+     * @Return: boolean
+     * @Create: 2020/4/14
      */
     @Override
     public boolean saveBaseTemplate(BaseTemplateDTO baseTemplateDTO) throws Exception {
+        logger.debug("saveBaseTemplate方法开始运行");
         BaseTemplate baseTemplate = baseTemplateDTO.getBaseTemplate();
         XmlEntityMap xmlEntityMap = baseTemplateDTO.getXmlEntityMap();
-        long millis = System.currentTimeMillis();//获取日期毫秒值
-        File localPath = new File(LOCALPATH + "gjk" + File.separator + "baseTemplate" + File.separator + baseTemplate.getTempName() + String.valueOf(millis) + ".xml");//保存的位置,文件名称由模板名称+时间毫秒值组成
-        if (!localPath.exists()) {
-            try {
-                File parentFile = localPath.getParentFile();//文件如果不存在,创建文件
-                if (!parentFile.exists()) {
-                    parentFile.mkdirs();
-                    localPath.createNewFile();
-                }
-                System.out.println("文件已生成");
-            } catch (IOException e) {
-                logger.error("文件创建失败");
-                e.printStackTrace();
-                return false;
-                //throw new IOException();
-            }
-        }
+        //获取日期毫秒值
+        long millis = System.currentTimeMillis();
+        //保存的绝对路径,文件名称由模板名称+时间毫秒值组成
+        String dataBasePath = "gjk" + File.separator + "baseTemplate" + File.separator + baseTemplate.getTempName() + String.valueOf(millis) + ".xml";
         try {
-            if (XmlFileHandleUtil.createXmlFile(xmlEntityMap, localPath)) {//先生成xml模板文件至指定位置
+            XMlEntityMapVO xMlEntityMapVO = new XMlEntityMapVO();
+            xMlEntityMapVO.setXmlEntityMap(xmlEntityMap);
+            xMlEntityMapVO.setLocalPath(LOCALPATH + dataBasePath);
+            //先生成xml模板文件至指定位置
+            R r = remoteBaseTemplateService.createXMLFile(xMlEntityMapVO);
+            if ((Boolean) r.getData()) {
+                //设置id
                 baseTemplate.setTempId(IdGenerate.uuid());
+                //设置创建时间
                 baseTemplate.setCreateTime(LocalDateTime.now());
                 baseTemplate.setUpdateTime(null);
                 baseTemplate.setDelFlag("0");
-                baseTemplate.setTempPath("gjk" + File.separator + "baseTemplate" + File.separator + baseTemplate.getTempName() + String.valueOf(millis) + ".xml");
+                baseTemplate.setTempPath(dataBasePath);
+                //设置初始版本号
                 Integer version = baseMapper.getMaxVersion(baseTemplate.getTempType());
                 if (version == null) {
                     baseTemplate.setTempVersion(1);
                 } else {
                     baseTemplate.setTempVersion(version + 1);
                 }
-                baseMapper.insert(baseTemplate);//xml文件生成成功后,数据库存储一条数据
+                //xml文件生成成功后,数据库存储一条数据
+                baseMapper.insert(baseTemplate);
                 return true;
             }
         } catch (Exception e) {
             logger.error("模板保存失败,请检查相关配置是否正确");
-            e.printStackTrace();
             throw new Exception();
         }
+        logger.debug("saveBaseTemplate方法运行结束");
         return false;
     }
 
     /**
-     * 基础模板新增功能根据路径解析xml文件
-     * 新增时选择指定位置的xml文件
-     *
-     * @param baseTemplatePath 文件路径对象
-     * @return XmlEntityMap
+     * @Author wang
+     * @Description: 基础模板新增功能根据路径解析xml文件, 新增时选择指定位置的xml文件
+     * @Param: [baseTemplatePath]
+     * @Return: com.inforbus.gjk.common.core.entity.XmlEntityMap
+     * @Create: 2020/4/14
      */
     @Override
-    public XmlEntityMap parseXml(String baseTemplatePath) throws FileNotFoundException {
-        File localPath = new File(baseTemplatePath);//根据文件路径创建file对象
-        if (!localPath.exists()) {
-            throw new FileNotFoundException();
-        }
-        return XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(localPath);//根据指定路径解析xml文件
+    public XmlEntityMap parseXml(String baseTemplatePath) {
+        //根据指定路径解析xml文件
+        R<XmlEntityMap> r = remoteBaseTemplateService.analysisXmlFileToXMLEntityMap(baseTemplatePath);
+        return r.getData();
     }
 
     /**
-     * 基础模板修改功能
-     *
-     * @param baseTemplate 将要读取的xml文件的路径
-     * @return boolean
+     * @Author wang
+     * @Description: 基础模板修改功能
+     * @Param: [baseTemplate]
+     * @Return: boolean
+     * @Create: 2020/4/14
      */
     @Override
-    public boolean update(BaseTemplate baseTemplate) {
-//        BaseTemplate template = new BaseTemplate();
-//        template.setTempName(baseTemplate.getTempName());
-//        BaseTemplate one = baseMapper.selectOne(new QueryWrapper<>(template));//查找数据库中,模板名称是否存在
-//        if(one != null){
-//            baseMapper.deleteById(one.getTempId());//删除模板名称重复的数据
-//        }
-        File oldPath = new File(LOCALPATH + baseTemplate.getTempPath());//保存的位置,文件名称由模板名称+时间毫秒值组成
-        if (oldPath.exists()) {
-            long millis = System.currentTimeMillis();
-            String path = "gjk" + File.separator + "baseTemplate" + File.separator + baseTemplate.getTempName() + String.valueOf(millis) + ".xml";
-            File newPath = new File(LOCALPATH + path);//保存的位置,文件名称由模板名称+时间毫秒值组成
-            FileInputStream in = null;//输入流对象
-            FileOutputStream out = null;//输出流对象
-            try {
-                in = new FileInputStream(oldPath);
-                out = new FileOutputStream(newPath);
-                int len = 0;
-                byte[] bytes = new byte[1024];//接收数据的数组
-                while ((len = in.read(bytes)) != -1) {//循环解读写数据,复制文件
-                    out.write(bytes, 0, len);
-                }
-
+    public boolean update(BaseTemplate baseTemplate) throws Exception {
+        logger.debug("update方法开始运行");
+        try {
+            //保存的位置,文件名称由模板名称+时间毫秒值组成
+            File oldPath = new File(LOCALPATH + baseTemplate.getTempPath());
+            if (oldPath.exists()) {
+                long millis = System.currentTimeMillis();
+                //生成新文件的名称
+                String path = "gjk" + File.separator + "baseTemplate" + File.separator + baseTemplate.getTempName() + String.valueOf(millis) + ".xml";
+                //调用fegin接口解析dataCenter数据中心中的原有的模板
+                R<XmlEntityMap> r = remoteBaseTemplateService.analysisXmlFileToXMLEntityMap(LOCALPATH + baseTemplate.getTempPath());
+                XmlEntityMap xmlData = r.getData();
+                XMlEntityMapVO xMlEntityMapVO = new XMlEntityMapVO();
+                xMlEntityMapVO.setXmlEntityMap(xmlData);
+                xMlEntityMapVO.setLocalPath(LOCALPATH + path);
+                //调用fegin接口在dataCenter数据中心生成新的模板
+                R result = remoteBaseTemplateService.createXMLFile(xMlEntityMapVO);
+                boolean flag = (boolean) result.getData();
+                //根据模板id查询模板数据
                 BaseTemplate oldBT = baseMapper.selectById(baseTemplate.getTempId());
-                if (oldBT != null) {
+                if (flag && oldBT != null) {
                     if (!oldBT.getTempType().equals(baseTemplate.getTempType())) {
-                        Integer version = baseMapper.getMaxVersion(baseTemplate.getTempType());//获取最新版本
+                        //获取最新版本
+                        Integer version = baseMapper.getMaxVersion(baseTemplate.getTempType());
                         if (version == null) {
                             baseTemplate.setTempVersion(1);
                         } else {
@@ -224,65 +219,40 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
                         }
                     }
                 }
-                baseTemplate.setTempPath(path);//更改新的路径
+                //更改新的路径
+                baseTemplate.setTempPath(path);
                 baseTemplate.setUpdateTime(LocalDateTime.now());
-                int i = baseMapper.updateById(baseTemplate);//把新的数据更细至数据库
-                if (i > 0) {
-                    if (in != null) {
-                        try {
-                            in.close();//关闭输入流
-                        } catch (IOException e) {
-                            logger.error("IO流关闭失败,请联系管理员");
-                            e.printStackTrace();
-                        }
-                    }
-                    if (out != null) {
-                        try {
-                            out.close();//关闭输出流
-                        } catch (IOException e) {
-                            logger.error("IO流关闭失败,请联系管理员");
-                            e.printStackTrace();
-                        }
-                    }
-                    oldPath.delete();
-                    return true;
-                }
-            } catch (IOException e) {
-                logger.error("IO出现错误,请联系管理员");
-                e.printStackTrace();
-
-            } finally {
-                if (in != null) {
-                    try {
-                        in.close();//关闭输入流
-                    } catch (IOException e) {
-                        logger.error("IO流关闭失败,请联系管理员");
-                        e.printStackTrace();
-                    }
-                }
-                if (out != null) {
-                    try {
-                        out.close();//关闭输出流
-                    } catch (IOException e) {
-                        logger.error("IO流关闭失败,请联系管理员");
-                        e.printStackTrace();
-                    }
-                }
+                //把新的数据更细至数据库
+                baseMapper.updateById(baseTemplate);
+                remoteBaseTemplateService.delFile(oldPath.getAbsolutePath());
+                return true;
             }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new Exception(e.getMessage());
         }
+        logger.debug("update方法运行结束");
         return false;
     }
 
+    /**
+     * @Author wang
+     * @Description: 查询模板数据
+     * @Param: []
+     * @Return: java.util.List<com.inforbus.gjk.admin.api.entity.BaseTemplate>
+     * @Create: 2020/4/15
+     */
     @Override
     public List<BaseTemplate> getBaseTemplate() {
         return baseMapper.selectList(null);
     }
 
     /**
-     * 根据模板类型获取基础模板数据
-     *
-     * @param tempType
-     * @return List<BaseTemplate>
+     * @Author wang
+     * @Description: 根据模板类型获取基础模板数据
+     * @Param: [tempType]
+     * @Return: java.util.List<com.inforbus.gjk.admin.api.entity.BaseTemplate>
+     * @Create: 2020/4/15
      */
     @Override
     public List<BaseTemplate> getBaseTemplateByTempType(String tempType) {
@@ -292,10 +262,11 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
     }
 
     /**
-     * 基础模板获取本地地址
-     *
-     * @param
-     * @return String
+     * @Author wang
+     * @Description: 基础模板获取本地地址
+     * @Param: []
+     * @Return: java.lang.String
+     * @Create: 2020/4/15
      */
     @Override
     public String getLocalPath() {
@@ -303,21 +274,20 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
     }
 
     /**
-     * 根据模板id删除模板
-     *
-     * @param tempId
-     * @return boolean
+     * @Author wang
+     * @Description: 根据模板id删除模板
+     * @Param: [tempId]
+     * @Return: boolean
+     * @Create: 2020/4/15
      */
     @Override
     public boolean removeById(String tempId) {
         BaseTemplate baseTemplate = baseMapper.selectById(tempId);
         int b = baseMapper.deleteById(tempId);
         if (b != -1) {
-            File file = new File(LOCALPATH + baseTemplate.getTempPath());
-            if (file.exists()) {
-                file.delete();
-                return true;
-            }
+            //调用fegin接口，根据文件的绝对路径删除文件
+            R<Boolean> r = remoteBaseTemplateService.delFile(LOCALPATH + baseTemplate.getTempPath());
+            return r.getData();
         }
         return false;
     }

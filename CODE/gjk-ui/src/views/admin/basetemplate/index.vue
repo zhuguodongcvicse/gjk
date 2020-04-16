@@ -183,7 +183,6 @@ import {
   addObj,
   putObj,
   delObj,
-  checkTempName,
   getLocalPath
 } from "@/api/admin/basetemplate";
 import { tableOption } from "@/const/crud/admin/basetemplate";

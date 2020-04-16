@@ -1,6 +1,8 @@
 package com.inforbus.gjk.dataCenter.controller;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import com.inforbus.gjk.common.core.constant.CommonConstants;
@@ -30,6 +32,7 @@ import com.inforbus.gjk.dataCenter.service.impl.FileServiceImpl;
  */
 @RestController
 @RequestMapping("/fileServe")
+@SuppressWarnings("unchecked")
 public class FileController {
 
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
@@ -352,7 +355,7 @@ public class FileController {
         logger.debug("createXMLFile方法运结束！");
         return r;
     }
-    
+
     /**
 	 * 程序文本编辑器的文件展示
 	 * @param threeLibsFilePathDTO 封装了路径（全路径，从D盘开始）及编码格式
@@ -362,7 +365,7 @@ public class FileController {
 	public R fileReads(@RequestBody ThreeLibsFilePathDTO threeLibsFilePathDTO) {
 		return fileService.fileReads(threeLibsFilePathDTO);
 	}
-	
+
 	/**
 	 * 保存文本编辑器修改的内容（文本编辑器的）
 	 * @param filePath 文件路径

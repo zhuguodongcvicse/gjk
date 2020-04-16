@@ -54,19 +54,19 @@ export function putObj(obj) {
     data: obj
   })
 }
-export function getXml(obj,template) {
+export function getXml(obj, template) {
   return request({
-    url: '/admin/basetemplate/getXml/'+template,
+    url: '/admin/basetemplate/getXml/' + template,
     method: 'post',
     data: obj
   })
 }
 
-export function parseXml (obj) {
+export function parseXml(obj) {
   return request({
     url: '/admin/basetemplate/parseXml/',
     method: 'post',
-    data:obj
+    data: obj
   })
 }
 
@@ -86,14 +86,6 @@ export function editBaseTemplate(obj) {
   })
 }
 
-export function checkTempName(tempName) {
-  return request({
-    url: '/admin/basetemplate/checkTempName/'+tempName,
-    method: 'get',
-
-  })
-}
-
 export function getBaseTemplate() {
   return request({
     url: '/admin/basetemplate/getBaseTemplate',
@@ -103,7 +95,7 @@ export function getBaseTemplate() {
 
 export function getBaseTemplates(tempType) {
   return request({
-    url: '/admin/basetemplate/getBaseTemplates/'+tempType,
+    url: '/admin/basetemplate/getBaseTemplates/' + tempType,
     method: 'get'
   })
 }
