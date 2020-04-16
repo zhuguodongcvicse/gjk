@@ -57,7 +57,7 @@ public class FileServiceImpl implements FileService {
     @Value("${git.local.path}")
     private String localBasePath;
     @Value("${gjk.code.encodeing}")
-	private String defaultEncoding;
+    private String defaultEncoding;
 
     private static final Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
 
@@ -343,11 +343,11 @@ public class FileServiceImpl implements FileService {
     @Override
     public boolean delFile(String absolutePath) {
         File file = new File(absolutePath);
-        if (file.exists()){
+        if (file.exists()) {
             return file.delete();
         }
         return false;
-}
+    }
 
     /**
      * @param filePath
@@ -606,130 +606,134 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
-	 * 程序文本编辑器的文件展示
-	 * @param threeLibsFilePathDTO 封装了路径（全路径，从D盘开始）及编码格式
-	 * @return
-	 */
-	public R fileReads(ThreeLibsFilePathDTO threeLibsFilePathDTO) {
-		String fileName = threeLibsFilePathDTO.getFilePathName();
-		// 获取文件编码格式
-		String code = "";
-		if (StringUtils.isEmpty(threeLibsFilePathDTO.getCode())) {
-			code = defaultEncoding;
-		} else {
-			code = threeLibsFilePathDTO.getCode();
-		}
-		if (StringUtils.isEmpty(fileName)) {
-			return new R<>();
-		}
-		File isFile = new File(fileName);
-		//获取文件后缀名
-		String prefix = fileName.substring(fileName.lastIndexOf(".") + 1);
-		String str = "";
-		ThreeLibsDTO dto = new ThreeLibsDTO();
-		if (isFile.exists() && isFile.isFile()) {
+     * 程序文本编辑器的文件展示
+     *
+     * @param threeLibsFilePathDTO 封装了路径（全路径，从D盘开始）及编码格式
+     * @return
+     */
+    @Override
+    public R fileReads(ThreeLibsFilePathDTO threeLibsFilePathDTO) {
+        String fileName = threeLibsFilePathDTO.getFilePathName();
+        // 获取文件编码格式
+        String code = "";
+        if (StringUtils.isEmpty(threeLibsFilePathDTO.getCode())) {
+            code = defaultEncoding;
+        } else {
+            code = threeLibsFilePathDTO.getCode();
+        }
+        if (StringUtils.isEmpty(fileName)) {
+            return new R<>();
+        }
+        File isFile = new File(fileName);
+        //获取文件后缀名
+        String prefix = fileName.substring(fileName.lastIndexOf(".") + 1);
+        String str = "";
+        ThreeLibsDTO dto = new ThreeLibsDTO();
+        if (isFile.exists() && isFile.isFile()) {
 
-			// 读取excel文件
-			if ("xlsx".equals(prefix) || "xls".equals(prefix)) {
-				try {
+            // 读取excel文件
+            if ("xlsx".equals(prefix) || "xls".equals(prefix)) {
+                try {
 
-					XSSFWorkbook xssfWorkbook = new XSSFWorkbook(fileName);
-					// 循环工作表sheet
-					XSSFSheet xssfSheet = xssfWorkbook.getSheetAt(0);
-					int firstRowIndex = xssfSheet.getFirstRowNum(); // 第一行是列名，所以不读
-					int lastRowIndex = xssfSheet.getLastRowNum();
-					// 循环行row
-					XSSFRow xssfRow = xssfSheet.getRow(0);
-					// 循环列cell
-					// 用stringbuffer得到excel表格一行的内容并用逗号分隔
-					StringBuffer sbs = new StringBuffer();
-					for (int rIndex = firstRowIndex; rIndex <= lastRowIndex; rIndex++) {// 遍历行
-						Row row = xssfSheet.getRow(rIndex);
-						if (row != null) {
-							int firstCellIndex = row.getFirstCellNum();
-							int lastCellIndex = row.getLastCellNum();
-							for (int cIndex = firstCellIndex; cIndex < lastCellIndex; cIndex++) {// 遍历列
-								Cell cell = row.getCell(cIndex);
-								sbs.append(cell);
-								if (cell != null) {
-									sbs.append(",");
-								}
-							}
-						}
+                    XSSFWorkbook xssfWorkbook = new XSSFWorkbook(fileName);
+                    // 循环工作表sheet
+                    XSSFSheet xssfSheet = xssfWorkbook.getSheetAt(0);
+                    int firstRowIndex = xssfSheet.getFirstRowNum(); // 第一行是列名，所以不读
+                    int lastRowIndex = xssfSheet.getLastRowNum();
+                    // 循环行row
+                    XSSFRow xssfRow = xssfSheet.getRow(0);
+                    // 循环列cell
+                    // 用stringbuffer得到excel表格一行的内容并用逗号分隔
+                    StringBuffer sbs = new StringBuffer();
+                    for (int rIndex = firstRowIndex; rIndex <= lastRowIndex; rIndex++) {// 遍历行
+                        Row row = xssfSheet.getRow(rIndex);
+                        if (row != null) {
+                            int firstCellIndex = row.getFirstCellNum();
+                            int lastCellIndex = row.getLastCellNum();
+                            for (int cIndex = firstCellIndex; cIndex < lastCellIndex; cIndex++) {// 遍历列
+                                Cell cell = row.getCell(cIndex);
+                                sbs.append(cell);
+                                if (cell != null) {
+                                    sbs.append(",");
+                                }
+                            }
+                        }
 
-					}
-					str = sbs.toString();
-				} catch (Exception e) {
-					e.printStackTrace();
-					return new R<>(new Exception("读取" + fileName + "文件内容出错"));
-				}
-				// 读取word文件
-			} else if ("doc".equals(prefix) || "docx".equals(prefix)) {
-				try {
+                    }
+                    str = sbs.toString();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return new R<>(new Exception("读取" + fileName + "文件内容出错"));
+                }
+                // 读取word文件
+            } else if ("doc".equals(prefix) || "docx".equals(prefix)) {
+                try {
 
-					FileInputStream in = new FileInputStream(fileName);
-					WordExtractor extractor = new WordExtractor(in);
-					str = extractor.getText();
+                    FileInputStream in = new FileInputStream(fileName);
+                    WordExtractor extractor = new WordExtractor(in);
+                    str = extractor.getText();
 //				dto.setTextContext(str);
-				} catch (Exception e) {
-					e.printStackTrace();
-					return new R<>(new Exception("读取" + fileName + "文件内容出错"));
-				}
-			}
-			// 读取//.h .m .c .o等客户 文件
-			else {
-				try {
-					str = FileUtils.readFileToString(new File(fileName), code);
-				} catch (Exception e) {
-					e.printStackTrace();
-					return new R<>(new Exception("读取" + fileName + "文件内容出错"));
-				}
-			}
-			dto.setTextContext(prefix + "@%#@*+-+@" + str + "@%#@*+-+@" + code);
-		} else {
-			return new R<>(new Exception("找不到指定的文件"));
-		}
-		return new R<>(dto);
-	}
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return new R<>(new Exception("读取" + fileName + "文件内容出错"));
+                }
+            }
+            // 读取//.h .m .c .o等客户 文件
+            else {
+                try {
+                    str = FileUtils.readFileToString(new File(fileName), code);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return new R<>(new Exception("读取" + fileName + "文件内容出错"));
+                }
+            }
+            dto.setTextContext(prefix + "@%#@*+-+@" + str + "@%#@*+-+@" + code);
+        } else {
+            return new R<>(new Exception("找不到指定的文件"));
+        }
+        return new R<>(dto);
+    }
 
-	/**
-	 * 保存文本编辑器修改的内容（文本编辑器的）
-	 * @param filePath 文件路径
-	 * @param textContext 文本内容
-	 */
-		public void saveFileContext(String filePath, String textContext) {
-			String fileName = filePath;
-			File file = new File(fileName);
-			OutputStream outputStream = null;
-			if (file.exists()) {
-				try {
-					// 如果文件找不到，就new一个
-					file.delete();
-					file.createNewFile();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			try {
-				// 定义输出流，写入文件的流
-				outputStream = new FileOutputStream(file);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-			// 定义将要写入文件的数据
-			// 把string转换成byte型的，并存放在数组中
-			byte[] bs = textContext.getBytes();
-			try {
-				// 写入bs中的数据到file中
-				outputStream.write(bs);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			try {
-				outputStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+    /**
+     * 保存文本编辑器修改的内容（文本编辑器的）
+     *
+     * @param filePath    文件路径
+     * @param textContext 文本内容
+     */
+    @Override
+    public void saveFileContext(String filePath, String textContext) {
+        String fileName = filePath;
+        File file = new File(fileName);
+        OutputStream outputStream = null;
+        if (file.exists()) {
+            try {
+                // 如果文件找不到，就new一个
+                file.delete();
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            // 定义输出流，写入文件的流
+            outputStream = new FileOutputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        // 定义将要写入文件的数据
+        // 把string转换成byte型的，并存放在数组中
+        byte[] bs = textContext.getBytes();
+        try {
+            // 写入bs中的数据到file中
+            outputStream.write(bs);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-		}
+    }
 }

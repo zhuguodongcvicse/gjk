@@ -423,7 +423,7 @@
 <script>
 import { parseStrToObj, parseObjToStr } from "@/util/util";
 import { menuTag } from "@/util/closeRouter";
-import { parseXml, addObj, checkTempName } from "@/api/admin/basetemplate"; //解析xml
+import { parseXml, addObj } from "@/api/admin/basetemplate"; //解析xml
 import {
   getDicts,
   getDictTypes,
