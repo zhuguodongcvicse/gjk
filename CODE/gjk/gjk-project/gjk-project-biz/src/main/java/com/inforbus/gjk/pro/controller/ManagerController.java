@@ -1,7 +1,6 @@
 package com.inforbus.gjk.pro.controller;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -68,10 +67,6 @@ import lombok.AllArgsConstructor;
 public class ManagerController {
 
 	private static final Logger logger = LoggerFactory.getLogger(ManagerController.class);
-//	private static final String gitDetailPath = JGitUtil.getLOCAL_REPO_PATH();// gitlu路径
-//	private static final String generateCodeResult = JGitUtil.getGenerateCodeResult();// 集成代码生成结果存放路径
-//	private static final String softToHardResult = JGitUtil.getSoftToHardResult();// 软硬件映射结果文件存放路径
-//	private static final String flowInfPath = JGitUtil.getFlowInfPath();// 获取流程内外部接口存放路径 add by hu
 
 	/**
 	 * @Fields managerService : 项目管理
@@ -125,19 +120,6 @@ public class ManagerController {
 	@PutMapping
 	@RequestMapping("/createXmlFile/{proDetailId}")
 	public R createXmlFile(@RequestBody XmlEntity entity, @PathVariable("proDetailId") String proDetailId) {
-//		ProjectFile processFile = managerService
-//				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, proDetailId));
-//		ProjectFile modelFile = managerService
-//				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, processFile.getParentId()));
-//		ProjectFile flowFile = managerService
-//				.getOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, modelFile.getParentId()));
-//
-//		String filePath = gitDetailPath + flowFile.getFilePath() + flowFile.getFileName() + "/softToHardResult";
-//		File file = new File(filePath);
-//		if (!file.exists()) {
-//			file.mkdirs();
-//		}
-//		return new R<>(managerService.createXmlFile(entity, proDetailId));
 		return new R<>(managerService.createXmlFiles(entity, proDetailId));
 	}
 
@@ -197,8 +179,6 @@ public class ManagerController {
 
 	@GetMapping("/getProcessName/{id}")
 	public R getProcessName(@PathVariable("id") String id) {
-		System.out.println("aaaaaaaa" + id);
-		System.out.println("pppppp" + managerService.getProcessName(id));
 		return new R<>(managerService.getProcessName(id));
 	}
 
@@ -262,7 +242,6 @@ public class ManagerController {
 				projectPlan.setParentId(id);
 
 				projectPlan.setFileName(array[i].getName().substring(0, (array[i].getName().length() - 4)));
-				System.out.println("fileName:" + projectPlan.getFileName());
 				projectPlan.setFilePath(array[i].getPath());
 				managerService.saveProjectPlan(projectPlan);
 			} else if (array[i].isDirectory()) {
@@ -349,10 +328,8 @@ public class ManagerController {
 			LineNumberReader input = new LineNumberReader(ir);
 			String line = null;
 			while ((line = input.readLine()) != null) {
-				System.out.println(line);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -370,7 +347,6 @@ public class ManagerController {
 		}
 		File file = new File(workModeFilePath);
 		if (file.exists()) {
-			System.out.println("iiii::" + ProcedureXmlAnalysis.getComponentList(file));
 			return new R<>(ProcedureXmlAnalysis.getComponentList(file));
 		} else {
 			logger.error("缺少流程配置文件，请先配置流程。");
@@ -401,7 +377,6 @@ public class ManagerController {
 	 */
 	@PostMapping("saveHardwarelibs")
 	public int saveHarewarelibs(@RequestBody Hardwarelibs hardwarelibs) {
-		System.out.println("hardwarelibs" + hardwarelibs);
 		int row = managerService.saveHardwarelibs(hardwarelibs);
 		return row;
 	}
@@ -440,7 +415,6 @@ public class ManagerController {
 	public List getAllList(@PathVariable("id") String id) {
 		File xmlFile = managerService.getXmlFile(id);
 		List<HardwareNode> hardwareNodeList = ProcedureXmlAnalysis.getHardwareNodeList(xmlFile);
-		System.out.println("hardwareNodeList----" + hardwareNodeList);
 		if (hardwareNodeList.size() != 0) {
 			List<Arrows> arrowsList = ProcedureXmlAnalysis.getArrowsList(xmlFile);
 			ArrayList<Object> array = new ArrayList<>();
@@ -459,7 +433,6 @@ public class ManagerController {
 	@PostMapping("/sendXmlMap")
 	public void updataDeploymentXml(@RequestBody DeploymentXMLMap deploymentXMLMap) {
 		managerService.updataDeploymentXml(deploymentXMLMap);
-		System.out.println("xmlparams" + deploymentXMLMap);
 	}
 
 	/**
@@ -566,7 +539,6 @@ public class ManagerController {
 					}
 					byte[] strBytes = bos.toByteArray();
 					json = new String(strBytes, 0, strBytes.length, "utf-8");
-					System.out.println(json);
 					Object jsonStr = JSON.toJavaObject(JSONObject.parseObject(json), Object.class);
 					retMap.put("json", jsonStr);
 				} else {
