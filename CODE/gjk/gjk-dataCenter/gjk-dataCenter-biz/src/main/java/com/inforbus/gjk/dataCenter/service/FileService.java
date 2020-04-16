@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
+import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
-
+import com.inforbus.gjk.dataCenter.api.dto.ThreeLibsFilePathDTO;
 import com.inforbus.gjk.dataCenter.api.entity.FileCenter;
 
 /**
@@ -154,4 +155,18 @@ public interface FileService {
 	 * @Create: 2020/4/15
 	 */
 	boolean delFile(String absolutePath);
+	
+	/**
+	 * 保存文本编辑器修改的内容（文本编辑器的）
+	 * @param filePath 文件路径
+	 * @param textContext 文本内容
+	 */
+	void saveFileContext(String filePath, String textContext) ;
+	
+	/**
+	 * 程序文本编辑器的文件展示
+	 * @param threeLibsFilePathDTO 封装了路径（全路径，从D盘开始）及编码格式
+	 * @return
+	 */
+	R fileReads(ThreeLibsFilePathDTO threeLibsFilePathDTO);
 }

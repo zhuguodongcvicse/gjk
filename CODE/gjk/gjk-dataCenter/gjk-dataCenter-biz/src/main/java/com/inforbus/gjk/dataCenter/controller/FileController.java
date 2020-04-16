@@ -34,8 +34,7 @@ public class FileController {
 
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
 
-    @Autowired
-	private FileServiceImpl fileServiceImpl;
+    
     @Autowired
     private FileService fileService;
 
@@ -361,7 +360,7 @@ public class FileController {
 	 */
 	@PostMapping("readFiles")
 	public R fileReads(@RequestBody ThreeLibsFilePathDTO threeLibsFilePathDTO) {
-		return fileServiceImpl.fileReads(threeLibsFilePathDTO);
+		return fileService.fileReads(threeLibsFilePathDTO);
 	}
 	
 	/**
@@ -371,6 +370,6 @@ public class FileController {
 	 */
 	@PostMapping("saveFileContext")
 	public void saveFileContext(@RequestParam("filePath") String filePath,@RequestParam("textContext") String textContext) {
-		fileServiceImpl.saveFileContext(filePath, textContext);
+		fileService.saveFileContext(filePath, textContext);
 	}
 }
