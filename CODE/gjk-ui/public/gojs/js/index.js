@@ -195,63 +195,18 @@ function init() {
         // allowDrop: true,  // must be true to accept drops from the Palette 必须正确才能接受调色板中的墨滴
         // "LinkDrawn": showLinkLabel,  // this DiagramEvent listener is defined below  该DiagramEvent侦听器在下面定义
         //"LinkRelinked": showLinkLabel,
-        //  scrollsPageOnFocus: false,
+        "scrollsPageOnFocus": true,
         "undoManager.isEnabled": true,  // enable undo & redo  启用撤消和重做
         "grid.visible": true, //开启网格背景
         initialPosition: new go.Point(0, 0),
         //  autoScale:go.Diagram.Uniform,//自适应
         //  autoScale:go.Diagram.UniformToFill,//自适应
-        "ChangedSelection": ChangedSelection
+        "ChangedSelection": ChangedSelection,
+        
       });
-
-
   var simulationData = [];
-
-  //  myDiagram.contextMenu =
-  //   $$(go.Adornment, "Vertical",
-  //       makeButton("开始仿真",
-  //                  //function(e, obj) { e.diagram.commandHandler.pasteSelection(e.diagram.lastInput.documentPoint); },
-  //                  //function(o) { return o.diagram.commandHandler.canPasteSelection();
-  //                 // }
-  //                  )
-  //   );
-
-
   var nodeMenu =  // context menu for each Node
     $$(go.Adornment, "Vertical",
-      //  makeButton("Copy",
-      //             function(e, obj) { e.diagram.commandHandler.copySelection(); }),
-      //  makeButton("Delete",
-      //             function(e, obj) { e.diagram.commandHandler.deleteSelection(); }),
-      // makeButton("开始仿真",
-      //   function (e, obj) {
-      //     flag = false;
-      //     var nodeOrLinkList = myDiagram.selection;
-      //     nodeOrLinkList.each(function (nodeOrLink) {
-      //       if (nodeOrLink instanceof go.Node) {
-      //         //获取选中节点
-      //         var key = nodeOrLink.data.key;
-      //       } else if (nodeOrLink instanceof go.Link) {
-
-      //         if (componentMap.get(nodeOrLink.data.from) === componentMap.get(nodeOrLink.data.to)) {
-      //           handleMessageToParent("returnFZInfo", "所选连线中存在俩端构件属于同一组件不可进行仿真");
-      //         } else {
-      //           //获取选中的连线
-      //           var from = nodeOrLink.data.fromPort;
-      //           var to = nodeOrLink.data.toPort;
-      //           let linkNodeData = findPortData(from, to);
-      //           let startId = nodeOrLink.data.from;
-      //           let endId = nodeOrLink.data.to;
-      //           let startName = linkNodeData.fromNodeData.variableName;
-      //           let endName = linkNodeData.toNodeData.variableName
-      //           let simulation = startId + ":" + startName + "|" + endId + ":" + endName
-
-      //           simulationData.push(simulation)
-      //         }
-      //       }
-      //     });
-      //     handleMessageToParent("returnSimulationData", simulationData);
-      //   }),
       makeButton("仿真展示",
         function (e, obj) {
 
@@ -331,7 +286,7 @@ function init() {
         // selectionAdorned: false,
         locationObjectName: "BODY",
         locationSpot: go.Spot.Center,
-        selectionObjectName: "BODY"
+        selectionObjectName: "BODY",
       },
       new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
       $$(go.TextBlock,
@@ -451,19 +406,10 @@ function init() {
                     margin: new go.Margin(2, 0)
                   },
                   new go.Binding("fill", "portColor")),
-
-              )  // end itemTemplate
+              ) 
           }
-        ),  // end Vertical Panel
-
-        //        $$(go.Shape, "Rectangle",
-        //          { fill: "#AC193D", stroke: null, strokeWidth: 0,
-        //            minSize: new go.Size(56, 56) }),
-        //  $$(go.TextBlock,
-        //    { margin: 10, textAlign: "center", font: "14px  Segoe UI,sans-serif", stroke: "white", editable: true },
-        //    new go.Binding("text", "text").makeTwoWay())
-      ),  // end Auto Panel body
-      //   ),
+        ),  
+      ),  
 
       //构件名称
       $$(go.TextBlock, "Vertical", {
@@ -568,29 +514,7 @@ function init() {
         //  nodeDataArray: loadData.nodeDataArray,
         //  linkDataArray: loadData.linkDataArray
       }
-
     );
-
-
-  //myDiagram.model.addLinkData({"color":"red"});
-  //      myDiagram.linkTemplateMap.add("lineColor",
-  //             objGo(go.Link,
-  //                 {
-  //                   selectable: false,      // 用户不能选择链接
-  //                   curve: go.Link.Bezier,
-  //                   layerName: "Background"  // 不要在任何节点前面交叉
-  //                 },
-  //                 objGo(go.Shape,  // 此形状仅在突出显示时才显示
-  //                   { isPanelMain: true, stroke: "red", strokeWidth: 2 },
-  //                   new go.Binding("stroke", "isHighlighted", function(h) { return h ? "red" : null; }).ofObject()),
-  //                 objGo(go.Shape,
-  //                   // mark each Shape to get the link geometry with isPanelMain: true
-  //                   { isPanelMain: true, stroke: "red", strokeWidth: 1 },
-  //                   new go.Binding("stroke", "color")),
-  //                 objGo(go.Shape, { toArrow: "Standard",stroke: "red"})
-  //             )
-
-  //         );
   function infoString(obj) {
     var part = obj.part;
     if (part instanceof go.Adornment) part = part.adornedPart;
@@ -614,8 +538,6 @@ function init() {
     }
     return msg;
   }
-
-
   $(".avatar-uploader").draggable({
     stack: "#myDiagramDiv",
     //  revert: true,
@@ -726,7 +648,8 @@ function init() {
               planColor: planColor,
               stateText: stateText,
               width: width,
-              height, height
+              height, height,
+              type:"new"
 
             });
             model.commitTransaction("drop");
@@ -786,7 +709,6 @@ function init() {
       //保存新旧节点的key
       var linkMap = new Map()
       for (let selectNodeData of selectNode) {
-        console.log("每一个选中的数据", selectNodeData)
         var random = ''
         random = Math.ceil(Math.random() * 10000000000000000000).toString().substr(0, 9 || 4)
         random = Date.now() + random
@@ -801,6 +723,7 @@ function init() {
         nodeData.leftArray = selectNodeData.leftArray
         nodeData.width = selectNodeData.width
         nodeData.height = selectNodeData.height
+        nodeData.type = "new"
         var uuidList = new Array()
         for (let leftPort of nodeData.leftArray) {
           leftPort.portId = leftPort.portId.split("*")[0] + "*" + leftPort.portId.split("*")[1] + "*" + nodeData.key
@@ -828,7 +751,6 @@ function init() {
       }
       if (selectLink.length > 0) {
         for (let selectLinkData of selectLink) {
-          console.log("每一条连线数据", selectLinkData)
           let oldFromPort = selectLinkData.fromPort.split("*")
           let oldToPort = selectLinkData.toPort.split("*")
           let link = {}
@@ -844,44 +766,92 @@ function init() {
     go.CommandHandler.prototype.doKeyDown.call(this);
   };
   //重写复制方法
-  // myDiagram.commandHandler.copySelection = function(e){}
+   myDiagram.commandHandler.copySelection = function(e,obj){
+    go.CommandHandler.prototype.copySelection.call( myDiagram.commandHandler);
+   }
 
-  //使其本身自带ctrl+V失效
-  myDiagram.commandHandler.pasteSelection = function () { }
+  //重写粘贴方法
+  myDiagram.commandHandler.pasteSelection = function () {
+   
+   }
 
-  //粘贴到画布
-  // myDiagram.addDiagramListener("ClipboardPasted", function (e) {
-  //   e.subject.each(function (part) {
-  //     var uuidList = new Array()
-  //     for (let leftPort of part.Zd.leftArray) {
-  //       leftPort.portId = leftPort.portId.split("*")[0] + "*" + leftPort.portId.split("*")[1] + "*" + part.Zd.key
-  //       uuidList.push(leftPort.portId)
-  //     }
-  //     for (let rightPort of part.Zd.rightArray) {
-  //       rightPort.portId = rightPort.portId.split("*")[0] + "*" + rightPort.portId.split("*")[1] + "*" + part.Zd.key
-  //       uuidList.push(rightPort.portId)
-  //     }
-  //     var gjidAndTemid = [];
-  //     gjidAndTemid.push({
-  //       //构件ID
-  //       gjId: part.Zd.compId,
-  //       //构件模板新ID
-  //       newTmpId: part.Zd.key,
-  //       //构件模板旧id
-  //       oldTmpId: part.Zd.key.substr(0, part.Zd.key.length - 1),
-  //       //状态
-  //       state: 4,
-  //       //节点所有锚点uuid
-  //       uuidList: uuidList
-  //     });
-  //     handleMessageToParent("returnFormJson", gjidAndTemid);
-  //   })
-  // })
+//监听新增的node同时判断是否使用crtl和鼠标移动
+// document.onkeydown=function(){
+//   if((event.ctrlKey)){
+myDiagram.addModelChangedListener(function(evt) {
+  // 忽略不重要的事务事件
+  if (!evt.isTransactionFinished) return;
+  var txn = evt.object;  // a Transaction
+  if (txn === null) 
+  return;
+  // 遍历事务的所有实际更改事件
+  txn.changes.each(function(e) {
+    // 忽略除添加/删除节点之外的任何更改
+    if (e.modelChange !== "nodeDataArray") 
+    return;
+    // 记录节点插入和删除
+    if (e.change === go.ChangedEvent.Insert) {
+    //监听鼠标
+    var nodeData=myDiagram.model.findNodeDataForKey(e.newValue.key);  
+    //myDiagram.model.removeNodeData(nodeData); 
+    var jsonData = JSON.parse(myDiagram.model.toJson());
+     if(nodeData.type === "new"){
+
+     }else{
+    nodeData.copy = "copy";
+    nodeData.type = "copy";
+    var copyKey1 = nodeData.key;
+    var objClone = JSON.parse(JSON.stringify(copyKey1));
+    nodeData.key = objClone.slice(0,objClone.length-1);
+     }
+    } else if (e.change === go.ChangedEvent.Remove) {
+      //console.log(evt.propertyName + " 22222222222222removed node with key: " + e.oldValue.key);
+    }
+  });
+});
+
+function ChangedSelection(e){//选择事件
+	var data=null;
+	e.diagram.selection.each(function(nodeOrLink) {
+		  if(nodeOrLink instanceof go.Node){//选择节点
+        data=nodeOrLink.data;
+        data.type= "copy"
+		  }
+	  });
+};
+ // 粘贴到画布
+  myDiagram.addDiagramListener("ClipboardPasted", function (e) {
+    e.subject.each(function (part) {
+      var uuidList = new Array()
+      for (let leftPort of part.Zd.leftArray) {
+        leftPort.portId = leftPort.portId.split("*")[0] + "*" + leftPort.portId.split("*")[1] + "*" + part.Zd.key
+        uuidList.push(leftPort.portId)
+      }
+      for (let rightPort of part.Zd.rightArray) {
+        rightPort.portId = rightPort.portId.split("*")[0] + "*" + rightPort.portId.split("*")[1] + "*" + part.Zd.key
+        uuidList.push(rightPort.portId)
+      }
+      var gjidAndTemid = [];
+      gjidAndTemid.push({
+        //构件ID
+        gjId: part.Zd.compId,
+        //构件模板新ID
+        newTmpId: part.Zd.key,
+        //构件模板旧id
+        oldTmpId: part.Zd.key.substr(0, part.Zd.key.length - 1),
+        //状态
+        state: 4,
+        //节点所有锚点uuid
+        uuidList: uuidList
+      });
+      handleMessageToParent("returnFormJson", gjidAndTemid);
+    })
+  })
   //复制/剪切到剪切板
   myDiagram.addDiagramListener("ClipboardChanged", function (e) {
-    console.log("剪切版数据1111", e.subject)
     var idList = []
     e.subject.each(function (part) {
+      part.Zd.type = "new";
       if (part.Zd.key != undefined) {
         idList.push(part.Zd.key)
         //保存节点数据用于粘贴
@@ -938,12 +908,11 @@ function init() {
         uuidList: uuidList
       });
       //gjIdAndTemId = gjidAndTemid;
+      console.log("单击node事件组装的数据",gjidAndTemid);
       handleMessageToParent("returnFormJson", gjidAndTemid);
     }
   })
-
-
-
+ 
   //监听连线完成事件
   myDiagram.addDiagramListener("LinkDrawn", function (e) {
     //输出端口id
@@ -1386,10 +1355,6 @@ function levelCenter() {
 
   });
 }
-function ChangedSelection(e) {//选择事件
-  nodeOrLinkList = myDiagram.selection;
-  nodeOrLinkFirst = myDiagram.selection.first()
-};
 
 //动态增加删除锚点
 function updatePoint(proParam) {
@@ -1410,7 +1375,7 @@ function updatePoint(proParam) {
     }
     var newPortData = {
       portId: pid,
-      portColor: "#923951",
+      portColor: "#00AF00",
       description: str,
       portDat: proParam.data
     };
@@ -1580,3 +1545,4 @@ function showMessage(message, type, time) {
     $('.' + type + '-message').remove()
   }, time)
 }
+
