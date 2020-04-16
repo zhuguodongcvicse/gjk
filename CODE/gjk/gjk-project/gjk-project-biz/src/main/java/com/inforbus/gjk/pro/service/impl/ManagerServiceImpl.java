@@ -20,7 +20,6 @@ import com.inforbus.gjk.pro.api.entity.*;
 
 import com.inforbus.gjk.pro.api.entity.GjkPlatform;
 import com.inforbus.gjk.pro.api.entity.Software;
-import com.inforbus.gjk.pro.api.feign.DisposeDataCenterServiceFeign;
 import com.inforbus.gjk.pro.mapper.*;
 import com.inforbus.gjk.pro.service.BaseTemplateService;
 import org.apache.commons.io.FileUtils;
@@ -59,7 +58,6 @@ import com.inforbus.gjk.common.core.util.ExternalIOTransUtils;
 import com.inforbus.gjk.common.core.util.FileUtil;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
-import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 import com.inforbus.gjk.pro.api.entity.App;
 import com.inforbus.gjk.pro.api.entity.Chipsfromhardwarelibs;
 import com.inforbus.gjk.pro.api.entity.Component;
@@ -104,8 +102,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	private BaseTemplateService baseTemplateService;
 	@Autowired
 	protected PartPlatformBSPMapper partPlatformBSPMapper;
-	@Autowired
-	protected DisposeDataCenterServiceFeign dataCenterServiceFeign;
 	@Autowired
 	private AppMapper appMapper;
 	@Autowired
@@ -283,13 +279,10 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 */
 	@Override
 	public synchronized String createXmlFile(XmlEntityMap entity, String proDetailId) {
-		XMlEntityMapVO xMlEntityMapVO = new XMlEntityMapVO();
-		xMlEntityMapVO.setXmlEntityMap(entity);
 		ProjectFile projectFile = this.getById(proDetailId);
 		String filePath = null;
 		if (projectFile != null) {
 			filePath = proDetailPath + projectFile.getFilePath() + File.separator + projectFile.getFileName() + ".xml";
-			xMlEntityMapVO.setLocalPath(filePath);
 		} else {
 			// return false;
 		}
@@ -297,7 +290,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (!file.getParentFile().exists()) {
 			file.getParentFile().mkdirs();
 		}
-		dataCenterServiceFeign.createXMLFile(xMlEntityMapVO);
+		boolean flag = XmlFileHandleUtil.createXmlFile(entity, file);
 		JGitUtil.commitAndPush(file.getAbsolutePath(), "上传项目相关文件");
 		return filePath;
 	}
@@ -547,6 +540,14 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	public XmlEntityMap getSysConfigXmlEntityMap(String proDetailId) {
 		ProjectFile projectFile = getProDetailById(proDetailId);
 		File hsmLocalFile = new File(gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml");// 老耿代码
+		// XmlEntityMap xmlEntityMap =
+		// XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);//老耿代码
+//		if (projectFile.getFileType().equals("14")) {
+//			file = new File(gitDetailPath+projectFile.getFilePath()+ "方案展示.xml");
+//		}
+//		 if (projectFile.getFileType().equals("11")) {
+//		 file = new File(System.getProperty("user.dir") + "/流程实例.xml");
+//		 }
 		if (hsmLocalFile.exists()) {
 			return XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(hsmLocalFile);
 		}
@@ -557,36 +558,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		return getXmlEntityMap(hsmTempId);// 解析软硬件映射xml文件返回数据
 	}
 
-	/**
-	 * @Title: getDisposeXmlEntityMap
-	 * @Description: 解析软硬件映射配置的xml文件进行前台回显
-	 * @Author geng
-	 * @DateTime 20200415
-	 * @param proDetailId
-	 * @return
-	 */
-	public XmlEntityMap getDisposeXmlEntityMap(String proDetailId) {
-		ProjectFile projectFile = getProDetailById(proDetailId);
-		//项目中是否已经存在的文件路径
-		File hsmLocalFile = new File(gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml");
-		String localFilePath = gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml";
-		//如果该项目中已经有该文件，则读取该文件内容显示在页面上；否则读取基础模板里的最新的软硬件映射配置文件
-		if (hsmLocalFile.exists()) {
-			R<XmlEntityMap> r = new R<XmlEntityMap>();
-			r = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(localFilePath);
-			return r.getData();
-			
-		}
-		Project project = projectMapper.getProById(projectFile.getProjectId());
-		// 获取到模板idjson串
-		String json = project.getBasetemplateIds();
-		// 把json串转成json对象
-		BaseTemplateIDsDTO baseTemplateIDsDTO = JSON.parseObject(json, BaseTemplateIDsDTO.class);
-		// 获取到软硬件映射模板id
-		String hsmTempId = baseTemplateIDsDTO.getHsmTempId();
-		// 解析软硬件映射xml文件返回数据
-		return getXmlEntityMap(hsmTempId);
-	}
 	/**
 	 * @editProJSON
 	 * @Description: 保存回显文件
@@ -843,6 +814,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 								}
 							}
 							if ("".equals(bspFilePath)) {
+								if(libsType.equals("Sylixos")||libsType.equals("Workbench")) {
 								if (returnStr.contains("请配置" + libsType + "对应的bsp,")) {
 									String s = "请配置" + libsType + "对应的bsp,部件";
 									StringBuilder sb = new StringBuilder(returnStr);
@@ -852,8 +824,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 									returnStr += "请配置" + libsType + "对应的bsp," + "部件" + part.getPartName() + "缺少对应的BSP。";
 								}
 								logger.error("请配置" + libsType + "对应的bsp," + "部件" + part.getPartName() + "缺少对应的BSP。");
+							
+								}
 							}
-
 						}
 					}
 				}
@@ -1047,29 +1020,30 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			String softwareFilePath, String softwareName, String bspFilePath) {
 
 		if ("".equals(bspFilePath)) {
-			logger.error("请配置" + libsType + "对应的bsp," + "部件" + partName + "缺少对应的BSP。");
-			r.setException(new Exception("请配置" + libsType + "对应的BSP," + "部件" + partName + "缺少对应的BSP。"));
-			return;
+			if(libsType.equals("Sylixos")||libsType.equals("Workbench")) {
+				logger.error("请配置" + libsType + "对应的bsp," + "部件" + partName + "缺少对应的BSP。");
+				r.setException(new Exception("请配置" + libsType + "对应的BSP," + "部件" + partName + "缺少对应的BSP。"));
+				return;
+			}
 		}
-		Thread thread = new Thread() {
-			@Override
-			public void run() {
-				File file = new File(appFilePath + "bsp" + File.separator + platformType + File.separator
-						+ new File(bspFilePath).getName());
-				if (!file.exists()) {
-					// 拷贝bsp对应的文件夹到app组件工程目录下
-					file.mkdirs();
-					try {
-						FileUtil.copyFile(proDetailPath + bspFilePath, file.getAbsolutePath());
-					} catch (IOException e) {
-						logger.error("复制BSP文件夹错误，请联系系统管理员");
-						r.setException(new Exception("复制BSP文件夹错误，请联系系统管理员"));
-						return;
-					}
+		Thread thread = new Thread(() -> {
+			File file = new File(appFilePath + "bsp" + File.separator + platformType + File.separator
+					+ new File(bspFilePath).getName());
+			if (!file.exists()) {
+				// 拷贝bsp对应的文件夹到app组件工程目录下
+				file.mkdirs();
+				try {
+					FileUtil.copyFile(proDetailPath + bspFilePath, file.getAbsolutePath());
+				} catch (IOException e) {
+					logger.error("复制BSP文件夹错误，请联系系统管理员");
+					r.setException(new Exception("复制BSP文件夹错误，请联系系统管理员"));
+					return;
 				}
 			}
-		};
-		thread.start();
+		});
+		if(libsType.equals("Sylixos")||libsType.equals("Workbench")) {
+			thread.start();
+		}
 
 		if ("".equals(softwareFilePath)) {
 			logger.error(partName + "寻找软件框架错误，请配置" + libsType + "对应的软件框架。");
@@ -1120,45 +1094,43 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		selectFileExtensionList.add(".c");
 		selectFileExtensionList.add(".cpp");
 
-		Thread copyFile = new Thread() {
-			@Override
-			public void run() {
-				// 查找组件文件夹下文件夹名为App的文件夹路径
-				String appFilePathName = FileUtil.getSelectStrFilePath(assemblyName, "App");
-				if (appFilePathName == null) {
-					// 如果未找到App文件夹路径，在组件文件夹下创建App文件夹
-					appFilePathName = assemblyName + File.separator + "App";
-				}
-				// 获取集成代码文件夹 文件夹路径规则:../App/Src/
-				String partIntegerCodeFilePath = appFilePathName + File.separator + "Src" + File.separator;
-				// 获取include文件夹 文件夹路径规则:../App/Include/Spb/
-				String includeFilePath = appFilePathName + File.separator + "Include" + File.separator + "Spb"
-						+ File.separator;
-				// 获取src文件夹 文件夹路径规则:../App/Src/Spb/
-				String srcFilePath = appFilePathName + File.separator + "Src" + File.separator + "Spb" + File.separator;
+		Thread copyFile = new Thread(() -> {
+			// 查找组件文件夹下文件夹名为App的文件夹路径
+			String appFilePathName = FileUtil.getSelectStrFilePath(assemblyName, "App");
+			if (appFilePathName == null) {
+				// 如果未找到App文件夹路径，在组件文件夹下创建App文件夹
+				appFilePathName = assemblyName + File.separator + "App";
+			}
+			// 获取集成代码文件夹 文件夹路径规则:../App/Src/
+			String partIntegerCodeFilePath = appFilePathName + File.separator + "Src" + File.separator;
+			// 获取include文件夹 文件夹路径规则:../App/Include/Spb/
+			String includeFilePath = appFilePathName + File.separator + "Include" + File.separator + "Spb"
+					+ File.separator;
+			// 获取src文件夹 文件夹路径规则:../App/Src/Spb/
+			String srcFilePath = appFilePathName + File.separator + "Src" + File.separator + "Spb" + File.separator;
 
-				// 复制集成代码
-				Set<String> integerCodeSet = new HashSet<String>();
-				FileUtil.getSelectStrFilePathList(integerCodeSet, integerCodeFilePath, "Cmp" + part.getPartName(),
-						".c");
-				try {
-					for (String filepath : integerCodeSet) {
-						FileUtil.copyFile(filepath, partIntegerCodeFilePath, "CmpSpbIntg.c");
-					}
-				} catch (IOException e) {
-					logger.error("复制集成代码失败，请联系管理员。");
-					r.setException(new Exception("复制集成代码失败，请联系管理员。"));
-					return;
+			// 复制集成代码
+			Set<String> integerCodeSet = new HashSet<String>();
+			FileUtil.getSelectStrFilePathList(integerCodeSet, integerCodeFilePath, "Cmp" + part.getPartName(),
+					".c");
+			try {
+				for (String filepath : integerCodeSet) {
+					FileUtil.copyFile(filepath, partIntegerCodeFilePath, "CmpSpbIntg.c");
 				}
+			} catch (IOException e) {
+				logger.error("复制集成代码失败，请联系管理员。");
+				r.setException(new Exception("复制集成代码失败，请联系管理员。"));
+				return;
+			}
 
-				getCompCHFileAndSave(r, part, assemblyName, includeFilePath, srcFilePath, hFilePathSet,
-						hMakeFilePathSet, cFilePathSet, cMakeFilePathSet, apiNeedStringSet, compFuncNameList,
-						selectFileExtensionList);
-				if (CommonConstants.FAIL.equals(r.getCode())) {
-					return;
-				}
+			getCompCHFileAndSave(r, part, assemblyName, includeFilePath, srcFilePath, hFilePathSet,
+					hMakeFilePathSet, cFilePathSet, cMakeFilePathSet, apiNeedStringSet, compFuncNameList,
+					selectFileExtensionList);
+			if (CommonConstants.FAIL.equals(r.getCode())) {
+				return;
+			}
 
-				FileUtil.getSelectStrFilePathList(linuxCFilePathSet, partIntegerCodeFilePath, selectFileExtensionList);
+			FileUtil.getSelectStrFilePathList(linuxCFilePathSet, partIntegerCodeFilePath, selectFileExtensionList);
 
 //				try {
 //					// 原始需求调用客户接口,apiFileList中存添加的.c .cpp .h文件不带后缀的文件名
@@ -1182,8 +1154,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 //					r.setException(new Exception("调用客户接口失败，请联系管理员。"));
 //					return;
 //				}
-			}
-		};
+		});
 		copyFile.start();
 
 		Thread modifyFile = new Thread() {

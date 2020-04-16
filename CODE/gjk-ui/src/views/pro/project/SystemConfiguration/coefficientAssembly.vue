@@ -57,11 +57,16 @@
       </div>
     </el-col>
 
+
     <div class="coefficientassembly_bottom_14s">
-      <el-col :span="24" class="nodeText">
+      <el-col :span="5" class="nodeText">
+      </el-col>
+      <el-col :span="19" class="nodeText">
         <span>扩展配置</span>
       </el-col>
-      <el-col :span="24" v-if="userSpaceXml!={}">
+      <el-col :span="5" class="nodeText">
+      </el-col>
+      <el-col :span="19" v-if="userSpaceXml!={}">
         <el-table :data="userSpaceXml.xmlEntityMaps" border height="250" max-height="250">
           <template v-for="(col) in userSpaceColumn">
             <el-table-column
@@ -99,7 +104,7 @@
     </div>
   </el-row>
 </template>
-  
+
 <script>
 import { mapGetters } from "vuex";
 import { parseStrToObj } from "@/util/util";

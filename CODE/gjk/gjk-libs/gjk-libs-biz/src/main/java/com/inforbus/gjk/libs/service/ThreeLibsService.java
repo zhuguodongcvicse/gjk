@@ -97,7 +97,7 @@ public interface ThreeLibsService extends IService<ThreeLibs> {
 	 * @param filePath
 	 * @param textContext
 	 */
-	void saveFileContext(String filePath, String textContext);
+	R saveFileContext(String filePath, String textContext);
 
 	/**
 	 * 根据libsid查询到已入库的表中是否选中三个库

@@ -15,53 +15,98 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+
 /**
- * 仿真webAPI
+ * @Description: 仿真webAPI
+ * @Author: ZhangHongXu
+ * @CreateDate: 2020/4/9 9:12
+ * @UpdateUser: ZhangHongXu
+ * @UpdateDate: 2020/4/9 9:12
+ * @UpdateRemark: 修改内容
+ * @Version: 1.0
  */
 @RestController
 @AllArgsConstructor
 @RequestMapping("/simulation")
 public class SimulatorController {
 
-	@Autowired
-	private SimulatorService simulatorService;
+    @Autowired
+    private SimulatorService simulatorService;
 
+    /**
+     * @param null
+     * @Description 开始仿真
+     * @Author ZhangHongXu
+     * @Return
+     * @Exception
+     * @Date 2020/4/9 9:12
+     */
+    @PostMapping("/startSimulator/{username}")
+    public R startSimulator(@PathVariable("username") String username, @RequestBody Object obj) {
+        Map parse = JSON.parseObject(JSONUtil.toJsonStr(obj));
+        return new R<>(simulatorService.startSimulator(username, (List<String>) parse.get("componentLinks"), (String) parse.get("filePath")));
+    }
+
+    /**
+     * @param null
+     * @Description 获取数据源
+     * @Author ZhangHongXu
+     * @Return
+     * @Exception
+     * @Date 2020/4/9 9:13
+     */
+    @PostMapping("/getDataSource/{username}")
+    public R getDataSource(@PathVariable("username") String username, @RequestBody SimulationDTO simulationDTO) {
+        return new R<>(simulatorService.getDataSource(username, simulationDTO));
+    }
 	/**
-	 * 开始仿真
-	 * @param username
-	 * @param obj
-	 * @return
-	 */
-	@PostMapping("/startSimulator/{username}")
-	public R startSimulator(@PathVariable("username") String username,@RequestBody Object obj){
-		Map parse = JSON.parseObject(JSONUtil.toJsonStr(obj));
-		return new R<>(simulatorService.startSimulator(username,(List<String>)parse.get("componentLinks"),(String)parse.get("filePath")));
-	}
-
-	@PostMapping("/getDataSource/{username}")
-	public R getDataSource(@PathVariable("username") String username,@RequestBody SimulationDTO simulationDTO){
-		return new R<>(simulatorService.getDataSource(username,simulationDTO));
-	}
-
-	@PostMapping("/getData/{username}/{projectId}")
-	public R getData(@PathVariable("username") String username,@PathVariable("projectId") String projectId, @RequestBody SimulationDTO simulationDTO){
-		return new R<>(simulatorService.getData(username,projectId,simulationDTO));
-	}
-
-	@PostMapping("/stopSimulator/{username}")
-	public R stopSimulator(@PathVariable("username") String username){
-		return new R<>(simulatorService.stopSimulator(username));
-	}
-
-	@PostMapping("/stop/{username}")
-	public R stop(@PathVariable("username") String username,@RequestBody Object obj){
-		Map parse = JSON.parseObject(JSONUtil.toJsonStr(obj));
-		return new R<>(simulatorService.suspend(username,(List<String>) parse.get("symbols")));
-	}
-
-	@PostMapping("/start")
-	public R start(@RequestBody SimulationDTO obj){
-		return new R<>(simulatorService.start(obj));
-	}
+	* @Description 获取曲波图数据
+	* @Author ZhangHongXu
+	 * @param null
+	* @Return 
+	* @Exception 
+	* @Date 2020/4/9 9:14
+	*/
+    @PostMapping("/getData/{username}/{projectId}")
+    public R getData(@PathVariable("username") String username, @PathVariable("projectId") String projectId, @RequestBody SimulationDTO simulationDTO) {
+        return new R<>(simulatorService.getData(username, projectId, simulationDTO));
+    }
+	/**
+	* @Description 停止仿真
+	* @Author ZhangHongXu
+	 * @param null
+	* @Return 
+	* @Exception 
+	* @Date 2020/4/9 9:14
+	*/
+    @PostMapping("/stopSimulator/{username}")
+    public R stopSimulator(@PathVariable("username") String username) {
+        return new R<>(simulatorService.stopSimulator(username));
+    }
+	/**
+	* @Description 停止
+	* @Author ZhangHongXu
+	 * @param null
+	* @Return 
+	* @Exception 
+	* @Date 2020/4/9 9:14
+	*/
+    @PostMapping("/stop/{username}")
+    public R stop(@PathVariable("username") String username, @RequestBody Object obj) {
+        Map parse = JSON.parseObject(JSONUtil.toJsonStr(obj));
+        return new R<>(simulatorService.suspend(username, (List<String>) parse.get("symbols")));
+    }
+	/**
+	* @Description 获取帧数得到数据
+	* @Author ZhangHongXu
+	 * @param null
+	* @Return 
+	* @Exception 
+	* @Date 2020/4/9 9:22
+	*/
+    @PostMapping("/start")
+    public R start(@RequestBody SimulationDTO obj) {
+        return new R<>(simulatorService.start(obj));
+    }
 }
 

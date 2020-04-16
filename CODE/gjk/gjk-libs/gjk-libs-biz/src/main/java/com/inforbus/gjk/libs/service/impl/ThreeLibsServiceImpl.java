@@ -1,50 +1,20 @@
-/*
- *    Copyright (c) 2018-2025, inforbus All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- * Neither the name of the inforbus.com developer nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- * Author: inforbus
- */
 package com.inforbus.gjk.libs.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.inforbus.gjk.admin.api.entity.ComponentDetail;
 import com.inforbus.gjk.common.core.util.R;
-import com.inforbus.gjk.libs.api.dto.ThreeLibsDTO;
 import com.inforbus.gjk.libs.api.dto.ThreeLibsFilePathDTO;
 import com.inforbus.gjk.libs.api.entity.Software;
 import com.inforbus.gjk.libs.api.entity.SoftwareDetail;
 import com.inforbus.gjk.libs.api.entity.SoftwareFile;
 import com.inforbus.gjk.libs.api.entity.ThreeLibs;
+import com.inforbus.gjk.libs.api.feign.DataCenterServiceFeign;
 import com.inforbus.gjk.libs.mapper.ThreeLibsMapper;
 import com.inforbus.gjk.libs.service.ThreeLibsService;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.poi.hwpf.extractor.WordExtractor;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -57,10 +27,15 @@ import org.springframework.stereotype.Service;
 @Service("ThreeLibsService")
 public class ThreeLibsServiceImpl extends ServiceImpl<ThreeLibsMapper, ThreeLibs> implements ThreeLibsService {
 
+	//文件路径（D:\14S_GJK_GIT\gjk\）
 	@Value("${git.local.path}")
 	private String gitFilePath;
+	//文件编码格式
 	@Value("${gjk.code.encodeing}")
 	private String defaultEncoding;
+	
+	@Autowired
+	private DataCenterServiceFeign dataCenterServiceFeign;
 
 	/*
 	 * 通过libs_id获取属于哪个算法类下
@@ -83,14 +58,12 @@ public class ThreeLibsServiceImpl extends ServiceImpl<ThreeLibsMapper, ThreeLibs
 	 */
 	@Override
 	public List<ThreeLibs> getAlgorithmFilePath(String id) {
-		List<ThreeLibs> list = baseMapper.getAlgorithmFilePath(id);
-		for (ThreeLibs lists : list) {
-			System.out.println("ssss" + lists.getFilePath());
-		}
-		System.out.println(baseMapper.getAlgorithmFilePath(id));
 		return baseMapper.getAlgorithmFilePath(id);
 	}
 
+	/*
+	 * 根据库id获取库信息
+	 */
 	@Override
 	public List<ThreeLibs> getPlatformByLibsId() {
 		return baseMapper.getPlatformByLibsId();
@@ -126,46 +99,14 @@ public class ThreeLibsServiceImpl extends ServiceImpl<ThreeLibsMapper, ThreeLibs
 		return baseMapper.getSoftwareFile();
 	}
 
-	// 文本编辑器的
-	public void saveFileContext(String filePath, String textContext) {
-//	 public static void main(String[] args) {
-		String fileName = filePath;
-//		 String fileName = softwarePath +"soft\\func2.h";
-		File file = new File(fileName);
-		OutputStream outputStream = null;
-		if (file.exists()) {
-			try {
-				// 如果文件找不到，就new一个
-				file.delete();
-				file.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		try {
-			// 定义输出流，写入文件的流
-			outputStream = new FileOutputStream(file);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		// 定义将要写入文件的数据
-//		String textContext = "Hell Java, Hello World, 你好，世界！";
-		// 把string转换成byte型的，并存放在数组中
-		byte[] bs = textContext.getBytes();
-		try {
-			// 写入bs中的数据到file中
-			outputStream.write(bs);
-			System.out.println("ooooo");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			outputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+	/**
+	 * 保存文本编辑器修改的内容（文本编辑器的）
+	 * @param filePath 文件路径
+	 * @param textContext 文本内容
+	 */
+	@Override
+	public R saveFileContext(String filePath, String textContext) {
+		return new R<>(dataCenterServiceFeign.saveFileContext(filePath, textContext));
 	}
 
 	/**
@@ -193,105 +134,14 @@ public class ThreeLibsServiceImpl extends ServiceImpl<ThreeLibsMapper, ThreeLibs
 		return baseMapper.findComponentDetailByPlatformId(platformId);
 	}
 
+	/**
+	 * 三个库读取程序文本编辑器文件
+	 * @param threeLibsFilePathDTO 封装了路径（全路径，从D盘开始）及编码格式
+	 * @return
+	 */
 	@Override
 	public R fileRead(ThreeLibsFilePathDTO threeLibsFilePathDTO) {
-		String fileName = threeLibsFilePathDTO.getFilePathName();
-		// 获取文件编码格式
-		String code = "";
-		if (StringUtils.isEmpty(threeLibsFilePathDTO.getCode())) {
-			code = defaultEncoding;
-		} else {
-			code = threeLibsFilePathDTO.getCode();
-		}
-		if (StringUtils.isEmpty(fileName)) {
-			return new R<>();
-		}
-		File isFile = new File(fileName);
-		// 获取文件编码格式
-		// 获得文件编码
-//		String fileEncode=EncodingDetect.getJavaEncode(filePath);
-//		if(threeLibsFilePathDTO.getEditorCode()!=null) {
-//			code = threeLibsFilePathDTO.getEditorCode();
-//		}else {
-//			code = this.codeString(fileName);
-//		}
-		String prefix = fileName.substring(fileName.lastIndexOf(".") + 1);
-
-		String str = "";
-		ThreeLibsDTO dto = new ThreeLibsDTO();
-		if (isFile.exists() && isFile.isFile()) {
-
-			// 读取excel文件
-			if ("xlsx".equals(prefix) || "xls".equals(prefix)) {
-				try {
-
-					XSSFWorkbook xssfWorkbook = new XSSFWorkbook(fileName);
-					// 循环工作表sheet
-					XSSFSheet xssfSheet = xssfWorkbook.getSheetAt(0);
-					int firstRowIndex = xssfSheet.getFirstRowNum(); // 第一行是列名，所以不读
-					int lastRowIndex = xssfSheet.getLastRowNum();
-					// 循环行row
-					XSSFRow xssfRow = xssfSheet.getRow(0);
-					// 循环列cell
-					// 用stringbuffer得到excel表格一行的内容并用逗号分隔
-					StringBuffer sbs = new StringBuffer();
-					for (int rIndex = firstRowIndex; rIndex <= lastRowIndex; rIndex++) {// 遍历行
-						Row row = xssfSheet.getRow(rIndex);
-						if (row != null) {
-							int firstCellIndex = row.getFirstCellNum();
-							int lastCellIndex = row.getLastCellNum();
-							for (int cIndex = firstCellIndex; cIndex < lastCellIndex; cIndex++) {// 遍历列
-								Cell cell = row.getCell(cIndex);
-								sbs.append(cell);
-								if (cell != null) {
-									sbs.append(",");
-									System.out.println(cell.toString());
-								}
-							}
-						}
-
-					}
-					str = sbs.toString();
-				} catch (Exception e) {
-					e.printStackTrace();
-					System.out.println("读取" + fileName + "文件内容出错");
-					return new R<>(new Exception("读取" + fileName + "文件内容出错"));
-				}
-				// 读取word文件
-			} else if ("doc".equals(prefix) || "docx".equals(prefix)) {
-				try {
-
-					FileInputStream in = new FileInputStream(fileName);
-					WordExtractor extractor = new WordExtractor(in);
-					str = extractor.getText();
-//				dto.setTextContext(str);
-				} catch (Exception e) {
-					e.printStackTrace();
-					System.out.println("读取" + fileName + "文件内容出错");
-					return new R<>(new Exception("读取" + fileName + "文件内容出错"));
-				}
-			}
-			// 读取//.h .m .c .o等客户 文件
-			else {
-				// 获得文件编码
-//				String fileEncode=EncodingDetect.getJavaEncode(fileName);
-				// String encoding = "utf-8";
-				try {
-					str = FileUtils.readFileToString(new File(fileName), code);
-					System.out.println("sss:::" + str);
-				} catch (Exception e) {
-					e.printStackTrace();
-					System.out.println("读取" + fileName + "文件内容出错");
-					return new R<>(new Exception("读取" + fileName + "文件内容出错"));
-				}
-			}
-			System.out.println("**************************code::::" + code);
-			dto.setTextContext(prefix + "@%#@*+-+@" + str + "@%#@*+-+@" + code);
-		} else {
-			System.out.println("找不到指定的文件");
-			return new R<>(new Exception("找不到指定的文件"));
-		}
-		return new R<>(dto);
+		return dataCenterServiceFeign.readFiles(threeLibsFilePathDTO);
+		
 	}
-
 }
