@@ -430,27 +430,17 @@ public class ManagerController {
 		return chipsfromhardwarelibs;
 	}
 
-	/**
-	 * xml文件解析
-	 * 
-	 * @return
-	 */
-
+    /**
+    * @Description 部署图获取部件结构数据
+    * @Author ZhangHongXu
+     * @param id
+    * @Return List
+    * @Exception
+    * @Date 2020/4/17 14:56
+    */
 	@GetMapping("getAllList/{id}")
 	public List getAllList(@PathVariable("id") String id) {
-		File xmlFile = managerService.getXmlFile(id);
-		List<HardwareNode> hardwareNodeList = ProcedureXmlAnalysis.getHardwareNodeList(xmlFile);
-		System.out.println("hardwareNodeList----" + hardwareNodeList);
-		if (hardwareNodeList.size() != 0) {
-			List<Arrows> arrowsList = ProcedureXmlAnalysis.getArrowsList(xmlFile);
-			ArrayList<Object> array = new ArrayList<>();
-			array.add(hardwareNodeList);
-			array.add(arrowsList);
-			return array;
-		} else {
-			return null;
-		}
-
+		return managerService.getXmlFile(id);
 	}
 
 	/**
