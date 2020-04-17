@@ -96,6 +96,15 @@ public interface ManagerService extends IService<ProjectFile> {
 	 * @return
 	 */
 	XmlEntityMap getcoefficientXmlEntityMap(String proDetailId);
+	
+	/**
+	 * @Title: getDisposeXmlEntityMap
+	 * @Description: 解析软硬件映射配置xml
+	 * @Author cvics
+	 * @DateTime 2019年5月22日 下午3:36:13
+	 * @return
+	 */
+	XmlEntityMap getDisposeXmlEntityMap(String proDetailId);
 
 	/**
 	 * @Title: getSysConfigByApiReturn

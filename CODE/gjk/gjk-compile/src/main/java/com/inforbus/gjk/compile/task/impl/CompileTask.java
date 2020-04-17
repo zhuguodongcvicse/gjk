@@ -62,6 +62,7 @@ public class CompileTask implements Task {
 
     @Value("${downPath.path}")
     private String dPath;
+
     @Autowired
     private AmqpTemplate rabbitmqTemplate;
 

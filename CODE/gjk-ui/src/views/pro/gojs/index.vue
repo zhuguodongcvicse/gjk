@@ -63,7 +63,7 @@
             style="padding:4px 4px" 
             type="primary" 
             v-bind:icon="simulationIcon" 
-          @click="simulationState = !simulationState"></el-button>-->
+          @click="simulationState = !simulationState"></el-button> -->
           <el-button
             style="padding:4px 4px"
             icon="icon-kaishifangzhen"
@@ -917,7 +917,7 @@ export default {
               this.tmpMaps.set(tmp.attributeMap.id, tmp);
             }
           });
-          this.postMessageData.cmd = "clickCompLoading";
+          this.postMessageData.cmd = "import";
           this.postMessageData.params = res.data.data.json;
           this.$refs.gjkIframe.sendMessage(this.postMessageData);
         });

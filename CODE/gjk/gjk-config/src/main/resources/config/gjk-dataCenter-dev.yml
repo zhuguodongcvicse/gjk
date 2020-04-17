@@ -28,4 +28,3 @@ ignore:
   urls:
     - /ftp/**
     - /gjkInterface/**
-    - /fileServe/**

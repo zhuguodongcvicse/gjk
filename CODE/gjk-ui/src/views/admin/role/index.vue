@@ -1,54 +1,56 @@
 <template>
-  <basic-container>
-    <avue-crud
-      :option="tableOption"
-      :data="list"
-      ref="crud"
-      :page="page"
-      :table-loading="listLoading"
-      :before-open="handleOpenBefore"
-      @on-load="getList"
-      @search-change="handleFilter"
-      @refresh-change="handleRefreshChange"
-      @row-update="update"
-      @row-save="create"
-    >
-      <!--        v-model="form"-->
-      <template slot="menuLeft">
-        <el-button
-          icon="el-icon-plus"
-          v-if="roleManager_btn_add"
-          class="filter-item"
-          @click="handleCreate"
-          size="small"
-          type="primary"
-        >添加</el-button>
-      </template>
+  <div class="app-container calendar-list-container admin_role_index_14s">
+    <basic-container>
+      <avue-crud
+        :option="tableOption"
+        :data="list"
+        ref="crud"
+        :page="page"
+        :table-loading="listLoading"
+        :before-open="handleOpenBefore"
+        @on-load="getList"
+        @search-change="handleFilter"
+        @refresh-change="handleRefreshChange"
+        @row-update="update"
+        @row-save="create"
+      >
+<!--        v-model="form"-->
+        <template slot="menuLeft">
+          <el-button
+            icon="el-icon-plus"
+            v-if="roleManager_btn_add"
+            class="filter-item"
+            @click="handleCreate"
+            size="small"
+            type="primary"
+          >添加</el-button>
+        </template>
 
-      <template slot="menu" slot-scope="scope">
-        <el-button
-          size="mini"
-          type="primary"
-          plain
-          v-if="roleManager_btn_edit"
-          @click="handleUpdate(scope.row,scope.index)"
-        >编辑</el-button>
-        <el-button
-          size="mini"
-          type="danger"
-          plain
-          v-if="roleManager_btn_del"
-          @click="handleDelete(scope.row,scope.index)"
-        >删除</el-button>
-        <el-button
-          size="mini"
-          type="warning"
-          plain
-          @click="handlePermission(scope.row,scope.index)"
-          v-if="roleManager_btn_perm"
-        >权限</el-button>
-      </template>
-    </avue-crud>
+        <template slot="menu" slot-scope="scope">
+          <el-button
+            size="mini"
+            type="primary"
+            plain
+            v-if="roleManager_btn_edit"
+            @click="handleUpdate(scope.row,scope.index)"
+          >编辑</el-button>
+          <el-button
+            size="mini"
+            type="danger"
+            plain
+            v-if="roleManager_btn_del"
+            @click="handleDelete(scope.row,scope.index)"
+          >删除</el-button>
+          <el-button
+            size="mini"
+            type="warning"
+            plain
+            @click="handlePermission(scope.row,scope.index)"
+            v-if="roleManager_btn_perm"
+          >权限</el-button>
+        </template>
+      </avue-crud>
+    </basic-container>
     <el-dialog width="30%" title="分配权限" :visible.sync="dialogPermissionVisible">
       <div class="admin_role__14s_25s_dialog">
         <el-tree
@@ -69,7 +71,7 @@
         <el-button type="primary" @click="updatePermession(roleId, roleCode)">更 新</el-button>
       </div>
     </el-dialog>
-  </basic-container>
+  </div>
 </template>
 
 <script>
@@ -146,10 +148,9 @@ export default {
     handleRefreshChange() {
       this.getList(this.page);
     },
-    handleFilter(param,done) {
+    handleFilter(param) {
       this.page.page = 1;
       this.getList(this.page, param);
-      done();
     },
     handleCreate() {
       this.$refs.crud.rowAdd();
@@ -286,7 +287,7 @@ export default {
         this.dialogPermissionVisible = false;
         fetchMenuTree()
           .then(response => {
-            // this.form = response.data.data;
+              // this.form = response.data.data;
             return fetchRoleTree(roleId);
           })
           .then(response => {

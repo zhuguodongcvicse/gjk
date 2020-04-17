@@ -84,6 +84,7 @@
                   :label="check"
                   :key="check"
                 >{{check}}</el-checkbox>
+                <!-- <el-checkbox v-model="currentXmlMap.attributeMap[attribute.attrName]" label="备选项1">备选项1</el-checkbox> -->
               </el-row>
               <!--选择文件夹配置方式-->
               <files-upload
@@ -241,6 +242,8 @@
             <!--选择属性名是否映射-->
             <el-table-column label="是否映射">
               <template slot-scope="scope">
+                <!-- <el-radio v-model="scope.row.attrMapping" label="true">Y</el-radio>
+                <el-radio v-model="scope.row.attrMapping" label="false">N</el-radio>-->
                 <el-switch
                   v-model="scope.row.attrMapping"
                   active-color="#13ce66"
@@ -328,7 +331,7 @@
                 ></el-switch>
               </template>
             </el-table-column>
-            <!--判断属性在流程建模是否显示-->
+             <!--判断属性在流程建模是否显示-->
             <el-table-column label="流程显示">
               <template slot-scope="scope">
                 <el-switch
@@ -341,6 +344,7 @@
             <!--属性的动作-->
             <el-table-column label="动作">
               <template slot-scope="scope">
+                <!-- <el-input v-model="scope.row.actionType"></el-input> -->
                 <el-select size="medium" clearable v-model="scope.row.actionType">
                   <el-option
                     v-for="item in actionOptions"
@@ -419,7 +423,7 @@
 <script>
 import { parseStrToObj, parseObjToStr } from "@/util/util";
 import { menuTag } from "@/util/closeRouter";
-import { parseXml, addObj, checkTempName } from "@/api/admin/basetemplate"; //解析xml
+import { parseXml, addObj } from "@/api/admin/basetemplate"; //解析xml
 import {
   getDicts,
   getDictTypes,
@@ -560,6 +564,8 @@ export default {
       attribute: undefined, //使用公式编辑器时对应的属性
       lablePosition: "in", //添加标签的位置
       node: undefined,
+      //checkBox: ["选项1", "选项2", "选项3", "选项4"], //复选框
+      //selectDatas: [], //下拉列表中的数据
       dicts: [], //标签名映射使用
       dictValues: [], //映射的标签名集合
       configureType: {
@@ -584,7 +590,10 @@ export default {
           value: "uploadComm",
           label: "选择文件"
         },
-
+        // {
+        //   value: "uploadBtnComm",
+        //   label: "文件夹选择"
+        // },
         {
           value: "switchComm",
           label: "开关"
@@ -593,7 +602,10 @@ export default {
           value: "radioComm",
           label: "单选框"
         },
-
+        // {
+        //   value: "checkBoxComm",
+        //   label: "复选框"
+        // },
         {
           value: "assignmenComm",
           label: "结构体赋值"
@@ -611,12 +623,66 @@ export default {
           label: "多选个数"
         }
       ],
-      lableConfigTypeData: [],
+      lableConfigTypeData: [
+        //标签配置方式
+        // {
+        //   label: "无",
+        //   value: "false"
+        // },
+        // {
+        //   label: "表单",
+        //   value: "form"
+        // },
+        // {
+        //   label: "标签表格",
+        //   value: "table"
+        // },
+        // {
+        //   label: "层级特殊",
+        //   value: "tabTS"
+        // },
+        // {
+        //   label: "行表格",
+        //   value: "colTab"
+        // },
+        // {
+        //   label: "选项卡",
+        //   value: "tab"
+        // },
+        // {
+        //   label: "特殊处理",
+        //   value: "specalHandle"
+        // },
+        // {
+        //   label: "联级表单",
+        //   value: "coreDeployDiv"
+        // },
+        // {
+        //   label: "属性表格",
+        //   value: "attrTable"
+        // },
+        // {
+        //   label: "表格群",
+        //   value: "networkTable"
+        // },
+        // {
+        //   label: "树节点表格",
+        //   value: "treeTable"
+        // },
+        // {
+        //   label: "页面块标题",
+        //   value: "title"
+        // },
+        // {
+        //   label: "topic列表及dataStream列表",
+        //   value: "topicTree"
+        // }
+      ],
       dialogType: "添加标签",
       dialogVisible: false,
       template: "", //模板
       lableName: "",
-
+      //lableMappingName: "",
       isCopyNode: false, //复制节点弹窗标志
 
       formulaDialogParams: {
@@ -670,7 +736,7 @@ export default {
   },
   //监听属性 类似于data概念
   computed: {
-    ...mapGetters(["tmpStructLength", "userInfo"]),
+    ...mapGetters(["tmpStructLength","userInfo"]),
     ...mapGetters(["tagWel", "tagList", "tag", "website"])
   },
   //方法集合
@@ -706,6 +772,7 @@ export default {
         configureType = parseStrToObj(str);
         this.configureType = configureType;
         if (this.currentXmlMap.lableMappingName != undefined) {
+          //this.configureType.lableMappingName = this.currentXmlMap.lableMappingName; //获取标签上映射名
           Vue.set(
             this.configureType,
             "lableMappingName",
@@ -735,9 +802,9 @@ export default {
                 attrs[i].selectData = [];
               } else if (attrs[i].dataKey == "dbtab_structlibs") {
                 attrs[i].selectData = [];
-              } else if (attrs[i].dataKey == "API Return") {
+              } else if(attrs[i].dataKey == "API Return"){
                 attrs[i].selectData = [];
-              } else {
+              }else {
                 //其他配置方式获取字典表数据
                 await getDictValue(attrs[i].dataKey).then(res => {
                   var data = res.data.data;
@@ -753,7 +820,7 @@ export default {
 
     getNodeData2(data, node) {
       //复制节点使用
-
+      console.log("当前粘贴的节点", data);
       this.currentPasteXmlMap = data;
       this.parentPasteXmlMap = node.parent.data;
     },
@@ -793,7 +860,7 @@ export default {
         attrMappingName: "",
         actionType: "",
         isShow: true,
-        isProcessShow: false,
+        isProcessShow:false,
         attrKeys: undefined,
         attrConfigType: "inputComm",
         dataKey: "[]",
@@ -1000,10 +1067,12 @@ export default {
         var index = this.parentXmlMap.xmlEntityMaps.indexOf(this.currentXmlMap);
         this.parentXmlMap.children = this.parentXmlMap.xmlEntityMaps;
         this.parentXmlMap.xmlEntityMaps.splice(index, 0, currentXmlMap);
+        //this.parentXmlMap.children.splice(index, 0, currentXmlMap);
       } else if (this.lablePosition == "down") {
         var index = this.parentXmlMap.xmlEntityMaps.indexOf(this.currentXmlMap);
         this.parentXmlMap.children = this.parentXmlMap.xmlEntityMaps;
         this.parentXmlMap.xmlEntityMaps.splice(index + 1, 0, currentXmlMap);
+        //this.parentXmlMap.children.splice(index + 1, 0, currentXmlMap);
       }
 
       //
@@ -1103,6 +1172,7 @@ export default {
           }
         }
       } else {
+        //this.currentXmlMap.lableMappingName = this.configureType.lableName;
         Vue.set(
           this.currentXmlMap,
           "lableMappingName",
@@ -1267,6 +1337,7 @@ export default {
         );
         this.parentPasteXmlMap.children = this.parentPasteXmlMap.xmlEntityMaps;
         this.parentPasteXmlMap.xmlEntityMaps.splice(index, 0, copyXmlMaps);
+        //this.parentXmlMap.children.splice(index, 0, currentXmlMap);
       } else if (this.lablePosition == "down") {
         //添加到标签下面
         var index = this.parentPasteXmlMap.xmlEntityMaps.indexOf(
@@ -1274,6 +1345,7 @@ export default {
         );
         this.parentPasteXmlMap.children = this.parentPasteXmlMap.xmlEntityMaps;
         this.parentPasteXmlMap.xmlEntityMaps.splice(index + 1, 0, copyXmlMaps);
+        //this.parentXmlMap.children.splice(index + 1, 0, currentXmlMap);
       }
       this.lablePosition = "in";
       this.isCopyNode = false;
@@ -1343,7 +1415,7 @@ export default {
 
     /* 上传文件 */
     UploadImage(attr, param) {
-      getUploadFilesUrl(param, this.userInfo).then(res => {
+      getUploadFilesUrl(param,this.userInfo).then(res => {
         /* 给文本框赋值 */
         var filePath = res.data.data;
         var attributeMap = this.currentXmlMap.attributeMap;
@@ -1358,7 +1430,11 @@ export default {
     },
 
     //上传文件夹
-    saveLeftData(paths) {},
+    saveLeftData(paths) {
+      //待定
+      console.log("路径", paths);
+      //this.compValueType.paths = paths;
+    },
 
     lableConfigType() {
       if (this.template == "comp_param_type") {
@@ -1426,7 +1502,10 @@ export default {
             label: "联级表单",
             value: "coreDeployDiv"
           },
-
+          // {
+          //   label: "属性表格",
+          //   value: "attrTable"
+          // },
           {
             label: "表格群",
             value: "networkTable"
@@ -1568,7 +1647,7 @@ export default {
                     attrMappingName: i,
                     actionType: "",
                     isShow: true,
-                    isProcessShow: false,
+                    isProcessShow:false,
                     attrKeys: undefined,
                     attrConfigType: "inputComm",
                     multiple: false,
@@ -1701,7 +1780,7 @@ export default {
               attrMappingName: attribute,
               actionType: "",
               isShow: true,
-              isProcessShow: false,
+              isProcessShow:false,
               attrKeys: undefined,
               attrConfigType: "inputComm",
               mappingData: [],
@@ -1767,6 +1846,7 @@ export default {
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
+    //console.log("this.$route.query",this.$route.query)
     this.BaseTemplate = JSON.parse(this.$route.query.BaseTemplate);
     this.template = this.$route.query.template;
     this.lableConfigType();
@@ -1780,6 +1860,7 @@ export default {
     getDictMappingData(this.DictVO).then(response => {
       //获取到字典表中固定类型的数据
       this.dictValues = response.data.data;
+      //this.attrDicts = response.data.data;
       parseXml(BaseTemplatePathDTO)
         .then(response => {
           //解析对应xml文件

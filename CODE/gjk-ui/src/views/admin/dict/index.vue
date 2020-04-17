@@ -56,7 +56,7 @@ export default {
     };
   },
   created() {
-    this.getList(this.page);
+    this.getList(this.page)
   },
   mounted: function() {},
   computed: {
@@ -155,15 +155,14 @@ export default {
           message: "添加成功",
           type: "success"
         });
-        this.getList(this.page, this.searchData);
+        this.getList(this.page,this.searchData);
         done();
       });
     },
-    searchChange(form, done) {
+    searchChange(form) {
       this.searchData = form;
-      this.page.currentPage = 1;
+      this.page.currentPage=1
       this.getList(this.page, form);
-      done();
     },
     sizeChange(pageSize) {
       console.log("pageSize", pageSize);

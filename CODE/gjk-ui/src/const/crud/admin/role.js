@@ -39,7 +39,6 @@ export const tableOption = {
   addBtn: false,
   viewBtn: true,
   dialogWidth:'35%',
-  searchMenuSpan:8,
   column: [{
     label: '角色名称',
     prop: 'roleName',

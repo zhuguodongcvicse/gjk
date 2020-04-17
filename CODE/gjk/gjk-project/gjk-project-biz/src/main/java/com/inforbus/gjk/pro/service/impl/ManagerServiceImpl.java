@@ -20,6 +20,7 @@ import com.inforbus.gjk.pro.api.entity.*;
 
 import com.inforbus.gjk.pro.api.entity.GjkPlatform;
 import com.inforbus.gjk.pro.api.entity.Software;
+import com.inforbus.gjk.pro.api.feign.DisposeDataCenterServiceFeign;
 import com.inforbus.gjk.pro.mapper.*;
 import com.inforbus.gjk.pro.service.BaseTemplateService;
 import org.apache.commons.io.FileUtils;
@@ -106,6 +107,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	private AppMapper appMapper;
 	@Autowired
 	private AmqpTemplate rabbitmqTemplate;
+	@Autowired
+	protected DisposeDataCenterServiceFeign dataCenterServiceFeign;
 
 //	private static final String proDetailPath = JGitUtil.getLOCAL_REPO_PATH();
 //	private static final String integerCodeFileName = JGitUtil.getINTEGER_CODE_FILE_NAME();
@@ -556,6 +559,38 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		BaseTemplateIDsDTO baseTemplateIDsDTO = JSON.parseObject(json, BaseTemplateIDsDTO.class);// 把json串转成json对象
 		String hsmTempId = baseTemplateIDsDTO.getHsmTempId();// 获取到软硬件映射模板id
 		return getXmlEntityMap(hsmTempId);// 解析软硬件映射xml文件返回数据
+	}
+	
+	/**
+	 * @Title: getDisposeXmlEntityMap
+	 * @Description: 解析软硬件映射配置的xml文件进行前台回显
+	 * @Author geng
+	 * @DateTime 20200415
+	 * @param proDetailId
+	 * @return
+	 */
+	@Override
+	public XmlEntityMap getDisposeXmlEntityMap(String proDetailId) {
+		ProjectFile projectFile = getProDetailById(proDetailId);
+		//项目中是否已经存在的文件路径
+		File hsmLocalFile = new File(gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml");
+		String localFilePath = gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml";
+		//如果该项目中已经有该文件，则读取该文件内容显示在页面上；否则读取基础模板里的最新的软硬件映射配置文件
+		if (hsmLocalFile.exists()) {
+			R<XmlEntityMap> r = new R<XmlEntityMap>();
+			r = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(localFilePath);
+			return r.getData();
+			
+		}
+		Project project = projectMapper.getProById(projectFile.getProjectId());
+		// 获取到模板idjson串
+		String json = project.getBasetemplateIds();
+		// 把json串转成json对象
+		BaseTemplateIDsDTO baseTemplateIDsDTO = JSON.parseObject(json, BaseTemplateIDsDTO.class);
+		// 获取到软硬件映射模板id
+		String hsmTempId = baseTemplateIDsDTO.getHsmTempId();
+		// 解析软硬件映射xml文件返回数据
+		return getXmlEntityMap(hsmTempId);
 	}
 
 	/**
@@ -1096,7 +1131,15 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		Thread copyFile = new Thread(() -> {
 			// 查找组件文件夹下文件夹名为App的文件夹路径
-			String appFilePathName = FileUtil.getSelectStrFilePath(assemblyName, "App");
+//			String appFilePathName = FileUtil.getSelectStrFilePath(assemblyName, "App");
+			String appFilePathName = null;
+			try {
+				appFilePathName = FileUtil.getAppPath(assemblyName, "App");
+			} catch (IOException e) {
+				logger.error("查找App路径失败，请联系管理员。");
+				r.setException(new Exception("查找App路径失败，请联系管理员。"));
+				return;
+			}
 			if (appFilePathName == null) {
 				// 如果未找到App文件夹路径，在组件文件夹下创建App文件夹
 				appFilePathName = assemblyName + File.separator + "App";

@@ -29,7 +29,6 @@ import javax.annotation.Resource;
 @RequestMapping("/devenv")
 public class DevenvConntroller {
 
-
     @Resource(name = "taskThread")
     private TaskThread taskThread;
     //任务线程类

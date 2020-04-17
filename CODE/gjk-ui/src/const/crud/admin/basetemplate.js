@@ -14,19 +14,9 @@
  * this software without specific prior written permission.
  * Author: inforbus
  */
-import { checkTempName } from "@/api/admin/basetemplate";
-var validateTempName = (rule, value, callback) => {
-  checkTempName(value).then(response => {
-    if (window.boxType === "edit") callback();
-    let result = response.data.data;
-    if (result !== null) {
-      callback(new Error("模板名已经存在"));
-    } else {
-      callback();
-    }
-  });
-};
 
+
+ 
 export const tableOption = {
   menuWidth: "150",//操作菜单栏的宽度
   border: true,
@@ -49,7 +39,6 @@ export const tableOption = {
       prop: 'tempName',
       rules:[
         { required: true, message: "请输入模板名称", trigger: "blur" },
-        { validator: validateTempName, trigger: "blur" }
     ]
     },
     {
