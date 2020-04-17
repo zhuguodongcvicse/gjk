@@ -318,7 +318,7 @@ export default {
           } else if (item.lableName === "函数路径") {
             if (["edit", "copy"].includes(this.$route.query.type)) {
               let name = item.attributeMap.name;
-              let headerKey = name.substring(name.lastIndexOf("\\") + 1);
+              let headerKey = name.substring(name.replace(/\\/,"/").lastIndexOf("/") + 1);
               let headerValue = {
                 输入: {},
                 输出: {}
