@@ -208,7 +208,7 @@ function init() {
   var nodeMenu =  // context menu for each Node
     $$(go.Adornment, "Vertical",
       makeButton("仿真展示",
-        function (e, obj) {
+        function (e, obj) { 
 
           var nodeOrLinkList = myDiagram.selection;
           nodeOrLinkList.each(function (nodeOrLink) {
@@ -798,11 +798,36 @@ myDiagram.addModelChangedListener(function(evt) {
      if(nodeData.type === "new"){
 
      }else{
-    nodeData.copy = "copy";
     nodeData.type = "copy";
     var copyKey1 = nodeData.key;
     var objClone = JSON.parse(JSON.stringify(copyKey1));
-    nodeData.key = objClone.slice(0,objClone.length-1);
+    var random = ''
+    random = Math.ceil(Math.random() * 10000000000000000000).toString().substr(0, 9 || 4)
+    random = Date.now() + random
+    nodeData.key = random;
+    var uuidList = new Array()
+    for (let leftPort of nodeData.leftArray) {
+      leftPort.portId = leftPort.portId.split("*")[0] + "*" + leftPort.portId.split("*")[1] + "*" + nodeData.key
+      uuidList.push(leftPort.portId)
+    }
+    for (let rightPort of nodeData.rightArray) {
+      rightPort.portId = rightPort.portId.split("*")[0] + "*" + rightPort.portId.split("*")[1] + "*" + nodeData.key
+      uuidList.push(rightPort.portId)
+    }
+    var gjidAndTemid = [];
+      gjidAndTemid.push({
+        //构件ID
+        gjId: nodeData.compId,
+        //构件模板新ID
+        newTmpId: random,
+        //构件模板旧id
+        oldTmpId: objClone.slice(0,objClone.length-1),
+        //状态
+        state: 4,
+        //节点所有锚点uuid
+        uuidList: uuidList
+      });
+      handleMessageToParent("returnFormJson", gjidAndTemid);
      }
     } else if (e.change === go.ChangedEvent.Remove) {
       //console.log(evt.propertyName + " 22222222222222removed node with key: " + e.oldValue.key);
@@ -883,6 +908,7 @@ function ChangedSelection(e){//选择事件
       //状态
       state: 5
     });
+    console.log("点击发送vue",removeTemp);
     handleMessageToParent("returnFormJson", removeTemp);
   })
 
@@ -897,9 +923,10 @@ function ChangedSelection(e){//选择事件
         uuidList.push(rightData.portId)
       }
       var gjidAndTemid = [];
+      console.log("asdasdasdasd",e.subject.part.Zd)
       gjidAndTemid.push({
         //构件ID
-        gjId: e.subject.part.Zd.gjId,
+        gjId: e.subject.part.Zd.compId,
         //构件模板id(nodeID)
         tmpId: e.subject.part.Zd.key,
         //状态
