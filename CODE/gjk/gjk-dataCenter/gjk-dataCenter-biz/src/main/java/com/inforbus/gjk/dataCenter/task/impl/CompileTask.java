@@ -1,23 +1,23 @@
-package com.inforbus.gjk.compile.task.impl;
+package com.inforbus.gjk.dataCenter.task.impl;
 
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
 import com.inforbus.gjk.common.core.util.FileUtil;
-import com.inforbus.gjk.compile.constant.PlatformType;
-import com.inforbus.gjk.compile.task.Task;
-import com.inforbus.gjk.compile.taskThread.StreamManage;
-import com.inforbus.gjk.compile.util.ChannelSftpSingleton;
-import com.inforbus.gjk.compile.util.SftpUtil;
+import com.inforbus.gjk.dataCenter.api.constant.PlatformType;
+import com.inforbus.gjk.dataCenter.api.utils.ChannelSftpSingleton;
+import com.inforbus.gjk.dataCenter.api.utils.SftpUtil;
+import com.inforbus.gjk.dataCenter.task.Task;
+import com.inforbus.gjk.dataCenter.taskThread.StreamManage;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpProgressMonitor;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -40,73 +40,56 @@ public class CompileTask implements Task {
 
     private static final Logger logger = LoggerFactory.getLogger(CompileTask.class);
 
-    //配置文件读取路径
-    @Value("${VS2010.path}")
-    private String vsPath;
-
-    @Value("${Workbench.path}")
-    private String wbPath;
-
-    @Value("${Linux.path}")
-    private String linuxPath;
-
-    //读取配置信息
-    @Value("${Linux.ip}")
-    private String ip;
-
-    @Value("${Linux.username}")
-    private String username;
-
-    @Value("${Linux.password}")
-    private String password;
-
-    @Value("${downPath.path}")
-    private String dPath;
-
     @Autowired
     private AmqpTemplate rabbitmqTemplate;
 
-    private Connection connection;//linux服务器连接对象
+    /*vs2010编译器路径*/
+    @Setter
+    private String vsPath;
 
-    private String path1;//被编译文件地址
+    /*workbench编译器的路径*/
+    @Setter
+    private String wbPath;
 
-    private String fileName;//被编译文件名
+    /*linux服务器上传文件的跟路径*/
+    @Setter
+    private String linuxPath;
 
-    private String platformType;//平台
+    /*linux服务器的IP地址*/
+    @Setter
+    private String ip;
 
-    private String token;//登录票据
+    /*linux服务器登录的用户名*/
+    @Setter
+    private String username;
 
-    public String getPath1() {
-        return path1;
-    }
+    /*linux服务器的登录密码*/
+    @Setter
+    private String password;
 
-    public void setPath1(String path1) {
-        this.path1 = path1;
-    }
+    /*文件从linux服务器下载回到本机服务器的地址*/
+    @Setter
+    private String dPath;
 
-    public String getFileName() {
-        return fileName;
-    }
+    /*linux服务器连接对象*/
+    @Setter
+    private Connection connection;
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
+    /*被编译文件地址*/
+    @Setter
+    private String path1;
 
-    public String getPlatformType() {
-        return platformType;
-    }
+    /*被编译文件名*/
+    @Setter
+    private String fileName;
 
-    public void setPlatformType(String platformType) {
-        this.platformType = platformType;
-    }
+    /*平台类型*/
+    @Setter
+    private String platformType;
 
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
+    /*登录票据*/
+    @Setter
+    private String token;
 
     /**
      * @Author wang
@@ -121,7 +104,7 @@ public class CompileTask implements Task {
         Set<String> filePathList = new TreeSet<String>();
         //VS编译
         String fileEndName = ".sln";
-        File file = new File(this.getPath1());
+        File file = new File(this.path1);
         String str = "";
         //判断是否存在sln文件
         boolean isFile = false;
@@ -159,7 +142,7 @@ public class CompileTask implements Task {
         }
 
         if (!isFile) {
-            FileUtil.getSelectStrFilePathList(filePathList, this.getPath1(), fileEndName);
+            FileUtil.getSelectStrFilePathList(filePathList, this.path1, fileEndName);
             if (filePathList.size() > 0) {
                 for (String slnPath : filePathList) {
                     return devenv(slnPath, this.fileName, this.token);

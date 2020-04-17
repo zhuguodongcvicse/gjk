@@ -1,20 +1,18 @@
-package com.inforbus.gjk.compile.util;
+package com.inforbus.gjk.dataCenter.api.utils;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
-import java.util.Vector;
-
-
+import cn.hutool.core.io.FileUtil;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 import com.jcraft.jsch.SftpProgressMonitor;
-
-import cn.hutool.core.io.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
+import java.util.Vector;
 
 /**
  * SftpUtil

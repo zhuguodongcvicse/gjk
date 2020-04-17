@@ -42,5 +42,9 @@ public interface ServiceNameConstants {
 	 * 构件管理模块
 	 */
 	String COMP_SERVICE = "gjk-component";
+	/**
+	 * 编译管理模块
+	 */
+	String COMPILE_SERVICE = "gjk-compile";
 
 }
