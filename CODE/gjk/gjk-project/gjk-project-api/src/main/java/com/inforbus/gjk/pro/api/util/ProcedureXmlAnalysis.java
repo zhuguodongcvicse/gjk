@@ -40,6 +40,18 @@ public class ProcedureXmlAnalysis {
 	 */
 	private List<Arrows> arrowsList;
 
+	/**
+	 * 文件分布式调用的方法
+	 * @author sunchao
+	 * @param file
+	 * @param xmlEntityMap
+	 * @return
+	 */
+	public List<HardwareNode> getHardwareNodeList(File file, XmlEntityMap xmlEntityMap) {
+		analysisByProcedureXml(file, xmlEntityMap);
+		return hardwareNodes;
+	}
+
 	public List<HardwareNode> getHardwareNodeList(File file) {
 		analysisByProcedureXml(file);
 		return hardwareNodes;
@@ -60,13 +72,18 @@ public class ProcedureXmlAnalysis {
 		return arrowsList;
 	}
 
-	private void analysisByProcedureXml(File file) {
+	/**
+	 * 文件分布式调用的方法
+	 * @author sunchao
+	 * @param file
+	 * @param xmlEntityMap
+	 * @return
+	 */
+	private void analysisByProcedureXml(File file, XmlEntityMap xmlEntityMap) {
 		hardwareNodes = new ArrayList<>();
 		parts = new ArrayList<>();
 		components = new ArrayList<Component>();
 		arrowsList = new ArrayList<Arrows>();
-
-		XmlEntityMap xmlEntityMap = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);
 
 		if (xmlEntityMap == null) {
 			return;
@@ -80,7 +97,7 @@ public class ProcedureXmlAnalysis {
 				setCompParame(entityMap, component);
 				// 将构件存入构件列表
 				components.add(component);
-				System.out.println("*/******" + component);
+//				System.out.println("*/******" + component);
 				// 获取构件所属的根部件
 				String rootCmpName = getAttributeValue(entityMap, "所属部件", "name");
 
@@ -113,7 +130,72 @@ public class ProcedureXmlAnalysis {
 					}
 				}
 				arrowsList.add(arrows);
-				System.out.println("arrowsListline" + arrows);
+//				System.out.println("arrowsListline" + arrows);
+			}
+		}
+
+		// 将所有节点的根部件存入部件列表
+		for (HardwareNode hardwareNode : hardwareNodes) {
+			if (hardwareNode.getRootPart().size() != 0) {
+				parts.addAll(hardwareNode.getRootPart());
+			}
+		}
+	}
+
+	private void analysisByProcedureXml(File file) {
+		hardwareNodes = new ArrayList<>();
+		parts = new ArrayList<>();
+		components = new ArrayList<Component>();
+		arrowsList = new ArrayList<Arrows>();
+
+		XmlEntityMap xmlEntityMap = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);
+
+		if (xmlEntityMap == null) {
+			return;
+		}
+		for (XmlEntityMap entityMap : xmlEntityMap.getXmlEntityMaps()) {
+			if (entityMap.getLableName().equals("node")) {
+
+				// 存入构件详细信息
+				Component component = new Component();
+				setCompAttr(entityMap, component);
+				setCompParame(entityMap, component);
+				// 将构件存入构件列表
+				components.add(component);
+//				System.out.println("*/******" + component);
+				// 获取构件所属的根部件
+				String rootCmpName = getAttributeValue(entityMap, "所属部件", "name");
+
+				// 获取构件所属节点-部件的对应关系集合
+				List<HardwarePart> hardwarePartMapList = new ArrayList<HardwarePart>();
+				getHardwarePartMapList(hardwarePartMapList, entityMap);
+
+				// 遍历集合，将构件按不同节点不同部件添加到节点-部件-构件结构中
+				for (HardwarePart hardwarePart : hardwarePartMapList) {
+					saveComp(component, rootCmpName, hardwarePart);
+				}
+			} else if (entityMap.getLableName().equals("arrow")) {
+				Arrows arrows = new Arrows();
+				arrows.setArrowId(entityMap.getAttributeMap().get("id"));
+				if (entityMap.getXmlEntityMaps() != null) {
+					for (XmlEntityMap entityXml : entityMap.getXmlEntityMaps()) {
+						if (entityXml.getLableName().equals("画图属性")) {
+							if (entityXml.getXmlEntityMaps() != null) {
+								for (XmlEntityMap startItemMap : entityXml.getXmlEntityMaps()) {
+									if ("startItem".equals(startItemMap.getLableName())) {
+										String startItem = startItemMap.getTextContent();
+										arrows.setStartItem(startItem);
+									} else if ("endItem".equals(startItemMap.getLableName())) {
+										String endItem = startItemMap.getTextContent();
+										arrows.setEndItem(endItem);
+									}
+								}
+							}
+						}
+					}
+				}
+				arrowsList.add(arrows);
+//				System.out.println("arrowsListline" + arrows);
 			}
 		}
 
