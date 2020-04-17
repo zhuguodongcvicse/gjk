@@ -32,9 +32,7 @@ import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.dataCenter.api.dto.ThreeLibsFilePathDTO;
 import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.dataCenter.api.entity.FileCenter;
-import com.inforbus.gjk.dataCenter.api.vo.FileCenterVo;
 import com.inforbus.gjk.dataCenter.service.FileService;
-import com.inforbus.gjk.dataCenter.service.impl.FileServiceImpl;
 
 /**
  * @ClassName: FileController
