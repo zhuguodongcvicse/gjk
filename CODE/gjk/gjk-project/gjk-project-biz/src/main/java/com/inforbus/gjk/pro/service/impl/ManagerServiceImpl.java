@@ -320,11 +320,15 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	public XmlEntityMap getcoefficientXmlEntityMap(String proDetailId) {
 		ProjectFile projectFile = getProDetailById(proDetailId);
 		Project project = projectMapper.getProById(projectFile.getProjectId());
-		String json = project.getBasetemplateIds();// 获取到模板idjson串
-		BaseTemplateIDsDTO baseTemplateIDsDTO = JSON.parseObject(json, BaseTemplateIDsDTO.class);// 把json串转成json对象
+		// 获取到模板idjson串
+		String json = project.getBasetemplateIds();
+		// 把json串转成json对象
+		BaseTemplateIDsDTO baseTemplateIDsDTO = JSON.parseObject(json, BaseTemplateIDsDTO.class);
 		// BaseTemplateIDsDTO baseTemplateIDsDTO = (BaseTemplateIDsDTO)JSON.parse(json);
-		String sysTempId = baseTemplateIDsDTO.getSysTempId();// 获取到系统配置模板id
-		return getXmlEntityMap(sysTempId);// 解析系统配置xml文件返回数据
+		// 获取到系统配置模板id
+		String sysTempId = baseTemplateIDsDTO.getSysTempId();
+		// 解析系统配置xml文件返回数据
+		return getXmlEntityMap(sysTempId);
 	}
 
 	/**
@@ -350,6 +354,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		return file;
 	}
 
+	@Override
 	public List<HardwareNode> getCoeffNodeTree(String proDetailId) {
 		File file = null;
 		for (ProjectFile projectFile : getProFileListByModelId(this.getById(proDetailId).getParentId())) {
@@ -359,7 +364,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			}
 		}
 		if (file.exists()) {
-			return ProcedureXmlAnalysis.getHardwareNodeList(file);
+			XmlEntityMap XmlEntityMap = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(file.getAbsolutePath()).getData();
+			return ProcedureXmlAnalysis.getHardwareNodeList(file, XmlEntityMap);
 		} else {
 			return null;
 		}
@@ -374,6 +380,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @return
 	 * @see com.inforbus.gjk.pro.service.ManagerService#getSysConfigByApiReturn(java.lang.String)
 	 */
+	@Override
 	public R getSysConfigByApiReturn(String proDetailId) {
 		ProjectFile file = getProDetailById(proDetailId);
 		String modelId = file.getParentId();
@@ -385,7 +392,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		for (ProjectFile projectFile : files) {
 			if (projectFile.getFileType().equals("11")) {
-				System.out.print(proDetailPath + projectFile.getFilePath());
+//				System.out.print(proDetailPath + projectFile.getFilePath());
 				processFileName = proDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml";
 			}
 			if (projectFile.getFileType().equals("16")) {
@@ -552,7 +559,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 //		 file = new File(System.getProperty("user.dir") + "/流程实例.xml");
 //		 }
 		if (hsmLocalFile.exists()) {
-			return XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(hsmLocalFile);
+//			return XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(hsmLocalFile);
+			return dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(hsmLocalFile.getAbsolutePath()).getData();
 		}
 		Project project = projectMapper.getProById(projectFile.getProjectId());
 		String json = project.getBasetemplateIds();// 获取到模板idjson串
@@ -1920,7 +1928,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	public XmlEntityMap getXmlEntityMap(String tempId) {
 		R<BaseTemplate> R = baseTemplateService.getById(tempId);// feign调用upms接口根据id查模板对象
 		File file = new File(gitDetailPath + R.getData().getTempPath());
-		return XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);
+		return dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(file.getAbsolutePath()).getData();
 	}
 
 	@Override
