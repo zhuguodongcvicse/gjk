@@ -22,6 +22,7 @@ import com.inforbus.gjk.pro.api.entity.*;
 import com.inforbus.gjk.pro.api.entity.GjkPlatform;
 import com.inforbus.gjk.pro.api.entity.Software;
 import com.inforbus.gjk.pro.api.feign.DisposeDataCenterServiceFeign;
+import com.inforbus.gjk.pro.api.feign.ExternalInfInvokeService;
 import com.inforbus.gjk.pro.mapper.*;
 import com.inforbus.gjk.pro.service.BaseTemplateService;
 import org.apache.commons.io.FileUtils;
@@ -110,6 +111,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	private AmqpTemplate rabbitmqTemplate;
 	@Autowired
 	protected DisposeDataCenterServiceFeign dataCenterServiceFeign;
+	@Autowired
+	private ExternalInfInvokeService externalInfInvokeService;
 //	private static final String proDetailPath = JGitUtil.getLOCAL_REPO_PATH();
 //	private static final String integerCodeFileName = JGitUtil.getINTEGER_CODE_FILE_NAME();
 //	private static String serverPath = JGitUtil.getLOCAL_REPO_PATH();
@@ -423,8 +426,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// 解析返回值
 		Map<String, List<Object>> map = new HashMap<>();
 		// 获取客户api的返回值
-		Map<String, List<String>> apiReturnStringList = ExternalIOTransUtils.getCmpSysConfig(customizeFileName,
-				packinfoFileName, processFileName);
+//		Map<String, List<String>> apiReturnStringList = ExternalIOTransUtils.getCmpSysConfig(customizeFileName, packinfoFileName, processFileName);
+		Map<String, List<String>> apiReturnStringList = externalInfInvokeService.getCmpSysConfig(customizeFileName, packinfoFileName, processFileName).getData();
 		analysisApiReturnStringList(apiReturnStringList, map);
 
 		return new R<>(map);
