@@ -1,20 +1,17 @@
 package com.inforbus.gjk.compile.controller;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.inforbus.gjk.compile.config.ExtractApplicationContext;
-import com.inforbus.gjk.compile.task.Task;
-import com.inforbus.gjk.compile.task.impl.CompileTask;
-import com.inforbus.gjk.compile.taskThread.TaskThread;
+
+import com.inforbus.gjk.common.core.constant.CommonConstants;
+import com.inforbus.gjk.compile.service.DevenvService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.inforbus.gjk.common.core.util.R;
 import lombok.AllArgsConstructor;
-
-import javax.annotation.Resource;
 
 
 /**
@@ -29,8 +26,8 @@ import javax.annotation.Resource;
 @RequestMapping("/devenv")
 public class DevenvConntroller {
 
-    @Resource(name = "taskThread")
-    private TaskThread taskThread;
+    @Autowired
+    private DevenvService devenvService;
     //任务线程类
 
     /**
@@ -42,25 +39,13 @@ public class DevenvConntroller {
      */
     @PutMapping(value = "/Command")
     public R command(@RequestBody Map<String, String> map) {
-        String path = map.get("path");
-        String fileName = map.get("fileName");
-        String platformType = map.get("platformType");
-        String token = map.get("token");
-        // 从spring容器中获取到编译任务类对象
-        CompileTask compileTask = (CompileTask) ExtractApplicationContext.getBean("compileTask");
-        compileTask.setFileName(fileName);
-        compileTask.setPath1(path);
-        compileTask.setPlatformType(platformType);
-        compileTask.setToken(token);
-        ConcurrentLinkedQueue<Task> compileQueue = taskThread.getCompileQueue();
-        //获取到排队人数
-        int count = compileQueue.size();
-        //使用另一条线程执行编译功能
-        taskThread.addTask(compileTask);
-        String str = "正在编译...请稍候";
-        if (count > 0) {
-            str = "前面有" + count + "个组件工程在编译......请等候一会";
+        R r = new R();
+        try {
+            r = devenvService.command(map);
+        } catch (Exception e) {
+            r.setCode(CommonConstants.FAIL);
+            r.setMsg("编译失败 ：" + e.getMessage());
         }
-        return new R<>(str);
+        return r;
     }
 }
