@@ -2,12 +2,11 @@ package com.inforbus.gjk.common.core.util;
 
 import java.io.*;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.experimental.UtilityClass;
 
@@ -196,6 +195,35 @@ public class FileUtil {
 			System.out.println("传入路径错误，请联系管理员。");
 			return null;
 		}
+	}
+
+	/**
+	 * 查找App路径
+	 * @param filePath
+	 * @param selectFileName
+	 * @auther sunchao
+	 * @return
+	 * @throws IOException
+	 */
+	public String getAppPath(String filePath, String selectFileName) throws IOException {
+		//要返回的app路径
+		String selectPath = null;
+		//拿到目标路径的path对象
+		Path path = Paths.get(filePath);
+		//拿到匹配器
+		PathMatcher matcher = FileSystems.getDefault()
+				.getPathMatcher("glob:**" + FileSystems.getDefault().getSeparator() + selectFileName);
+		//查找匹配的文件，转成list
+		List<Path> collect = Files.walk(path)
+				.filter(matcher::matches)
+				.collect(Collectors.toList());
+		//找到符合条件的路径
+		for (Path pathEl : collect) {
+			if (pathEl.toString().contains(selectFileName) && !pathEl.toString().contains("debug")) {
+				selectPath = pathEl.toString();
+			}
+		}
+		return selectPath;
 	}
 
 	/**
