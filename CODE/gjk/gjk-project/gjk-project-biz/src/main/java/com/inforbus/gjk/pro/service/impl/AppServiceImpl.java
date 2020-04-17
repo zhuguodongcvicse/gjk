@@ -16,7 +16,6 @@
  */
 package com.inforbus.gjk.pro.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -24,12 +23,12 @@ import com.google.common.collect.Lists;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.ExternalIOTransUtils;
-import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.pro.api.dto.AppDataDTO;
 import com.inforbus.gjk.pro.api.entity.App;
 import com.inforbus.gjk.pro.api.entity.Project;
 import com.inforbus.gjk.pro.api.entity.ProjectFile;
+import com.inforbus.gjk.pro.api.feign.DisposeDataCenterServiceFeign;
 import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
 import com.inforbus.gjk.pro.mapper.AppMapper;
 import com.inforbus.gjk.pro.service.AppService;
@@ -37,11 +36,16 @@ import com.inforbus.gjk.pro.service.AppService;
 import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.json.JSONUtil;
+import feign.Response;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -49,15 +53,13 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.ibatis.annotations.Param;
 import org.apache.tools.ant.taskdefs.Zip;
 import org.apache.tools.ant.types.FileSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
@@ -70,8 +72,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppService {
 
 	private static final Logger logger = LoggerFactory.getLogger(AppServiceImpl.class);
+	@Autowired
+	private DisposeDataCenterServiceFeign disposeDataCenterServiceFeign;
 
-	//private static final String proDetailPath = JGitUtil.getLOCAL_REPO_PATH();
 	//git文件路径
 	@Value("${git.local.path}")
 	private String proDetailPath;
@@ -94,6 +97,9 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		return baseMapper.getAppPage(page, app);
 	}
 
+	/**
+	 * 保存app
+	 */
 	@Override
 	public App saveApp(App app) {
 		App a = getAppByProcessId(app.getProcessId());
@@ -104,11 +110,17 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		return this.getById(app.getId());
 	}
 
+	/**
+	 * 获取所有app工程
+	 */
 	@Override
 	public List<App> getAllApp() {
 		return baseMapper.getAllApp();
 	}
 
+	/**
+	 * 获取app工程图片
+	 */
 	@Override
 	public FileInputStream getAppImgFile(String id) {
 		App app = baseMapper.getAppImgFile(id);
@@ -124,16 +136,25 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		return fis;
 	}
 
+	/**
+	 * 获取app页数
+	 */
 	@Override
 	public List<App> getAppVosPage(String fileName, String userId) {
 		return baseMapper.getAppVosPage(fileName, userId);
 	}
 
+	/**
+	 * 通过流程id获取app
+	 */
 	@Override
 	public App getAppByProcessId(String processId) {
 		return baseMapper.getAppByProcessId(processId);
 	}
 
+	/**
+	 * 获取app树
+	 */
 	@Override
 	public List<ProjectFileVO> getAppFileTree(String processId) {
 		App app = getAppByProcessId(processId);
@@ -162,6 +183,13 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		}
 	}
 
+	/**
+	 * 添加app树
+	 * @param tree
+	 * @param parentId
+	 * @param file
+	 * @param processId
+	 */
 	private void addAppFileTree(List<ProjectFileVO> tree, String parentId, File file, String processId) {
 		String fileId = IdGenerate.uuid();
 
@@ -178,21 +206,33 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		}
 	}
 
+	/**
+	 * 编辑app运行状态
+	 */
 	@Override
 	public void editAppState(String id, String appState) {
 		baseMapper.editAppState(id, appState);
 	}
 
+	/**
+	 * 通过流程id获取项目
+	 */
 	@Override
 	public ProjectFile getProcessByProjectId(String id) {
 		return baseMapper.getProcessByProjectId(id);
 	}
 
+	/**
+	 * 通过项目id获取项目
+	 */
 	@Override
 	public Project getprojectByProjectId(String id) {
 		return baseMapper.getprojectByProjectId(id);
 	}
 
+	/**
+	 * 通过appid删除app
+	 */
 	@Override
 	public void deleteAppByAPPId(String id) {
 		App appData = baseMapper.selectAPPByAPPId(id);
@@ -201,11 +241,17 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		baseMapper.deleteAppByAPPId(id);
 	}
 
+	/**
+	 * 通过appid筛选app
+	 */
 	@Override
 	public App selectAPPByAPPId(String id) {
 		return baseMapper.selectAPPByAPPId(id);
 	}
-
+	
+	/**
+	 * 通过流程id获取流程
+	 */
 	@Override
 	public ProjectFile getProcessByProcessId(String parentId) {
 		return baseMapper.getProcessByProcessId(parentId);
@@ -449,13 +495,90 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		return returnVal;
 	}
 	
-	//返回文件路径
+	/**
+	 * 返回文件路径
+	 */
 	public String returnFilePath() {
 		return proDetailPath;
 	}
-
-	//压缩文件
+	/**
+	 * 导出压缩文件
+	 */
 	public void createZipFile(HttpServletRequest request, HttpServletResponse response,
+			 Map<String, String> map) {
+		InputStream inputStream = null;
+		ByteArrayOutputStream outStream = null;
+		String filePath = proDetailPath + map.get("oriFilePath");
+//		String filePath = "D:\\14S_GJK_GIT\\gjk\\gjk\\project\\Project1234\\Flow12\\app\\AppTaskInfo.xml";
+		String zipFileName = map.get("downloadAPPFileName") + ".zip";
+		String zipFilePath = proDetailPath + "gjk" + File.separator + "APPDownload" + File.separator + zipFileName;
+		String [] strArr = {filePath};
+		try {
+			// feign文件下载
+			Response respon = disposeDataCenterServiceFeign.downloadStreamFiles(strArr);
+			Response.Body body = respon.body();
+			inputStream = body.asInputStream();
+			BufferedInputStream in = null;
+			BufferedOutputStream out = null;
+			in = new BufferedInputStream(inputStream);
+			out = new BufferedOutputStream(new FileOutputStream(zipFilePath));
+			outStream = new ByteArrayOutputStream();
+			int len = -1;
+			byte[] b = new byte[1024];
+			while ((len = in.read(b)) != -1) {
+				out.write(b, 0, len);
+				outStream.write(b, 0, len);
+			}
+			in.close();
+			out.close();
+			
+			byte[] data = outStream.toByteArray();
+
+			new File(zipFilePath).deleteOnExit();
+
+			String userAgent = request.getHeader("User-Agent");
+			String formFileName = new String(new File(zipFilePath).getName().getBytes());
+			// 针对IE或者以IE为内核的浏览器：
+			if (userAgent.contains("MSIE") || userAgent.contains("Trident")) {
+				formFileName = java.net.URLEncoder.encode(formFileName, "UTF-8");
+			} else {
+				// 非IE浏览器的处理：
+				formFileName = new String(formFileName.getBytes("UTF-8"), "ISO-8859-1");
+			}
+
+			response.reset();
+			response.setHeader("Content-Disposition", String.format("attachment; filename=%s.zip", formFileName));
+			response.setHeader("FileName", formFileName);
+			response.setHeader("Content-Length", "" + data.length);
+			response.setContentType("application/octet-stream; charset=UTF-8");
+
+			IoUtil.write(response.getOutputStream(), Boolean.TRUE, data);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}finally {
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (outStream != null) {
+				try {
+					outStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+	}
+	
+
+	/**
+	 * 导出压缩文件
+	 */
+	public void createZipFiles(HttpServletRequest request, HttpServletResponse response,
 			 Map<String, String> map) {
 		FileInputStream inputStream = null;
 		ByteArrayOutputStream outStream = null;

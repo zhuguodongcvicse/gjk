@@ -498,18 +498,19 @@ export default {
       this.appDataDTO.appName = domain.filePath.split("\\")[3];
       //导出接口
       appTaskExport(this.appDataDTO).then(res => {
-        if (res) {
+        if (res.data.data) {
           let mm = {};
           mm.oriFilePath = this.appFilePath;
           mm.downloadAPPFileName =
             this.appFilePath.split("\\")[2] +
             "\\" +
             this.appFilePath.split("\\")[3];
-          handleDown(mm).then(res => {});
+          handleDown(mm).then(res => {
+          });
         } else {
           this.$notify.error({
             title: "错误",
-            message: "调用客户接口出错！！！"
+            message: "调用导出接口出错！！！"
           });
         }
       });
