@@ -18,10 +18,6 @@ var nodeOrLinkList;
 var nodeOrLinkFirst
 //仿真数据
 var simulationData = [];
-//保存选中的节点用于复制粘贴
-var selectNode = new Array()
-//保存连线用于复制粘贴
-var selectLink = new Array()
 //子向父传参数
 function handleMessageToParent(cmd, gjIdAndTemId) {
   window.parent.postMessage({
@@ -128,9 +124,10 @@ function handleMessageFromParent(event) {
     case 'endSimulation':
       endSimulation();
       break;
-    // case 'returnRemoveComp':
-    // 	$("#" + data.params).remove()
-    // 	break;
+    case 'returnRemoveComp':
+      $("#" + data.params).remove()
+      $("#"+ data.params+"spanId").remove()
+    	break;
   }
 };
 
@@ -538,6 +535,25 @@ function init() {
     }
     return msg;
   }
+
+  //删除构件列表构件
+  $(".avatar-uploader").bind('click', function (event) {
+		//console.log(event.currentTarget.id)
+		gjkCompId = event.currentTarget.id
+		$('#' + event.currentTarget.id).attr('tabindex', 0);
+		document.getElementById(event.currentTarget.id).style.outline = "2"
+		$('#' + event.currentTarget.id).focus();
+		document.getElementById(event.currentTarget.id).onkeydown = function (e) {
+			if (e.keyCode == 46) {
+				//$("#" + event.currentTarget.id).remove()
+				//console.log("参数：",JSON.stringify(gjidAndTemid));
+				//gjIdAndTemId = gjidAndTemid;
+				handleMessageToParent("removeComp", event.currentTarget.id);
+			}
+		}
+
+	})
+
   $(".avatar-uploader").draggable({
     stack: "#myDiagramDiv",
     //  revert: true,
@@ -677,7 +693,7 @@ function init() {
     var str = "";
     for (var i = 0; i < dat.length; i++) {
       // str += "<div id = '" + dat[i].id + "' >" + dat[i].compImg + "</div></br>"
-      str += dat[i].compImg + "<span >" + dat[i].compName + "_V" + dat[i].compVersion + "</span>"
+      str += dat[i].compImg + "<span id = '" +dat[i].id + "spanId" + "'>" + dat[i].compName + "_V" + dat[i].compVersion + "</span>"
     }
     $('#gjk').append(str);
   }
@@ -704,8 +720,8 @@ function init() {
     var key = e.key;
     //退出任何撤销/重做组合键，具体键值根据需求而定
     if (control && (key === 'V')) {
-      selectNode = JSON.parse(sessionStorage.getItem("copyNodeData"));
-      selectLink = JSON.parse(sessionStorage.getItem("copyLinkData"));
+      let selectNode = JSON.parse(sessionStorage.getItem("copyNodeData")).selectNode;
+      let selectLink = JSON.parse(sessionStorage.getItem("copyLinkData")).selectLink;
       //保存新旧节点的key
       var linkMap = new Map()
       for (let selectNodeData of selectNode) {
@@ -874,6 +890,10 @@ function ChangedSelection(e){//选择事件
   })
   //复制/剪切到剪切板
   myDiagram.addDiagramListener("ClipboardChanged", function (e) {
+    //保存选中的节点用于复制粘贴
+    var selectNode = new Array()
+    //保存连线用于复制粘贴
+    var selectLink = new Array()
     var idList = []
     e.subject.each(function (part) {
       part.Zd.type = "new";
@@ -886,8 +906,9 @@ function ChangedSelection(e){//选择事件
         selectLink.push(part.Zd)
       }
     })
-    sessionStorage.setItem("copyNodeData", JSON.stringify(selectNode));
-    sessionStorage.setItem("copyLinkData", JSON.stringify(selectLink));
+    sessionStorage.setItem("copyNodeData", JSON.stringify({"selectNode":selectNode}));
+    sessionStorage.setItem("copyLinkData", JSON.stringify({"selectLink":selectLink}));
+    console.log("session数据1",JSON.parse(sessionStorage.getItem("copyNodeData")))
     var gjidAndTemid = []
     gjidAndTemid.push({
       gjId: "",
