@@ -17,11 +17,17 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,32 +39,26 @@ import com.inforbus.gjk.common.core.jgit.JGitUtil;
 
 /**
  * @ClassName: UploadFilesUtils
- * @Description: 文件上传工具
+ * @Description: 鏂囦欢涓婁紶宸ュ叿
  * @Author xiaohe
- * @DateTime 2019年5月13日 上午10:55:53
+ * @DateTime 2019骞�5鏈�13鏃� 涓婂崍10:55:53
  */
 public class UploadFilesUtils {
-	// 文件存储在服务器的相对地址
-//	@Value("${file.local.path}")
-//	private static String serverPath = JGitUtil.getLOCAL_REPO_PATH();
-//	static {
-//		serverPath = "D:/14S_GJK_GIT/gjk";
-//	}
 
 	/**
 	 * @Title: createFile
-	 * @Description: 创建文件及文件夹
+	 * @Description: 鍒涘缓鏂囦欢鍙婃枃浠跺す
 	 * @Author xiaohe
-	 * @DateTime 2019年5月13日 下午3:14:51
-	 * @param filePath 文件名
+	 * @DateTime 2019骞�5鏈�13鏃� 涓嬪崍3:14:51
+	 * @param filePath 鏂囦欢鍚�
 	 * @return File()
-	 * @throws IOException 文件目录或目标文件创建失败
+	 * @throws IOException 鏂囦欢鐩綍鎴栫洰鏍囨枃浠跺垱寤哄け璐�
 	 */
 	public static File createFile(String filePath) throws IOException {
-		// 获取文件的完整目录
+		// 鑾峰彇鏂囦欢鐨勫畬鏁寸洰褰�
 //		String fileDir = "D:/upload/files";
 		File file = null;
-		// 判断目录是否存在，不存在就创建一个目录
+		// 鍒ゆ柇鐩綍鏄惁瀛樺湪锛屼笉瀛樺湪灏卞垱寤轰竴涓洰褰�
 //		String path = serverPath + "/" + filePath;
 		if (StringUtils.isNotEmpty(filePath)) {
 			file = new File(filePath);
@@ -72,9 +72,9 @@ public class UploadFilesUtils {
 
 	/**
 	 * @Title: getUploadFilesUrl
-	 * @Description: 单文件上传
+	 * @Description: 鍗曟枃浠朵笂浼�
 	 * @Author xiaohe
-	 * @DateTime 2019年5月13日 下午3:12:45
+	 * @DateTime 2019骞�5鏈�13鏃� 涓嬪崍3:12:45
 	 * @param file
 	 * @return
 	 */
@@ -82,13 +82,13 @@ public class UploadFilesUtils {
 		String url = new String();
 		File uploadFile = null;
 		try {
-			// 获取上传文件名,包含后缀
+			// 鑾峰彇涓婁紶鏂囦欢鍚�,鍖呭惈鍚庣紑
 			String originalFilename = file.getOriginalFilename();
-			// 上传"image/"
+			// 涓婁紶"image/"
 
 			url = new String("gjk/upload/" + originalFilename).replace("\\", "/");
 			uploadFile = createFile(url);
-			// 将上传文件保存到路径
+			// 灏嗕笂浼犳枃浠朵繚瀛樺埌璺緞
 			if (uploadFile.exists()) {
 				boolean ok = uploadFile.delete();
 				System.out.println(ok);
@@ -110,27 +110,27 @@ public class UploadFilesUtils {
 
 	/**
 	 * @Title: getUploadImgUrl
-	 * @Description: 上传图片
+	 * @Description: 涓婁紶鍥剧墖
 	 * @Author xiaohe
-	 * @DateTime 2019年5月28日 下午2:32:10
+	 * @DateTime 2019骞�5鏈�28鏃� 涓嬪崍2:32:10
 	 * @param file
 	 * @return
 	 */
 	public static String getUploadImgUrl(MultipartFile file) {
 		String url = "";
 		try {
-			// 获取上传文件名,包含后缀
+			// 鑾峰彇涓婁紶鏂囦欢鍚�,鍖呭惈鍚庣紑
 			String originalFilename = file.getOriginalFilename();
 			url = new String("./gjk/image/" + originalFilename);
-			// 上传
+			// 涓婁紶
 //			File uploadFile = createFile(originalFilename);
 			File uploadFile = createFile(url);
-			// 将上传文件保存到路径
+			// 灏嗕笂浼犳枃浠朵繚瀛樺埌璺緞
 			if (uploadFile.exists()) {
 				uploadFile.delete();
 			}
 			file.transferTo(uploadFile);
-			JGitUtil.commitAndPush(url, "上传构件图片img");
+			JGitUtil.commitAndPush(url, "涓婁紶鏋勪欢鍥剧墖img");
 			url = new String(url).replace("\\", "/");
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
@@ -141,10 +141,10 @@ public class UploadFilesUtils {
 	}
 
 	/**
-	 * @Title: getUploadFiles 多文件上传
+	 * @Title: getUploadFiles 澶氭枃浠朵笂浼�
 	 * @Description:
 	 * @Author xiaohe
-	 * @DateTime 2019年7月9日 下午4:24:11
+	 * @DateTime 2019骞�7鏈�9鏃� 涓嬪崍4:24:11
 	 * @param file
 	 * @return
 	 */
@@ -154,16 +154,16 @@ public class UploadFilesUtils {
 		try {
 			for (MultipartFile file : files) {
 				Map<String, String> map = Maps.newHashMap();
-				// 获取上传文件名,包含后缀
+				// 鑾峰彇涓婁紶鏂囦欢鍚�,鍖呭惈鍚庣紑
 				String fileName = file.getOriginalFilename();
 				url = new String(mapPath.get("path") + File.separator + fileName);
 				File uploadFile = createFile(url);
-				// 将上传文件保存到路径
+				// 灏嗕笂浼犳枃浠朵繚瀛樺埌璺緞
 				if (uploadFile.exists()) {
 					uploadFile.delete();
 				}
 				file.transferTo(uploadFile);
-				JGitUtil.commitAndPush(url, "多个文件上传");
+				JGitUtil.commitAndPush(url, "澶氫釜鏂囦欢涓婁紶");
 				int index = fileName.lastIndexOf("/");
 //				if (index == -1) {
 				map.put("name", fileName);
@@ -190,10 +190,10 @@ public class UploadFilesUtils {
 
 	/**
 	 * @Title: delAllFile
-	 * @Description: 删除指定文件夹下的所有文件
+	 * @Description: 鍒犻櫎鎸囧畾鏂囦欢澶逛笅鐨勬墍鏈夋枃浠�
 	 * @Author xiaohe
-	 * @DateTime 2019年9月29日 下午5:13:56
-	 * @param 文件夹路径
+	 * @DateTime 2019骞�9鏈�29鏃� 涓嬪崍5:13:56
+	 * @param 鏂囦欢澶硅矾寰�
 	 * @return
 	 */
 	public static boolean delAllFile(String path) {
@@ -221,8 +221,8 @@ public class UploadFilesUtils {
 				temp.delete();
 			}
 			if (temp.isDirectory()) {
-//				delAllFile(path + "/" + tempList[i]);// 先删除文件夹里面的文件
-				delFolder(path + "/" + tempList[i]);// 再删除空文件夹
+//				delAllFile(path + "/" + tempList[i]);// 鍏堝垹闄ゆ枃浠跺す閲岄潰鐨勬枃浠�
+				delFolder(path + "/" + tempList[i]);// 鍐嶅垹闄ょ┖鏂囦欢澶�
 				flag = true;
 			} else {
 				flag = false;
@@ -233,18 +233,18 @@ public class UploadFilesUtils {
 
 	/**
 	 * @Title: delFolder
-	 * @Description: 删除文件夹
+	 * @Description: 鍒犻櫎鏂囦欢澶�
 	 * @Author xiaohe
-	 * @DateTime 2019年9月29日 下午5:14:34
-	 * @param 文件夹路径
+	 * @DateTime 2019骞�9鏈�29鏃� 涓嬪崍5:14:34
+	 * @param 鏂囦欢澶硅矾寰�
 	 */
 	public static void delFolder(String folderPath) {
 		try {
-			delAllFile(folderPath); // 删除完里面所有内容
+			delAllFile(folderPath); // 鍒犻櫎瀹岄噷闈㈡墍鏈夊唴瀹�
 			String filePath = folderPath;
 			filePath = filePath.toString();
 			java.io.File myFilePath = new java.io.File(filePath);
-			myFilePath.delete(); // 删除空文件夹
+			myFilePath.delete(); // 鍒犻櫎绌烘枃浠跺す
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -252,9 +252,9 @@ public class UploadFilesUtils {
 
 	/**
 	 * @Title: base64ToFile
-	 * @Description: 将base64字节流转文件
+	 * @Description: 灏哹ase64瀛楄妭娴佽浆鏂囦欢
 	 * @Author xiaohe
-	 * @DateTime 2019年10月14日 下午3:29:20
+	 * @DateTime 2019骞�10鏈�14鏃� 涓嬪崍3:29:20
 	 * @param file
 	 * @param base64
 	 * @throws IOException
@@ -276,9 +276,9 @@ public class UploadFilesUtils {
 
 	/**
 	 * @Title: getBase64ByInputStream
-	 * @Description: 将inputStream 转Base64字符串
+	 * @Description: 灏唅nputStream 杞珺ase64瀛楃涓�
 	 * @Author xiaohe
-	 * @DateTime 2019年10月14日 下午4:43:03
+	 * @DateTime 2019骞�10鏈�14鏃� 涓嬪崍4:43:03
 	 * @param inputStream
 	 * @return
 	 */
@@ -299,9 +299,9 @@ public class UploadFilesUtils {
 
 	/**
 	 * @Title: encodeBase64File
-	 * @Description: 将文件转BASE64
+	 * @Description: 灏嗘枃浠惰浆BASE64
 	 * @Author xiaohe
-	 * @DateTime 2019年10月14日 下午8:46:20
+	 * @DateTime 2019骞�10鏈�14鏃� 涓嬪崍8:46:20
 	 * @param path
 	 * @return
 	 * @throws Exception
@@ -316,11 +316,11 @@ public class UploadFilesUtils {
 
 	/**
 	 * @Title: encodeBase64File
-	 * @Description: 拷贝文件
+	 * @Description: 鎷疯礉鏂囦欢
 	 * @Author xiaohe
-	 * @DateTime 2019年11月27日 下午8:46:20
-	 * @param source 源文件路径
-	 * @param destin 拷贝文件路径
+	 * @DateTime 2019骞�11鏈�27鏃� 涓嬪崍8:46:20
+	 * @param source 婧愭枃浠惰矾寰�
+	 * @param destin 鎷疯礉鏂囦欢璺緞
 	 * @return
 	 * @throws Exception
 	 */
@@ -328,24 +328,24 @@ public class UploadFilesUtils {
 	public static void NioToCopyFile(String source, String destin) throws Exception {
 		File sourcePath = new File(source);
 		File destinPath = new File(destin);
-		// 如果源文件不存在就不用赋值
+		// 濡傛灉婧愭枃浠朵笉瀛樺湪灏变笉鐢ㄨ祴鍊�
 		if (sourcePath.exists()) {
-			// 目标目录是否存在、不存在就创建
+			// 鐩爣鐩綍鏄惁瀛樺湪銆佷笉瀛樺湪灏卞垱寤�
 			if (!destinPath.exists()) {
 				destinPath.mkdirs();
 			}
 			FileChannel in = null;
 			FileChannel out = null;
-			// 如果是文件就拷贝文件
+			// 濡傛灉鏄枃浠跺氨鎷疯礉鏂囦欢
 			if (sourcePath.isFile()) {
 				try {
 					in = new FileInputStream(sourcePath).getChannel();
-					String xxx=destinPath + File.separator + sourcePath.getName();
-					FileOutputStream outs=new FileOutputStream(destinPath + File.separator + sourcePath.getName());
+					String xxx = destinPath + File.separator + sourcePath.getName();
+					FileOutputStream outs = new FileOutputStream(destinPath + File.separator + sourcePath.getName());
 					System.out.println(xxx);
 					System.out.println(outs);
 					out = new FileOutputStream(destinPath + File.separator + sourcePath.getName()).getChannel();
-					// 连接两个通道，并从in通道读取，写入out中
+					// 杩炴帴涓や釜閫氶亾锛屽苟浠巌n閫氶亾璇诲彇锛屽啓鍏ut涓�
 					in.transferTo(0, in.size(), out);
 				} catch (Exception e) {
 					throw e;
@@ -354,17 +354,17 @@ public class UploadFilesUtils {
 					out.close();
 				}
 			}
-			// 如果是文件夹循环
+			// 濡傛灉鏄枃浠跺す寰幆
 			else if (sourcePath.isDirectory()) {
-				// 源文件路径下的所有文件和文件夹
+				// 婧愭枃浠惰矾寰勪笅鐨勬墍鏈夋枃浠跺拰鏂囦欢澶�
 				File[] items = sourcePath.listFiles();
 				for (File file : items) {
-					// 判断是不是文件
+					// 鍒ゆ柇鏄笉鏄枃浠�
 					if (file.isFile()) {
 						try {
 							in = new FileInputStream(file).getChannel();
 							out = new FileOutputStream(destinPath + File.separator + file.getName()).getChannel();
-							// 连接两个通道，并从in通道读取，写入out中
+							// 杩炴帴涓や釜閫氶亾锛屽苟浠巌n閫氶亾璇诲彇锛屽啓鍏ut涓�
 							in.transferTo(0, in.size(), out);
 						} catch (Exception e) {
 							throw e;
@@ -384,11 +384,11 @@ public class UploadFilesUtils {
 
 	/**
 	 * @Title: moveNioFile
-	 * @Description: 移动文件
+	 * @Description: 绉诲姩鏂囦欢
 	 * @Author xiaohe
-	 * @DateTime 2019年11月27日 下午8:46:20
-	 * @param source 源文件路径
-	 * @param destin 拷贝文件路径
+	 * @DateTime 2019骞�11鏈�27鏃� 涓嬪崍8:46:20
+	 * @param source 婧愭枃浠惰矾寰�
+	 * @param destin 鎷疯礉鏂囦欢璺緞
 	 * @throws Exception
 	 */
 	public static void moveNioFile(String source, String destin) throws Exception {
@@ -398,11 +398,11 @@ public class UploadFilesUtils {
 
 	/**
 	 * @Title: decompression
-	 * @Description: 解压压缩包文件
+	 * @Description: 瑙ｅ帇鍘嬬缉鍖呮枃浠�
 	 * @Author xiaohe
-	 * @DateTime 2019年12月10日 下午8:46:20
-	 * @param InputStream   接收的文件流
-	 * @param targetPathStr 解压目录(D:/xxx)
+	 * @DateTime 2019骞�12鏈�10鏃� 涓嬪崍8:46:20
+	 * @param InputStream   鎺ユ敹鐨勬枃浠舵祦
+	 * @param targetPathStr 瑙ｅ帇鐩綍(D:/xxx)
 	 * @throws IOException
 	 */
 	public static void decompression(InputStream file, String targetPathStr) throws IOException {
@@ -417,7 +417,7 @@ public class UploadFilesUtils {
 				try {
 					outputStream = new BufferedOutputStream(
 							new FileOutputStream(new File(targetPathStr, entry.getName())));
-					// 输出文件路径信息
+					// 杈撳嚭鏂囦欢璺緞淇℃伅
 					IOUtils.copy(inputStream, outputStream);
 				} finally {
 					IOUtils.closeQuietly(outputStream);
@@ -426,12 +426,45 @@ public class UploadFilesUtils {
 		}
 	}
 
+	/**
+	 * 2 澶氭枃浠� 鍘嬬缉鎴� ZIP
+	 * 
+	 * @Title: toZip
+	 * @Desc
+	 * @Author xiaohe
+	 * @DateTime 2020骞�4鏈�15鏃�
+	 * @param filePaths 鏂囦欢璺緞+鍚嶅瓧
+	 * @return ByteArrayOutputStream 鏂囦欢娴�
+	 * @throws Exception
+	 */
+	public static ByteArrayOutputStream toZip(String[] filePaths) throws Exception {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		ZipOutputStream zipstream = new ZipOutputStream(outputStream);
+		ZipEntry zipEntry = null;
+		for (String path : filePaths) {
+			File file = createFile(path);
+			try {
+				BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+				zipEntry = new ZipEntry(file.getName());
+				zipstream.putNextEntry(zipEntry);
+				zipstream.write(FileUtils.readFileToByteArray(file));
+				IOUtils.closeQuietly(bis);
+				zipstream.flush();
+				zipstream.closeEntry();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		IOUtils.closeQuietly(zipstream);
+		return outputStream;
+	}
+
 	@Test
 	public void moveNioFileTest() {
 		try {
 			moveNioFile(
-					"D:\\14S_GJK_GIT\\gjk\\gjk\\component\\admin\\1219\\20191220141933\\平台文件\\构件框架库_6.0\\func4 - 副本.c",
-					"D:\\14S_GJK_GIT\\gjk\\gjk\\component\\admin\\1219\\20191220141933\\平台文件\\");
+					"D:\\14S_GJK_GIT\\gjk\\gjk\\component\\admin\\1219\\20191220141933\\骞冲彴鏂囦欢\\鏋勪欢妗嗘灦搴揰6.0\\func4 - 鍓湰.c",
+					"D:\\14S_GJK_GIT\\gjk\\gjk\\component\\admin\\1219\\20191220141933\\骞冲彴鏂囦欢\\");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

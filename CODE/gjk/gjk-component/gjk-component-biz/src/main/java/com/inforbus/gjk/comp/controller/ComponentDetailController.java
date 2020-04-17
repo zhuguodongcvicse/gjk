@@ -28,6 +28,7 @@ import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.common.log.annotation.SysLog;
 import com.inforbus.gjk.comp.api.entity.Component;
 import com.inforbus.gjk.comp.api.entity.ComponentDetail;
+import com.inforbus.gjk.comp.api.feign.RemoteDataCenterService;
 import com.inforbus.gjk.comp.api.vo.CompFilesVO;
 //import com.inforbus.gjk.comp.api.util.UploadFileUtils;   //20190628未完善版本报错，注释
 import com.inforbus.gjk.comp.service.ComponentDetailService;
@@ -38,6 +39,7 @@ import cn.hutool.json.JSONUtil;
 
 import lombok.AllArgsConstructor;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +61,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @RequestMapping("/componentdetail")
 public class ComponentDetailController {
-
+	private final RemoteDataCenterService rdcService;
 	private final ComponentDetailService componentDetailService;
 
 	/**
@@ -164,8 +166,8 @@ public class ComponentDetailController {
 	@PostMapping(path = "/uploadUrl", consumes = { "multipart/mixed", "multipart/form-data" })
 	public R<?> uploadReturnUrl(@RequestParam(value = "file", required = false) MultipartFile ufile,
 			@RequestParam(value = "userName", required = false) String userName) {
-		System.out.println("上传的文件是:" + ufile);
-		return new R<>(componentDetailService.getUploadFilesUrl(ufile,userName));
+		// 2020年4月16日14:04:28 更改返回方式(xiaohe) old====> new R<>(componentDetailService.getUploadFilesUrl(ufile,userName))
+		return componentDetailService.getUploadFilesUrl(ufile,userName);
 	}
 
 	/**

@@ -55,14 +55,24 @@
 			<version>${mybatis-plus.version}</version>
 		</dependency>
 		<!--feign 依赖 -->
-		<dependency>
-			<groupId>io.github.openfeign</groupId>
-			<artifactId>feign-okhttp</artifactId>
-		</dependency>
+		<!-- <dependency> <groupId>io.github.openfeign</groupId> <artifactId>feign-okhttp</artifactId> 
+			</dependency> -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
+		<!--feign文件上传 让他支持任意数量文件上传 -->
+		<dependency>
+			<groupId>io.github.openfeign.form</groupId>
+			<artifactId>feign-form</artifactId>
+			<version>3.8.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.openfeign.form</groupId>
+			<artifactId>feign-form-spring</artifactId>
+			<version>3.8.0</version>
+		</dependency>
+
 		<!--hibernate-validator -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -105,27 +115,13 @@
 			<systemPath>${pom.basedir}/src/main/resources/lib/nddsjava.jar</systemPath>
 		</dependency> -->
 		<!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
-		<!-- <dependency>
-			<groupId>org.jsoup</groupId>
-			<artifactId>jsoup</artifactId>
-			<version>1.12.1</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>org.jsoup</groupId> <artifactId>jsoup</artifactId> 
+			<version>1.12.1</version> </dependency> -->
 
 	</dependencies>
-	<!--<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						&lt;!&ndash; 添加classpath缺少的内容&ndash;&gt;
-						<manifestEntries>
-							<Class-Path>./lib/gjk-softRadarInf-1.0.jar ./lib/nddsjava.jar</Class-Path>
-						</manifestEntries>
-					</archive>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>-->
+	<!--<build> <plugins> <plugin> <groupId>org.apache.maven.plugins</groupId> 
+		<artifactId>maven-jar-plugin</artifactId> <configuration> <archive> &lt;!&ndash; 
+		添加classpath缺少的内容&ndash;&gt; <manifestEntries> <Class-Path>./lib/gjk-softRadarInf-1.0.jar 
+		./lib/nddsjava.jar</Class-Path> </manifestEntries> </archive> </configuration> 
+		</plugin> </plugins> </build> -->
 </project>

@@ -25,6 +25,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.inforbus.gjk.common.core.constant.CommonConstants;
+import com.inforbus.gjk.common.core.constant.DataCenterConstants;
 import com.inforbus.gjk.common.core.entity.XmlEntity;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
@@ -37,6 +39,7 @@ import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.comp.api.entity.CompImg;
 import com.inforbus.gjk.comp.api.entity.Component;
 import com.inforbus.gjk.comp.api.entity.ComponentDetail;
+import com.inforbus.gjk.comp.api.feign.RemoteDataCenterService;
 import com.inforbus.gjk.comp.api.vo.CompFilesVO;
 import com.inforbus.gjk.comp.mapper.CompImgMapper;
 import com.inforbus.gjk.comp.mapper.ComponentDetailMapper;
@@ -90,6 +93,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import java.io.IOException;
 
+import org.apache.poi.hssf.record.RecalcIdRecord;
 //import org.jsoup.Jsoup;
 //import org.jsoup.nodes.Document;
 //import org.jsoup.nodes.Element;
@@ -120,6 +124,8 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	private ComponentService componentService;
 	@Autowired
 	protected ComponentDetailMapper compDetailMapper;
+	@Autowired
+	private RemoteDataCenterService rdcService;
 	private static final Logger logger = LoggerFactory.getLogger(ComponentDetailServiceImpl.class);
 
 	/**
@@ -770,7 +776,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	 * @param file
 	 * @return
 	 */
-	public List<CompFilesVO> getUploadFilesUrl(MultipartFile[] files,String userName) {
+	public List<CompFilesVO> getUploadFilesUrl(MultipartFile[] files, String userName) {
 		String url = "";
 		List<CompFilesVO> listvos = Lists.newArrayList();
 		try {
@@ -778,7 +784,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 				Map<String, String> map = Maps.newHashMap();
 				// 获取上传文件名,包含后缀
 				String fileName = file.getOriginalFilename();
-				url = new String(this.compDetailPath +"/gjk/upload/" + userName  + File.separator + fileName);
+				url = new String(this.compDetailPath + "/gjk/upload/" + userName + File.separator + fileName);
 				File uploadFile = null;
 				if (StringUtils.isNotEmpty(url)) {
 					uploadFile = new File(url);
@@ -1099,44 +1105,36 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	public List<String> findPlatformByName(String frameName) {
 		return baseMapper.findPlatformByName(frameName);
 	}
+
 	/**
 	 * @Title: getUploadFilesUrl
 	 * @Description: 单文件上传返回路径
 	 * @Author xiaohe
 	 * @DateTime 2019年11月26日 下午2:04:44
-	 * @param ufile 文件流
+	 * @param ufile    文件流
 	 * @param userName 当前用户
 	 * @return 路径
 	 */
 	@Override
-	public String getUploadFilesUrl(MultipartFile ufile, String userName) {
-		String url = new String();
-		File uploadFile = null;
-		try {
-			// 获取上传文件名,包含后缀
-			String originalFilename = ufile.getOriginalFilename();
-			// 上传"image/"
-
-			url = new String("gjk/upload/" + userName + "/" + originalFilename).replace("\\", "/");
-			uploadFile = UploadFilesUtils.createFile(this.compDetailPath + url);
-			// 将上传文件保存到路径
-			if (uploadFile.exists()) {
-				boolean ok = uploadFile.delete();
-				System.out.println(ok);
-			}
-			ufile.transferTo(uploadFile);
-
-			JGitUtil.commitAndPush(url, "");
-		} catch (IllegalStateException e) {
-
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-
-		} finally {
-			url = new String(uploadFile.getPath().replace("\\", "/"));
+	public R getUploadFilesUrl(MultipartFile ufile, String userName) {
+		// xiaohe 2020年4月16日14:17:12 更改调用方式 调用fegin接口上传文件
+		// fileName==>获取上传文件名,包含后缀
+		String fileName = ufile.getOriginalFilename();
+		//upload
+		String upload = DataCenterConstants.FILE_DIRS_UPLOAD;
+		// filePath==>文件全路径
+		String filePath = (compDetailPath + upload + File.separator + userName + File.separator + fileName)
+				.replace("/", File.separator);
+		// fegin 调用接口 返回调用状态
+		R<?> rdc = rdcService.uploadLocalFile(ufile, filePath);
+		R<String> ret = new R<String>();
+		// rdc.getData()判断是否上传成功
+		if (rdc.getCode() == CommonConstants.SUCCESS) {
+			ret.setData(filePath);
 		}
-		return url;
+		ret.setCode(rdc.getCode());
+		ret.setMsg(rdc.getMsg());
+		return ret;
 	}
 
 }
