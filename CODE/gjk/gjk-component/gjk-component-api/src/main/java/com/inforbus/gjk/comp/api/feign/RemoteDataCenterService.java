@@ -1,15 +1,11 @@
 package com.inforbus.gjk.comp.api.feign;
 
 import com.inforbus.gjk.comp.api.feign.factory.RemoteDataCenterServiceFallbackFactory;
-import com.inforbus.gjk.comp.api.feign.factory.RemoteTokenServiceFallbackFactory;
-import com.inforbus.gjk.dataCenter.api.entity.FileCenter;
 
 import feign.Response;
 import feign.codec.Encoder;
-import feign.form.spring.SpringFormEncoder;
 
 import com.inforbus.gjk.common.core.config.FeignSpringFormEncoder;
-import com.inforbus.gjk.common.core.config.SpringMultipartEncoder;
 import com.inforbus.gjk.common.core.constant.ServiceNameConstants;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.util.R;
