@@ -1,9 +1,10 @@
-package com.inforbus.gjk.compile.config;
+package com.inforbus.gjk.dataCenter.config;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+
 /*
 * 2019年10月30日 11:14:46
 * wang创建
@@ -15,7 +16,7 @@ public class ExtractApplicationContext implements ApplicationContextAware {
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
+        ExtractApplicationContext.applicationContext = applicationContext;
     }
 
     public ApplicationContext getApplicationContext() {
