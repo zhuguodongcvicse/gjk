@@ -1131,7 +1131,15 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		Thread copyFile = new Thread(() -> {
 			// 查找组件文件夹下文件夹名为App的文件夹路径
-			String appFilePathName = FileUtil.getSelectStrFilePath(assemblyName, "App");
+//			String appFilePathName = FileUtil.getSelectStrFilePath(assemblyName, "App");
+			String appFilePathName = null;
+			try {
+				appFilePathName = FileUtil.getAppPath(assemblyName, "App");
+			} catch (IOException e) {
+				logger.error("查找App路径失败，请联系管理员。");
+				r.setException(new Exception("查找App路径失败，请联系管理员。"));
+				return;
+			}
 			if (appFilePathName == null) {
 				// 如果未找到App文件夹路径，在组件文件夹下创建App文件夹
 				appFilePathName = assemblyName + File.separator + "App";
