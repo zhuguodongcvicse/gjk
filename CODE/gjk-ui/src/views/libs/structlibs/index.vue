@@ -35,7 +35,7 @@
             plain
             @click="handleEdit(scope.row,scope.index)"
           >编辑</el-button>
-            <!-- v-if="scope.row.storageFlag=='1'?false:scope.row.storageFlag=='2'?false:true" -->
+          <!-- v-if="scope.row.storageFlag=='1'?false:scope.row.storageFlag=='2'?false:true" -->
           <el-button
             type="danger"
             size="small"
@@ -156,7 +156,7 @@ export default {
       if (!params) {
         params = {};
       }
-      this.$set(params, "userId", this.userInfo.userId);
+      // this.$set(params, "userId", this.userInfo.userId);
       fetchList(
         Object.assign(
           {
@@ -287,9 +287,10 @@ export default {
       this.storageApplyDialog = true;
       this.compItemMsg = row;
     },
-    searchChange(form) {
-      // alert("编辑改变："+form)
+    searchChange(form,done) {
+      this.page.currentPage = 1;
       this.getList(this.page, form);
+      done();
     }
   }
 };

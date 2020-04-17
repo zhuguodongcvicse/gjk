@@ -17,11 +17,17 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import org.springframework.web.multipart.MultipartFile;
@@ -426,15 +432,38 @@ public class UploadFilesUtils {
 		}
 	}
 
-	@Test
-	public void moveNioFileTest() {
-		try {
-			moveNioFile(
-					"D:\\14S_GJK_GIT\\gjk\\gjk\\component\\admin\\1219\\20191220141933\\平台文件\\构件框架库_6.0\\func4 - 副本.c",
-					"D:\\14S_GJK_GIT\\gjk\\gjk\\component\\admin\\1219\\20191220141933\\平台文件\\");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	/**
+	 * 2 
+	 * 
+	 * @Title: toZip
+	 * @Desc
+	 * @Author xiaohe
+	 * @DateTime 2020年4月17日10:23:30
+	 * @param filePaths 文件路径集合 
+	 * @return ByteArrayOutputStream 
+	 * @throws Exception
+	 */
+	public static ByteArrayOutputStream toZip(String[] filePaths) throws Exception {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		ZipOutputStream zipstream = new ZipOutputStream(outputStream);
+		ZipEntry zipEntry = null;
+		for (String path : filePaths) {
+			File file = createFile(path);
+			try {
+				BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+				zipEntry = new ZipEntry(file.getName());
+				zipstream.putNextEntry(zipEntry);
+				zipstream.write(FileUtils.readFileToByteArray(file));
+				IOUtils.closeQuietly(bis);
+				zipstream.flush();
+				zipstream.closeEntry();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+		IOUtils.closeQuietly(zipstream);
+		return outputStream;
 	}
+
+
 }
