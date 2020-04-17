@@ -214,6 +214,15 @@ public interface ComponentDetailService extends IService<ComponentDetail> {
 	 */
 	public List<String> findPlatformByName(String frameName);
 
-	String getUploadFilesUrl(MultipartFile ufile,String userName);
+	/**
+	 * @Title: getUploadFilesUrl
+	 * @Desc 文件上传
+	 * @Author xiaohe
+	 * @DateTime 2020年4月16日
+	 * @param ufile
+	 * @param userName
+	 * @return 文件绝对路径 //修改返回类型 String to R
+	 */
+	R getUploadFilesUrl(MultipartFile ufile,String userName);
 
 }

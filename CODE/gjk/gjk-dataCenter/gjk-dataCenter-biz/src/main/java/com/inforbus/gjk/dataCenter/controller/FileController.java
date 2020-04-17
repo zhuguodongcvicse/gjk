@@ -1,8 +1,12 @@
 package com.inforbus.gjk.dataCenter.controller;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import com.inforbus.gjk.common.core.constant.CommonConstants;
@@ -11,16 +15,24 @@ import org.slf4j.Logger;
 
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.http.entity.FileEntity;
 import org.slf4j.LoggerFactory;
 
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.google.common.collect.Lists;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.dataCenter.api.dto.ThreeLibsFilePathDTO;
+import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.dataCenter.api.entity.FileCenter;
+import com.inforbus.gjk.dataCenter.api.vo.FileCenterVo;
 import com.inforbus.gjk.dataCenter.service.FileService;
 import com.inforbus.gjk.dataCenter.service.impl.FileServiceImpl;
 
@@ -70,8 +82,6 @@ public class FileController {
         return ret;
 
     }
-
-    ;
 
     /**
      * @param sourcePath 文件/文件夹路径
@@ -217,7 +227,6 @@ public class FileController {
         return ret;
     }
 
-
     /**
      * @param source 源文件路径
      * @param destin 拷贝文件路径
@@ -241,8 +250,6 @@ public class FileController {
         }
         return ret;
     }
-
-    ;
 
     /**
      * @param localPath 文件路径
@@ -273,8 +280,6 @@ public class FileController {
         return ret;
     }
 
-    ;
-
     /**
      * @param localPath   文件路径
      * @param charset     编码格式
@@ -303,10 +308,40 @@ public class FileController {
             return new R<Boolean>(e);
         }
         return ret;
+	}
 
+	/**
+	 * @Title: uploadLocalFile
+	 * @Desc
+	 * @Author cvics
+	 * @DateTime 2020年4月13日
+	 * @param ufile
+	 * @param type
+	 * @return
+	 */
+	@PostMapping(value = "/uploadFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public R uploadLocalFile(@RequestPart(value = "file") MultipartFile ufile, HttpServletResponse response) {
+		// 临时变量
+		MultipartFile[] ufiles = { ufile };
+		R<FileEntity> ret = new R<FileEntity>();
+		try {
+			List<FileCenter> fileCenters = Lists.newArrayList();
+//			List<FileCenter> fileCenters = fileService.uploadLocalFile(ufiles, "aaa/bbb");
+			if (fileCenters.size() > 0) {
+				ret.setCode(CommonConstants.SUCCESS);
+				ret.setData(null);
+				ret.setMsg("上传文件成功。。。");
+			} else {
+				ret.setCode(CommonConstants.FAIL);
+				ret.setData(null);
+				ret.setMsg("上传文件失败。。。");
     }
-
-    ;
+		} catch (Exception e) {
+			ret.setException(e);
+			logger.error("上传文件失败。。", e.getMessage());
+		}
+		return ret;
+	}
 
     /**
      * @Author wang
@@ -358,6 +393,7 @@ public class FileController {
 
     /**
 	 * 程序文本编辑器的文件展示
+	 * 
 	 * @param threeLibsFilePathDTO 封装了路径（全路径，从D盘开始）及编码格式
 	 * @return
 	 */
@@ -368,11 +404,121 @@ public class FileController {
 
 	/**
 	 * 保存文本编辑器修改的内容（文本编辑器的）
+	 * 
 	 * @param filePath 文件路径
 	 * @param textContext 文本内容
 	 */
 	@PostMapping("saveFileContext")
-	public void saveFileContext(@RequestParam("filePath") String filePath,@RequestParam("textContext") String textContext) {
+	public void saveFileContext(@RequestParam("filePath") String filePath,
+			@RequestParam("textContext") String textContext) {
 		fileService.saveFileContext(filePath, textContext);
 	}
+
+	@PostMapping(value = "/uploadMultipartFile", produces = {
+			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public R handleFileUpload(@RequestPart(value = "file") MultipartFile file,
+			@RequestParam("filePath") String localPath) {
+		R<Object> ret = new R<>();
+		MultipartFile[] files = { file };
+		try {
+			boolean vo = fileService.getUploadFilePaths(files, localPath);
+			if (vo) {
+				ret.setCode(CommonConstants.SUCCESS);
+				ret.setData(vo);
+				ret.setMsg("文件上传成功");
+				logger.info("上传文件成功", file);
+			} else {
+				ret.setCode(CommonConstants.FAIL);
+				ret.setData(vo);
+				ret.setMsg("文件上传失败");
+				logger.info("上传文件失败", file);
+}
+
+		} catch (IllegalStateException e) {
+			logger.error("文件上传失败", e);
+			ret.setException(e);
+		} catch (IOException e) {
+			logger.error("文件上传失败", e);
+			ret.setException(e);
+		}
+		return ret;
+	}
+
+	@PostMapping(value = "/uploadMultipartFiles", produces = {
+			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public R<?> uploadLocalFiles(@RequestPart(value = "files") MultipartFile[] ufile) {
+		R<Object> ret = new R<>();
+		for (MultipartFile r : ufile) {
+			logger.info("文件上传失败", r.getOriginalFilename());
+		}
+		ret.setMsg("多文文件上传");
+		return ret;
+
+	}
+
+	/**
+	 * @Title: downloadFile
+	 * @Desc 下载多文件返回流
+	 * @Author xiaohe
+	 * @DateTime 2020年4月15日
+	 * @param filePaths 文件全路径
+	 * @param response  返回zip流
+	 */
+	@ResponseBody
+	@PostMapping(value = "/downloadStreamFiles")
+	public void downloadFile(@RequestParam("filePaths") String[] filePaths, HttpServletResponse response) {
+		InputStream in = null;
+		try {
+			ByteArrayOutputStream zps = UploadFilesUtils.toZip(filePaths);
+			OutputStream out = response.getOutputStream();
+			out.write(zps.toByteArray());
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	/**
+	 * @Title: downloadFile
+	 * @Desc 下载单文件返回流
+	 * @Author xiaohe
+	 * @DateTime 2020年4月15日
+	 * @param filePath 文件全路径
+	 * @param response
+	 */
+	@ResponseBody
+	@PostMapping(value = "/downloadStreamFile")
+	public void downloadFile(@RequestParam("filePath") String filePath, HttpServletResponse response) {
+		File file = new File(filePath);
+		InputStream in = null;
+		if (file.exists()) {
+			try {
+				OutputStream out = response.getOutputStream();
+				in = new FileInputStream(file);
+				byte buffer[] = new byte[1024];
+				int length = 0;
+				while ((length = in.read(buffer)) >= 0) {
+					out.write(buffer, 0, length);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				if (in != null) {
+					try {
+						in.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+
 }

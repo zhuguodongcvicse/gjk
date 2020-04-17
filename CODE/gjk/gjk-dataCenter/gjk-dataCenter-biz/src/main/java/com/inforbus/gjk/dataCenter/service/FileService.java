@@ -1,14 +1,18 @@
 package com.inforbus.gjk.dataCenter.service;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 import com.inforbus.gjk.dataCenter.api.dto.ThreeLibsFilePathDTO;
 import com.inforbus.gjk.dataCenter.api.entity.FileCenter;
+import com.inforbus.gjk.dataCenter.api.vo.FileCenterVo;
 
 /**
  * @ClassName: FileService
@@ -169,4 +173,18 @@ public interface FileService {
 	 * @return
 	 */
 	R fileReads(ThreeLibsFilePathDTO threeLibsFilePathDTO);
+
+	/**
+	 * @Title: getUploadFilePaths
+	 * @Desc 文件上传返回路径
+	 * @Author xiaohe
+	 * @DateTime 2020年4月16日
+	 * @param files 要上传的文件集合
+	 * @param paths 文件的绝对路径（带盘符）
+	 * @return 
+	 * @throws IllegalStateException
+	 * @throws IOException 
+	 */
+	Boolean getUploadFilePaths(MultipartFile[] files, String paths)
+			throws IllegalStateException, IOException;
 }

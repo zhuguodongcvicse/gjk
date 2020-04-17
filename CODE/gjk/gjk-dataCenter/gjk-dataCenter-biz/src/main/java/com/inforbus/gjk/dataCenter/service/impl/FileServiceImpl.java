@@ -1,6 +1,5 @@
 package com.inforbus.gjk.dataCenter.service.impl;
 
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -43,6 +43,7 @@ import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.dataCenter.api.dto.ThreeLibsDTO;
 import com.inforbus.gjk.dataCenter.api.dto.ThreeLibsFilePathDTO;
 import com.inforbus.gjk.dataCenter.api.entity.FileCenter;
+import com.inforbus.gjk.dataCenter.api.vo.FileCenterVo;
 import com.inforbus.gjk.dataCenter.service.FileService;
 
 /**
@@ -392,29 +393,6 @@ public class FileServiceImpl implements FileService {
         return buffer;
     }
 
-    public static void main(String[] args) {
-        try {
-            String filePath = "D:\\输入输出参数赋值说明.docx";
-//			System.out.println(getFilecharset(new File("D:\\输入输出参数赋值说明.docx")));
-//			;
-            String fileType = filePath.substring(filePath.lastIndexOf("."));
-//			FileExtensionEnum.DOC_EXTENSION
-            FileExtensionEnum typeEnum = FileExtensionEnum.containsFileType(fileType);
-            System.out.println(typeEnum);
-            String linList = readWord("D:\\输入输出参数赋值说明.docx");
-//			writeTxt("D:\\123.txt", "GBK");
-//			writeTxt("D:\\1234.txt", "UTF8");
-//			System.out.println(getFilecharset(new File("D:\\123.txt")));
-            System.out.println("fileType:" + fileType + "    " + FileExtensionEnum.DOC_EXTENSION);
-//			for (String string : linList) {
-            System.out.println("string:::::::" + linList);
-//			}
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
     /**
      * @param sourceFile
      * @return
@@ -423,13 +401,14 @@ public class FileServiceImpl implements FileService {
      * @Author xiaohe
      * @DateTime 2020年4月1日
      */
+	@SuppressWarnings("resource")
     private static String getFilecharset(File sourceFile) {
         String charset = "GBK";
-        byte _xff = (byte) 0xFF;
-        byte _xfe = (byte) 0xFE;
-        byte _xef = (byte) 0xEF;
-        byte _xbf = (byte) 0xBF;
-        byte _xbb = (byte) 0xBB;
+		byte xff = (byte) 0xFF;
+		byte xfe = (byte) 0xFE;
+		byte xef = (byte) 0xEF;
+		byte xbf = (byte) 0xBF;
+		byte xbb = (byte) 0xBB;
         byte[] first3Bytes = new byte[3];
         try {
             boolean checked = false;
@@ -439,15 +418,15 @@ public class FileServiceImpl implements FileService {
             if (read == -1) {
                 // 文件编码为 ANSI
                 return charset;
-            } else if (first3Bytes[0] == _xff && first3Bytes[1] == _xfe) {
+			} else if (first3Bytes[0] == xff && first3Bytes[1] == xfe) {
                 // 文件编码为 Unicode
                 charset = "UTF-16LE";
                 checked = true;
-            } else if (first3Bytes[0] == _xfe && first3Bytes[1] == _xff) {
+			} else if (first3Bytes[0] == xfe && first3Bytes[1] == xff) {
                 // 文件编码为 Unicode big endian
                 charset = "UTF-16BE";
                 checked = true;
-            } else if (first3Bytes[0] == _xef && first3Bytes[1] == _xbb && first3Bytes[2] == _xbf) {
+			} else if (first3Bytes[0] == xef && first3Bytes[1] == xbb && first3Bytes[2] == xbf) {
                 // 文件编码为 UTF-8
                 charset = "UTF-8";
                 checked = true;
@@ -564,7 +543,7 @@ public class FileServiceImpl implements FileService {
     public List<FileCenter> downloadFile(String sourcePath) throws Exception {
         List<FileCenter> fileCenters = Lists.newArrayList();
         // 循环遍历所有文件
-        readfile(fileCenters, sourcePath);
+		readfileStream(fileCenters, sourcePath);
         return fileCenters;
     }
 
@@ -578,7 +557,8 @@ public class FileServiceImpl implements FileService {
      * @Author cvics
      * @DateTime 2020年4月7日
      */
-    private void readfile(List<FileCenter> fileCenters, String filepath) throws FileNotFoundException, IOException {
+	private void readfileStream(List<FileCenter> fileCenters, String filepath)
+			throws FileNotFoundException, IOException {
         File file = UploadFilesUtils.createFile(filepath);
         // 判断是否是文件
         if (!file.isDirectory()) {
@@ -599,7 +579,7 @@ public class FileServiceImpl implements FileService {
                 } else
                     // 判断是否是文件 如果时文件夹递归遍历文件
                     if (readfile.isDirectory()) {
-                        readfile(fileCenters, filepath + File.separator + path);
+					readfileStream(fileCenters, filepath + File.separator + path);
                     }
             }
         }
@@ -607,7 +587,7 @@ public class FileServiceImpl implements FileService {
 
     /**
      * 程序文本编辑器的文件展示
-     *
+	 * 
      * @param threeLibsFilePathDTO 封装了路径（全路径，从D盘开始）及编码格式
      * @return
      */
@@ -625,7 +605,7 @@ public class FileServiceImpl implements FileService {
             return new R<>();
         }
         File isFile = new File(fileName);
-        //获取文件后缀名
+		// 获取文件后缀名
         String prefix = fileName.substring(fileName.lastIndexOf(".") + 1);
         String str = "";
         ThreeLibsDTO dto = new ThreeLibsDTO();
@@ -736,4 +716,43 @@ public class FileServiceImpl implements FileService {
         }
 
     }
+	/**
+	 * @Title: getUploadFilePaths
+	 * @Desc 多文件上传 
+	 * @Author cvics
+	 * @DateTime 2020年4月16日
+	 * @param files 文件列表
+	 * @param paths 列表全路径
+	 * @return 
+	 * @throws IllegalStateException
+	 * @throws IOException
+	 * @see com.inforbus.gjk.dataCenter.service.FileService#getUploadFilePaths(org.springframework.web.multipart.MultipartFile[],
+	 *      java.lang.String)
+	 */
+	@Override
+	public Boolean getUploadFilePaths(MultipartFile[] files, String paths)
+			throws IllegalStateException, IOException {
+		String url = "";
+		Boolean bool = true;
+		try {
+			for (MultipartFile file : files) {
+				// 获取上传文件名,包含后缀
+				String fileName = file.getOriginalFilename();
+				url = new String(paths + File.separator + fileName);
+				File uploadFile = UploadFilesUtils.createFile(url);
+				// 将上传文件保存到路径
+				if (uploadFile.exists()) {
+					uploadFile.delete();
+}
+				file.transferTo(uploadFile);
+			}
+		} catch (IllegalStateException e) {
+			bool = false;
+			throw new IllegalStateException("上传文件返回路径出错", e);
+		} catch (IOException e) {
+			bool = false;
+			throw new IOException("上传文件返回路径出错", e);
+		}
+		return bool;
+	}
 }
