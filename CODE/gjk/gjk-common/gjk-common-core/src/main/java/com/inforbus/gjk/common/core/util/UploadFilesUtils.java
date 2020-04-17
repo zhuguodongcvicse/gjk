@@ -447,48 +447,43 @@ public class UploadFilesUtils {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		ZipOutputStream zipstream = new ZipOutputStream(outputStream);
 		// getZipStreamFiles获取多文件时的文件zip流
-		UploadFilesUtils.getZipStreamFiles(filePaths, zipstream);
+		for (String path : filePaths) {
+			// createFile==>创建文件及目录
+			File file = UploadFilesUtils.createFile(path);
+			UploadFilesUtils.getZipStreamFiles(file, zipstream, file.getName());
+		}
 		IOUtils.closeQuietly(zipstream);
 		return outputStream;
 	}
 
 	/**
 	 * @Title: getZipStreamFiles
-	 * @Desc 获取ZipOutputStream zip 的流
+	 * @Desc getZipStreamFiles
 	 * @Author xiaohe
 	 * @DateTime 2020年4月17日
-	 * @param filePaths
-	 * @param zipstream
-	 * @throws IOException
+	 * @param file 要压缩的文件
+	 * @param zipstream  zip流
+	 * @param dir 相对路径
+	 * @throws IOException 
 	 */
-
-	private static void getZipStreamFiles(String[] filePaths, ZipOutputStream zipstream) throws IOException {
-		ZipEntry zipEntry = null;
-		for (String path : filePaths) {
-			// createFile==>创建文件及目录
-			File file = UploadFilesUtils.createFile(path);
-			// isFile==>判断是否时文件
-			if (file.isFile()) {
-				try {
-					BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-					zipEntry = new ZipEntry(file.getName());
-					zipstream.putNextEntry(zipEntry);
-					zipstream.write(FileUtils.readFileToByteArray(file));
-					IOUtils.closeQuietly(bis);
-					zipstream.flush();
-					zipstream.closeEntry();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			} else
-			// isDirectory==>判断是否是文件夹
-			if (file.isDirectory()) {
-				File[] files = file.listFiles();
-				String[] paths = new String[files.length];
-				for (int i = 0; i < files.length; i++) {
-					paths[i] = files[i].getPath();
-				}
-				UploadFilesUtils.getZipStreamFiles(paths, zipstream);
+	private static void getZipStreamFiles(File file, ZipOutputStream zipstream, String dir) throws IOException {
+		//isFile==>判断是否是文件
+		if (file.isFile()) {
+			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+			ZipEntry zipEntry = new ZipEntry(dir);
+			zipstream.putNextEntry(zipEntry);
+			zipstream.write(FileUtils.readFileToByteArray(file));
+			IOUtils.closeQuietly(bis);
+			zipstream.flush();
+			zipstream.closeEntry();
+		} else
+		// isDirectory==>判断是否是文件夹
+		if (file.isDirectory()) {
+			File[] files = file.listFiles();
+			zipstream.putNextEntry(new ZipEntry(dir + File.separator));
+			dir = dir.length() == 0 ? "" : dir + File.separator;
+			for (File f : files) {
+				UploadFilesUtils.getZipStreamFiles(f, zipstream, dir + f.getName());
 			}
 		}
 	}
