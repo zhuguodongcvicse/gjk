@@ -245,9 +245,15 @@ public interface ManagerService extends IService<ProjectFile> {
 	* @Date 2020/4/17 14:58
 	*/
 	ArrayList<Object> getXmlFile(String id);
-
 	int updateHardwarelib(Hardwarelibs hardwarelibs);
-
+	/**
+	 * @Description 部署图xml生成
+	 * @Author ZhangHongXu
+	 * @param deploymentXMLMap
+	 * @Return void
+	 * @Exception
+	 * @Date 2020/4/20 10:16
+	 */
 	void updataDeploymentXml(DeploymentXMLMap deploymentXMLMap);
 
 	void deleteHardwarelibById(String id);

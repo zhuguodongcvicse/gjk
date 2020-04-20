@@ -14,4 +14,21 @@ public interface DeploymentConstants {
     String JOBNUMBER = "11";
     //流程建模xml
     String PROCESSMODELINGXML = "/流程建模.xml";
+
+    String MEMBER = "node";
+
+    String HIERARCHICALATTRIBUTES = "层级属性";
+
+    String  OWNEDPARTS = "所属部件";
+
+    String DEPLOYMENTCONFIG = "部署配置";
+
+    String NODE = "所属节点";
+
+    String CMPNAME = "cmpName";
+
+    String NAME = "name";
+
+    String ID= "id";
+
 }
