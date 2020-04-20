@@ -23,6 +23,7 @@ import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 import com.inforbus.gjk.pro.api.feign.DisposeDataCenterServiceFeign;
 
+import feign.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -73,5 +74,25 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
 		r.setCode(CommonConstants.FAIL);
 		r.setMsg(ServiceNameConstants.DATACENDER_SERVICE+"服务器异常，请联系管理员");
 		return r;
+	}
+
+	/**
+	 * @Title: downloadStreamFiles
+	 * @Desc 多文件下载（feign）
+	 * @Author cvics
+	 * @DateTime 2020年4月15日
+	 * @param filePaths
+	 * @return Response 其中包含 文件流
+	 * 
+	 *         <pre>
+	 *         Response.Body body = response.body();
+	 *         InputStream inputStream = body.asInputStream();
+	 * 
+	 *         </pre>
+	 */
+	@Override
+	public Response downloadStreamFiles(String[] filePaths) {
+		log.error("file-service 服务异常", cause);
+		return null;
 	}
 }

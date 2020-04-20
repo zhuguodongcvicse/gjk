@@ -16,12 +16,9 @@
  */
 package com.inforbus.gjk.pro.controller;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.inforbus.gjk.common.core.jgit.JGitUtil;
-import com.inforbus.gjk.common.core.util.ExternalIOTransUtils;
 import com.inforbus.gjk.common.core.util.FileDownload;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.log.annotation.SysLog;
@@ -32,15 +29,8 @@ import com.inforbus.gjk.pro.api.entity.ProjectFile;
 import com.inforbus.gjk.pro.service.AppService;
 import com.inforbus.gjk.pro.service.impl.ManagerServiceImpl;
 
-import ch.qos.logback.core.util.FileUtil;
-import cn.hutool.core.io.IORuntimeException;
-import cn.hutool.core.io.IoUtil;
-import cn.hutool.json.JSONUtil;
 import lombok.AllArgsConstructor;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -48,20 +38,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.tools.ant.taskdefs.Zip;
-import org.apache.tools.ant.types.FileSet;
 import org.ho.yaml.Yaml;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -76,12 +60,6 @@ import org.springframework.web.bind.annotation.*;
 public class AppController {
 
 	private final AppService appService;
-//	private static String filePath = AppController.class.getResource("/").getPath().split("WEB-INF")[0] + "upload/";
-	private static final String gitFilePath = JGitUtil.getLOCAL_REPO_PATH();
-	// packinfo文件路径(客户自存自取)
-	private static final String softToHardResult = JGitUtil.getSoftToHardResult();
-	// 组件划分方案路径(客户自存自取)
-	private static final String generateCodeResult = JGitUtil.getGenerateCodeResult();
 
 	/**
 	 * 简单分页查询
@@ -210,9 +188,12 @@ public class AppController {
 		return new R<>(appService.getAppVosPage(fileName, userId));
 	}
 
+	/**
+	 * 返回文件路径
+	 * @return
+	 */
 	@PostMapping(value = "/returnFilePath")
 	public R returnFilePath() {
-//		return new R<>(gitFilePath);
 		return new R<>(appService.returnFilePath());
 	}
 
@@ -229,30 +210,6 @@ public class AppController {
 	 */
 	@PostMapping(value = "/appInstall")
 	public R appInstall(@RequestBody AppDataDTO appDataDTO) {
-//		// 前台以json串的形式传到后台，后台解析成map
-//		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
-//		String bb = appDataDTO.getSysconfigPath().replaceAll("\\\\", "/");
-//		// String aa = bb.substring(0,bb.lastIndexOf("/",bb.indexOf("/")+1));
-//		String aa = bb.substring(0, bb.lastIndexOf("/"));
-//		aa = aa.substring(0, aa.lastIndexOf("/"));
-//		// packinfo文件路径（客户自存自取的路径）
-//		String selfSoftToHardResult = gitFilePath + aa + File.separator + generateCodeResult + File.separator
-//				+ "packinfo.xml";
-//		// 组件划分方案路径（自存自取）
-//		String selfGenerateCodeResult = gitFilePath + aa + File.separator + softToHardResult + File.separator
-//				+ "组件划分方案.xml";
-//		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
-//		boolean returnVal;
-//		try {
-//			// 调用注册接口
-//			returnVal = ExternalIOTransUtils.appInstall(cmpNameToHwType, appDataDTO.getUserName(),
-//					appDataDTO.getFlowId(), appDataDTO.getAppName(), selfSoftToHardResult, selfGenerateCodeResult,
-//					gitFilePath + appDataDTO.getAppProPath());
-//		} catch (Exception e) {
-//			returnVal = false;
-//			e.printStackTrace();
-//		}
-//		return new R<>(returnVal);
 		return new R<>(appService.appInstall(appDataDTO));
 	}
 
@@ -269,27 +226,6 @@ public class AppController {
 	 */
 	@PostMapping(value = "/appLoadStart")
 	public R appLoadStart(@RequestBody AppDataDTO appDataDTO) {
-//		// 前台以json串的形式传到后台，后台解析成map
-//		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
-//		// 是否带部署方案(数据库存的字符串0、1，后台需要转换一下)
-//		boolean existDeployConfig;
-//		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
-//		boolean returnVal;
-//		if (appDataDTO.getExistDeployConfig().equals("1")) {
-//			existDeployConfig = false;
-//		} else {
-//			existDeployConfig = true;
-//		}
-//		try {
-//			// 调用加载、更新加载接口
-//			returnVal = ExternalIOTransUtils.appLoad(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(),
-//					appDataDTO.getAppName(), existDeployConfig, gitFilePath + appDataDTO.getSysconfigPath(),
-//					gitFilePath + appDataDTO.getAppProPath());
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			returnVal = false;
-//		}
-//		return new R<>(returnVal);
 		return new R<>(appService.appLoadStart(appDataDTO));
 	}
 
@@ -303,19 +239,6 @@ public class AppController {
 	 */
 	@PostMapping(value = "/appUnload")
 	public R appUnload(@RequestBody AppDataDTO appDataDTO) {
-//		// 前台以json串的形式传到后台，后台解析成map
-//		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
-//		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
-//		boolean returnVal;
-//		try {
-//			// 调用卸载接口
-//			returnVal = ExternalIOTransUtils.appUnload(cmpNameToHwType, appDataDTO.getUserName(),
-//					appDataDTO.getFlowId(), appDataDTO.getAppName());
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			returnVal = false;
-//		}
-//		return new R<>(returnVal);
 		return new R<>(appService.appUnload(appDataDTO));
 	}
 
@@ -329,19 +252,6 @@ public class AppController {
 	 */
 	@PostMapping(value = "/appTaskRestart")
 	public R appTaskRestart(@RequestBody AppDataDTO appDataDTO) {
-//		// 前台以json串的形式传到后台，后台解析成map
-//		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
-//		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
-//		boolean returnVal;
-//		try {
-//			// 调用启动接口
-//			returnVal = ExternalIOTransUtils.appRestart(cmpNameToHwType, appDataDTO.getUserName(),
-//					appDataDTO.getFlowId(), appDataDTO.getAppName());
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			returnVal = false;
-//		}
-//		return new R<>(returnVal);
 		return new R<>(appService.appTaskRestart(appDataDTO));
 	}
 
@@ -355,19 +265,6 @@ public class AppController {
 	 */
 	@PostMapping(value = "/appStop")
 	public R appStop(@RequestBody AppDataDTO appDataDTO) {
-//		// 前台以json串的形式传到后台，后台解析成map
-//		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
-//		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
-//		boolean returnVal;
-//		try {
-//			// 调用停止接口
-//			returnVal = ExternalIOTransUtils.appStop(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(),
-//					appDataDTO.getAppName());
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			returnVal = false;
-//		}
-//		return new R<>(returnVal);
 		return new R<>(appService.appStop(appDataDTO));
 	}
 
@@ -381,19 +278,6 @@ public class AppController {
 	 */
 	@PostMapping(value = "/appPause")
 	public R appPause(@RequestBody AppDataDTO appDataDTO) {
-//		// 前台以json串的形式传到后台，后台解析成map
-//		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
-//		// 返回值
-//		boolean returnVal;
-//		try {
-//			// 调用暂停接口
-//			returnVal = ExternalIOTransUtils.appPause(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(),
-//					appDataDTO.getAppName());
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			returnVal = false;
-//		}
-//		return new R<>(returnVal);
 		return new R<>(appService.appPause(appDataDTO));
 	}
 
@@ -408,26 +292,6 @@ public class AppController {
 	 */
 	@PostMapping(value = "/appDelete")
 	public R appDelete(@RequestBody AppDataDTO appDataDTO) {
-//		// 前台以json串的形式传到后台，后台解析成map
-//		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
-//		String bb = appDataDTO.getSysconfigPath().replaceAll("\\\\", "/");
-//		// String aa = bb.substring(0,bb.lastIndexOf("/",bb.indexOf("/")+1));
-//		String aa = bb.substring(0, bb.lastIndexOf("/"));
-//		aa = aa.substring(0, aa.lastIndexOf("/"));
-//		// packinfo文件路径（客户自存自取的路径）
-//		String selfSoftToHardResult = gitFilePath + aa + File.separator + generateCodeResult + File.separator
-//				+ "packinfo.xml";
-//		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
-//		boolean returnVal;
-//		try {
-//			// 调用注销接口
-//			returnVal = ExternalIOTransUtils.appUnInstall(cmpNameToHwType, appDataDTO.getUserName(),
-//					appDataDTO.getFlowId(), appDataDTO.getAppName(), selfSoftToHardResult);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			returnVal = false;
-//		}
-//		return new R<>(returnVal);
 		return new R<>(appService.appDelete(appDataDTO));
 	}
 
@@ -444,29 +308,6 @@ public class AppController {
 
 	@PostMapping(value = "/appTaskExport")
 	public R appTaskExport(@RequestBody AppDataDTO appDataDTO) {
-//		String bb = appDataDTO.getSysconfigPath().replaceAll("\\\\", "/");
-//		// String aa = bb.substring(0,bb.lastIndexOf("/",bb.indexOf("/")+1));
-//		String aa = bb.substring(0, bb.lastIndexOf("/"));
-//		aa = aa.substring(0, aa.lastIndexOf("/"));
-//		// packinfo文件路径（客户自存自取的路径）
-//		String selfSoftToHardResult = gitFilePath + aa + File.separator + generateCodeResult + File.separator
-//				+ "packinfo.xml";
-//		// 组件划分方案路径（自存自取）
-//		String selfGenerateCodeResult = gitFilePath + aa + File.separator + softToHardResult + File.separator
-//				+ "组件划分方案.xml";
-//		String appPath = gitFilePath + File.separator + appDataDTO.getAppProPath();
-//		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
-//				boolean returnVal;
-//				try {
-//					// 调用注销接口
-//					ExternalIOTransUtils.appTaskExport(appDataDTO.getUserName(), appDataDTO.getFlowId(), appDataDTO.getAppName(),
-//							appPath, gitFilePath + appDataDTO.getSysconfigPath(), selfSoftToHardResult, selfGenerateCodeResult);
-//					returnVal = true;
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//					returnVal = false;
-//				}
-//		return new R<>(returnVal);
 		return new R<>(appService.appTaskExport(appDataDTO));
 	}
 
@@ -532,79 +373,16 @@ public class AppController {
 
 	}
 
+	/**
+	 * 导出文件夹
+	 * @param request 
+	 * @param response
+	 * @param map  需要下载的文件路径，下载到的路径+9
+	 */
 	@PostMapping("/createZipFile")
 	public void createZipFile(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody Map<String, String> map) {
-//		FileInputStream inputStream = null;
-//		ByteArrayOutputStream outStream = null;
-//		String zipFileName = map.get("downloadAPPFileName") + ".zip";
-//		String zipFilePath = gitFilePath + "gjk" + File.separator + "APPDownload" + File.separator + zipFileName;
-//		try {
-//			org.apache.tools.ant.Project prj = new org.apache.tools.ant.Project();
-//			Zip zip = new Zip();
-//			zip.setProject(prj);
-//			zip.setDestFile(new File(zipFilePath));
-//			FileSet fileSet = new FileSet();
-//			fileSet.setProject(prj);
-//
-//			File srcFile = null;
-//			srcFile = new File(gitFilePath + map.get("oriFilePath"));
-//			if (srcFile.isDirectory()) {
-//
-//				fileSet.setDir(srcFile);
-//			} else {
-//				fileSet.setFile(srcFile);
-//			}
-//			zip.addFileset(fileSet);
-//			zip.execute();
-//
-//			int len = 0;
-//			inputStream = new FileInputStream(new File(zipFilePath));
-//			outStream = new ByteArrayOutputStream();
-//			byte[] buffer = new byte[1024];
-//			while ((len = inputStream.read(buffer)) > 0) {
-//				outStream.write(buffer, 0, len);
-//			}
-//			byte[] data = outStream.toByteArray();
-//
-//			new File(zipFilePath).deleteOnExit();
-//
-//			String userAgent = request.getHeader("User-Agent");
-//			String formFileName = new String(new File(zipFilePath).getName().getBytes());
-//			// 针对IE或者以IE为内核的浏览器：
-//			if (userAgent.contains("MSIE") || userAgent.contains("Trident")) {
-//				formFileName = java.net.URLEncoder.encode(formFileName, "UTF-8");
-//			} else {
-//				// 非IE浏览器的处理：
-//				formFileName = new String(formFileName.getBytes("UTF-8"), "ISO-8859-1");
-//			}
-//
-//			response.reset();
-//			response.setHeader("Content-Disposition", String.format("attachment; filename=%s.zip", formFileName));
-//			response.setHeader("FileName", formFileName);
-//			response.setHeader("Content-Length", "" + data.length);
-//			response.setContentType("application/octet-stream; charset=UTF-8");
-//
-//			IoUtil.write(response.getOutputStream(), Boolean.TRUE, data);
-//		} catch (IORuntimeException | IOException e) {
-//			e.printStackTrace();
-//		} finally {
-//			if (inputStream != null) {
-//				try {
-//					inputStream.close();
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//			if (outStream != null) {
-//				try {
-//					outStream.close();
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}
-
+		appService.createZipFile(request, response, map);
 	}
 
 	/**
@@ -643,6 +421,10 @@ public class AppController {
 		}
 		return new R<>(makefileType);
 	}
+	/**
+	 * 通过yml文件获取平台
+	 * @return
+	 */
 	@PutMapping( "/getPlatformName")
 	public R getPlatformNameByYml() {
 		String filePath = ManagerServiceImpl.class.getResource("").getPath();
