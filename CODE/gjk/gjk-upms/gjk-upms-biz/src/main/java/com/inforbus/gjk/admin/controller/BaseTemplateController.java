@@ -172,9 +172,9 @@ public class BaseTemplateController {
     public R parseXml(@RequestBody BaseTemplatePathDTO baseTemplatePathDTO) {
         R r = new R();
         try {
+            r.setMsg("解析成功");
             XmlEntityMap xmlEntityMap = baseTemplateService.parseXml(baseTemplatePathDTO.getPath());
             r.setData(xmlEntityMap);
-            r.setMsg("解析成功");
         } catch (Exception e) {
             r.setCode(CommonConstants.FAIL);
             r.setMsg(baseTemplatePathDTO.getPath() + "文件不存在");
@@ -196,8 +196,8 @@ public class BaseTemplateController {
     public R editParseXml(@RequestBody BaseTemplate baseTemplate) {
         R r = new R();
         try {
-            r = baseTemplateService.editParseXml(baseTemplate);
             r.setMsg("解析xml文件成功");
+            r = baseTemplateService.editParseXml(baseTemplate);
         } catch (Exception e) {
             r.setCode(CommonConstants.FAIL);
             r.setMsg("解析xml文件失败" + e.getMessage());
@@ -219,8 +219,8 @@ public class BaseTemplateController {
         boolean b = false;
         R r = new R();
         try {
-            b = baseTemplateService.editBaseTemplate(baseTemplateDTO);
             r.setMsg("模板修改成功");
+            b = baseTemplateService.editBaseTemplate(baseTemplateDTO);
             if (!b) {
                 r.setMsg("模板修改失败,请联系管理员");
                 r.setCode(CommonConstants.FAIL);
