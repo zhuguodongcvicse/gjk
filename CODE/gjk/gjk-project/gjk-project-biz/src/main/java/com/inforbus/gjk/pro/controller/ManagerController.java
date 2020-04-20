@@ -405,21 +405,26 @@ public class ManagerController {
 		return chipsfromhardwarelibs;
 	}
 
-    /**
-    * @Description 部署图获取部件结构数据
-    * @Author ZhangHongXu
-     * @param id
-    * @Return List
-    * @Exception
-    * @Date 2020/4/17 14:56
-    */
+	/**
+	 * @Description 部署图部件连线数据获取
+	 * @Author ZhangHongXu
+	 * @param id
+	 * @Return java.util.List
+	 * @Exception
+	 * @Date 2020/4/20 10:18
+	 */
 	@GetMapping("getAllList/{id}")
 	public List getAllList(@PathVariable("id") String id) {
 	return managerService.getXmlFile(id);
 	}
 
 	/**
-	 * 部署图xml生成
+	 * @Description 部署图xml生成
+	 * @Author ZhangHongXu
+	 * @param deploymentXMLMap
+	 * @Return void
+	 * @Exception
+	 * @Date 2020/4/20 10:16
 	 */
 	@PostMapping("/sendXmlMap")
 	public void updataDeploymentXml(@RequestBody DeploymentXMLMap deploymentXMLMap) {
