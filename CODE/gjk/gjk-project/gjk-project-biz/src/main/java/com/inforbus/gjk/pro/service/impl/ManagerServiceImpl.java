@@ -1378,6 +1378,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		return list;
 	}
 
+	/**
+	 * 20200420修改使用Feign接口调用生成xml文件方法
+	 */
 	@Override
 	public boolean createThemeXML(XmlEntityMap entity, String proDetailId, String name) {
 		ProjectFile projectFile = getProDetailById(proDetailId);
@@ -1391,7 +1394,11 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (!file.exists()) {
 			file.mkdirs();
 		}
-		boolean flag = XmlFileHandleUtil.createXmlFile(entity, new File(filePath + fileName));
+		//boolean flag = XmlFileHandleUtil.createXmlFile(entity, new File(filePath + fileName));
+		XMlEntityMapVO xmlVo = new XMlEntityMapVO();
+		xmlVo.setLocalPath(filePath + fileName);
+		xmlVo.setXmlEntityMap(entity);
+		boolean flag = dataCenterServiceFeign.createXMLFile(xmlVo).getData();
 		String flowFilePath = "";
 		List<ProjectFile> ProjectFileList = baseMapper.getFilePathListById(proDetailId);
 		for (ProjectFile proFile : ProjectFileList) {
@@ -1404,14 +1411,25 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (!newFile.exists()) {
 			newFile.mkdirs();
 		}
-		ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName,
-				newFilePath + "UserDefineTopicFile.xml");
-		baseMapper.saveNewFilePath(newFilePath + "UserDefineTopicFile.xml", proDetailId);
-
-		JGitUtil.commitAndPush(filePath + fileName, "上传构件相关文件");
+//		ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName,
+//				newFilePath + "UserDefineTopicFile.xml");
+		boolean bo = externalInfInvokeService.createUserDefineTopic(flowFilePath, filePath + fileName,
+				newFilePath + "UserDefineTopicFile.xml").getData();
+		if(bo) {
+			File topicFile = new File(newFilePath + "UserDefineTopicFile.xml");
+			if(topicFile.exists()) {
+				baseMapper.saveNewFilePath(newFilePath + "UserDefineTopicFile.xml", proDetailId);
+			}else {
+				logger.error("UserDefineTopicFile.xml不存在");
+			}
+			
+		}
+		//JGitUtil.commitAndPush(filePath + fileName, "上传构件相关文件");
 		return flag;
 	}
-
+	/**
+	 * 20200420修改使用Feign接口调用生成xml文件方法
+	 */
 	@Override
 	public boolean createNetWorkXML(XmlEntityMap entity, String proDetailId, String name) {
 		ProjectFile projectFile = getProDetailById(proDetailId);
@@ -1425,8 +1443,12 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (!file.exists()) {
 			file.mkdirs();
 		}
-		boolean flag = XmlFileHandleUtil.createXmlFile(entity, new File(filePath + fileName));
-		JGitUtil.commitAndPush(filePath + fileName, "上传构件相关文件");
+		//boolean flag = XmlFileHandleUtil.createXmlFile(entity, new File(filePath + fileName));
+		XMlEntityMapVO xmlVo = new XMlEntityMapVO();
+		xmlVo.setLocalPath(filePath + fileName);
+		xmlVo.setXmlEntityMap(entity);
+		boolean flag = dataCenterServiceFeign.createXMLFile(xmlVo).getData();
+		//JGitUtil.commitAndPush(filePath + fileName, "上传构件相关文件");
 		return flag;
 	}
 
@@ -1960,6 +1982,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		return dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(file.getAbsolutePath()).getData();
 	}
 
+	/*
+	 * 20200420修改使用feign调用解析xml方法
+	 */
 	@Override
 	public R analysisThemeXML(String proDetailId) {
 		ProjectFile projectFile = getProDetailById(proDetailId);
@@ -1976,20 +2001,14 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				path = proDetailPath + proFile.getFilePath();
 			}
 		}
-
-		// flowFilePath =
-		// "D:\\14S_GJK_GIT\\gjk\\gjk\\project\\测试项目\\测试流程流程\\模型\\流程模型.xml";
-		// File file = new File(flowFilePath);
 		// 获取部件及部件及部件下构建
 		File flowFile = new File(flowFilePath);
 		if (flowFile.exists()) {
-			// partList.addAll(ProcedureXmlAnalysis.getPartList(new File(flowFilePath)));
-			List<Part> partList1 = ProcedureXmlAnalysis.getPartList(new File(flowFilePath));
+			//List<Part> partList1 = ProcedureXmlAnalysis.getPartList(new File(flowFilePath));
+			XmlEntityMap xmlMap = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(flowFilePath).getData();
+			List<Part> partList1 = ProcedureXmlAnalysis.getPartList(flowFile,xmlMap);
 			partList.addAll(partList1);
 		}
-		// 解析流程模型文件
-		// XmlEntityMap folwModelData
-		// =XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(new File(flowFilePath));
 		String themePath = path + "自定义配置__主题配置.xml";
 		File themeFile = new File(themePath);
 		XmlEntityMap themeData = null;
@@ -1997,14 +2016,15 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (!themeFile.exists()) {
 			themeData = this.getXmlEntityMap(baseTemplateIDsDTO.getThemeTempId());
 		} else {
-			themeData = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(themeFile);
+			//themeData = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(themeFile);
+			themeData = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(themePath).getData();
 		}
 		String netWorkPath = path + "自定义配置__网络配置.xml";
 		File netWorkFile = new File(netWorkPath);
 		if (!netWorkFile.exists()) {
 			netWorkData = this.getXmlEntityMap(baseTemplateIDsDTO.getNetworkTempId());
 		} else {
-			netWorkData = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(netWorkFile);
+			netWorkData = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(netWorkPath).getData();
 		}
 		JSONObject obj = new JSONObject();
 		obj.put("themeData", themeData);
