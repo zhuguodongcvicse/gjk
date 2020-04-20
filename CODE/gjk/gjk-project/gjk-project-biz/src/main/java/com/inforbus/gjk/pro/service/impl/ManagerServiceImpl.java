@@ -13,6 +13,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import com.inforbus.gjk.admin.api.entity.*;
+import com.inforbus.gjk.common.core.constant.DeploymentConstants;
 import com.inforbus.gjk.common.core.entity.*;
 import com.inforbus.gjk.pro.api.dto.AppDataDTO;
 import com.inforbus.gjk.pro.api.dto.BaseTemplateIDsDTO;
@@ -112,7 +113,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	protected DisposeDataCenterServiceFeign dataCenterServiceFeign;
 	@Autowired
 	private ExternalInfInvokeService externalInfInvokeService;
-
 //	private static final String proDetailPath = JGitUtil.getLOCAL_REPO_PATH();
 //	private static final String integerCodeFileName = JGitUtil.getINTEGER_CODE_FILE_NAME();
 //	private static String serverPath = JGitUtil.getLOCAL_REPO_PATH();
@@ -1534,22 +1534,39 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		return procedureNameList;
 	}
 
-	/*
-	 * 部署图获取流程建模xml文件地址
-	 */
+	/**
+	* @Description 部署图获取部件结构数据
+	* @Author ZhangHongXu
+	 * @param null
+	* @Return
+	* @Exception
+	* @Date 2020/4/17 15:01
+	*/
 	@Override
-	public File getXmlFile(String id) {
+	public ArrayList<Object> getXmlFile(String id) {
 		String Path = null;
 		String local_REPO_PATH = null;
+		String jopNumber = DeploymentConstants.JOBNUMBER;
 		for (ProjectFile projectFile : getProFileListByModelId(this.getById(id).getParentId())) {
-			if ("11".equals(projectFile.getFileType())) {
+			if (jopNumber.equals(projectFile.getFileType())) {
 				Path = projectFile.getFilePath();
 				local_REPO_PATH = gitDetailPath;
 				break;
 			}
 		}
-		File file = new File(local_REPO_PATH + Path + "/流程建模.xml");
-		return file;
+		String localPath = local_REPO_PATH + Path + DeploymentConstants.PROCESSMODELINGXML;
+		XmlEntityMap xmlEntityMap = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(localPath).getData();
+		File file = new File(local_REPO_PATH + Path + DeploymentConstants.PROCESSMODELINGXML);
+		List<HardwareNode> hardwareNodeList = ProcedureXmlAnalysis.getHardwareNodeList(file,xmlEntityMap);
+		if (hardwareNodeList.size() != 0) {
+			List<Arrows> arrowsList = ProcedureXmlAnalysis.getArrowsList(file,xmlEntityMap);
+			ArrayList<Object> array = new ArrayList<>();
+			array.add(hardwareNodeList);
+			array.add(arrowsList);
+			return array;
+		} else {
+			return null;
+		}
 	}
 
 	@Override

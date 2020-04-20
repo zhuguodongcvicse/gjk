@@ -71,7 +71,18 @@ public class ProcedureXmlAnalysis {
 		analysisByProcedureXml(file);
 		return arrowsList;
 	}
-
+	/**
+	* @Description 分布式调用方法
+	* @Author ZhangHongXu
+	 * @param null
+	* @Return
+	* @Exception
+	* @Date 2020/4/17 15:26
+	*/
+	public List<Arrows> getArrowsList(File file,XmlEntityMap xmlEntityMap) {
+		analysisByProcedureXml(file, xmlEntityMap);
+		return arrowsList;
+	}
 	/**
 	 * 文件分布式调用的方法
 	 * @author sunchao

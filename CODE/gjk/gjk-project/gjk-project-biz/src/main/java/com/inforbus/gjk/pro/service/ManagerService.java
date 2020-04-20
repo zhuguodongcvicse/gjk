@@ -236,8 +236,15 @@ public interface ManagerService extends IService<ProjectFile> {
 	int saveHardwarelibs(Hardwarelibs hardwarelibs);
 
 	Hardwarelibs getlibsInDepolyment(String id);
-
-	File getXmlFile(String id);
+	/**
+	* @Description 部署图获取部件结构数据实现类接口
+	* @Author ZhangHongXu
+	 * @param id
+	* @Return
+	* @Exception
+	* @Date 2020/4/17 14:58
+	*/
+	ArrayList<Object> getXmlFile(String id);
 
 	int updateHardwarelib(Hardwarelibs hardwarelibs);
 
