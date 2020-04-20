@@ -1,9 +1,10 @@
-package com.inforbus.gjk.compile.taskThread;
+package com.inforbus.gjk.dataCenter.taskThread;
 
-import com.inforbus.gjk.compile.task.Task;
+import com.inforbus.gjk.dataCenter.task.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -13,7 +14,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @date 2020/4/8
  * @Description 任务线程类，实现编译排队功能
  */
-@Component(value="taskThread")
+@Component(value = "taskThread")
 public class TaskThread extends Thread {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskThread.class);
@@ -71,7 +72,7 @@ public class TaskThread extends Thread {
                     } catch (Exception e) {
                         logger.error("编译失败,请检查相关配置");
                     }
-                }else {
+                } else {
                     try {
                         compileQueue.wait(1000);
                     } catch (InterruptedException e) {

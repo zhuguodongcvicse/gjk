@@ -31,7 +31,7 @@ Workbench:
   path: D:\\software\\windriver\\windriverForMipsHR2
 Linux:
   path: /gjk/project
-  ip: 192.168.230.144
+  ip: 192.168.159.129
   username: root1
   password: root
 downPath:

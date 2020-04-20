@@ -158,7 +158,7 @@ import {
   codeGeneration,
   getPassCompByProId,
   removeProIdCompIdList,
-    getCurrentProApplyedComps
+  getCurrentProApplyedComps
 } from "@/api/pro/project";
 import {
   fetchProList,
@@ -478,8 +478,6 @@ export default {
             if (i.isComplie) {
               let filePath = { filePath: "" };
               filePath.filePath = i.filePath + "\\" + i.fileName;
-              // filePath.filePath = this.fileData.filePath
-              //getPath({path:"D:\\\CCode\\\ConsoleApplication1\\\ConsoleApplication1.sln"});
               //将 文件夹名称 和 数据 一起返回给textEdits.vue
               var platformType = "";
               //获取平台类型
@@ -494,13 +492,8 @@ export default {
                   platformType: platformType,
                   token: this.token
                 }).then(val => {
-                  // this.$store.dispatch(
-                  //   "saveConsoleLog",
-                  //   this.fileData.fileName + "===@@@===" + val.data.data
-                  // );
-                  //this.$store.dispatch("saveTextLog",val.data.data)
                   this.$message({
-                    message: val.data.data
+                    message: val.data.msg
                   });
                 });
               });
@@ -510,10 +503,7 @@ export default {
           let filePath = { filePath: "" };
           filePath.filePath =
             this.fileData.filePath + "\\" + this.fileData.fileName;
-          // filePath.filePath = this.fileData.filePath
-          //getPath({path:"D:\\\CCode\\\ConsoleApplication1\\\ConsoleApplication1.sln"});
           //将 文件夹名称 和 数据 一起返回给textEdits.vue
-
           //获取平台类型
           getAppByProcessId({
             fileName: this.fileData.fileName,
@@ -525,16 +515,8 @@ export default {
               platformType: val.data.data,
               token: this.token
             }).then(val => {
-              //this.$store.state.consoleLog = "编译信息"
-              // this.$store.dispatch(
-              //   "saveConsoleLog",
-              //   this.fileData.fileName + "===@@@===" + val.data.data
-              // );
-              // this.$store.dispatch("saveTextLog",val.data.data)
-              console.log("响应了");
-              //this.connect();
               this.$message({
-                message: val.data.data
+                message: val.data.msg
               });
             });
           });
@@ -544,15 +526,15 @@ export default {
         this.addProcedureDialogVisible = true;
       } else if (item == "申请构件") {
         //this.addProCompDialogVisible = true;
-          getCurrentProApplyedComps(this.temp_currProject.id).then(res => {
-              this.$router.push({
-                  path: "/showComponent",
-                  query: {
-                      temp_currProject: this.temp_currProject,
-                      proComps: res.data.data
-                  }
-              });
-          })
+        getCurrentProApplyedComps(this.temp_currProject.id).then(res => {
+          this.$router.push({
+            path: "/showComponent",
+            query: {
+              temp_currProject: this.temp_currProject,
+              proComps: res.data.data
+            }
+          });
+        });
       } else if (item == "导入") {
         this.importProjectDialogVisible = true;
       } else if (item == "删除流程") {

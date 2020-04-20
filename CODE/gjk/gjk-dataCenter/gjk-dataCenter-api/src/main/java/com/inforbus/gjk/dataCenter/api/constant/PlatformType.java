@@ -1,4 +1,4 @@
-package com.inforbus.gjk.compile.constant;
+package com.inforbus.gjk.dataCenter.api.constant;
 
 /**
  * PlatformType
