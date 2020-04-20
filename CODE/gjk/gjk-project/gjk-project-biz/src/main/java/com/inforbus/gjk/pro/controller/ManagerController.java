@@ -415,22 +415,7 @@ public class ManagerController {
     */
 	@GetMapping("getAllList/{id}")
 	public List getAllList(@PathVariable("id") String id) {
-<<<<<<< HEAD
-		return managerService.getXmlFile(id);
-=======
-		File xmlFile = managerService.getXmlFile(id);
-		List<HardwareNode> hardwareNodeList = ProcedureXmlAnalysis.getHardwareNodeList(xmlFile);
-		if (hardwareNodeList.size() != 0) {
-			List<Arrows> arrowsList = ProcedureXmlAnalysis.getArrowsList(xmlFile);
-			ArrayList<Object> array = new ArrayList<>();
-			array.add(hardwareNodeList);
-			array.add(arrowsList);
-			return array;
-		} else {
-			return null;
-		}
-
->>>>>>> 672fc552d6045adf80437e8c79215676675ed586
+	return managerService.getXmlFile(id);
 	}
 
 	/**
