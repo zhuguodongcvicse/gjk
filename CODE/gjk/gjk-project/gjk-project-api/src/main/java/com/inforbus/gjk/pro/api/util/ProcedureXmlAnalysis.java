@@ -56,6 +56,11 @@ public class ProcedureXmlAnalysis {
 		analysisByProcedureXml(file);
 		return hardwareNodes;
 	}
+	
+	public List<Part> getPartList(File file, XmlEntityMap xmlEntityMap) {
+		analysisByProcedureXml(file,xmlEntityMap);
+		return parts;
+	}
 
 	public List<Part> getPartList(File file) {
 		analysisByProcedureXml(file);

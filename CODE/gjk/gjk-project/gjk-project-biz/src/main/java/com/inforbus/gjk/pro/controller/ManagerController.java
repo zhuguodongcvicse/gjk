@@ -281,7 +281,13 @@ public class ManagerController {
 
 	}
 
-	// 主题配置生成xml
+	/**
+	 * 主题配置生成xml文件
+	 * @param entity
+	 * @param proDetailId
+	 * @param name
+	 * @return
+	 */
 	@PutMapping
 	@RequestMapping("/createThemeXML/{proDetailId}/{name}")
 	public R createThemeXML(@RequestBody XmlEntityMap entity, @PathVariable("proDetailId") String proDetailId,
@@ -289,7 +295,13 @@ public class ManagerController {
 		return new R<>(managerService.createThemeXML(entity, proDetailId, name));
 	}
 
-	// 网络配置生成xml
+	/**
+	 * 网络配置生成xml文件
+	 * @param entity
+	 * @param proDetailId
+	 * @param name
+	 * @return
+	 */
 	@PutMapping
 	@RequestMapping("/createNetWorkXML/{proDetailId}/{name}")
 	public R createNetWorkXML(@RequestBody XmlEntityMap entity, @PathVariable("proDetailId") String proDetailId,
@@ -303,7 +315,11 @@ public class ManagerController {
 		return deleteFlag;
 	}
 
-	// 解析自定义配置xml
+	/**
+	 * 解析自定义配置xml
+	 * @param proDetailId
+	 * @return
+	 */
 	@PutMapping
 	@RequestMapping("/analysisThemeXML/{proDetailId}")
 	public R analysisThemeXML(@PathVariable("proDetailId") String proDetailId) {
