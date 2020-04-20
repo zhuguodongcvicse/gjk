@@ -18,6 +18,8 @@ var nodeOrLinkList;
 var nodeOrLinkFirst
 //仿真数据
 var simulationData = [];
+//完备性检查
+var completeCheckflag = false;
 //子向父传参数
 function handleMessageToParent(cmd, gjIdAndTemId) {
   window.parent.postMessage({
@@ -53,7 +55,10 @@ function handleMessageFromParent(event) {
       updatePoint(proData.params);
       break
     case 'clickCompSave':
+
+    if(completeCheckflag == false){
       save();
+    };
       break
     case 'clickCompLoading':
       loadData = data.params
@@ -1154,6 +1159,7 @@ function save() {
 var backupJsonData
 //完备性检查
 function completeCheckFun(data) {
+  completeCheckflag = true;
   //获取当前画布json
   backupJsonData = JSON.parse(myDiagram.model.toJson());
   var jsonData = JSON.parse(myDiagram.model.toJson());
@@ -1247,6 +1253,7 @@ function completeCheckFun(data) {
 function removeStyle() {
   myDiagram.model = go.Model.fromJson({})
   myDiagram.model = go.Model.fromJson(backupJsonData);
+  completeCheckflag = false;
 }
 
 //上对齐
