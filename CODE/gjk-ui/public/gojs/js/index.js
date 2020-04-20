@@ -20,6 +20,8 @@ var nodeOrLinkFirst
 var simulationData = [];
 //完备性检查
 var completeCheckflag = false;
+//双击连线标识
+var doublechick  = false;
 //子向父传参数
 function handleMessageToParent(cmd, gjIdAndTemId) {
   window.parent.postMessage({
@@ -122,7 +124,8 @@ function handleMessageFromParent(event) {
       }
       break;
     case 'startSimulation':
-      if (simulationData == null) {
+      console.log("+++++++++++++++",simulationData)
+      if (doublechick == true) {
         getSimulationData();
       }
       break;
@@ -206,7 +209,7 @@ function init() {
         "ChangedSelection": ChangedSelection,
         
       });
-  var simulationData = [];
+  //var simulationData = [];
   var nodeMenu =  // context menu for each Node
     $$(go.Adornment, "Vertical",
       makeButton("仿真展示",
@@ -1565,6 +1568,8 @@ function handlerDC(e, obj) {
     let endName = linkNodeData.toNodeData.variableName
     let simulation = startId + ":" + startName + "|" + endId + ":" + endName
     simulationData.push(simulation)
+    //双击标识
+    doublechick = true;
     // drawNode('success',fromKey,toKey);
 
   } else {
