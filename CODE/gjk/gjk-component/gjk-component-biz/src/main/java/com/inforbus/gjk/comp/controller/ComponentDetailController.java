@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
+import com.inforbus.gjk.common.core.constant.DataCenterConstants;
 import com.inforbus.gjk.common.core.entity.XmlEntity;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.util.R;
@@ -47,6 +48,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -166,8 +168,9 @@ public class ComponentDetailController {
 	@PostMapping(path = "/uploadUrl", consumes = { "multipart/mixed", "multipart/form-data" })
 	public R<?> uploadReturnUrl(@RequestParam(value = "file", required = false) MultipartFile ufile,
 			@RequestParam(value = "userName", required = false) String userName) {
-		// 2020年4月16日14:04:28 更改返回方式(xiaohe) old====> new R<>(componentDetailService.getUploadFilesUrl(ufile,userName))
-		return componentDetailService.getUploadFilesUrl(ufile,userName);
+		// 2020年4月16日14:04:28 更改返回方式(xiaohe) old====> new
+		// R<>(componentDetailService.getUploadFilesUrl(ufile,userName))
+		return componentDetailService.getUploadFilesUrl(ufile, userName);
 	}
 
 	/**
@@ -179,12 +182,12 @@ public class ComponentDetailController {
 	 * @param filesPath 文件路径（JSON字符串）
 	 * @return 文件夹路径
 	 */
-	@SuppressWarnings("unchecked")
 	@ResponseBody
-	@PostMapping(path = "/uploadFiles", consumes = { "multipart/mixed", "multipart/form-data" })
-	public R<?> uploadFilesReturnUrl(@RequestParam(value = "file", required = false) MultipartFile[] ufile,
+	@PostMapping(path = "/uploadFiles", produces = {
+			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public R<?> uploadFilesReturnUrl(@RequestPart(value = "file", required = false) MultipartFile[] ufile,
 			@RequestParam(value = "userName", required = false) String userName) {
-//		JSONObject jsonObject = JSONUtil.parseObj(filesPath);
+		// 2020年4月16日14:04:28 更改调用 方式(xiaohe) old====> new
 		return new R<>(componentDetailService.getUploadFilesUrl(ufile, userName));
 	}
 
@@ -238,6 +241,13 @@ public class ComponentDetailController {
 		return new R<>(componentDetailService.listCompDetailByCompId(compId));
 	}
 
+	/**
+	 * @Title: delFilePath
+	 * @Desc 删除文件
+	 * @Author xiaohe
+	 * @DateTime 2020年4月20日
+	 * @param lists 文件路径列表 
+	 */
 	@PostMapping("/delFilePath")
 	public void delFilePath(@RequestBody List<String> lists) {
 		componentDetailService.delFilePath(lists);

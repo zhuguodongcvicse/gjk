@@ -51,8 +51,6 @@ public class RemoteDataCenterServiceFallbackImpl implements RemoteDataCenterServ
 	@Setter
 	private Throwable cause;
 
-
-
 	@Override
 	public R uploadLocalFile(MultipartFile ufile, String filePath) {
 		R ret = new R<>();
@@ -61,14 +59,16 @@ public class RemoteDataCenterServiceFallbackImpl implements RemoteDataCenterServ
 		log.error("file-service 服务异常", cause);
 		return ret;
 	}
+
 	@Override
-	public R uploadLocalFiles(MultipartFile[] ufile) {
+	public R uploadLocalFiles(MultipartFile[] ufile, String localPath) {
 		R ret = new R<>();
 		ret.setException(cause);
 		ret.setMsg("file-service 服务异常 ");
 		log.error("file-service 服务异常", cause);
 		return ret;
 	}
+
 	/**
 	 * @Title: downloadStreamFiles
 	 * @Desc 多文件下载（fegin）
@@ -112,14 +112,15 @@ public class RemoteDataCenterServiceFallbackImpl implements RemoteDataCenterServ
 		log.error("file-service 服务异常", cause);
 		return null;
 	}
+
 	/**
 	 * @Title: analysisXmlFileToXMLEntityMap
 	 * @Desc 解析xml文件为xmlEntity对象
 	 * @Author xiaohe
 	 * @DateTime 2020年4月16日
 	 * @param localPath
-	 * @return 
-	 * @see com.inforbus.gjk.comp.api.feign.RemoteDataCenterService#analysisXmlFileToXMLEntityMap(java.lang.String) 
+	 * @return
+	 * @see com.inforbus.gjk.comp.api.feign.RemoteDataCenterService#analysisXmlFileToXMLEntityMap(java.lang.String)
 	 */
 	@Override
 	public R<XmlEntityMap> analysisXmlFileToXMLEntityMap(String localPath) {
@@ -129,14 +130,15 @@ public class RemoteDataCenterServiceFallbackImpl implements RemoteDataCenterServ
 		log.error("数据中心服务异常---解析XML文件", cause);
 		return ret;
 	}
+
 	/**
 	 * @Title: createXMLFile
 	 * @Desc 在指定位置生成xml文件
 	 * @Author xiaohe
 	 * @DateTime 2020年4月16日
 	 * @param xMlEntityMapVO
-	 * @return 
-	 * @see com.inforbus.gjk.comp.api.feign.RemoteDataCenterService#createXMLFile(com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO) 
+	 * @return
+	 * @see com.inforbus.gjk.comp.api.feign.RemoteDataCenterService#createXMLFile(com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO)
 	 */
 	@Override
 	public R<Boolean> createXMLFile(XMlEntityMapVO xMlEntityMapVO) {
@@ -144,6 +146,15 @@ public class RemoteDataCenterServiceFallbackImpl implements RemoteDataCenterServ
 		ret.setException(cause);
 		ret.setMsg("数据中心服务异常---生成XML文件 ");
 		log.error("数据中心服务异常---生成XML文件", cause);
+		return ret;
+	}
+
+	@Override
+	public R delFolder(String[] folderPath) {
+		R<Boolean> ret = new R<Boolean>();
+		ret.setException(cause);
+		ret.setMsg("数据中心服务异常---删除文件错误 ");
+		log.error("数据中心服务异常---删除文件错误", cause);
 		return ret;
 	}
 

@@ -84,11 +84,11 @@ public interface FileService {
 	 * @Description: 删除文件夹
 	 * @Author xiaohe
 	 * @DateTime 2020年4月1日
-	 * @param folderPath 文件夹路径
+	 * @param folderPath 文件路径集合
 	 * @return Boolean
 	 * @throws Exception 文件流出错
 	 */
-	public Boolean delFolder(String folderPath) throws Exception;
+	public Boolean delFolder(String[] folderPath) throws Exception;
 
 	/**
 	 * 拷贝文件

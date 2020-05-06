@@ -66,6 +66,7 @@ import com.inforbus.gjk.comp.api.entity.ComponentDetail;
 import com.inforbus.gjk.comp.api.feign.RemoteDataCenterService;
 import com.inforbus.gjk.comp.api.util.CompTreeUtil;
 import com.inforbus.gjk.comp.api.vo.ComponentVO;
+import com.inforbus.gjk.comp.service.ComponentDetailService;
 import com.inforbus.gjk.comp.service.ComponentService;
 import com.inforbus.gjk.libs.api.dto.ThreeLibsFilePathDTO;
 import com.inforbus.gjk.dataCenter.api.entity.FileCenter;
@@ -86,7 +87,7 @@ import lombok.AllArgsConstructor;
 public class ComponentController {
 
 	private final ComponentService componentService;
-	
+	private final ComponentDetailService componentDetailService;
 	private final RemoteDataCenterService rdcService;
 
 	public void downloadFile() {
@@ -395,12 +396,14 @@ public class ComponentController {
 	@PostMapping(value = "/uploadMultipartFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public R handleFileUpload(@RequestPart(value = "file") MultipartFile file,
 			@RequestParam("filePath") String filePath) {
+
 		return rdcService.uploadLocalFile(file, filePath);
 	}
 
 	@PostMapping(value = "/uploadMultipartFiles", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public R handleFileUploads(@RequestPart(value = "files") MultipartFile[] file) {
-		return rdcService.uploadLocalFiles(file);
+	public R handleFileUploads(@RequestPart(value = "file") MultipartFile[] file,
+			@RequestParam("filePath") String filePath) {
+		return rdcService.uploadLocalFiles(file, filePath);
 	}
 
 	@PostMapping(value = "/downloadStreamFiles", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -412,11 +415,11 @@ public class ComponentController {
 			Response response = rdcService.downloadStreamFiles(strArr);
 			Response.Body body = response.body();
 			inputStream = body.asInputStream();
-			
+
 			BufferedInputStream in = null;
 			BufferedOutputStream out = null;
 			in = new BufferedInputStream(inputStream);
-			out = new BufferedOutputStream(new FileOutputStream("D:\\0000\\func1.bak.zip"));
+			out = new BufferedOutputStream(new FileOutputStream("D:\\0000\\测试.zip"));
 			int len = -1;
 			byte[] b = new byte[1024];
 			while ((len = in.read(b)) != -1) {

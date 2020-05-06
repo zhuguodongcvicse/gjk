@@ -55,14 +55,33 @@ public interface RemoteDataCenterService {
 		}
 	}
 
+	/**
+	 * @Title: uploadLocalFile
+	 * @Desc 文件上传
+	 * @Author xiaohe
+	 * @DateTime 2020年4月17日
+	 * @param ufile      MultipartFile文件
+	 * @param localPath 要上传的全文件路径
+	 * @return 
+	 */
 	@PostMapping(value = serviceName + "/uploadMultipartFile", produces = {
 			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public R<?> uploadLocalFile(@RequestPart(value = "file") MultipartFile ufile,
 			@RequestParam("filePath") String filePath);
 
+	/**
+	 * @Title: uploadLocalFiles
+	 * @Desc 多文件上传 MultipartFile[]
+	 * @Author xiaohe
+	 * @DateTime 2020年4月17日
+	 * @param ufile     MultipartFile[] 文件数组
+	 * @param localPath 要上传的全文件路径
+	 * @return 
+	 */
 	@PostMapping(value = serviceName + "/uploadMultipartFiles", produces = {
 			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public R<?> uploadLocalFiles(@RequestPart(value = "files") MultipartFile[] ufile);
+	public R<?> uploadLocalFiles(@RequestPart(value = "file") MultipartFile[] ufile,
+			@RequestParam("filePath") String localPath);
 
 	/**
 	 * @Title: downloadStreamFiles
@@ -120,4 +139,14 @@ public interface RemoteDataCenterService {
 	 */
 	@PostMapping(serviceName + "/createXMLFile")
 	public R<Boolean> createXMLFile(@RequestBody XMlEntityMapVO xMlEntityMapVO);
+	/**
+	 * @Title: delFolder
+	 * @Desc 删除文件或者文件夹，或多个文件和文件夹
+	 * @Author xiaohe
+	 * @DateTime 2020年4月20日
+	 * @param folderPath 文件和文件夹列表
+	 * @return 
+	 */
+	@PostMapping(serviceName +"/delFolder")
+	public R<Boolean> delFolder(@RequestParam("folderPath") String[] folderPath);
 }
