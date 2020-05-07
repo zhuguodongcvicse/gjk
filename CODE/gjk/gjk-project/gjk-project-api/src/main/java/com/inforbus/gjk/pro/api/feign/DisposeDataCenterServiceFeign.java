@@ -1,6 +1,14 @@
 package com.inforbus.gjk.pro.api.feign;
 
+import com.inforbus.gjk.common.core.config.FeignSpringFormEncoder;
+import feign.codec.Encoder;
+import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.support.SpringEncoder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,11 +21,34 @@ import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 import com.inforbus.gjk.pro.api.feign.factory.DisposeDataCenterServiceFallbackFactory;
 
 import feign.Response;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
-@FeignClient(value = ServiceNameConstants.DATACENDER_SERVICE, fallbackFactory = DisposeDataCenterServiceFallbackFactory.class)
+@FeignClient(value = ServiceNameConstants.DATACENDER_SERVICE,
+		url = "localhost:8080/dataCenter/fileServe",
+		fallbackFactory = DisposeDataCenterServiceFallbackFactory.class,
+		configuration = DisposeDataCenterServiceFeign.FeignMultipartSupportConfig.class)
 public interface DisposeDataCenterServiceFeign {
 
 	public static final String serviceName = "/fileServe";
+
+	/**
+	 * @ClassName: FeignMultipartSupportConfig
+	 * @Desc Feign 上传文件时用到的配置
+	 * @Author wang
+	 * @DateTime 2020年4月15日
+	 */
+	@Configuration
+	public class FeignMultipartSupportConfig {
+		@Autowired
+		private ObjectFactory<HttpMessageConverters> messageConverters;
+
+		@Bean
+		public Encoder feignFormEncoder() {
+			return new FeignSpringFormEncoder(new SpringEncoder(messageConverters));
+		}
+	}
+
 	/**
 	 * 解析xml文件为xmlMap对象
 	 * @param [localPath] 文件的绝对路径
@@ -52,4 +83,18 @@ public interface DisposeDataCenterServiceFeign {
 		 */
 		@PostMapping(value = serviceName + "/downloadStreamFiles", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 		public Response downloadStreamFiles(@RequestParam("filePaths") String[] filePaths);
+
+	/**
+	 * @Title: uploadLocalFiles
+	 * @Desc 多文件上传 MultipartFile[]
+	 * @Author wang
+	 * @DateTime 2020年5月6日
+	 * @param ufile     MultipartFile[] 文件数组
+	 * @param localPath 要上传的文件绝对路径
+	 * @return
+	 */
+	@PostMapping(value = "/uploadMultipartFiles", produces = {
+			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public R<?> uploadLocalFiles(@RequestPart(value = "file") MultipartFile[] ufile,
+								 @RequestParam("filePath") String localPath);
 }
