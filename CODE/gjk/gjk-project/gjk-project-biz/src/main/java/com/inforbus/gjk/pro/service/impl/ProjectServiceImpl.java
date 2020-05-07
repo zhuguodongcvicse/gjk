@@ -23,18 +23,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Maps;
 import com.inforbus.gjk.admin.api.entity.SysUser;
 import com.inforbus.gjk.common.core.constant.CommonConstants;
-import com.inforbus.gjk.common.core.constant.DataCenterConstants;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.pro.api.dto.BaseTemplateIDsDTO;
 import com.inforbus.gjk.pro.api.dto.FilePathDTO;
-import com.inforbus.gjk.pro.api.dto.FolderPathDTO;
 import com.inforbus.gjk.pro.api.dto.ProjectInfoDTO;
-import com.inforbus.gjk.pro.api.entity.Hardwarelibs;
 import com.inforbus.gjk.pro.api.entity.ProComp;
 import com.inforbus.gjk.pro.api.entity.Project;
-import com.inforbus.gjk.pro.api.entity.ProjectFile;
 import com.inforbus.gjk.pro.api.feign.DisposeDataCenterServiceFeign;
 import com.inforbus.gjk.pro.api.util.HttpClientUtil;
 import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
@@ -49,27 +45,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import com.inforbus.gjk.pro.thread.StreamManage;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
-import sun.rmi.runtime.Log;
-
-import javax.xml.transform.OutputKeys;
 
 /**
  * 资源管理
@@ -88,8 +71,6 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
 	@Autowired
 	private DisposeDataCenterServiceFeign disposeDataCenterServiceFeign;
-
-	private static final String proDetailPath = JGitUtil.getLOCAL_REPO_PATH();
 
 	@Value("${git.local.path}")
 	private String LOCALPATH;
@@ -192,62 +173,12 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 	 * @DateTime 2019年10月17日 13:54:34
 	 */
 	@Override
-	public boolean uploadFile(FilePathDTO filePathDTO) {
-		if (filePathDTO != null) {
-			File oldFile = new File(filePathDTO.getOldFilePath());// 创建将要增加的文件的file对象
-			File newFile = new File(filePathDTO.getNewFilePath());// 增加到的位置的对象
-			if (oldFile.exists() && newFile.exists()) {
-				File uploadFile = new File(newFile, filePathDTO.getFileName());// 将要增加的文件file对象
-				FileInputStream in = null;
-				FileOutputStream out = null;
-				try {
-					if (!uploadFile.exists()) {// 判断文件是否在将要增加的路径下存在
-						uploadFile.createNewFile();// 新建将要增加文件
-						in = new FileInputStream(oldFile);
-						out = new FileOutputStream(uploadFile);
-						int len = 0;
-						byte[] bytes = new byte[1024];
-						while ((len = in.read(bytes)) != -1) {// 循环读写
-							out.write(bytes, 0, len);
-						}
-						System.out.println("文件增加成功");
-					} else {// 文件已存在,替换掉,给出提示
-						in = new FileInputStream(oldFile);
-						out = new FileOutputStream(uploadFile);
-						int len = 0;
-						byte[] bytes = new byte[1024];
-						while ((len = in.read(bytes)) != -1) {
-							out.write(bytes, 0, len);
-						}
-						System.out.println("此文件已存在,被替换");
-					}
-					return true;
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} finally {
-					if (in != null) {
-						try {
-							in.close();// 关闭输入流
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-					if (out != null) {
-						try {
-							out.close();// 关闭输出流
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-		}
-		return false;
+	public R<Boolean> uploadFile(FilePathDTO filePathDTO) {
+		R<Boolean> r = disposeDataCenterServiceFeign.copylocalFile(filePathDTO.getOldFilePath(), filePathDTO.getNewFilePath());
+		return r;
 	}
 
-
+	@Override
 	public List<ProComp> saveProCompList(String projectId, List<String> compList) {
 		List<ProComp> proComps = new ArrayList<ProComp>();
 		ProComp proComp = null;
@@ -338,7 +269,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 		String path = "";
 		for (ProjectFileVO proFile : treeByProjectId) {
 			if (proFile.getFileType().equals("11")) {
-				path = proDetailPath + proFile.getFilePath();
+				path = LOCALPATH + proFile.getFilePath();
 			}
 		}
 		BaseTemplateIDsDTO oldBaseTemplateIDsDTO = JSON.parseObject(oldProject.getBasetemplateIds(),

@@ -200,7 +200,7 @@ public class FileController {
 
 	/**
 	 * @Author wang
-	 * @Description: 根据据对路径删除文件
+	 * @Description: 根据绝对路径删除文件
 	 * @Param: [absolutePath] 文件的绝对路径
 	 * @Return: com.inforbus.gjk.common.core.util.R
 	 * @Create: 2020/4/15
@@ -242,8 +242,10 @@ public class FileController {
 			ret.setData(true);
 			ret.setMsg("拷贝文件成功");
 		} catch (Exception e) {
-			logger.error("删除指定文件夹", e);
-			return new R<Boolean>(e);
+			logger.error("文件拷贝失败", e);
+			ret.setCode(CommonConstants.FAIL);
+			ret.setData(false);
+			ret.setMsg("文件拷贝失败");
 		}
 		return ret;
 	}

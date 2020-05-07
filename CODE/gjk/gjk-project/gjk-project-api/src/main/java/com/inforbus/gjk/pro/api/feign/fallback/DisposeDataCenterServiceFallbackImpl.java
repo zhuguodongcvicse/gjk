@@ -107,4 +107,13 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
         r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
         return r;
     }
+
+    @Override
+    public R<Boolean> copylocalFile(String source, String destin) {
+        log.error("调用数据中心的feign接口copylocalFile方法失败", cause);
+        R r = new R();
+        r.setCode(CommonConstants.FAIL);
+        r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
+        return r;
+    }
 }

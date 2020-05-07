@@ -31,6 +31,7 @@ import com.inforbus.gjk.admin.service.BaseTemplateService;
 import lombok.AllArgsConstructor;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,6 +51,7 @@ public class BaseTemplateController {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BaseTemplateController.class);
 
+    @Autowired
     private final BaseTemplateService baseTemplateService;
 
     /**

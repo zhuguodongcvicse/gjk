@@ -127,7 +127,7 @@ public interface ProjectService extends IService<Project> {
 	 * @param filePathDTO
 	 * @return boolean
 	 */
-	boolean uploadFile(FilePathDTO filePathDTO);
+	 R<Boolean> uploadFile(FilePathDTO filePathDTO);
 
 	void removeCompProject(String compId, String projectId);
 

@@ -35,6 +35,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -51,9 +53,14 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/project")
 public class ProjectController {
 
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ProjectController.class);
+
+	@Autowired
 	private final ProjectService projectService;
+
+	@Autowired
 	private final ProCompService proCompService;
-	private static final String uploadPath = JGitUtil.getLOCAL_REPO_PATH();
+
 
 	/**
 	 * 简单分页查询
@@ -166,7 +173,7 @@ public class ProjectController {
 
 	/**
 	 * @param filePathDTO
-	 * @return
+	 * @return R
 	 * @Title: uploadFile
 	 * @Description: 项目树右键菜单上传文件功能
 	 * @Author wang
@@ -175,7 +182,27 @@ public class ProjectController {
 	@SysLog("增加文件")
 	@PutMapping("/uploadFile")
 	public R uploadFile(@RequestBody FilePathDTO filePathDTO) {
-		return new R<>(projectService.uploadFile(filePathDTO));
+		R ret = new R();
+		boolean flag = false;
+		try {
+			R<Boolean> r = projectService.uploadFile(filePathDTO);
+			flag = r.getData();
+			if (flag){
+				ret.setData(flag);
+				ret.setCode(CommonConstants.SUCCESS);
+				ret.setMsg("增加文件成功");
+			}else {
+				ret.setData(flag);
+				ret.setCode(CommonConstants.FAIL);
+				ret.setMsg("增加文件失败");
+			}
+		}catch (Exception e){
+			ret.setData(false);
+			ret.setCode(CommonConstants.FAIL);
+			ret.setMsg("增加文件失败");
+			logger.error("增加文件失败 ：" + e.getMessage());
+		}
+		return ret;
 	}
 
 	/**

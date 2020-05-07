@@ -97,4 +97,17 @@ public interface DisposeDataCenterServiceFeign {
 			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public R<?> uploadLocalFiles(@RequestPart(value = "file") MultipartFile[] ufile,
 								 @RequestParam("filePath") String localPath);
+
+	/**
+	 * @param source 源文件路径
+	 * @param destin 拷贝文件路径
+	 * @return R<Boolean>
+	 * @throws Exception
+	 * @Title: copylocalFile
+	 * @Description: 拷贝文件
+	 * @Author wang
+	 * @DateTime 2020年5月07日
+	 */
+	@PostMapping("copylocalFile")
+	public R<Boolean> copylocalFile(@RequestParam("source") String source, @RequestParam("destin") String destin);
 }
