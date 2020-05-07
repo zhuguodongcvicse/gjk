@@ -232,16 +232,6 @@
 		ORDER BY create_time DESC
 	</select>
 
-	<select id="getComponentCompDetailById"
-		resultMap="componentCompDetailMap">
-		SELECT
-		<include refid="componentCompDetailSql" />
-		FROM
-		gjk_component AS comp LEFT JOIN gjk_component_detail AS d ON
-		comp.id=d.comp_id
-		WHERE
-		comp.id = #{id}
-	</select>
 
 	<update id="deleteCompById">
 		UPDATE gjk_component AS comp SET comp.del_flag = '1'

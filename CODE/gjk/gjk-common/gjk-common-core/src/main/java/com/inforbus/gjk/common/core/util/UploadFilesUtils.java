@@ -5,31 +5,28 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.junit.Test;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -461,13 +458,13 @@ public class UploadFilesUtils {
 	 * @Desc getZipStreamFiles
 	 * @Author xiaohe
 	 * @DateTime 2020年4月17日
-	 * @param file 要压缩的文件
-	 * @param zipstream  zip流
-	 * @param dir 相对路径
-	 * @throws IOException 
+	 * @param file      要压缩的文件
+	 * @param zipstream zip流
+	 * @param dir       相对路径
+	 * @throws IOException
 	 */
 	private static void getZipStreamFiles(File file, ZipOutputStream zipstream, String dir) throws IOException {
-		//isFile==>判断是否是文件
+		// isFile==>判断是否是文件
 		if (file.isFile()) {
 			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
 			ZipEntry zipEntry = new ZipEntry(dir);
@@ -486,5 +483,33 @@ public class UploadFilesUtils {
 				UploadFilesUtils.getZipStreamFiles(f, zipstream, dir + f.getName());
 			}
 		}
+	}
+
+	/**
+	 * @Title: createFileItem
+	 * @Desc 
+	 * @Author xiaohe
+	 * @DateTime 2020年5月7日
+	 * @param filePath
+	 * @param fileName
+	 * @return
+	 * @throws IOException 
+	 */
+	public static FileItem createFileItem(String filePath, String fileName) throws IOException {
+		String fieldName = "file";
+		FileItemFactory factory = new DiskFileItemFactory(16, null);
+		FileItem item = factory.createItem(fieldName, "text/plain", false, fileName);
+		File newfile = new File(filePath);
+		int bytesRead = 0;
+		byte[] buffer = new byte[8192];
+		FileInputStream fis = new FileInputStream(newfile);
+		OutputStream os = item.getOutputStream();
+		while ((bytesRead = fis.read(buffer, 0, 8192)) != -1) {
+			os.write(buffer, 0, bytesRead);
+		}
+		os.close();
+		fis.close();
+		return item;
+
 	}
 }

@@ -20,22 +20,23 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.ibatis.javassist.expr.NewArray;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.entity.ContentType;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,18 +45,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.common.log.annotation.SysLog;
@@ -65,11 +63,7 @@ import com.inforbus.gjk.comp.api.entity.Component;
 import com.inforbus.gjk.comp.api.entity.ComponentDetail;
 import com.inforbus.gjk.comp.api.feign.RemoteDataCenterService;
 import com.inforbus.gjk.comp.api.util.CompTreeUtil;
-import com.inforbus.gjk.comp.api.vo.ComponentVO;
-import com.inforbus.gjk.comp.service.ComponentDetailService;
 import com.inforbus.gjk.comp.service.ComponentService;
-import com.inforbus.gjk.libs.api.dto.ThreeLibsFilePathDTO;
-import com.inforbus.gjk.dataCenter.api.entity.FileCenter;
 
 import feign.Response;
 import lombok.AllArgsConstructor;
@@ -87,12 +81,7 @@ import lombok.AllArgsConstructor;
 public class ComponentController {
 
 	private final ComponentService componentService;
-	private final ComponentDetailService componentDetailService;
 	private final RemoteDataCenterService rdcService;
-
-	public void downloadFile() {
-
-	}
 
 	/**
 	 * 简单分页查询
@@ -189,11 +178,6 @@ public class ComponentController {
 		return new R<>(list);
 	}
 
-	@RequestMapping("/getCompDetailById/{id}")
-	public ComponentVO getComponentCompDetailById(@PathVariable("id") String id) {
-		return componentService.getComponentCompDetailById(id);
-	}
-
 	/**
 	 * @Title: getCompByUserId
 	 * @Description: 通过用户编号查询构件
@@ -229,12 +213,7 @@ public class ComponentController {
 	 */
 	@PostMapping("/compFiles/{compId}")
 	public R getCompFiles(@PathVariable String compId) {
-		return new R<>(componentService.getCompFiles(compId));
-	}
-
-	@GetMapping("/comImg1/{imgId}")
-	public R getImgFileStr(@PathVariable String imgId) {
-		return new R<>(componentService.getImgFileStr(imgId));
+		return componentService.getCompFiles(compId);
 	}
 
 	/**
@@ -294,7 +273,7 @@ public class ComponentController {
 //	@Cacheable(value = "compDicts{filePath}")
 	public R<?> analysisXmlFile(@RequestParam(value = "filePath", required = false) String filePath) {
 		System.out.println("filePath" + filePath);
-		return new R<>(componentService.analysisXmlFile(filePath));
+		return componentService.analysisXmlFile(filePath);
 	}
 
 	/**
@@ -396,7 +375,6 @@ public class ComponentController {
 	@PostMapping(value = "/uploadMultipartFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public R handleFileUpload(@RequestPart(value = "file") MultipartFile file,
 			@RequestParam("filePath") String filePath) {
-
 		return rdcService.uploadLocalFile(file, filePath);
 	}
 

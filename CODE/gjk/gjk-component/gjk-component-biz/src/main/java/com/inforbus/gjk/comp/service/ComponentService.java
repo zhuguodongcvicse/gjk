@@ -78,16 +78,6 @@ public interface ComponentService extends IService<Component> {
 	boolean deleteCompAndCompDetail(String compId);
 
 	/**
-	 * @Title: getComponentCompDetailById
-	 * @Description: 根据构件ID关联查询
-	 * @Author cvicse
-	 * @DateTime 2019年4月29日 上午11:34:29
-	 * @param id
-	 * @return
-	 */
-	ComponentVO getComponentCompDetailById(String id);
-
-	/**
 	 * @Title: getCompByUserId
 	 * @Description: 根据用户编号查询构件菜单
 	 * @Author xiaohe
@@ -117,15 +107,6 @@ public interface ComponentService extends IService<Component> {
 	 */
 	Map<String, Object> getCompAndDetailMap(String userId);
 
-	/**
-	 * @Title: deleteCompById
-	 * @Description:根据ID删除构件
-	 * @Author cvicse
-	 * @DateTime 2019年4月29日 上午11:30:38
-	 * @param id
-	 * @return
-	 */
-	boolean deleteCompById(String id);
 
 	/**
 	 * @Title: saveComp
@@ -163,18 +144,9 @@ public interface ComponentService extends IService<Component> {
 	 * @DateTime 2019年5月23日 上午11:34:43
 	 * @param compId 构件Id
 	 * @return
+	 * 2020年5月6日13:33:19 xiaohe 更改返回类型
 	 */
-	Map<String, Object> getCompFiles(String compId);
-
-	/**
-	 * @Title: getImgFileStr
-	 * @Description: 获取构件图片
-	 * @Author cvics
-	 * @DateTime 2019年5月23日 上午11:34:43
-	 * @param imgId 图片Id
-	 * @return
-	 */
-	String getImgFileStr(String imgId);
+	R getCompFiles(String compId);
 
 	/**
 	 * @Title: getImgFile
@@ -193,7 +165,15 @@ public interface ComponentService extends IService<Component> {
 	 */
 	List<CompDictVO> getCompDictList();
 
-	XmlEntityMap analysisXmlFile(String filePath);
+	/**
+	 * @Title: analysisXmlFile
+	 * @Desc 解析基础模板文件
+	 * @Author xiaohe
+	 * @DateTime 2020年5月6日
+	 * @param filePath 文件路径
+	 * @return 
+	 */
+	R analysisXmlFile(String filePath);
 
 	/**
 	 * 解析传入的压缩文件

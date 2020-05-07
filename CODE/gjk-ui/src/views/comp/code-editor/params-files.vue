@@ -233,6 +233,7 @@ export default {
       deep: true
     },
     fileLists: function(param) {
+      console.log("1111111111",param)
       //回显文件列表
       let paramFile = param[this.fileType + "file"];
       if (paramFile !== undefined) {
