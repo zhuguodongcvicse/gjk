@@ -213,6 +213,9 @@ public class UploadFilesUtils {
 			return flag;
 		}
 		String[] tempList = file.list();
+		if (tempList == null || tempList.length <= 0){
+			return file.delete();
+		}
 		File temp = null;
 		for (int i = 0; i < tempList.length; i++) {
 			if (path.endsWith(File.separator)) {

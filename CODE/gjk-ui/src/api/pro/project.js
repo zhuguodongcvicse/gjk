@@ -256,16 +256,6 @@ export function uploadFolder(obj) {
   })
 }
 
-//项目树增加文件夹
-export function uploadFiles(obj) {
-  return request({
-    url: '/pro/project/uploadFiles',
-    method: 'put',
-    data: obj,
-  })
-}
-
-
 export function removeCompProject(compId, projectId) {
   return request({
     url: '/pro/project/removeCompProject/' + compId + '/' + projectId,

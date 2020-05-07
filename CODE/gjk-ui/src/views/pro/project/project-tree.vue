@@ -549,7 +549,7 @@ export default {
           filePath.filePath =
             this.fileData.filePath + "\\" + this.fileData.fileName;
           deleteSelectFile(filePath).then(response => {
-            if (response.data == true) {
+            if (response.data.data == true) {
               let flowFile = this.treeData[0].children;
               let appList;
               for (const i in flowFile) {
@@ -567,6 +567,17 @@ export default {
                 }
               }
               // console.log("targetNode", targetNode);
+              this.$notify({
+                title: "成功",
+                message: response.data.msg,
+                type: "success",
+                duration: 2000
+              });
+            } else {
+              this.$notify.error({
+                title: "错误",
+                message: response.data.msg
+              });
             }
           });
         });

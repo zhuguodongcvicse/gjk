@@ -17,47 +17,47 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 
 /**
- * @author geng
- * @date 2020/5/7
+ * @author lengleng
+ * @date 2019/2/1
  * feign token  fallback
  */
 @Slf4j
 @Component
 public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterServiceFeign {
-	@Setter
-	private Throwable cause;
-	
-	 /**
+    @Setter
+    private Throwable cause;
+
+    /**
      * @Author wang
      * @Description: 解析xml文件为xmlEntity对象
      * @Param: [localPath] 文件的绝对路径
      * @Return: boolean
      * @Create: 2020/4/13
      */
-	@Override
-	public R<XmlEntityMap> analysisXmlFileToXMLEntityMap(String localPath) {
-		log.error("调用数据中心的feign接口analysisXmlFileToXMLEntityMap方法失败", cause);
-		R r = new R();
-		r.setCode(CommonConstants.FAIL);
-		r.setMsg(ServiceNameConstants.DATACENDER_SERVICE+"服务器异常，请联系管理员");
-		return r;
-	}
+    @Override
+    public R<XmlEntityMap> analysisXmlFileToXMLEntityMap(String localPath) {
+        log.error("调用数据中心的feign接口analysisXmlFileToXMLEntityMap方法失败", cause);
+        R r = new R();
+        r.setCode(CommonConstants.FAIL);
+        r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
+        return r;
+    }
 
-	 /**
+    /**
      * @Author wang
      * @Description: 在指定位置生成xml文件
      * @Param: [xMlEntityMapVO]
      * @Return: boolean
      * @Create: 2020/4/14
      */
-	@Override
-	public R<Boolean> createXMLFile(XMlEntityMapVO xMlEntityMapVO) {
-		log.error("调用数据中心的feign接口createXMLFile方法失败", cause);
-		R r = new R();
-		r.setCode(CommonConstants.FAIL);
-		r.setMsg(ServiceNameConstants.DATACENDER_SERVICE+"服务器异常，请联系管理员");
-		return r;
-	}
+    @Override
+    public R<Boolean> createXMLFile(XMlEntityMapVO xMlEntityMapVO) {
+        log.error("调用数据中心的feign接口createXMLFile方法失败", cause);
+        R r = new R();
+        r.setCode(CommonConstants.FAIL);
+        r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
+        return r;
+    }
 
     /**
      * @Author wang
@@ -74,6 +74,14 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
         r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
         return r;
     }
+
+    /**
+     * @Author wang
+     * @Description: 拷贝文件熔断方法
+     * @Param: [source, destin]
+     * @Return: com.inforbus.gjk.common.core.util.R<java.lang.Boolean>
+     * @Create: 2020/5/7
+     */
     @Override
     public R<Boolean> copylocalFile(String source, String destin) {
         log.error("调用数据中心的feign接口copylocalFile方法失败", cause);
@@ -90,7 +98,7 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
 	 * @DateTime 2020年4月15日
 	 * @param filePaths
 	 * @return Response 其中包含 文件流
-	 * 
+	 *
 	 *         <pre>
 	 *         Response.Body body = response.body();
 	 *         InputStream inputStream = body.asInputStream();
@@ -117,30 +125,6 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
 	}
 
 	@Override
-	public boolean appUnload(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
-		log.error("调用数据中心的第三方客户接口feign接口appUnload方法失败", cause);
-		return false;
-	}
-
-	@Override
-	public boolean appRestart(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
-		log.error("调用数据中心的第三方客户接口feign接口appRestart方法失败", cause);
-		return false;
-	}
-
-	@Override
-	public boolean appStop(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
-		log.error("调用数据中心的第三方客户接口feign接口appStop方法失败", cause);
-		return false;
-	}
-
-	@Override
-	public boolean appPause(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
-		log.error("调用数据中心的第三方客户接口feign接口appPause方法失败", cause);
-		return false;
-	}
-
-	@Override
 	public boolean appUnInstall(Map<String, String> cmpNameToHwType, String userName, int appID, String appName,
 			String packinfoPath) {
 		log.error("调用数据中心的第三方客户接口feign接口appUnInstall方法失败", cause);
@@ -152,4 +136,20 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
 			String packinfoPath, String cmpDeployPlanFilePath) {
 		log.error("调用数据中心的第三方客户接口feign接口appLoad方法失败", cause);
 	}
+
+    /**
+     * @Author wang
+     * @Description: 删除文件熔断方法
+     * @Param: [sourcePath]
+     * @Return: com.inforbus.gjk.common.core.util.R<java.lang.Boolean>
+     * @Create: 2020/5/7
+     */
+    @Override
+    public R<Boolean> delAllFile(String sourcePath) {
+        log.error("调用数据中心的feign接口delAllFile方法失败", cause);
+        R r = new R();
+        r.setCode(CommonConstants.FAIL);
+        r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
+        return r;
+    }
 }

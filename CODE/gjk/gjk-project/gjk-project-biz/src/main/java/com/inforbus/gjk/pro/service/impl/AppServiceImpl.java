@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
+import com.inforbus.gjk.common.core.util.ExternalIOTransUtils;
 import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.pro.api.dto.AppDataDTO;
 import com.inforbus.gjk.pro.api.entity.App;
@@ -350,9 +351,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		boolean returnVal;
 		try {
 			// 调用卸载接口
-//			returnVal = ExternalIOTransUtils.appUnload(cmpNameToHwType, appDataDTO.getUserName(),
-//					appDataDTO.getFlowId(), appDataDTO.getAppName());
-			returnVal = disposeDataCenterServiceFeign.appUnload(cmpNameToHwType, appDataDTO.getUserName(),
+			returnVal = ExternalIOTransUtils.appUnload(cmpNameToHwType, appDataDTO.getUserName(),
 					appDataDTO.getFlowId(), appDataDTO.getAppName());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -376,9 +375,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		boolean returnVal;
 		try {
 			// 调用启动接口
-//			returnVal = ExternalIOTransUtils.appRestart(cmpNameToHwType, appDataDTO.getUserName(),
-//					appDataDTO.getFlowId(), appDataDTO.getAppName());
-			returnVal = disposeDataCenterServiceFeign.appRestart(cmpNameToHwType, appDataDTO.getUserName(),
+			returnVal = ExternalIOTransUtils.appRestart(cmpNameToHwType, appDataDTO.getUserName(),
 					appDataDTO.getFlowId(), appDataDTO.getAppName());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -402,9 +399,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		boolean returnVal;
 		try {
 			// 调用停止接口
-//			returnVal = ExternalIOTransUtils.appStop(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(),
-//					appDataDTO.getAppName());
-			returnVal = disposeDataCenterServiceFeign.appStop(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(),
+			returnVal = ExternalIOTransUtils.appStop(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(),
 					appDataDTO.getAppName());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -428,9 +423,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		boolean returnVal;
 		try {
 			// 调用暂停接口
-//			returnVal = ExternalIOTransUtils.appPause(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(),
-//					appDataDTO.getAppName());
-			returnVal = disposeDataCenterServiceFeign.appPause(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(),
+			returnVal = ExternalIOTransUtils.appPause(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(),
 					appDataDTO.getAppName());
 		} catch (Exception e) {
 			e.printStackTrace();

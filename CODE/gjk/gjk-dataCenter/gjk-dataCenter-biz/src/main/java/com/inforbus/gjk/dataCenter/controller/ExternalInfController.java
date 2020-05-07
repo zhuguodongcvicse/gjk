@@ -95,58 +95,6 @@ public class ExternalInfController {
 	}
 
 	/**
-	 * 卸载
-	 *
-	 * @param cmpNameToHwType APP组件工程生成，<组件名称，对应平台大类属性>
-	 * @param appID           APP对应的流程ID
-	 * @param appName         APP名称
-	 * @return
-	 */
-	@RequestMapping("/appUnload")
-	public boolean appUnload(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName) {
-		return externalInfService.appUnload(cmpNameToHwType, userName, appID, appName);
-	}
-
-	/**
-	 * 启动
-	 *
-	 * @param cmpNameToHwType APP组件工程生成，<组件名称，对应平台大类属性>
-	 * @param appID           APP对应的流程ID
-	 * @param appName         APP名称
-	 * @return
-	 */
-	@RequestMapping("/appRestart")
-	public boolean appRestart(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName) {
-		return externalInfService.appRestart(cmpNameToHwType, userName, appID, appName);
-	}
-
-	/**
-	 * 停止
-	 *
-	 * @param cmpNameToHwType APP组件工程生成，<组件名称，对应平台大类属性>
-	 * @param appID           APP对应的流程ID
-	 * @param appName         APP名称
-	 * @return
-	 */
-	@RequestMapping("/appStop")
-	public boolean appStop(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName) {
-		return externalInfService.appStop(cmpNameToHwType, userName, appID, appName);
-	}
-
-	/**
-	 * 暂停
-	 *
-	 * @param cmpNameToHwType APP组件工程生成，<组件名称，对应平台大类属性>
-	 * @param appID           APP对应的流程ID
-	 * @param appName         APP名称
-	 * @return
-	 */
-	@RequestMapping("/appPause")
-	public boolean appPause(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName) {
-		return externalInfService.appPause(cmpNameToHwType, userName, appID, appName);
-	}
-
-	/**
 	 * 注销
 	 *
 	 * @param cmpNameToHwType APP组件工程生成，<组件名称，对应平台大类属性>
