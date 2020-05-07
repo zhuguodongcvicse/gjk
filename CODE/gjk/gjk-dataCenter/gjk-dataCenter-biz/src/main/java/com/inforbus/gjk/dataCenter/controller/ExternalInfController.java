@@ -1,21 +1,20 @@
 package com.inforbus.gjk.dataCenter.controller;
 
-import com.inforbus.gjk.common.core.util.R;
-import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
-import com.inforbus.gjk.dataCenter.service.ExternalInfService;
-
-import appcontrol.AppControl;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Map;
+import com.inforbus.gjk.common.core.util.R;
+import com.inforbus.gjk.common.core.util.vo.HeaderFileTransVO;
+import com.inforbus.gjk.dataCenter.service.ExternalInfService;
 
 /**
  * @program: gjk
@@ -124,6 +123,32 @@ public class ExternalInfController {
 			@RequestParam("packinfoPath") String packinfoPath, @RequestParam("cmpDeployPlanFilePath") String cmpDeployPlanFilePath) {
 		externalInfService.appTaskExport(userName, appId, appName, appPath, sysconfigPath, packinfoPath,
 				cmpDeployPlanFilePath);
+	}
+	/**
+	 * @Title: getHeader
+	 * @Desc 解析头文件
+	 * @Author xiaohe
+	 * @DateTime 2020年5月7日
+	 * @param maps
+	 * 
+	 * @return
+	 */
+	@PostMapping("/parseHeaderFile")
+	public R<HeaderFileTransVO> getHeader(@RequestParam("path") String path) {
+		return new R<>(externalInfService.parseHeaderFile(path));
+	}
+
+	/**
+	 * @Title: getPerformanceTable
+	 * @Desc 解析性能测试表
+	 * @Author xiaohe
+	 * @DateTime 2020年5月7日
+	 * @param maps key is excelPath
+	 * @return
+	 */
+	@PostMapping("/parsePerformanceTable")
+	public R<?> getPerformanceTable(@RequestParam("excelPath") String excelPath) {
+		return new R<>(externalInfService.parsePerformanceTable(excelPath));
 	}
 
 }

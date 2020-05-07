@@ -309,15 +309,14 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	 * @Author xiaohe
 	 * @DateTime 2019年5月5日 下午2:44:33
 	 * @see com.inforbus.gjk.comp.service.ComponentService#getCompAndDetailMap(java.lang.String)
+	 *      2020年5月7日15:43:23 更改解析xml文件的调用方式 xiaohe
 	 */
 	@Override
 	public Map<String, Object> getCompAndDetailMap(String proId) {
-
 		Map<String, Object> maps = Maps.newHashMap();
-
 		List<ComponentDTO> dtos = Lists.newArrayList();
 //		List<XmlEntity> xmls = Lists.newArrayList();
-		Map<String, XmlEntity> xmlMap = Maps.newHashMap();
+//		Map<String, XmlEntity> xmlMap = Maps.newHashMap();
 		Map<String, XmlEntityMap> xmlEntityMap = Maps.newHashMap();
 		// 查询流程
 //		String pro = compDetailMapper.selectById(proId).getParaentId();
@@ -325,7 +324,6 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		List<Component> comps = baseMapper.selectByComms(proId);
 //		List<Component> comps = baseMapper.selectList(Wrappers.<Component>query().lambda().inSql(Component::getId,
 //				"SELECT comp_id FROM gjk_project_comp a WHERE  a.project_id='" + proId + "' and a.can_use = 0"));
-		System.out.println(comps);
 //		List<Component> comps = baseMapper.listCompByUserId(proId);
 		for (Component comp : comps) {
 			// 查询基本构件中的明细
@@ -333,19 +331,31 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			// 查询公共构件中的明细
 			ComponentDetail vo = compDetailMapper.getCommCompXMl(comp.getId());
 			if (vo != null) {
-				String path = vo.getFileName();
-				File file = null;
-				if (path.startsWith("Component") && path.toUpperCase().endsWith(".XML")) {
-					file = new File(this.compDetailPath + File.separator + vo.getFilePath() + "/" + path);
+				String fileName = vo.getFileName();
+				// p判断是否是满足条件的xml文件
+				if (fileName.startsWith(ComponentConstant.COMP)
+						&& fileName.toUpperCase().endsWith(ComponentConstant.COMP_XML)) {
+					String filePath = this.compDetailPath + File.separator + vo.getFilePath() + File.separator
+							+ fileName;
+					R<XmlEntityMap> rdc = rdcService.analysisXmlFileToXMLEntityMap(filePath);
+					if (rdc.getCode() == CommonConstants.SUCCESS) {
+						// 将构件文件放入map
+						dtos.add(XmlAnalysisUtil.xmlFileToComponentDTO(comp, vo));
+						// 将构件所对应的xml存入xmlEntityMap中
+						xmlEntityMap.put(vo.getCompId(), rdc.getData());
+					}
 				}
-				if (file.exists()) {
-					// 将构件文件放入map
-					dtos.add(XmlAnalysisUtil.xmlFileToComponentDTO(comp, vo));
+//				File file = null;
+//				if (fileName.startsWith("Component") && fileName.toUpperCase().endsWith(".XML")) {
+//					file = new File(this.compDetailPath + File.separator + vo.getFilePath() + "/" + fileName);
+//				}
+//				if (file.exists()) {
+//					// 将构件文件放入map
+//					dtos.add(XmlAnalysisUtil.xmlFileToComponentDTO(comp, vo));
 //					xmls.add(XmlFileHandleUtil.analysisXmlFile(file));
-					xmlMap.put(vo.getCompId(), XmlFileHandleUtil.analysisXmlFile(file));
-					xmlEntityMap.put(vo.getCompId(), XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file));
-				}
-
+//					xmlMap.put(vo.getCompId(), XmlFileHandleUtil.analysisXmlFile(file));
+//					xmlEntityMap.put(vo.getCompId(), XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file));
+//				}
 			}
 		}
 		// 构件编号集合
@@ -364,7 +374,6 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 					dto.getInputList().remove(i);
 					i--;
 				}
-
 			}
 			for (int i = 0; i < dto.getOutputList().size(); i++) {
 				ComponentOutput output = dto.getOutputList().get(i);
@@ -372,7 +381,6 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 					dto.getOutputList().remove(i);
 					i--;
 				}
-
 			}
 			System.out.println("dto.getInputList()=>" + dto.getInputList());
 		}
@@ -404,9 +412,8 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 				versions.clear();
 			}
 		}
-
 		maps.put("dtos", dtos);
-		maps.put("xmls", xmlMap);
+//		maps.put("xmls", xmlMap);
 		maps.put("xmlMaps", xmlEntityMap);
 		maps.put("compUpdate", compUpdate);
 		return maps;
