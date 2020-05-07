@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.inforbus.gjk.common.core.constant.ServiceNameConstants;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
@@ -60,6 +62,37 @@ public interface DisposeDataCenterServiceFeign {
 	 */
 	@PostMapping(value = serviceName + "/downloadStreamFiles", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public Response downloadStreamFiles(@RequestParam("filePaths") String[] filePaths);
+
+	/**
+	 * 
+	 * @Title: uploadLocalFiles
+	 * @Desc 多文件上传 MultipartFile[]
+	 * @Author wang
+	 * @DateTime 2020年5月6日
+	 * @param ufile     MultipartFile[] 文件数组
+	 * @param localPath 要上传的文件绝对路径
+	 * @return
+	 * 
+	 */
+	@PostMapping(value = "/uploadMultipartFiles", produces = {
+			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public R<?> uploadLocalFiles(@RequestPart(value = "file") MultipartFile[] ufile,
+			@RequestParam("filePath") String localPath);
+
+	/**
+	 * 
+	 * @param source 源文件路径
+	 * @param destin 拷贝文件路径
+	 * @return R<Boolean>
+	 * @throws Exception
+	 * @Title: copylocalFile
+	 * @Description: 拷贝文件
+	 * @Author wang
+	 * @DateTime 2020年5月07日
+	 * 
+	 */
+	@PostMapping("copylocalFile")
+	public R<Boolean> copylocalFile(@RequestParam("source") String source, @RequestParam("destin") String destin);
 
 	/**
 	 * 注册

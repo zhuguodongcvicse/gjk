@@ -18,6 +18,7 @@ package com.inforbus.gjk.pro.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.inforbus.gjk.common.core.constant.CommonConstants;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.log.annotation.SysLog;
@@ -34,6 +35,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,9 +53,14 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/project")
 public class ProjectController {
 
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ProjectController.class);
+
+	@Autowired
 	private final ProjectService projectService;
+
+	@Autowired
 	private final ProCompService proCompService;
-	private static final String uploadPath = JGitUtil.getLOCAL_REPO_PATH();
+
 
 	/**
 	 * 简单分页查询
@@ -164,7 +173,7 @@ public class ProjectController {
 
 	/**
 	 * @param filePathDTO
-	 * @return
+	 * @return R
 	 * @Title: uploadFile
 	 * @Description: 项目树右键菜单上传文件功能
 	 * @Author wang
@@ -173,66 +182,52 @@ public class ProjectController {
 	@SysLog("增加文件")
 	@PutMapping("/uploadFile")
 	public R uploadFile(@RequestBody FilePathDTO filePathDTO) {
-		return new R<>(projectService.uploadFile(filePathDTO));
-	}
-
-	/**
-	 * @param files
-	 * @return
-	 * @Title: uploadFolder
-	 * @Description: 项目树右键菜单上传文件夹功能
-	 * @Author wang
-	 * @DateTime 2019年10月17日 19:47:39
-	 */
-	@SysLog("增加文件夹")
-	@PostMapping("/uploadFolder")
-	public R uploadFolder(@RequestParam(value = "file") MultipartFile[] files) {
-		String aimsFilePath = uploadPath + "gjk" + File.separator + "upload";
-		File aimsFile = new File(aimsFilePath);// 上传的目的地文件夹位置
-		FolderPathDTO folderPathDTO = new FolderPathDTO();
-		if (!aimsFile.exists()) {
-			aimsFile.mkdirs();
-		}
-		if (files != null && files.length > 0) {
-			for (MultipartFile file : files) {
-				String filePath = aimsFilePath + File.separator + file.getOriginalFilename();// 文件路径
-				File uploadFile = new File(filePath);
-				String absolutePath = uploadFile.getAbsolutePath();
-				String folderPath = absolutePath.substring(0, absolutePath.lastIndexOf(File.separator));
-				;
-				File uploadFolder = new File(folderPath);
-				if (uploadFolder.exists()) {// 文件夹是否存在
-					uploadFolder.mkdirs();
-				}
-				uploadFolder.mkdirs();// 不存在就创建
-				if (uploadFile.exists()) {
-					uploadFile.delete();// 文件存在,删除掉
-				}
-				try {
-					// uploadFile.createNewFile();//创建文件
-					file.transferTo(uploadFile);// 读写数据到文件中
-					folderPathDTO.getFilePaths().add(absolutePath);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+		R ret = new R();
+		boolean flag = false;
+		try {
+			R<Boolean> r = projectService.uploadFile(filePathDTO);
+			flag = r.getData();
+			if (flag){
+				ret.setData(flag);
+				ret.setCode(CommonConstants.SUCCESS);
+				ret.setMsg("增加文件成功");
+			}else {
+				ret.setData(flag);
+				ret.setCode(CommonConstants.FAIL);
+				ret.setMsg("增加文件失败");
 			}
+		}catch (Exception e){
+			ret.setData(false);
+			ret.setCode(CommonConstants.FAIL);
+			ret.setMsg("增加文件失败");
+			logger.error("增加文件失败 ：" + e.getMessage());
 		}
-		return new R<>(folderPathDTO);
+		return ret;
 	}
 
 	/**
-	 * @param folderPathDTO
-	 * @return R
-	 * @Title: uploadFiles
-	 * @Description: 项目树右键菜单上传文件夹功能
 	 * @Author wang
-	 * @DateTime 2019年10月18日 15:46:41
+	 * @Description: 项目树右键文件夹上传
+	 * @Param: [files, amisPath]
+	 * @Return: com.inforbus.gjk.common.core.util.R
+	 * @Create: 2020/5/6
 	 */
 	@SysLog("增加文件夹")
-	@PutMapping("/uploadFiles")
-	public R uploadFiles(@RequestBody FolderPathDTO folderPathDTO) {
-		return new R<>(projectService.uploadFiles(folderPathDTO));
+	@PostMapping(value = "/uploadFolder",produces = {
+			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public R uploadFolder2(@RequestParam(value = "file") MultipartFile[] files,
+						   @RequestParam("amisPath") String amisPath){
+		R r = new R();
+		try {
+			r = projectService.uploadFolder(files,amisPath);
+		}catch (Exception e){
+			r.setCode(CommonConstants.FAIL);
+			r.setMsg("上传失败");
+			r.setData(false);
+		}
+		return r;
 	}
+
 
 	/**
 	 * 流程建模删除构件

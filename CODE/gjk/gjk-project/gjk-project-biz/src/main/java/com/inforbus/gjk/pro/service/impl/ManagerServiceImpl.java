@@ -57,6 +57,7 @@ import com.inforbus.gjk.common.core.util.ExternalIOTransUtils;
 import com.inforbus.gjk.common.core.util.FileUtil;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
+import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 import com.inforbus.gjk.pro.api.entity.App;
 import com.inforbus.gjk.pro.api.entity.Chipsfromhardwarelibs;
 import com.inforbus.gjk.pro.api.entity.Component;
@@ -282,10 +283,13 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 */
 	@Override
 	public synchronized String createXmlFile(XmlEntityMap entity, String proDetailId) {
+		XMlEntityMapVO xMlEntityMapVO = new XMlEntityMapVO();
+		xMlEntityMapVO.setXmlEntityMap(entity);
 		ProjectFile projectFile = this.getById(proDetailId);
 		String filePath = null;
 		if (projectFile != null) {
 			filePath = proDetailPath + projectFile.getFilePath() + File.separator + projectFile.getFileName() + ".xml";
+			xMlEntityMapVO.setLocalPath(filePath);
 		} else {
 			// return false;
 		}
@@ -293,7 +297,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (!file.getParentFile().exists()) {
 			file.getParentFile().mkdirs();
 		}
-		boolean flag = XmlFileHandleUtil.createXmlFile(entity, file);
+		dataCenterServiceFeign.createXMLFile(xMlEntityMapVO);
 		JGitUtil.commitAndPush(file.getAbsolutePath(), "上传项目相关文件");
 		return filePath;
 	}
@@ -550,14 +554,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	public XmlEntityMap getSysConfigXmlEntityMap(String proDetailId) {
 		ProjectFile projectFile = getProDetailById(proDetailId);
 		File hsmLocalFile = new File(gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml");// 老耿代码
-		// XmlEntityMap xmlEntityMap =
-		// XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);//老耿代码
-//		if (projectFile.getFileType().equals("14")) {
-//			file = new File(gitDetailPath+projectFile.getFilePath()+ "方案展示.xml");
-//		}
-//		 if (projectFile.getFileType().equals("11")) {
-//		 file = new File(System.getProperty("user.dir") + "/流程实例.xml");
-//		 }
 		if (hsmLocalFile.exists()) {
 //			return XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(hsmLocalFile);
 			return dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(hsmLocalFile.getAbsolutePath()).getData();
@@ -577,7 +573,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @param proDetailId
 	 * @return
 	 */
-	@Override
 	public XmlEntityMap getDisposeXmlEntityMap(String proDetailId) {
 		ProjectFile projectFile = getProDetailById(proDetailId);
 		//项目中是否已经存在的文件路径
@@ -600,7 +595,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// 解析软硬件映射xml文件返回数据
 		return getXmlEntityMap(hsmTempId);
 	}
-
 	/**
 	 * @editProJSON
 	 * @Description: 保存回显文件

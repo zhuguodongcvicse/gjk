@@ -32,6 +32,7 @@ import com.inforbus.gjk.pro.api.dto.ProjectInfoDTO;
 import com.inforbus.gjk.pro.api.entity.Hardwarelibs;
 import com.inforbus.gjk.pro.api.entity.ProComp;
 import com.inforbus.gjk.pro.api.entity.Project;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 资源管理
@@ -126,18 +127,7 @@ public interface ProjectService extends IService<Project> {
 	 * @param filePathDTO
 	 * @return boolean
 	 */
-	boolean uploadFile(FilePathDTO filePathDTO);
-
-	/**
-	 *
-	 * @Title: uploadFile
-	 * @Description: 上传文件夹
-	 * @Author wang
-	 * @DateTime 2019年10月18日 15:49:05
-	 * @param folderPathDTO
-	 * @return String
-	 */
-	String uploadFiles(FolderPathDTO folderPathDTO);
+	 R<Boolean> uploadFile(FilePathDTO filePathDTO);
 
 	void removeCompProject(String compId, String projectId);
 
@@ -185,4 +175,13 @@ public interface ProjectService extends IService<Project> {
 	int compUseNum(@PathVariable String compId);
 
     List getCurrentProApplyedComps(String proId);
+
+	/**
+	 * @Author wang
+	 * @Description: 文件夹上传
+	 * @Param: [files, amisPath]
+	 * @Return: com.inforbus.gjk.common.core.util.R
+	 * @Create: 2020/5/6
+	 */
+	R uploadFolder(MultipartFile[] files, String amisPath);
 }
