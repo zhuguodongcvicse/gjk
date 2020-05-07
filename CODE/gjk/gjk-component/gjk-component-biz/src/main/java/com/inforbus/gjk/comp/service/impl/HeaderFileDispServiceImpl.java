@@ -1,37 +1,20 @@
 package com.inforbus.gjk.comp.service.impl;
 
 import java.io.File;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.inforbus.gjk.common.core.entity.StringRef;
-import com.inforbus.gjk.common.core.entity.XmlEntity;
-import com.inforbus.gjk.common.core.idgen.IdGenerate;
-import com.inforbus.gjk.common.core.jgit.JGitUtil;
+import com.inforbus.gjk.common.core.constant.CommonConstants;
 import com.inforbus.gjk.common.core.util.ExternalIOTransUtils;
 import com.inforbus.gjk.common.core.util.HeaderFileAndStructUtils;
-import com.inforbus.gjk.common.core.util.vo.HeaderFileShowVO;
+import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.vo.HeaderFileTransVO;
 import com.inforbus.gjk.common.core.util.vo.ParamTreeVO;
-import com.inforbus.gjk.comp.api.entity.Component;
-import com.inforbus.gjk.comp.mapper.ComponentMapper;
-import com.inforbus.gjk.comp.service.ComponentService;
+import com.inforbus.gjk.comp.api.feign.RemoteDataCenterService;
 import com.inforbus.gjk.comp.service.HeaderFileDispService;
 
 /**
@@ -47,6 +30,8 @@ public class HeaderFileDispServiceImpl implements HeaderFileDispService {
 	protected HeaderFileDispService headerFileDispService;
 	@Value("${git.local.path}")
 	private String serverPath;
+	@Autowired
+	private RemoteDataCenterService rdcService;
 
 	/**
 	 * 头文件解析
@@ -60,8 +45,16 @@ public class HeaderFileDispServiceImpl implements HeaderFileDispService {
 	 * @see com.inforbus.gjk.comp.service.HeaderFileDispService#parseHeaderFile(java.lang.String)
 	 */
 	@Override
-	public HeaderFileShowVO parseHeaderFile(String headerFile) {
-		return HeaderFileAndStructUtils.headFileToShow(parsefilePath(headerFile));
+	public R<?> parseHeaderFile(String headerFile) {
+		R ret = new R<>();
+		R<HeaderFileTransVO> rdc = rdcService.getHeader(headerFile);
+		if (rdc.getCode() == CommonConstants.SUCCESS) {
+			ret.setData(HeaderFileAndStructUtils.headFileToShow(rdc.getData()));
+		}
+		ret.setCode(rdc.getCode());
+		ret.setMsg(rdc.getMsg());
+		return ret;
+//		return new R(HeaderFileAndStructUtils.headFileToShow(parsefilePath(headerFile)));
 	}
 
 	/**
@@ -91,8 +84,9 @@ public class HeaderFileDispServiceImpl implements HeaderFileDispService {
 	 * @return
 	 */
 	@Override
-	public Map<Integer, Float> parsePerformanceTable(String excelPath) {
-		return ExternalIOTransUtils.parsePerformanceTable(parsefilePath(excelPath));
+	public R<?> parsePerformanceTable(String excelPath) {
+		return rdcService.getPerformanceTable(excelPath);
+//		return ExternalIOTransUtils.parsePerformanceTable(parsefilePath(excelPath));
 	}
 
 	/**

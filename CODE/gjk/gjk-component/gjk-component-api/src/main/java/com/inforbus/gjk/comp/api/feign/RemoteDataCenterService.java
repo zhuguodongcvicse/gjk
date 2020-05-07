@@ -1,16 +1,5 @@
 package com.inforbus.gjk.comp.api.feign;
 
-import com.inforbus.gjk.comp.api.feign.factory.RemoteDataCenterServiceFallbackFactory;
-
-import feign.Response;
-import feign.codec.Encoder;
-
-import com.inforbus.gjk.common.core.config.FeignSpringFormEncoder;
-import com.inforbus.gjk.common.core.constant.ServiceNameConstants;
-import com.inforbus.gjk.common.core.entity.XmlEntityMap;
-import com.inforbus.gjk.common.core.util.R;
-import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
-
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
@@ -18,15 +7,23 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Scope;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import com.inforbus.gjk.common.core.config.FeignSpringFormEncoder;
+import com.inforbus.gjk.common.core.constant.ServiceNameConstants;
+import com.inforbus.gjk.common.core.entity.XmlEntityMap;
+import com.inforbus.gjk.common.core.util.R;
+import com.inforbus.gjk.common.core.util.vo.HeaderFileTransVO;
+import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
+import com.inforbus.gjk.comp.api.feign.factory.RemoteDataCenterServiceFallbackFactory;
 
-import javax.servlet.http.HttpServletResponse;
+import feign.Response;
+import feign.codec.Encoder;
 
 /**
  * @ClassName: RemoteDataCenterService
@@ -37,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 @FeignClient(value = ServiceNameConstants.DATACENDER_SERVICE, configuration = RemoteDataCenterService.FeignMultipartSupportConfig.class, fallbackFactory = RemoteDataCenterServiceFallbackFactory.class)
 public interface RemoteDataCenterService {
 	public static final String serviceName = "/fileServe";
+	public static final String serviceHeaderName = "/ExternalInfServer";
 
 	/**
 	 * @ClassName: FeignMultipartSupportConfig
@@ -60,9 +58,9 @@ public interface RemoteDataCenterService {
 	 * @Desc 文件上传
 	 * @Author xiaohe
 	 * @DateTime 2020年4月17日
-	 * @param ufile      MultipartFile文件
+	 * @param ufile     MultipartFile文件
 	 * @param localPath 要上传的全文件路径
-	 * @return 
+	 * @return
 	 */
 	@PostMapping(value = serviceName + "/uploadMultipartFile", produces = {
 			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -76,7 +74,7 @@ public interface RemoteDataCenterService {
 	 * @DateTime 2020年4月17日
 	 * @param ufile     MultipartFile[] 文件数组
 	 * @param localPath 要上传的全文件路径
-	 * @return 
+	 * @return
 	 */
 	@PostMapping(value = serviceName + "/uploadMultipartFiles", produces = {
 			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -139,14 +137,38 @@ public interface RemoteDataCenterService {
 	 */
 	@PostMapping(serviceName + "/createXMLFile")
 	public R<Boolean> createXMLFile(@RequestBody XMlEntityMapVO xMlEntityMapVO);
+
 	/**
 	 * @Title: delFolder
 	 * @Desc 删除文件或者文件夹，或多个文件和文件夹
 	 * @Author xiaohe
 	 * @DateTime 2020年4月20日
 	 * @param folderPath 文件和文件夹列表
-	 * @return 
+	 * @return
 	 */
-	@PostMapping(serviceName +"/delFolder")
+	@PostMapping(serviceName + "/delFolder")
 	public R<Boolean> delFolder(@RequestParam("folderPath") String[] folderPath);
+
+	/**
+	 * @Title: getHeader
+	 * @Desc 解析头文件
+	 * @Author xiaohe
+	 * @DateTime 2020年5月7日
+	 * @param maps key is path
+	 * 
+	 * @return
+	 */
+	@PostMapping(serviceHeaderName + "/parseHeaderFile")
+	public R<HeaderFileTransVO> getHeader(@RequestParam("path") String path);
+
+	/**
+	 * @Title: getPerformanceTable
+	 * @Desc 解析性能测试表
+	 * @Author xiaohe
+	 * @DateTime 2020年5月7日
+	 * @param maps key is excelPath
+	 * @return
+	 */
+	@PostMapping(serviceHeaderName + "/parsePerformanceTable")
+	public R<?> getPerformanceTable(@RequestParam("excelPath") String excelPath);
 }

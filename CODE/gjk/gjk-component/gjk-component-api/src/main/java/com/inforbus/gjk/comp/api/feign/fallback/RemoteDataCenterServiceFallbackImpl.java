@@ -16,28 +16,18 @@
 
 package com.inforbus.gjk.comp.api.feign.fallback;
 
-import com.inforbus.gjk.comp.api.feign.RemoteDataCenterService;
-import com.inforbus.gjk.comp.api.feign.RemoteTokenService;
-import com.inforbus.gjk.dataCenter.api.entity.FileCenter;
-
-import brave.http.HttpRuleSampler.Builder;
-import feign.Response;
-
-import com.inforbus.gjk.common.core.constant.CommonConstants;
-import com.inforbus.gjk.common.core.entity.XmlEntityMap;
-import com.inforbus.gjk.common.core.util.R;
-import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
-
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import com.inforbus.gjk.common.core.entity.XmlEntityMap;
+import com.inforbus.gjk.common.core.util.R;
+import com.inforbus.gjk.common.core.util.vo.HeaderFileTransVO;
+import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
+import com.inforbus.gjk.comp.api.feign.RemoteDataCenterService;
 
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
+import feign.Response;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @ClassName: RemoteDataCenterServiceFallbackImpl
@@ -155,6 +145,42 @@ public class RemoteDataCenterServiceFallbackImpl implements RemoteDataCenterServ
 		ret.setException(cause);
 		ret.setMsg("数据中心服务异常---删除文件错误 ");
 		log.error("数据中心服务异常---删除文件错误", cause);
+		return ret;
+	}
+
+	/**
+	 * @Title: getHeader
+	 * @Desc 构件头文件解析
+	 * @Author xiaohe
+	 * @DateTime 2020年5月7日
+	 * @param maps
+	 * @return
+	 * @see com.inforbus.gjk.comp.api.feign.RemoteDataCenterService#getHeader(java.util.Map)
+	 */
+	@Override
+	public R<HeaderFileTransVO> getHeader(String excelPath) {
+		R ret = new R();
+		ret.setException(cause);
+		ret.setMsg("数据中心服务异常---解析头文件出错 ");
+		log.error("数据中心服务异常---解析头文件错误，文件路劲为{}", excelPath, cause);
+		return ret;
+	}
+
+	/**
+	 * @Title: getPerformanceTable
+	 * @Desc 解析性能测试表
+	 * @Author xiaohe
+	 * @DateTime 2020年5月7日
+	 * @param maps
+	 * @return
+	 * @see com.inforbus.gjk.comp.api.feign.RemoteDataCenterService#getPerformanceTable(java.util.Map)
+	 */
+	@Override
+	public R<?> getPerformanceTable(String excelPath) {
+		R ret = new R();
+		ret.setException(cause);
+		ret.setMsg("数据中心服务异常---解析性能测试表格出错 ");
+		log.error("数据中心服务异常---解析性能测试表格错误,文件路劲为{}", excelPath, cause);
 		return ret;
 	}
 

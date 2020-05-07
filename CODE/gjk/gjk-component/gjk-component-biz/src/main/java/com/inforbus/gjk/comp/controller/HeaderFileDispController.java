@@ -26,13 +26,12 @@ public class HeaderFileDispController {
 
 	@PostMapping("/parseHeaderFile")
 	public R getHeader(@RequestBody Map<String, String> maps) {
-		return new R<>(headerFileDispService.parseHeaderFile(maps.get("path")));
+		return headerFileDispService.parseHeaderFile(maps.get("path"));
 	}
 
 	@PostMapping("/parsePerformanceTable")
 	public R getPerformanceTable(@RequestBody Map<String, String> maps) {
-		return new R<>(headerFileDispService.parsePerformanceTable(maps.get("excelPath")));
+		return headerFileDispService.parsePerformanceTable(maps.get("excelPath"));
 	}
-
 
 }

@@ -1,6 +1,9 @@
 package com.inforbus.gjk.dataCenter.controller;
 
+import com.inforbus.gjk.common.core.util.HeaderFileAndStructUtils;
 import com.inforbus.gjk.common.core.util.R;
+import com.inforbus.gjk.common.core.util.vo.HeaderFileShowVO;
+import com.inforbus.gjk.common.core.util.vo.HeaderFileTransVO;
 import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 import com.inforbus.gjk.dataCenter.service.ExternalInfService;
 
@@ -9,6 +12,7 @@ import appcontrol.AppControl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -69,8 +73,10 @@ public class ExternalInfController {
 	 * @return
 	 */
 	@RequestMapping("/appInstall")
-	public boolean appInstall(Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID,@RequestParam("appName") String appName,
-			@RequestParam("packinfoPath") String packinfoPath, @RequestParam("cmpResFilePath") String cmpResFilePath, @RequestParam("appProPath") String appProPath) {
+	public boolean appInstall(Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName,
+			@RequestParam("appID") int appID, @RequestParam("appName") String appName,
+			@RequestParam("packinfoPath") String packinfoPath, @RequestParam("cmpResFilePath") String cmpResFilePath,
+			@RequestParam("appProPath") String appProPath) {
 		return externalInfService.appInstall(cmpNameToHwType, userName, appID, appName, packinfoPath, cmpResFilePath,
 				appProPath);
 	}
@@ -87,8 +93,10 @@ public class ExternalInfController {
 	 * @return
 	 */
 	@RequestMapping("/appLoad")
-	public boolean appLoad(Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName,
-			@RequestParam("existDeployConfig") boolean existDeployConfig, @RequestParam("sysconfigPath") String sysconfigPath, @RequestParam("appProPath") String appProPath) {
+	public boolean appLoad(Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName,
+			@RequestParam("appID") int appID, @RequestParam("appName") String appName,
+			@RequestParam("existDeployConfig") boolean existDeployConfig,
+			@RequestParam("sysconfigPath") String sysconfigPath, @RequestParam("appProPath") String appProPath) {
 		return externalInfService.appLoad(cmpNameToHwType, userName, appID, appName, existDeployConfig, sysconfigPath,
 				appProPath);
 
@@ -103,7 +111,9 @@ public class ExternalInfController {
 	 * @return
 	 */
 	@RequestMapping("/appUnload")
-	public boolean appUnload(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName) {
+	public boolean appUnload(@RequestBody Map<String, String> cmpNameToHwType,
+			@RequestParam("userName") String userName, @RequestParam("appID") int appID,
+			@RequestParam("appName") String appName) {
 		return externalInfService.appUnload(cmpNameToHwType, userName, appID, appName);
 	}
 
@@ -116,7 +126,9 @@ public class ExternalInfController {
 	 * @return
 	 */
 	@RequestMapping("/appRestart")
-	public boolean appRestart(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName) {
+	public boolean appRestart(@RequestBody Map<String, String> cmpNameToHwType,
+			@RequestParam("userName") String userName, @RequestParam("appID") int appID,
+			@RequestParam("appName") String appName) {
 		return externalInfService.appRestart(cmpNameToHwType, userName, appID, appName);
 	}
 
@@ -129,7 +141,8 @@ public class ExternalInfController {
 	 * @return
 	 */
 	@RequestMapping("/appStop")
-	public boolean appStop(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName) {
+	public boolean appStop(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName,
+			@RequestParam("appID") int appID, @RequestParam("appName") String appName) {
 		return externalInfService.appStop(cmpNameToHwType, userName, appID, appName);
 	}
 
@@ -142,7 +155,8 @@ public class ExternalInfController {
 	 * @return
 	 */
 	@RequestMapping("/appPause")
-	public boolean appPause(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName) {
+	public boolean appPause(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName,
+			@RequestParam("appID") int appID, @RequestParam("appName") String appName) {
 		return externalInfService.appPause(cmpNameToHwType, userName, appID, appName);
 	}
 
@@ -156,8 +170,9 @@ public class ExternalInfController {
 	 * @return
 	 */
 	@RequestMapping("/appUnInstall")
-	public boolean appUnInstall(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName,
-			@RequestParam("packinfoPath") String packinfoPath) {
+	public boolean appUnInstall(@RequestBody Map<String, String> cmpNameToHwType,
+			@RequestParam("userName") String userName, @RequestParam("appID") int appID,
+			@RequestParam("appName") String appName, @RequestParam("packinfoPath") String packinfoPath) {
 		return externalInfService.appUnInstall(cmpNameToHwType, userName, appID, appName, packinfoPath);
 	}
 
@@ -172,10 +187,39 @@ public class ExternalInfController {
 	 * @param cmpDeployPlanFilePath 客户自存自取路径
 	 */
 	@RequestMapping("/appTaskExport")
-	public void appTaskExport( @RequestParam("userName") String userName, @RequestParam("appId") int appId, @RequestParam("appName") String appName, @RequestParam("appPath") String appPath, @RequestParam("sysconfigPath") String sysconfigPath,
-			@RequestParam("packinfoPath") String packinfoPath, @RequestParam("cmpDeployPlanFilePath") String cmpDeployPlanFilePath) {
+	public void appTaskExport(@RequestParam("userName") String userName, @RequestParam("appId") int appId,
+			@RequestParam("appName") String appName, @RequestParam("appPath") String appPath,
+			@RequestParam("sysconfigPath") String sysconfigPath, @RequestParam("packinfoPath") String packinfoPath,
+			@RequestParam("cmpDeployPlanFilePath") String cmpDeployPlanFilePath) {
 		externalInfService.appTaskExport(userName, appId, appName, appPath, sysconfigPath, packinfoPath,
 				cmpDeployPlanFilePath);
+	}
+
+	/**
+	 * @Title: getHeader
+	 * @Desc 解析头文件
+	 * @Author xiaohe
+	 * @DateTime 2020年5月7日
+	 * @param maps
+	 * 
+	 * @return
+	 */
+	@PostMapping("/parseHeaderFile")
+	public R<HeaderFileTransVO> getHeader(@RequestParam("path") String path) {
+		return new R<>(externalInfService.parseHeaderFile(path));
+	}
+
+	/**
+	 * @Title: getPerformanceTable
+	 * @Desc 解析性能测试表
+	 * @Author xiaohe
+	 * @DateTime 2020年5月7日
+	 * @param maps key is excelPath
+	 * @return
+	 */
+	@PostMapping("/parsePerformanceTable")
+	public R<?> getPerformanceTable(@RequestParam("excelPath") String excelPath) {
+		return new R<>(externalInfService.parsePerformanceTable(excelPath));
 	}
 
 }

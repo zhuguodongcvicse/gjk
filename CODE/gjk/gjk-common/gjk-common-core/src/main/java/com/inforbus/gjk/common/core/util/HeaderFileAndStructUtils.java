@@ -60,12 +60,13 @@ public class HeaderFileAndStructUtils {
 	 * @Author CVICSE-COMMON
 	 * @DateTime 2019年5月31日 下午9:19:19
 	 * @param headfile
-	 * @return
+	 * @return HeaderFileShowVO
+	 * 2020年5月7日15:13:06 xiaohe 更改传值参数 String =>  HeaderFileTransVO
 	 */
-	public static HeaderFileShowVO headFileToShow(String headfile) {
+	public static HeaderFileShowVO headFileToShow(HeaderFileTransVO headerFileTransVO) {
 		HeaderFileShowVO headerFileShowVO = new HeaderFileShowVO();
 		// 调用客户接口完成头文件解析
-		HeaderFileTransVO headerFileTransVO = ExternalIOTransUtils.parseHeaderFile(headfile);
+//		HeaderFileTransVO headerFileTransVO = ExternalIOTransUtils.parseHeaderFile(headfile);
 		if (null == headerFileTransVO) {
 			return null;
 		}
