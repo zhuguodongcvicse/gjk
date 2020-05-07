@@ -157,56 +157,6 @@ public interface DisposeDataCenterServiceFeign {
 			@RequestParam("sysconfigPath") String sysconfigPath, @RequestParam("appProPath") String appProPath);
 
 	/**
-	 * 卸载
-	 *
-	 * @param cmpNameToHwType APP组件工程生成，<组件名称，对应平台大类属性>
-	 * @param appID           APP对应的流程ID
-	 * @param appName         APP名称
-	 * @return
-	 */
-	@RequestMapping("/ExternalInfServer/appUnload")
-	public boolean appUnload(@RequestBody Map<String, String> cmpNameToHwType,
-			@RequestParam("userName") String userName, @RequestParam("appID") int appID,
-			@RequestParam("appName") String appName);
-
-	/**
-	 * 启动
-	 *
-	 * @param cmpNameToHwType APP组件工程生成，<组件名称，对应平台大类属性>
-	 * @param appID           APP对应的流程ID
-	 * @param appName         APP名称
-	 * @return
-	 */
-	@RequestMapping("/ExternalInfServer/appRestart")
-	public boolean appRestart(@RequestBody Map<String, String> cmpNameToHwType,
-			@RequestParam("userName") String userName, @RequestParam("appID") int appID,
-			@RequestParam("appName") String appName);
-
-	/**
-	 * 停止
-	 *
-	 * @param cmpNameToHwType APP组件工程生成，<组件名称，对应平台大类属性>
-	 * @param appID           APP对应的流程ID
-	 * @param appName         APP名称
-	 * @return
-	 */
-	@RequestMapping("/ExternalInfServer/appStop")
-	public boolean appStop(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName,
-			@RequestParam("appID") int appID, @RequestParam("appName") String appName);
-
-	/**
-	 * 暂停
-	 *
-	 * @param cmpNameToHwType APP组件工程生成，<组件名称，对应平台大类属性>
-	 * @param appID           APP对应的流程ID
-	 * @param appName         APP名称
-	 * @return
-	 */
-	@RequestMapping("/ExternalInfServer/appPause")
-	public boolean appPause(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName,
-			@RequestParam("appID") int appID, @RequestParam("appName") String appName);
-
-	/**
 	 * 注销
 	 *
 	 * @param cmpNameToHwType APP组件工程生成，<组件名称，对应平台大类属性>

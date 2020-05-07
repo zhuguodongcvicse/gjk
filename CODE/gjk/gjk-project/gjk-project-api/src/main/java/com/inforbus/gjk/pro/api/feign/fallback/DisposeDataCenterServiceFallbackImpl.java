@@ -125,30 +125,6 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
 	}
 
 	@Override
-	public boolean appUnload(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
-		log.error("调用数据中心的第三方客户接口feign接口appUnload方法失败", cause);
-		return false;
-	}
-
-	@Override
-	public boolean appRestart(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
-		log.error("调用数据中心的第三方客户接口feign接口appRestart方法失败", cause);
-		return false;
-	}
-
-	@Override
-	public boolean appStop(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
-		log.error("调用数据中心的第三方客户接口feign接口appStop方法失败", cause);
-		return false;
-	}
-
-	@Override
-	public boolean appPause(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
-		log.error("调用数据中心的第三方客户接口feign接口appPause方法失败", cause);
-		return false;
-	}
-
-	@Override
 	public boolean appUnInstall(Map<String, String> cmpNameToHwType, String userName, int appID, String appName,
 			String packinfoPath) {
 		log.error("调用数据中心的第三方客户接口feign接口appUnInstall方法失败", cause);
