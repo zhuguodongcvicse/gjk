@@ -1939,38 +1939,20 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		}
 	}
 
+	/**
+	 * @Author wang
+	 * @Description: 项目树右键删除文件功能
+	 * @Param: [filePath]
+	 * @Return: boolean
+	 * @Create: 2020/5/7
+	 */
 	@Override
 	public boolean deleteFilesFromLocal(Map filePath) {
 		Set set = filePath.keySet();
 		String keyUrl = (String) set.iterator().next();
 		String url = (String) filePath.get(keyUrl);
-		File file = new File(url);
-		if (!file.exists()) {
-			return false;
-		} else {
-			deleteChildFile(file);
-		}
-		return !file.exists();
-	}
-
-	public void deleteChildFile(File file) {
-		if (file.isDirectory()) {
-			File[] files = file.listFiles();
-			if (files.length == 0) {
-				file.delete();
-			} else {
-				for (File fileTemp : files) {
-					if (fileTemp.isDirectory()) {
-						deleteChildFile(fileTemp);
-					} else {
-						fileTemp.delete();
-					}
-				}
-				deleteChildFile(file);
-			}
-		} else {
-			file.delete();
-		}
+		R<Boolean> r = dataCenterServiceFeign.delAllFile(url);
+		return r.getData();
 	}
 
 	/*

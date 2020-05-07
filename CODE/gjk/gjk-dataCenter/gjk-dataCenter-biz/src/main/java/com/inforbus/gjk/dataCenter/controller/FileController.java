@@ -153,21 +153,22 @@ public class FileController {
 	 * @DateTime 2020年4月1日
 	 */
 	@PostMapping("delAllFile")
-	public R<Object> delAllFile(@RequestParam("sourcePath") String sourcePath) {
-//		return fileService.delAllFile(sourcePath);
-		R<Object> ret = new R<Object>();
+	public R<Boolean> delAllFile(@RequestParam("sourcePath") String sourcePath) {
+		R<Boolean> ret = new R<Boolean>();
 		try {
 			if (fileService.delAllFile(sourcePath)) {
 				ret.setData(true);
 				ret.setMsg("删除指定文件夹下的所有文件成功");
 			} else {
-				ret.setCode(1);
+				ret.setCode(CommonConstants.FAIL);
 				ret.setData(false);
 				ret.setMsg("删除指定文件夹下的所有文件失败");
 			}
 		} catch (Exception e) {
 			logger.error("删除指定文件夹下的所有文件", e);
-			return new R<Object>(e);
+			ret.setCode(CommonConstants.FAIL);
+			ret.setData(false);
+			ret.setMsg("删除指定文件夹下的所有文件失败");
 		}
 		return ret;
 	}

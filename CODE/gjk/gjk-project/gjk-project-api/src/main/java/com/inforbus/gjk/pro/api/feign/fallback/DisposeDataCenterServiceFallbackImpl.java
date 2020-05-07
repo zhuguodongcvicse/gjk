@@ -108,9 +108,32 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
         return r;
     }
 
+    /**
+     * @Author wang
+     * @Description: 拷贝文件熔断方法
+     * @Param: [source, destin]
+     * @Return: com.inforbus.gjk.common.core.util.R<java.lang.Boolean>
+     * @Create: 2020/5/7
+     */
     @Override
     public R<Boolean> copylocalFile(String source, String destin) {
         log.error("调用数据中心的feign接口copylocalFile方法失败", cause);
+        R r = new R();
+        r.setCode(CommonConstants.FAIL);
+        r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
+        return r;
+    }
+
+    /**
+     * @Author wang
+     * @Description: 删除文件熔断方法
+     * @Param: [sourcePath]
+     * @Return: com.inforbus.gjk.common.core.util.R<java.lang.Boolean>
+     * @Create: 2020/5/7
+     */
+    @Override
+    public R<Boolean> delAllFile(String sourcePath) {
+        log.error("调用数据中心的feign接口delAllFile方法失败", cause);
         R r = new R();
         r.setCode(CommonConstants.FAIL);
         r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");

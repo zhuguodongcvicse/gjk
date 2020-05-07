@@ -110,4 +110,15 @@ public interface DisposeDataCenterServiceFeign {
 	 */
 	@PostMapping("copylocalFile")
 	public R<Boolean> copylocalFile(@RequestParam("source") String source, @RequestParam("destin") String destin);
+
+	/**
+	 * @param sourcePath 文件绝对路径
+	 * @return R<Boolean>
+	 * @Title: delAllFile
+	 * @Description: 删除文件或文件夹
+	 * @Author wang
+	 * @DateTime 2020年5月07日
+	 */
+	@PostMapping("delAllFile")
+	public R<Boolean> delAllFile(@RequestParam("sourcePath") String sourcePath);
 }

@@ -309,10 +309,34 @@ public class ManagerController {
 		return new R<>(managerService.createNetWorkXML(entity, proDetailId, name));
 	}
 
+	/**
+	 * @Author wang
+	 * @Description: 项目树右键菜单删除功能
+	 * @Param: [filePath]
+	 * @Return: com.inforbus.gjk.common.core.util.R
+	 * @Create: 2020/5/7
+	 */
 	@PostMapping("deleteSelectFile")
-	public boolean deleteSelectFile(@RequestBody Map filePath) {
-		boolean deleteFlag = managerService.deleteFilesFromLocal(filePath);
-		return deleteFlag;
+	public R deleteSelectFile(@RequestBody Map filePath) {
+		R r = new R();
+		boolean flag = false;
+		try {
+			flag = managerService.deleteFilesFromLocal(filePath);
+			if (flag){
+				r.setMsg("删除成功");
+				r.setData(flag);
+			}else {
+				r.setMsg("删除失败");
+				r.setData(flag);
+				r.setCode(CommonConstants.FAIL);
+			}
+		}catch (Exception e){
+			r.setMsg("删除失败");
+			r.setData(flag);
+			r.setCode(CommonConstants.FAIL);
+			logger.error("删除失败" + e.getMessage());
+		}
+		return r;
 	}
 
 	/**
