@@ -2,7 +2,15 @@ package com.inforbus.gjk.pro.api.feign;
 
 import java.util.Map;
 
+import com.inforbus.gjk.common.core.config.FeignSpringFormEncoder;
+import feign.codec.Encoder;
+import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.support.SpringEncoder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +39,22 @@ public interface DisposeDataCenterServiceFeign {
 	// 第三方客户接口
 	public static final String externallInfServiceName = "/ExternalInfServer";
 
+	/**
+	 * @ClassName: FeignMultipartSupportConfig
+	 * @Desc Feign 上传文件时用到的配置
+	 * @Author cvics
+	 * @DateTime 2020年4月15日
+	 */
+	@Configuration
+	public class FeignMultipartSupportConfig {
+		@Autowired
+		private ObjectFactory<HttpMessageConverters> messageConverters;
+
+		@Bean
+		public Encoder feignFormEncoder() {
+			return new FeignSpringFormEncoder(new SpringEncoder(messageConverters));
+		}
+	}
 	/**
 	 * 解析xml文件为xmlMap对象
 	 *
