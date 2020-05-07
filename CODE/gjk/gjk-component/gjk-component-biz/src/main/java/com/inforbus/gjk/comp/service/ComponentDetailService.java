@@ -52,15 +52,15 @@ public interface ComponentDetailService extends IService<ComponentDetail> {
 	 */
 	IPage<ComponentDetail> getComponentDetailPage(Page<ComponentDetail> page, ComponentDetail componentDetail);
 
-	/**
-	 * @Title: upload
-	 * @Description: 上传文件
-	 * @Author cvics
-	 * @DateTime 2019年4月30日 下午5:48:38
-	 * @param request
-	 * @return
-	 */
-	ComponentDetail upload(HttpServletRequest request);
+//	/**
+//	 * @Title: upload
+//	 * @Description: 上传文件
+//	 * @Author cvics
+//	 * @DateTime 2019年4月30日 下午5:48:38
+//	 * @param request
+//	 * @return
+//	 */
+//	ComponentDetail upload(HttpServletRequest request);
 
 	/**
 	 * @Title: saveCompDetail
@@ -98,8 +98,9 @@ public interface ComponentDetailService extends IService<ComponentDetail> {
 	 * @DateTime 2019年4月29日 上午11:34:34
 	 * @param entity
 	 * @param token
+	 * 2020年5月6日10:48:46 更改返回类型
 	 */
-	String createXmlFile(XmlEntityMap entMap, String token, String compId, String userCurrent);
+	R createXmlFile(XmlEntityMap entMap, String token, String compId, String userCurrent);
 
 	/**
 	 * @param ufile
@@ -221,8 +222,9 @@ public interface ComponentDetailService extends IService<ComponentDetail> {
 	 * @DateTime 2020年4月16日
 	 * @param ufile
 	 * @param userName
+	 * @param type
 	 * @return 文件绝对路径 //修改返回类型 String to R
 	 */
-	R getUploadFilesUrl(MultipartFile ufile,String userName);
+	R getUploadFilesUrl(MultipartFile ufile,String userName,String type);
 
 }

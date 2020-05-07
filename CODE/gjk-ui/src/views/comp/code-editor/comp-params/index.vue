@@ -412,7 +412,9 @@ export default {
                 for (let key in strcutArr) {
                   this.$set(strcutArr[key], "userId", this.userInfo.userId);
                 }
+                //保存结构体 2020年5月6日10:24:22 xiaohe
                 saveStructMap(strcutArr).then(() => {
+                  //清空头文件数据 2020年5月6日10:24:38 
                   this.$store.dispatch("clearParseHeaderObj");
                 });
               }
@@ -517,7 +519,7 @@ export default {
       this.component.id = this.$route.query.compId;
       //查询构件文件
       getCompFiles(this.$route.query.compId).then(res => {
-        // console.log("res",res)
+        console.log("基本构件res",res)
         //基本构件
         //备注信息赋值
         this.compSpbParam.compBackupinfo = res.data.data.comp.compBackupinfo;

@@ -20,33 +20,23 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.io.Files;
 import com.inforbus.gjk.common.core.constant.DataCenterConstants;
 import com.inforbus.gjk.common.core.entity.XmlEntity;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.util.R;
-import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.common.log.annotation.SysLog;
-import com.inforbus.gjk.comp.api.entity.Component;
 import com.inforbus.gjk.comp.api.entity.ComponentDetail;
-import com.inforbus.gjk.comp.api.feign.RemoteDataCenterService;
 import com.inforbus.gjk.comp.api.vo.CompFilesVO;
 //import com.inforbus.gjk.comp.api.util.UploadFileUtils;   //20190628未完善版本报错，注释
 import com.inforbus.gjk.comp.service.ComponentDetailService;
 
-import cn.hutool.json.JSON;
-import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 
 import lombok.AllArgsConstructor;
 
-import java.io.File;
-import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -63,7 +53,6 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @RequestMapping("/componentdetail")
 public class ComponentDetailController {
-	private final RemoteDataCenterService rdcService;
 	private final ComponentDetailService componentDetailService;
 
 	/**
@@ -129,18 +118,18 @@ public class ComponentDetailController {
 		return new R<>(componentDetailService.removeById(id));
 	}
 
-	@PutMapping
-	@ResponseBody
-	@RequestMapping(path = "/upload", method = RequestMethod.POST)
-	public R<ComponentDetail> upload(HttpServletRequest request) {
-		ComponentDetail componentDetail = componentDetailService.upload(request);
-		if (componentDetail != null) {
-			System.out.println("上传成功！！！");
-			return new R<>(componentDetail, "上传成功！");
-		} else {
-			return new R<>(componentDetail, "无文件上传！");
-		}
-	}
+//	@PutMapping
+//	@ResponseBody
+//	@RequestMapping(path = "/upload", method = RequestMethod.POST)
+//	public R<ComponentDetail> upload(HttpServletRequest request) {
+//		ComponentDetail componentDetail = componentDetailService.upload(request);
+//		if (componentDetail != null) {
+//			System.out.println("上传成功！！！");
+//			return new R<>(componentDetail, "上传成功！");
+//		} else {
+//			return new R<>(componentDetail, "无文件上传！");
+//		}
+//	}
 
 	@PutMapping
 	@RequestMapping("/createXmlFile/{token}/{compId}")
@@ -149,11 +138,22 @@ public class ComponentDetailController {
 		return new R<>(componentDetailService.createXmlFile(entity, token, compId));
 	}
 
+	/**
+	 * @Title: createXmlFileMap
+	 * @Desc 创建并生成构件XML文件
+	 * @Author xiaohe
+	 * @DateTime 2020年5月6日
+	 * @param entity      构件xml
+	 * @param token
+	 * @param compId      构件编号
+	 * @param userCurrent 用户
+	 * @return
+	 */
 	@PutMapping
 	@RequestMapping("/createXmlFileMap/{token}/{compId}/{userCurrent}")
 	public R createXmlFileMap(@RequestBody XmlEntityMap entity, @PathVariable("token") String token,
 			@PathVariable("compId") String compId, @PathVariable("userCurrent") String userCurrent) {
-		return new R<>(componentDetailService.createXmlFile(entity, token, compId, userCurrent));
+		return componentDetailService.createXmlFile(entity, token, compId, userCurrent);
 	}
 
 	/**
@@ -170,7 +170,7 @@ public class ComponentDetailController {
 			@RequestParam(value = "userName", required = false) String userName) {
 		// 2020年4月16日14:04:28 更改返回方式(xiaohe) old====> new
 		// R<>(componentDetailService.getUploadFilesUrl(ufile,userName))
-		return componentDetailService.getUploadFilesUrl(ufile, userName);
+		return componentDetailService.getUploadFilesUrl(ufile, userName, DataCenterConstants.FILE_DIRS_UPLOAD);
 	}
 
 	/**
@@ -201,8 +201,9 @@ public class ComponentDetailController {
 	 */
 	@ResponseBody
 	@PostMapping(path = "/uploadImg", consumes = { "multipart/mixed", "multipart/form-data" })
-	public R<?> uploadImgUrl(@RequestParam(value = "file", required = false) MultipartFile ufile) {
-		return new R<>(UploadFilesUtils.getUploadImgUrl(ufile));
+	public R<?> uploadImgUrl(@RequestParam(value = "file", required = false) MultipartFile ufile,
+			@RequestParam(value = "userName", required = false) String userName) {
+		return componentDetailService.getUploadFilesUrl(ufile, userName, DataCenterConstants.FILE_DIRS_IMAGE);
 	}
 
 	/**
@@ -246,7 +247,7 @@ public class ComponentDetailController {
 	 * @Desc 删除文件
 	 * @Author xiaohe
 	 * @DateTime 2020年4月20日
-	 * @param lists 文件路径列表 
+	 * @param lists 文件路径列表
 	 */
 	@PostMapping("/delFilePath")
 	public void delFilePath(@RequestBody List<String> lists) {

@@ -51,36 +51,6 @@ public class FileController {
 	private FileService fileService;
 
 	/**
-	 * @param localPath 保存的本地文件路劲
-	 * @param localFile 要保存的文件列表
-	 * @return
-	 * @Title: uploadLocalFile
-	 * @Desc 多文件上传
-	 * @Author xiaohe
-	 * @DateTime 2020年4月1日
-	 */
-	@PostMapping("uploadFile")
-	public R<Boolean> uploadLocalFile(@RequestParam("localPath") String localPath,
-			@RequestParam("localFile") List<FileCenter> localFile) {
-		R<Boolean> ret = new R<Boolean>();
-		try {
-			if (fileService.uploadLocalFile(localPath, localFile)) {
-				ret.setData(true);
-				ret.setMsg("上传文件成功");
-			} else {
-				ret.setCode(1);
-				ret.setData(false);
-				ret.setMsg("上传文件失败");
-			}
-		} catch (Exception e) {
-			logger.error("多文件上传", e);
-			return new R<Boolean>(e);
-		}
-		return ret;
-
-	}
-
-	/**
 	 * @param sourcePath 文件/文件夹路径
 	 * @param localPath  保存文件/文件夹根路径
 	 * @param fileName   文件名字
