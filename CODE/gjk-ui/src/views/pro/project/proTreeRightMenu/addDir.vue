@@ -7,6 +7,7 @@
     :visible.sync="dialog"
   >
     <el-form :label-position="labelPosition">
+      <!-- <el-input v-model="frameFilePath" placeholder="软件框架文件夹" ></el-input> -->
       <uploader :options="optionsUploader" :key="uploader_key" ref="uploader" :autoStart="false">
         <el-form-item label="文件选择" label-width="90px">
           <uploader-unsupport></uploader-unsupport>
@@ -26,6 +27,9 @@
                   <el-table-column label="名称">
                     <template slot-scope="scope">{{ scope.row.name }}</template>
                   </el-table-column>
+                  <!-- <el-table-column label="路径">
+                      <template slot-scope="scope">{{ scope.row.relativePath }}</template>
+                  </el-table-column>-->
                   <el-table-column label="文件大小">
                     <template slot-scope="scope">
                       <uploader-file :file="scope.row" :list="false" :key="scope.index">
@@ -57,7 +61,10 @@
           </uploader-files>
         </el-form-item>
       </uploader>
-      <el-form-item label></el-form-item>
+
+      <el-form-item label>
+        <!-- <el-button type="primary" @click="handleSaveSoftware">提交</el-button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -->
+      </el-form-item>
     </el-form>
   </el-dialog>
 </template>
@@ -97,6 +104,7 @@ export default {
     },
     // 文件移除功能
     remove(filerow, files) {
+      console.log("files:::", files);
       files.forEach((e, index) => {
         if (filerow.id === e.id) {
           files.splice(index, 1);
@@ -106,33 +114,41 @@ export default {
     // 全部取消功能
     removeAll(files) {
       files.splice(0, files.length);
+      //todo
+      //this.isAble = false;
     },
     resumes(files) {
       let formData = new FormData();
       for (let file of files) {
         formData.append("file", file.file);
       }
-      let amisPath =
-        this.currentNodeData.filePath + "\\" + this.currentNodeData.fileName; //上传文件夹的目标绝对路径
-      formData.append("amisPath", amisPath);
       uploadFolder(formData)
         .then(res => {
-          if (res.data.data) {
-            this.$notify({
-              title: "成功",
-              message: res.data.msg,
-              type: "success",
-              duration: 2000
-            });
+          var folderPathDTO = res.data.data;
+          if (
+            folderPathDTO.filePaths != null &&
+            folderPathDTO.filePaths.length > 0
+          ) {
+            console.log("folderPathDTO", folderPathDTO);
+            (folderPathDTO.amisPath =
+              this.currentNodeData.filePath +
+              "\\" +
+              this.currentNodeData.fileName),
+              uploadFiles(folderPathDTO)
+                .then(res => {
+                  this.$notify({
+                    message: res.data.data,
+                    type: "success"
+                  });
+                  this.reload();
+                })
+                .catch(error => {
+                  this.$message.error("文件增加失败"); //todo
+                });
           } else {
-            this.$notify({
-              title: "失败",
-              message: res.data.msg,
-              duration: 2000
-            });
+            this.$message.error("文件增加失败"); //todo
           }
-          this.reload(); //刷新页面
-          this.closeDialog(); //关闭对话框
+          this.closeDialog();
         })
         .catch(error => {
           this.$message.error(error);

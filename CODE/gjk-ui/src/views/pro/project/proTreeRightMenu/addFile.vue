@@ -71,9 +71,10 @@ export default {
     },
     /* 上传文件 */
     UploadFile(param) {
-      getUploadFilesUrl(param, this.userInfo).then(res => {
+      getUploadFilesUrl(param,this.userInfo).then(res => {
         this.filePath = res.data.data;
         this.file.fileName = param.file.name;
+        // console.log("fileName", this.file.fileName);
       });
     },
     saveUploadFile() {
@@ -87,27 +88,22 @@ export default {
               this.currentNodeData.fileName,
             fileName: this.file.fileName
           };
+          console.log("FilePathDTO", FilePathDTO);
           uploadFile(FilePathDTO)
             .then(res => {
               if (res.data.data) {
                 this.$notify({
-                  message: res.data.msg,
+                  message: "文件增加成功",
                   type: "success"
                 });
+                this.reload();
               } else {
-                this.$notify({
-                  message: res.data.msg,
-                  type: "fail"
-                });
+                this.$message.error("文件增加失败");
               }
-              this.reload();
               this.closeDialog();
             })
             .catch(error => {
-              this.$notify({
-                message: res.data.msg,
-                type: "fail"
-              });
+              this.$message.error("文件增加失败"); //todo
             });
         }
       });

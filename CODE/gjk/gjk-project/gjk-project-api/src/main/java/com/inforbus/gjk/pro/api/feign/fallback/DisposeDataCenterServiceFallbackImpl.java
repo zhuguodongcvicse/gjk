@@ -1,18 +1,3 @@
-/*
- *  Copyright (c) 2019-2020, 冷冷 (wangiegie@gmail.com).
- *  <p>
- *  Licensed under the GNU Lesser General Public License 3.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *  <p>
- * https://www.gnu.org/licenses/lgpl.html
- *  <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 package com.inforbus.gjk.pro.api.feign.fallback;
 
@@ -28,6 +13,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Map;
 
 /**
  * @author lengleng
@@ -73,26 +60,6 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
     }
 
     /**
-     * @param filePaths
-     * @return Response 其中包含 文件流
-     * <p>
-     * <pre>
-     *         Response.Body body = response.body();
-     *         InputStream inputStream = body.asInputStream();
-     *
-     *         </pre>
-     * @Title: downloadStreamFiles
-     * @Desc 多文件下载（feign）
-     * @Author cvics
-     * @DateTime 2020年4月15日
-     */
-    @Override
-    public Response downloadStreamFiles(String[] filePaths) {
-        log.error("file-service 服务异常", cause);
-        return null;
-    }
-
-    /**
      * @Author wang
      * @Description: 多文件上传熔断方法
      * @Param: [ufile, localPath]
@@ -123,6 +90,76 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
         r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
         return r;
     }
+
+	/**
+	 * @Title: downloadStreamFiles
+	 * @Desc 多文件下载（feign）
+	 * @Author cvics
+	 * @DateTime 2020年4月15日
+	 * @param filePaths
+	 * @return Response 其中包含 文件流
+	 *
+	 *         <pre>
+	 *         Response.Body body = response.body();
+	 *         InputStream inputStream = body.asInputStream();
+	 *         </pre>
+	 */
+	@Override
+	public Response downloadStreamFiles(String[] filePaths) {
+		log.error("file-service 服务异常", cause);
+		return null;
+	}
+
+	@Override
+	public boolean appInstall(Map<String, String> cmpNameToHwType, String userName, int appID, String appName,
+			String packinfoPath, String cmpResFilePath, String appProPath) {
+		log.error("调用数据中心的第三方客户接口feign接口appInstall方法失败", cause);
+		return false;
+	}
+
+	@Override
+	public boolean appLoad(Map<String, String> cmpNameToHwType, String userName, int appID, String appName,
+			boolean existDeployConfig, String sysconfigPath, String appProPath) {
+		log.error("调用数据中心的第三方客户接口feign接口appLoad方法失败", cause);
+		return false;
+	}
+
+	@Override
+	public boolean appUnload(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
+		log.error("调用数据中心的第三方客户接口feign接口appUnload方法失败", cause);
+		return false;
+	}
+
+	@Override
+	public boolean appRestart(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
+		log.error("调用数据中心的第三方客户接口feign接口appRestart方法失败", cause);
+		return false;
+	}
+
+	@Override
+	public boolean appStop(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
+		log.error("调用数据中心的第三方客户接口feign接口appStop方法失败", cause);
+		return false;
+	}
+
+	@Override
+	public boolean appPause(Map<String, String> cmpNameToHwType, String userName, int appID, String appName) {
+		log.error("调用数据中心的第三方客户接口feign接口appPause方法失败", cause);
+		return false;
+	}
+
+	@Override
+	public boolean appUnInstall(Map<String, String> cmpNameToHwType, String userName, int appID, String appName,
+			String packinfoPath) {
+		log.error("调用数据中心的第三方客户接口feign接口appUnInstall方法失败", cause);
+		return false;
+	}
+
+	@Override
+	public void appTaskExport(String userName, int appId, String appName, String appPath, String sysconfigPath,
+			String packinfoPath, String cmpDeployPlanFilePath) {
+		log.error("调用数据中心的第三方客户接口feign接口appLoad方法失败", cause);
+	}
 
     /**
      * @Author wang
