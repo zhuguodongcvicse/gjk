@@ -1,14 +1,13 @@
-package com.inforbus.gjk.pro.api.util;
+package com.inforbus.gjk.common.core.util.compileutil;
+
+import com.inforbus.gjk.common.core.util.FileUtil;
+import lombok.experimental.UtilityClass;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.inforbus.gjk.common.core.util.FileUtil;
-
-import lombok.experimental.UtilityClass;
 
 /**
  * LinuxUtil
