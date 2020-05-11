@@ -1586,9 +1586,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String localPath = local_REPO_PATH + Path + DeploymentConstants.PROCESSMODELINGXML;
 		XmlEntityMap xmlEntityMap = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(localPath).getData();
 		File file = new File(local_REPO_PATH + Path + DeploymentConstants.PROCESSMODELINGXML);
-        List<HardwareNode> hardwareNodeList = ProcedureXmlAnalysis.getHardwareNodeList(file, xmlEntityMap);
+        List<HardwareNode> hardwareNodeList = ProcedureXmlAnalysis.getHardwareNodeList(xmlEntityMap);
 		if (hardwareNodeList.size() != 0) {
-            List<Arrows> arrowsList = ProcedureXmlAnalysis.getArrowsList(file, xmlEntityMap);
+            List<Arrows> arrowsList = ProcedureXmlAnalysis.getArrowsList(xmlEntityMap);
 			ArrayList<Object> array = new ArrayList<>();
 			array.add(hardwareNodeList);
 			array.add(arrowsList);
@@ -1999,7 +1999,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			// List<Part> partList1 = ProcedureXmlAnalysis.getPartList(new
 			// File(flowFilePath));
 			XmlEntityMap xmlMap = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(flowFilePath).getData();
-			List<Part> partList1 = ProcedureXmlAnalysis.getPartList(flowFile,xmlMap);
+			List<Part> partList1 = ProcedureXmlAnalysis.getPartList(xmlMap);
 			partList.addAll(partList1);
 		}
 		String themePath = path + "自定义配置__主题配置.xml";
