@@ -138,6 +138,7 @@ export default {
         params.append("allMessage", JSON.stringify(allMessage));
         appProCreatePretreatment(params)
           .then(Response => {
+              console.log("Response",Response)
             if (Response.data.data === true) {
               // this.reflush(loading);
               const loadingToo = this.$loading({

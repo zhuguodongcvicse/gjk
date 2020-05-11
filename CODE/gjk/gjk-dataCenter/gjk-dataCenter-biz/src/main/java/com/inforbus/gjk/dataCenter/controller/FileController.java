@@ -531,4 +531,35 @@ public class FileController {
 		}
 	}
 
+	/**
+	 * 判断文件是否存在
+	 * @param filePath
+	 * @auther sunchao
+	 * @return
+	 */
+	@PostMapping("/judgeFileExist")
+	@ResponseBody
+	public R judgeFileExist(@RequestParam("filePath") String filePath) {
+		R<Boolean> r = new R<>();
+		try {
+			r.setData(fileService.judgeFileExist(filePath));
+		} catch (Exception e) {
+			r.setMsg("\"判断文件是否存在失败：\" + e.getMessage()");
+			logger.error("判断文件是否存在失败：" + e.getMessage());
+		}
+		return r;
+	}
+
+	@PostMapping("/getAppPath")
+	@ResponseBody
+	public R getAppPath(@RequestParam("filePath") String filePath, @RequestParam("selectFileName") String selectFileName) {
+		R<String> r = new R<>();
+		try {
+			r.setData(fileService.getAppPath(filePath, selectFileName));
+		} catch (Exception e) {
+			r.setMsg("\"获取APP路径失败：\" + e.getMessage()");
+			logger.error("获取APP路径失败：" + e.getMessage());
+		}
+		return r;
+	}
 }

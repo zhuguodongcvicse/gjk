@@ -43,12 +43,11 @@ public class ProcedureXmlAnalysis {
 	/**
 	 * 文件分布式调用的方法
 	 * @author sunchao
-	 * @param file
 	 * @param xmlEntityMap
 	 * @return
 	 */
-	public List<HardwareNode> getHardwareNodeList(File file, XmlEntityMap xmlEntityMap) {
-		analysisByProcedureXml(file, xmlEntityMap);
+	public List<HardwareNode> getHardwareNodeList(XmlEntityMap xmlEntityMap) {
+		analysisByProcedureXml(xmlEntityMap);
 		return hardwareNodes;
 	}
 
@@ -57,8 +56,8 @@ public class ProcedureXmlAnalysis {
 		return hardwareNodes;
 	}
 	
-	public List<Part> getPartList(File file, XmlEntityMap xmlEntityMap) {
-		analysisByProcedureXml(file,xmlEntityMap);
+	public List<Part> getPartList(XmlEntityMap xmlEntityMap) {
+		analysisByProcedureXml(xmlEntityMap);
 		return parts;
 	}
 
@@ -84,18 +83,17 @@ public class ProcedureXmlAnalysis {
 	* @Exception
 	* @Date 2020/4/17 15:26
 	*/
-	public List<Arrows> getArrowsList(File file,XmlEntityMap xmlEntityMap) {
-		analysisByProcedureXml(file, xmlEntityMap);
+	public List<Arrows> getArrowsList(XmlEntityMap xmlEntityMap) {
+		analysisByProcedureXml(xmlEntityMap);
 		return arrowsList;
 	}
 	/**
 	 * 文件分布式调用的方法
 	 * @author sunchao
-	 * @param file
 	 * @param xmlEntityMap
 	 * @return
 	 */
-	private void analysisByProcedureXml(File file, XmlEntityMap xmlEntityMap) {
+	private void analysisByProcedureXml(XmlEntityMap xmlEntityMap) {
 		hardwareNodes = new ArrayList<>();
 		parts = new ArrayList<>();
 		components = new ArrayList<Component>();
