@@ -3,6 +3,7 @@ package com.inforbus.gjk.pro.api.feign;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.io.File;
 import java.util.Map;
 
 import com.inforbus.gjk.common.core.config.FeignSpringFormEncoder;
@@ -138,4 +139,24 @@ public interface DisposeDataCenterServiceFeign {
 	 */
 	@PostMapping("delAllFile")
 	public R<Boolean> delAllFile(@RequestParam("sourcePath") String sourcePath);
+
+	/**
+	 * 判断文件是否存在
+	 * @param filePath
+	 * @auther sunchao
+	 * @return
+	 */
+	@PostMapping("/judgeFileExist")
+	R judgeFileExist(@RequestParam("filePath") String filePath);
+
+	/**
+	 * 查找App路径
+	 * @param filePath
+	 * @param selectFileName
+	 * @auther sunchao
+	 * @return
+	 * @throws IOException
+	 */
+	@PostMapping("/getAppPath")
+	R getAppPath(@RequestParam("filePath") String filePath, @RequestParam("selectFileName") String selectFileName);
 }
