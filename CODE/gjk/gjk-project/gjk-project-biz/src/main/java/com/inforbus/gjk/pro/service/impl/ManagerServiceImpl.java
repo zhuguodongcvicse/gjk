@@ -22,10 +22,7 @@ import com.inforbus.gjk.pro.api.entity.*;
 
 import com.inforbus.gjk.pro.api.entity.GjkPlatform;
 import com.inforbus.gjk.pro.api.entity.Software;
-import com.inforbus.gjk.pro.api.feign.DisposeDataCenterServiceFeign;
-import com.inforbus.gjk.pro.api.feign.ExternalInfInvokeService;
-import com.inforbus.gjk.pro.api.feign.MapSoftToHardService;
-import com.inforbus.gjk.pro.api.feign.RemoteCodeGenerationService;
+import com.inforbus.gjk.pro.api.feign.*;
 import com.inforbus.gjk.pro.mapper.*;
 import com.inforbus.gjk.pro.service.BaseTemplateService;
 import org.apache.commons.io.FileUtils;
@@ -112,6 +109,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	private ExternalInfInvokeService externalInfInvokeService;
 	@Autowired
 	private MapSoftToHardService mapSoftToHardService;
+	@Autowired
+	private AppSubassemblyServiceFeign appSubassemblyServiceFeign;
 
 	@Autowired
 	private RemoteCodeGenerationService remoteCodeGenerationService;
@@ -770,7 +769,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
         ProjectFile projectFile = this.getById(messageMap.get("procedureXmlId"));
         // 创建流程xml文件路径
         String procedureFilePath = proDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml";
-        Boolean fileExistFlag = (Boolean) dataCenterServiceFeign.judgeFileExist(procedureFilePath).getData();
+        Boolean fileExistFlag = (Boolean) appSubassemblyServiceFeign.judgeFileExist(procedureFilePath).getData();
 //        File file = new File(procedureFilePath);
 
         String modelId = projectFile.getParentId();
@@ -907,7 +906,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
         ProjectFile projectFile = this.getById(messageMap.get("procedureXmlId"));
         // 创建流程xml文件路径
         String procedureFilePath = proDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml";
-        Boolean fileExistFlag = (Boolean) dataCenterServiceFeign.judgeFileExist(procedureFilePath).getData();
+        Boolean fileExistFlag = (Boolean) appSubassemblyServiceFeign.judgeFileExist(procedureFilePath).getData();
 //        File file = new File(procedureFilePath);
 
         ProjectFile sysConfigXmlFile = getProFileByModelIdAndProFileType(projectFile.getParentId(), "17");
@@ -1150,7 +1149,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
             String appFilePathName = null;
             try {
 //                appFilePathName = FileUtil.getAppPath(assemblyName, "App");
-                appFilePathName = (String) dataCenterServiceFeign.getAppPath(assemblyName, "App").getData();
+                appFilePathName = (String) appSubassemblyServiceFeign.getAppPath(assemblyName, "App").getData();
             } catch (Exception e) {
                 logger.error("查找App路径失败，请联系管理员。");
                 r.setException(new Exception("查找App路径失败，请联系管理员。"));
