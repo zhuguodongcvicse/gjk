@@ -1,19 +1,17 @@
-package com.inforbus.gjk.pro.api.util;
+package com.inforbus.gjk.common.core.util.compileutil;
+
+import com.inforbus.gjk.common.core.entity.XmlEntityMap;
+import com.inforbus.gjk.common.core.entity.XmlHasParentEntity;
+import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
+import lombok.experimental.UtilityClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.inforbus.gjk.common.core.entity.XmlEntityMap;
-import com.inforbus.gjk.common.core.entity.XmlHasParentEntity;
-import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
-
-import lombok.experimental.UtilityClass;
 
 /**
  * MakeFileUtil

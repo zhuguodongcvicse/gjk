@@ -1,17 +1,10 @@
-package com.inforbus.gjk.pro.api.util;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.*;
+package com.inforbus.gjk.common.core.util.compileutil;
 
 import com.inforbus.gjk.common.core.util.FileUtil;
 import lombok.experimental.UtilityClass;
+
+import java.io.*;
+import java.util.*;
 
 /**
  * SylixosUtil
