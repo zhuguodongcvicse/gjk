@@ -23,6 +23,7 @@ import com.inforbus.gjk.pro.api.entity.GjkPlatform;
 import com.inforbus.gjk.pro.api.entity.Software;
 import com.inforbus.gjk.pro.api.feign.DisposeDataCenterServiceFeign;
 import com.inforbus.gjk.pro.api.feign.ExternalInfInvokeService;
+import com.inforbus.gjk.pro.api.feign.MapSoftToHardService;
 import com.inforbus.gjk.pro.api.feign.RemoteCodeGenerationService;
 import com.inforbus.gjk.pro.mapper.*;
 import com.inforbus.gjk.pro.service.BaseTemplateService;
@@ -57,7 +58,6 @@ import com.inforbus.gjk.common.core.util.ExternalIOTransUtils;
 import com.inforbus.gjk.common.core.util.FileUtil;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
-import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 import com.inforbus.gjk.pro.api.entity.App;
 import com.inforbus.gjk.pro.api.entity.Chipsfromhardwarelibs;
 import com.inforbus.gjk.pro.api.entity.Component;
@@ -109,35 +109,32 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	protected DisposeDataCenterServiceFeign dataCenterServiceFeign;
 	@Autowired
 	private ExternalInfInvokeService externalInfInvokeService;
-//	private static final String proDetailPath = JGitUtil.getLOCAL_REPO_PATH();
-//	private static final String integerCodeFileName = JGitUtil.getINTEGER_CODE_FILE_NAME();
-//	private static String serverPath = JGitUtil.getLOCAL_REPO_PATH();
-//
-//	private static final String flowInfPath = JGitUtil.getFlowInfPath();// 获取流程内外部接口存放路径 add by hu
-//	private static final String gitDetailPath = JGitUtil.getLOCAL_REPO_PATH();// gitlu路径
-//	private static final String generateCodeResult = JGitUtil.getGenerateCodeResult();// 集成代码生成结果存放路径
-//	private static final String softToHardResult = JGitUtil.getSoftToHardResult();// 软硬件映射结果文件存放路径
+	@Autowired
+	private MapSoftToHardService mapSoftToHardService;
 
-    @Autowired
-    private RemoteCodeGenerationService remoteCodeGenerationService;
-    @Value("${git.local.path}")
-    private String proDetailPath;
-    @Value("${integer.code.file.name}")
-    private String integerCodeFileName;
-    @Value("${git.local.path}")
-    private String serverPath;
-    // 获取流程内外部接口存放路径 add by hu
-    @Value("${gjk.pro.process.flowInfPath}")
-    private String flowInfPath;
-    // gitlu路径
-    @Value("${git.local.path}")
-    private String gitDetailPath;
-    // 集成代码生成结果存放路径
-    @Value("${gjk.pro.process.generateCodeResult}")
-    private String generateCodeResult;
-    // 软硬件映射结果文件存放路径
-    @Value("${gjk.pro.process.softToHardResult}")
-    private String softToHardResult;
+	@Autowired
+	private RemoteCodeGenerationService remoteCodeGenerationService;
+	@Value("${git.local.path}")
+	private String proDetailPath;
+	@Value("${integer.code.file.name}")
+	private String integerCodeFileName;
+	@Value("${git.local.path}")
+	private String serverPath;
+	// 获取流程内外部接口存放路径 add by hu
+	@Value("${gjk.pro.process.flowInfPath}")
+	private String flowInfPath;
+	// gitlu路径
+	@Value("${git.local.path}")
+	private String gitDetailPath;
+	// 集成代码生成结果存放路径
+	@Value("${gjk.pro.process.generateCodeResult}")
+	private String generateCodeResult;
+	// 软硬件映射结果文件存放路径
+	@Value("${gjk.pro.process.softToHardResult}")
+	private String softToHardResult;
+	// mapSoftToHardPath.exe所在路径 "D:/14S_GJK_GIT/gjk/gjk/mapSoftToHardPath/exe.exe"
+	@Value("${git.local.mapSoftToHardPath}")
+	private String mapSoftToHardPath;
 
 	/**
 	 * @getTreeByProjectId
@@ -368,7 +365,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			}
 		}
 		if (file.exists()) {
-			XmlEntityMap XmlEntityMap = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(file.getAbsolutePath()).getData();
+			XmlEntityMap XmlEntityMap = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(file.getAbsolutePath())
+					.getData();
 			return ProcedureXmlAnalysis.getHardwareNodeList(file, XmlEntityMap);
 		} else {
 			return null;
@@ -428,7 +426,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		Map<String, List<Object>> map = new HashMap<>();
 		// 获取客户api的返回值
 //		Map<String, List<String>> apiReturnStringList = ExternalIOTransUtils.getCmpSysConfig(customizeFileName, packinfoFileName, processFileName);
-		Map<String, List<String>> apiReturnStringList = externalInfInvokeService.getCmpSysConfig(customizeFileName, packinfoFileName, processFileName).getData();
+		Map<String, List<String>> apiReturnStringList = externalInfInvokeService
+				.getCmpSysConfig(customizeFileName, packinfoFileName, processFileName).getData();
 		analysisApiReturnStringList(apiReturnStringList, map);
 
 		return new R<>(map);
@@ -564,7 +563,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String hsmTempId = baseTemplateIDsDTO.getHsmTempId();// 获取到软硬件映射模板id
 		return getXmlEntityMap(hsmTempId);// 解析软硬件映射xml文件返回数据
 	}
-	
+
 	/**
 	 * @Title: getDisposeXmlEntityMap
 	 * @Description: 解析软硬件映射配置的xml文件进行前台回显
@@ -575,15 +574,15 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 */
 	public XmlEntityMap getDisposeXmlEntityMap(String proDetailId) {
 		ProjectFile projectFile = getProDetailById(proDetailId);
-		//项目中是否已经存在的文件路径
+		// 项目中是否已经存在的文件路径
 		File hsmLocalFile = new File(gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml");
 		String localFilePath = gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml";
-		//如果该项目中已经有该文件，则读取该文件内容显示在页面上；否则读取基础模板里的最新的软硬件映射配置文件
+		// 如果该项目中已经有该文件，则读取该文件内容显示在页面上；否则读取基础模板里的最新的软硬件映射配置文件
 		if (hsmLocalFile.exists()) {
 			R<XmlEntityMap> r = new R<XmlEntityMap>();
 			r = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(localFilePath);
 			return r.getData();
-			
+
 		}
 		Project project = projectMapper.getProById(projectFile.getProjectId());
 		// 获取到模板idjson串
@@ -595,6 +594,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// 解析软硬件映射xml文件返回数据
 		return getXmlEntityMap(hsmTempId);
 	}
+
 	/**
 	 * @editProJSON
 	 * @Description: 保存回显文件
@@ -714,7 +714,10 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 */
 	@Override
 	public void simplePlan(ArrayList<String> schemeFileList, String simplePlanFile) {
-		ExternalIOTransUtils.simplePlan(schemeFileList, simplePlanFile);// update by zhx
+//		ExternalIOTransUtils.simplePlan(schemeFileList, simplePlanFile);// update by zhx?
+		// 将list转换为数组
+		String[] array = (String[]) schemeFileList.toArray(new String[schemeFileList.size()]);
+		externalInfInvokeService.simplePlan(array, simplePlanFile);
 	}
 
 	/**
@@ -851,17 +854,19 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 								}
 							}
 							if ("".equals(bspFilePath)) {
-								if(libsType.equals("Sylixos")||libsType.equals("Workbench")) {
-								if (returnStr.contains("请配置" + libsType + "对应的bsp,")) {
-									String s = "请配置" + libsType + "对应的bsp,部件";
-									StringBuilder sb = new StringBuilder(returnStr);
-									sb.insert(returnStr.indexOf(s) + s.length(), part.getPartName() + ",");
-									returnStr = sb.toString();
-								} else {
-									returnStr += "请配置" + libsType + "对应的bsp," + "部件" + part.getPartName() + "缺少对应的BSP。";
-								}
-								logger.error("请配置" + libsType + "对应的bsp," + "部件" + part.getPartName() + "缺少对应的BSP。");
-							
+								if (libsType.equals("Sylixos") || libsType.equals("Workbench")) {
+									if (returnStr.contains("请配置" + libsType + "对应的bsp,")) {
+										String s = "请配置" + libsType + "对应的bsp,部件";
+										StringBuilder sb = new StringBuilder(returnStr);
+										sb.insert(returnStr.indexOf(s) + s.length(), part.getPartName() + ",");
+										returnStr = sb.toString();
+									} else {
+										returnStr += "请配置" + libsType + "对应的bsp," + "部件" + part.getPartName()
+												+ "缺少对应的BSP。";
+									}
+									logger.error(
+											"请配置" + libsType + "对应的bsp," + "部件" + part.getPartName() + "缺少对应的BSP。");
+
 								}
 							}
 						}
@@ -1057,7 +1062,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			String softwareFilePath, String softwareName, String bspFilePath) {
 
 		if ("".equals(bspFilePath)) {
-			if(libsType.equals("Sylixos")||libsType.equals("Workbench")) {
+			if (libsType.equals("Sylixos") || libsType.equals("Workbench")) {
 				logger.error("请配置" + libsType + "对应的bsp," + "部件" + partName + "缺少对应的BSP。");
 				r.setException(new Exception("请配置" + libsType + "对应的BSP," + "部件" + partName + "缺少对应的BSP。"));
 				return;
@@ -1078,7 +1083,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				}
 			}
 		});
-		if(libsType.equals("Sylixos")||libsType.equals("Workbench")) {
+		if (libsType.equals("Sylixos") || libsType.equals("Workbench")) {
 			thread.start();
 		}
 
@@ -1156,8 +1161,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 			// 复制集成代码
 			Set<String> integerCodeSet = new HashSet<String>();
-			FileUtil.getSelectStrFilePathList(integerCodeSet, integerCodeFilePath, "Cmp" + part.getPartName(),
-					".c");
+			FileUtil.getSelectStrFilePathList(integerCodeSet, integerCodeFilePath, "Cmp" + part.getPartName(), ".c");
 			try {
 				for (String filepath : integerCodeSet) {
 					FileUtil.copyFile(filepath, partIntegerCodeFilePath, "CmpSpbIntg.c");
@@ -1168,9 +1172,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				return;
 			}
 
-			getCompCHFileAndSave(r, part, assemblyName, includeFilePath, srcFilePath, hFilePathSet,
-					hMakeFilePathSet, cFilePathSet, cMakeFilePathSet, apiNeedStringSet, compFuncNameList,
-					selectFileExtensionList);
+			getCompCHFileAndSave(r, part, assemblyName, includeFilePath, srcFilePath, hFilePathSet, hMakeFilePathSet,
+					cFilePathSet, cMakeFilePathSet, apiNeedStringSet, compFuncNameList, selectFileExtensionList);
 			if (CommonConstants.FAIL.equals(r.getCode())) {
 				return;
 			}
@@ -1388,7 +1391,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (!file.exists()) {
 			file.mkdirs();
 		}
-		//boolean flag = XmlFileHandleUtil.createXmlFile(entity, new File(filePath + fileName));
+		// boolean flag = XmlFileHandleUtil.createXmlFile(entity, new File(filePath +
+		// fileName));
 		XMlEntityMapVO xmlVo = new XMlEntityMapVO();
 		xmlVo.setLocalPath(filePath + fileName);
 		xmlVo.setXmlEntityMap(entity);
@@ -1407,20 +1411,22 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		}
 //		ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName,
 //				newFilePath + "UserDefineTopicFile.xml");
-		boolean bo = externalInfInvokeService.createUserDefineTopic(flowFilePath, filePath + fileName,
-				newFilePath + "UserDefineTopicFile.xml").getData();
-		if(bo) {
+		boolean bo = externalInfInvokeService
+				.createUserDefineTopic(flowFilePath, filePath + fileName, newFilePath + "UserDefineTopicFile.xml")
+				.getData();
+		if (bo) {
 			File topicFile = new File(newFilePath + "UserDefineTopicFile.xml");
-			if(topicFile.exists()) {
+			if (topicFile.exists()) {
 				baseMapper.saveNewFilePath(newFilePath + "UserDefineTopicFile.xml", proDetailId);
-			}else {
+			} else {
 				logger.error("UserDefineTopicFile.xml不存在");
 			}
-			
+
 		}
-		//JGitUtil.commitAndPush(filePath + fileName, "上传构件相关文件");
+		// JGitUtil.commitAndPush(filePath + fileName, "上传构件相关文件");
 		return flag;
 	}
+
 	/**
 	 * 20200420修改使用Feign接口调用生成xml文件方法
 	 */
@@ -1437,12 +1443,13 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (!file.exists()) {
 			file.mkdirs();
 		}
-		//boolean flag = XmlFileHandleUtil.createXmlFile(entity, new File(filePath + fileName));
+		// boolean flag = XmlFileHandleUtil.createXmlFile(entity, new File(filePath +
+		// fileName));
 		XMlEntityMapVO xmlVo = new XMlEntityMapVO();
 		xmlVo.setLocalPath(filePath + fileName);
 		xmlVo.setXmlEntityMap(entity);
 		boolean flag = dataCenterServiceFeign.createXMLFile(xmlVo).getData();
-		//JGitUtil.commitAndPush(filePath + fileName, "上传构件相关文件");
+		// JGitUtil.commitAndPush(filePath + fileName, "上传构件相关文件");
 		return flag;
 	}
 
@@ -1547,152 +1554,152 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		return procedureNameList;
 	}
 
-    /**
-     * @param id
-     * @Description 部署图获取部件结构数据
-     * @Author ZhangHongXu
-     * @Return array
-     * @Exception
-     * @Date 2020/4/17 15:01
-     */
-    @Override
-    public ArrayList<Object> getXmlFile(String id) {
-        String Path = null;
-        String local_REPO_PATH = null;
-        String jopNumber = DeploymentConstants.JOBNUMBER;
-        for (ProjectFile projectFile : getProFileListByModelId(this.getById(id).getParentId())) {
-            if (jopNumber.equals(projectFile.getFileType())) {
-                Path = projectFile.getFilePath();
-                local_REPO_PATH = gitDetailPath;
-                break;
-            }
-        }
-        String localPath = local_REPO_PATH + Path + DeploymentConstants.PROCESSMODELINGXML;
-        XmlEntityMap xmlEntityMap = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(localPath).getData();
-        File file = new File(local_REPO_PATH + Path + DeploymentConstants.PROCESSMODELINGXML);
-        List<HardwareNode> hardwareNodeList = ProcedureXmlAnalysis.getHardwareNodeList(file, xmlEntityMap);
-        if (hardwareNodeList.size() != 0) {
-            List<Arrows> arrowsList = ProcedureXmlAnalysis.getArrowsList(file, xmlEntityMap);
-            ArrayList<Object> array = new ArrayList<>();
-            array.add(hardwareNodeList);
-            array.add(arrowsList);
-            return array;
-        } else {
-            return null;
-        }
-    }
+	/**
+	 * @param id
+	 * @Description 部署图获取部件结构数据
+	 * @Author ZhangHongXu
+	 * @Return array
+	 * @Exception
+	 * @Date 2020/4/17 15:01
+	 */
+	@Override
+	public ArrayList<Object> getXmlFile(String id) {
+		String Path = null;
+		String local_REPO_PATH = null;
+		String jopNumber = DeploymentConstants.JOBNUMBER;
+		for (ProjectFile projectFile : getProFileListByModelId(this.getById(id).getParentId())) {
+			if (jopNumber.equals(projectFile.getFileType())) {
+				Path = projectFile.getFilePath();
+				local_REPO_PATH = gitDetailPath;
+				break;
+			}
+		}
+		String localPath = local_REPO_PATH + Path + DeploymentConstants.PROCESSMODELINGXML;
+		XmlEntityMap xmlEntityMap = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(localPath).getData();
+		File file = new File(local_REPO_PATH + Path + DeploymentConstants.PROCESSMODELINGXML);
+		List<HardwareNode> hardwareNodeList = ProcedureXmlAnalysis.getHardwareNodeList(file, xmlEntityMap);
+		if (hardwareNodeList.size() != 0) {
+			List<Arrows> arrowsList = ProcedureXmlAnalysis.getArrowsList(file, xmlEntityMap);
+			ArrayList<Object> array = new ArrayList<>();
+			array.add(hardwareNodeList);
+			array.add(arrowsList);
+			return array;
+		} else {
+			return null;
+		}
+	}
 
-    /**
-     * @param deploymentXMLMap
-     * @Description 部署图xml生成
-     * @Author ZhangHongXu
-     * @Return void
-     * @Exception
-     * @Date 2020/4/20 10:16
-     */
-    @Override
-    public void updataDeploymentXml(DeploymentXMLMap deploymentXMLMap) {
-        String procedureId = null;
-        XmlEntityMap entityMap = null;
-        String Path = null;
-        String local_REPO_PATH = null;
-        String jopNumber = DeploymentConstants.JOBNUMBER;
-        String id = deploymentXMLMap.getId();
-        String localPath = null;
-        //获取XmlEntityMap数据
-        for (ProjectFile projectFile : getProFileListByModelId(this.getById(id).getParentId())) {
-            if (jopNumber.equals(projectFile.getFileType())) {
-                procedureId = projectFile.getId();
-                Path = projectFile.getFilePath();
-                local_REPO_PATH = gitDetailPath;
-                 localPath = local_REPO_PATH + Path + DeploymentConstants.PROCESSMODELINGXML;
-                entityMap = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(localPath).getData();
-                break;
-            }
-        }
-        if (entityMap != null) {
-            // 遍历部署图回传数据
-            for (DeploymentNode bakCompAllArray : deploymentXMLMap.getBakcompAllArray()) {
-                String nodeId = bakCompAllArray.getCompId();
-                System.out.println(bakCompAllArray);
-                List<DeploymentPart> bakPart = bakCompAllArray.getBakPart();
-                // 遍历备份组件
-                for (DeploymentPart bakParts : bakPart) {
-                    String bakpartName = bakParts.getPartName();
-                    String bakcpuid = bakParts.getCpuid();
-                    // 遍历xml解析数据
-                    findData(entityMap, nodeId, bakpartName, bakcpuid);
-                }
-            }
+	/**
+	 * @param deploymentXMLMap
+	 * @Description 部署图xml生成
+	 * @Author ZhangHongXu
+	 * @Return void
+	 * @Exception
+	 * @Date 2020/4/20 10:16
+	 */
+	@Override
+	public void updataDeploymentXml(DeploymentXMLMap deploymentXMLMap) {
+		String procedureId = null;
+		XmlEntityMap entityMap = null;
+		String Path = null;
+		String local_REPO_PATH = null;
+		String jopNumber = DeploymentConstants.JOBNUMBER;
+		String id = deploymentXMLMap.getId();
+		String localPath = null;
+		// 获取XmlEntityMap数据
+		for (ProjectFile projectFile : getProFileListByModelId(this.getById(id).getParentId())) {
+			if (jopNumber.equals(projectFile.getFileType())) {
+				procedureId = projectFile.getId();
+				Path = projectFile.getFilePath();
+				local_REPO_PATH = gitDetailPath;
+				localPath = local_REPO_PATH + Path + DeploymentConstants.PROCESSMODELINGXML;
+				entityMap = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(localPath).getData();
+				break;
+			}
+		}
+		if (entityMap != null) {
+			// 遍历部署图回传数据
+			for (DeploymentNode bakCompAllArray : deploymentXMLMap.getBakcompAllArray()) {
+				String nodeId = bakCompAllArray.getCompId();
+				System.out.println(bakCompAllArray);
+				List<DeploymentPart> bakPart = bakCompAllArray.getBakPart();
+				// 遍历备份组件
+				for (DeploymentPart bakParts : bakPart) {
+					String bakpartName = bakParts.getPartName();
+					String bakcpuid = bakParts.getCpuid();
+					// 遍历xml解析数据
+					findData(entityMap, nodeId, bakpartName, bakcpuid);
+				}
+			}
 
-            // 遍历部署图回传数据
-            for (DeploymentNode compAllArray : deploymentXMLMap.getCompAllArray()) {
-                String nodeId = compAllArray.getCompId();
-                System.out.println(compAllArray);
-                List<DeploymentPart> rootPart = compAllArray.getRootPart();
-                List<DeploymentPart> bakPart = compAllArray.getBakPart();
-                // 遍历根组件
-                for (DeploymentPart Part : rootPart) {
-                    String partName = Part.getPartName();
-                    String cpuid = Part.getCpuid();
-                    // 遍历xml解析数据
-                    findData(entityMap, nodeId, partName, cpuid);
-                }
-            }
-            //生成xml文件
-            //createXmlFile(entityMap, procedureId)
-            XMlEntityMapVO xMlEntityMapVO = new XMlEntityMapVO();
-            xMlEntityMapVO.setLocalPath(localPath);
-            xMlEntityMapVO.setXmlEntityMap(entityMap);
-            dataCenterServiceFeign.createXMLFile(xMlEntityMapVO);
-        }
-    }
+			// 遍历部署图回传数据
+			for (DeploymentNode compAllArray : deploymentXMLMap.getCompAllArray()) {
+				String nodeId = compAllArray.getCompId();
+				System.out.println(compAllArray);
+				List<DeploymentPart> rootPart = compAllArray.getRootPart();
+				List<DeploymentPart> bakPart = compAllArray.getBakPart();
+				// 遍历根组件
+				for (DeploymentPart Part : rootPart) {
+					String partName = Part.getPartName();
+					String cpuid = Part.getCpuid();
+					// 遍历xml解析数据
+					findData(entityMap, nodeId, partName, cpuid);
+				}
+			}
+			// 生成xml文件
+			// createXmlFile(entityMap, procedureId)
+			XMlEntityMapVO xMlEntityMapVO = new XMlEntityMapVO();
+			xMlEntityMapVO.setLocalPath(localPath);
+			xMlEntityMapVO.setXmlEntityMap(entityMap);
+			dataCenterServiceFeign.createXMLFile(xMlEntityMapVO);
+		}
+	}
 
-    /**
-     * @Description 处理xml文件数据
-     * @Author ZhangHongXu
-     * @param entityMap
-     * @param nodeId
-     * @param partName
-     * @param cpuid
-     * @Return void
-     * @Exception
-     * @Date 2020/4/20 15:44
-     */
-    private void findData(XmlEntityMap entityMap, String nodeId, String partName, String cpuid) {
-        String member = DeploymentConstants.MEMBER;
-        String id = DeploymentConstants.ID;
-        for (XmlEntityMap xmlMap : entityMap.getXmlEntityMaps()) {
-            String xmlNoedId = xmlMap.getAttributeMap().get(id);
-            if (xmlMap.getLableName().equals(member) && xmlNoedId.equals(nodeId)) {
-                recursiveXML(partName, entityMap, cpuid);
-            }
-        }
-    }
+	/**
+	 * @Description 处理xml文件数据
+	 * @Author ZhangHongXu
+	 * @param entityMap
+	 * @param nodeId
+	 * @param partName
+	 * @param cpuid
+	 * @Return void
+	 * @Exception
+	 * @Date 2020/4/20 15:44
+	 */
+	private void findData(XmlEntityMap entityMap, String nodeId, String partName, String cpuid) {
+		String member = DeploymentConstants.MEMBER;
+		String id = DeploymentConstants.ID;
+		for (XmlEntityMap xmlMap : entityMap.getXmlEntityMaps()) {
+			String xmlNoedId = xmlMap.getAttributeMap().get(id);
+			if (xmlMap.getLableName().equals(member) && xmlNoedId.equals(nodeId)) {
+				recursiveXML(partName, entityMap, cpuid);
+			}
+		}
+	}
 
-    /**
-     * @param partName
-     * @param xmlMap
-     * @param cpuid
-     * @Description 递归解析xml
-     * @Author ZhangHongXu
-     * @Return void
-     * @Exception
-     * @Date 2020/4/20 14:42
-     */
-    private void recursiveXML(String partName, XmlEntityMap xmlMap, String cpuid) {
-        String node = DeploymentConstants.NODE;
-        for (XmlEntityMap map : xmlMap.getXmlEntityMaps()) {
-            if (map.getLableName().equals(node)) {
-                String cmpname = map.getAttributeMap().get(DeploymentConstants.CMPNAME);
-                if (cmpname.equals(partName)) {
-                    map.getAttributeMap().put(DeploymentConstants.NAME, cpuid);
-                }
-            } else if (map.getXmlEntityMaps() != null && map.getXmlEntityMaps().size() > 0) {
-                recursiveXML(partName, map, cpuid);
-            }
-        }
-    }
+	/**
+	 * @param partName
+	 * @param xmlMap
+	 * @param cpuid
+	 * @Description 递归解析xml
+	 * @Author ZhangHongXu
+	 * @Return void
+	 * @Exception
+	 * @Date 2020/4/20 14:42
+	 */
+	private void recursiveXML(String partName, XmlEntityMap xmlMap, String cpuid) {
+		String node = DeploymentConstants.NODE;
+		for (XmlEntityMap map : xmlMap.getXmlEntityMaps()) {
+			if (map.getLableName().equals(node)) {
+				String cmpname = map.getAttributeMap().get(DeploymentConstants.CMPNAME);
+				if (cmpname.equals(partName)) {
+					map.getAttributeMap().put(DeploymentConstants.NAME, cpuid);
+				}
+			} else if (map.getXmlEntityMaps() != null && map.getXmlEntityMaps().size() > 0) {
+				recursiveXML(partName, map, cpuid);
+			}
+		}
+	}
 
 	@Override
 	public void deleteHardwarelibById(String id) {
@@ -1980,9 +1987,10 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// 获取部件及部件及部件下构建
 		File flowFile = new File(flowFilePath);
 		if (flowFile.exists()) {
-			//List<Part> partList1 = ProcedureXmlAnalysis.getPartList(new File(flowFilePath));
+			// List<Part> partList1 = ProcedureXmlAnalysis.getPartList(new
+			// File(flowFilePath));
 			XmlEntityMap xmlMap = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(flowFilePath).getData();
-			List<Part> partList1 = ProcedureXmlAnalysis.getPartList(flowFile,xmlMap);
+			List<Part> partList1 = ProcedureXmlAnalysis.getPartList(flowFile, xmlMap);
 			partList.addAll(partList1);
 		}
 		String themePath = path + "自定义配置__主题配置.xml";
@@ -1992,7 +2000,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (!themeFile.exists()) {
 			themeData = this.getXmlEntityMap(baseTemplateIDsDTO.getThemeTempId());
 		} else {
-			//themeData = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(themeFile);
+			// themeData = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(themeFile);
 			themeData = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(themePath).getData();
 		}
 		String netWorkPath = path + "自定义配置__网络配置.xml";
@@ -3269,49 +3277,49 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		return new R(checkResult);
 	}
 
-    /**
-     * @Author wang
-     * @Description: 集成代码生成
-     * @Param: [projectId, username]
-     * @Return: com.inforbus.gjk.common.core.util.R
-     * @Create: 2020/4/20
-     */
-    @Override
-    public R codeGeneration(String projectId, String username) {
-        R r1 = new R<>();
-        try {
-            // 获取流程对应记录
-            ProjectFile procedure = this.getById(projectId);
-            Map<String, String> map = new HashMap<>();
-            // 获取流程下generateCodeResult文件夹路径
-            String tmpGenerateCodeResult = gitDetailPath + procedure.getFilePath() + procedure.getFileName()
-                    + File.separator + generateCodeResult;
-            //获取流程图id
-            String workModeId = String.valueOf(procedure.getFlowId());
-            //流程模型文件的绝对路径
-            String workModeFilePath = getWorkModeFilePath(projectId);
-            //packinfo文件路径（打包解包）
-            String packinfoPath = tmpGenerateCodeResult + File.separator + "packinfo.xml";
-            //自定义主题XML文件（经过处理的路径）
-            String userDefineTopicFilePath = getUserDefineTopicFilePath(projectId);
-            map.put("TmpGenerateCodeResult", tmpGenerateCodeResult);
-            map.put("WorkModeId", workModeId);
-            map.put("WorkModeFilePath", workModeFilePath);
-            map.put("PackinfoPath", packinfoPath);
-            map.put("UserDefineTopicFilePath", userDefineTopicFilePath);
-            map.put("Username", username);
-            //调用fegin接口执行集成代码生成方法
-            R<Boolean> r = remoteCodeGenerationService.codeGeneration(map);
-            r1.setData("集成代码生成成功");
-            if (!r.getData()){
-                r1.setData("集成代码生成失败,请检查相关配置");
-            }
-            return r1;
-        }catch (Exception e){
-            logger.error("集成代码生成失败 :" + e.getMessage());
-            return new R<>(new Exception("集成代码生成失败"));
-        }
-    }
+	/**
+	 * @Author wang
+	 * @Description: 集成代码生成
+	 * @Param: [projectId, username]
+	 * @Return: com.inforbus.gjk.common.core.util.R
+	 * @Create: 2020/4/20
+	 */
+	@Override
+	public R codeGeneration(String projectId, String username) {
+		R r1 = new R<>();
+		try {
+			// 获取流程对应记录
+			ProjectFile procedure = this.getById(projectId);
+			Map<String, String> map = new HashMap<>();
+			// 获取流程下generateCodeResult文件夹路径
+			String tmpGenerateCodeResult = gitDetailPath + procedure.getFilePath() + procedure.getFileName()
+					+ File.separator + generateCodeResult;
+			// 获取流程图id
+			String workModeId = String.valueOf(procedure.getFlowId());
+			// 流程模型文件的绝对路径
+			String workModeFilePath = getWorkModeFilePath(projectId);
+			// packinfo文件路径（打包解包）
+			String packinfoPath = tmpGenerateCodeResult + File.separator + "packinfo.xml";
+			// 自定义主题XML文件（经过处理的路径）
+			String userDefineTopicFilePath = getUserDefineTopicFilePath(projectId);
+			map.put("TmpGenerateCodeResult", tmpGenerateCodeResult);
+			map.put("WorkModeId", workModeId);
+			map.put("WorkModeFilePath", workModeFilePath);
+			map.put("PackinfoPath", packinfoPath);
+			map.put("UserDefineTopicFilePath", userDefineTopicFilePath);
+			map.put("Username", username);
+			// 调用fegin接口执行集成代码生成方法
+			R<Boolean> r = remoteCodeGenerationService.codeGeneration(map);
+			r1.setData("集成代码生成成功");
+			if (!r.getData()) {
+				r1.setData("集成代码生成失败,请检查相关配置");
+			}
+			return r1;
+		} catch (Exception e) {
+			logger.error("集成代码生成失败 :" + e.getMessage());
+			return new R<>(new Exception("集成代码生成失败"));
+		}
+	}
 
 	/**
 	 * 根据当前软硬件映射配置的id，查找当前流程下的所有模块的文件路径，从而截取想要的路径
@@ -3420,29 +3428,32 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// flowFile.getFilePath()+flowInfPath+File.separator+"系数文件.xml" ;
 		workSpacePath = gitDetailPath + flowFile.getFilePath() + softToHardResult;
 		sysParamFilePath = workSpacePath + File.separator + "系数文件.xml";
-		// 客户exe文件全路径
-		String exe = JGitUtil.getSoftToHard();// "D:\\14S_GJK_GIT\\gjk\\gjk\\exe\\exe.exe";
-		// 调用客户接口执行exe
-		// appDataDTO.getUserName():当前用户名
-		String[] strArray = new String[] { exe, hardWareFilePath, mapConfigPath, sysParamFilePath,
-				appDataDTO.getUserName() };
-		try {
-			Process process = Runtime.getRuntime().exec(strArray);
-			InputStreamReader reader = new InputStreamReader(process.getInputStream());
-			BufferedReader bufferedReader = new BufferedReader(reader);
-
-			StringBuffer stringBuffer = new StringBuffer();
-
-			String str = null;
-
-			while ((str = bufferedReader.readLine()) != null) {
-				stringBuffer.append(str);
-			}
-
-			System.out.println(stringBuffer);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		// 客户exe文件全路径
+//		String exe = JGitUtil.getSoftToHard();// "D:\\14S_GJK_GIT\\gjk\\gjk\\exe\\exe.exe";
+//		// 调用客户接口执行exe
+//		// appDataDTO.getUserName():当前用户名
+//		String[] strArray = new String[] { exe, hardWareFilePath, mapConfigPath, sysParamFilePath,
+//				appDataDTO.getUserName() };
+//		try {
+//			Process process = Runtime.getRuntime().exec(strArray);
+//			InputStreamReader reader = new InputStreamReader(process.getInputStream());
+//			BufferedReader bufferedReader = new BufferedReader(reader);
+//
+//			StringBuffer stringBuffer = new StringBuffer();
+//
+//			String str = null;
+//
+//			while ((str = bufferedReader.readLine()) != null) {
+//				stringBuffer.append(str);
+//			}
+//
+//			System.out.println(stringBuffer);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+		// 调用feign第三方c接口
+		mapSoftToHardService.mapSoftToHard(mapSoftToHardPath, hardWareFilePath, mapConfigPath, sysParamFilePath,
+				appDataDTO.getUserName());
 
 		/****************************************
 		 * end
@@ -3479,33 +3490,34 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		File file = new File(path);
 		// 获得该文件夹内的所有文件
 		File[] array = file.listFiles();
+		if (array!=null) {
+			for (int i = 0; i < array.length; i++) {
+				if (array[i].isFile())// 如果是文件
+				{
+					for (int j = 0; j < deep; j++)// 输出前置空格
+						System.out.print(" ");
+					// 只输出文件名字
+					// System.out.println( array[i].getName());
+					if (array[i].getName().startsWith("软硬件映射") && array[i].getName().endsWith(".xml")) {
 
-		for (int i = 0; i < array.length; i++) {
-			if (array[i].isFile())// 如果是文件
-			{
-				for (int j = 0; j < deep; j++)// 输出前置空格
-					System.out.print(" ");
-				// 只输出文件名字
-				// System.out.println( array[i].getName());
-				if (array[i].getName().startsWith("软硬件映射") && array[i].getName().endsWith(".xml")) {
+						fileNamelist.add(array[i].getName());
+					}
+					System.out.println("fileNamelist" + fileNamelist);
 
-					fileNamelist.add(array[i].getName());
+					// 输出当前文件的完整路径
+					// System.out.println("#####" + array[i]);
+					// 同样输出当前文件的完整路径 大家可以去掉注释 测试一下
+					// System.out.println(array[i].getPath());
+				} else if (array[i].isDirectory())// 如果是文件夹
+				{
+					for (int j = 0; j < deep; j++)// 输出前置空格
+						System.out.print(" ");
+
+					System.out.println(array[i].getName());
+					// System.out.println(array[i].getPath());
+					// 文件夹需要调用递归 ，深度+1
+					getFile(array[i].getPath(), deep + 1);
 				}
-				System.out.println("fileNamelist" + fileNamelist);
-
-				// 输出当前文件的完整路径
-				// System.out.println("#####" + array[i]);
-				// 同样输出当前文件的完整路径 大家可以去掉注释 测试一下
-				// System.out.println(array[i].getPath());
-			} else if (array[i].isDirectory())// 如果是文件夹
-			{
-				for (int j = 0; j < deep; j++)// 输出前置空格
-					System.out.print(" ");
-
-				System.out.println(array[i].getName());
-				// System.out.println(array[i].getPath());
-				// 文件夹需要调用递归 ，深度+1
-				getFile(array[i].getPath(), deep + 1);
 			}
 		}
 		return fileNamelist;
@@ -3524,25 +3536,16 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			if (ls.getFileType().equals("11")) {
 				workModeFilePath = gitDetailPath + File.separator + ls.getFilePath() + ls.getFileName() + ".xml";
 			}
-			// 方案展示的路径
-			// if (ls.getFileType().equals("14")) {
-			// simplePlanFiles = ls.getFilePath() + ls.getFileName() + ".xml";
-			// }
 		}
-		// 调用回写部署方案接口
-		// String path =
-		// "D:\\14S_GJK_GIT\\gjk\\gjk\\project\\gengTest\\geng流程\\模型\\方案展示.xml";
-		// String simplePlanFiles =
-		// gitDetailPath+processFile.getFilePath()+processFile.getFileName()+"\\模型\\方案展示.xml"
-		// ;
-
 		try {
 			// 后期换成(String)map.get("path")
 			schemeFile = (String) map.get("path");
 			// 报错
 			// 输入：流程模型文件、部署方案文件（选择的方案路径）
 			try {
-				ExternalIOTransUtils.writeBackDeployScheme(workModeFilePath, schemeFile);
+//				ExternalIOTransUtils.writeBackDeployScheme(workModeFilePath, schemeFile);
+				// 调用回写部署方案接口
+				externalInfInvokeService.writeBackDeployScheme(workModeFilePath, schemeFile);
 			} catch (Exception e) {
 			}
 		} catch (Exception e) {

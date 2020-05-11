@@ -29,6 +29,7 @@ import com.inforbus.gjk.pro.api.entity.App;
 import com.inforbus.gjk.pro.api.entity.Project;
 import com.inforbus.gjk.pro.api.entity.ProjectFile;
 import com.inforbus.gjk.pro.api.feign.DisposeDataCenterServiceFeign;
+import com.inforbus.gjk.pro.api.feign.ExternalInfInvokeService;
 import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
 import com.inforbus.gjk.pro.mapper.AppMapper;
 import com.inforbus.gjk.pro.service.AppService;
@@ -73,7 +74,9 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 
 	private static final Logger logger = LoggerFactory.getLogger(AppServiceImpl.class);
 	@Autowired
-	private DisposeDataCenterServiceFeign disposeDataCenterServiceFeign;
+	private ExternalInfInvokeService externalInfInvokeService;
+	@Autowired
+	protected DisposeDataCenterServiceFeign disposeDataCenterServiceFeign;
 
 	//git文件路径
 	@Value("${git.local.path}")
@@ -288,7 +291,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 //			returnVal = ExternalIOTransUtils.appInstall(cmpNameToHwType, appDataDTO.getUserName(),
 //					appDataDTO.getFlowId(), appDataDTO.getAppName(), selfSoftToHardResult, selfGenerateCodeResult,
 //					proDetailPath + appDataDTO.getAppProPath());
-			returnVal = disposeDataCenterServiceFeign.appInstall(cmpNameToHwType, appDataDTO.getUserName(),
+			returnVal = externalInfInvokeService.appInstall(cmpNameToHwType, appDataDTO.getUserName(),
 					appDataDTO.getFlowId(), appDataDTO.getAppName(), selfSoftToHardResult, selfGenerateCodeResult,
 					proDetailPath + appDataDTO.getAppProPath());
 		} catch (Exception e) {
@@ -326,7 +329,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 //			returnVal = ExternalIOTransUtils.appLoad(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(),
 //					appDataDTO.getAppName(), existDeployConfig, proDetailPath + appDataDTO.getSysconfigPath(),
 //					proDetailPath + appDataDTO.getAppProPath());
-			returnVal = disposeDataCenterServiceFeign.appLoad(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(),
+			returnVal = externalInfInvokeService.appLoad(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(),
 					appDataDTO.getAppName(), existDeployConfig, proDetailPath + appDataDTO.getSysconfigPath(),
 					proDetailPath + appDataDTO.getAppProPath());
 		} catch (Exception e) {
@@ -457,7 +460,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 			// 调用注销接口
 //			returnVal = ExternalIOTransUtils.appUnInstall(cmpNameToHwType, appDataDTO.getUserName(),
 //					appDataDTO.getFlowId(), appDataDTO.getAppName(), selfSoftToHardResult);
-			returnVal = disposeDataCenterServiceFeign.appUnInstall(cmpNameToHwType, appDataDTO.getUserName(),
+			returnVal = externalInfInvokeService.appUnInstall(cmpNameToHwType, appDataDTO.getUserName(),
 					appDataDTO.getFlowId(), appDataDTO.getAppName(), selfSoftToHardResult);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -495,7 +498,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 					// 调用注销接口
 //					ExternalIOTransUtils.appTaskExport(appDataDTO.getUserName(), appDataDTO.getFlowId(), appDataDTO.getAppName(),
 //							appPath, proDetailPath + appDataDTO.getSysconfigPath(), selfSoftToHardResult, selfGenerateCodeResult);
-					disposeDataCenterServiceFeign.appTaskExport(appDataDTO.getUserName(), appDataDTO.getFlowId(), appDataDTO.getAppName(),
+					externalInfInvokeService.appTaskExport(appDataDTO.getUserName(), appDataDTO.getFlowId(), appDataDTO.getAppName(),
 							appPath, proDetailPath + appDataDTO.getSysconfigPath(), selfSoftToHardResult, selfGenerateCodeResult);
 					returnVal = true;
 				} catch (Exception e) {

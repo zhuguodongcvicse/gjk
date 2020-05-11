@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -110,33 +111,6 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
 		return null;
 	}
 
-	@Override
-	public boolean appInstall(Map<String, String> cmpNameToHwType, String userName, int appID, String appName,
-			String packinfoPath, String cmpResFilePath, String appProPath) {
-		log.error("调用数据中心的第三方客户接口feign接口appInstall方法失败", cause);
-		return false;
-	}
-
-	@Override
-	public boolean appLoad(Map<String, String> cmpNameToHwType, String userName, int appID, String appName,
-			boolean existDeployConfig, String sysconfigPath, String appProPath) {
-		log.error("调用数据中心的第三方客户接口feign接口appLoad方法失败", cause);
-		return false;
-	}
-
-	@Override
-	public boolean appUnInstall(Map<String, String> cmpNameToHwType, String userName, int appID, String appName,
-			String packinfoPath) {
-		log.error("调用数据中心的第三方客户接口feign接口appUnInstall方法失败", cause);
-		return false;
-	}
-
-	@Override
-	public void appTaskExport(String userName, int appId, String appName, String appPath, String sysconfigPath,
-			String packinfoPath, String cmpDeployPlanFilePath) {
-		log.error("调用数据中心的第三方客户接口feign接口appLoad方法失败", cause);
-	}
-
     /**
      * @Author wang
      * @Description: 删除文件熔断方法
@@ -152,4 +126,6 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
         r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
         return r;
     }
+
+
 }

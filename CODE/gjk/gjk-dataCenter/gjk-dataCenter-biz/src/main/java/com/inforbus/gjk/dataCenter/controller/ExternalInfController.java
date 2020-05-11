@@ -1,5 +1,8 @@
 package com.inforbus.gjk.dataCenter.controller;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.vo.HeaderFileTransVO;
 import com.inforbus.gjk.dataCenter.service.ExternalInfService;
+
+import flowModel.BackNodeInfoForSpb;
+import flowModel.SimpleScheme;
 
 /**
  * @program: gjk
@@ -67,8 +73,8 @@ public class ExternalInfController {
 	 * @param appProPath      APP工程文件夹路径
 	 * @return
 	 */
-	@RequestMapping("/appInstall")
-	public boolean appInstall(Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID,@RequestParam("appName") String appName,
+	@PostMapping("/appInstall")
+	public boolean appInstall(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID,@RequestParam("appName") String appName,
 			@RequestParam("packinfoPath") String packinfoPath, @RequestParam("cmpResFilePath") String cmpResFilePath, @RequestParam("appProPath") String appProPath) {
 		return externalInfService.appInstall(cmpNameToHwType, userName, appID, appName, packinfoPath, cmpResFilePath,
 				appProPath);
@@ -85,8 +91,8 @@ public class ExternalInfController {
 	 * @param appProPath        APP工程文件夹路径
 	 * @return
 	 */
-	@RequestMapping("/appLoad")
-	public boolean appLoad(Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName,
+	@PostMapping("/appLoad")
+	public boolean appLoad(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName,
 			@RequestParam("existDeployConfig") boolean existDeployConfig, @RequestParam("sysconfigPath") String sysconfigPath, @RequestParam("appProPath") String appProPath) {
 		return externalInfService.appLoad(cmpNameToHwType, userName, appID, appName, existDeployConfig, sysconfigPath,
 				appProPath);
@@ -102,7 +108,7 @@ public class ExternalInfController {
 	 * @param packinfoPath    客户自存自取路径
 	 * @return
 	 */
-	@RequestMapping("/appUnInstall")
+	@PostMapping("/appUnInstall")
 	public boolean appUnInstall(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName,
 			@RequestParam("packinfoPath") String packinfoPath) {
 		return externalInfService.appUnInstall(cmpNameToHwType, userName, appID, appName, packinfoPath);
@@ -118,12 +124,46 @@ public class ExternalInfController {
 	 * @param packinfoPath          客户自存自取路径
 	 * @param cmpDeployPlanFilePath 客户自存自取路径
 	 */
-	@RequestMapping("/appTaskExport")
+	@PostMapping("/appTaskExport")
 	public void appTaskExport( @RequestParam("userName") String userName, @RequestParam("appId") int appId, @RequestParam("appName") String appName, @RequestParam("appPath") String appPath, @RequestParam("sysconfigPath") String sysconfigPath,
 			@RequestParam("packinfoPath") String packinfoPath, @RequestParam("cmpDeployPlanFilePath") String cmpDeployPlanFilePath) {
 		externalInfService.appTaskExport(userName, appId, appName, appPath, sysconfigPath, packinfoPath,
 				cmpDeployPlanFilePath);
 	}
+	
+	/**
+     * 软硬件映射的接口，生成缩略方案
+     *
+     * @param schemeFileList
+     */
+	@RequestMapping("/simplePlan")
+    public void simplePlan(@RequestParam("str") String[] str,@RequestParam("simplePlanFile")  String simplePlanFile) {
+        try {
+        	//调用feign接口，不能传泛型，需要转换为数组
+        	ArrayList<String> schemeFileList = new ArrayList<String>();
+        	Collections.addAll(schemeFileList, str);
+        	//调用客户第三方生成缩略方案的接口
+            SimpleScheme.createSimpleScheme(schemeFileList, simplePlanFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+	
+	 /**
+     * 调回写部署方案接口
+     *
+     * @param schemeFileList
+     */
+	@RequestMapping("/writeBackDeployScheme")
+    public void writeBackDeployScheme(@RequestParam("workModeFilePath") String workModeFilePath, @RequestParam("schemeFile") String schemeFile ) {
+        try {
+            BackNodeInfoForSpb.writeBackDeployScheme(workModeFilePath, schemeFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+	
 	/**
 	 * @Title: getHeader
 	 * @Desc 解析头文件
