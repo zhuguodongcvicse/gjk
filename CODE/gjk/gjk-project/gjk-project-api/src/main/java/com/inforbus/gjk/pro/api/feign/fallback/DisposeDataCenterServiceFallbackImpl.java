@@ -12,9 +12,11 @@ import feign.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.File;
 import java.util.Map;
 
 /**
@@ -128,4 +130,22 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
     }
 
 
+
+    @Override
+    public R judgeFileExist(@RequestParam("judgeFileExist") String filePath) {
+        log.error("调用数据中心的feign接口judgeFileExist方法失败", cause);
+        R r = new R();
+        r.setCode(CommonConstants.FAIL);
+        r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
+        return r;
+    }
+
+    @Override
+    public R getAppPath(@RequestParam("filePath") String filePath, @RequestParam("selectFileName") String selectFileName) {
+        log.error("调用数据中心的feign接口getAppPath方法失败", cause);
+        R r = new R();
+        r.setCode(CommonConstants.FAIL);
+        r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
+        return r;
+    }
 }
