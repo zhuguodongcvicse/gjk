@@ -109,8 +109,9 @@ public class ExternalInfController {
 	 * @return
 	 */
 	@PostMapping("/appUnInstall")
-	public boolean appUnInstall(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName,
-			@RequestParam("packinfoPath") String packinfoPath) {
+	public boolean appUnInstall(@RequestBody Map<String, String> cmpNameToHwType,
+			@RequestParam("userName") String userName, @RequestParam("appID") int appID,
+			@RequestParam("appName") String appName, @RequestParam("packinfoPath") String packinfoPath) {
 		return externalInfService.appUnInstall(cmpNameToHwType, userName, appID, appName, packinfoPath);
 	}
 
@@ -125,8 +126,10 @@ public class ExternalInfController {
 	 * @param cmpDeployPlanFilePath 客户自存自取路径
 	 */
 	@PostMapping("/appTaskExport")
-	public void appTaskExport( @RequestParam("userName") String userName, @RequestParam("appId") int appId, @RequestParam("appName") String appName, @RequestParam("appPath") String appPath, @RequestParam("sysconfigPath") String sysconfigPath,
-			@RequestParam("packinfoPath") String packinfoPath, @RequestParam("cmpDeployPlanFilePath") String cmpDeployPlanFilePath) {
+	public void appTaskExport(@RequestParam("userName") String userName, @RequestParam("appId") int appId,
+			@RequestParam("appName") String appName, @RequestParam("appPath") String appPath,
+			@RequestParam("sysconfigPath") String sysconfigPath, @RequestParam("packinfoPath") String packinfoPath,
+			@RequestParam("cmpDeployPlanFilePath") String cmpDeployPlanFilePath) {
 		externalInfService.appTaskExport(userName, appId, appName, appPath, sysconfigPath, packinfoPath,
 				cmpDeployPlanFilePath);
 	}

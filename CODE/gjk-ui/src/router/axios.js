@@ -6,7 +6,7 @@ import router from "@/router/router"
 import {Message} from 'element-ui'
 import 'nprogress/nprogress.css'
 import store from "@/store"; // progress bar style
-axios.defaults.timeout = 30000
+axios.defaults.timeout = 122000
 // 返回其他状态吗
 axios.defaults.validateStatus = function (status) {
   return status >= 200 && status <= 500 // 默认的

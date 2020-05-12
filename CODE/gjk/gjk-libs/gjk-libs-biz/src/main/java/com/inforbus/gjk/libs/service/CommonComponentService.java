@@ -16,6 +16,8 @@
  */
 package com.inforbus.gjk.libs.service;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -144,4 +146,5 @@ public interface CommonComponentService extends IService<CommonComponent> {
 	 * @return
 	 */
 	List<String> getRemoveCompIdList(List<String> compIdList);
+
 }

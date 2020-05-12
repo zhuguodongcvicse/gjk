@@ -2,6 +2,10 @@
   port: 5432
 
 spring:
+  http:
+    multipart:
+      maxFileSize: 200Mb
+      maxRequestSize: 200Mb
   application:
     name: gjk-dataCenter
 #    rabbitmq: 
@@ -23,7 +27,6 @@ spring:
   main:
     allow-bean-definition-overriding: true
     
-
       
 # 注册中心配置
 eureka:

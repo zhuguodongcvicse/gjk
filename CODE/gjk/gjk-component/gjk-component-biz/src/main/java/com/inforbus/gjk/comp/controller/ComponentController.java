@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,6 +55,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Maps;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.common.log.annotation.SysLog;
@@ -65,6 +67,10 @@ import com.inforbus.gjk.comp.api.feign.RemoteDataCenterService;
 import com.inforbus.gjk.comp.api.util.CompTreeUtil;
 import com.inforbus.gjk.comp.service.ComponentService;
 
+import cn.hutool.json.JSON;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import feign.Response;
 import lombok.AllArgsConstructor;
 
@@ -385,15 +391,19 @@ public class ComponentController {
 	}
 
 	@PostMapping(value = "/downloadStreamFiles", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public R downFile(@RequestBody List<String> files) {
+	public R downFile(@RequestParam(value = "file") MultipartFile file) {
 		InputStream inputStream = null;
-		String[] strArr = files.toArray(new String[files.size()]);
+		String[] strArr = new String[2];
+//		String[] strArr = files.toArray(new String[files.size()]);
 		try {
+			Map<String, String> filePaths = Maps.newHashMap();
+			filePaths.put("D:\\14S_GJK_GIT\\gjk\\gjk\\common\\component\\xiaohe99\\1.0", "component/xiaohe99/");
+			filePaths.put("D:\\14S_GJK_GIT\\gjk\\gjk\\common\\component\\xiaohe99\\2.0", "component/xiaohe99/");
+//			Response response = rdcService.downloadStreamFiles(file, "component\\", filePaths);
 			// feign文件下载
-			Response response = rdcService.downloadStreamFiles(strArr);
-			Response.Body body = response.body();
-			inputStream = body.asInputStream();
-
+//			Response response = rdcService.downloadStreamFiles(strArr);
+//			Response.Body body = response.body();
+//			inputStream = body.asInputStream();
 			BufferedInputStream in = null;
 			BufferedOutputStream out = null;
 			in = new BufferedInputStream(inputStream);
@@ -420,4 +430,35 @@ public class ComponentController {
 		return new R<>();
 	}
 
+	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public R handleFileUploads(@RequestPart(value = "file") MultipartFile file) {
+		InputStream inputStream = null;
+		try {
+			Map<String, String> filePaths = Maps.newHashMap();
+			filePaths.put("D:\\14S_GJK_GIT\\gjk\\gjk\\common\\component\\xiaohe99\\1.0", "component/xiaohe99/");
+			filePaths.put("D:\\14S_GJK_GIT\\gjk\\gjk\\common\\component\\xiaohe99\\2.0", "component/xiaohe99/");
+			
+			//
+			JSONObject json = JSONUtil.parseFromMap(filePaths);
+			Response response = rdcService.downloadStreamFiles(file,"component\\", json.toJSONString(0));
+			Response.Body body = response.body();
+			inputStream = body.asInputStream();
+			BufferedInputStream in = null;
+			BufferedOutputStream out = null;
+			in = new BufferedInputStream(inputStream);
+			out = new BufferedOutputStream(new FileOutputStream("D:\\0000\\测试.zip"));
+			int len = -1;
+			byte[] b = new byte[1024];
+			while ((len = in.read(b)) != -1) {
+				out.write(b, 0, len);
+			}
+			in.close();
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return new R<>();
+	}
 }

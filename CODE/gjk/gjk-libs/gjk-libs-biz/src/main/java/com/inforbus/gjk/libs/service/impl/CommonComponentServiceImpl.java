@@ -401,8 +401,11 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		workbook.write(op);
 		// 将Excel文件读入压缩文件流
 		zip.write(FileUtils.readFileToByteArray(file));
-		// 将临时文件删除
-		file.delete();
+		FileItem fileItem = UploadFilesUtils.createFileItem(file.getPath(), file.getName());
+		MultipartFile mfile = new CommonsMultipartFile(fileItem);
+
+//		// 将临时文件删除
+//		file.delete();
 		zip.flush();
 		zip.closeEntry();
 	}
