@@ -16,32 +16,33 @@
  */
 package com.inforbus.gjk.libs.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.inforbus.gjk.admin.api.vo.DictVO;
+import com.inforbus.gjk.common.core.constant.CommonConstants;
+import com.inforbus.gjk.common.core.entity.Structlibs;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
-import com.inforbus.gjk.common.core.util.ExternalIOTransUtils;
 import com.inforbus.gjk.common.core.util.HeaderFileAndStructUtils;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.vo.ParamTreeVO;
 import com.inforbus.gjk.libs.api.dto.StructDTO;
-import com.inforbus.gjk.common.core.entity.Structlibs;
+import com.inforbus.gjk.libs.api.feign.RemoteStructServiceFeign;
 import com.inforbus.gjk.libs.mapper.StructlibsMapper;
 import com.inforbus.gjk.libs.service.StructlibsService;
 
 import cn.hutool.json.JSONUtil;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 结构体库
@@ -51,6 +52,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service("structlibsService")
 public class StructlibsServiceImpl extends ServiceImpl<StructlibsMapper, Structlibs> implements StructlibsService {
+	@Autowired
+	private RemoteStructServiceFeign rdcService;
 
 	/**
 	 * 结构体库简单分页查询
@@ -65,23 +68,26 @@ public class StructlibsServiceImpl extends ServiceImpl<StructlibsMapper, Structl
 	}
 
 	/**
-	 * 解析结构体文件
-	 *
+	 * @Title: parseStructFile
+	 * @Desc 解析结构体文件
+	 * @Author cvics
+	 * @DateTime 2020年5月7日
 	 * @param filePath 结构体文件路径
 	 * @return
+	 * @see com.inforbus.gjk.libs.service.StructlibsService#parseStructFile(java.lang.String)
 	 */
 	@Override
-	public Map<String, ParamTreeVO> parseStructFile(String filePath) {
-		String url = new String(filePath);
-		// 判断路径是否为空
-		if (StringUtils.isNotEmpty(url)) {
-			File file = new File(url);
-			if (!file.exists()) {
-				return null;
-			}
+	public R<?> parseStructFile(String filePath) {
+		R<Map<String, List<String>>> rdc = rdcService.parseStruct(filePath);
+		// ret==>要返回的数据
+		R ret = rdc;
+		if (rdc.getCode() == CommonConstants.SUCCESS) {
+			// 调用结构体转换方法，解析结构体数据
+//			HeaderFileAndStructUtils.convertStruct(ExternalIOTransUtils.parseStruct(url));
+			// rdc 调用数据中心解析文件
+			ret.setData(HeaderFileAndStructUtils.convertStruct(rdc.getData()));
 		}
-		// 调用结构体转换方法，解析结构体数据
-		return HeaderFileAndStructUtils.convertStruct(ExternalIOTransUtils.parseStruct(url));
+		return ret;
 	}
 
 	/**
@@ -277,10 +283,10 @@ public class StructlibsServiceImpl extends ServiceImpl<StructlibsMapper, Structl
 	public List<StructDTO> getStructTreeDto(StructDTO structlibs) {
 //		QueryWrapper<Structlibs> query = Wrappers.<Structlibs>query();
 //		query.apply("lower('user_name') like {0}", structlibs.getQueryParam().toLowerCase());
-		List<Structlibs> lists = baseMapper
-				.selectList(Wrappers.<Structlibs>query().lambda().eq(Structlibs::getParentId, structlibs.getDbId())
-						.apply("upper(name) like concat(concat('%',upper({0})),'%')", structlibs.getQueryParam().toUpperCase())
-						.orderByAsc(Structlibs::getSort));
+		List<Structlibs> lists = baseMapper.selectList(Wrappers.<Structlibs>query().lambda()
+				.eq(Structlibs::getParentId, structlibs.getDbId())
+				.apply("upper(name) like concat(concat('%',upper({0})),'%')", structlibs.getQueryParam().toUpperCase())
+				.orderByAsc(Structlibs::getSort));
 		List<StructDTO> retList = Lists.newArrayList();
 		for (Structlibs strs : lists) {
 			strs.setRootId(IdGenerate.uuid());
@@ -309,8 +315,9 @@ public class StructlibsServiceImpl extends ServiceImpl<StructlibsMapper, Structl
 			// 根据结构体主键查询数据
 			List<Structlibs> lists = baseMapper.selectList(
 					Wrappers.<Structlibs>query().lambda().eq(Structlibs::getParentId, struct.getChildrenIds())
-							.apply("upper(name)  like concat(concat('%',upper({0})),'%')", param[0].toUpperCase()).orderByAsc(Structlibs::getSort));
-							// .like(Structlibs::getName, param[0]).orderByAsc(Structlibs::getSort));
+							.apply("upper(name)  like concat(concat('%',upper({0})),'%')", param[0].toUpperCase())
+							.orderByAsc(Structlibs::getSort));
+			// .like(Structlibs::getName, param[0]).orderByAsc(Structlibs::getSort));
 			// 将ChildrenIds处理，用于重新赋值关系 ①
 			struct.setChildrenIds(IdGenerate.uuid());
 			for (Structlibs strs : lists) {

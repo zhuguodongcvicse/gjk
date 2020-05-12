@@ -6,18 +6,18 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import com.inforbus.gjk.common.core.entity.XmlEntityMap;
-import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
-import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 import org.apache.poi.POIXMLDocument;
 import org.apache.poi.POIXMLTextExtractor;
 import org.apache.poi.hwpf.extractor.WordExtractor;
@@ -34,12 +34,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.inforbus.gjk.common.core.constant.enums.FileExtensionEnum;
+import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.util.FileUtil;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.UploadFilesUtils;
+import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
+import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 import com.inforbus.gjk.dataCenter.api.dto.ThreeLibsDTO;
 import com.inforbus.gjk.dataCenter.api.dto.ThreeLibsFilePathDTO;
 import com.inforbus.gjk.dataCenter.api.entity.FileCenter;
@@ -754,5 +758,64 @@ public class FileServiceImpl implements FileService {
 			throw new IOException("上传文件返回路径出错", e);
 		}
 		return bool;
+	}
+
+	/**
+	 * @Title: decompression
+	 * @Desc 解压文件
+	 * @Author xiaohe
+	 * @DateTime 2020年5月8日
+	 * @param file  文件
+	 * @param paths 文件路径
+	 * @return
+	 * @see com.inforbus.gjk.dataCenter.service.FileService#decompression(org.springframework.web.multipart.MultipartFile,
+	 *      java.lang.String)
+	 */
+	@Override
+	public R decompression(MultipartFile file, String paths) {
+		logger.debug("开始解压文件{}", file.getOriginalFilename());
+		long startTime = System.currentTimeMillis(); // 获取开始时间
+		if (ObjectUtils.isNotEmpty(file)) {
+			File uploadFile = null;
+			if (StringUtils.isNotEmpty(paths)) {
+				uploadFile = new File(paths);
+				if (!uploadFile.getParentFile().exists()) {
+					uploadFile.getParentFile().mkdirs();
+				}
+			}
+		}
+		// 创建FutureTask
+		R ret = new R<Boolean>();
+		try {
+			FutureTask<R> futureTask = new FutureTask<>(new Callable<R>() {
+				@Override
+				public R call() {
+					// 线程执行体
+					try {
+						UploadFilesUtils.decompression(file.getInputStream(), paths);
+						// 返回值
+						return new R<Boolean>(true);
+					} catch (IOException e) {
+						logger.error("解压文件出错", e.getMessage());
+						// 返回值
+						return new R<>(e);
+					}
+
+				}
+			});
+			futureTask.run();
+			ret = futureTask.get();
+			logger.debug("结束解压文件{}", file.getOriginalFilename());
+			long endTime = System.currentTimeMillis(); // 获取结束时间
+			System.out.println("程序运行时间：" + (endTime - startTime) + "ms"); // 输出程序运行时间
+			logger.info("程序运行时间：" + (endTime - startTime) + "ms"); // 输出程序运行时间
+		} catch (InterruptedException e) {
+			ret = new R<>(e);
+			logger.error("解压文件出错", e.getMessage());
+		} catch (ExecutionException e) {
+			ret = new R<>(e);
+			logger.error("解压文件出错", e.getMessage());
+		}
+		return ret;
 	}
 }

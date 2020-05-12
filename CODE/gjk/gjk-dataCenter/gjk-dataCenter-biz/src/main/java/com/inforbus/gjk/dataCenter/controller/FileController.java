@@ -1,38 +1,49 @@
 package com.inforbus.gjk.dataCenter.controller;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-
-import com.inforbus.gjk.common.core.constant.CommonConstants;
-import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
-import org.slf4j.Logger;
-
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.http.entity.FileEntity;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.google.common.collect.Lists;
+import com.inforbus.gjk.common.core.constant.CommonConstants;
+import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.util.R;
-import com.inforbus.gjk.dataCenter.api.dto.ThreeLibsFilePathDTO;
 import com.inforbus.gjk.common.core.util.UploadFilesUtils;
+import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
+import com.inforbus.gjk.dataCenter.api.dto.ThreeLibsFilePathDTO;
 import com.inforbus.gjk.dataCenter.api.entity.FileCenter;
 import com.inforbus.gjk.dataCenter.service.FileService;
+
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 
 /**
  * @ClassName: FileController
@@ -79,8 +90,6 @@ public class FileController {
 		return ret;
 	}
 
-	;
-
 	/**
 	 * @param sourcePath
 	 * @param localPath
@@ -125,6 +134,7 @@ public class FileController {
 	@PostMapping("delAllFile")
 	public R<Boolean> delAllFile(@RequestParam("sourcePath") String sourcePath) {
 		R<Boolean> ret = new R<Boolean>();
+		long startTime = System.currentTimeMillis(); // 获取开始时间
 		try {
 			if (fileService.delAllFile(sourcePath)) {
 				ret.setData(true);
@@ -134,6 +144,9 @@ public class FileController {
 				ret.setData(false);
 				ret.setMsg("删除指定文件夹下的所有文件失败");
 			}
+			long endTime = System.currentTimeMillis(); // 获取结束时间
+			System.out.println("程序运行时间：" + (endTime - startTime) + "ms"); // 输出程序运行时间
+			logger.info("程序运行时间：" + (endTime - startTime) + "ms"); // 输出程序运行时间
 		} catch (Exception e) {
 			logger.error("删除指定文件夹下的所有文件", e);
 			ret.setCode(CommonConstants.FAIL);
@@ -494,6 +507,52 @@ public class FileController {
 
 	/**
 	 * @Title: downloadFile
+	 * @Desc 下载多文件返回流
+	 * @Author xiaohe
+	 * @DateTime 2020年4月15日
+	 * @param ufile      上传的文件
+	 * @param fileTarget 文件的文件相对存储路径
+	 * @param filePaths  文件全路径 maps JOSN
+	 * @param response   返回流
+	 */
+	@ResponseBody
+	@PostMapping(value = "/downloadStreamFilesTarget", produces = {
+			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public void downloadFile(@RequestPart("file") MultipartFile[] ufile,
+			@RequestParam("fileTarget") String[] fileTarget, @RequestParam("filePaths") String filePaths,
+			HttpServletResponse response) {
+		// 方法一：使用工具类转换
+		Map<String, String> bean = JSONUtil.toBean(filePaths, Map.class);
+		logger.debug("多文件下载开始。。。。");
+		InputStream in = null;
+		try {
+			//将MultipartFile文件转成File
+			File[] files = new File[ufile.length];
+			for (int i = 0; i < ufile.length; i++) {
+				File savedFile = new File("./" + fileTarget[i] + ufile[i].getOriginalFilename());
+				// 使用下面的jar包
+				FileUtils.copyInputStreamToFile(ufile[i].getInputStream(), savedFile);
+				files[i] = savedFile;
+			}
+			ByteArrayOutputStream zps = UploadFilesUtils.toZip(files, fileTarget, bean);
+			OutputStream out = response.getOutputStream();
+			out.write(zps.toByteArray());
+		} catch (Exception e) {
+			logger.error("多文件下载异常", e);
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					logger.error("文件流关闭异常", e);
+				}
+			}
+			logger.debug("多文件下载结束。。。。");
+		}
+	}
+
+	/**
+	 * @Title: downloadFile
 	 * @Desc 下载单文件返回流
 	 * @Author xiaohe
 	 * @DateTime 2020年4月15日
@@ -529,6 +588,22 @@ public class FileController {
 				logger.debug("文件下载结束。。。。", filePath);
 			}
 		}
+	}
+
+	/**
+	 * @Title: uploadDecompression
+	 * @Desc 上传并解压文件
+	 * @Author cvics
+	 * @DateTime 2020年5月8日
+	 * @param file      要解压的文件
+	 * @param localPath 解压的文件路径
+	 * @return
+	 */
+	@PostMapping(value = "/decompression", produces = {
+			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public R<Boolean> uploadDecompression(@RequestPart(value = "files") MultipartFile file,
+			@RequestParam("filePath") String localPath) {
+		return fileService.decompression(file, localPath);
 	}
 
 }

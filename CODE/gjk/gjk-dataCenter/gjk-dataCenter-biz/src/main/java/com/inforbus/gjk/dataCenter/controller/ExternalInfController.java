@@ -68,8 +68,10 @@ public class ExternalInfController {
 	 * @return
 	 */
 	@RequestMapping("/appInstall")
-	public boolean appInstall(Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID,@RequestParam("appName") String appName,
-			@RequestParam("packinfoPath") String packinfoPath, @RequestParam("cmpResFilePath") String cmpResFilePath, @RequestParam("appProPath") String appProPath) {
+	public boolean appInstall(Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName,
+			@RequestParam("appID") int appID, @RequestParam("appName") String appName,
+			@RequestParam("packinfoPath") String packinfoPath, @RequestParam("cmpResFilePath") String cmpResFilePath,
+			@RequestParam("appProPath") String appProPath) {
 		return externalInfService.appInstall(cmpNameToHwType, userName, appID, appName, packinfoPath, cmpResFilePath,
 				appProPath);
 	}
@@ -86,8 +88,10 @@ public class ExternalInfController {
 	 * @return
 	 */
 	@RequestMapping("/appLoad")
-	public boolean appLoad(Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName,
-			@RequestParam("existDeployConfig") boolean existDeployConfig, @RequestParam("sysconfigPath") String sysconfigPath, @RequestParam("appProPath") String appProPath) {
+	public boolean appLoad(Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName,
+			@RequestParam("appID") int appID, @RequestParam("appName") String appName,
+			@RequestParam("existDeployConfig") boolean existDeployConfig,
+			@RequestParam("sysconfigPath") String sysconfigPath, @RequestParam("appProPath") String appProPath) {
 		return externalInfService.appLoad(cmpNameToHwType, userName, appID, appName, existDeployConfig, sysconfigPath,
 				appProPath);
 
@@ -103,8 +107,9 @@ public class ExternalInfController {
 	 * @return
 	 */
 	@RequestMapping("/appUnInstall")
-	public boolean appUnInstall(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName,
-			@RequestParam("packinfoPath") String packinfoPath) {
+	public boolean appUnInstall(@RequestBody Map<String, String> cmpNameToHwType,
+			@RequestParam("userName") String userName, @RequestParam("appID") int appID,
+			@RequestParam("appName") String appName, @RequestParam("packinfoPath") String packinfoPath) {
 		return externalInfService.appUnInstall(cmpNameToHwType, userName, appID, appName, packinfoPath);
 	}
 
@@ -119,11 +124,14 @@ public class ExternalInfController {
 	 * @param cmpDeployPlanFilePath 客户自存自取路径
 	 */
 	@RequestMapping("/appTaskExport")
-	public void appTaskExport( @RequestParam("userName") String userName, @RequestParam("appId") int appId, @RequestParam("appName") String appName, @RequestParam("appPath") String appPath, @RequestParam("sysconfigPath") String sysconfigPath,
-			@RequestParam("packinfoPath") String packinfoPath, @RequestParam("cmpDeployPlanFilePath") String cmpDeployPlanFilePath) {
+	public void appTaskExport(@RequestParam("userName") String userName, @RequestParam("appId") int appId,
+			@RequestParam("appName") String appName, @RequestParam("appPath") String appPath,
+			@RequestParam("sysconfigPath") String sysconfigPath, @RequestParam("packinfoPath") String packinfoPath,
+			@RequestParam("cmpDeployPlanFilePath") String cmpDeployPlanFilePath) {
 		externalInfService.appTaskExport(userName, appId, appName, appPath, sysconfigPath, packinfoPath,
 				cmpDeployPlanFilePath);
 	}
+
 	/**
 	 * @Title: getHeader
 	 * @Desc 解析头文件
@@ -149,6 +157,19 @@ public class ExternalInfController {
 	@PostMapping("/parsePerformanceTable")
 	public R<?> getPerformanceTable(@RequestParam("excelPath") String excelPath) {
 		return new R<>(externalInfService.parsePerformanceTable(excelPath));
+	}
+
+	/**
+	 * @Title: parseStruct
+	 * @Desc 解析结构体（通用：包括系统表、内部表等）
+	 * @Author xiaohe
+	 * @DateTime 2020年5月7日
+	 * @param filePath 文件路径
+	 * @return R<?> <结构体类型名，list<变量类型+空格+变量名>>
+	 */
+	@PostMapping("/parseStruct")
+	public R<?> parseStruct(@RequestParam("filePath") String filePath) {
+		return new R<>(externalInfService.parseStruct(filePath));
 	}
 
 }

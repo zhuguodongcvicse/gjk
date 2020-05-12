@@ -16,6 +16,8 @@
 
 package com.inforbus.gjk.comp.api.feign.fallback;
 
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -182,6 +184,12 @@ public class RemoteDataCenterServiceFallbackImpl implements RemoteDataCenterServ
 		ret.setMsg("数据中心服务异常---解析性能测试表格出错 ");
 		log.error("数据中心服务异常---解析性能测试表格错误,文件路劲为{}", excelPath, cause);
 		return ret;
+	}
+
+	@Override
+	public Response downloadStreamFiles(MultipartFile ufile, String fileTarget, String filePaths) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

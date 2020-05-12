@@ -64,4 +64,14 @@ public interface CompframeService extends IService<Compframe> {
 	 */
 	List<CompframeTree> compframeToTree(Compframe compframe);
 
+	/**
+	 * @Title: removeByIdAndFile
+	 * @Desc 删除构件框架
+	 * @Author xiaohe
+	 * @DateTime 2020年5月9日
+	 * @param id 构件编号
+	 * @return 
+	 */
+	R<?> removeByIdAndFile(String id);
+	
 }

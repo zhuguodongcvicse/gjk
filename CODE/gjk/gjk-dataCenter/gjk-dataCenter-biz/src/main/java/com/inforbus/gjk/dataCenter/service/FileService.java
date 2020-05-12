@@ -130,7 +130,7 @@ public interface FileService {
 	 * @return Boolean
 	 * @throws Exception
 	 */
-	public Boolean writeFile(String localPath,String charset,String textContext);
+	public Boolean writeFile(String localPath, String charset, String textContext);
 
 	/**
 	 * @Author wang
@@ -139,7 +139,7 @@ public interface FileService {
 	 * @Return: boolean
 	 * @Create: 2020/4/13
 	 */
-    XmlEntityMap analysisXmlFileToXMLEntityMap(String localPath) throws FileNotFoundException;
+	XmlEntityMap analysisXmlFileToXMLEntityMap(String localPath) throws FileNotFoundException;
 
 	/**
 	 * @Author wang
@@ -148,7 +148,7 @@ public interface FileService {
 	 * @Return: com.inforbus.gjk.common.core.util.R
 	 * @Create: 2020/4/14
 	 */
-    boolean createXMLFile(XMlEntityMapVO xMlEntityMapVO);
+	boolean createXMLFile(XMlEntityMapVO xMlEntityMapVO);
 
 	/**
 	 * @Author wang
@@ -158,16 +158,18 @@ public interface FileService {
 	 * @Create: 2020/4/15
 	 */
 	boolean delFile(String absolutePath);
-	
+
 	/**
 	 * 保存文本编辑器修改的内容（文本编辑器的）
-	 * @param filePath 文件路径
+	 * 
+	 * @param filePath    文件路径
 	 * @param textContext 文本内容
 	 */
-	void saveFileContext(String filePath, String textContext) ;
-	
+	void saveFileContext(String filePath, String textContext);
+
 	/**
 	 * 程序文本编辑器的文件展示
+	 * 
 	 * @param threeLibsFilePathDTO 封装了路径（全路径，从D盘开始）及编码格式
 	 * @return
 	 */
@@ -180,10 +182,20 @@ public interface FileService {
 	 * @DateTime 2020年4月16日
 	 * @param files 要上传的文件集合
 	 * @param paths 文件的绝对路径（带盘符）
-	 * @return 
+	 * @return
 	 * @throws IllegalStateException
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	Boolean getUploadFilePaths(MultipartFile[] files, String paths)
-			throws IllegalStateException, IOException;
+	Boolean getUploadFilePaths(MultipartFile[] files, String paths) throws IllegalStateException, IOException;
+
+	/**
+	 * @Title: decompression
+	 * @Desc 上传文件（ZIP）并解压文件
+	 * @Author xiaohe
+	 * @DateTime 2020年5月8日
+	 * @param file  文件流
+	 * @param paths 要解压的文件路径
+	 * @return
+	 */
+	R decompression(MultipartFile file, String paths);
 }

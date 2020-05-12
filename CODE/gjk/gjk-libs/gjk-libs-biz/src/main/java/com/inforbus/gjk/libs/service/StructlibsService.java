@@ -48,17 +48,19 @@ public interface StructlibsService extends IService<Structlibs> {
 	 * @param filePath 结构体文件路径
 	 * @return 解析结果
 	 */
-	public Map<String, ParamTreeVO> parseStructFile(String filePath);
-	
+	public R<?> parseStructFile(String filePath);
+
 	/**
 	 * 新增一个结构体树
+	 * 
 	 * @param paramTreeVO 结构体树
 	 * @return
 	 */
 	public int saveOneStruct(@RequestBody ParamTreeVO paramTreeVO);
-	
+
 	/**
 	 * 获取指定结构体类型最新版本
+	 * 
 	 * @param structType
 	 * @return 版本
 	 */
@@ -73,7 +75,7 @@ public interface StructlibsService extends IService<Structlibs> {
 	IPage<Structlibs> getStructlibsPage(Page<Structlibs> page, Structlibs structlibs);
 
 	/**
-	 * @param  
+	 * @param
 	 * @Title: saveCompImg
 	 * @Description: 获取所有结构体
 	 * @Author xiaohe
@@ -84,7 +86,7 @@ public interface StructlibsService extends IService<Structlibs> {
 	public List<StructDTO> getStructTypeAll();
 
 	/**
-	 * @param  
+	 * @param
 	 * @Title: getStructTree
 	 * @Description: 获取所有结构体
 	 * @Author xiaohe
@@ -93,9 +95,10 @@ public interface StructlibsService extends IService<Structlibs> {
 	 * @return
 	 */
 	@Deprecated
-	public List<Structlibs>  getStructTree( Structlibs structlibs);
+	public List<Structlibs> getStructTree(Structlibs structlibs);
+
 	/**
-	 * @param  
+	 * @param
 	 * @Title: getStructTree
 	 * @Description: 获取所有结构体
 	 * @Author xiaohe
@@ -103,54 +106,61 @@ public interface StructlibsService extends IService<Structlibs> {
 	 * @param Structlibs
 	 * @return
 	 */
-	public List<StructDTO>  getStructTreeDto( StructDTO structlibs);
+	public List<StructDTO> getStructTreeDto(StructDTO structlibs);
 
 	/**
 	 * @Title: saveStructMap
 	 * @Description: 保存导入的结构体Maps
 	 * @Author xiaohe
 	 * @DateTime 2019年7月12日 下午4:42:18
-	 * @param structMaps 
+	 * @param structMaps
 	 */
 	public void saveStructMap(Map<String, Object> structMaps);
 
 	/**
 	 * @Title: getStructIncludePointer
-	 * @Description:  获取所有结构体包含指针
+	 * @Description: 获取所有结构体包含指针
 	 * @Author xiaohe
 	 * @DateTime 2019年8月23日 下午1:50:27
-	 * @return 
+	 * @return
 	 */
 	public List<DictVO> getStructIncludePointer();
 
 	/**
 	 * 根据ID删除结构体数据
+	 * 
 	 * @param id
 	 * @return
 	 */
-	public  R deleteStructLibById(String id);
+	public R deleteStructLibById(String id);
 
 	/**
 	 * 修改结构体库
+	 * 
 	 * @param structlibs
 	 * @return
 	 */
-	public  R editStruct(Structlibs structlibs);
+	public R editStruct(Structlibs structlibs);
 
 	/**
 	 * 入库
+	 * 
 	 * @param structlibs
 	 * @return
 	 */
-	public  R rKuStruct(Structlibs structlibs);
+	public R rKuStruct(Structlibs structlibs);
+
 	/**
 	 * 修改一个结构体树
+	 * 
 	 * @param paramTreeVO 结构体树
 	 * @return
 	 */
 	public int updateOneStruct(@RequestBody ParamTreeVO paramTreeVO);
+
 	/**
 	 * 得到库中所有结构体
+	 * 
 	 * @return
 	 */
 	public R findAllStructs();
