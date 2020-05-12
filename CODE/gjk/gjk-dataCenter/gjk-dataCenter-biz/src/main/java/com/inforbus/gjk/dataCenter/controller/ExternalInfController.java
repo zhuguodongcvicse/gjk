@@ -76,10 +76,11 @@ public class ExternalInfController {
 	@PostMapping("/appInstall")
 	public boolean appInstall(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID,@RequestParam("appName") String appName,
 			@RequestParam("packinfoPath") String packinfoPath, @RequestParam("cmpResFilePath") String cmpResFilePath, @RequestParam("appProPath") String appProPath) {
+
+
 		return externalInfService.appInstall(cmpNameToHwType, userName, appID, appName, packinfoPath, cmpResFilePath,
 				appProPath);
 	}
-
 	/**
 	 * 加载、更新加载
 	 *
@@ -94,6 +95,8 @@ public class ExternalInfController {
 	@PostMapping("/appLoad")
 	public boolean appLoad(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName,
 			@RequestParam("existDeployConfig") boolean existDeployConfig, @RequestParam("sysconfigPath") String sysconfigPath, @RequestParam("appProPath") String appProPath) {
+
+
 		return externalInfService.appLoad(cmpNameToHwType, userName, appID, appName, existDeployConfig, sysconfigPath,
 				appProPath);
 
@@ -109,8 +112,9 @@ public class ExternalInfController {
 	 * @return
 	 */
 	@PostMapping("/appUnInstall")
-	public boolean appUnInstall(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName,
-			@RequestParam("packinfoPath") String packinfoPath) {
+	public boolean appUnInstall(@RequestBody Map<String, String> cmpNameToHwType,
+			@RequestParam("userName") String userName, @RequestParam("appID") int appID,
+			@RequestParam("appName") String appName, @RequestParam("packinfoPath") String packinfoPath) {
 		return externalInfService.appUnInstall(cmpNameToHwType, userName, appID, appName, packinfoPath);
 	}
 
@@ -125,12 +129,13 @@ public class ExternalInfController {
 	 * @param cmpDeployPlanFilePath 客户自存自取路径
 	 */
 	@PostMapping("/appTaskExport")
-	public void appTaskExport( @RequestParam("userName") String userName, @RequestParam("appId") int appId, @RequestParam("appName") String appName, @RequestParam("appPath") String appPath, @RequestParam("sysconfigPath") String sysconfigPath,
-			@RequestParam("packinfoPath") String packinfoPath, @RequestParam("cmpDeployPlanFilePath") String cmpDeployPlanFilePath) {
+	public void appTaskExport(@RequestParam("userName") String userName, @RequestParam("appId") int appId,
+			@RequestParam("appName") String appName, @RequestParam("appPath") String appPath,
+			@RequestParam("sysconfigPath") String sysconfigPath, @RequestParam("packinfoPath") String packinfoPath,
+			@RequestParam("cmpDeployPlanFilePath") String cmpDeployPlanFilePath) {
 		externalInfService.appTaskExport(userName, appId, appName, appPath, sysconfigPath, packinfoPath,
 				cmpDeployPlanFilePath);
 	}
-	
 	/**
      * 软硬件映射的接口，生成缩略方案
      *
@@ -189,6 +194,19 @@ public class ExternalInfController {
 	@PostMapping("/parsePerformanceTable")
 	public R<?> getPerformanceTable(@RequestParam("excelPath") String excelPath) {
 		return new R<>(externalInfService.parsePerformanceTable(excelPath));
+	}
+
+	/**
+	 * @Title: parseStruct
+	 * @Desc 解析结构体（通用：包括系统表、内部表等）
+	 * @Author xiaohe
+	 * @DateTime 2020年5月7日
+	 * @param filePath 文件路径
+	 * @return R<?> <结构体类型名，list<变量类型+空格+变量名>>
+	 */
+	@PostMapping("/parseStruct")
+	public R<?> parseStruct(@RequestParam("filePath") String filePath) {
+		return new R<>(externalInfService.parseStruct(filePath));
 	}
 
 }

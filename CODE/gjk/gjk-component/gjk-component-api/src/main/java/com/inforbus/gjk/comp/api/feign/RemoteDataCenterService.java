@@ -1,5 +1,7 @@
 package com.inforbus.gjk.comp.api.feign;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
@@ -9,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -171,4 +174,23 @@ public interface RemoteDataCenterService {
 	 */
 	@PostMapping(serviceHeaderName + "/parsePerformanceTable")
 	public R<?> getPerformanceTable(@RequestParam("excelPath") String excelPath);
+
+	/**
+	 * @Title: downloadStreamFiles
+	 * @Desc 多文件下载（feign）
+	 * @Author cvics
+	 * @DateTime 2020年4月15日
+	 * @param filePaths
+	 * @return Response 其中包含 文件流
+	 * 
+	 *         <pre>
+	 *         Response.Body body = response.body();
+	 *         InputStream inputStream = body.asInputStream();
+	 * 
+	 *         </pre>
+	 */
+	@PostMapping(value = serviceName + "/downloadStreamFilesTarget", produces = {
+			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public Response downloadStreamFiles(@RequestPart("file") MultipartFile ufile,
+			@RequestParam("fileTarget") String fileTarget, @RequestParam("filePaths") String filePaths);
 }

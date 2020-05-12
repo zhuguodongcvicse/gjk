@@ -16,14 +16,32 @@
  */
 package com.inforbus.gjk.libs.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.log.annotation.SysLog;
 import com.inforbus.gjk.comp.api.entity.Component;
+import com.inforbus.gjk.comp.api.feign.RemoteDataCenterService;
 import com.inforbus.gjk.libs.api.entity.CommonComponent;
 import com.inforbus.gjk.libs.api.entity.CommonComponentDetail;
+import com.inforbus.gjk.libs.api.feign.RemoteStructServiceFeign;
 import com.inforbus.gjk.libs.service.CommonComponentDetailService;
 import com.inforbus.gjk.libs.service.CommonComponentService;
 import com.inforbus.gjk.libs.service.ComponentServiceFeign;
@@ -31,6 +49,7 @@ import com.inforbus.gjk.libs.service.ComponentServiceFeign;
 import cn.hutool.core.io.IoUtil;
 import lombok.AllArgsConstructor;
 
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,6 +58,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -56,7 +76,7 @@ public class CommonComponentController {
 
 	private final CommonComponentService commonComponentService;
 	private final CommonComponentDetailService commonComponentDetailService;
-	private final ComponentServiceFeign componentServiceFeign;
+	private final ComponentServiceFeign componentServiceFeign;;
 
 	/**
 	 * 简单分页查询
@@ -70,12 +90,13 @@ public class CommonComponentController {
 			CommonComponent commonComponent) {
 		return new R<>(commonComponentService.getCommonComponentPage(page, commonComponent));
 	}
+
 	/**
 	 * @Title: getCommonComponentPage
 	 * @Desc 查询所有数据
 	 * @Author cvics
 	 * @DateTime 2020年3月30日
-	 * @return 
+	 * @return
 	 */
 	@PostMapping("/pageAll")
 	public List<CommonComponent> getCommonComponentPage() {
@@ -167,7 +188,7 @@ public class CommonComponentController {
 	}
 
 	@PostMapping("/createZipFile")
-	public void createZipFile(HttpServletRequest request, HttpServletResponse response,
+	public void createZipFilecopy(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody List<CommonComponent> list) {
 		try {
 			List<CommonComponentDetail> details = commonComponentDetailService.getAllCompDetailByCompId(list);
