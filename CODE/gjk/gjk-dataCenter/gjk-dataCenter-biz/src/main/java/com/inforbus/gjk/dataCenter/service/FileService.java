@@ -198,18 +198,6 @@ public interface FileService {
 	 * @return
 	 */
 	R decompression(MultipartFile file, String paths);
-	Boolean getUploadFilePaths(MultipartFile[] files, String paths) throws IllegalStateException, IOException;
-
-	/**
-	 * @Title: decompression
-	 * @Desc 上传文件（ZIP）并解压文件
-	 * @Author xiaohe
-	 * @DateTime 2020年5月8日
-	 * @param file  文件流
-	 * @param paths 要解压的文件路径
-	 * @return
-	 */
-	R decompression(MultipartFile file, String paths);
 
 	/**
 	 * 判断文件是否存在

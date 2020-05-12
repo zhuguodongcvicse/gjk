@@ -76,11 +76,10 @@ public class ExternalInfController {
 	@PostMapping("/appInstall")
 	public boolean appInstall(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID,@RequestParam("appName") String appName,
 			@RequestParam("packinfoPath") String packinfoPath, @RequestParam("cmpResFilePath") String cmpResFilePath, @RequestParam("appProPath") String appProPath) {
-
-
 		return externalInfService.appInstall(cmpNameToHwType, userName, appID, appName, packinfoPath, cmpResFilePath,
 				appProPath);
 	}
+
 	/**
 	 * 加载、更新加载
 	 *
@@ -95,8 +94,6 @@ public class ExternalInfController {
 	@PostMapping("/appLoad")
 	public boolean appLoad(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName, @RequestParam("appID") int appID, @RequestParam("appName") String appName,
 			@RequestParam("existDeployConfig") boolean existDeployConfig, @RequestParam("sysconfigPath") String sysconfigPath, @RequestParam("appProPath") String appProPath) {
-
-
 		return externalInfService.appLoad(cmpNameToHwType, userName, appID, appName, existDeployConfig, sysconfigPath,
 				appProPath);
 
@@ -136,6 +133,7 @@ public class ExternalInfController {
 		externalInfService.appTaskExport(userName, appId, appName, appPath, sysconfigPath, packinfoPath,
 				cmpDeployPlanFilePath);
 	}
+	
 	/**
      * 软硬件映射的接口，生成缩略方案
      *
@@ -208,5 +206,4 @@ public class ExternalInfController {
 	public R<?> parseStruct(@RequestParam("filePath") String filePath) {
 		return new R<>(externalInfService.parseStruct(filePath));
 	}
-
 }
