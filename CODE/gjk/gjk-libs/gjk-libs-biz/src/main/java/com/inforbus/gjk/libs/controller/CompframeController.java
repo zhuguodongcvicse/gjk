@@ -110,7 +110,7 @@ public class CompframeController {
 	@DeleteMapping("/{id}")
 	@PreAuthorize("@pms.hasPermission('libs_compframe_del')")
 	public R removeById(@PathVariable String id) {
-		return new R<>(compframeService.removeById(id));
+		return compframeService.removeByIdAndFile(id);
 	}
 
 	/**

@@ -16,32 +16,15 @@
  */
 package com.inforbus.gjk.libs.service.impl;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.common.collect.Lists;
-import com.inforbus.gjk.common.core.entity.CompStruct;
-import com.inforbus.gjk.common.core.entity.Structlibs;
-import com.inforbus.gjk.common.core.util.R;
-import com.inforbus.gjk.libs.api.dto.CompTree;
-import com.inforbus.gjk.libs.api.entity.CommonComponent;
-import com.inforbus.gjk.libs.api.entity.CommonComponentDetail;
-import com.inforbus.gjk.libs.api.vo.CompDictVO;
-import com.inforbus.gjk.libs.api.vo.CompVO;
-import com.inforbus.gjk.libs.api.vo.TreeUtil;
-import com.inforbus.gjk.libs.mapper.CommonComponentDetailMapper;
-import com.inforbus.gjk.libs.mapper.CommonComponentMapper;
-import com.inforbus.gjk.libs.mapper.StructlibsMapper;
-import com.inforbus.gjk.libs.service.BatchApprovalService;
-import com.inforbus.gjk.libs.service.CommonComponentService;
-
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -54,8 +37,10 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -68,6 +53,36 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.inforbus.gjk.common.core.constant.ComponentConstant;
+import com.inforbus.gjk.common.core.entity.CompStruct;
+import com.inforbus.gjk.common.core.entity.Structlibs;
+import com.inforbus.gjk.common.core.util.R;
+import com.inforbus.gjk.common.core.util.UploadFilesUtils;
+import com.inforbus.gjk.libs.api.dto.CompTree;
+import com.inforbus.gjk.libs.api.entity.CommonComponent;
+import com.inforbus.gjk.libs.api.entity.CommonComponentDetail;
+import com.inforbus.gjk.libs.api.feign.RemoteStructServiceFeign;
+import com.inforbus.gjk.libs.api.vo.CompDictVO;
+import com.inforbus.gjk.libs.api.vo.CompVO;
+import com.inforbus.gjk.libs.api.vo.TreeUtil;
+import com.inforbus.gjk.libs.mapper.CommonComponentDetailMapper;
+import com.inforbus.gjk.libs.mapper.CommonComponentMapper;
+import com.inforbus.gjk.libs.mapper.StructlibsMapper;
+import com.inforbus.gjk.libs.service.BatchApprovalService;
+import com.inforbus.gjk.libs.service.CommonComponentService;
+
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import feign.Response;
 
 /**
  * 公共构件库详细表
@@ -90,6 +105,8 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 
 	@Autowired
 	private BatchApprovalService batchApprovalService;
+	@Autowired
+	private RemoteStructServiceFeign rsService;
 
 	/**
 	 * 公共构件库详细表简单分页查询
@@ -127,9 +144,9 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 			commonComponent.setVersion(1.0 + "");
 		}
 		try {
-			String divId = " id='"+commonComponent.getId()+"'";
+			String divId = " id='" + commonComponent.getId() + "'";
 			String img = commonComponent.getCompImg();// >测试构件01-Vnull<
-			img =img.replace("id=\"$divId$\"", divId);
+			img = img.replace("id=\"$divId$\"", divId);
 			String showName = commonComponent.getCompName() + "_V" + commonComponent.getVersion();
 			System.out.println("showName:  " + showName);
 			img = img.replaceAll(">" + commonComponent.getCompName() + "([^<>]*)<", ">" + showName + "<");
@@ -172,9 +189,22 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		return TreeUtil.buildCompTree(getAllComp(baseMapper.getScreenComp(libsList)), "-1");
 	}
 
+	/**
+	 * @Title: createZip
+	 * @Desc 创建压缩流数据
+	 * @Author xiaohe
+	 * @DateTime 2020年5月12日
+	 * @param compList 构件列表
+	 * @param details  构件文件列表
+	 * @return 字节流数据
+	 * @throws Exception
+	 * @see com.inforbus.gjk.libs.service.CommonComponentService#createZip(java.util.List,
+	 *      java.util.List)
+	 */
+	@Override
 	public byte[] createZip(List<CommonComponent> compList, List<CommonComponentDetail> details) throws Exception {
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		ZipOutputStream zip = new ZipOutputStream(outputStream);
+		InputStream inputStream = null;
+		Map<String, String> filePaths = Maps.newHashMap();
 		// 将目标文件打包成zip导出
 		for (CommonComponent comp : compList) {
 			String compFilePath = null;
@@ -184,22 +214,25 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 					break;
 				}
 			}
-			if (compFilePath != null) {
-				compFilePath = gitFilePath + compFilePath;
-//				String compPath = gitFilePath + "gjk" + File.separator + "common" + File.separator + "component"
-//						+ File.separator + comp.getCompId() + File.separator + comp.getVersion();
-				if (new File(compFilePath).exists()) {
-					zipDirOrFile(zip, new File(compFilePath),
-							"component" + File.separator + comp.getCompId() + File.separator + comp.getVersion());
-				}
+			if (StringUtils.isNotEmpty(compFilePath)) {
+				String target = ComponentConstant.COMP + File.separator + comp.getCompId() + File.separator;
+				// 设置需要下载的文件
+				filePaths.put(this.gitFilePath + File.separator + compFilePath, target);
 			}
-
 		}
-
-		createExcelFileToZipIO(compList, details, zip);
-
-		IOUtils.closeQuietly(zip);
-		return outputStream.toByteArray();
+		try {
+			MultipartFile mf = this.createExcelFileToZipIO(compList, details);
+			// feign文件下载
+			JSONObject json = JSONUtil.parseFromMap(filePaths);
+			Response response = rsService.downloadStreamFiles(new MultipartFile[] { mf },
+					new String[] { ComponentConstant.COMP + File.separator }, json.toJSONString(0));
+			Response.Body body = response.body();
+			inputStream = body.asInputStream();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		// 数据中心返回的ZIP流
+		return IOUtils.toByteArray(inputStream);
 	}
 
 	/**
@@ -271,6 +304,37 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		}
 	}
 
+	private MultipartFile createExcelFileToZipIO(List<CommonComponent> compList, List<CommonComponentDetail> details)
+			throws Exception {
+		// 创建表格工作空间
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		// 构件库页
+		createSheet(workbook, compList, "gjk_common_component");
+		// 构件库详情页
+		createSheet(workbook, details, "gjk_common_component_detail");
+
+		// 构件库和结构体表关系页
+		List<String> compIdList = compList.stream().map(CommonComponent::getId).collect(Collectors.toList());
+		List<CompStruct> compStructList = baseMapper.getCompStructByCompIdList(compIdList);
+		createSheet(workbook, compStructList, "gjk_comp_struct");
+
+		// 结构体页
+		List<Structlibs> structlibsList = new ArrayList<>();
+		List<String> structIdList = compStructList.stream().map(CompStruct::getStructId).collect(Collectors.toList());
+		List<Structlibs> structlibsListSub = new ArrayList<>();
+		if (structIdList.size() > 0) {
+			structlibsListSub = structlibsMapper.getStructlibsByIdList(structIdList);
+		}
+
+		structlibsList.addAll(structlibsListSub);
+		findStructlibsRecursion(structlibsListSub, structlibsList);
+		createSheet(workbook, structlibsList, "gjk_structlibs");
+		File file = new File(gitFilePath + "gjk" + File.separator + "testExcel" + File.separator + "MySQL.xlsx");
+		FileItem fileItem = UploadFilesUtils.createFileItem(file.getPath(), file.getName());
+		MultipartFile mfile = new CommonsMultipartFile(fileItem);
+		return mfile;
+	}
+
 	/**
 	 * 根据构件和构件详细信息表生成Excel文件并添加到压缩文件流中
 	 * 
@@ -324,13 +388,13 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		createSheet(workbook, structlibsList, "gjk_structlibs");
 
 		// 创建Excel文件保存的临时地址
-		File file = new File(gitFilePath + "gjk" + File.separator + "testExcel" + File.separator + "MySQL.xls");
+		File file = new File(gitFilePath + "gjk" + File.separator + "testExcel" + File.separator + "MySQL.xlsx");
 		if (!file.getParentFile().exists()) {
 			file.getParentFile().mkdirs();
 		}
 
 		// 创建Excel文件压缩目录
-		ZipEntry entry = new ZipEntry("component" + File.separator + "MySQL.xls");
+		ZipEntry entry = new ZipEntry("component" + File.separator + "MySQL.xlsx");
 		zip.putNextEntry(entry);
 		// 将Excel文件内容写入临时文件
 		OutputStream op = new FileOutputStream(file);

@@ -532,6 +532,21 @@ public class FileController {
 	}
 
 	/**
+	 * @Title: uploadDecompression
+	 * @Desc 上传并解压文件
+	 * @Author cvics
+	 * @DateTime 2020年5月8日
+	 * @param file      要解压的文件
+	 * @param localPath 解压的文件路径
+	 * @return
+	 */
+	@PostMapping(value = "/decompression", produces = {
+			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public R<Boolean> uploadDecompression(@RequestPart(value = "files") MultipartFile file,
+			@RequestParam("filePath") String localPath) {
+		return fileService.decompression(file, localPath);
+	}
+	/**
 	 * 判断文件是否存在
 	 * @param filePath
 	 * @auther sunchao

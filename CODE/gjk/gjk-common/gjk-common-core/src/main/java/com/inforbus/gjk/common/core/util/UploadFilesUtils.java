@@ -213,19 +213,19 @@ public class UploadFilesUtils {
 			return flag;
 		}
 		String[] tempList = file.list();
-		if (tempList == null || tempList.length <= 0){
+		if (tempList == null || tempList.length <= 0) {
 			return file.delete();
 		}
 		File temp = null;
 		for (int i = 0; i < tempList.length; i++) {
-				if (path.endsWith(File.separator)) {
-					temp = new File(path + tempList[i]);
-				} else {
-					temp = new File(path + File.separator + tempList[i]);
-				}
-				if (temp.isFile()) {
-					temp.delete();
-				}
+			if (path.endsWith(File.separator)) {
+				temp = new File(path + tempList[i]);
+			} else {
+				temp = new File(path + File.separator + tempList[i]);
+			}
+			if (temp.isFile()) {
+				temp.delete();
+			}
 
 			if (temp.isDirectory()) {
 //				delAllFile(path + "/" + tempList[i]);// 先删除文件夹里面的文件
@@ -235,8 +235,8 @@ public class UploadFilesUtils {
 				flag = false;
 			}
 		}
-		//删除父目录文件夹
-		if (file.delete()){
+		// 删除父目录文件夹
+		if (file.delete()) {
 			return true;
 		}
 		return flag;
@@ -407,6 +407,7 @@ public class UploadFilesUtils {
 		delAllFile(source);
 	}
 
+
 	/**
 	 * @Title: decompression
 	 * @Description: 解压压缩包文件
@@ -438,8 +439,6 @@ public class UploadFilesUtils {
 	}
 
 	/**
-	 * 2
-	 * 
 	 * @Title: toZip
 	 * @Desc
 	 * @Author xiaohe
@@ -456,6 +455,36 @@ public class UploadFilesUtils {
 			// createFile==>创建文件及目录
 			File file = UploadFilesUtils.createFile(path);
 			UploadFilesUtils.getZipStreamFiles(file, zipstream, file.getName());
+		}
+		IOUtils.closeQuietly(zipstream);
+		return outputStream;
+	}
+
+	/**
+	 * @param fileTarget
+	 * @param ufile
+	 * @Title: toZip
+	 * @Desc
+	 * @Author xiaohe
+	 * @DateTime 2020年5月9日
+	 * @param mapPaths 文件路径集合 key 设置相对路径 Value 文件路径
+	 * @return
+	 * @throws Exception
+	 */
+	public static ByteArrayOutputStream toZip(File[] ufile, String[] fileTarget, Map<String, String> mapPaths)
+			throws Exception {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		ZipOutputStream zipstream = new ZipOutputStream(outputStream);
+		// 循环上传的文件
+		for (int i = 0; i < ufile.length; i++) {
+			// 压缩上传的文件
+			UploadFilesUtils.getZipStreamFiles(ufile[i], zipstream, fileTarget[i] + ufile[i].getName());
+		}
+		// getZipStreamFiles获取多文件时的文件zip流
+		for (Map.Entry<String, String> it : mapPaths.entrySet()) {
+			// createFile==>创建文件及目录
+			File file = UploadFilesUtils.createFile(it.getKey());
+			UploadFilesUtils.getZipStreamFiles(file, zipstream, it.getValue() + file.getName());
 		}
 		IOUtils.closeQuietly(zipstream);
 		return outputStream;
@@ -495,13 +524,13 @@ public class UploadFilesUtils {
 
 	/**
 	 * @Title: createFileItem
-	 * @Desc 
+	 * @Desc
 	 * @Author xiaohe
 	 * @DateTime 2020年5月7日
 	 * @param filePath
 	 * @param fileName
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static FileItem createFileItem(String filePath, String fileName) throws IOException {
 		String fieldName = "file";
