@@ -6,20 +6,24 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.*;
-import java.util.List;
-import java.util.Map;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import com.inforbus.gjk.common.core.entity.XmlEntityMap;
-import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
-import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 import org.apache.poi.POIXMLDocument;
 import org.apache.poi.POIXMLTextExtractor;
 import org.apache.poi.hwpf.extractor.WordExtractor;
@@ -36,12 +40,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.inforbus.gjk.common.core.constant.enums.FileExtensionEnum;
+import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.util.FileUtil;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.UploadFilesUtils;
+import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
+import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 import com.inforbus.gjk.dataCenter.api.dto.ThreeLibsDTO;
 import com.inforbus.gjk.dataCenter.api.dto.ThreeLibsFilePathDTO;
 import com.inforbus.gjk.dataCenter.api.entity.FileCenter;
@@ -85,9 +93,10 @@ public class FileServiceImpl implements FileService {
 		localFile.stream().forEach(fc -> {
 			FileChannel in = null;
 			FileChannel out = null;
+			FileOutputStream fos=null;
 			try {
 				in = fc.getInputStream().getChannel();
-				FileOutputStream fos = new FileOutputStream(
+				fos = new FileOutputStream(
 						localBasePath + File.separator + localPath + File.separator + fc.getAbsolutePath());
 				out = fos.getChannel();
 				// 连接两个通道，并从in通道读取，写入out中
@@ -98,6 +107,7 @@ public class FileServiceImpl implements FileService {
 				logger.debug("下载本地文件,{}", e);
 			} finally {
 				try {
+					fos.close();
 					in.close();
 					out.close();
 				} catch (IOException e) {
@@ -648,15 +658,23 @@ public class FileServiceImpl implements FileService {
 				}
 				// 读取word文件
 			} else if ("doc".equals(prefix) || "docx".equals(prefix)) {
+				WordExtractor extractor = null;
 				try {
 
 					FileInputStream in = new FileInputStream(fileName);
-					WordExtractor extractor = new WordExtractor(in);
+					extractor = new WordExtractor(in);
 					str = extractor.getText();
 //				dto.setTextContext(str);
 				} catch (Exception e) {
 					e.printStackTrace();
 					return new R<>(new Exception("读取" + fileName + "文件内容出错"));
+				} finally {
+					// 关闭 WordExtractor
+					try {
+						extractor.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 			// 读取//.h .m .c .o等客户 文件
@@ -759,7 +777,67 @@ public class FileServiceImpl implements FileService {
 	}
 
 	/**
+	 * @Title: decompression
+	 * @Desc 解压文件
+	 * @Author xiaohe
+	 * @DateTime 2020年5月8日
+	 * @param file  文件
+	 * @param paths 文件路径
+	 * @return
+	 * @see com.inforbus.gjk.dataCenter.service.FileService#decompression(org.springframework.web.multipart.MultipartFile,
+	 *      java.lang.String)
+	 */
+	@Override
+	public R decompression(MultipartFile file, String paths) {
+		logger.debug("开始解压文件{}", file.getOriginalFilename());
+		long startTime = System.currentTimeMillis(); // 获取开始时间
+		if (ObjectUtils.isNotEmpty(file)) {
+			File uploadFile = null;
+			if (StringUtils.isNotEmpty(paths)) {
+				uploadFile = new File(paths);
+				if (!uploadFile.getParentFile().exists()) {
+					uploadFile.getParentFile().mkdirs();
+				}
+			}
+		}
+		// 创建FutureTask
+		R ret = new R<Boolean>();
+		try {
+			FutureTask<R> futureTask = new FutureTask<>(new Callable<R>() {
+				@Override
+				public R call() {
+					// 线程执行体
+					try {
+						UploadFilesUtils.decompression(file.getInputStream(), paths);
+						// 返回值
+						return new R<Boolean>(true);
+					} catch (IOException e) {
+						logger.error("解压文件出错", e.getMessage());
+						// 返回值
+						return new R<>(e);
+					}
+
+				}
+			});
+			futureTask.run();
+			ret = futureTask.get();
+			logger.debug("结束解压文件{}", file.getOriginalFilename());
+			long endTime = System.currentTimeMillis(); // 获取结束时间
+			System.out.println("程序运行时间：" + (endTime - startTime) + "ms"); // 输出程序运行时间
+			logger.info("程序运行时间：" + (endTime - startTime) + "ms"); // 输出程序运行时间
+		} catch (InterruptedException e) {
+			ret = new R<>(e);
+			logger.error("解压文件出错", e.getMessage());
+		} catch (ExecutionException e) {
+			ret = new R<>(e);
+			logger.error("解压文件出错", e.getMessage());
+		}
+		return ret;
+	}
+
+	/**
 	 * 判断文件是否存在
+	 * 
 	 * @param filePath
 	 * @auther sunchao
 	 * @return
@@ -772,6 +850,7 @@ public class FileServiceImpl implements FileService {
 
 	/**
 	 * 查找App路径
+	 * 
 	 * @param filePath
 	 * @param selectFileName
 	 * @auther sunchao
@@ -780,18 +859,16 @@ public class FileServiceImpl implements FileService {
 	 */
 	@Override
 	public String getAppPath(String filePath, String selectFileName) throws IOException {
-		//要返回的app路径
+		// 要返回的app路径
 		String selectPath = null;
-		//拿到目标路径的path对象
+		// 拿到目标路径的path对象
 		Path path = Paths.get(filePath);
-		//拿到匹配器
+		// 拿到匹配器
 		PathMatcher matcher = FileSystems.getDefault()
 				.getPathMatcher("glob:**" + FileSystems.getDefault().getSeparator() + selectFileName);
-		//查找匹配的文件，转成list
-		List<Path> collect = Files.walk(path)
-				.filter(matcher::matches)
-				.collect(Collectors.toList());
-		//找到符合条件的路径
+		// 查找匹配的文件，转成list
+		List<Path> collect = Files.walk(path).filter(matcher::matches).collect(Collectors.toList());
+		// 找到符合条件的路径
 		for (Path pathEl : collect) {
 			if (pathEl.toString().contains(selectFileName) && !pathEl.toString().contains("debug")) {
 				selectPath = pathEl.toString();

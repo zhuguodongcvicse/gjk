@@ -39,8 +39,8 @@ feign:
   client:
     config:
       default:
-        connectTimeout: 10000
-        readTimeout: 10000
+        connectTimeout: 120000
+        readTimeout: 120000
   compression:
     request:
       enabled: true

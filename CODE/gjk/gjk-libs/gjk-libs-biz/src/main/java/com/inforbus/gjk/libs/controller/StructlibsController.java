@@ -80,7 +80,7 @@ public class StructlibsController {
 	 */
 	@PostMapping("/parseStructFile")
 	public R getStructByFile(@RequestBody Map<String, String> maps) {
-		return new R<>(structlibsService.parseStructFile(maps.get("path")));
+		return structlibsService.parseStructFile(maps.get("path"));
 	}
 
 	/**

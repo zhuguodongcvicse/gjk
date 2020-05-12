@@ -191,4 +191,16 @@ public class ExternalInfController {
 		return new R<>(externalInfService.parsePerformanceTable(excelPath));
 	}
 
+	/**
+	 * @Title: parseStruct
+	 * @Desc 解析结构体（通用：包括系统表、内部表等）
+	 * @Author xiaohe
+	 * @DateTime 2020年5月7日
+	 * @param filePath 文件路径
+	 * @return R<?> <结构体类型名，list<变量类型+空格+变量名>>
+	 */
+	@PostMapping("/parseStruct")
+	public R<?> parseStruct(@RequestParam("filePath") String filePath) {
+		return new R<>(externalInfService.parseStruct(filePath));
+	}
 }
