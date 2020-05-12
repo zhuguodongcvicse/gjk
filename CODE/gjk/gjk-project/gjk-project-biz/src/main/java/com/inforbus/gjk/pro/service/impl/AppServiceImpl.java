@@ -16,6 +16,7 @@
  */
 package com.inforbus.gjk.pro.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -28,6 +29,7 @@ import com.inforbus.gjk.pro.api.dto.AppDataDTO;
 import com.inforbus.gjk.pro.api.entity.App;
 import com.inforbus.gjk.pro.api.entity.Project;
 import com.inforbus.gjk.pro.api.entity.ProjectFile;
+import com.inforbus.gjk.pro.api.feign.AppSubassemblyServiceFeign;
 import com.inforbus.gjk.pro.api.feign.DisposeDataCenterServiceFeign;
 import com.inforbus.gjk.pro.api.feign.ExternalInfInvokeService;
 import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
@@ -48,6 +50,7 @@ import java.io.InputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -77,6 +80,9 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	private ExternalInfInvokeService externalInfInvokeService;
 	@Autowired
 	protected DisposeDataCenterServiceFeign disposeDataCenterServiceFeign;
+
+	@Autowired
+	private AppSubassemblyServiceFeign appSubassemblyServiceFeign;
 
 	//git文件路径
 	@Value("${git.local.path}")
@@ -163,23 +169,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		App app = getAppByProcessId(processId);
 		if (app != null) {
 			String appPath = proDetailPath + app.getFilePath() + File.separator + app.getFileName();
-			File appFile = new File(appPath);
-			List<ProjectFileVO> tree = Lists.newArrayList();
-			if (!appFile.exists()) {
-				return Lists.newArrayList();
-			}
-
-			String id = IdGenerate.uuid();
-			tree.add(new ProjectFileVO(id, appFile.getName(), "App组件工程", "app",
-					appFile.getParentFile().getAbsolutePath(), processId, processId, "0"));
-			File[] fileList = appFile.listFiles();
-			for (File file : fileList) {
-				if (file.getName().equals("bsp") && appFile.getName().equals("AppPro")) {
-					continue;
-				}
-				addAppFileTree(tree, id, file, processId);
-			}
-
+			List tree = appSubassemblyServiceFeign.createAppTree(appPath, processId).getData();
 			return tree;
 		} else {
 			return Lists.newArrayList();
