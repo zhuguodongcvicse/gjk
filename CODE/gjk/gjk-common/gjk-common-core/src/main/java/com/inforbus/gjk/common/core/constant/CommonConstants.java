@@ -73,4 +73,34 @@ public interface CommonConstants {
 	 * 验证码前缀
 	 */
 	String DEFAULT_CODE_KEY = "DEFAULT_CODE_KEY_";
+
+	/**
+	 * 树节点
+	 */
+	String STATUS_TREE = "-1";
+	
+	/**
+	 * 程序文本编辑器的odecd ：utf-8
+	 */
+	String CODE_UTF8 = "UTF-8";
+	
+	/**
+	 * 程序文本编辑器的CODE_UNICODE
+	 */
+	String CODE_UNICODE = "Unicode";
+	
+	/**
+	 * 程序文本编辑器的CODE_UTF16
+	 */
+	String CODE_UTF16 = "UTF-16BE";
+	
+	/**
+	 * 程序文本编辑器的CODE_GBK
+	 */
+	String CODE_GBK = "GBK";
+	
+	/**
+	 *  APP下载路径
+	 */
+	String APPDOWNLOAD_FILEPATH = "APPDownload";
 }

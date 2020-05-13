@@ -3,6 +3,7 @@ package com.inforbus.gjk.libs.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.inforbus.gjk.common.core.constant.CommonConstants;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.TreeUtil;
 import com.inforbus.gjk.common.log.annotation.SysLog;
@@ -185,7 +186,8 @@ public class BSPController {
 	 */
 	@GetMapping("/getTreeById/{id}")
 	public R getTreeById(@PathVariable("id") String id) {
-		return new R<>(TreeUtil.buildByLoop(bspService.getTreeById(id), "-1"));
+		//树节点为-1
+		return new R<>(TreeUtil.buildByLoop(bspService.getTreeById(id), CommonConstants.STATUS_TREE));
 	}
 
 }

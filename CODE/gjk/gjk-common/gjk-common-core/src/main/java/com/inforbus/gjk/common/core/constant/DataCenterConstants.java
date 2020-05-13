@@ -28,5 +28,10 @@ public interface DataCenterConstants {
 	 * @Fields FILE_DIRS_COMP : 上传时构件 用户构件文件特定
 	 */
 	String FILE_DIRS_COMPUSERFILEPATH = "gjk" + File.separator + "component";
-
+	
+	//BSP库存储路径
+	String BSP_FILEPATH = "gjk"+ File.separator + "bsp" + File.separator;
+	
+	//软件框架库库存储路径
+	String SOFTWARE_FILEPATH = "gjk"+ File.separator + "software" + File.separator;
 }

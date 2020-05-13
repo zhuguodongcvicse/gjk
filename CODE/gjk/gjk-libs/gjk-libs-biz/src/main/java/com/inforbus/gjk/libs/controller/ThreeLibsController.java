@@ -16,6 +16,7 @@
  */
 package com.inforbus.gjk.libs.controller;
 
+import com.inforbus.gjk.common.core.constant.CommonConstants;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.libs.api.dto.ThreeLibsFilePathDTO;
 import com.inforbus.gjk.libs.api.entity.Software;
@@ -158,16 +159,16 @@ public class ThreeLibsController {
 
 		switch (p) {
 		case 298127:
-			code = "UTF-8";
+			code = CommonConstants.CODE_UTF8;
 			break;
 		case 65534:
-			code = "Unicode";
+			code = CommonConstants.CODE_UNICODE;
 			break;
 		case 65279:
-			code = "UTF-16BE";
+			code = CommonConstants.CODE_UTF16;
 			break;
 		default:
-			code = "GBK";
+			code = CommonConstants.CODE_GBK;
 		}
 
 		return code;

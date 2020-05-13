@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
+import com.inforbus.gjk.common.core.constant.CommonConstants;
+import com.inforbus.gjk.common.core.constant.DataCenterConstants;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.libs.api.dto.BSPDTO;
 import com.inforbus.gjk.libs.api.dto.BSPTree;
@@ -60,7 +62,8 @@ public class BSPServiceImpl extends ServiceImpl<BSPMapper, BSP> implements BSPSe
 	 */
 	@Override
 	public BSP saveBSP(BSP bsp) {
-		bsp.setDelFlag("0");
+		// 删除状态为0
+		bsp.setDelFlag(CommonConstants.STATUS_NORMAL);
 		bsp.setId(IdGenerate.uuid());
 		bsp.setCreateTime(LocalDateTime.now());
 		bsp.setUpdateTime(LocalDateTime.now());
@@ -142,7 +145,8 @@ public class BSPServiceImpl extends ServiceImpl<BSPMapper, BSP> implements BSPSe
 	@Override
 	public List<BSPTree> getBSPTree() {
 		List<BSP> list = this.list(Wrappers.<BSP>query().lambda());
-		List<BSPTree> trees = BSPTreeUtil.buildTree(list, "-1");
+		// 树节点为-1
+		List<BSPTree> trees = BSPTreeUtil.buildTree(list, CommonConstants.STATUS_TREE);
 		return trees;
 	}
 
@@ -171,7 +175,8 @@ public class BSPServiceImpl extends ServiceImpl<BSPMapper, BSP> implements BSPSe
 	public List<BSPTree> getTreeById(String id) {
 		List<BSPTree> tree = Lists.newArrayList();
 		BSP bsp = this.getById(id);
-		tree.add(new BSPTree(bsp, "-1"));
+		// 树节点为-1
+		tree.add(new BSPTree(bsp, CommonConstants.STATUS_TREE));
 
 		File file = new File(gitFilePath + bsp.getFilePath());
 		if (file.isDirectory()) {
@@ -206,17 +211,18 @@ public class BSPServiceImpl extends ServiceImpl<BSPMapper, BSP> implements BSPSe
 	/**
 	 * 文件上传
 	 * 
-	 * @param files 文件夹流
-	 * @param versionDisc 版本号
-	 * * @param userName 用户名
+	 * @param files       文件夹流
+	 * @param versionDisc 版本号 * @param userName 用户名
 	 * @return
 	 */
 	@Override
 	public String uploadFiles(MultipartFile files, String versionDisc, String userName) {
 		String path = gitFilePath;
+		// 文件上传的状态：上传成功！！！
 		String res = "上传成功！！！";
-		String ss = (path + "gjk/bsp/" + userName + File.separator + versionDisc + ".0" + File.separator)
-				.replaceAll("\\\\", "/");
+		// DataCenterConstants.BSP_FILEPATH : gjk/bsp/
+		String ss = (path + DataCenterConstants.BSP_FILEPATH + userName + File.separator + versionDisc + ".0"
+				+ File.separator).replaceAll("\\\\", "/");
 		File file = new File(ss);
 		if (!file.exists()) {
 			file.mkdir();

@@ -1,26 +1,12 @@
-/*
- *    Copyright (c) 2018-2025, inforbus All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- * Neither the name of the inforbus.com developer nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- * Author: inforbus
- */
+
 package com.inforbus.gjk.pro.service.impl;
 
-import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
+import com.inforbus.gjk.common.core.constant.CommonConstants;
+import com.inforbus.gjk.common.core.constant.ComponentConstant;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.ExternalIOTransUtils;
@@ -50,7 +36,6 @@ import java.io.InputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +70,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	@Autowired
 	private AppSubassemblyServiceFeign appSubassemblyServiceFeign;
 
-	//git文件路径
+	// git文件路径
 	@Value("${git.local.path}")
 	private String proDetailPath;
 	// packinfo文件路径(客户自存自取)
@@ -94,7 +79,6 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	// 组件划分方案路径(客户自存自取)
 	@Value("${gjk.pro.process.generateCodeResult}")
 	private String generateCodeResult;
-	
 
 	/**
 	 * 简单分页查询
@@ -103,7 +87,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	 * @return
 	 */
 	@Override
-	public IPage<App> getAppPage(Page<App> page,@RequestBody App app) {
+	public IPage<App> getAppPage(Page<App> page, @RequestBody App app) {
 		return baseMapper.getAppPage(page, app);
 	}
 
@@ -138,7 +122,6 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		FileInputStream fis = null;
 		try {
 			String filePath = app.getBackPath();
-			System.out.println("....." + (basePath + filePath));
 			fis = new FileInputStream(basePath + filePath);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -182,6 +165,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 
 	/**
 	 * 添加app树
+	 * 
 	 * @param tree
 	 * @param parentId
 	 * @param file
@@ -191,14 +175,15 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		String fileId = IdGenerate.uuid();
 
 		if (file.isDirectory()) {
-			tree.add(new ProjectFileVO(fileId, file.getName(), file.getName(), "app",
+			// ComponentConstant.APP_RUN :app
+			tree.add(new ProjectFileVO(fileId, file.getName(), file.getName(), ComponentConstant.APP_RUN,
 					file.getParentFile().getAbsolutePath(), parentId, processId, "0"));
 			File[] childFileList = file.listFiles();
 			for (File childFile : childFileList) {
 				addAppFileTree(tree, fileId, childFile, processId);
 			}
 		} else {
-			tree.add(new ProjectFileVO(fileId, file.getName(), file.getName(), "app",
+			tree.add(new ProjectFileVO(fileId, file.getName(), file.getName(), ComponentConstant.APP_RUN,
 					file.getParentFile().getAbsolutePath(), parentId, processId, "1"));
 		}
 	}
@@ -245,7 +230,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	public App selectAPPByAPPId(String id) {
 		return baseMapper.selectAPPByAPPId(id);
 	}
-	
+
 	/**
 	 * 通过流程id获取流程
 	 */
@@ -253,7 +238,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	public ProjectFile getProcessByProcessId(String parentId) {
 		return baseMapper.getProcessByProcessId(parentId);
 	}
-	
+
 	/**
 	 * 注册
 	 * 
@@ -265,7 +250,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	 * @param AppProPath      app工程文件夹路径
 	 * @return 执行结果(成功或失败)
 	 */
-	public boolean appInstall( AppDataDTO appDataDTO) {
+	public boolean appInstall(AppDataDTO appDataDTO) {
 		// 前台以json串的形式传到后台，后台解析成map
 		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
 		String bb = appDataDTO.getSysconfigPath().replaceAll("\\\\", "/");
@@ -273,18 +258,17 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		String aa = bb.substring(0, bb.lastIndexOf("/"));
 		aa = aa.substring(0, aa.lastIndexOf("/"));
 		// packinfo文件路径（客户自存自取的路径）
+		// ComponentConstant.PACKINFO_XML: "packinfo.xml"
 		String selfSoftToHardResult = proDetailPath + aa + File.separator + generateCodeResult + File.separator
-				+ "packinfo.xml";
+				+ ComponentConstant.PACKINFO_XML;
 		// 组件划分方案路径（自存自取）
+		// ComponentConstant.GENERATECODERESULT_XML:ComponentConstant
 		String selfGenerateCodeResult = proDetailPath + aa + File.separator + softToHardResult + File.separator
-				+ "组件划分方案.xml";
+				+ ComponentConstant.GENERATECODERESULT_XML;
 		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
 		boolean returnVal;
 		try {
 			// 调用注册接口
-//			returnVal = ExternalIOTransUtils.appInstall(cmpNameToHwType, appDataDTO.getUserName(),
-//					appDataDTO.getFlowId(), appDataDTO.getAppName(), selfSoftToHardResult, selfGenerateCodeResult,
-//					proDetailPath + appDataDTO.getAppProPath());
 			returnVal = externalInfInvokeService.appInstall(cmpNameToHwType, appDataDTO.getUserName(),
 					appDataDTO.getFlowId(), appDataDTO.getAppName(), selfSoftToHardResult, selfGenerateCodeResult,
 					proDetailPath + appDataDTO.getAppProPath());
@@ -306,7 +290,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	 * @param appProPath        APP工程文件夹路径
 	 * @return 执行结果(成功或失败)
 	 */
-	public boolean appLoadStart( AppDataDTO appDataDTO) {
+	public boolean appLoadStart(AppDataDTO appDataDTO) {
 		// 前台以json串的形式传到后台，后台解析成map
 		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
 		// 是否带部署方案(数据库存的字符串0、1，后台需要转换一下)
@@ -323,9 +307,9 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 //			returnVal = ExternalIOTransUtils.appLoad(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(),
 //					appDataDTO.getAppName(), existDeployConfig, proDetailPath + appDataDTO.getSysconfigPath(),
 //					proDetailPath + appDataDTO.getAppProPath());
-			returnVal = externalInfInvokeService.appLoad(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(),
-					appDataDTO.getAppName(), existDeployConfig, proDetailPath + appDataDTO.getSysconfigPath(),
-					proDetailPath + appDataDTO.getAppProPath());
+			returnVal = externalInfInvokeService.appLoad(cmpNameToHwType, appDataDTO.getUserName(),
+					appDataDTO.getFlowId(), appDataDTO.getAppName(), existDeployConfig,
+					proDetailPath + appDataDTO.getSysconfigPath(), proDetailPath + appDataDTO.getAppProPath());
 		} catch (Exception e) {
 			e.printStackTrace();
 			returnVal = false;
@@ -341,7 +325,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	 * @param appName         APP名称
 	 * @return 执行结果(成功或失败)
 	 */
-	public boolean appUnload( AppDataDTO appDataDTO) {
+	public boolean appUnload(AppDataDTO appDataDTO) {
 		// 前台以json串的形式传到后台，后台解析成map
 		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
 		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
@@ -365,7 +349,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	 * @param appName         APP名称
 	 * @return 执行结果(成功或失败)
 	 */
-	public boolean appTaskRestart( AppDataDTO appDataDTO) {
+	public boolean appTaskRestart(AppDataDTO appDataDTO) {
 		// 前台以json串的形式传到后台，后台解析成map
 		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
 		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
@@ -389,7 +373,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	 * @param appName         APP名称
 	 * @return 执行结果(成功或失败)
 	 */
-	public boolean appStop( AppDataDTO appDataDTO) {
+	public boolean appStop(AppDataDTO appDataDTO) {
 		// 前台以json串的形式传到后台，后台解析成map
 		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
 		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
@@ -413,7 +397,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	 * @param appName         APP名称
 	 * @return 执行结果(成功或失败)
 	 */
-	public boolean appPause( AppDataDTO appDataDTO) {
+	public boolean appPause(AppDataDTO appDataDTO) {
 		// 前台以json串的形式传到后台，后台解析成map
 		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
 		// 返回值
@@ -438,16 +422,15 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	 * @param packinfoPath    客户自存自取路径
 	 * @return 执行结果(成功或失败)
 	 */
-	public boolean appDelete( AppDataDTO appDataDTO) {
+	public boolean appDelete(AppDataDTO appDataDTO) {
 		// 前台以json串的形式传到后台，后台解析成map
 		Map<String, String> cmpNameToHwType = JSONUtil.toBean(appDataDTO.getCmpNameToHwType(), Map.class);
 		String bb = appDataDTO.getSysconfigPath().replaceAll("\\\\", "/");
-		// String aa = bb.substring(0,bb.lastIndexOf("/",bb.indexOf("/")+1));
 		String aa = bb.substring(0, bb.lastIndexOf("/"));
 		aa = aa.substring(0, aa.lastIndexOf("/"));
 		// packinfo文件路径（客户自存自取的路径）
 		String selfSoftToHardResult = proDetailPath + aa + File.separator + generateCodeResult + File.separator
-				+ "packinfo.xml";
+				+ ComponentConstant.PACKINFO_XML;
 		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
 		boolean returnVal;
 		try {
@@ -474,17 +457,16 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	 * @param cmpDeployPlanFilePath 客户自存自取路径
 	 */
 
-	public boolean appTaskExport( AppDataDTO appDataDTO) {
+	public boolean appTaskExport(AppDataDTO appDataDTO) {
 		String bb = appDataDTO.getSysconfigPath().replaceAll("\\\\", "/");
-		// String aa = bb.substring(0,bb.lastIndexOf("/",bb.indexOf("/")+1));
 		String aa = bb.substring(0, bb.lastIndexOf("/"));
 		aa = aa.substring(0, aa.lastIndexOf("/"));
 		// packinfo文件路径（客户自存自取的路径）
 		String selfSoftToHardResult = proDetailPath + aa + File.separator + generateCodeResult + File.separator
-				+ "packinfo.xml";
+				+ ComponentConstant.PACKINFO_XML;
 		// 组件划分方案路径（自存自取）
 		String selfGenerateCodeResult = proDetailPath + aa + File.separator + softToHardResult + File.separator
-				+ "组件划分方案.xml";
+				+ ComponentConstant.GENERATECODERESULT_XML;
 		String appPath = proDetailPath + File.separator + appDataDTO.getAppProPath();
 		// 接口返回值（用于修改app的运行状态 true：改变；false：不改变）
 				boolean returnVal;
@@ -492,8 +474,9 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 					// 调用注销接口
 //					ExternalIOTransUtils.appTaskExport(appDataDTO.getUserName(), appDataDTO.getFlowId(), appDataDTO.getAppName(),
 //							appPath, proDetailPath + appDataDTO.getSysconfigPath(), selfSoftToHardResult, selfGenerateCodeResult);
-					externalInfInvokeService.appTaskExport(appDataDTO.getUserName(), appDataDTO.getFlowId(), appDataDTO.getAppName(),
-							appPath, proDetailPath + appDataDTO.getSysconfigPath(), selfSoftToHardResult, selfGenerateCodeResult);
+			externalInfInvokeService.appTaskExport(appDataDTO.getUserName(), appDataDTO.getFlowId(),
+					appDataDTO.getAppName(), appPath, proDetailPath + appDataDTO.getSysconfigPath(),
+					selfSoftToHardResult, selfGenerateCodeResult);
 					returnVal = true;
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -501,25 +484,28 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 				}
 		return returnVal;
 	}
-	
+
 	/**
 	 * 返回文件路径
 	 */
 	public String returnFilePath() {
 		return proDetailPath;
 	}
+
 	/**
 	 * 导出压缩文件
 	 */
-	public void createZipFile(HttpServletRequest request, HttpServletResponse response,
-			 Map<String, String> map) {
+	public void createZipFile(HttpServletRequest request, HttpServletResponse response, Map<String, String> map) {
 		InputStream inputStream = null;
 		ByteArrayOutputStream outStream = null;
 		String filePath = proDetailPath + map.get("oriFilePath");
 //		String filePath = "D:\\14S_GJK_GIT\\gjk\\gjk\\project\\Project1234\\Flow12\\app\\AppTaskInfo.xml";
 		String zipFileName = map.get("downloadAPPFileName") + ".zip";
-		String zipFilePath = proDetailPath + "gjk" + File.separator + "APPDownload" + File.separator + zipFileName;
-		String [] strArr = {filePath};
+		// CommonConstants.BACK_END_PROJECT:gjk
+		// CommonConstants.APPDOWNLOAD_FILEPATH ：APPDownload
+		String zipFilePath = proDetailPath + CommonConstants.BACK_END_PROJECT + File.separator
+				+ CommonConstants.APPDOWNLOAD_FILEPATH + File.separator + zipFileName;
+		String[] strArr = { filePath };
 		try {
 			// feign文件下载
 			Response respon = disposeDataCenterServiceFeign.downloadStreamFiles(strArr);
@@ -538,7 +524,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 			}
 			in.close();
 			out.close();
-			
+
 			byte[] data = outStream.toByteArray();
 
 			new File(zipFilePath).deleteOnExit();
@@ -562,7 +548,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 			IoUtil.write(response.getOutputStream(), Boolean.TRUE, data);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			if (inputStream != null) {
 				try {
 					inputStream.close();
@@ -578,19 +564,20 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 				}
 			}
 		}
-		
+
 	}
-	
 
 	/**
 	 * 导出压缩文件
 	 */
-	public void createZipFiles(HttpServletRequest request, HttpServletResponse response,
-			 Map<String, String> map) {
+	public void createZipFiles(HttpServletRequest request, HttpServletResponse response, Map<String, String> map) {
 		FileInputStream inputStream = null;
 		ByteArrayOutputStream outStream = null;
 		String zipFileName = map.get("downloadAPPFileName") + ".zip";
-		String zipFilePath = proDetailPath + "gjk" + File.separator + "APPDownload" + File.separator + zipFileName;
+		// CommonConstants.BACK_END_PROJECT:gjk
+		// CommonConstants.APPDOWNLOAD_FILEPATH ：APPDownload
+		String zipFilePath = proDetailPath + CommonConstants.BACK_END_PROJECT + File.separator
+				+ CommonConstants.APPDOWNLOAD_FILEPATH + File.separator + zipFileName;
 		try {
 			org.apache.tools.ant.Project prj = new org.apache.tools.ant.Project();
 			Zip zip = new Zip();

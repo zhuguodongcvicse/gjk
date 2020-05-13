@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
+import com.inforbus.gjk.common.core.constant.CommonConstants;
+import com.inforbus.gjk.common.core.constant.DataCenterConstants;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.libs.api.dto.SelectFolderDTO;
 import com.inforbus.gjk.libs.api.dto.SoftwareDTO;
@@ -59,7 +61,8 @@ public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> i
 	 */
 	@Override
 	public Software saveSoftware(Software software) {
-		software.setDelFlag("0");
+		// 删除状态为0
+		software.setDelFlag(CommonConstants.STATUS_NORMAL);
 		software.setId(IdGenerate.uuid());
 		software.setCreateTime(LocalDateTime.now());
 		software.setUpdateTime(LocalDateTime.now());
@@ -113,7 +116,8 @@ public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> i
 	@Override
 	public List<SoftwareTree> getSoftwareTree() {
 		List<Software> list = this.list(Wrappers.<Software>query().lambda());
-		List<SoftwareTree> trees = SoftwareTreeUtil.buildTree(list, "-1");
+		// 树节点为-1
+		List<SoftwareTree> trees = SoftwareTreeUtil.buildTree(list, CommonConstants.STATUS_TREE);
 		return trees;
 	}
 
@@ -167,7 +171,8 @@ public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> i
 	public List<SoftwareTree> getTreeById(String id) {
 		List<SoftwareTree> tree = Lists.newArrayList();
 		Software software = this.getById(id);
-		tree.add(new SoftwareTree(software, "-1"));
+		// 树节点为-1
+		tree.add(new SoftwareTree(software, CommonConstants.STATUS_TREE));
 
 		File file = new File(gitFilePath + software.getFilePath());
 		if (file.isDirectory()) {
@@ -211,7 +216,7 @@ public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> i
 	public String uploadFiles(MultipartFile files, String versionDisc, String userName) {
 		String path = gitFilePath;
 		String res = path + ",";
-		String ss = (path + "gjk/software/" + userName + File.separator + versionDisc + ".0" + File.separator)
+		String ss = (path +  DataCenterConstants.SOFTWARE_FILEPATH + userName + File.separator + versionDisc + ".0" + File.separator)
 				.replaceAll("\\\\", "/");
 		File file = new File(ss);
 		if (!file.exists()) {

@@ -30,5 +30,14 @@ public interface DeploymentConstants {
     String NAME = "name";
 
     String ID= "id";
+    
+    //测试文件
+    String TEST_FILE = "测试文件";
+    
+    //平台文件
+    String PLATFORM_FILE = "平台文件";
+    
+    //算法文件
+    String ALGORITH_FILE = "算法文件";
 
 }
