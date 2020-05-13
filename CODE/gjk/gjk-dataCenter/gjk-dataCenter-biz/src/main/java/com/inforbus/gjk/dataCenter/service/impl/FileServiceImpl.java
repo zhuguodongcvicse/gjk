@@ -5,9 +5,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.FileSystems;
@@ -51,6 +56,7 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.inforbus.gjk.common.core.constant.enums.FileExtensionEnum;
+import com.inforbus.gjk.common.core.entity.StringRef;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.util.FileUtil;
 import com.inforbus.gjk.common.core.util.R;
@@ -882,5 +888,66 @@ public class FileServiceImpl implements FileService {
 			}
 		}
 		return selectPath;
+	}
+	
+	/**
+	 * 保存流程建模json
+	 */
+	@Override
+	public void editProJSON(StringRef strRef, String filePath) {
+		String jsonString = strRef.getVal();
+		File file = new File(filePath);
+		if (!file.getParentFile().exists()) { // 如果父目录不存在，创建父目录
+			file.getParentFile().mkdirs();
+		}
+		if (file.exists()) { // 如果已存在,删除旧文件
+			file.delete();
+		}
+		Writer write = null;
+		try {
+			write = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+			write.write(jsonString);
+			write.flush();
+		} catch (Exception e) {
+			logger.error("保存json文件失败");
+		} finally {
+			if(write != null) {
+				try {
+					write.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		
+	}
+	/**
+	 * 解析流程建模json
+	 */
+	@Override
+	public String findJson(String jsonPath) {
+		File jsonFile = new File(jsonPath);
+		FileReader fileReader;
+		String jsonStr = "";
+		if(jsonFile.exists()) {
+			try {
+				fileReader = new FileReader(jsonFile);
+				Reader reader = new InputStreamReader(new FileInputStream(jsonFile), "utf-8");
+				int ch = 0;
+				StringBuffer sb = new StringBuffer();
+				while ((ch = reader.read()) != -1) {
+					sb.append((char) ch);
+				}
+				fileReader.close();
+				reader.close();
+				jsonStr = sb.toString();
+			} catch (Exception e) {
+				logger.error("json文件解析失败");
+			}
+			
+		}
+		return jsonStr;
+		
 	}
 }

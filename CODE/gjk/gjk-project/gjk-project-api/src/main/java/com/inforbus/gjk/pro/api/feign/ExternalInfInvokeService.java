@@ -2,6 +2,9 @@ package com.inforbus.gjk.pro.api.feign;
 
 import com.inforbus.gjk.common.core.constant.ServiceNameConstants;
 import com.inforbus.gjk.common.core.util.R;
+
+import flowModel.CheckResult;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -113,5 +116,11 @@ public interface ExternalInfInvokeService {
      */
 	@RequestMapping("/writeBackDeployScheme")
     public void writeBackDeployScheme(@RequestParam("workModeFilePath") String workModeFilePath, @RequestParam("schemeFile") String schemeFile );
-
+	
+	/**
+	 * 流程建模完备性检查
+	 * @param xmlFilepath
+	 */
+	@RequestMapping("/completeCheck")
+	public R<CheckResult> completeCheck(@RequestParam("xmlFilepath") String xmlFilepath);
 }

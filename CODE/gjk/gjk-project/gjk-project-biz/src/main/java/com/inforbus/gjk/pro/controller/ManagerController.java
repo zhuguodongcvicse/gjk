@@ -548,52 +548,7 @@ public class ManagerController {
 	@ResponseBody
 	@PostMapping(path = "/importFile", consumes = { "multipart/mixed", "multipart/form-data" })
 	public R importFile(@RequestParam(value = "file", required = false) MultipartFile file) {
-		if (Objects.isNull(file) || file.isEmpty()) {
-			logger.error("请选中文件导入");
-		}
-		String filename = file.getOriginalFilename();
-		if (!filename.endsWith("zip")) {
-			logger.info("传入文件格式不是zip文件" + filename);
-		}
-		Map<String, Object> retMap = Maps.newHashMap();
-		String zipFileName = "";
-		try {
-			ZipInputStream zipInputStream = new ZipInputStream(file.getInputStream(), Charset.forName("utf-8"));
-			BufferedInputStream bs = new BufferedInputStream(zipInputStream);
-			ByteArrayOutputStream bos = null;
-			ZipEntry zipEntry;
-			String json = "";
-			String xmlData = "";
-			while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-				zipFileName = zipEntry.getName();
-				if (zipFileName.split("\\.")[1].equals("json")) {
-					bos = new ByteArrayOutputStream();
-					int index = 0;
-					byte[] jsonBytes = new byte[1024];
-					while ((index = bs.read(jsonBytes)) != -1) {
-						bos.write(jsonBytes, 0, index);
-					}
-					byte[] strBytes = bos.toByteArray();
-					json = new String(strBytes, 0, strBytes.length, "utf-8");
-					Object jsonStr = JSON.toJavaObject(JSONObject.parseObject(json), Object.class);
-					retMap.put("json", jsonStr);
-				} else {
-					bos = new ByteArrayOutputStream();
-					int bytesRead = 0;
-					byte[] bytes = new byte[1024];
-					while ((bytesRead = bs.read(bytes)) != -1) {
-						bos.write(bytes, 0, bytesRead);
-					}
-					byte[] strByte = bos.toByteArray();
-					// xmlData = new String(strByte,0,strByte .length ,"utf-8" );
-					XmlEntityMap xmlJson = XmlFileHandleUtil.analysisXmlStr(strByte);
-					retMap.put("xmlJson", xmlJson);
-				}
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		Map<String, Object> retMap = managerService.importFile(file);
 		return new R<>(retMap);
 	}
 

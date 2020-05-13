@@ -4,12 +4,14 @@ import java.beans.PropertyDescriptor;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import com.inforbus.gjk.admin.api.entity.*;
@@ -81,6 +83,7 @@ import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
 import com.inforbus.gjk.pro.mapper.PartPlatformSoftwareMapper;
 import com.inforbus.gjk.pro.service.ManagerService;
 
+import feign.Response;
 import flowModel.CheckResult;
 
 /**
@@ -606,6 +609,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @return
 	 * @see com.inforbus.gjk.pro.service.ManagerService#editProJSON(java.lang.String,
 	 *      java.lang.String)
+	 *      20200512修改分布式文件
 	 */
 	@Override
 	public boolean editProJSON(String proDetailId, Object objJson) {
@@ -614,37 +618,17 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		StringBuffer sb = new StringBuffer(proDetailPath);
 		sb.append(map.get("filePath"));
 		String str = "\\流程模型-" + proDetailId + ".json";
-		// 标记文件生成是否成功
-		boolean flag = true;
-		try {
-
-			// 拼接文件完整路径
-			// String fullPath = path + "流程模型-" + proDetailId + ".json";
-			sb.append(str);
-			// 保证创建一个新文件
-			File file = new File(sb.toString());
-			if (!file.getParentFile().exists()) { // 如果父目录不存在，创建父目录
-				file.getParentFile().mkdirs();
-			}
-			if (file.exists()) { // 如果已存在,删除旧文件
-				file.delete();
-			}
-			// String jsonString =
-			// JSON.toJSONString(JSON.toJSONString(objJson),SerializerFeature.PrettyFormat,
-			// SerializerFeature.WriteMapNullValue,
-			// SerializerFeature.WriteDateUseDateFormat);
-			String jsonString = JSON.toJSONString(objJson, SerializerFeature.PrettyFormat,
-					SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat);
-			Writer write = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
-			write.write(jsonString);
-			write.flush();
-			write.close();
+		// 拼接文件完整路径
+		// String fullPath = path + "流程模型-" + proDetailId + ".json";
+		sb.append(str);
+		String jsonString = JSON.toJSONString(objJson, SerializerFeature.PrettyFormat,
+				SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat);
+		StringRef strRef= new StringRef();
+		strRef.setVal(jsonString);
+		boolean flag = dataCenterServiceFeign.editProJSON(strRef, sb.toString()).getData();
+		if(flag) {
 			baseMapper.editProJSON(proDetailId, str);
-		} catch (Exception e) {
-			flag = false;
-			e.printStackTrace();
 		}
-
 		return flag;
 	}
 
@@ -655,6 +639,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @DateTime 2019年5月31日 下午1:57:13
 	 * @param proId
 	 * @return
+	 * 20200512修改分布式文件
 	 */
 	public Map<String, Object> findProJSON(String proId) {
 		Map<String, Object> retMap = Maps.newHashMap();
@@ -662,43 +647,18 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		Map<String, String> map = baseMapper.findProJSON(proId);
 		StringBuffer sb = new StringBuffer(proDetailPath);
 		sb.append(map.get("filePath"));
-		// String gitPath = JGitUtil.getLOCAL_REPO_PATH();
-		// String parentFilePath = map.get("parentFilePath");
-		File file = new File(sb.toString());
-		if (file.exists()) {
-			String str = sb.toString() + map.get("fileName") + ".xml";
-			File file1 = new File(str);
-			if (file1.exists()) {
-				XmlEntityMap xmlJson = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file1);
-				retMap.put("xmlJson", xmlJson);
-				retMap.put("flowFilePath", str);
-			}
-		}
+		String str = sb.toString() + map.get("fileName") + ".xml";
+		XmlEntityMap xmlJson = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(str).getData();
+		retMap.put("xmlJson", xmlJson);
+		retMap.put("flowFilePath", str);
 		if (map.get("jsonPath") == null) {
 			return null;
 		}
-		String jsonStr = "";
-		try {
-			File jsonFile = new File(sb.toString() + map.get("jsonPath"));
-			FileReader fileReader = new FileReader(jsonFile);
-
-			Reader reader = new InputStreamReader(new FileInputStream(jsonFile), "utf-8");
-			int ch = 0;
-			sb = new StringBuffer();
-			while ((ch = reader.read()) != -1) {
-				sb.append((char) ch);
-			}
-			fileReader.close();
-			reader.close();
-			jsonStr = sb.toString();
-			Object json = JSON.toJavaObject(JSONObject.parseObject(jsonStr), Object.class);
-			retMap.put("json", json);
-			return retMap;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-		// return jsonPath;
+		String jsonPath = sb.toString() + map.get("jsonPath");
+		String strJson = dataCenterServiceFeign.findJson(jsonPath).getData();
+		Object json = JSON.toJavaObject(JSONObject.parseObject(strJson), Object.class);
+		retMap.put("json", json);
+		return retMap;
 	}
 
 	/**
@@ -1430,35 +1390,28 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	public void deleteHardwarelibById(String id) {
 		baseMapper.deleteHardwarelibById(id);
 	}
-
+	/**
+	 * 流程建模导出分布式文件修改
+	 * 20200512
+	 */
 	public byte[] exportFile(String id, StringRef sr) {
+		InputStream inputStream = null;
+		byte[] data = null;
 		Map<String, String> map = baseMapper.findProJSON(id);
 		String xmlFilepath = proDetailPath + map.get("filePath") + map.get("fileName") + ".xml";
 		String jsonFilepath = proDetailPath + map.get("filePath") + map.get("jsonPath");
+		String[] filePaths = { xmlFilepath, jsonFilepath };
+		Response respon = dataCenterServiceFeign.downloadStreamFiles(filePaths);
 		sr.setVal(map.get("fileName"));
-		File xmlFile = new File(xmlFilepath);
-		File jsonFile = new File(jsonFilepath);
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		ZipOutputStream zip = new ZipOutputStream(outputStream);
-		ZipEntry zipEntry = null;
-		if (xmlFile.exists() && jsonFile.exists()) {
-			File[] files = { xmlFile, jsonFile };
-			for (int i = 0; i < files.length; i++) {
-				try {
-					BufferedInputStream bis = new BufferedInputStream(new FileInputStream(files[i]));
-					zipEntry = new ZipEntry(files[i].getName());
-					zip.putNextEntry(zipEntry);
-					zip.write(FileUtils.readFileToByteArray(files[i]));
-					IOUtils.closeQuietly(bis);
-					zip.flush();
-					zip.closeEntry();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+		Response.Body body = respon.body();
+		try {
+			inputStream = body.asInputStream();
+			data = IOUtils.toByteArray(inputStream);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		IOUtils.closeQuietly(zip);
-		return outputStream.toByteArray();
+		return data;
 	}
 
 	@Override
@@ -2991,12 +2944,16 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		}
 		return obj;
 	}
-
+	/**
+	 * 完备性检查分布式文件修改
+	 * 20200512
+	 */
 	@Override
 	public R completeCheck(String id, String userId) {
 		Map<String, String> map = baseMapper.findProJSON(id);
 		String xmlFilepath = proDetailPath + map.get("filePath") + map.get("fileName") + ".xml";
-		CheckResult checkResult = ExternalIOTransUtils.completeCheck(xmlFilepath);
+		//CheckResult checkResult = ExternalIOTransUtils.completeCheck(xmlFilepath);
+		CheckResult checkResult = externalInfInvokeService.completeCheck(xmlFilepath).getData();
 		String strLog = checkResult.getM_textConsole();
 		this.rabbitmqTemplate.convertAndSend(userId, "checkLog" + "===@@@===" + strLog);
 		return new R(checkResult);
@@ -3300,5 +3257,56 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, this.getById(projectId).getParentId()));
 		String filePath = processFile.getFilePath();
 		return filePath;
+	}
+	
+	@Override
+	public Map<String, Object> importFile(MultipartFile file) {
+		if (Objects.isNull(file) || file.isEmpty()) {
+			logger.error("请选中文件导入");
+		}
+		String filename = file.getOriginalFilename();
+		if (!filename.endsWith("zip")) {
+			logger.info("传入文件格式不是zip文件" + filename);
+		}
+		Map<String, Object> retMap = Maps.newHashMap();
+		String zipFileName = "";
+		try {
+			ZipInputStream zipInputStream = new ZipInputStream(file.getInputStream(), Charset.forName("utf-8"));
+			BufferedInputStream bs = new BufferedInputStream(zipInputStream);
+			ByteArrayOutputStream bos = null;
+			ZipEntry zipEntry;
+			String json = "";
+			String xmlData = "";
+			while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+				zipFileName = zipEntry.getName();
+				if (zipFileName.split("\\.")[1].equals("json")) {
+					bos = new ByteArrayOutputStream();
+					int index = 0;
+					byte[] jsonBytes = new byte[1024];
+					while ((index = bs.read(jsonBytes)) != -1) {
+						bos.write(jsonBytes, 0, index);
+					}
+					byte[] strBytes = bos.toByteArray();
+					json = new String(strBytes, 0, strBytes.length, "utf-8");
+					Object jsonStr = JSON.toJavaObject(JSONObject.parseObject(json), Object.class);
+					retMap.put("json", jsonStr);
+				} else {
+					bos = new ByteArrayOutputStream();
+					int bytesRead = 0;
+					byte[] bytes = new byte[1024];
+					while ((bytesRead = bs.read(bytes)) != -1) {
+						bos.write(bytes, 0, bytesRead);
+					}
+					byte[] strByte = bos.toByteArray();
+					// xmlData = new String(strByte,0,strByte .length ,"utf-8" );
+					XmlEntityMap xmlJson = XmlFileHandleUtil.analysisXmlStr(strByte);
+					retMap.put("xmlJson", xmlJson);
+				}
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return retMap;
 	}
 }

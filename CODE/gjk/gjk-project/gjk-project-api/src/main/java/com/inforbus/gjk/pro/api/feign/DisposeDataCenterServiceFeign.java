@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.inforbus.gjk.common.core.constant.ServiceNameConstants;
+import com.inforbus.gjk.common.core.entity.StringRef;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
@@ -95,7 +96,7 @@ public interface DisposeDataCenterServiceFeign {
 		 * 
 		 *         </pre>
 		 */
-		@PostMapping(value = serviceName + "/downloadStreamFiles", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+		@PostMapping(value = "/downloadStreamFiles", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 		public Response downloadStreamFiles(@RequestParam("filePaths") String[] filePaths);
 
 	/**
@@ -159,4 +160,18 @@ public interface DisposeDataCenterServiceFeign {
 	 */
 	@PostMapping("/getAppPath")
 	R getAppPath(@RequestParam("filePath") String filePath, @RequestParam("selectFileName") String selectFileName);
+	/**
+	 * 流程建模生成json文件
+	 * @param jsonString
+	 * @param filePath
+	 * @return
+	 */
+	@PostMapping(value = "/editProJSON")
+	public R<Boolean> editProJSON(@RequestBody StringRef strRef, @RequestParam("filePath") String filePath);
+	/**
+	 * 获取流程建模json文件
+	 * @param jsonPath
+	 */
+	@PostMapping(value = "/findJson")
+	public R<String> findJson(@RequestParam("jsonPath")String jsonPath);
 }

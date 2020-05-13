@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.inforbus.gjk.common.core.entity.StringRef;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
@@ -217,4 +218,17 @@ public interface FileService {
 	 * @throws IOException
 	 */
 	String getAppPath(String filePath, String selectFileName) throws IOException;
+	
+	/**
+	 * 保存流程建模json文件
+	 * @param strRef
+	 * @param filePath
+	 */
+	public void editProJSON(StringRef strRef, String filePath);
+	/**
+	 * 解析流程建模json文件
+	 * @param jsonPath
+	 * @return
+	 */
+	public String findJson(String jsonPath);
 }

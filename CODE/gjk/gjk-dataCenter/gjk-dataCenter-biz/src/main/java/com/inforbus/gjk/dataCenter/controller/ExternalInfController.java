@@ -20,6 +20,7 @@ import com.inforbus.gjk.common.core.util.vo.HeaderFileTransVO;
 import com.inforbus.gjk.dataCenter.service.ExternalInfService;
 
 import flowModel.BackNodeInfoForSpb;
+import flowModel.CheckResult;
 import flowModel.SimpleScheme;
 
 /**
@@ -205,5 +206,22 @@ public class ExternalInfController {
 	@PostMapping("/parseStruct")
 	public R<?> parseStruct(@RequestParam("filePath") String filePath) {
 		return new R<>(externalInfService.parseStruct(filePath));
+	}
+	
+	/**
+	 * 完备性检查
+	 * @param xmlFilepath 流程模型文件路径
+	 * @return
+	 */
+	@RequestMapping("/completeCheck")
+	public R<CheckResult> completeCheck(@RequestParam("xmlFilepath") String xmlFilepath){
+		R<CheckResult> r = new R();
+		try {
+			CheckResult cr = externalInfService.completeCheck(xmlFilepath);
+			r.setData(cr);
+		} catch (Exception e) {
+			logger.error("完备性检查completeCheck接口调用失败");
+		}
+		return r;
 	}
 }
