@@ -14,6 +14,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.inforbus.gjk.common.core.constant.ComponentConstant;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.comp.api.dto.ComponentDTO;
 import com.inforbus.gjk.comp.api.dto.ComponentInput;
@@ -35,7 +36,7 @@ public class XmlAnalysisUtil {
 		try {
 			String path = comp.getFileName();
 			File file = null;
-			if (path.startsWith("Component") && path.toUpperCase().endsWith(".XML")) {
+			if (path.startsWith(ComponentConstant.COMP) && path.toUpperCase().endsWith(ComponentConstant.COMP_XML)) {
 				file = new File(JGitUtil.getLOCAL_REPO_PATH() + "/" + comp.getFilePath() + "/" + path);
 			}
 
