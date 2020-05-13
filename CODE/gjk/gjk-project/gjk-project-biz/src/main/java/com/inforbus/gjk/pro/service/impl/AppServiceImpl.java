@@ -304,9 +304,6 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		}
 		try {
 			// 调用加载、更新加载接口
-//			returnVal = ExternalIOTransUtils.appLoad(cmpNameToHwType, appDataDTO.getUserName(), appDataDTO.getFlowId(),
-//					appDataDTO.getAppName(), existDeployConfig, proDetailPath + appDataDTO.getSysconfigPath(),
-//					proDetailPath + appDataDTO.getAppProPath());
 			returnVal = externalInfInvokeService.appLoad(cmpNameToHwType, appDataDTO.getUserName(),
 					appDataDTO.getFlowId(), appDataDTO.getAppName(), existDeployConfig,
 					proDetailPath + appDataDTO.getSysconfigPath(), proDetailPath + appDataDTO.getAppProPath());
@@ -435,8 +432,6 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		boolean returnVal;
 		try {
 			// 调用注销接口
-//			returnVal = ExternalIOTransUtils.appUnInstall(cmpNameToHwType, appDataDTO.getUserName(),
-//					appDataDTO.getFlowId(), appDataDTO.getAppName(), selfSoftToHardResult);
 			returnVal = externalInfInvokeService.appUnInstall(cmpNameToHwType, appDataDTO.getUserName(),
 					appDataDTO.getFlowId(), appDataDTO.getAppName(), selfSoftToHardResult);
 		} catch (Exception e) {
@@ -472,8 +467,6 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 				boolean returnVal;
 				try {
 					// 调用注销接口
-//					ExternalIOTransUtils.appTaskExport(appDataDTO.getUserName(), appDataDTO.getFlowId(), appDataDTO.getAppName(),
-//							appPath, proDetailPath + appDataDTO.getSysconfigPath(), selfSoftToHardResult, selfGenerateCodeResult);
 			externalInfInvokeService.appTaskExport(appDataDTO.getUserName(), appDataDTO.getFlowId(),
 					appDataDTO.getAppName(), appPath, proDetailPath + appDataDTO.getSysconfigPath(),
 					selfSoftToHardResult, selfGenerateCodeResult);
