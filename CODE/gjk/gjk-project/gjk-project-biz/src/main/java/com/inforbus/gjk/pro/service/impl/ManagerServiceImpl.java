@@ -614,7 +614,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 */
 	@Override
 	public boolean editProJSON(String proDetailId, Object objJson) {
-		// String path = JGitUtil.getLOCAL_REPO_PATH();
 		Map<String, String> map = baseMapper.findProJSON(proDetailId);
 		StringBuffer sb = new StringBuffer(proDetailPath);
 		sb.append(map.get("filePath"));

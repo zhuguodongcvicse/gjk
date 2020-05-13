@@ -169,4 +169,5 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
 		r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
 		return r;
 	}
+	
 }

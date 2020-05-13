@@ -292,6 +292,7 @@ public class ManagerController {
 	@RequestMapping("/createThemeXML/{proDetailId}/{name}")
 	public R createThemeXML(@RequestBody XmlEntityMap entity, @PathVariable("proDetailId") String proDetailId,
 			@PathVariable("name") String name) {
+		
 		return new R<>(managerService.createThemeXML(entity, proDetailId, name));
 	}
 
