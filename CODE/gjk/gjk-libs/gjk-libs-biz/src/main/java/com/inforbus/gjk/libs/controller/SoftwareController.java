@@ -1,19 +1,4 @@
-/*
- *    Copyright (c) 2018-2025, inforbus All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- * Neither the name of the inforbus.com developer nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- * Author: inforbus
- */
+
 package com.inforbus.gjk.libs.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -22,7 +7,6 @@ import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.TreeUtil;
 import com.inforbus.gjk.common.log.annotation.SysLog;
 import com.inforbus.gjk.libs.api.dto.SoftwareDTO;
-import com.inforbus.gjk.libs.api.entity.BSP;
 import com.inforbus.gjk.libs.api.entity.Software;
 import com.inforbus.gjk.libs.api.entity.SoftwareDetail;
 import com.inforbus.gjk.libs.api.entity.SoftwareFile;
@@ -170,16 +154,34 @@ public class SoftwareController {
 		return new R<>(softwareService.setVersionSize());
 	}
 
+	/**
+	 * 上传文件
+	 * 
+	 * @param files 文件流
+	 * @param versionDisc 版本号
+	 * @param userName 用户名
+	 * @return
+	 */
 	@PostMapping("/uploadFiles/{versionDisc}/{userName}")
-	public String uploadFiles(@RequestParam(value = "file") MultipartFile[] files, @PathVariable String versionDisc, @PathVariable String userName) {
+	public String uploadFiles(@RequestParam(value = "files") MultipartFile files, @PathVariable String versionDisc, @PathVariable String userName) {
 		return softwareService.uploadFiles(files, versionDisc, userName);
 	}
 
+	/**
+	 * 获取软件框架的树
+	 * 
+	 * @return
+	 */
 	@GetMapping("/getSoftwareTree")
 	public R getSoftwareTree() {
 		return new R<>(softwareService.getSoftwareTree());
 	}
 
+	/**
+	 * 获取id软件框架的树
+	 * 
+	 * @return
+	 */
 	@GetMapping("/getTreeById/{id}")
 	public R getTreeById(@PathVariable("id") String id) {
 		return new R<>(TreeUtil.buildByLoop(softwareService.getTreeById(id), "-1"));

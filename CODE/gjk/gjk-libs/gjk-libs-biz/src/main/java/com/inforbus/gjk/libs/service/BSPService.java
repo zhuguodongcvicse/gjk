@@ -86,7 +86,7 @@ public interface BSPService extends IService<BSP> {
 	 * @Description:
 	 * @Author cvicse
 	 * @DateTime 2019年6月14日 下午4:50:03
-	 * @param BSPFile
+	 * @param BSPFile bsp的文件路径
 	 * @return
 	 */
 	BSPFile saveBSPFile(@Param("bsptFile") BSPFile bspFile);
@@ -94,7 +94,6 @@ public interface BSPService extends IService<BSP> {
 	/**
 	 * 根据选择的平台文件对版本进行赋值
 	 */
-//  List<Software> setVersionSize( String platformId);
 	BSP setVersionSize();
 
 	/**
@@ -142,8 +141,9 @@ public interface BSPService extends IService<BSP> {
 	/**
 	 * 文件上传
 	 * 
-	 * @param files
-	 * @param versionDisc
+	 * @param files 文件夹流
+	 * @param versionDisc 版本号
+	 * * @param userName 用户名
 	 * @return
 	 */
 	String uploadFiles(MultipartFile files, @PathVariable String versionDisc, @PathVariable String userName);
