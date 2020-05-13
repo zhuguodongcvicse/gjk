@@ -51,6 +51,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -170,6 +171,9 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 		if (app != null) {
 			String appPath = proDetailPath + app.getFilePath() + File.separator + app.getFileName();
 			List tree = appSubassemblyServiceFeign.createAppTree(appPath, processId).getData();
+			if (tree == null) {
+				return Collections.emptyList();
+			}
 			return tree;
 		} else {
 			return Lists.newArrayList();
