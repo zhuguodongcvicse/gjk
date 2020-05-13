@@ -74,6 +74,7 @@ import com.inforbus.gjk.pro.api.entity.PartPlatformSoftware;
 import com.inforbus.gjk.pro.api.entity.Project;
 import com.inforbus.gjk.pro.api.entity.ProjectFile;
 import com.inforbus.gjk.pro.api.entity.ProjectPlan;
+import com.inforbus.gjk.pro.api.util.Constant;
 import com.inforbus.gjk.pro.api.util.LinuxUtil;
 import com.inforbus.gjk.pro.api.util.MakeFileUtil;
 import com.inforbus.gjk.pro.api.util.ProcedureXmlAnalysis;
@@ -1085,7 +1086,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String flowFilePath = "";
 		List<ProjectFile> ProjectFileList = baseMapper.getFilePathListById(proDetailId);
 		for (ProjectFile proFile : ProjectFileList) {
-			if (proFile.getFileType().equals("11")) {
+			if (proFile.getFileType().equals(Constant.flowType)) {
 				flowFilePath = proDetailPath + proFile.getFilePath() + proFile.getFileName() + ".xml";
 			}
 		}
@@ -1097,12 +1098,12 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 //		ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName,
 //				newFilePath + "UserDefineTopicFile.xml");
 		boolean bo = externalInfInvokeService
-				.createUserDefineTopic(flowFilePath, filePath + fileName, newFilePath + "UserDefineTopicFile.xml")
+				.createUserDefineTopic(flowFilePath, filePath + fileName, newFilePath + Constant.newFileName)
 				.getData();
 		if (bo) {
-			File topicFile = new File(newFilePath + "UserDefineTopicFile.xml");
+			File topicFile = new File(newFilePath + Constant.newFileName);
 			if (topicFile.exists()) {
-				baseMapper.saveNewFilePath(newFilePath + "UserDefineTopicFile.xml", proDetailId);
+				baseMapper.saveNewFilePath(newFilePath + Constant.newFileName, proDetailId);
 			} else {
 				logger.error("UserDefineTopicFile.xml不存在");
 			}
@@ -1671,7 +1672,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			List<Part> partList1 = ProcedureXmlAnalysis.getPartList(xmlMap);
 			partList.addAll(partList1);
 		}
-		String themePath = path + "自定义配置__主题配置.xml";
+		String themePath = path + Constant.themeName;
 		File themeFile = new File(themePath);
 		XmlEntityMap themeData = null;
 		XmlEntityMap netWorkData = null;
@@ -1681,7 +1682,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			// themeData = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(themeFile);
 			themeData = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(themePath).getData();
 		}
-		String netWorkPath = path + "自定义配置__网络配置.xml";
+		String netWorkPath = path + Constant.netWorkName;
 		File netWorkFile = new File(netWorkPath);
 		if (!netWorkFile.exists()) {
 			netWorkData = this.getXmlEntityMap(baseTemplateIDsDTO.getNetworkTempId());
