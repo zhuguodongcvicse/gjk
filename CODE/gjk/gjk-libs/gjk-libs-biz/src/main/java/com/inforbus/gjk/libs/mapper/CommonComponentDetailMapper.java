@@ -56,4 +56,11 @@ public interface CommonComponentDetailMapper extends BaseMapper<CommonComponentD
 	 * @return
 	 */
 	List<CommonComponentDetail> getAllCompDetailByCompId(@Param("compList") List<CommonComponent> compList);
+
+	/**
+	 * 根据多个ID查询gjk_CommonComponent_Detail表数据
+	 * @param ids
+	 * @return
+	 */
+	List<CommonComponentDetail> getCommonComponentDetailByCompIdIn(@Param("ids") String ids);
 }

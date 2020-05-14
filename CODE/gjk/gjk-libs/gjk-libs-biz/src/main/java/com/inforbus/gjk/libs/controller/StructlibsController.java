@@ -19,6 +19,7 @@ package com.inforbus.gjk.libs.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 //import com.inforbus.gjk.admin.api.vo.TreeUtil;
+import com.inforbus.gjk.common.core.constant.CommonConstants;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.vo.ParamTreeVO;
 import com.inforbus.gjk.common.log.annotation.SysLog;
@@ -28,6 +29,7 @@ import com.inforbus.gjk.libs.api.vo.TreeUtil;
 import com.inforbus.gjk.libs.service.StructlibsService;
 import lombok.AllArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
@@ -189,5 +191,28 @@ public class StructlibsController {
 	@RequestMapping("/findAllStructs")
 	public R findAllStructs(){
 		return structlibsService.findAllStructs();
+	}
+
+	/**
+	 * @Author wang
+	 * @Description: 根据多个id查询结构体数据
+	 * @Param: [idList]
+	 * @Return: com.inforbus.gjk.common.core.util.R<java.util.List<com.inforbus.gjk.common.core.entity.Structlibs>>
+	 * @Create: 2020/5/13
+	 */
+	@PostMapping("/getStructlibsByIdList")
+	public R<List<Structlibs>> getStructlibsByIdList(@RequestBody List<String> idList){
+		R<List<Structlibs>> r = new R<>();
+		try {
+			List<Structlibs> list = structlibsService.getStructlibsByIdList(idList);
+			r.setData(list);
+			r.setMsg("查询成功");
+		}catch (Exception e){
+			r.setData(null);
+			r.setMsg("查询失败");
+			r.setCode(CommonConstants.FAIL);
+		}
+		return r;
+
 	}
 }

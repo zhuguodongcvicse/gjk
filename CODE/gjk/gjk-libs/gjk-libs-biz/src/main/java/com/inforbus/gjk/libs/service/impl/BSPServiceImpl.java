@@ -247,4 +247,16 @@ public class BSPServiceImpl extends ServiceImpl<BSPMapper, BSP> implements BSPSe
 		rdcService.delAllFile(folderPath);
 	}
 
+	/**
+	 * @Author wang
+	 * @Description: 根据多个id查询bsp数据
+	 * @Param: [ids]
+	 * @Return: java.util.List<com.inforbus.gjk.libs.api.entity.BSP>
+	 * @Create: 2020/5/12
+	 */
+    @Override
+    public List<BSP> getAllBSPListByIdIn(String ids) {
+        return baseMapper.getAllBSPListByIdIn(ids);
+    }
+
 }

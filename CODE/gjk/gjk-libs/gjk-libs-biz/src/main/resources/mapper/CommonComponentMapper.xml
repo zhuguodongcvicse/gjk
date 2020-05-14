@@ -263,4 +263,10 @@
 
 	</select>
 
+	<!-- 根据多个id查询构件库数据 -->
+	<select id="getCommonComponentByIdIn" resultMap="commonComponentMap">
+		SELECT * FROM gjk_common_component
+		WHERE id IN (${ids})
+	</select>
+
 </mapper>

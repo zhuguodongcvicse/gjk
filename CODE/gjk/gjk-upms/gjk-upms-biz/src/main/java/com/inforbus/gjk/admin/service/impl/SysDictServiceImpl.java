@@ -99,4 +99,16 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 		return sysDictMapper.getDictsByTypeAndRemarks(dictVO);
 	}
 
+	/**
+	 * @Author wang
+	 * @Description: 根据remarks查找字典数据
+	 * @Param: [remarks]
+	 * @Return: java.util.List<com.inforbus.gjk.admin.api.entity.SysDict>
+	 * @Create: 2020/5/13
+	 */
+	@Override
+	public List<SysDict> getSysDictByRemarksIn(List<String> remarksList) {
+		return baseMapper.getSysDictByRemarksIn(remarksList);
+	}
+
 }

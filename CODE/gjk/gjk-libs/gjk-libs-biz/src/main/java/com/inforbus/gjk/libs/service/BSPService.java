@@ -153,4 +153,11 @@ public interface BSPService extends IService<BSP> {
 	 * @param filePath
 	 */
 	void deleteFolderByFilePath(String filePath);
+
+	/**
+	 * 根据多个ID查询数据列表
+	 * @param ids
+	 * @return
+	 */
+	List<BSP> getAllBSPListByIdIn(String ids);
 }

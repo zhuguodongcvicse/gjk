@@ -152,4 +152,10 @@ public interface SoftwareService extends IService<Software> {
 	 * @param filePath
 	 */
 	void deleteFolderByFilePath(String filePath);
+
+	/**
+	 * 根据多个ID查询数据列表
+	 * @param ids
+	 */
+	List<Software> getAllSoftwareListByIdIn(String ids);
 }

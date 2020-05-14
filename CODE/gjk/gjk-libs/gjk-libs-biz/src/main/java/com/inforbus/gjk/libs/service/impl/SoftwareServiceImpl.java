@@ -243,4 +243,16 @@ public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> i
 		rdcService.delAllFile(folderPath);
 	}
 
+	/**
+	 * @Author wang
+	 * @Description: 根据多个ID查询数据列表
+	 * @Param: [ids] id字符串每个id间以“，”分隔
+	 * @Return: java.util.List<com.inforbus.gjk.libs.api.entity.Software>
+	 * @Create: 2020/5/11
+	 */
+	@Override
+	public List<Software> getAllSoftwareListByIdIn(String ids) {
+		return baseMapper.getAllSoftwareListByIdIn(ids);
+	}
+
 }

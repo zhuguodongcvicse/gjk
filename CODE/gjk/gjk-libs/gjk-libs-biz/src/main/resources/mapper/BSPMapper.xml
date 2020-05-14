@@ -157,7 +157,15 @@
 		b
 		ORDER BY b.`version` DESC LIMIT 1
 	</select>
-	
+
+	<!--根据多个ID查询数据列表-->
+	<select id="getAllBSPListByIdIn" resultMap="BSPMap">
+		SELECT *
+		FROM gjk_bsp as gs
+		where gs.id in (${ids})  and del_flag != '1'
+		order by gs.bsp_name desc,gs.version desc
+	</select>
+
 	<!-- 根据id级联删除bsp文件表 -->
 	<delete id="removeBspFile">
 		DELETE FROM gjk_bsp_file WHERE bsp_id = #{bspId}
@@ -167,5 +175,6 @@
 	<delete id="removeBspDetail">
 		DELETE FROM gjk_bsp_detail WHERE bsp_id = #{bspId}
 	</delete>
+
 
 </mapper>

@@ -26,6 +26,8 @@ import com.inforbus.gjk.libs.api.entity.SoftwareFile;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 软件框架库表
  *
@@ -97,4 +99,10 @@ public interface SoftwareMapper extends BaseMapper<Software> {
    * @param softwareId
    */
   void removeSoftwareDetail(@Param("softwareId") String softwareId);
+
+  /**
+   * 根据多个ID查询数据列表
+   * @param ids
+   */
+  List<Software> getAllSoftwareListByIdIn(@Param("ids") String ids);
 }

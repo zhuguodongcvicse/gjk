@@ -617,4 +617,16 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		return removeCompIdList;
 	}
 
+	/**
+	 * @Author wang
+	 * @Description: 根据多个id查询构件库数据
+	 * @Param: [ids]
+	 * @Return: java.util.List<com.inforbus.gjk.libs.api.entity.CommonComponent>
+	 * @Create: 2020/5/12
+	 */
+	@Override
+	public List<CommonComponent> getCommonComponentByIdIn(String ids) {
+		return baseMapper.getCommonComponentByIdIn(ids);
+	}
+
 }

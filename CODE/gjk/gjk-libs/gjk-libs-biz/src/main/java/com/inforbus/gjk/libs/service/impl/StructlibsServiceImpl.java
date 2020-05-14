@@ -416,4 +416,16 @@ public class StructlibsServiceImpl extends ServiceImpl<StructlibsMapper, Structl
 		return new R<>(baseMapper.findAllStructs());
 	}
 
+	/**
+	 * @Author wang
+	 * @Description: 根据多个id查询结构体数据
+	 * @Param: [idList]
+	 * @Return: java.util.List<com.inforbus.gjk.common.core.entity.Structlibs>
+	 * @Create: 2020/5/13
+	 */
+	@Override
+	public List<Structlibs> getStructlibsByIdList(List<String> idList) {
+		return baseMapper.getStructlibsByIdList(idList);
+	}
+
 }

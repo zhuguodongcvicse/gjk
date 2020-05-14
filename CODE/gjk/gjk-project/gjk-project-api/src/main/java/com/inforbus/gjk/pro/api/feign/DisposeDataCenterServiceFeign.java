@@ -18,12 +18,7 @@ import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.inforbus.gjk.common.core.constant.ServiceNameConstants;
@@ -160,6 +155,22 @@ public interface DisposeDataCenterServiceFeign {
 	 */
 	@PostMapping("/getAppPath")
 	R getAppPath(@RequestParam("filePath") String filePath, @RequestParam("selectFileName") String selectFileName);
+
+	/**
+	 * @Title: downloadFile
+	 * @Desc 下载多文件返回流
+	 * @Author xiaohe
+	 * @DateTime 2020年4月15日
+	 * @param ufile      上传的文件
+	 * @param fileTarget 文件的文件相对存储路径
+	 * @param filePaths  文件全路径 maps JOSN
+	 *
+	 */
+	@ResponseBody
+	@PostMapping(value = "/downloadStreamFilesTarget", produces = {
+			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public Response downloadFile(@RequestPart("file") MultipartFile[] ufile,
+							 @RequestParam("fileTarget") String[] fileTarget, @RequestParam("filePaths") String filePaths);
 	/**
 	 * 流程建模生成json文件
 	 * @param jsonString
@@ -168,7 +179,7 @@ public interface DisposeDataCenterServiceFeign {
 	 */
 	@PostMapping(value = "/editProJSON")
 	public R<Boolean> editProJSON(@RequestBody StringRef strRef, @RequestParam("filePath") String filePath);
-	
+
 	/**
 	 * 获取流程建模json文件
 	 * @param jsonPath

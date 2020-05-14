@@ -126,4 +126,11 @@ public interface CommonComponentMapper extends BaseMapper<CommonComponent> {
 	 * @return
 	 */
 	List<CompStruct> getCompStructByCompIdList(@Param("compIdList") List<String> compIdList);
+
+	/**
+	 * 根据多个ID查询数据列表 结构库
+	 * @param ids
+	 * @return
+	 */
+	List<CommonComponent> getCommonComponentByIdIn(@Param("ids") String ids);
 }

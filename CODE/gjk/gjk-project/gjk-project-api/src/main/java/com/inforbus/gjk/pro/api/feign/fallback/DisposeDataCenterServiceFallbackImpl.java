@@ -151,6 +151,24 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
         return r;
     }
 
+    /**
+     * @Title: downloadFile
+     * @Desc 下载多文件返回流
+     * @Author xiaohe
+     * @DateTime 2020年4月15日
+     * @param ufile      上传的文件
+     * @param fileTarget 文件的文件相对存储路径
+     * @param filePaths  文件全路径 maps JOSN
+     */
+    @Override
+    public Response downloadFile(MultipartFile[] ufile, String[] fileTarget, String filePaths) {
+        log.error("调用数据中心的feign接口downloadFile方法失败", cause);
+        R r = new R();
+        r.setCode(CommonConstants.FAIL);
+        r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
+        return null;
+    }
+
 	@Override
 	public R<Boolean> editProJSON(@RequestBody StringRef strRef, @RequestParam("filePath")String filePath) {
 		log.error("调用数据中心的feign接口editProJSON方法失败", cause);
@@ -158,7 +176,7 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
         r.setCode(CommonConstants.FAIL);
         r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
         return r;
-		
+
 	}
 
 	@Override
@@ -169,5 +187,5 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
 		r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
 		return r;
 	}
-	
+
 }

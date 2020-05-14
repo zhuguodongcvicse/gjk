@@ -3,20 +3,19 @@ package com.inforbus.gjk.pro.service.impl;
 import java.beans.PropertyDescriptor;
 import java.io.*;
 import java.lang.reflect.Method;
-import java.net.URI;
-import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import cn.hutool.json.JSONUtil;
 import com.inforbus.gjk.admin.api.entity.*;
-import com.inforbus.gjk.common.core.constant.DeploymentConstants;
+import com.inforbus.gjk.common.core.constant.*;
 import com.inforbus.gjk.common.core.entity.*;
+import com.inforbus.gjk.common.core.util.*;
 import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 import com.inforbus.gjk.pro.api.dto.AppDataDTO;
 import com.inforbus.gjk.pro.api.dto.BaseTemplateIDsDTO;
@@ -24,11 +23,16 @@ import com.inforbus.gjk.pro.api.dto.CopySoftwareAndBspDTO;
 import com.inforbus.gjk.pro.api.dto.ModifyAssemblyDirDTO;
 import com.inforbus.gjk.pro.api.entity.*;
 
+import com.inforbus.gjk.pro.api.entity.BSP;
+import com.inforbus.gjk.pro.api.entity.BSPDetail;
 import com.inforbus.gjk.pro.api.entity.GjkPlatform;
 import com.inforbus.gjk.pro.api.entity.Software;
+import com.inforbus.gjk.pro.api.entity.SoftwareDetail;
 import com.inforbus.gjk.pro.api.feign.*;
 import com.inforbus.gjk.pro.mapper.*;
 import com.inforbus.gjk.pro.service.BaseTemplateService;
+import feign.Response;
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -53,16 +57,10 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.inforbus.gjk.common.core.constant.CommonConstants;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
-import com.inforbus.gjk.common.core.util.ExternalIOTransUtils;
-import com.inforbus.gjk.common.core.util.FileUtil;
-import com.inforbus.gjk.common.core.util.R;
-import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
 import com.inforbus.gjk.pro.api.entity.App;
 import com.inforbus.gjk.pro.api.entity.Chipsfromhardwarelibs;
-import com.inforbus.gjk.pro.api.entity.Component;
 import com.inforbus.gjk.pro.api.entity.DeploymentNode;
 import com.inforbus.gjk.pro.api.entity.DeploymentPart;
 import com.inforbus.gjk.pro.api.entity.DeploymentXMLMap;
@@ -74,18 +72,13 @@ import com.inforbus.gjk.pro.api.entity.PartPlatformSoftware;
 import com.inforbus.gjk.pro.api.entity.Project;
 import com.inforbus.gjk.pro.api.entity.ProjectFile;
 import com.inforbus.gjk.pro.api.entity.ProjectPlan;
-import com.inforbus.gjk.pro.api.util.Constant;
-import com.inforbus.gjk.pro.api.util.LinuxUtil;
-import com.inforbus.gjk.pro.api.util.MakeFileUtil;
 import com.inforbus.gjk.pro.api.util.ProcedureXmlAnalysis;
-import com.inforbus.gjk.pro.api.util.SylixosUtil;
-import com.inforbus.gjk.pro.api.util.WorkbenchUtil;
 import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
 import com.inforbus.gjk.pro.mapper.PartPlatformSoftwareMapper;
 import com.inforbus.gjk.pro.service.ManagerService;
 
-import feign.Response;
 import flowModel.CheckResult;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 /**
  * @ClassName: ManagerServiceImpl 项目管理实现类
@@ -120,6 +113,24 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 	@Autowired
 	private RemoteCodeGenerationService remoteCodeGenerationService;
+	@Autowired
+	private RemoteSoftwareService remoteSoftwareService;
+	@Autowired
+	private RemoteSoftwareDetailService remoteSoftwareDetailService;
+	@Autowired
+	private RemoteBSPService remoteBSPService;
+	@Autowired
+	private RemoteBSPDetailService remoteBSPDetailService;
+	@Autowired
+	private RemoteCommonComponentService remoteCommonComponentService;
+	@Autowired
+	private RemoteCommonComponentDetailService remoteCommonComponentDetailService;
+	@Autowired
+	private RemoteCompStructService remoteCompStructService;
+	@Autowired
+	private RemoteStructService remoteStructService;
+	@Autowired
+	private RemoteSysDictService remoteSysDictService;
 	@Value("${git.local.path}")
 	private String proDetailPath;
 	@Value("${integer.code.file.name}")
@@ -610,25 +621,45 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @return
 	 * @see com.inforbus.gjk.pro.service.ManagerService#editProJSON(java.lang.String,
 	 *      java.lang.String)
-	 *      20200512修改分布式文件
 	 */
 	@Override
 	public boolean editProJSON(String proDetailId, Object objJson) {
+		// String path = JGitUtil.getLOCAL_REPO_PATH();
 		Map<String, String> map = baseMapper.findProJSON(proDetailId);
 		StringBuffer sb = new StringBuffer(proDetailPath);
 		sb.append(map.get("filePath"));
 		String str = "\\流程模型-" + proDetailId + ".json";
-		// 拼接文件完整路径
-		// String fullPath = path + "流程模型-" + proDetailId + ".json";
-		sb.append(str);
-		String jsonString = JSON.toJSONString(objJson, SerializerFeature.PrettyFormat,
-				SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat);
-		StringRef strRef= new StringRef();
-		strRef.setVal(jsonString);
-		boolean flag = dataCenterServiceFeign.editProJSON(strRef, sb.toString()).getData();
-		if(flag) {
+		// 标记文件生成是否成功
+		boolean flag = true;
+		try {
+
+			// 拼接文件完整路径
+			// String fullPath = path + "流程模型-" + proDetailId + ".json";
+			sb.append(str);
+			// 保证创建一个新文件
+			File file = new File(sb.toString());
+			if (!file.getParentFile().exists()) { // 如果父目录不存在，创建父目录
+				file.getParentFile().mkdirs();
+			}
+			if (file.exists()) { // 如果已存在,删除旧文件
+				file.delete();
+			}
+			// String jsonString =
+			// JSON.toJSONString(JSON.toJSONString(objJson),SerializerFeature.PrettyFormat,
+			// SerializerFeature.WriteMapNullValue,
+			// SerializerFeature.WriteDateUseDateFormat);
+			String jsonString = JSON.toJSONString(objJson, SerializerFeature.PrettyFormat,
+					SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat);
+			Writer write = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+			write.write(jsonString);
+			write.flush();
+			write.close();
 			baseMapper.editProJSON(proDetailId, str);
+		} catch (Exception e) {
+			flag = false;
+			e.printStackTrace();
 		}
+
 		return flag;
 	}
 
@@ -639,7 +670,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @DateTime 2019年5月31日 下午1:57:13
 	 * @param proId
 	 * @return
-	 * 20200512修改分布式文件
 	 */
 	public Map<String, Object> findProJSON(String proId) {
 		Map<String, Object> retMap = Maps.newHashMap();
@@ -647,18 +677,43 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		Map<String, String> map = baseMapper.findProJSON(proId);
 		StringBuffer sb = new StringBuffer(proDetailPath);
 		sb.append(map.get("filePath"));
-		String str = sb.toString() + map.get("fileName") + ".xml";
-		XmlEntityMap xmlJson = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(str).getData();
-		retMap.put("xmlJson", xmlJson);
-		retMap.put("flowFilePath", str);
+		// String gitPath = JGitUtil.getLOCAL_REPO_PATH();
+		// String parentFilePath = map.get("parentFilePath");
+		File file = new File(sb.toString());
+		if (file.exists()) {
+			String str = sb.toString() + map.get("fileName") + ".xml";
+			File file1 = new File(str);
+			if (file1.exists()) {
+				XmlEntityMap xmlJson = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file1);
+				retMap.put("xmlJson", xmlJson);
+				retMap.put("flowFilePath", str);
+			}
+		}
 		if (map.get("jsonPath") == null) {
 			return null;
 		}
-		String jsonPath = sb.toString() + map.get("jsonPath");
-		String strJson = dataCenterServiceFeign.findJson(jsonPath).getData();
-		Object json = JSON.toJavaObject(JSONObject.parseObject(strJson), Object.class);
-		retMap.put("json", json);
-		return retMap;
+		String jsonStr = "";
+		try {
+			File jsonFile = new File(sb.toString() + map.get("jsonPath"));
+			FileReader fileReader = new FileReader(jsonFile);
+
+			Reader reader = new InputStreamReader(new FileInputStream(jsonFile), "utf-8");
+			int ch = 0;
+			sb = new StringBuffer();
+			while ((ch = reader.read()) != -1) {
+				sb.append((char) ch);
+			}
+			fileReader.close();
+			reader.close();
+			jsonStr = sb.toString();
+			Object json = JSON.toJavaObject(JSONObject.parseObject(jsonStr), Object.class);
+			retMap.put("json", json);
+			return retMap;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		// return jsonPath;
 	}
 
 	/**
@@ -1085,7 +1140,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String flowFilePath = "";
 		List<ProjectFile> ProjectFileList = baseMapper.getFilePathListById(proDetailId);
 		for (ProjectFile proFile : ProjectFileList) {
-			if (proFile.getFileType().equals(Constant.flowType)) {
+			if (proFile.getFileType().equals("11")) {
 				flowFilePath = proDetailPath + proFile.getFilePath() + proFile.getFileName() + ".xml";
 			}
 		}
@@ -1097,12 +1152,12 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 //		ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName,
 //				newFilePath + "UserDefineTopicFile.xml");
 		boolean bo = externalInfInvokeService
-				.createUserDefineTopic(flowFilePath, filePath + fileName, newFilePath + Constant.newFileName)
+				.createUserDefineTopic(flowFilePath, filePath + fileName, newFilePath + "UserDefineTopicFile.xml")
 				.getData();
 		if (bo) {
-			File topicFile = new File(newFilePath + Constant.newFileName);
+			File topicFile = new File(newFilePath + "UserDefineTopicFile.xml");
 			if (topicFile.exists()) {
-				baseMapper.saveNewFilePath(newFilePath + Constant.newFileName, proDetailId);
+				baseMapper.saveNewFilePath(newFilePath + "UserDefineTopicFile.xml", proDetailId);
 			} else {
 				logger.error("UserDefineTopicFile.xml不存在");
 			}
@@ -1390,28 +1445,35 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	public void deleteHardwarelibById(String id) {
 		baseMapper.deleteHardwarelibById(id);
 	}
-	/**
-	 * 流程建模导出分布式文件修改
-	 * 20200512
-	 */
+
 	public byte[] exportFile(String id, StringRef sr) {
-		InputStream inputStream = null;
-		byte[] data = null;
 		Map<String, String> map = baseMapper.findProJSON(id);
 		String xmlFilepath = proDetailPath + map.get("filePath") + map.get("fileName") + ".xml";
 		String jsonFilepath = proDetailPath + map.get("filePath") + map.get("jsonPath");
-		String[] filePaths = { xmlFilepath, jsonFilepath };
-		Response respon = dataCenterServiceFeign.downloadStreamFiles(filePaths);
 		sr.setVal(map.get("fileName"));
-		Response.Body body = respon.body();
-		try {
-			inputStream = body.asInputStream();
-			data = IOUtils.toByteArray(inputStream);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		File xmlFile = new File(xmlFilepath);
+		File jsonFile = new File(jsonFilepath);
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		ZipOutputStream zip = new ZipOutputStream(outputStream);
+		ZipEntry zipEntry = null;
+		if (xmlFile.exists() && jsonFile.exists()) {
+			File[] files = { xmlFile, jsonFile };
+			for (int i = 0; i < files.length; i++) {
+				try {
+					BufferedInputStream bis = new BufferedInputStream(new FileInputStream(files[i]));
+					zipEntry = new ZipEntry(files[i].getName());
+					zip.putNextEntry(zipEntry);
+					zip.write(FileUtils.readFileToByteArray(files[i]));
+					IOUtils.closeQuietly(bis);
+					zip.flush();
+					zip.closeEntry();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
-		return data;
+		IOUtils.closeQuietly(zip);
+		return outputStream.toByteArray();
 	}
 
 	@Override
@@ -1671,7 +1733,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			List<Part> partList1 = ProcedureXmlAnalysis.getPartList(xmlMap);
 			partList.addAll(partList1);
 		}
-		String themePath = path + Constant.themeName;
+		String themePath = path + "自定义配置__主题配置.xml";
 		File themeFile = new File(themePath);
 		XmlEntityMap themeData = null;
 		XmlEntityMap netWorkData = null;
@@ -1681,7 +1743,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			// themeData = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(themeFile);
 			themeData = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(themePath).getData();
 		}
-		String netWorkPath = path + Constant.netWorkName;
+		String netWorkPath = path + "自定义配置__网络配置.xml";
 		File netWorkFile = new File(netWorkPath);
 		if (!netWorkFile.exists()) {
 			netWorkData = this.getXmlEntityMap(baseTemplateIDsDTO.getNetworkTempId());
@@ -1737,7 +1799,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		List<String> bspIdList = Arrays.asList(bspIdsArr);
 
 		String ids = "'" + StringUtils.join(bspIdList, "','") + "'";
-		List<BSP> bspList = baseMapper.getAllBSPListByIdIn(ids);
+		List<BSP> bspList = remoteBSPService.getAllBSPListByIdIn(ids).getData();
 		for (BSP item : bspList) {
 			List<GjkPlatform> platformList = baseMapper.getAllPlatformListByBSPId(item.getId());
 			String platformNames = "";
@@ -1764,10 +1826,11 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		ZipOutputStream zip = new ZipOutputStream(outputStream);
 
-		createExcelFileToZipIO(projectId, processId, zip);
+		byte[] excelFileToZipIO = createExcelFileToZipIO(projectId, processId, zip);
 
-		IOUtils.closeQuietly(zip);
-		return outputStream.toByteArray();
+		//IOUtils.closeQuietly(zip);
+		//return outputStream.toByteArray();
+		return excelFileToZipIO;
 	}
 
 	@Override
@@ -2123,7 +2186,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		// 构件库表 id存在则更新 不存在则新增
 		for (CommonComponent commonComponent : compList) {
-			if (baseMapper.getCommonComponentByIdIn("'" + commonComponent.getId() + "'") == null) {
+			if (remoteCommonComponentService.getCommonComponentByIdIn("'" + commonComponent.getId() + "'").getData() == null) {
 				baseMapper.saveCommonComp(commonComponent);
 			} else {
 				commonComponent.setUpdateTime(LocalDateTime.now());
@@ -2133,7 +2196,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 		// 结构库详细表 id存在则更新 不存在则新增
 		for (CommonComponentDetail commonComponentDetail : compDetailList) {
-			if (baseMapper.getCommonComponentDetailByCompIdIn("'" + commonComponentDetail.getId() + "'") == null) {
+			if (remoteCommonComponentDetailService.getCommonComponentDetailByCompIdIn("'" + commonComponentDetail.getId() + "'").getData() == null) {
 				baseMapper.saveCommonCompDetail(commonComponentDetail);
 			} else {
 				baseMapper.updateCommonCompDetail(commonComponentDetail);
@@ -2297,16 +2360,24 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @throws Exception
 	 * @throws IOException
 	 */
-	private void createExcelFileToZipIO(String projectId, String processId, ZipOutputStream zip)
+	private byte[] createExcelFileToZipIO(String projectId, String processId, ZipOutputStream zip)
 			throws Exception, IOException {
 		// 创建表格工作空间
 		XSSFWorkbook workbook = new XSSFWorkbook();
+		//文件路径集合
+		ArrayList<String> list = new ArrayList<>();
+		//添加数据库表的打包路径
+		list.add(ProjectConstants.MYSQL+File.separator);
+		list.add(ProjectConstants.MYSQL+File.separator);
+		list.add(ProjectConstants.MYSQL+File.separator);
 
+		//文件路径map，键为文件的绝对路径，value为压缩包的相对路径
+		HashMap<String, String> map = new HashMap<>();
 		// 项目表
 		List<Project> projectList = new ArrayList<>();
 		Project project = projectMapper.selectById(projectId);
 		projectList.add(project);
-		createSheet(workbook, projectList, "gjk_project");
+		createSheet(workbook, projectList, TableNameConstants.GJK_PROJECT);
 
 		// 项目详细信息表
 		List<ProjectFile> projectDetailList = new ArrayList<>();
@@ -2321,15 +2392,18 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			List<ProjectFile> list11_17 = baseMapper.getProFileListByModelId(file.getId());
 			projectDetailList.addAll(list11_17);
 		}
-		createSheet(workbook, projectDetailList, "gjk_project_detail");
+		createSheet(workbook, projectDetailList, TableNameConstants.GJK_PROJECT_DETAIL);
 
 		// 项目文件
 		for (ProjectFile projectDetail : projectDetailList) {
-			if (projectDetail.getFileType().equals("9")) {
+			if (projectDetail.getFileType().equals(FileTypeConstants.PROCESS_NAME)) {
 				String peoFlowPath = serverPath + projectDetail.getFilePath() + projectDetail.getFileName();
-				if (new File(peoFlowPath).exists()) {
-					zipDirOrFile(zip, new File(peoFlowPath), "project" + File.separator + project.getProjectName()
-							+ File.separator + projectDetail.getFileName());
+				R projectExists = dataCenterServiceFeign.judgeFileExist(peoFlowPath);
+				if ((Boolean) projectExists.getData()) {
+					String zipPath = ProjectConstants.PROJECT + File.separator + project.getProjectName()+File.separator;
+					//添加项目文件到压缩包中
+					list.add(ProjectConstants.PROJECT + File.separator);
+					map.put(peoFlowPath,zipPath);
 				}
 				break;
 			}
@@ -2341,33 +2415,34 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (app != null) {
 			appList.add(app);
 		}
-		createSheet(workbook, appList, "gjk_app");
+		createSheet(workbook, appList, TableNameConstants.GJK_APP);
 
 		// 基础模版表
 		JSONObject jsonObject = JSONObject.parseObject(project.getBasetemplateIds());
-		R<BaseTemplate> sysTemplateR = baseTemplateService.getById(jsonObject.getString("sysTempId"));
-		R<BaseTemplate> themeTemplateR = baseTemplateService.getById(jsonObject.getString("themeTempId"));
-		R<BaseTemplate> networkTemplateR = baseTemplateService.getById(jsonObject.getString("networkTempId"));
-		R<BaseTemplate> hsmTemplateR = baseTemplateService.getById(jsonObject.getString("hsmTempId"));
+		R<BaseTemplate> sysTemplateR = baseTemplateService.getById(jsonObject.getString(ProjectConstants.SYSTEMPID));
+		R<BaseTemplate> themeTemplateR = baseTemplateService.getById(jsonObject.getString(ProjectConstants.THEMETEMPID));
+		R<BaseTemplate> networkTemplateR = baseTemplateService.getById(jsonObject.getString(ProjectConstants.NETWORKTEMPID));
+		R<BaseTemplate> hsmTemplateR = baseTemplateService.getById(jsonObject.getString(ProjectConstants.HSMTEMPID));
 		List<BaseTemplate> baseTemplateList = new ArrayList<>();
 		baseTemplateList.add(sysTemplateR.getData());
 		baseTemplateList.add(themeTemplateR.getData());
 		baseTemplateList.add(networkTemplateR.getData());
 		baseTemplateList.add(hsmTemplateR.getData());
-		createSheet(workbook, baseTemplateList, "gjk_base_template");
+		createSheet(workbook, baseTemplateList, TableNameConstants.GJK_BASE_TEMPLATE);
 
 		// 基础模版文件
 		for (BaseTemplate baseTemplate : baseTemplateList) {
 			String peoFlowPath = serverPath + baseTemplate.getTempPath();
-			File file = new File(peoFlowPath);
-			if (file.exists()) {
-				zipDirOrFile(zip, file, "baseTemplate" + File.separator + file.getName());
+			R baseTemplateExist = dataCenterServiceFeign.judgeFileExist(peoFlowPath);
+			if ((Boolean) baseTemplateExist.getData()) {
+				list.add(ProjectConstants.BASETEMPLATE + File.separator);
+				map.put(peoFlowPath,ProjectConstants.BASETEMPLATE + File.separator);
 			}
 		}
 
 		// 软件框架与流程关系表
 		List<PartPlatformSoftware> partPlatformSoftwareList = partPlatformSoftwareMapper.getByProcedureId(processId);
-		createSheet(workbook, partPlatformSoftwareList, "gjk_app_part_platform_software");
+		createSheet(workbook, partPlatformSoftwareList, TableNameConstants.GJK_APP_PART_PLATFORM_SOFTWARE);
 
 		// 软件框架表
 		List<String> softwareIdList = partPlatformSoftwareList.stream().map(PartPlatformSoftware::getSoftwareId)
@@ -2376,37 +2451,33 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String ids = "";
 		if (softwareIdList.size() > 0) {
 			ids = "'" + StringUtils.join(softwareIdList, "','") + "'";
-			softwareList = baseMapper.getAllSoftwareListByIdIn(ids);
+			softwareList = remoteSoftwareService.getAllSoftwareListByIdIn(ids).getData();
 		}
-		createSheet(workbook, softwareList, "gjk_software");
+		createSheet(workbook, softwareList, TableNameConstants.GJK_SOFTWARE);
 
 		// 软件框架文件
 		for (Software software : softwareList) {
 			String peoFlowPath = serverPath + software.getFilePath();
-			File file = new File(peoFlowPath);
-			if (file.exists()) {
-				zipDirOrFile(zip, file,
-						"software" + File.separator + software.getVersion() + File.separator + file.getName());
+			R softwareExist = dataCenterServiceFeign.judgeFileExist(peoFlowPath);
+			if ((Boolean) softwareExist.getData()) {
+				String softwarePath = software.getFilePath();
+				String sbSoftwarePath = softwarePath.substring(4);
+				String[] split = sbSoftwarePath.split(String.valueOf(software.getVersion()));
+				list.add(ProjectConstants.SOFTWARE + File.separator);
+				map.put(peoFlowPath,split[0]);
 			}
 		}
 
 		// 软件框架与平台关系表
 		List<SoftwareDetail> softwareDetailList = new ArrayList<>();
 		if (ids.length() > 0) {
-			softwareDetailList = baseMapper.getSoftwareDetailBySoftwareIdIn(ids);
+			softwareDetailList = remoteSoftwareDetailService.getSoftwareDetailBySoftwareIdIn(ids).getData();
 		}
-		createSheet(workbook, softwareDetailList, "gjk_software_detail");
-
-		// 软件框架文件表
-		List<SoftwareFile> softwareFileList = new ArrayList<>();
-		if (ids.length() > 0) {
-			softwareFileList = baseMapper.getSoftwareFileBySoftwareIdIn(ids);
-		}
-		createSheet(workbook, softwareFileList, "gjk_software_file");
+		createSheet(workbook, softwareDetailList, TableNameConstants.GJK_SOFTWARE_DETAIL);
 
 		// bsp与流程关系表
 		List<PartPlatformBSP> partPlatformBSPList = partPlatformBSPMapper.getByProcedureId(processId);
-		createSheet(workbook, partPlatformBSPList, "gjk_app_part_platform_bsp");
+		createSheet(workbook, partPlatformBSPList, TableNameConstants.GJK_APP_PART_PLATFORM_BSP);
 
 		// bsp表
 		List<String> bspIdList = partPlatformBSPList.stream().map(PartPlatformBSP::getBspId)
@@ -2415,36 +2486,32 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String bspIds = "";
 		if (bspIdList.size() > 0) {
 			bspIds = "'" + StringUtils.join(bspIdList, "','") + "'";
-			bspList = baseMapper.getAllBSPListByIdIn(bspIds);
+			bspList = remoteBSPService.getAllBSPListByIdIn(bspIds).getData();
 		}
-		createSheet(workbook, bspList, "gjk_bsp");
+		createSheet(workbook, bspList, TableNameConstants.GJK_BSP);
 
 		// bsp文件
 		for (BSP bsp : bspList) {
 			String peoFlowPath = serverPath + bsp.getFilePath();
 			File file = new File(peoFlowPath);
-			if (file.exists()) {
-				zipDirOrFile(zip, file, "bsp" + File.separator + bsp.getVersion() + File.separator + file.getName());
+			R bspExist = dataCenterServiceFeign.judgeFileExist(peoFlowPath);
+			if ((Boolean) bspExist.getData()) {
+				String[] split = bsp.getFilePath().substring(4).split(String.valueOf(bsp.getVersion()));
+				list.add(ProjectConstants.BSP + File.separator);
+				map.put(peoFlowPath,split[0]);
 			}
 		}
 
 		// bsp和平台关系表
 		List<BSPDetail> bspDetailList = new ArrayList<>();
 		if (bspIds.length() > 0) {
-			bspDetailList = baseMapper.getBSPDetailByBSPIdIn(bspIds);
+			bspDetailList = remoteBSPDetailService.getBSPDetailByBSPIdIn(bspIds).getData();
 		}
-		createSheet(workbook, bspDetailList, "gjk_bsp_detail");
-
-		// BSP文件表
-		List<BSPFile> bspFileList = new ArrayList<>();
-		if (bspIds.length() > 0) {
-			bspFileList = baseMapper.getBSPFileByBSPIdIn(bspIds);
-		}
-		createSheet(workbook, bspFileList, "gjk_bsp_file");
+		createSheet(workbook, bspDetailList, TableNameConstants.GJK_BSP_DETAIL);
 
 		// 项目和构件关系表
 		List<ProComp> proCompList = projectMapper.getProjectCompByProId(projectId);
-		createSheet(workbook, proCompList, "gjk_project_comp");
+		createSheet(workbook, proCompList, TableNameConstants.GJK_PROJECT_COMP);
 
 		// 构件库表
 		List<String> compIdList = proCompList.stream().map(ProComp::getCompId).collect(Collectors.toList());
@@ -2452,58 +2519,56 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String compIds = "";
 		if (compIdList.size() > 0) {
 			compIds = "'" + StringUtils.join(compIdList, "','") + "'";
-			compList = baseMapper.getCommonComponentByIdIn(compIds);
+			compList = remoteCommonComponentService.getCommonComponentByIdIn(compIds).getData();
 		}
-		createSheet(workbook, compList, "gjk_common_component");
+		createSheet(workbook, compList, TableNameConstants.GJK_COMMON_COMPONENT);
 
 		// 结构库详细表
 		List<CommonComponentDetail> compDetailList = new ArrayList<>();
 		if (compIds.length() > 0) {
-			compDetailList = baseMapper.getCommonComponentDetailByCompIdIn(compIds);
+			compDetailList = remoteCommonComponentDetailService.getCommonComponentDetailByCompIdIn(compIds).getData();
 		}
-		createSheet(workbook, compDetailList, "gjk_common_component_detail");
+		createSheet(workbook, compDetailList, TableNameConstants.GJK_COMMON_COMPONENT_DETAIL);
 
-		// 结构库文件
+		// 构件文件
 		for (CommonComponent commonComponent : compList) {
-			String compPath = serverPath + "gjk" + File.separator + "common" + File.separator + "component"
+			String compPath = serverPath + ProjectConstants.GJK + File.separator + ProjectConstants.COMMON + File.separator + ProjectConstants.COMPONENT
 					+ File.separator + commonComponent.getCompId() + File.separator + commonComponent.getVersion()
 					+ File.separator;
-			File file = new File(compPath);
-			if (file.exists()) {
-				zipDirOrFile(zip, file, "common" + File.separator + "component" + File.separator
-						+ commonComponent.getCompId() + File.separator + commonComponent.getVersion());
+			//判断文件是否存在
+			R component = dataCenterServiceFeign.judgeFileExist(compPath);
+			if ((Boolean) component.getData()) {
+				list.add(ProjectConstants.COMMON + File.separator + ProjectConstants.COMPONENT + File.separator);
+				map.put(compPath,ProjectConstants.COMMON + File.separator + ProjectConstants.COMPONENT + File.separator
+					+ commonComponent.getCompId() + File.separator);
 			}
 		}
 
 		// 构件库和结构体表关系表
 		List<CompStruct> compStructList = new ArrayList<>();
 		if (compIdList.size() > 0) {
-			compStructList = baseMapper.getCompStructByCompIdList(compIdList);
+			compStructList = remoteCompStructService.getCompStructByCompIdList(compIdList).getData();
 		}
-		createSheet(workbook, compStructList, "gjk_comp_struct");
+		createSheet(workbook, compStructList, TableNameConstants.GJK_COMP_STRUCT);
 
 		// 结构体表
 		List<Structlibs> structlibsList = new ArrayList<>();
 		List<String> structIdList = compStructList.stream().map(CompStruct::getStructId).collect(Collectors.toList());
 		List<Structlibs> structlibsListSub = new ArrayList<>();
 		if (structIdList.size() > 0) {
-			structlibsListSub = baseMapper.getStructlibsByIdList(structIdList);
+			structlibsListSub = remoteStructService.getStructlibsByIdList(structIdList).getData();
 		}
 		structlibsList.addAll(structlibsListSub);
 		findStructlibsRecursion(structlibsListSub, structlibsList);
-		createSheet(workbook, structlibsList, "gjk_structlibs");
+		createSheet(workbook, structlibsList, TableNameConstants.GJK_STRUCTLIBS);
 
-//		// 硬件建模表
-//        Hardwarelibs hardwarelibs = baseMapper.getHardwarelibsByFlowId(processId);
-//        List<Hardwarelibs> hardwarelibsList = new ArrayList<>();
-//        hardwarelibsList.add(hardwarelibs);
-//        createSheet(workbook, hardwarelibsList, "gjk_hardwarelibs");
+		// 硬件建模表
 		Hardwarelibs hardwarelibs = baseMapper.getHardwarelibsByFlowId(processId);
 		List<String> columnNames = new ArrayList<>();
 		StringBuffer columnValues = new StringBuffer();
-		List<Map<String, String>> columns = queryColumns("gjk_hardwarelibs");
+		List<Map<String, String>> columns = queryColumns(TableNameConstants.GJK_HARDWARELIBS);
 		for (Map<String, String> column : columns) {
-			String colName = columnToJava(column.get("columnName"));
+			String colName = columnToJava(column.get(ProjectConstants.COLUMNNAME));
 			columnNames.add(colName);
 			if (hardwarelibs != null) {
 				String cvsStr = String.valueOf(getFieldValueByName(colName, hardwarelibs));
@@ -2516,19 +2581,20 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (columnValues.length() > 0) {
 			cvsContent.add(columnValues.substring(0, columnValues.length() - 1));
 		}
-		String filePath = serverPath + "gjk" + File.separator + "testExcel" + File.separator + "gjk_hardwarelibs.csv";
+		//gjk_hardwarelibs表数据
+		String filePath = serverPath + ProjectConstants.GJK + File.separator + ProjectConstants.TESTEXCEL + File.separator + TableNameConstants.GJK_HARDWARELIBS_CSV;
 		File hardwarelibsFile = FileUtil.writeFileContent(filePath, cvsContent);
+		//把表格文件数据转成MultipartFile对象
+		FileItem fileItem1 = UploadFilesUtils.createFileItem(hardwarelibsFile.getPath(), hardwarelibsFile.getName());
+		MultipartFile hardwarelibsMFile = new CommonsMultipartFile(fileItem1);
 
-//        //芯片表
+        //芯片表
 		Chipsfromhardwarelibs chipsfromhardwarelibs = baseMapper.getChipsByFlowId(processId);
-//        List<Chipsfromhardwarelibs> chipsfromhardwarelibsList = new ArrayList<>();
-//        chipsfromhardwarelibsList.add(chipsfromhardwarelibs);
-//        createSheet(workbook, chipsfromhardwarelibsList, "gjk_chipsfromhardwarelibs");
 		columnNames = new ArrayList<>();
 		columnValues = new StringBuffer();
-		columns = queryColumns("gjk_chipsfromhardwarelibs");
+		columns = queryColumns(TableNameConstants.GJK_CHIPSFROMHARDWARELIBS);
 		for (Map<String, String> column : columns) {
-			String colName = columnToJava(column.get("columnName"));
+			String colName = columnToJava(column.get(ProjectConstants.COLUMNNAME));
 			columnNames.add(colName);
 			if (chipsfromhardwarelibs != null) {
 				String cvsStr = String.valueOf(getFieldValueByName(colName, chipsfromhardwarelibs));
@@ -2541,41 +2607,48 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		if (columnValues.length() > 0) {
 			cvsContent.add(columnValues.substring(0, columnValues.length() - 1));
 		}
-		filePath = serverPath + "gjk" + File.separator + "testExcel" + File.separator + "gjk_chipsfromhardwarelibs.csv";
+		//gjk_chipsfromhardwarelibs表数据
+		filePath = serverPath + ProjectConstants.GJK + File.separator + ProjectConstants.TESTEXCEL + File.separator + TableNameConstants.GJK_CHIPSFROMHARDWARELIBS_CSV;
 		File chipsFile = FileUtil.writeFileContent(filePath, cvsContent);
+		//把表格文件数据转成MultipartFile对象
+		FileItem fileItem2 = UploadFilesUtils.createFileItem(chipsFile.getPath(), chipsFile.getName());
+		MultipartFile chipsMFile = new CommonsMultipartFile(fileItem2);
 
 		// 字典表
-		List<SysDict> sysDictList = baseMapper.getSysDictByRemarksIn("'mapperType','selectType'");
-		createSheet(workbook, sysDictList, "sys_dict");
+		ArrayList<String> typeList = new ArrayList<>();
+		typeList.add(ProjectConstants.MAPPERTYPE);
+		typeList.add(ProjectConstants.SELECTTYPE);
+		List<SysDict> sysDictList = remoteSysDictService.getSysDictByRemarksIn(typeList).getData();
+		createSheet(workbook, sysDictList, TableNameConstants.SYS_DICT);
 
 		// 创建Excel文件保存的临时地址
-		File file = new File(serverPath + "gjk" + File.separator + "testExcel" + File.separator + "MySQL.xls");
-		if (!file.getParentFile().exists()) {
-			file.getParentFile().mkdirs();
+		File mysqlFile = new File(serverPath + ProjectConstants.GJK + File.separator + ProjectConstants.TESTEXCEL + File.separator + TableNameConstants.MYSQL_XLS);
+		if (!mysqlFile.getParentFile().exists()) {
+			mysqlFile.getParentFile().mkdirs();
 		}
 
 		// 创建Excel文件压缩目录
-		ZipEntry entry = new ZipEntry("mysql" + File.separator + "MySQL.xls");
+		ZipEntry entry = new ZipEntry(ProjectConstants.MYSQL + File.separator + TableNameConstants.MYSQL_XLS);
 		zip.putNextEntry(entry);
 		// 将Excel文件内容写入临时文件
-		OutputStream op = new FileOutputStream(file);
+		OutputStream op = new FileOutputStream(mysqlFile);
 		workbook.write(op);
-		// 将Excel文件读入压缩文件流
-		zip.write(FileUtils.readFileToByteArray(file));
-		// 硬件建模数据
-		ZipEntry entryH = new ZipEntry("mysql" + File.separator + "gjk_hardwarelibs.csv");
-		zip.putNextEntry(entryH);
-		zip.write(FileUtils.readFileToByteArray(hardwarelibsFile));
-		// 芯片数据
-		ZipEntry entryC = new ZipEntry("mysql" + File.separator + "gjk_chipsfromhardwarelibs.csv");
-		zip.putNextEntry(entryC);
-		zip.write(FileUtils.readFileToByteArray(chipsFile));
+		//把file对象转成为MultipartFile对象
+		FileItem fileItem3 = UploadFilesUtils.createFileItem(mysqlFile.getPath(), mysqlFile.getName());
+		MultipartFile mysqlMFile = new CommonsMultipartFile(fileItem3);
+
+		String[] strings = new String[list.size()];
+		Response response2 = dataCenterServiceFeign.downloadFile(new MultipartFile[]{mysqlMFile,hardwarelibsMFile,chipsMFile},list.toArray(strings), JSONUtil.parseFromMap(map).toJSONString(0));
+		Response.Body body = response2.body();
+
 		// 将临时文件删除
-		file.delete();
+		mysqlFile.delete();
 		hardwarelibsFile.delete();
 		chipsFile.delete();
 		zip.flush();
 		zip.closeEntry();
+		InputStream inputStream = body.asInputStream();
+		return IOUtils.toByteArray(inputStream);
 	}
 
 	/**
@@ -2944,16 +3017,12 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		}
 		return obj;
 	}
-	/**
-	 * 完备性检查分布式文件修改
-	 * 20200512
-	 */
+
 	@Override
 	public R completeCheck(String id, String userId) {
 		Map<String, String> map = baseMapper.findProJSON(id);
 		String xmlFilepath = proDetailPath + map.get("filePath") + map.get("fileName") + ".xml";
-		//CheckResult checkResult = ExternalIOTransUtils.completeCheck(xmlFilepath);
-		CheckResult checkResult = externalInfInvokeService.completeCheck(xmlFilepath).getData();
+		CheckResult checkResult = ExternalIOTransUtils.completeCheck(xmlFilepath);
 		String strLog = checkResult.getM_textConsole();
 		this.rabbitmqTemplate.convertAndSend(userId, "checkLog" + "===@@@===" + strLog);
 		return new R(checkResult);
@@ -3258,55 +3327,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String filePath = processFile.getFilePath();
 		return filePath;
 	}
-	
+
 	@Override
 	public Map<String, Object> importFile(MultipartFile file) {
-		if (Objects.isNull(file) || file.isEmpty()) {
-			logger.error("请选中文件导入");
-		}
-		String filename = file.getOriginalFilename();
-		if (!filename.endsWith("zip")) {
-			logger.info("传入文件格式不是zip文件" + filename);
-		}
-		Map<String, Object> retMap = Maps.newHashMap();
-		String zipFileName = "";
-		try {
-			ZipInputStream zipInputStream = new ZipInputStream(file.getInputStream(), Charset.forName("utf-8"));
-			BufferedInputStream bs = new BufferedInputStream(zipInputStream);
-			ByteArrayOutputStream bos = null;
-			ZipEntry zipEntry;
-			String json = "";
-			String xmlData = "";
-			while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-				zipFileName = zipEntry.getName();
-				if (zipFileName.split("\\.")[1].equals("json")) {
-					bos = new ByteArrayOutputStream();
-					int index = 0;
-					byte[] jsonBytes = new byte[1024];
-					while ((index = bs.read(jsonBytes)) != -1) {
-						bos.write(jsonBytes, 0, index);
-					}
-					byte[] strBytes = bos.toByteArray();
-					json = new String(strBytes, 0, strBytes.length, "utf-8");
-					Object jsonStr = JSON.toJavaObject(JSONObject.parseObject(json), Object.class);
-					retMap.put("json", jsonStr);
-				} else {
-					bos = new ByteArrayOutputStream();
-					int bytesRead = 0;
-					byte[] bytes = new byte[1024];
-					while ((bytesRead = bs.read(bytes)) != -1) {
-						bos.write(bytes, 0, bytesRead);
-					}
-					byte[] strByte = bos.toByteArray();
-					// xmlData = new String(strByte,0,strByte .length ,"utf-8" );
-					XmlEntityMap xmlJson = XmlFileHandleUtil.analysisXmlStr(strByte);
-					retMap.put("xmlJson", xmlJson);
-				}
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return retMap;
+		return null;
 	}
 }

@@ -147,4 +147,10 @@ public interface CommonComponentService extends IService<CommonComponent> {
 	 */
 	List<String> getRemoveCompIdList(List<String> compIdList);
 
+	/**
+	 * 根据多个ID查询构件数据
+	 * @param ids
+	 * @return
+	 */
+	List<CommonComponent> getCommonComponentByIdIn(String ids);
 }

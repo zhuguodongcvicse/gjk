@@ -25,6 +25,7 @@ import com.inforbus.gjk.admin.api.dto.RoleDTO;
 import com.inforbus.gjk.admin.api.entity.SysDict;
 import com.inforbus.gjk.admin.api.vo.DictVO;
 import com.inforbus.gjk.admin.service.SysDictService;
+import com.inforbus.gjk.common.core.constant.CommonConstants;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.log.annotation.SysLog;
@@ -244,4 +245,25 @@ public class DictController {
 		return new R<>(sysDictService.getDictsByTypeAndRemarks(dictVO));
 	}
 
+	/**
+	 * @Author wang
+	 * @Description: 根据remarks查找字典数据
+	 * @Param: [remarks]
+	 * @Return: com.inforbus.gjk.common.core.util.R<java.util.List<com.inforbus.gjk.admin.api.entity.SysDict>>
+	 * @Create: 2020/5/13
+	 */
+	@PostMapping("getSysDictByRemarksIn")
+	public R<List<SysDict>> getSysDictByRemarksIn(@RequestBody List<String> remarksList){
+		R<List<SysDict>> r = new R<>();
+		try {
+			List<SysDict> list = sysDictService.getSysDictByRemarksIn(remarksList);
+			r.setData(list);
+			r.setMsg("查询成功");
+		}catch (Exception e){
+			r.setData(null);
+			r.setMsg("查询失败");
+			r.setCode(CommonConstants.FAIL);
+		}
+		return r;
+	}
 }

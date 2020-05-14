@@ -25,6 +25,8 @@ import com.inforbus.gjk.libs.api.entity.BSPFile;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 软件框架库表
  *
@@ -88,5 +90,12 @@ public interface BSPMapper extends BaseMapper<BSP> {
    * 根据id级联删除bsp详细表
    */
   void removeBspDetail(@Param("bspId")String bspId);
+
+  /**
+   * 根据多个ID查询数据列表
+   * @param ids
+   * @return
+   */
+  List<BSP> getAllBSPListByIdIn(@Param("ids") String ids);
   
 }

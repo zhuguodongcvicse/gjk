@@ -55,4 +55,12 @@ public interface SysDictService extends IService<SysDict> {
 	List<DictType> getDictTypes();
 
 	List<DictVO> getDictsByTypeAndRemarks(DictVO dictVO);
+
+	/**
+	 * 根据remarks查找字典数据
+	 *
+	 * @param remarksList
+	 * @return list
+	 */
+	List<SysDict> getSysDictByRemarksIn(List<String> remarksList);
 }

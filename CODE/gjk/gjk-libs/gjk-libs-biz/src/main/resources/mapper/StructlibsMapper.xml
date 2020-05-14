@@ -215,6 +215,7 @@
 		(${ids})
 	</update>
 
+	<!-- 根据多个id查询结构体数据 -->
 	<select id="getStructlibsByIdList" resultMap="structlibsMap">
 		select *
 		from gjk_structlibs

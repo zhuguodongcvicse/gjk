@@ -19,6 +19,8 @@ import com.inforbus.gjk.common.core.entity.XmlEntity;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * @ClassName: ManagerService
  * @Description:项目管理Service
@@ -332,7 +334,7 @@ public interface ManagerService extends IService<ProjectFile> {
 	 * @param bsp
 	 * @return
 	 */
-	R updatePartBSPAndPlatform(BSP bsp);
+	R updatePartBSPAndPlatform(com.inforbus.gjk.pro.api.entity.BSP bsp);
 
 	/**
 	 * 导出项目流程压缩文件流

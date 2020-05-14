@@ -177,4 +177,12 @@
 		DELETE FROM gjk_software_detail WHERE software_id = #{softwareId}
 	</delete>
 
+	<!--根据多个ID查询数据列表-->
+	<select id="getAllSoftwareListByIdIn" resultMap="softwareMap">
+		SELECT *
+		FROM gjk_software as gs
+		where gs.id in (${ids})  and del_flag!='1'
+		order by gs.software_name desc,gs.version desc
+	</select>
+
 </mapper>

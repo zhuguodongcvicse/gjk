@@ -84,4 +84,11 @@ public interface CommonComponentDetailService extends IService<CommonComponentDe
 	 * @return
 	 */
 	List<CommonComponentDetail> findCommonComponentDetailByLibsId(String libsId);
+
+	/**
+	 * 根据多个ID查询gjk_CommonComponent_Detail表数据
+	 * @param ids
+	 * @return
+	 */
+	List<CommonComponentDetail> getCommonComponentDetailByCompIdIn(String ids);
 }

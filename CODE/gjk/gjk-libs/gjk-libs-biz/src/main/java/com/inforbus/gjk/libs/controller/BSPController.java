@@ -18,6 +18,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * 软件框架库表
  *
@@ -190,4 +192,25 @@ public class BSPController {
 		return new R<>(TreeUtil.buildByLoop(bspService.getTreeById(id), CommonConstants.STATUS_TREE));
 	}
 
+	/**
+	 * @Author wang
+	 * @Description: 根据多个id查询bsp数据
+	 * @Param: [ids]
+	 * @Return: com.inforbus.gjk.common.core.util.R<java.util.List<com.inforbus.gjk.libs.api.entity.BSP>>
+	 * @Create: 2020/5/12
+	 */
+	@GetMapping("getAllBSPListByIdIn/{ids}")
+	public R<List<BSP>>getAllBSPListByIdIn(@PathVariable("ids") String ids){
+		R<List<BSP>> r = new R<>();
+		try {
+			List<BSP> list = bspService.getAllBSPListByIdIn(ids);
+			r.setData(list);
+			r.setMsg("查询成功");
+		}catch (Exception e){
+			r.setData(null);
+			r.setMsg("查询失败");
+			r.setCode(CommonConstants.FAIL);
+		}
+		return r;
+	}
 }

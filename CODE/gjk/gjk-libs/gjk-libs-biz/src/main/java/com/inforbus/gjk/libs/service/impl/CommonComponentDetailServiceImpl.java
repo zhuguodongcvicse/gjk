@@ -233,9 +233,22 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 	 * @param libsId
 	 * @return
 	 */
+	@Override
 	public List<CommonComponentDetail> findCommonComponentDetailByLibsId(String libsId) {
 		return baseMapper.selectList(
 				Wrappers.<CommonComponentDetail>query().lambda().eq(CommonComponentDetail::getLibsId, libsId));
 
+	}
+
+	/**
+	 * @Author wang
+	 * @Description: 根据多个ID查询gjk_CommonComponent_Detail表数据
+	 * @Param: [ids]
+	 * @Return: java.util.List<com.inforbus.gjk.libs.api.entity.CommonComponentDetail>
+	 * @Create: 2020/5/12
+	 */
+	@Override
+	public List<CommonComponentDetail> getCommonComponentDetailByCompIdIn(String ids) {
+		return baseMapper.getCommonComponentDetailByCompIdIn(ids);
 	}
 }

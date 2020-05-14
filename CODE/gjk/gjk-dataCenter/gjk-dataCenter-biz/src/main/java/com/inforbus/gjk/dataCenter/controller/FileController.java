@@ -552,44 +552,7 @@ public class FileController {
 		}
 	}
 
-	/**
-	 * @Title: downloadFile
-	 * @Desc 下载单文件返回流
-	 * @Author xiaohe
-	 * @DateTime 2020年4月15日
-	 * @param filePath 文件全路径
-	 * @param response
-	 */
-	@ResponseBody
-	@PostMapping(value = "/downloadStreamFile")
-	public void downloadFile(@RequestParam("filePath") String filePath, HttpServletResponse response) {
-		logger.debug("文件下载开始。。。。", filePath);
-		File file = new File(filePath);
-		InputStream in = null;
-		if (file.exists()) {
-			try {
-				OutputStream out = response.getOutputStream();
-				in = new FileInputStream(file);
-				// 1024 * 1024 * 10==>byte设置缓冲区大小
-				byte buffer[] = new byte[1024 * 1024 * 10];
-				int length = 0;
-				while ((length = in.read(buffer)) >= 0) {
-					out.write(buffer, 0, length);
-				}
-			} catch (IOException e) {
-				logger.error("文件下载异常", e);
-			} finally {
-				if (in != null) {
-					try {
-						in.close();
-					} catch (IOException e) {
-						logger.error("文件流关闭异常", e);
-					}
-				}
-				logger.debug("文件下载结束。。。。", filePath);
-			}
-		}
-	}
+
 
 	/**
 	 * @Title: uploadDecompression

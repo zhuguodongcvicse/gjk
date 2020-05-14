@@ -23,6 +23,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.inforbus.gjk.common.core.constant.CommonConstants;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -255,6 +256,28 @@ public class CommonComponentController {
 	@PostMapping("/getRemoveCompIdList")
 	public R getRemoveCompIdList(@RequestBody List<String> compIdList) {
 		return new R<>(commonComponentService.getRemoveCompIdList(compIdList));
+	}
+
+	/**
+	 * @Author wang
+	 * @Description: 根据多个id查询构件库数据
+	 * @Param: [ids]
+	 * @Return: com.inforbus.gjk.common.core.util.R<java.util.List<com.inforbus.gjk.libs.api.entity.CommonComponent>>
+	 * @Create: 2020/5/12
+	 */
+	@GetMapping("getCommonComponentByIdIn/{ids}")
+	public R<List<CommonComponent>> getCommonComponentByIdIn(@PathVariable("ids")String ids){
+		R<List<CommonComponent>> r = new R<>();
+		try {
+			List<CommonComponent> list = commonComponentService.getCommonComponentByIdIn(ids);
+			r.setData(list);
+			r.setMsg("查询成功");
+		}catch (Exception e){
+			r.setData(null);
+			r.setMsg("查询失败");
+			r.setCode(CommonConstants.FAIL);
+		}
+		return r;
 	}
 
 }

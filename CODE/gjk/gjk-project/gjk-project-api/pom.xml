@@ -21,5 +21,10 @@
 			<artifactId>gjk-common-core</artifactId>
 			<version>1.0.0</version>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>com.inforbus</groupId>
+            <artifactId>gjk-upms-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
 </project>

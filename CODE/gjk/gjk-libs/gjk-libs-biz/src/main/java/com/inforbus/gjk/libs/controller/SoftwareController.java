@@ -18,6 +18,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * 软件框架库表
  *
@@ -187,5 +189,27 @@ public class SoftwareController {
 	public R getTreeById(@PathVariable("id") String id) {
 		//树节点为-1
 		return new R<>(TreeUtil.buildByLoop(softwareService.getTreeById(id), CommonConstants.STATUS_TREE));
+	}
+
+	/**
+	 * @Author wang
+	 * @Description: 根据多个ID查询数据列表
+	 * @Param: [ids]
+	 * @Return: com.inforbus.gjk.common.core.util.R<java.util.List<com.inforbus.gjk.libs.api.entity.Software>>
+	 * @Create: 2020/5/11
+	 */
+	@GetMapping("/getAllSoftwareListByIdIn/{ids}")
+	public R<List<Software>> getAllSoftwareListByIdIn(@PathVariable("ids") String ids){
+		R<List<Software>> r = new R<>();
+		try {
+			List<Software> list = softwareService.getAllSoftwareListByIdIn(ids);
+			r.setData(list);
+			r.setMsg("查询成功");
+		}catch (Exception e){
+			r.setData(null);
+			r.setMsg("查询失败");
+			r.setCode(CommonConstants.FAIL);
+		}
+		return r;
 	}
 }

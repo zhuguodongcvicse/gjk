@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ~ Copyright (c) 2018-2025, inforbus All rights reserved. ~ ~ Redistribution 
+	and use in source and binary forms, with or without ~ modification, are permitted 
+	provided that the following conditions are met: ~ ~ Redistributions of source 
+	code must retain the above copyright notice, ~ this list of conditions and 
+	the following disclaimer. ~ Redistributions in binary form must reproduce 
+	the above copyright ~ notice, this list of conditions and the following disclaimer 
+	in the ~ documentation and/or other materials provided with the distribution. 
+	~ Neither the name of the inforbus.com developer nor the names of its ~ contributors 
+	may be used to endorse or promote products derived from ~ this software without 
+	specific prior written permission. ~ Author: inforbus -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inforbus.gjk.libs.mapper.CompStructMapper">
+	<!-- 根据多个id查询构件结构体关系数据 -->
+	<select id="getCompStructByCompIdList" resultType="com.inforbus.gjk.common.core.entity.CompStruct">
+		select id, comp_id, struct_id
+		from gjk_comp_struct
+		where comp_id in
+		<foreach collection="compIdList" item="item" index="index"
+				 open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+</mapper>

@@ -164,4 +164,11 @@ public interface StructlibsService extends IService<Structlibs> {
 	 * @return
 	 */
 	public R findAllStructs();
+
+	/**
+	 * 得到结构体数据，根据id集合
+	 * @param idList
+	 * @return
+	 */
+	List<Structlibs> getStructlibsByIdList(List<String> idList);
 }

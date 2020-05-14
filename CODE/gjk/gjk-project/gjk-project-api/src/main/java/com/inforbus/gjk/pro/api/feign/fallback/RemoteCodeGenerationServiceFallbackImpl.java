@@ -15,7 +15,7 @@ import java.util.Map;
  *
  * @author wang
  * @date 2020/4/20
- * @Description TODO
+ * @Description 集成代码生成熔断器实现类
  */
 @Slf4j
 @Component

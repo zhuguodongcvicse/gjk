@@ -55,4 +55,12 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
     List<SysDict> getDictTypes();
 
     List<DictVO> getDictsByTypeAndRemarks(DictVO dictVO);
+
+	/**
+	 * 根据remarks查找字典数据
+	 *
+	 * @param remarksList
+	 * @return list
+	 */
+	List<SysDict> getSysDictByRemarksIn(@Param("remarksList") List<String> remarksList);
 }

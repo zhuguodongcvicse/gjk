@@ -117,4 +117,9 @@
 		</where>
 	</select>
 
+	<!-- 根据多个id查询构件库详情数据 -->
+	<select id="getCommonComponentDetailByCompIdIn" resultMap="commonComponentDetailMap">
+		SELECT * FROM gjk_common_component_detail
+		WHERE comp_id IN (${ids})
+	</select>
 </mapper>

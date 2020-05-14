@@ -18,6 +18,7 @@ package com.inforbus.gjk.libs.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.inforbus.gjk.common.core.constant.CommonConstants;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.log.annotation.SysLog;
 import com.inforbus.gjk.libs.api.entity.CommonComponent;
@@ -127,5 +128,27 @@ public class CommonComponentDetailController {
 	public R getCommCompViewTree(@PathVariable String compId) {
 		return new R<>(TreeUtil.buildCommCompTree(
 				commonComponentDetailService.getCommCompViewTree(commonComponentService.getById(compId)), "-1"));
+	}
+
+	/**
+	 * @Author wang
+	 * @Description: 根据多个ID查询gjk_CommonComponent_Detail表数据
+	 * @Param: [ids]
+	 * @Return: com.inforbus.gjk.common.core.util.R<java.util.List<com.inforbus.gjk.libs.api.entity.CommonComponentDetail>>
+	 * @Create: 2020/5/12
+	 */
+	@GetMapping("/getCommonComponentDetailByCompIdIn/{ids}")
+	public R<List<CommonComponentDetail>>getCommonComponentDetailByCompIdIn(@PathVariable("ids") String ids){
+		R<List<CommonComponentDetail>> r = new R<>();
+		try {
+			List<CommonComponentDetail> list = commonComponentDetailService.getCommonComponentDetailByCompIdIn(ids);
+			r.setData(list);
+			r.setMsg("查询成功");
+		}catch (Exception e){
+			r.setData(null);
+			r.setMsg("查询失败");
+			r.setCode(CommonConstants.FAIL);
+		}
+		return r;
 	}
 }

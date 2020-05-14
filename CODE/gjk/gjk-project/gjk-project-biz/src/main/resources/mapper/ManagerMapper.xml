@@ -97,7 +97,7 @@
     </resultMap>
 
     <resultMap id="BSPMap"
-               type="com.inforbus.gjk.admin.api.entity.BSP">
+               type="com.inforbus.gjk.pro.api.entity.BSP">
         <id property="id" column="id"/>
         <result property="bspName" column="bsp_name"/>
         <result property="version" column="version"/>
@@ -663,17 +663,9 @@
         FROM gjk_software as gs
         where gs.id = #{id}
     </select>
-    <select id="getSoftwareDetailBySoftwareIdIn" resultMap="softwareDetailMap">
-		SELECT * FROM gjk_software_detail
-		WHERE software_id IN (${ids})
-	</select>
     <select id="getSoftwareDetailBySoftwareIdAndPlatformId" resultMap="softwareDetailMap">
 		SELECT * FROM gjk_software_detail
 		WHERE software_id = #{softwareId} and platform_id = #{platformId}
-	</select>
-    <select id="getSoftwareFileBySoftwareIdIn" resultMap="softwareFileMap">
-		SELECT * FROM gjk_software_file
-		WHERE software_id IN (${ids})
 	</select>
     <select id="getSoftwareFileBySoftwareIdAndFileName" resultMap="softwareFileMap">
 		SELECT * FROM gjk_software_file
@@ -708,7 +700,7 @@
         )
     </insert>
     <insert id="saveBSPDetail"
-            parameterType="com.inforbus.gjk.admin.api.entity.BSPDetail">
+            parameterType="com.inforbus.gjk.pro.api.entity.BSPDetail">
 		INSERT INTO gjk_bsp_detail (
 			platform_id, bsp_id
 		) VALUES (
@@ -749,10 +741,6 @@
         FROM gjk_bsp as gs
         where gs.id = #{id}
     </select>
-    <select id="getBSPDetailByBSPIdIn" resultMap="bspDetailMap">
-		SELECT * FROM gjk_bsp_detail
-		WHERE bsp_id IN (${ids})
-	</select>
     <select id="getBSPDetailByBSPIdAndPlatformId" resultMap="bspDetailMap">
 		SELECT * FROM gjk_bsp_detail
 		WHERE bsp_id = #{bspId} and platform_id = #{platformId}
@@ -802,11 +790,6 @@
 		`version` = #{comp.version}
 		WHERE `id` = #{comp.id}
 	</update>
-    <!-- 根据多个id查询构件库数据 -->
-    <select id="getCommonComponentByIdIn" resultMap="commonComponentMap">
-		SELECT * FROM gjk_common_component
-		WHERE id IN (#{ids})
-	</select>
     <!-- 保存公共构件详细信息 -->
     <insert id="saveCommonCompDetail"
             parameterType="com.inforbus.gjk.pro.api.entity.CommonComponentDetail">
@@ -836,11 +819,6 @@
 		`version` = #{comp.version}
 		WHERE `id` = #{comp.id}
 	</update>
-    <!-- 根据多个id查询构件库详情数据 -->
-    <select id="getCommonComponentDetailByCompIdIn" resultMap="commonComponentDetailMap">
-		SELECT * FROM gjk_common_component_detail
-		WHERE comp_id IN (${ids})
-	</select>
     <insert id="saveCompAndStruct" parameterType="com.inforbus.gjk.common.core.entity.CompStruct">
 		INSERT INTO `gjk_comp_struct`
 		( `id`, `comp_id`, `struct_id`)
@@ -862,16 +840,6 @@
 		from gjk_comp_struct
 		where id = #{id}
 	</select>
-    <!-- 根据多个id查询结构体数据 -->
-    <select id="getStructlibsByIdList" resultMap="structlibsMap">
-        select *
-        from gjk_structlibs
-        where id in
-        <foreach collection="idList" item="item" index="index"
-                 open="(" separator="," close=")">
-            #{item}
-        </foreach>
-    </select>
     <select id="getStructlibsByParentIdList" resultMap="structlibsMap">
         select *
         from gjk_structlibs
@@ -923,11 +891,6 @@
 		WHERE `id` = #{structlibs.id}
 	</update>
 
-    <select id="getSysDictByRemarksIn" resultMap="sysDictMap">
-		select *
-		from sys_dict
-		where remarks in (#{remarks}) and del_Flag != 1
-	</select>
     <select id="getSysDictById" resultMap="sysDictMap">
 		select *
 		from sys_dict
