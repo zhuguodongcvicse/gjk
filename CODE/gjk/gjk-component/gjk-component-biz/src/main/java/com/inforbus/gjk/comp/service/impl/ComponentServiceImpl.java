@@ -16,58 +16,8 @@
  */
 package com.inforbus.gjk.comp.service.impl;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.inforbus.gjk.admin.api.entity.GjkAlgorithm;
-import com.inforbus.gjk.admin.api.entity.GjkPlatform;
-import com.inforbus.gjk.admin.api.entity.GjkTest;
-import com.inforbus.gjk.admin.api.entity.SysUser;
-import com.inforbus.gjk.common.core.constant.CommonConstants;
-import com.inforbus.gjk.common.core.constant.ComponentConstant;
-import com.inforbus.gjk.common.core.entity.CompStruct;
-import com.inforbus.gjk.common.core.entity.Structlibs;
-import com.inforbus.gjk.common.core.entity.XmlEntity;
-import com.inforbus.gjk.common.core.entity.XmlEntityMap;
-import com.inforbus.gjk.common.core.idgen.IdGenerate;
-import com.inforbus.gjk.common.core.jgit.JGitUtil;
-import com.inforbus.gjk.common.core.util.FileUtil;
-import com.inforbus.gjk.common.core.util.R;
-import com.inforbus.gjk.common.core.util.UploadFilesUtils;
-import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
-import com.inforbus.gjk.comp.api.dto.CompTree;
-import com.inforbus.gjk.comp.api.dto.ComponentDTO;
-import com.inforbus.gjk.comp.api.dto.ComponentInput;
-import com.inforbus.gjk.comp.api.dto.ComponentOutput;
-import com.inforbus.gjk.comp.api.entity.CompImg;
-import com.inforbus.gjk.comp.api.entity.Component;
-import com.inforbus.gjk.comp.api.entity.ComponentDetail;
-import com.inforbus.gjk.comp.api.feign.RemoteDataCenterService;
-import com.inforbus.gjk.comp.api.util.CompTreeUtil;
-import com.inforbus.gjk.comp.api.util.XmlAnalysisUtil;
-import com.inforbus.gjk.comp.api.vo.CompDetailVO;
-import com.inforbus.gjk.comp.api.vo.CompDictVO;
-import com.inforbus.gjk.comp.api.vo.CompFilesVO;
-import com.inforbus.gjk.comp.api.vo.CompVO;
-import com.inforbus.gjk.comp.api.vo.ComponentVO;
-import com.inforbus.gjk.comp.mapper.CompImgMapper;
-import com.inforbus.gjk.comp.mapper.ComponentDetailMapper;
-import com.inforbus.gjk.comp.mapper.ComponentMapper;
-import com.inforbus.gjk.comp.service.CommonComponentServiceFeign;
-import com.inforbus.gjk.comp.service.ComponentDetailService;
-import com.inforbus.gjk.comp.service.ComponentService;
-import com.inforbus.gjk.comp.service.SysUserService;
-import com.inforbus.gjk.libs.api.entity.CommonComponent;
-
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
-import sun.misc.BASE64Encoder;
-
 import java.beans.PropertyDescriptor;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -77,9 +27,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -90,12 +38,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
@@ -114,6 +62,51 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.inforbus.gjk.admin.api.entity.GjkAlgorithm;
+import com.inforbus.gjk.admin.api.entity.GjkPlatform;
+import com.inforbus.gjk.admin.api.entity.GjkTest;
+import com.inforbus.gjk.common.core.constant.CommonConstants;
+import com.inforbus.gjk.common.core.constant.ComponentConstant;
+import com.inforbus.gjk.common.core.entity.CompStruct;
+import com.inforbus.gjk.common.core.entity.Structlibs;
+import com.inforbus.gjk.common.core.entity.XmlEntityMap;
+import com.inforbus.gjk.common.core.idgen.IdGenerate;
+import com.inforbus.gjk.common.core.util.FileUtil;
+import com.inforbus.gjk.common.core.util.R;
+import com.inforbus.gjk.common.core.util.UploadFilesUtils;
+import com.inforbus.gjk.comp.api.dto.CompTree;
+import com.inforbus.gjk.comp.api.dto.ComponentDTO;
+import com.inforbus.gjk.comp.api.dto.ComponentInput;
+import com.inforbus.gjk.comp.api.dto.ComponentOutput;
+import com.inforbus.gjk.comp.api.entity.CompImg;
+import com.inforbus.gjk.comp.api.entity.Component;
+import com.inforbus.gjk.comp.api.entity.ComponentDetail;
+import com.inforbus.gjk.comp.api.feign.RemoteDataCenterService;
+import com.inforbus.gjk.comp.api.util.CompTreeUtil;
+import com.inforbus.gjk.comp.api.util.XmlAnalysisUtil;
+import com.inforbus.gjk.comp.api.vo.CompDetailVO;
+import com.inforbus.gjk.comp.api.vo.CompDictVO;
+import com.inforbus.gjk.comp.api.vo.CompFilesVO;
+import com.inforbus.gjk.comp.api.vo.CompVO;
+import com.inforbus.gjk.comp.mapper.CompImgMapper;
+import com.inforbus.gjk.comp.mapper.ComponentDetailMapper;
+import com.inforbus.gjk.comp.mapper.ComponentMapper;
+import com.inforbus.gjk.comp.service.CommonComponentServiceFeign;
+import com.inforbus.gjk.comp.service.ComponentDetailService;
+import com.inforbus.gjk.comp.service.ComponentService;
+import com.inforbus.gjk.comp.service.SysUserService;
+import com.inforbus.gjk.libs.api.entity.CommonComponent;
+
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 
 /**
  * 构件
@@ -168,7 +161,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			Component comp = this.getById(compId);
 			// 获取当前用户信息
 //			R<SysUser> su=	sysUserService.user(comp.getUserId());
-			String filePath = this.compDetailPath + "gjk" + File.separator + "component" + File.separator
+			String filePath = this.compDetailPath + "gjk" + File.separator + ComponentConstant.COMP + File.separator
 					+ comp.getCompId() + File.separator
 					+ comp.getCreateTime().toString().replaceAll("[[\\s-T:punct:]]", "") + File.separator;
 
@@ -235,7 +228,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		Component comp = baseMapper.listCompByCompId(compId);
 		List<CompDetailVO> tree = Lists.newArrayList();
 //			将构件转成树
-		tree.add(new CompDetailVO(comp.getId(), comp.getCompName(), "component", "", "-1", comp.getVersion()));
+		tree.add(new CompDetailVO(comp.getId(), comp.getCompName(), ComponentConstant.COMP, "", "-1", comp.getVersion()));
 		List<ComponentDetail> vos = compDetailMapper.listCompDetailByCompId(comp.getId());
 		// 如果为true,则显示comp的xml文件，不走if内
 		for (ComponentDetail v : vos) {
@@ -657,24 +650,21 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		String filePath = this.compDetailPath + "gjk" + File.separator + "zipFile" + File.separator
 				+ (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date()) + "-" + ufile.getOriginalFilename();
 		try {
-			File file = new File(filePath);
-			if (!file.getParentFile().exists()) {
-				file.getParentFile().mkdirs();
-			}
-			ufile.transferTo(file);
-
 			String descDirPath = filePath.substring(0, filePath.lastIndexOf("."));
 			// 解压zip文件夹
-			unZipFiles(filePath, descDirPath);
-
+			UploadFilesUtils.decompression(ufile.getInputStream(), descDirPath);
 			List<Component> components = null;
-			if ("component".equals(new File(descDirPath).listFiles()[0].getName())) {
-				String excelFilePath = descDirPath + File.separator + "component" + File.separator + "MySQL.xls";
-				components = readExcel(descDirPath, excelFilePath, userId, userName);
-				// 删除压缩包
-				cn.hutool.core.io.FileUtil.del(filePath);
-				// 删除解压包
-				cn.hutool.core.io.FileUtil.del(descDirPath);
+			File[] fs = new File(descDirPath).listFiles();
+			for (File f : fs) {
+				if (ComponentConstant.COMP.equals(f.getName())) {
+					String excelFilePath = descDirPath + File.separator + ComponentConstant.COMP + File.separator
+							+ "MySQL.xlsx";
+					components = readExcel(descDirPath, excelFilePath, userId, userName);
+					// 删除压缩包
+					cn.hutool.core.io.FileUtil.del(filePath);
+					// 删除解压包
+					cn.hutool.core.io.FileUtil.del(descDirPath);
+				}
 			}
 			return components;
 		} catch (Exception e) {
@@ -690,12 +680,8 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	 * @param descDir 指定目录
 	 * @throws IOException
 	 */
-	private static void unZipFiles(String zipPath, String descDir) throws IOException {
+	private static void unZipFiles(File zipFile, String descDir) throws IOException {
 		try {
-			File zipFile = new File(zipPath);
-			if (!zipFile.exists()) {
-				throw new IOException("需解压文件不存在.");
-			}
 			File pathFile = new File(descDir);
 			if (!pathFile.exists()) {
 				pathFile.mkdirs();
@@ -795,9 +781,9 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 				}
 			}
 
-			String beforeFilePath = unZipFilePath + File.separator + "component" + File.separator + comp.getCompId()
-					+ File.separator + comp.getVersion() + File.separator;
-			String beforeDetailFilePath = "gjk" + File.separator + "common" + File.separator + "component"
+			String beforeFilePath = unZipFilePath + File.separator + ComponentConstant.COMP + File.separator
+					+ comp.getCompId() + File.separator + comp.getVersion() + File.separator;
+			String beforeDetailFilePath = "gjk" + File.separator + "common" + File.separator + ComponentConstant.COMP
 					+ File.separator + comp.getCompId() + File.separator + comp.getVersion() + File.separator;
 			String compVersion = comp.getVersion();
 
@@ -814,8 +800,8 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			if (timeStr.contains(".")) {
 				timeStr = timeStr.substring(0, timeStr.indexOf("."));
 			}
-			String afterFilePath = "gjk" + File.separator + "component" + File.separator + userName + File.separator
-					+ comp.getCompId() + File.separator + timeStr + File.separator;
+			String afterFilePath = "gjk" + File.separator + ComponentConstant.COMP + File.separator + userName
+					+ File.separator + comp.getCompId() + File.separator + timeStr + File.separator;
 			for (ComponentDetail detail : componentDetails) {
 				String filePath = detail.getFilePath().substring(beforeDetailFilePath.length());
 				detail.setFilePath(afterFilePath + filePath);
@@ -832,7 +818,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			for (CompStruct compStruct : compStructSubList) {
 				baseMapper.saveCompAndStruct(compStruct.getId(), compStruct.getCompId(), compStruct.getStructId());
 			}
-
+//			rdcService.uploadLocalFile(ufile, filePath);
 			FileUtil.copyFile(beforeFilePath, this.compDetailPath + afterFilePath);
 			compList.add(this.getById(comp.getId()));
 		}
