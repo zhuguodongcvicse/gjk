@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.google.common.collect.Lists;
 import com.inforbus.gjk.common.core.constant.CommonConstants;
+import com.inforbus.gjk.common.core.entity.StringRef;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.UploadFilesUtils;
@@ -636,4 +637,49 @@ public class FileController {
 		}
 		return r;
 	}
+	
+	/**
+	 * 保存流程建模json文件路径
+	 * @param jsonSring  json字符串
+	 * @param filePath   文件路径 
+	 * @return
+	 */
+	@PostMapping("editProJSON")
+	@ResponseBody
+	public R<Boolean> editProJSON(@RequestBody StringRef strRef, @RequestParam("filePath") String filePath) {
+		R<Boolean> ret = new R<Boolean>();
+		try {
+			fileService.editProJSON(strRef, filePath);
+			ret.setData(true);
+			ret.setMsg("json文件保存成功");
+		} catch (Exception e) {
+			logger.error("json文件保存失败", e);
+			ret.setCode(CommonConstants.FAIL);
+			ret.setData(false);
+			ret.setMsg("json文件保存失败");
+		}
+		return ret;
+	}
+	/**
+	 * 解析流程建模json
+	 * @param jsonPath
+	 * @return
+	 */
+	@PostMapping("findJson")
+	@ResponseBody
+	public R<String> findJson(@RequestParam("jsonPath") String jsonPath){
+		R<String> ret = new R<String>();
+		try {
+			String str = fileService.findJson(jsonPath);
+			ret.setData(str);
+			ret.setMsg("json文件解析成功");
+		} catch (Exception e) {
+			logger.error("json文件解析失败");
+			ret.setCode(CommonConstants.FAIL);
+			ret.setData("");
+			ret.setMsg("json文件解析失败");
+		}
+		return ret;
+	}
+	
 }

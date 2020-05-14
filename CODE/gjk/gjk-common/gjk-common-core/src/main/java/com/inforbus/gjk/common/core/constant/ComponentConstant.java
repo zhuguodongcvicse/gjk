@@ -31,7 +31,48 @@ public interface ComponentConstant {
 	  */
 	String COMP_XML = ".XML";
 	
+	/**
+	 * APP运行与控制
+	 */
+	String APP_RUN = "app";
 	
+	/**
+	 * 软件框架
+	 */
+	String SOFTWARE = "software";
 	
+	/**
+	 * 软件框架库
+	 */
+	String SOFTWARE_DEPOT = "软件框架库";
 	
+	/**
+	 * bsp
+	 */
+	String BSP = "bsp";
+	
+	/**
+	 * bsp库
+	 */
+	String BSP_DEPOT = "BSP库";
+	
+	/**
+	 * 构建
+	 */
+	String COMPONENT = "component";
+	
+	/**
+	 * 构建
+	 */
+	String COMPONENT_DEPOT = "构件库";
+	
+	/**
+	 *  组件划分方案路径（自存自取）
+	 */
+	String GENERATECODERESULT_XML = "组件划分方案.xml";
+	
+	/**
+	 *  packinfo文件路径（客户自存自取的路径）
+	 */
+	String PACKINFO_XML = "packinfo.xml";
 }

@@ -114,7 +114,6 @@ public interface SoftwareService extends IService<Software> {
 	 * @param software
 	 * @return
 	 */
-
 	IPage<SoftwareDTO> getSoftwareDTOPage(Page<Software> page, Software software);
 
 	/**
@@ -141,11 +140,12 @@ public interface SoftwareService extends IService<Software> {
 	/**
 	 * 上传文件
 	 * 
-	 * @param files
-	 * @param versionDisc
+	 * @param files 文件流
+	 * @param versionDisc 版本号
+	 * @param userName 用户名
 	 * @return
 	 */
-	String uploadFiles(@RequestParam(value = "file") MultipartFile[] files, @PathVariable String versionDisc, @PathVariable String userName);
+	String uploadFiles(MultipartFile files, @PathVariable String versionDisc, @PathVariable String userName);
 	
 	/**
 	 * 通过id删除本地文件夹 

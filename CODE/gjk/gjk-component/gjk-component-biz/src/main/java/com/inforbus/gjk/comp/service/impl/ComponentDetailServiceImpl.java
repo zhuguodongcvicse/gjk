@@ -87,7 +87,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		implements ComponentDetailService {
 	@Value("${git.local.path}")
 	private String compDetailPath;
-	private static final String compUserFilePath = "gjk" + File.separator + "component";
+	private static final String compUserFilePath = "gjk" + File.separator + ComponentConstant.COMP;
 	@Autowired
 	private ComponentMapper compMapper;
 	@Autowired
@@ -150,7 +150,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 				+ component.getCreateTime().toString().replaceAll("[[\\s-T:punct:]]", "") + File.separator;
 		ComponentDetail detail = baseMapper.findCompXml(compId, "xml");
 		String time = (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date());
-		String xmlFileName = XmlFileToken.COMPONENT + time + ".xml";
+		String xmlFileName = ComponentConstant.COMP + time + ".xml";
 		if (!token.equals(XmlFileToken.COMPONENT)) {
 
 		}

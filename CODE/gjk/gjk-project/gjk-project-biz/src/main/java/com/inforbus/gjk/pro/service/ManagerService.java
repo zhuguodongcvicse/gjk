@@ -381,4 +381,11 @@ public interface ManagerService extends IService<ProjectFile> {
 	boolean createXmlFiles(XmlEntity entity, String proDetailId);
 
 	String getprocessFile(String projectId);
+	
+	/**
+	 * 流程建模导入
+	 * @param file
+	 * @return
+	 */
+	Map<String, Object> importFile(MultipartFile file);
 }

@@ -407,7 +407,6 @@ public class UploadFilesUtils {
 		delAllFile(source);
 	}
 
-
 	/**
 	 * @Title: decompression
 	 * @Description: 解压压缩包文件
@@ -427,10 +426,18 @@ public class UploadFilesUtils {
 			} else {
 				OutputStream outputStream = null;
 				try {
-					outputStream = new BufferedOutputStream(
-							new FileOutputStream(new File(targetPathStr, entry.getName())));
+					File target = new File(targetPathStr, entry.getName());
+                    // 保证这个文件的父文件夹必须要存在
+                    if(!target.getParentFile().exists()){
+                    	target.getParentFile().mkdirs();
+                    }
+                    target.createNewFile();
+					outputStream = new BufferedOutputStream(new FileOutputStream(target));
 					// 输出文件路径信息
 					IOUtils.copy(inputStream, outputStream);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				} finally {
 					IOUtils.closeQuietly(outputStream);
 				}

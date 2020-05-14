@@ -339,7 +339,7 @@ export default {
             background: "rgba(0, 0, 0, 0.7)"
           });
           let formData = new FormData();
-          formData.append("file", this.importCompFileList);
+          formData.append("files", this.importCompFileList);
           //平台的选择的id
           this.platfoemId = "";
           let softId = "";

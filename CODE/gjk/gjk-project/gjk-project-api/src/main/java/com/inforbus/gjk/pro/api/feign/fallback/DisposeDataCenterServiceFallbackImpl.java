@@ -3,6 +3,7 @@ package com.inforbus.gjk.pro.api.feign.fallback;
 
 import com.inforbus.gjk.common.core.constant.CommonConstants;
 import com.inforbus.gjk.common.core.constant.ServiceNameConstants;
+import com.inforbus.gjk.common.core.entity.StringRef;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
@@ -12,6 +13,7 @@ import feign.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -148,4 +150,24 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
         r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
         return r;
     }
+
+	@Override
+	public R<Boolean> editProJSON(@RequestBody StringRef strRef, @RequestParam("filePath")String filePath) {
+		log.error("调用数据中心的feign接口editProJSON方法失败", cause);
+        R r = new R();
+        r.setCode(CommonConstants.FAIL);
+        r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
+        return r;
+		
+	}
+
+	@Override
+	public R<String> findJson(String jsonPath) {
+		log.error("调用数据中心的feign接口findJSON方法失败", cause);
+		R r = new R();
+		r.setCode(CommonConstants.FAIL);
+		r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
+		return r;
+	}
+	
 }
