@@ -15,7 +15,7 @@ export function startSimulator(query) {
     filePath: query.filePath
   }
   return request({
-    url: '/simula/simulation/startSimulator/'+query.username,
+    url: '/simula/simulation/startSimulator/'+query.username+"/"+query.projectId,
     method: 'post',
     data: params
   })

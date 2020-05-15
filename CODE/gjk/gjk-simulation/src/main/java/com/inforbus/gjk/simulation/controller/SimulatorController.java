@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -41,10 +42,10 @@ public class SimulatorController {
      * @Exception
      * @Date 2020/4/9 9:12
      */
-    @PostMapping("/startSimulator/{username}")
-    public R startSimulator(@PathVariable("username") String username, @RequestBody Object obj) {
+    @PostMapping("/startSimulator/{username}/{projectId}")
+    public R startSimulator(@PathVariable("username") String username,@PathVariable("projectId") String projectId, @RequestBody Object obj) throws IOException {
         Map parse = JSON.parseObject(JSONUtil.toJsonStr(obj));
-        return new R<>(simulatorService.startSimulator(username, (List<String>) parse.get("componentLinks"), (String) parse.get("filePath")));
+        return new R<>(simulatorService.startSimulator(username,projectId, (List<String>) parse.get("componentLinks"), (String) parse.get("filePath")));
     }
 
     /**

@@ -298,9 +298,9 @@ export default {
         startSimulator({
           username: this.userInfo.username,
           componentLinks: this.simulationData,
-          filePath: this.flowFilePath
+          filePath: this.flowFilePath,
+          projectId: this.$route.query.processId
         });
-        console.log("仿真数据startSimulator",startSimulator)
       }
     },
 

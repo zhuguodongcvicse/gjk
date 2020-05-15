@@ -81,6 +81,18 @@
             <artifactId>jedis</artifactId>
             <version>2.9.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.inforbus</groupId>
+            <artifactId>gjk-dataCenter-biz</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.inforbus</groupId>
+            <artifactId>gjk-dataCenter-biz</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

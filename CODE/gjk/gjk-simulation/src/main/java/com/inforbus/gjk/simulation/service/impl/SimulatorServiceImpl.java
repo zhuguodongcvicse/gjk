@@ -3,29 +3,35 @@ package com.inforbus.gjk.simulation.service.impl;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.parser.Feature;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.inforbus.gjk.admin.api.entity.SysDict;
+import com.inforbus.gjk.common.core.constant.SimulationConstant;
+import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.util.ExternalIOTransUtils;
+import com.inforbus.gjk.common.core.util.R;
+import com.inforbus.gjk.common.core.util.UploadFilesUtils;
+import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 import com.inforbus.gjk.simulation.dto.SimulationDTO;
 import com.inforbus.gjk.simulation.core.Global;
 import com.inforbus.gjk.simulation.dto.SimulationTableDataDTO;
+import com.inforbus.gjk.simulation.dto.SimulatorFilePathBO;
+import com.inforbus.gjk.simulation.feign.SimulationExternalInfService;
 import com.inforbus.gjk.simulation.mapper.SysDictMapper;
-import com.inforbus.gjk.simulation.service.ManagerServiceImpl;
+import com.inforbus.gjk.simulation.feign.ManagerService;
 import com.inforbus.gjk.simulation.service.SimulatorService;
 import com.inforbus.gjk.simulation.task.*;
+import feign.Response;
 import flowModel.MoniRecvDataThread;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
-import sun.security.krb5.internal.crypto.HmacSha1Aes128CksumType;
 
-import javax.validation.constraints.Max;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -51,7 +57,10 @@ public class SimulatorServiceImpl implements SimulatorService {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
     @Autowired
-    ManagerServiceImpl managerServiceImpl;
+    ManagerService managerService;
+
+    @Autowired
+    SimulationExternalInfService simulationExternalInfService;
     @Autowired
     SysDictMapper sysDictMapper;
     /**
@@ -79,6 +88,7 @@ public class SimulatorServiceImpl implements SimulatorService {
 
     /**
      * @param null
+     * @param s
      * @Description 开始仿真客户线程放入全局变量
      * @Author ZhangHongXu
      * @Return
@@ -86,7 +96,45 @@ public class SimulatorServiceImpl implements SimulatorService {
      * @Date 2020/4/9 9:19
      */
     @Override
-    public boolean startSimulator(String username, List<String> componentLinks, String filePath) {
+    public boolean startSimulator(String username, String projectId, List<String> componentLinks, String filePath) throws IOException {
+        //拼接流程模型文件路径,packinfo文件路径
+        String FilePath = managerService.getprocessFile(projectId);
+        //调用feigna的nalysisXmlFileToXMLEntityMap接口获取xmlentitymap
+        R<XmlEntityMap> xmlEntityMapR = simulationExternalInfService.analysisXmlFileToXMLEntityMap(filePath);
+        XmlEntityMap xmlEntity = xmlEntityMapR.getData();
+        //存放本地文件地址
+        String processModelNativePath = SimulationConstant.FILEPATH + File.separator+username +  File.separator+FilePath+SimulationConstant.PROCESS_MODEL_NAME;
+        String packinfoNativePath= SimulationConstant.FILEPATH +  File.separator+username +  File.separator+FilePath+SimulationConstant.PACKINFO_NAME;
+        //放到全局变量中
+        SimulatorFilePathBO simulatorFilePathBO = new SimulatorFilePathBO();
+        simulatorFilePathBO.setProcessModelNativePath(processModelNativePath);
+        simulatorFilePathBO.setPackinfoNativePath(packinfoNativePath);
+        //String tabFilePathNativePath = SimulationConstant.FILEPATH + File.separator+username+ File.separator+FilePath;
+        //datacenter中packinfo文件地址
+        String packinfoPath = gitDetailPath + FilePath + generateCodeResult + File.separator +SimulationConstant.PACKINFO_NAME;
+        //生成xml文件
+        XMlEntityMapVO xmlEntityMapVO = new XMlEntityMapVO();
+        xmlEntityMapVO.setLocalPath(processModelNativePath);
+        xmlEntityMapVO.setXmlEntityMap(xmlEntity);
+        simulationExternalInfService.createXMLFile(xmlEntityMapVO);
+        //拼接流程模型文件路径,packinfo文件路径
+        String packinfoFileName = gitDetailPath + FilePath + generateCodeResult + SimulationConstant.PACKINFO_NAME;
+        String[] filePaths = {packinfoPath};
+        //下载packinfo文件到本地
+        Response response =  simulationExternalInfService.downloadFile(filePaths);
+        Response.Body body = response.body();
+        InputStream inputStream = body.asInputStream();
+        UploadFilesUtils.decompression(inputStream,SimulationConstant.FILEPATH + File.separator+username+File.separator+FilePath);
+        //下载头文件到本地
+        try {
+            String[] filePathh = {tabFilePath};
+            Response responseh =  simulationExternalInfService.downloadFile(filePathh);
+            Response.Body bodyh = responseh.body();
+            InputStream inputStreamh = bodyh.asInputStream();
+            UploadFilesUtils.decompression(inputStreamh,tabFilePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         //定义通道名
         String channelName = username + "SimulatorChannel";
         //队列初始状态
@@ -103,7 +151,7 @@ public class SimulatorServiceImpl implements SimulatorService {
         //启动监听线程
         new SubscriberThread(subscriber, channelName, host).start();
         //启用客户线程，传入参数
-        MoniRecvDataThread startMoniRecvDataThread = ExternalIOTransUtils.startMoniRecvDataThread(host, channelName, componentLinks, filePath, tabFilePath);
+        MoniRecvDataThread startMoniRecvDataThread = ExternalIOTransUtils.startMoniRecvDataThread(host, channelName, componentLinks, processModelNativePath, tabFilePath);
 
         //放入全局变量
         Global.USERS_SIMULATOR_THREAD.put(username, startMoniRecvDataThread);
@@ -158,9 +206,14 @@ public class SimulatorServiceImpl implements SimulatorService {
         JSONObject objects = JSONUtil.parseObj(str);
 
         //拼接流程模型文件路径,packinfo文件路径
-        String FilePath = managerServiceImpl.getprocessFile(projectId);
-        String packinfoFileName = gitDetailPath + FilePath + generateCodeResult + "/packinfo.xml";
-        String XmlFilePath = simulationDTO.getFlowFilePath();
+//        String FilePath = managerService.getprocessFile(projectId);
+//        String packinfoFileName = gitDetailPath + FilePath + generateCodeResult +File.separator+SimulationConstant.PACKINFO_NAME;
+        //取本地packinfo文件路径
+        SimulatorFilePathBO simulatorFilePathBO = new SimulatorFilePathBO();
+        String packinfoNativePath = simulatorFilePathBO.getPackinfoNativePath();
+   //     String XmlFilePath = simulationDTO.getFlowFilePath();
+        //取本都流程建模文件路径
+        String processModelNativePath = simulatorFilePathBO.getProcessModelNativePath();
         String arrowInfo = simulationDTO.getStartId() + ":" + simulationDTO.getStartName() + "|" + simulationDTO.getEndId() + ":" + simulationDTO.getEndName();
 
         //获取结构体表格数据
@@ -174,7 +227,7 @@ public class SimulatorServiceImpl implements SimulatorService {
         //        String yMax = "9";
         //        String zMax = "8";
         // 获取最大xyz维度
-        Map<String, String> MaxXYZ = ExternalIOTransUtils.getMaxXYZ(XmlFilePath, packinfoFileName, objects, arrowInfo);
+        Map<String, String> MaxXYZ = ExternalIOTransUtils.getMaxXYZ(processModelNativePath, packinfoNativePath, objects, arrowInfo);
         String xMax = MaxXYZ.get("xMax");
         String yMax = MaxXYZ.get("yMax");
         String zMax = MaxXYZ.get("zMax");
@@ -198,7 +251,7 @@ public class SimulatorServiceImpl implements SimulatorService {
         packDataMap.put("zMax", zMax);
         packDataMap.put("symbol", simulationDTO.getSymbol());
         packDataMap.put("dataHandleType", simulationDTO.getDataProcessingType());
-        Map<String, Object> dataInfo = ExternalIOTransUtils.parseMoniData(XmlFilePath, packinfoFileName, packDataMap, arrowInfo);
+        Map<String, Object> dataInfo = ExternalIOTransUtils.parseMoniData(processModelNativePath, packinfoNativePath, packDataMap, arrowInfo);
         Map<String, Object> dataMap = Maps.newHashMap();
         //表格数据(表格数据)
         //dataMap.put("tableData", "tableData");//模拟数据
@@ -334,11 +387,18 @@ public class SimulatorServiceImpl implements SimulatorService {
                 if (dataMap.get("FrameId").toString().equals(frameId)) {
                     JSONObject objects = JSONUtil.parseObj(dataMap.get("Data"));
                     //获取最大维度值添加到配置页面数据中
-                    String FilePath = managerServiceImpl.getprocessFile(obj.getProjectId());
-                    String packinfoFileName = gitDetailPath + FilePath + generateCodeResult + "/packinfo.xml";
-                    String XmlFilePath = obj.getFlowFilePath();
+//                    String FilePath = managerService.getprocessFile(obj.getProjectId());
+//                    String packinfoFileName = gitDetailPath + FilePath + generateCodeResult +File.separator+SimulationConstant.PACKINFO_NAME;
+//                    String XmlFilePath = obj.getFlowFilePath();
+
+                    //取本地packinfo文件路径
+                    SimulatorFilePathBO simulatorFilePathBO = new SimulatorFilePathBO();
+                    String packinfoNativePath = simulatorFilePathBO.getPackinfoNativePath();
+                    //取本都流程建模文件路径
+                    String processModelNativePath = simulatorFilePathBO.getProcessModelNativePath();
+
                     String arrowInfo = obj.getStartId() + ":" + obj.getStartName() + "|" + obj.getEndId() + ":" + obj.getEndName();
-                    Map<String, String> MaxXYZ = ExternalIOTransUtils.getMaxXYZ(XmlFilePath, packinfoFileName, objects, arrowInfo);
+                    Map<String, String> MaxXYZ = ExternalIOTransUtils.getMaxXYZ(processModelNativePath, packinfoNativePath, objects, arrowInfo);
                     //模拟数据++++++++++++++++++
 //                    String xMax = "10";
 //                    String yMax = "9";
@@ -356,7 +416,7 @@ public class SimulatorServiceImpl implements SimulatorService {
                     packDataMap.put("symbol", symbol);
                     packDataMap.put("dataHandleType", obj.getDataProcessingType());
 
-                    Map<String, Object> dataInfo = ExternalIOTransUtils.parseMoniData(XmlFilePath, packinfoFileName, packDataMap, arrowInfo);
+                    Map<String, Object> dataInfo = ExternalIOTransUtils.parseMoniData(processModelNativePath, packinfoNativePath, packDataMap, arrowInfo);
                     HashMap<Object, Object> dataMaps = new HashMap<>();
 //                    //展示数据模拟数据+++++++++++++++++++++++++++++++++
 //                    dataMaps.put("data", dataMap.get("Data"));
