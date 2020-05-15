@@ -668,7 +668,7 @@ public class ManagerController {
 	 */
 	@ResponseBody
 	@PostMapping(path = "/importProjectZipUpload", consumes = { "multipart/mixed", "multipart/form-data" })
-	public R importProjectZipUpload(@RequestParam(value = "file", required = false) MultipartFile ufile,
+	public R importProjectZipUpload(@RequestParam(value = "files", required = false) MultipartFile ufile,
 			@RequestParam(value = "projectId", required = false) String projectId) {
 		return new R<>(managerService.analysisZipFile(ufile, projectId));
 	}

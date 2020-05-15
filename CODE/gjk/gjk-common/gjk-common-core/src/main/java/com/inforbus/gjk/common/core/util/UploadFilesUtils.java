@@ -421,6 +421,7 @@ public class UploadFilesUtils {
 		Files.createDirectories(Paths.get(targetPathStr));
 		ZipArchiveEntry entry = null;
 		while ((entry = inputStream.getNextZipEntry()) != null) {
+
 			if (entry.isDirectory()) {
 				Files.createDirectories(Paths.get(targetPathStr, entry.getName()));
 			} else {

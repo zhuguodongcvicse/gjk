@@ -953,7 +953,7 @@ export default {
           }
         ).then(data => {
           let params = new FormData();
-          params.append("file", this.importProjectFileList[0]);
+          params.append("files", this.importProjectFileList[0]);
           params.append("projectId", this.currentNodeData.id);
           importProjectZipUpload(params).then(Response => {
             if (Response.data.data == -1) {

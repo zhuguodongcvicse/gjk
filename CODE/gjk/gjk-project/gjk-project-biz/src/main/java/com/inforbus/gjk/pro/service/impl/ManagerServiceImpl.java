@@ -1833,57 +1833,92 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		return excelFileToZipIO;
 	}
 
+	/**
+	 * @Author wang
+	 * @Description: 项目树导入功能
+	 * @Param: [ufile, projectId]
+	 * @Return: int
+	 * @Create: 2020/5/14
+	 */
 	@Override
 	public int analysisZipFile(MultipartFile ufile, String projectId) {
 		Project project = projectMapper.getProById(projectId);
-		String filePath = serverPath + "gjk" + File.separator + "zipFile" + File.separator
-				+ (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date()) + "-" + ufile.getOriginalFilename();
+		String filePath = serverPath + ProjectConstants.GJK + File.separator + ProjectConstants.ZIPFILE+ File.separator
+				+ (new SimpleDateFormat(ProjectConstants.TIME_FORMAT)).format(new Date()) ;
+		File file = new File(filePath);
+		if (!file.getParentFile().exists()) {
+			file.getParentFile().mkdirs();
+		}
+
+		int tag = 0;
 		try {
-			File file = new File(filePath);
-			if (!file.getParentFile().exists()) {
-				file.getParentFile().mkdirs();
-			}
-			ufile.transferTo(file);
+			//上传文件至分布式文件服务器并解压
+			R<Boolean> r = dataCenterServiceFeign.uploadDecompression(ufile, filePath);
+			Boolean isUploadSuccess = r.getData();
+			//文件上传成功进行如下操作
+			if (isUploadSuccess != null && isUploadSuccess){
+				String[] paths = new String[]{
+					filePath + File.separator + ProjectConstants.MYSQL + File.separator +TableNameConstants.MYSQL_XLS,
+					filePath + File.separator + ProjectConstants.MYSQL + File.separator +TableNameConstants.GJK_HARDWARELIBS_CSV,
+					filePath + File.separator + ProjectConstants.MYSQL + File.separator +TableNameConstants.GJK_CHIPSFROMHARDWARELIBS_CSV
+				};
+				//从文件服务器下载表格数据至本地服务器，下载回来的为zip流
+				Response response = dataCenterServiceFeign.downloadFile(paths);
+				Response.Body body = response.body();
+				InputStream in = body.asInputStream();
+				//本地服务器上表格文件存放的地址
+				String downPath = serverPath + ProjectConstants.GJK + File.separator + ProjectConstants.ZIPFILE + File.separator
+						+ (new SimpleDateFormat(ProjectConstants.TIME_FORMAT)).format(new Date()) ;
+				//对下载回来的表格数据zip流进行解压，解压到本地服务器
+				UploadFilesUtils.decompression(in, downPath);
 
-			String descDirPath = filePath.substring(0, filePath.lastIndexOf("."));
-			// 解压zip文件夹
-			unZipFiles(filePath, descDirPath);
-
-			int tag = 0;
-
-			File[] files = new File(descDirPath).listFiles();
-			for (File item : files) {
-				// 表数据入库处理
-				if (item.getName().equals("mysql")) {
-					String excelFilePath = descDirPath + File.separator + "mysql" + File.separator + "MySQL.xls";
-					tag = readExcel(descDirPath, excelFilePath, projectId);
+				File downFile = new File(downPath);
+				if (downFile.exists()){
+					//把MySQL.xls表格中的数据添加或更新到数据库中
+					String excelFilePath = downPath + File.separator + TableNameConstants.MYSQL_XLS;
+					tag = readExcel(downPath, excelFilePath, projectId);
 					// 硬件建模数据
-					excelFilePath = descDirPath + File.separator + "mysql" + File.separator + "gjk_hardwarelibs.csv";
-					tag = readCvs(excelFilePath, "gjk_hardwarelibs", projectId);
+					excelFilePath = downPath + File.separator + TableNameConstants.GJK_HARDWARELIBS_CSV;
+					tag = readCvs(excelFilePath, ProjectConstants.GJK_HARDWARELIBS, projectId);
 					// 芯片数据
-					excelFilePath = descDirPath + File.separator + "mysql" + File.separator
-							+ "gjk_chipsfromhardwarelibs.csv";
-					tag = readCvs(excelFilePath, "gjk_chipsfromhardwarelibs", projectId);
+					excelFilePath = downPath +  File.separator + TableNameConstants.GJK_CHIPSFROMHARDWARELIBS_CSV;
+					tag = readCvs(excelFilePath, ProjectConstants.GJK_CHIPSFROMHARDWARELIBS, projectId);
 				}
-
-				// 引用的资源文件拷贝到指定目录
-				else {
-					if (item.getName().equals("project")) {
-						// project 需要把目录改成导入项目的目录名
-						String targetFilePath = serverPath + "gjk" + File.separator + item.getName() + File.separator
-								+ project.getProjectName();
-						FileUtil.copyFile(item.listFiles()[0].getPath(), targetFilePath);
-					} else {
-						String targetFilePath = serverPath + "gjk" + File.separator + item.getName();
-						FileUtil.copyFile(item.getPath(), targetFilePath);
-					}
-				}
+				//压缩包中模板文件解压后的绝对路径
+				String baseTemplatePath = filePath + File.separator + ProjectConstants.BASETEMPLATE;
+				//拷贝basetemplate文件的目标路径
+				String baseTemplateAimsPath = serverPath + ProjectConstants.GJK + File.separator + ProjectConstants.BASETEMPLATE;
+				//复制文件服务器中的文件到对应目录下
+				dataCenterServiceFeign.copylocalFile(baseTemplatePath,baseTemplateAimsPath);
+				//压缩包中bsp文件解压后的绝对路径
+				String bspPath = filePath + File.separator + ProjectConstants.BSP;
+				//拷贝bsp文件的目标路径
+				String bspAimsPath = serverPath + ProjectConstants.GJK + File.separator + ProjectConstants.BSP;
+				//复制文件服务器中的文件到对应目录下
+				dataCenterServiceFeign.copylocalFile(bspPath,bspAimsPath);
+				//压缩包中common文件夹解压后的绝对路径
+				String commonPath = filePath + File.separator + ProjectConstants.COMMON;
+				//拷贝common文件的目标路径
+				String commonAimsPath = serverPath + ProjectConstants.GJK + File.separator + ProjectConstants.COMMON;
+				//复制文件服务器中的文件到对应目录下
+				dataCenterServiceFeign.copylocalFile(commonPath,commonAimsPath);
+				//压缩包中project文件夹解压后的绝对路径
+				String projectPath = filePath + File.separator + ProjectConstants.PROJECT;
+				//拷贝project文件的目标路径
+				String projectAimsPath = serverPath + ProjectConstants.GJK + File.separator + ProjectConstants.PROJECT;
+				//复制文件服务器中的文件到对应目录下
+				dataCenterServiceFeign.copylocalFile(projectPath,projectAimsPath);
+				//压缩包中software文件夹解压后的绝对路径
+				String softwarePath = filePath + File.separator + ProjectConstants.SOFTWARE;
+				//拷贝software文件的目标路径
+				String softwareAimsPath = serverPath + ProjectConstants.GJK + File.separator + ProjectConstants.SOFTWARE;
+				//复制文件服务器中的文件到对应目录下
+				dataCenterServiceFeign.copylocalFile(softwarePath,softwareAimsPath);
+				//删除解压后的文件
+				dataCenterServiceFeign.delAllFile(filePath);
+				//删除本地服务器的表格
+				downFile.delete();
 			}
-
-			// 删除压缩包
-			cn.hutool.core.io.FileUtil.del(filePath);
-			// 删除解压包
-			cn.hutool.core.io.FileUtil.del(descDirPath);
 			return tag;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1911,18 +1946,14 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		List<PartPlatformSoftware> partPlatformSoftwareList = new ArrayList<>();
 		List<Software> softwareList = new ArrayList<>();
 		List<SoftwareDetail> softwareDetailList = new ArrayList<>();
-		List<SoftwareFile> softwareFileList = new ArrayList<>();
 		List<PartPlatformBSP> partPlatformBSPList = new ArrayList<>();
 		List<BSP> bspList = new ArrayList<>();
 		List<BSPDetail> bspDetailList = new ArrayList<>();
-		List<BSPFile> bspFileList = new ArrayList<>();
 		List<ProComp> proCompList = new ArrayList<>();
 		List<CommonComponent> compList = new ArrayList<>();
 		List<CommonComponentDetail> compDetailList = new ArrayList<>();
 		List<CompStruct> compStructList = new ArrayList<>();
 		List<Structlibs> structlibsList = new ArrayList<>();
-//		List<Hardwarelibs> hardwarelibsList = new ArrayList<>();
-//		List<Chipsfromhardwarelibs> chipsfromhardwarelibsList = new ArrayList<>();
 		List<SysDict> sysDictList = new ArrayList<>();
 
 		// 获取所有sheet对象
@@ -1932,141 +1963,116 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			String tableName = sheet.getSheetName();
 			String className = null;
 			// 项目表
-			if ("gjk_project".equals(tableName)) {
-				className = "com.inforbus.gjk.pro.api.entity.Project";
+			if (TableNameConstants.GJK_PROJECT.equals(tableName)) {
+				className = ClassNameConstants.PROJECT_ENTITY;
 				for (Object obj : parseSheet(sheet, className)) {
 					projectList.add((Project) obj);
 				}
 			}
 			// 项目详情表
-			else if ("gjk_project_detail".equals(tableName)) {
-				className = "com.inforbus.gjk.pro.api.entity.ProjectFile";
+			else if (TableNameConstants.GJK_PROJECT_DETAIL.equals(tableName)) {
+				className = ClassNameConstants.PROJECTFILE_ENTITY;
 				for (Object obj : parseSheet(sheet, className)) {
 					projectDetailList.add((ProjectFile) obj);
 				}
 			}
 			// app表
-			else if ("gjk_app".equals(tableName)) {
-				className = "com.inforbus.gjk.pro.api.entity.App";
+			else if (TableNameConstants.GJK_APP.equals(tableName)) {
+				className = ClassNameConstants.APP_ENTITY;
 				for (Object obj : parseSheet(sheet, className)) {
 					appList.add((App) obj);
 				}
 			}
 			// 基础模版表
-			else if ("gjk_base_template".equals(tableName)) {
-				className = "com.inforbus.gjk.admin.api.entity.BaseTemplate";
+			else if (TableNameConstants.GJK_BASE_TEMPLATE.equals(tableName)) {
+				className = ClassNameConstants.BASETEMPLATE_ENTITY;
 				for (Object obj : parseSheet(sheet, className)) {
 					baseTemplateList.add((BaseTemplate) obj);
 				}
 			}
 			// 软件框架与流程关系表
-			else if ("gjk_app_part_platform_software".equals(tableName)) {
-				className = "com.inforbus.gjk.pro.api.entity.PartPlatformSoftware";
+			else if (TableNameConstants.GJK_APP_PART_PLATFORM_SOFTWARE.equals(tableName)) {
+				className = ClassNameConstants.PART_PLATFORM_SOFTWARE_ENTITY;
 				for (Object obj : parseSheet(sheet, className)) {
 					partPlatformSoftwareList.add((PartPlatformSoftware) obj);
 				}
 			}
 			// 软件框架表
-			else if ("gjk_software".equals(tableName)) {
-				className = "com.inforbus.gjk.pro.api.entity.Software";
+			else if (TableNameConstants.GJK_SOFTWARE.equals(tableName)) {
+				className = ClassNameConstants.SOFTWARE_ENTITY;
 				for (Object obj : parseSheet(sheet, className)) {
 					softwareList.add((Software) obj);
 				}
 			}
 			// 软件框架与平台关系表
-			else if ("gjk_software_detail".equals(tableName)) {
-				className = "com.inforbus.gjk.admin.api.entity.SoftwareDetail";
+			else if (TableNameConstants.GJK_SOFTWARE_DETAIL.equals(tableName)) {
+				className = ClassNameConstants.SOFTWARE_DETAIL_ENTITY;
 				for (Object obj : parseSheet(sheet, className)) {
 					softwareDetailList.add((SoftwareDetail) obj);
 				}
 			}
+
 			// 软件框架文件表
-			else if ("gjk_software_file".equals(tableName)) {
-				className = "com.inforbus.gjk.admin.api.entity.SoftwareFile";
-				for (Object obj : parseSheet(sheet, className)) {
-					softwareFileList.add((SoftwareFile) obj);
-				}
-			}
-			// 软件框架文件表
-			else if ("gjk_app_part_platform_bsp".equals(tableName)) {
-				className = "com.inforbus.gjk.pro.api.entity.PartPlatformBSP";
+			else if (TableNameConstants.GJK_APP_PART_PLATFORM_BSP.equals(tableName)) {
+				className = ClassNameConstants.PART_PLATFORM_BSP_ENTITY;
 				for (Object obj : parseSheet(sheet, className)) {
 					partPlatformBSPList.add((PartPlatformBSP) obj);
 				}
 			}
 			// bsp表
-			else if ("gjk_bsp".equals(tableName)) {
-				className = "com.inforbus.gjk.admin.api.entity.BSP";
+			else if (TableNameConstants.GJK_BSP.equals(tableName)) {
+				className = ClassNameConstants.BSP_ENTITY;
 				for (Object obj : parseSheet(sheet, className)) {
 					bspList.add((BSP) obj);
 				}
 			}
 			// bsp和平台关系表
-			else if ("gjk_bsp_detail".equals(tableName)) {
-				className = "com.inforbus.gjk.admin.api.entity.BSPDetail";
+			else if (TableNameConstants.GJK_BSP_DETAIL.equals(tableName)) {
+				className = ClassNameConstants.BSP_DETAIL_ENTITY;
 				for (Object obj : parseSheet(sheet, className)) {
 					bspDetailList.add((BSPDetail) obj);
 				}
 			}
-			// BSP文件表
-			else if ("gjk_bsp_file".equals(tableName)) {
-				className = "com.inforbus.gjk.admin.api.entity.BSPFile";
-				for (Object obj : parseSheet(sheet, className)) {
-					bspFileList.add((BSPFile) obj);
-				}
-			}
+
 			// 项目和构件关系表
-			else if ("gjk_project_comp".equals(tableName)) {
-				className = "com.inforbus.gjk.pro.api.entity.ProComp";
+			else if (TableNameConstants.GJK_PROJECT_COMP.equals(tableName)) {
+				className = ClassNameConstants.PROCOMP_ENTITY;
 				for (Object obj : parseSheet(sheet, className)) {
 					proCompList.add((ProComp) obj);
 				}
 			}
 			// 构件库表
-			else if ("gjk_common_component".equals(tableName)) {
-				className = "com.inforbus.gjk.pro.api.entity.CommonComponent";
+			else if (TableNameConstants.GJK_COMMON_COMPONENT.equals(tableName)) {
+				className = ClassNameConstants.COMMON_COMPONENT_ENTITY;
 				for (Object obj : parseSheet(sheet, className)) {
 					compList.add((CommonComponent) obj);
 				}
 			}
 			// 结构库详细表
-			else if ("gjk_common_component_detail".equals(tableName)) {
-				className = "com.inforbus.gjk.pro.api.entity.CommonComponentDetail";
+			else if (TableNameConstants.GJK_COMMON_COMPONENT_DETAIL.equals(tableName)) {
+				className = ClassNameConstants.COMMON_COMPONENT_DETAIL_ENTITY;
 				for (Object obj : parseSheet(sheet, className)) {
 					compDetailList.add((CommonComponentDetail) obj);
 				}
 			}
 			// 构件库和结构体表关系表
-			else if ("gjk_comp_struct".equals(tableName)) {
-				className = "com.inforbus.gjk.common.core.entity.CompStruct";
+			else if (TableNameConstants.GJK_COMP_STRUCT.equals(tableName)) {
+				className = ClassNameConstants.COMP_STRUCT_ENTITY;
 				for (Object obj : parseSheet(sheet, className)) {
 					compStructList.add((CompStruct) obj);
 				}
 			}
 			// 结构体表
-			else if ("gjk_structlibs".equals(tableName)) {
-				className = "com.inforbus.gjk.common.core.entity.Structlibs";
+			else if (TableNameConstants.GJK_STRUCTLIBS.equals(tableName)) {
+				className = ClassNameConstants.STRUCTLIBS_ENTITY;
 				for (Object obj : parseSheet(sheet, className)) {
 					structlibsList.add((Structlibs) obj);
 				}
 			}
-//			// 硬件建模表
-//			else if("gjk_hardwarelibs".equals(tableName)){
-//				className = "com.inforbus.gjk.pro.api.entity.Hardwarelibs";
-//				for (Object obj : parseSheet(sheet, className)) {
-//					hardwarelibsList.add((Hardwarelibs) obj);
-//				}
-//			}
-//			// 芯片表
-//			else if("gjk_chipsfromhardwarelibs".equals(tableName)){
-//				className = "com.inforbus.gjk.pro.api.entity.Chipsfromhardwarelibs";
-//				for (Object obj : parseSheet(sheet, className)) {
-//					chipsfromhardwarelibsList.add((Chipsfromhardwarelibs) obj);
-//				}
-//			}
+
 			// 字典表
-			else if ("sys_dict".equals(tableName)) {
-				className = "com.inforbus.gjk.admin.api.entity.SysDict";
+			else if (TableNameConstants.SYS_DICT.equals(tableName)) {
+				className = ClassNameConstants.SYS_DICT_ENTITY;
 				for (Object obj : parseSheet(sheet, className)) {
 					sysDictList.add((SysDict) obj);
 				}
@@ -2135,14 +2141,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			}
 		}
 
-		// 软件框架文件表
-		for (SoftwareFile softwareFile : softwareFileList) {
-			if (baseMapper.getSoftwareFileBySoftwareIdAndFileName(softwareFile.getSoftwareId(),
-					softwareFile.getFileName()) == null) {
-				baseMapper.saveSoftwareFile(softwareFile);
-			}
-		}
-
 		// bsp与流程关系表
 		for (PartPlatformBSP partPlatformBSP : partPlatformBSPList) {
 			if (partPlatformBSPMapper.selectById(partPlatformBSP.getId()) == null) {
@@ -2161,14 +2159,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		for (BSPDetail bspDetail : bspDetailList) {
 			if (baseMapper.getBSPDetailByBSPIdAndPlatformId(bspDetail.getBspId(), bspDetail.getPlatformId()) == null) {
 				baseMapper.saveBSPDetail(bspDetail);
-			}
-		}
-
-		// BSP文件表
-		for (BSPFile bspFile : bspFileList) {
-			if (baseMapper.getBSPFileByBSPIdAndFileNameAndFilePath(bspFile.getBspId(), bspFile.getFileName(),
-					bspFile.getFilePath()) == null) {
-				baseMapper.saveBSPFile(bspFile);
 			}
 		}
 
@@ -2218,26 +2208,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				baseMapper.updateStructlibs(structlibs);
 			}
 		}
-
-//		// 硬件建模表
-//		for (Hardwarelibs hardwarelibs : hardwarelibsList) {
-//			hardwarelibs.setProjectId(projectId);
-//			if(baseMapper.getHardwarelibsById(hardwarelibs.getId()) == null){
-//				baseMapper.saveHardwarelibs(hardwarelibs);
-//			}else{
-//				baseMapper.updateHardwarelibById(hardwarelibs);
-//			}
-//		}
-//
-//		// 芯片表
-//		for (Chipsfromhardwarelibs chipsfromhardwarelibs : chipsfromhardwarelibsList) {
-//			chipsfromhardwarelibs.setProjectId(projectId);
-//			if(baseMapper.getChipsfromhardwarelibsById(chipsfromhardwarelibs.getId()) == null){
-//				baseMapper.saveChipsfromhardwarelibs(chipsfromhardwarelibs);
-//			}else{
-//				baseMapper.updateChipsfromhardwarelibsById(chipsfromhardwarelibs);
-//			}
-//		}
 
 		// 字典表
 		for (SysDict sysDict : sysDictList) {
@@ -2916,15 +2886,15 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		List<Chipsfromhardwarelibs> chipsfromhardwarelibsList = new ArrayList<>();
 		String className = "";
 		// 硬件建模表
-		if ("gjk_hardwarelibs".equals(tableName)) {
-			className = "com.inforbus.gjk.pro.api.entity.Hardwarelibs";
+		if (TableNameConstants.GJK_HARDWARELIBS.equals(tableName)) {
+			className = ClassNameConstants.HARDWARELIBS_ENTITY;
 			for (Object obj : parseCvsFile(path, className)) {
 				hardwarelibsList.add((Hardwarelibs) obj);
 			}
 		}
 		// 芯片表
-		else if ("gjk_chipsfromhardwarelibs".equals(tableName)) {
-			className = "com.inforbus.gjk.pro.api.entity.Chipsfromhardwarelibs";
+		else if (TableNameConstants.GJK_CHIPSFROMHARDWARELIBS.equals(tableName)) {
+			className = ClassNameConstants.CHIPSFROM_HARDWARELIBS_ENTITY;
 			for (Object obj : parseCvsFile(path, className)) {
 				chipsfromhardwarelibsList.add((Chipsfromhardwarelibs) obj);
 			}

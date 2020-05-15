@@ -111,7 +111,7 @@
     </resultMap>
 
     <resultMap id="softwareDetailMap"
-               type="com.inforbus.gjk.admin.api.entity.SoftwareDetail">
+               type="com.inforbus.gjk.pro.api.entity.SoftwareDetail">
         <id property="software_id" column="softwareId"/>
         <result property="platform_id" column="platformId"/>
     </resultMap>
@@ -124,7 +124,7 @@
     </resultMap>
 
     <resultMap id="bspDetailMap"
-               type="com.inforbus.gjk.admin.api.entity.BSPDetail">
+               type="com.inforbus.gjk.pro.api.entity.BSPDetail">
         <id property="bsp_id" column="bspId"/>
         <result property="platform_id" column="platformId"/>
     </resultMap>
@@ -922,7 +922,7 @@
 		`description` = #{sysDict.description},
 		`sort` = #{sysDict.sort},
 		`remarks` = #{sysDict.remarks},
-		`del_flag` = #{sysDict.delFlag})
-		WHERE `id` = #{sysDict.id}
+		`del_flag` = #{sysDict.delFlag}
+		WHERE id = #{sysDict.id}
 	</update>
 </mapper>

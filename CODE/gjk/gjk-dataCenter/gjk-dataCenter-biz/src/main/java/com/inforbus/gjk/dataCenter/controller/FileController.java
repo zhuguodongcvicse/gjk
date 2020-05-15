@@ -10,6 +10,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -538,6 +540,10 @@ public class FileController {
 			ByteArrayOutputStream zps = UploadFilesUtils.toZip(files, fileTarget, bean);
 			OutputStream out = response.getOutputStream();
 			out.write(zps.toByteArray());
+			//删除临时文件
+			for (File file : files) {
+				Files.deleteIfExists(Paths.get(file.getPath()));
+			}
 		} catch (Exception e) {
 			logger.error("多文件下载异常", e);
 		} finally {
