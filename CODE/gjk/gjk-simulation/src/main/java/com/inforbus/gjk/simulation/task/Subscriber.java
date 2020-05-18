@@ -35,6 +35,7 @@ public class Subscriber extends JedisPubSub {
         this.queueSize = queueSize;
     }
 
+    @Override
     public void onMessage(String channel, String message) {
         //处理message
         Map jsonObject = JSONUtil.parseObj(message);
@@ -55,11 +56,13 @@ public class Subscriber extends JedisPubSub {
         }
     }
 
+    @Override
     public void onSubscribe(String channel, int subscribedChannels) {
         System.out.println(String.format("subscribe redis channel success, channel %s, subscribedChannels %d",
                 channel, subscribedChannels));
     }
 
+    @Override
     public void onUnsubscribe(String channel, int subscribedChannels) {
         System.out.println(String.format("unsubscribe redis channel, channel %s, subscribedChannels %d",
                 channel, subscribedChannels));

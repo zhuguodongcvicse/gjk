@@ -35,7 +35,6 @@ public class SimulatorController {
     private SimulatorService simulatorService;
 
     /**
-     * @param null
      * @Description 开始仿真
      * @Author ZhangHongXu
      * @Return
@@ -49,7 +48,6 @@ public class SimulatorController {
     }
 
     /**
-     * @param null
      * @Description 获取数据源
      * @Author ZhangHongXu
      * @Return
@@ -63,8 +61,7 @@ public class SimulatorController {
 	/**
 	* @Description 获取曲波图数据
 	* @Author ZhangHongXu
-	 * @param null
-	* @Return 
+	 * @Return
 	* @Exception 
 	* @Date 2020/4/9 9:14
 	*/
@@ -75,8 +72,7 @@ public class SimulatorController {
 	/**
 	* @Description 停止仿真
 	* @Author ZhangHongXu
-	 * @param null
-	* @Return 
+	 * @Return
 	* @Exception 
 	* @Date 2020/4/9 9:14
 	*/
@@ -87,8 +83,7 @@ public class SimulatorController {
 	/**
 	* @Description 停止
 	* @Author ZhangHongXu
-	 * @param null
-	* @Return 
+	 * @Return
 	* @Exception 
 	* @Date 2020/4/9 9:14
 	*/
@@ -100,8 +95,7 @@ public class SimulatorController {
 	/**
 	* @Description 获取帧数得到数据
 	* @Author ZhangHongXu
-	 * @param null
-	* @Return 
+	 * @Return
 	* @Exception 
 	* @Date 2020/4/9 9:22
 	*/

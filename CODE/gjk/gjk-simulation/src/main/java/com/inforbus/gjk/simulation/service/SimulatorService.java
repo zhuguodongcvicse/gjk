@@ -20,7 +20,6 @@ public interface SimulatorService {
     /**
      * 开始仿真
      *
-     * @param s
      * @param username
      * @param componentLinks
      * @param filePath

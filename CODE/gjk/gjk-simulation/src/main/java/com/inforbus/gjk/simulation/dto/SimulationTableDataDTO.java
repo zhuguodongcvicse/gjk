@@ -1,6 +1,9 @@
 package com.inforbus.gjk.simulation.dto;
 
 import lombok.Data;
+/**
+ * @author ZHX
+ */
 @Data
 public class SimulationTableDataDTO {
 	

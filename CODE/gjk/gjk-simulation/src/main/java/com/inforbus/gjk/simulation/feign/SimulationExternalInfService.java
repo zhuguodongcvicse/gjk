@@ -44,7 +44,6 @@ public interface SimulationExternalInfService {
     public R<Boolean> createXMLFile(@RequestBody XMlEntityMapVO xMlEntityMapVO);
 
     /**
-     * @param response  返回zip流
      * @param filePaths 文件全路径
      * @Title: downloadFile
      * @Desc 下载多文件返回流

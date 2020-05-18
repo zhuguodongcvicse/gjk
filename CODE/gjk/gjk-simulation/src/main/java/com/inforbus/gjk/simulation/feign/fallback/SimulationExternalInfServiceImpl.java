@@ -50,7 +50,6 @@ public class SimulationExternalInfServiceImpl implements SimulationExternalInfSe
     }
 
     /**
-     * @param response  返回zip流
      * @param filePaths 文件全路径
      * @Title: downloadFile
      * @Desc 下载多文件返回流

@@ -39,7 +39,6 @@ import java.util.List;
 public interface SysDictMapper extends BaseMapper<SysDict> {
 
     /**
-     * @param null
      * @Description      * @Description
      * @Author ZhangHongXu
      * @Return
