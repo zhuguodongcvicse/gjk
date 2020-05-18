@@ -188,4 +188,14 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
 		return r;
 	}
 
+    @Override
+    public R<Boolean> uploadDecompression(MultipartFile file, String localPath) {
+        return null;
+    }
+
+    @Override
+    public Response downloadFile(String[] filePaths) {
+        return null;
+    }
+
 }

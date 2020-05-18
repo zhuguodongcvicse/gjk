@@ -89,4 +89,23 @@ public interface ProjectConstants {
      */
     String SELECTTYPE= "selectType";
 
+    /**
+     * zipFile 字符串
+     */
+    String ZIPFILE= "zipFile";
+
+    /**
+     * gjk_hardwarelibs 字符串
+     */
+    String GJK_HARDWARELIBS= "gjk_hardwarelibs";
+
+    /**
+     * gjk_chipsfromhardwarelibs 字符串
+     */
+    String GJK_CHIPSFROMHARDWARELIBS= "gjk_chipsfromhardwarelibs";
+
+    /**
+     * 时间格式 字符串
+     */
+    String TIME_FORMAT= "yyyyMMddHHmmss";
 }

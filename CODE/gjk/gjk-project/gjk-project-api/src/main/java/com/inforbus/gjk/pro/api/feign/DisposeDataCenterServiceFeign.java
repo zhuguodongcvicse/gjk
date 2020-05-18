@@ -186,4 +186,30 @@ public interface DisposeDataCenterServiceFeign {
 	 */
 	@PostMapping(value = "/findJson")
 	public R<String> findJson(@RequestParam("jsonPath")String jsonPath);
+
+	/**
+	 * @Title: uploadDecompression
+	 * @Desc 上传并解压文件
+	 * @Author cvics
+	 * @DateTime 2020年5月8日
+	 * @param file      要解压的文件
+	 * @param localPath 解压的文件路径
+	 * @return
+	 */
+	@PostMapping(value = "/decompression", produces = {
+			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public R<Boolean> uploadDecompression(@RequestPart(value = "files") MultipartFile file,
+										  @RequestParam("filePath") String localPath);
+
+
+	/**
+	 * @Title: downloadFile
+	 * @Desc 下载多文件返回zip流
+	 * @Author xiaohe
+	 * @DateTime 2020年4月15日
+	 * @param filePaths 文件全路径
+	 */
+	@ResponseBody
+	@PostMapping(value = "/downloadStreamFiles")
+	public Response downloadFile(@RequestParam("filePaths") String[] filePaths);
 }

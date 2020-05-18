@@ -399,7 +399,7 @@ export default {
     //对能够编译的构件工程文件夹做处理
     addIsComplie(treeData) {
       for (let node of treeData) {
-        if (node.label == "App组件工程") {
+        if (node.label == "AppPro") {
           Vue.set(node, "isComplie", true);
           this.appComponentId = node.id;
         } else if (node.parentId == this.appComponentId) {
@@ -674,7 +674,7 @@ export default {
         data.type == "app" &&
         data.isComplie &&
         data.isDirectory == "0" &&
-        data.label == "App组件工程"
+        data.label == "AppPro"
       ) {
         this.procedureId = data.processId;
         this.menus = ["编译", "删除", "静态检查", "增加文件", "增加文件夹"];
@@ -953,7 +953,7 @@ export default {
           }
         ).then(data => {
           let params = new FormData();
-          params.append("file", this.importProjectFileList[0]);
+          params.append("files", this.importProjectFileList[0]);
           params.append("projectId", this.currentNodeData.id);
           importProjectZipUpload(params).then(Response => {
             if (Response.data.data == -1) {
