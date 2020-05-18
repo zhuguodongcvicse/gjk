@@ -45,20 +45,13 @@ import java.util.*;
  */
 @Service
 public class SimulatorServiceImpl implements SimulatorService {
-
     /**
-     * @Description redis连接工具模板
-     * @Author ZhangHongXu
-     * @param null
-     * @Return
-     * @Exception
-     * @Date 2020/4/9 9:19
+     * redis连接工具模板
      */
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
     @Autowired
     ManagerService managerService;
-
     @Autowired
     SimulationExternalInfService simulationExternalInfService;
     @Autowired
@@ -68,32 +61,37 @@ public class SimulatorServiceImpl implements SimulatorService {
      */
     @Value("${simulation.jedisHost}")
     private String host;
-
     /**
      * 队列长度
      */
     @Value("${simulation.queueSize}")
     private String queueSize;
-    // gitlu路径
+    /**
+     * gitlu路径
+     */
     @Value("${git.local.path}")
     private String gitDetailPath;
-
-    // 集成代码生成结果存放路径
+    /*
+     *集成代码生成结果存放路径
+     */
     @Value("${gjk.pro.process.generateCodeResult}")
     private String generateCodeResult;
-
-    //获取控制表头文件路径
+    /**
+     * 获取控制表头文件路径
+     */
     @Value("${ctrl.tab.file.path}")
     private String tabFilePath;
 
     /**
-     * @param null
-     * @param s
+     * @param username
+     * @param projectId
+     * @param componentLinks
+     * @param filePath
      * @Description 开始仿真客户线程放入全局变量
      * @Author ZhangHongXu
-     * @Return
+     * @Return boolean
      * @Exception
-     * @Date 2020/4/9 9:19
+     * @Date 2020/5/18 13:56
      */
     @Override
     public boolean startSimulator(String username, String projectId, List<String> componentLinks, String filePath) throws IOException {
@@ -103,15 +101,15 @@ public class SimulatorServiceImpl implements SimulatorService {
         R<XmlEntityMap> xmlEntityMapR = simulationExternalInfService.analysisXmlFileToXMLEntityMap(filePath);
         XmlEntityMap xmlEntity = xmlEntityMapR.getData();
         //存放本地文件地址
-        String processModelNativePath = SimulationConstant.FILEPATH + File.separator+username +  File.separator+FilePath+SimulationConstant.PROCESS_MODEL_NAME;
-        String packinfoNativePath= SimulationConstant.FILEPATH +  File.separator+username +  File.separator+FilePath+SimulationConstant.PACKINFO_NAME;
+        String processModelNativePath = SimulationConstant.FILEPATH + File.separator + username + File.separator + FilePath + SimulationConstant.PROCESS_MODEL_NAME;
+        String packinfoNativePath = SimulationConstant.FILEPATH + File.separator + username + File.separator + FilePath + SimulationConstant.PACKINFO_NAME;
         //放到全局变量中
         SimulatorFilePathBO simulatorFilePathBO = new SimulatorFilePathBO();
         simulatorFilePathBO.setProcessModelNativePath(processModelNativePath);
         simulatorFilePathBO.setPackinfoNativePath(packinfoNativePath);
         //String tabFilePathNativePath = SimulationConstant.FILEPATH + File.separator+username+ File.separator+FilePath;
-        //datacenter中packinfo文件地址
-        String packinfoPath = gitDetailPath + FilePath + generateCodeResult + File.separator +SimulationConstant.PACKINFO_NAME;
+        //decenter中packinfo文件地址
+        String packinfoPath = gitDetailPath + FilePath + generateCodeResult + File.separator + SimulationConstant.PACKINFO_NAME;
         //生成xml文件
         XMlEntityMapVO xmlEntityMapVO = new XMlEntityMapVO();
         xmlEntityMapVO.setLocalPath(processModelNativePath);
@@ -121,17 +119,17 @@ public class SimulatorServiceImpl implements SimulatorService {
         String packinfoFileName = gitDetailPath + FilePath + generateCodeResult + SimulationConstant.PACKINFO_NAME;
         String[] filePaths = {packinfoPath};
         //下载packinfo文件到本地
-        Response response =  simulationExternalInfService.downloadFile(filePaths);
+        Response response = simulationExternalInfService.downloadFile(filePaths);
         Response.Body body = response.body();
         InputStream inputStream = body.asInputStream();
-        UploadFilesUtils.decompression(inputStream,SimulationConstant.FILEPATH + File.separator+username+File.separator+FilePath);
+        UploadFilesUtils.decompression(inputStream, SimulationConstant.FILEPATH + File.separator + username + File.separator + FilePath);
         //下载头文件到本地
         try {
             String[] filePathh = {tabFilePath};
-            Response responseh =  simulationExternalInfService.downloadFile(filePathh);
+            Response responseh = simulationExternalInfService.downloadFile(filePathh);
             Response.Body bodyh = responseh.body();
             InputStream inputStreamh = bodyh.asInputStream();
-            UploadFilesUtils.decompression(inputStreamh,tabFilePath);
+            UploadFilesUtils.decompression(inputStreamh, tabFilePath);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -159,12 +157,12 @@ public class SimulatorServiceImpl implements SimulatorService {
     }
 
     /**
-     * @param null
+     * @param username
      * @Description 停止仿真
      * @Author ZhangHongXu
-     * @Return
+     * @Return boolean
      * @Exception
-     * @Date 2020/4/9 9:20
+     * @Date 2020/5/18 13:56
      */
     @Override
     public boolean stopSimulator(String username) {
@@ -186,16 +184,17 @@ public class SimulatorServiceImpl implements SimulatorService {
     }
 
     /**
-     * @param null
+     * @param username
+     * @param projectId
+     * @param simulationDTO
      * @Description 获取曲波图数据
      * @Author ZhangHongXu
-     * @Return
+     * @Return java.util.Map<java.lang.String, java.lang.Object>
      * @Exception
-     * @Date 2020/4/9 9:20
+     * @Date 2020/5/18 13:56
      */
     @Override
     public Map<String, Object> getData(String username, String projectId, SimulationDTO simulationDTO) {
-
         //修改队列初始化状态
         redisTemplate.opsForValue().set(username + ":initState:" + simulationDTO.getSymbol(), "1");
         //拼接队列key
@@ -211,7 +210,7 @@ public class SimulatorServiceImpl implements SimulatorService {
         //取本地packinfo文件路径
         SimulatorFilePathBO simulatorFilePathBO = new SimulatorFilePathBO();
         String packinfoNativePath = simulatorFilePathBO.getPackinfoNativePath();
-   //     String XmlFilePath = simulationDTO.getFlowFilePath();
+        //     String XmlFilePath = simulationDTO.getFlowFilePath();
         //取本都流程建模文件路径
         String processModelNativePath = simulatorFilePathBO.getProcessModelNativePath();
         String arrowInfo = simulationDTO.getStartId() + ":" + simulationDTO.getStartName() + "|" + simulationDTO.getEndId() + ":" + simulationDTO.getEndName();
@@ -269,12 +268,14 @@ public class SimulatorServiceImpl implements SimulatorService {
     }
 
     /**
-     * @param null
+     * @param xMax
+     * @param yMax
+     * @param zMax
      * @Description 重组xyz维度数据
      * @Author ZhangHongXu
-     * @Return
+     * @Return java.util.HashMap<java.lang.String, java.lang.Object>
      * @Exception
-     * @Date 2020/4/9 9:22
+     * @Date 2020/5/18 13:56
      */
     public HashMap<String, Object> dataSplitting(Integer xMax, Integer yMax, Integer zMax) {
         ArrayList<Object> xList = new ArrayList<>();
@@ -305,12 +306,13 @@ public class SimulatorServiceImpl implements SimulatorService {
     }
 
     /**
-     * @param null
+     * @param username
+     * @param symbols
      * @Description 暂停获取帧数
      * @Author ZhangHongXu
-     * @Return
+     * @Return java.util.ArrayList<java.lang.Object>
      * @Exception
-     * @Date 2020/4/9 9:21
+     * @Date 2020/5/18 13:55
      */
     @Override
     public ArrayList<Object> suspend(String username, List<String> symbols) {
@@ -335,16 +337,16 @@ public class SimulatorServiceImpl implements SimulatorService {
     }
 
     /**
-     * @param null
+     * @param username
+     * @param simulationDto
      * @Description 点击小图标获取数据源获取
      * @Author ZhangHongXu
-     * @Return
+     * @Return java.util.Map<java.lang.String, java.lang.Object>
      * @Exception
-     * @Date 2020/4/9 9:21
+     * @Date 2020/5/18 13:55
      */
     @Override
     public Map<String, Object> getDataSource(String username, SimulationDTO simulationDto) {
-
         MoniRecvDataThread moniRecvDataThread = (MoniRecvDataThread) Global.USERS_SIMULATOR_THREAD.get(username);
 
         //调用客户接口 获取数据源
@@ -361,16 +363,15 @@ public class SimulatorServiceImpl implements SimulatorService {
     }
 
     /**
-     * @param null
+     * @param obj
      * @Description 选择帧数回显数据
      * @Author ZhangHongXu
-     * @Return
+     * @Return java.util.List<java.lang.Object>
      * @Exception
-     * @Date 2020/4/9 9:21
+     * @Date 2020/5/18 13:55
      */
     @Override
     public List<Object> start(SimulationDTO obj) {
-
         ArrayList<Object> frameIds = (ArrayList<Object>) obj.getFrameId();
         ArrayList<Object> frameIdlist = new ArrayList<>();
         frameIds.forEach(s -> {
@@ -430,12 +431,12 @@ public class SimulatorServiceImpl implements SimulatorService {
     }
 
     /**
-     * @param null
+     * @param tableDataMap
      * @Description 解析表格Map
      * @Author ZhangHongXu
-     * @Return
+     * @Return java.util.List<com.inforbus.gjk.simulation.dto.SimulationTableDataDTO>
      * @Exception
-     * @Date 2020/4/9 9:22
+     * @Date 2020/5/18 13:54
      */
     public List<SimulationTableDataDTO> forEachGetSimulationTableData(Map<String, String> tableDataMap) {
         List<SimulationTableDataDTO> simulationTableDataDTOS = Lists.newArrayList();
