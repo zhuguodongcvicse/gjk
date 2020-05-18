@@ -16,17 +16,16 @@ import java.util.List;
 import java.util.Map;
 
 @FeignClient(value = ServiceNameConstants.DATACENDER_SERVICE,
-		url = "localhost:8080/dataCenter/appSubassemblyServer",
 		fallbackFactory = AppSubassemblyServiceFallbackFactory.class)
 public interface AppSubassemblyServiceFeign {
-
+	String url = "/appSubassemblyServer";
 	/**
 	 * 判断文件是否存在
 	 * @param filePath
 	 * @auther sunchao
 	 * @return
 	 */
-	@PostMapping("/judgeFileExist")
+	@PostMapping(url + "/judgeFileExist")
 	R judgeFileExist(@RequestParam("filePath") String filePath);
 
 	/**
@@ -35,7 +34,7 @@ public interface AppSubassemblyServiceFeign {
 	 * @auther sunchao
 	 * @return String
 	 */
-	@PostMapping("/getFileProperty")
+	@PostMapping(url + "/getFileProperty")
 	R getFileProperty(@RequestParam("filePath") String filePath, @RequestParam("fileProperty") String fileProperty);
 
 	/**
@@ -46,19 +45,19 @@ public interface AppSubassemblyServiceFeign {
 	 * @return
 	 * @throws IOException
 	 */
-	@PostMapping("/getAppPath")
+	@PostMapping(url + "/getAppPath")
 	R getAppPath(@RequestParam("filePath") String filePath, @RequestParam("selectFileName") String selectFileName);
 
-	@PostMapping("/modifyAssemblyDir")
+	@PostMapping(url + "/modifyAssemblyDir")
 	R modifyAssemblyDir(@RequestBody ModifyAssemblyDirDTO modifyAssemblyDirDTO);
 
-	@PostMapping("/copySoftwareAndBsp")
+	@PostMapping(url + "/copySoftwareAndBsp")
 	R copySoftwareAndBsp(@RequestBody CopySoftwareAndBspDTO copySoftwareAndBspDTO);
 
-	@PostMapping(value = "/transferFileToDestination", produces = {
+	@PostMapping(value = url +  "/transferFileToDestination", produces = {
 			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	R transferFileToDestination(@RequestParam("appDirPath") String appDirPath, @RequestPart("file")  MultipartFile file) throws IOException;
 
-	@PostMapping("/createAppTree")
+	@PostMapping(url + "/createAppTree")
 	R<List<ProjectFileVO>> createAppTree(@RequestParam("appPath") String appPath, @RequestParam("processId") String processId);
 }

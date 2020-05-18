@@ -32,6 +32,7 @@ import com.inforbus.gjk.pro.api.dto.ProjectInfoDTO;
 import com.inforbus.gjk.pro.api.entity.ProComp;
 import com.inforbus.gjk.pro.api.entity.Project;
 import com.inforbus.gjk.pro.api.feign.DisposeDataCenterServiceFeign;
+import com.inforbus.gjk.pro.api.feign.RemoteCodeGenerationService;
 import com.inforbus.gjk.pro.api.util.HttpClientUtil;
 import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
 import com.inforbus.gjk.pro.mapper.ProjectMapper;
@@ -72,6 +73,8 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 	@Autowired
 	private DisposeDataCenterServiceFeign disposeDataCenterServiceFeign;
 
+	@Autowired
+	private RemoteCodeGenerationService remoteCodeGenerationService;
 	@Value("${git.local.path}")
 	private String LOCALPATH;
 
@@ -217,49 +220,50 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
 	@Override
 	public R staticInspect(String filePath, String fileName) {
-		Map<String, String> params = Maps.newHashMap();
-		String projectKey = "s" + fileName.hashCode();
-		params.put("name", fileName);
-		params.put("project", projectKey);
-		String url = "http://127.0.0.1:9000/api/projects/create";
-		HttpResponse httpResponse = HttpClientUtil.toPost(url, params);
-		if (httpResponse == null) {
-			return new R<>(CommonConstants.FAIL, "sonar工具未启动", null);
-		}
-		int statusCode = httpResponse.getStatusLine().getStatusCode();
-		try {
-			String s = EntityUtils.toString(httpResponse.getEntity());
-			System.out.println(s);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-//        System.out.println(statusCode);
-//        if(statusCode!=200){
-//            return new R<>(CommonConstants.FAIL,"sonar创建项目失败", null);
-//        }
-		// 执行sonar-scanner命令
-		// 文件所在盘符
-		String diskCharacter = filePath.split(":")[0] + ":";
-		String execCommand = "cmd.exe /c cd " + filePath + " && " + diskCharacter + " && "
-				+ JGitUtil.getSONAR_SCANNER_PATH() + "\\sonar-scanner.bat -D\"sonar.projectKey=" + projectKey
-				+ "\" -D\"sonar.sources=.\" -D\"sonar.host.url=http://localhost:9000\"";
-		try {
-			Process execResult = Runtime.getRuntime().exec(execCommand);
-			// 出现error时 单个线程会阻塞
-			StreamManage errorStream = new StreamManage(execResult.getErrorStream(), "Error");
-			StreamManage outputStream = new StreamManage(execResult.getInputStream(), "Output");
-			errorStream.start();
-			outputStream.start();
-//            execResult.waitFor();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new R<>(CommonConstants.FAIL, "执行sonar-scanner扫描项目失败", null);
-		}
-		File file = new File(filePath + "/.sonar/" + fileName.hashCode() + ".pdf");
-		if (file.exists()) {
-			file.renameTo(new File(filePath + "/.sonar/" + fileName + "检查报告.pdf"));
-		}
-		return new R<>(CommonConstants.SUCCESS, "filePath + \"/.sonar/\" + fileName + \".pdf\"", projectKey);
+//		Map<String, String> params = Maps.newHashMap();
+//		String projectKey = "s" + fileName.hashCode();
+//		params.put("name", fileName);
+//		params.put("project", projectKey);
+//		String url = "http://127.0.0.1:9000/api/projects/create";
+//		HttpResponse httpResponse = HttpClientUtil.toPost(url, params);
+//		if (httpResponse == null) {
+//			return new R<>(CommonConstants.FAIL, "sonar工具未启动", null);
+//		}
+//		int statusCode = httpResponse.getStatusLine().getStatusCode();
+//		try {
+//			String s = EntityUtils.toString(httpResponse.getEntity());
+//			System.out.println(s);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+////        System.out.println(statusCode);
+////        if(statusCode!=200){
+////            return new R<>(CommonConstants.FAIL,"sonar创建项目失败", null);
+////        }
+//		// 执行sonar-scanner命令
+//		// 文件所在盘符
+//		String diskCharacter = filePath.split(":")[0] + ":";
+//		String execCommand = "cmd.exe /c cd " + filePath + " && " + diskCharacter + " && "
+//				+ JGitUtil.getSONAR_SCANNER_PATH() + "\\sonar-scanner.bat -D\"sonar.projectKey=" + projectKey
+//				+ "\" -D\"sonar.sources=.\" -D\"sonar.host.url=http://localhost:9000\"";
+//		try {
+//			Process execResult = Runtime.getRuntime().exec(execCommand);
+//			// 出现error时 单个线程会阻塞
+//			StreamManage errorStream = new StreamManage(execResult.getErrorStream(), "Error");
+//			StreamManage outputStream = new StreamManage(execResult.getInputStream(), "Output");
+//			errorStream.start();
+//			outputStream.start();
+////            execResult.waitFor();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return new R<>(CommonConstants.FAIL, "执行sonar-scanner扫描项目失败", null);
+//		}
+//		File file = new File(filePath + "/.sonar/" + fileName.hashCode() + ".pdf");
+//		if (file.exists()) {
+//			file.renameTo(new File(filePath + "/.sonar/" + fileName + "检查报告.pdf"));
+//		}
+//		return new R<>(CommonConstants.SUCCESS, "filePath + \"/.sonar/\" + fileName + \".pdf\"", projectKey);
+		return remoteCodeGenerationService.staticInspect(filePath,fileName);
 	}
 
 	@Override

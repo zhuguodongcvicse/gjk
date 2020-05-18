@@ -1,5 +1,7 @@
 package com.inforbus.gjk.dataCenter.service;
 
+import com.inforbus.gjk.common.core.util.R;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -19,4 +21,14 @@ public interface CodeGenerationService {
      * @Create: 2020/4/20
      */
     boolean codeGeneration(Map<String, String> map) throws IOException;
+
+    /**
+     * @Author wang
+     * @Description: 静态检查功能
+     * @Param: [filePath, fileName]
+     * @Return: com.inforbus.gjk.common.core.util.R
+     * @Create: 2020/5/18
+     */
+    R staticInspect(String filePath, String fileName);
 }
+

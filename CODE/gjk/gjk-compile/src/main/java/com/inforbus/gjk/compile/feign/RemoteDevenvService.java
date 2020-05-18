@@ -16,9 +16,11 @@ import java.util.Map;
  * @date 2020/4/16
  * @Description 远程调用的fegin接口，调用编译功能
  */
-@FeignClient(value = ServiceNameConstants.COMPILE_SERVICE,url = "localhost:8080/dataCenter/devenv",fallbackFactory = RemoteDevenvServiceFallbackFactory.class)
+@FeignClient(value = ServiceNameConstants.COMPILE_SERVICE,fallbackFactory = RemoteDevenvServiceFallbackFactory.class)
 public interface RemoteDevenvService {
 
-    @PutMapping(value = "/Command")
+    String url = "devenv";
+
+    @PutMapping(value = url + "/Command")
     public R command(@RequestBody Map<String, String> map);
 }

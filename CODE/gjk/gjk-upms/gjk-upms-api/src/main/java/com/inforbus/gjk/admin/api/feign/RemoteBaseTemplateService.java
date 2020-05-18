@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @date 2020/4/14
  * @Description fegin调用dataCenter提供的公共接口
  */
-@FeignClient(name = ServiceNameConstants.DATACENDER_SERVICE,url = "localhost:8080/dataCenter/fileServe",fallbackFactory = RemoteBaseTemplateServiceFallbackFactory.class)
+@FeignClient(name = ServiceNameConstants.DATACENDER_SERVICE,
+        fallbackFactory = RemoteBaseTemplateServiceFallbackFactory.class)
 public interface RemoteBaseTemplateService {
+    String url = "/fileServe";
     /**
      * @Author wang
      * @Description: 解析xml文件为xmlEntity对象
@@ -27,7 +29,7 @@ public interface RemoteBaseTemplateService {
      * @Create: 2020/4/13
      */
 
-    @PostMapping("/analysisXmlFile")
+    @PostMapping(url + "/analysisXmlFile")
     public R<XmlEntityMap> analysisXmlFileToXMLEntityMap(@RequestParam("localPath") String localPath);
 
     /**
@@ -37,7 +39,7 @@ public interface RemoteBaseTemplateService {
      * @Return: com.inforbus.gjk.common.core.util.R
      * @Create: 2020/4/14
      */
-    @PostMapping("/createXMLFile")
+    @PostMapping(url + "/createXMLFile")
     public R<Boolean> createXMLFile(@RequestBody XMlEntityMapVO xMlEntityMapVO);
 
     /**
@@ -47,6 +49,6 @@ public interface RemoteBaseTemplateService {
      * @Return: com.inforbus.gjk.common.core.util.R
      * @Create: 2020/4/15
      */
-    @PostMapping("/delFile")
+    @PostMapping(url + "/delFile")
     public R<Boolean> delFile(@RequestParam("absolutePath") String absolutePath);
 }

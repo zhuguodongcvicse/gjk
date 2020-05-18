@@ -32,11 +32,11 @@ import feign.Response;
 import org.springframework.web.multipart.MultipartFile;
 
 @FeignClient(value = ServiceNameConstants.DATACENDER_SERVICE,
-		url = "localhost:8080/dataCenter/fileServe",
 		fallbackFactory = DisposeDataCenterServiceFallbackFactory.class,
 		configuration = DisposeDataCenterServiceFeign.FeignMultipartSupportConfig.class)
 public interface DisposeDataCenterServiceFeign {
 
+	String url = "/fileServe";
 	// 分布式文件
 	public static final String serviceName = "/fileServe";
 	// 第三方客户接口
@@ -64,7 +64,7 @@ public interface DisposeDataCenterServiceFeign {
 	 * @param [localPath] 文件的绝对路径
 	 * @return
 	 */
-	@PostMapping("/analysisXmlFile")
+	@PostMapping(url + "/analysisXmlFile")
 	public R<XmlEntityMap> analysisXmlFileToXMLEntityMap(@RequestParam("localPath") String localPath) ;
 	
 	/**
@@ -74,7 +74,7 @@ public interface DisposeDataCenterServiceFeign {
      * @Return: boolean
      * @Create: 2020/4/14
      */
-	 @PostMapping("createXMLFile")
+	 @PostMapping(url + "createXMLFile")
 	    public R<Boolean> createXMLFile(@RequestBody XMlEntityMapVO xMlEntityMapVO) ;
 	 
 	 /**
@@ -91,7 +91,7 @@ public interface DisposeDataCenterServiceFeign {
 		 * 
 		 *         </pre>
 		 */
-		@PostMapping(value = "/downloadStreamFiles", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+		@PostMapping(value = url + "/downloadStreamFiles", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 		public Response downloadStreamFiles(@RequestParam("filePaths") String[] filePaths);
 
 	/**
@@ -105,7 +105,7 @@ public interface DisposeDataCenterServiceFeign {
 	 * @return
 	 *
 	 */
-	@PostMapping(value = "/uploadMultipartFiles", produces = {
+	@PostMapping(value = url + "/uploadMultipartFiles", produces = {
 			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public R<?> uploadLocalFiles(@RequestPart(value = "file") MultipartFile[] ufile,
 								 @RequestParam("filePath") String localPath);
@@ -122,7 +122,7 @@ public interface DisposeDataCenterServiceFeign {
 	 * @DateTime 2020年5月07日
 	 *
 	 */
-	@PostMapping("copylocalFile")
+	@PostMapping(url + "copylocalFile")
 	public R<Boolean> copylocalFile(@RequestParam("source") String source, @RequestParam("destin") String destin);
 
 	/**
@@ -133,7 +133,7 @@ public interface DisposeDataCenterServiceFeign {
 	 * @Author wang
 	 * @DateTime 2020年5月07日
 	 */
-	@PostMapping("delAllFile")
+	@PostMapping(url + "delAllFile")
 	public R<Boolean> delAllFile(@RequestParam("sourcePath") String sourcePath);
 
 	/**
@@ -142,7 +142,7 @@ public interface DisposeDataCenterServiceFeign {
 	 * @auther sunchao
 	 * @return
 	 */
-	@PostMapping("/judgeFileExist")
+	@PostMapping(url + "/judgeFileExist")
 	R judgeFileExist(@RequestParam("filePath") String filePath);
 
 	/**
@@ -153,7 +153,7 @@ public interface DisposeDataCenterServiceFeign {
 	 * @return
 	 * @throws IOException
 	 */
-	@PostMapping("/getAppPath")
+	@PostMapping(url + "/getAppPath")
 	R getAppPath(@RequestParam("filePath") String filePath, @RequestParam("selectFileName") String selectFileName);
 
 	/**
@@ -167,7 +167,7 @@ public interface DisposeDataCenterServiceFeign {
 	 *
 	 */
 	@ResponseBody
-	@PostMapping(value = "/downloadStreamFilesTarget", produces = {
+	@PostMapping(value = url + "/downloadStreamFilesTarget", produces = {
 			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public Response downloadFile(@RequestPart("file") MultipartFile[] ufile,
 							 @RequestParam("fileTarget") String[] fileTarget, @RequestParam("filePaths") String filePaths);
@@ -177,14 +177,14 @@ public interface DisposeDataCenterServiceFeign {
 	 * @param filePath
 	 * @return
 	 */
-	@PostMapping(value = "/editProJSON")
+	@PostMapping(value = url + "/editProJSON")
 	public R<Boolean> editProJSON(@RequestBody StringRef strRef, @RequestParam("filePath") String filePath);
 
 	/**
 	 * 获取流程建模json文件
 	 * @param jsonPath
 	 */
-	@PostMapping(value = "/findJson")
+	@PostMapping(value = url + "/findJson")
 	public R<String> findJson(@RequestParam("jsonPath")String jsonPath);
 
 	/**
@@ -196,7 +196,7 @@ public interface DisposeDataCenterServiceFeign {
 	 * @param localPath 解压的文件路径
 	 * @return
 	 */
-	@PostMapping(value = "/decompression", produces = {
+	@PostMapping(value = url + "/decompression", produces = {
 			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public R<Boolean> uploadDecompression(@RequestPart(value = "files") MultipartFile file,
 										  @RequestParam("filePath") String localPath);
@@ -210,6 +210,6 @@ public interface DisposeDataCenterServiceFeign {
 	 * @param filePaths 文件全路径
 	 */
 	@ResponseBody
-	@PostMapping(value = "/downloadStreamFiles")
+	@PostMapping(value = url + "/downloadStreamFiles")
 	public Response downloadFile(@RequestParam("filePaths") String[] filePaths);
 }

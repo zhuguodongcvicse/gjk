@@ -16,12 +16,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-@RequestMapping("/ExternalInfServer")
+
 @FeignClient(value = ServiceNameConstants.DATACENDER_SERVICE)
 public interface ExternalInfInvokeService {
 
+	String url = "/ExternalInfServer";
 
-    @RequestMapping("/getCmpSysConfig")
+    @RequestMapping(url + "/getCmpSysConfig")
     public R<Map<String, List<String>>> getCmpSysConfig(@RequestParam("netWorkConfigFileName") String netWorkConfigFileName,
                                                         @RequestParam("packinfoPath") String packinfoPath,
                                                         @RequestParam("workModeFileName") String workModeFileName);
@@ -32,7 +33,7 @@ public interface ExternalInfInvokeService {
 	 * @param filePath
 	 * @return
 	 */
-	@PostMapping("/createUserDefineTopic")
+	@PostMapping(url + "/createUserDefineTopic")
 	public R<Boolean> createUserDefineTopic(@RequestParam("flowFilePath")String flowFilePath, 
 			@RequestParam("ThemeFilePath")String ThemeFilePath, @RequestParam("filePath")String filePath);
 	
@@ -48,7 +49,7 @@ public interface ExternalInfInvokeService {
 	 * @param appProPath      APP工程文件夹路径
 	 * @return
 	 */
-	@PostMapping("/appInstall")
+	@PostMapping(url + "/appInstall")
 	public boolean appInstall(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName,
 			@RequestParam("appID") int appID, @RequestParam("appName") String appName,
 			@RequestParam("packinfoPath") String packinfoPath, @RequestParam("cmpResFilePath") String cmpResFilePath,
@@ -65,7 +66,7 @@ public interface ExternalInfInvokeService {
 	 * @param appProPath        APP工程文件夹路径
 	 * @return
 	 */
-	@PostMapping("/appLoad")
+	@PostMapping(url + "/appLoad")
 	public boolean appLoad(@RequestBody Map<String, String> cmpNameToHwType, @RequestParam("userName") String userName,
 			@RequestParam("appID") int appID, @RequestParam("appName") String appName,
 			@RequestParam("existDeployConfig") boolean existDeployConfig,
@@ -80,7 +81,7 @@ public interface ExternalInfInvokeService {
 	 * @param packinfoPath    客户自存自取路径
 	 * @return
 	 */
-	@PostMapping("/appUnInstall")
+	@PostMapping(url + "/appUnInstall")
 	public boolean appUnInstall(@RequestBody Map<String, String> cmpNameToHwType,
 			@RequestParam("userName") String userName, @RequestParam("appID") int appID,
 			@RequestParam("appName") String appName, @RequestParam("packinfoPath") String packinfoPath);
@@ -95,7 +96,7 @@ public interface ExternalInfInvokeService {
 	 * @param packinfoPath          客户自存自取路径
 	 * @param cmpDeployPlanFilePath 客户自存自取路径
 	 */
-	@PostMapping("/appTaskExport")
+	@PostMapping(url + "/appTaskExport")
 	public void appTaskExport(@RequestParam("userName") String userName, @RequestParam("appId") int appId,
 			@RequestParam("appName") String appName, @RequestParam("appPath") String appPath,
 			@RequestParam("sysconfigPath") String sysconfigPath, @RequestParam("packinfoPath") String packinfoPath,
@@ -106,7 +107,7 @@ public interface ExternalInfInvokeService {
      *
      * @param schemeFileList
      */
-	@RequestMapping("/simplePlan")
+	@RequestMapping(url + "/simplePlan")
     public void simplePlan(@RequestParam("str") String[] str,@RequestParam("simplePlanFile")  String simplePlanFile) ;
 	
 	/**
@@ -114,7 +115,7 @@ public interface ExternalInfInvokeService {
      *
      * @param schemeFileList
      */
-	@RequestMapping("/writeBackDeployScheme")
+	@RequestMapping(url + "/writeBackDeployScheme")
     public void writeBackDeployScheme(@RequestParam("workModeFilePath") String workModeFilePath, @RequestParam("schemeFile") String schemeFile );
 	
 	
@@ -122,6 +123,6 @@ public interface ExternalInfInvokeService {
 	 * 流程建模完备性检查
 	 * @param xmlFilepath
 	 */
-	@RequestMapping("/completeCheck")
+	@RequestMapping(url + "/completeCheck")
 	public R<CheckResult> completeCheck(@RequestParam("xmlFilepath") String xmlFilepath);
 }

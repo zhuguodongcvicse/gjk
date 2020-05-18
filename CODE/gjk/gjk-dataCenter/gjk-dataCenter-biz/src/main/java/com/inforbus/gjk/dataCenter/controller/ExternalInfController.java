@@ -39,8 +39,8 @@ public class ExternalInfController {
 	private ExternalInfService externalInfService;
 
 	@RequestMapping("/getCmpSysConfig")
-	public R<Map<String, List<String>>> getCmpSysConfig(String netWorkConfigFileName, String packinfoPath,
-			String workModeFileName) {
+	public R<Map<String, List<String>>> getCmpSysConfig(@RequestParam("netWorkConfigFileName") String netWorkConfigFileName, @RequestParam("packinfoPath") String packinfoPath,
+														@RequestParam("workModeFileName") String workModeFileName) {
 		Map<String, List<String>> cmpSysConfig = externalInfService.getCmpSysConfig(netWorkConfigFileName, packinfoPath,
 				workModeFileName);
 		return new R<>(cmpSysConfig);

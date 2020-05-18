@@ -21,8 +21,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @UpdateRemark: 修改内容
  * @Version: 1.0
  */
-@FeignClient(value = ServiceNameConstants.DATACENDER_SERVICE,url = "localhost:8080/dataCenter/fileServe" )
+@FeignClient(value = ServiceNameConstants.DATACENDER_SERVICE)
 public interface SimulationExternalInfService {
+    String url = "/fileServe";
     /**
      * @Author wang
      * @Description: 解析xml文件为xmlEntity对象
@@ -30,7 +31,7 @@ public interface SimulationExternalInfService {
      * @Return: boolean
      * @Create: 2020/4/13
      */
-    @PostMapping("/analysisXmlFile")
+    @PostMapping(url + "/analysisXmlFile")
     public R<XmlEntityMap> analysisXmlFileToXMLEntityMap(@RequestParam("localPath") String localPath);
 
     /**
@@ -40,7 +41,7 @@ public interface SimulationExternalInfService {
      * @Return: boolean
      * @Create: 2020/4/14
      */
-    @PostMapping("/createXMLFile")
+    @PostMapping(url + "/createXMLFile")
     public R<Boolean> createXMLFile(@RequestBody XMlEntityMapVO xMlEntityMapVO);
 
     /**
@@ -52,7 +53,7 @@ public interface SimulationExternalInfService {
      * @return
      */
     @ResponseBody
-    @PostMapping(value = "/downloadStreamFiles")
+    @PostMapping(value = url + "/downloadStreamFiles")
     public Response downloadFile(@RequestParam("filePaths") String[] filePaths);
 
 

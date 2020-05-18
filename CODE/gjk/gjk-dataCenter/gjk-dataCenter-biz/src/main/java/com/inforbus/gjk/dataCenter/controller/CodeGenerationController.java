@@ -49,4 +49,16 @@ public class CodeGenerationController {
         }
         return r;
     }
+
+    /**
+     * @Author wang
+     * @Description: 静态检查功能
+     * @Param: [filePath, fileName]
+     * @Return: com.inforbus.gjk.common.core.util.R
+     * @Create: 2020/5/18
+     */
+    @PostMapping("/staticInspect")
+    public R staticInspect(@RequestParam("filePath") String filePath, @RequestParam("fileName")String fileName){
+        return codeGenerationService.staticInspect(filePath, fileName);
+    }
 }
