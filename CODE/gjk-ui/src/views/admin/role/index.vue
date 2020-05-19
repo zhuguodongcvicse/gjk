@@ -148,7 +148,8 @@ export default {
     handleRefreshChange() {
       this.getList(this.page);
     },
-    handleFilter(param) {
+    handleFilter(param,done) {
+      done();
       this.page.page = 1;
       this.getList(this.page, param);
     },

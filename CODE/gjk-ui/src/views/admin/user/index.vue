@@ -57,14 +57,14 @@
           >删除</el-button>
         </template>
         <template slot="deptIdForm" slot-scope="scope">
-          <avue-input
+          <avue-input-tree
             v-model="form.deptId"
             type="tree"
             placeholder="请选择所属部门"
             :node-click="getNodeData"
             :dic="treeDeptData"
             :props="defaultProps"
-          ></avue-input>
+          ></avue-input-tree>
         </template>
         <template slot="roleForm" slot-scope="scope">
           <avue-select
@@ -151,6 +151,7 @@ export default {
     getNodeData(data) {
       deptRoleList().then(response => {
         this.rolesOptions = response.data.data;
+        console.log("this.rolesOptions",this.rolesOptions)
       });
     },
     handleDept() {
@@ -158,7 +159,8 @@ export default {
         this.treeDeptData = response.data.data;
       });
     },
-    handleFilter(param) {
+    handleFilter(param,done) {
+      done();
       this.page.page = 1;
       this.getList(this.page, param);
     },
@@ -181,6 +183,9 @@ export default {
         });
       } else if (type === "add") {
         this.role = [];
+          deptRoleList().then(response => {
+          this.rolesOptions = response.data.data;
+        });
       }
       show();
     },

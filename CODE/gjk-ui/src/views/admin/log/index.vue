@@ -88,7 +88,8 @@
       /**
        * 搜索回调
        */
-      searchChange(form) {
+      searchChange(form,done) {
+        done();
         this.getList(this.page, form)
       },
       /**

@@ -159,7 +159,8 @@ export default {
         done();
       });
     },
-    searchChange(form) {
+    searchChange(form,done) {
+      done();
       this.searchData = form;
       this.page.currentPage=1
       this.getList(this.page, form);

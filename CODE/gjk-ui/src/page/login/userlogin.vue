@@ -89,13 +89,13 @@
             <el-input v-model="form.name" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="所属部门" prop="deptId">
-            <avue-input
+            <avue-input-tree
               v-model="form.deptId"
               type="tree"
               placeholder="请选择所属部门"
               :dic="depts"
               :props="defaultProps"
-            ></avue-input>
+            ></avue-input-tree>
           </el-form-item>
           <el-form-item label="手机号" prop="phone">
             <el-input v-model="form.phone" autocomplete="off"></el-input>
