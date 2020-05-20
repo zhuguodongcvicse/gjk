@@ -75,6 +75,7 @@
               <if test="project.delFlag != null and project.delFlag.trim() != ''">
           AND del_flag = #{project.delFlag}
         </if>
+              p.del_flag = "0"
           </where>
           ORDER BY create_time DESC
   </select>
