@@ -85,6 +85,15 @@ public class GjkPlatformController {
 	}
 
 	/**
+	 * 获取平台类型
+	 * @return
+	 */
+	@GetMapping("/getPlatFormTypeList")
+	public List<GjkPlatform> getPlatFormTypeList() {
+		return gjkPlatformService.list(Wrappers.emptyWrapper());
+	}
+
+	/**
 	 * 返回角色的平台库集合
 	 *
 	 * @param roleId 角色ID

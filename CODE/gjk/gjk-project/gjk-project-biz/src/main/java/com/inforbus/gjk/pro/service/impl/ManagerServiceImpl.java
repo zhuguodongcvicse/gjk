@@ -87,6 +87,8 @@ import com.inforbus.gjk.pro.service.ManagerService;
 import feign.Response;
 import flowModel.CheckResult;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * @ClassName: ManagerServiceImpl 项目管理实现类
  * @Description:
@@ -117,9 +119,12 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	private MapSoftToHardService mapSoftToHardService;
 	@Autowired
 	private AppSubassemblyServiceFeign appSubassemblyServiceFeign;
+	@Autowired
+	private PlatformTypeServiceFeign platformTypeServiceFeign;
 
 	@Autowired
 	private RemoteCodeGenerationService remoteCodeGenerationService;
+
 	@Value("${git.local.path}")
 	private String proDetailPath;
 	@Value("${integer.code.file.name}")
@@ -762,7 +767,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
             Map platformProp = null;
             // 获取配置文件并解析
-            R prop = getMakefileTypeByProperties();
+            R prop = getPlatformType();
             if (CommonConstants.FAIL.equals(prop.getCode())) {
                 returnStr += prop.getMsg();
             } else {
@@ -797,7 +802,8 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
                                     softwareFilePath = software.getSoftwareFilePath();
                                 }
                             }
-                            if ("".equals(softwareFilePath)) {
+
+							if ("".equals(softwareFilePath)) {
                                 if (returnStr.contains("请配置" + libsType + "对应的软件框架,")) {
                                     String s = "请配置" + libsType + "对应的软件框架,部件";
                                     StringBuilder sb = new StringBuilder(returnStr);
@@ -906,7 +912,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
             Map platformProp = null;
             // 获取配置文件并解析
-            R prop = getMakefileTypeByProperties();
+            R prop = getPlatformType();
             if (CommonConstants.FAIL.equals(prop.getCode())) {
                 return prop;
             } else {
@@ -1029,6 +1035,27 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
         }
     }
 
+	/**
+	 * 获取平台库结构
+	 * @return
+	 */
+	private R getPlatformType() {
+		R<Map<String, String>> r = new R<>();
+		List<GjkPlatform> platFormTypeList = platformTypeServiceFeign.getPlatFormTypeList();
+		if (platFormTypeList == null || platFormTypeList.size() == 0) {
+			r.setMsg("尚未添加平台库结构");
+			r.setCode(CommonConstants.FAIL);
+			return r;
+		}
+		Map<String, String> map = platFormTypeList.stream().collect(Collectors.toMap(GjkPlatform::getName, GjkPlatform::getTypeValue));
+		if (map.keySet().size() == 0) {
+			r.setMsg("尚未添加平台库结构");
+			r.setCode(CommonConstants.FAIL);
+			return r;
+		}
+		r.setData(map);
+		return r;
+	}
 
     private R getMakefileTypeByProperties() {
         // 获取当前类的路径

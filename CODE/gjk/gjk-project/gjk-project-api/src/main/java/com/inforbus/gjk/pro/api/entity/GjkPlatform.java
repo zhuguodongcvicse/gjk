@@ -38,6 +38,10 @@ public class GjkPlatform extends Model<GjkPlatform> {
 	@NotBlank(message = "平台库名称不能为空")
 	private String name;
 	/**
+	 * 平台类型值，App组件生成时根据此值进行判断
+	 */
+	private String typeValue;
+	/**
 	 * 平台权限标识
 	 */
 	private String permission;
@@ -71,7 +75,19 @@ public class GjkPlatform extends Model<GjkPlatform> {
 		this.permission = permission;
 		this.parentId = parentId;
 	}
-	
+
+	public GjkPlatform(@NotNull(message = "平台库ID不能为空") String platformId, @NotBlank(message = "平台库名称不能为空") String name, String typeValue, String permission, @NotNull(message = "平台库父ID不能为空") String parentId, Integer sort, LocalDateTime createTime, LocalDateTime updateTime, String delFlag) {
+		this.platformId = platformId;
+		this.name = name;
+		this.typeValue = typeValue;
+		this.permission = permission;
+		this.parentId = parentId;
+		this.sort = sort;
+		this.createTime = createTime;
+		this.updateTime = updateTime;
+		this.delFlag = delFlag;
+	}
+
 	public GjkPlatform() {
 		super();
 	}

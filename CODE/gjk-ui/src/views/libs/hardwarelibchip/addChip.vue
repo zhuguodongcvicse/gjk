@@ -27,9 +27,9 @@
         <el-select v-model="form.hrTypeName" placeholder="请选择平台">
           <el-option
             v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
+            :key="item.name"
+            :label="item.name"
+            :value="item.typeValue"
           ></el-option>
         </el-select>
       </el-form-item>
@@ -56,7 +56,7 @@
     //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 
     import {mapGetters} from "vuex";
-    import {fetchPlatformTree} from "@/api/admin/platform";
+    import {getPlatFormTypeList} from "@/api/admin/platform";
 
     export default {
         //import引入的组件需要注入到对象中才能使用
@@ -128,6 +128,7 @@
                 this.showInf.dialogFormVisible = false;
             },
             submit(formName) {
+                console.log("this.form", this.form)
                 // console.log("allChips", this.allChips)
                 //芯片名称不能重复
                 for (const i in this.allChips) {
@@ -154,19 +155,10 @@
             },
             //获取平台库的数据
             getPlatformSelectTree() {
-                fetchPlatformTree().then(response => {
-                    //平台库树结构只展示根节点数据
-                    for (let item of response.data.data) {
-                        let index = response.data.data.indexOf(item);
-                        let plaTreeData = {};
-                        plaTreeData.value = item.name;
-                        plaTreeData.label = item.label;
-                        plaTreeData.id = item.id;
-                        plaTreeData.parentId = item.parentId;
-                        this.pTreeData.push(plaTreeData);
-                    }
-                    this.options = this.pTreeData;
-                });
+                getPlatFormTypeList().then(response => {
+                    console.log("response",response)
+                    this.options = response.data;
+                })
             }
         },
         //生命周期 - 创建完成（可以访问当前this实例）

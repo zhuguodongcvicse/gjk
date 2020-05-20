@@ -59,3 +59,10 @@ export function getOwnPlatform (obj) {
     data: obj
   })
 }
+
+export function getPlatFormTypeList () {
+  return request({
+    url: '/admin/platform/getPlatFormTypeList',
+    method: 'get'
+  })
+}
