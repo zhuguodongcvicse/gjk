@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Maps;
 import com.inforbus.gjk.admin.api.entity.SysUser;
 import com.inforbus.gjk.common.core.constant.CommonConstants;
+import com.inforbus.gjk.common.core.constant.FileTypeConstants;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.jgit.JGitUtil;
 import com.inforbus.gjk.common.core.util.R;
@@ -34,6 +35,7 @@ import com.inforbus.gjk.pro.api.entity.Project;
 import com.inforbus.gjk.pro.api.feign.DisposeDataCenterServiceFeign;
 import com.inforbus.gjk.pro.api.feign.RemoteCodeGenerationService;
 import com.inforbus.gjk.pro.api.util.HttpClientUtil;
+import com.inforbus.gjk.pro.api.util.ProjectConStant;
 import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
 import com.inforbus.gjk.pro.mapper.ProjectMapper;
 import com.inforbus.gjk.pro.service.ManagerService;
@@ -272,7 +274,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 		Project oldProject = baseMapper.getProById(project.getId());
 		String path = "";
 		for (ProjectFileVO proFile : treeByProjectId) {
-			if (proFile.getFileType().equals("11")) {
+			if (proFile.getFileType().equals(FileTypeConstants.PROCESS_MODELING)) {
 				path = LOCALPATH + proFile.getFilePath();
 			}
 		}
@@ -285,7 +287,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 			if (newBaseTemplateIDsDTO.getNetworkTempId() != null && !newBaseTemplateIDsDTO.getNetworkTempId().equals("")
 					&& !oldBaseTemplateIDsDTO.getNetworkTempId().equals(newBaseTemplateIDsDTO.getNetworkTempId())) {
 				// 把项目路径下的模板删除
-				File file = new File(path + "自定义配置__网络配置.xml");
+				File file = new File(path + ProjectConStant.netWorkName);
 				if (file.exists()) {
 					file.delete();
 				}
@@ -293,7 +295,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 			if (newBaseTemplateIDsDTO.getThemeTempId() != null && !newBaseTemplateIDsDTO.getThemeTempId().equals("")
 					&& !oldBaseTemplateIDsDTO.getThemeTempId().equals(newBaseTemplateIDsDTO.getThemeTempId())) {
 				// 把项目路径下的模板删除
-				File file = new File(path + "自定义配置__主题配置.xml");
+				File file = new File(path + ProjectConStant.themeName);
 				if (file.exists()) {
 					file.delete();
 				}

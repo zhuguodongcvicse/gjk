@@ -72,6 +72,7 @@ import com.inforbus.gjk.pro.api.entity.PartPlatformSoftware;
 import com.inforbus.gjk.pro.api.entity.Project;
 import com.inforbus.gjk.pro.api.entity.ProjectFile;
 import com.inforbus.gjk.pro.api.entity.ProjectPlan;
+import com.inforbus.gjk.pro.api.util.ProjectConStant;
 import com.inforbus.gjk.pro.api.util.ProcedureXmlAnalysis;
 import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
 import com.inforbus.gjk.pro.mapper.PartPlatformSoftwareMapper;
@@ -214,38 +215,38 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String filePath = "gjk" + File.separator + "project" + File.separator + project.getProjectName()
 				+ File.separator;
 
-		ProjectFile processFile = new ProjectFile(IdGenerate.uuid(), projectId, processName + "", "9", filePath,
+		ProjectFile processFile = new ProjectFile(IdGenerate.uuid(), projectId, processName + "", FileTypeConstants.PROCESS_NAME, filePath,
 				projectId, defaultSoftwareId, defaultBspId);
 		files.add(processFile);
 
 		filePath += processFile.getFileName() + File.separator;
-		ProjectFile modelFile = new ProjectFile(IdGenerate.uuid(), projectId, -1, "模型", "10", filePath,
+		ProjectFile modelFile = new ProjectFile(IdGenerate.uuid(), projectId, -1, FileTypeConstants.PROJECT_MODEL, FileTypeConstants.MODEL, filePath,
 				processFile.getId(), null, null);
 		files.add(modelFile);
 
 		filePath += modelFile.getFileName() + File.separator;
-		ProjectFile file = new ProjectFile(IdGenerate.uuid(), projectId, -1, "流程建模", "11", filePath, modelFile.getId(),
+		ProjectFile file = new ProjectFile(IdGenerate.uuid(), projectId, -1, FileTypeConstants.PROJECT_FLOWMODEL, FileTypeConstants.PROCESS_MODELING, filePath, modelFile.getId(),
 				null, null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, "硬件建模", "12", filePath, modelFile.getId(), null, null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, FileTypeConstants.PROJECT_HARDWAREMODEL, FileTypeConstants.HARDWARE_MODELING, filePath, modelFile.getId(), null, null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, "软硬件映射配置", "13", filePath, modelFile.getId(), null,
+		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, FileTypeConstants.PROJECT_SHM_CONFIG, FileTypeConstants.SH_MAPPING_CONFIG, filePath, modelFile.getId(), null,
 				null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, "方案展示", "14", filePath, modelFile.getId(), null, null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, FileTypeConstants.PROJECT_SCHEMEDISPLAY, FileTypeConstants.PLAN_DISPLAY, filePath, modelFile.getId(), null, null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, "部署图", "15", filePath, modelFile.getId(), null, null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, FileTypeConstants.PROJECT_DEPLOYMENT_DIAGRAM, FileTypeConstants.DEPLOYMENT_DIAGRAM, filePath, modelFile.getId(), null, null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, "自定义配置", "16", filePath, modelFile.getId(), null,
+		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, FileTypeConstants.PROJECT_CUSTOMIZE_CONFIG, FileTypeConstants.CUSTOMIZE_CONFIG, filePath, modelFile.getId(), null,
 				null);
 		files.add(file);
 
-		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, "系统配置", "17", filePath, modelFile.getId(), null, null);
+		file = new ProjectFile(IdGenerate.uuid(), projectId, -1, FileTypeConstants.PROJECT_SYSTEM_CONFIG, FileTypeConstants.SYSTEM_CONFIG, filePath, modelFile.getId(), null, null);
 		files.add(file);
 
 		for (ProjectFile projectFile : files) {
@@ -1140,7 +1141,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String flowFilePath = "";
 		List<ProjectFile> ProjectFileList = baseMapper.getFilePathListById(proDetailId);
 		for (ProjectFile proFile : ProjectFileList) {
-			if (proFile.getFileType().equals("11")) {
+			if (proFile.getFileType().equals(FileTypeConstants.PROCESS_MODELING)) {
 				flowFilePath = proDetailPath + proFile.getFilePath() + proFile.getFileName() + ".xml";
 			}
 		}
@@ -1152,12 +1153,12 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 //		ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName,
 //				newFilePath + "UserDefineTopicFile.xml");
 		boolean bo = externalInfInvokeService
-				.createUserDefineTopic(flowFilePath, filePath + fileName, newFilePath + "UserDefineTopicFile.xml")
+				.createUserDefineTopic(flowFilePath, filePath + fileName, newFilePath + ProjectConStant.newFileName)
 				.getData();
 		if (bo) {
-			File topicFile = new File(newFilePath + "UserDefineTopicFile.xml");
+			File topicFile = new File(newFilePath + ProjectConStant.newFileName);
 			if (topicFile.exists()) {
-				baseMapper.saveNewFilePath(newFilePath + "UserDefineTopicFile.xml", proDetailId);
+				baseMapper.saveNewFilePath(newFilePath + ProjectConStant.newFileName, proDetailId);
 			} else {
 				logger.error("UserDefineTopicFile.xml不存在");
 			}
@@ -1520,7 +1521,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		ProjectFile model = baseMapper
 				.selectOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getParentId, projectId));
 		for (ProjectFile projectFile : getProFileListByModelId(model.getId())) {
-			if ("11".equals(projectFile.getFileType())) {
+			if (FileTypeConstants.PROCESS_MODELING.equals(projectFile.getFileType())) {
 				Path = projectFile.getFilePath();
 				local_REPO_PATH = gitDetailPath;
 				break;
@@ -1543,14 +1544,14 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		ProjectFile model = baseMapper
 				.selectOne(Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getParentId, projectId));
 		for (ProjectFile projectFile : getProFileListByModelId(model.getId())) {
-			if ("11".equals(projectFile.getFileType())) {
+			if (FileTypeConstants.PROCESS_MODELING.equals(projectFile.getFileType())) {
 				Path = projectFile.getFilePath();
 				// local_REPO_PATH = JGitUtil.getLOCAL_REPO_PATH();
 				local_REPO_PATH = gitDetailPath;
 				break;
 			}
 		}
-		String userDefineTopicFilePath = local_REPO_PATH + Path + "TopicConfig/UserDefineTopicFile.xml";
+		String userDefineTopicFilePath = local_REPO_PATH + Path + "TopicConfig/"+ProjectConStant.newFileName;
 
 		return userDefineTopicFilePath;
 	}
@@ -1568,7 +1569,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		/************************************
 		 * update by zhx
 		 ********************************************/
-		String filePath = flowPath + "系数文件.xml";
+		String filePath = flowPath + ProjectConStant.coefficientFile;
 
 		/*****************************************************************************************/
 		File flowFile = new File(flowPath);
@@ -1719,7 +1720,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		List<Part> partList = new ArrayList<Part>();
 		List<ProjectFile> ProjectFileList = this.getFilePathListById(proDetailId);
 		for (ProjectFile proFile : ProjectFileList) {
-			if (proFile.getFileType().equals("11")) {
+			if (proFile.getFileType().equals(FileTypeConstants.PROCESS_MODELING)) {
 				flowFilePath = proDetailPath + proFile.getFilePath() + proFile.getFileName() + ".xml";
 				path = proDetailPath + proFile.getFilePath();
 			}
@@ -1733,7 +1734,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			List<Part> partList1 = ProcedureXmlAnalysis.getPartList(xmlMap);
 			partList.addAll(partList1);
 		}
-		String themePath = path + "自定义配置__主题配置.xml";
+		String themePath = path + ProjectConStant.themeName;
 		File themeFile = new File(themePath);
 		XmlEntityMap themeData = null;
 		XmlEntityMap netWorkData = null;
@@ -1743,7 +1744,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			// themeData = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(themeFile);
 			themeData = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(themePath).getData();
 		}
-		String netWorkPath = path + "自定义配置__网络配置.xml";
+		String netWorkPath = path + ProjectConStant.netWorkName;
 		File netWorkFile = new File(netWorkPath);
 		if (!netWorkFile.exists()) {
 			netWorkData = this.getXmlEntityMap(baseTemplateIDsDTO.getNetworkTempId());
@@ -3056,7 +3057,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String planFilePath = "";
 		String str = "";
 		for (ProjectFile ls : lists) {
-			if (ls.getFileType().equals("11")) {
+			if (ls.getFileType().equals(FileTypeConstants.PROCESS_MODELING)) {
 				String bb = ls.getFilePath().replaceAll("\\\\", "/");
 				String www = gitDetailPath + ls.getFilePath() + ls.getFileName() + ".xml";
 				String aa = bb.substring(0, bb.lastIndexOf("/"));
@@ -3105,27 +3106,27 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		String flowpath = "";
 		String flowName = "";
 		for (ProjectFile ls : lists) {
-			if (ls.getFileType().equals("11")) {
+			if (ls.getFileType().equals(FileTypeConstants.PROCESS_MODELING)) {
 				workModeFilePath = ls.getFilePath() + ls.getFileName() + ".xml";
 			}
-			if (ls.getFileType().equals("15")) {
+			if (ls.getFileType().equals(FileTypeConstants.DEPLOYMENT_DIAGRAM)) {
 				cpuModelFilePath = ls.getFilePath() + ls.getFileName() + ".xml";
 			}
-			if (ls.getFileType().equals("12")) {
+			if (ls.getFileType().equals(FileTypeConstants.HARDWARE_MODELING)) {
 				hardWareFilePath = ls.getFilePath() + ls.getFileName() + ".xml";
 			}
-			if (ls.getFileType().equals("13")) {
+			if (ls.getFileType().equals(FileTypeConstants.SH_MAPPING_CONFIG)) {
 				mapConfigPath = ls.getFilePath() + ls.getFileName() + ".xml";
 			}
-			if (ls.getFileType().equals("17")) {
+			if (ls.getFileType().equals(FileTypeConstants.SYSTEM_CONFIG)) {
 				sysParamFilePath = ls.getFilePath() + ls.getFileName() + ".xml";
 			}
 			// 方案展示的路径
-			if (ls.getFileType().equals("14")) {
+			if (ls.getFileType().equals(FileTypeConstants.PLAN_DISPLAY)) {
 				simplePlanFile = gitDetailPath + ls.getFilePath() + ls.getFileName() + ".xml";
 			}
 			// 详细方案的路径
-			if (ls.getFileType().equals("18")) {
+			if (ls.getFileType().equals(FileTypeConstants.DETAILED_SCHEME)) {
 				planId = ls.getId();
 				workSpacePath = ls.getFilePath();
 			}
@@ -3148,7 +3149,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		// sysParamFilePath = gitDetailPath +
 		// flowFile.getFilePath()+flowInfPath+File.separator+"系数文件.xml" ;
 		workSpacePath = gitDetailPath + flowFile.getFilePath() + softToHardResult;
-		sysParamFilePath = workSpacePath + File.separator + "系数文件.xml";
+		sysParamFilePath = workSpacePath + File.separator + ProjectConStant.coefficientFile;
 //		// 客户exe文件全路径
 //		String exe = JGitUtil.getSoftToHard();// "D:\\14S_GJK_GIT\\gjk\\gjk\\exe\\exe.exe";
 //		// 调用客户接口执行exe
@@ -3254,7 +3255,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		map.get("path");
 		List<ProjectFile> lists = this.getFilePathListById((String) map.get("id"));
 		for (ProjectFile ls : lists) {
-			if (ls.getFileType().equals("11")) {
+			if (ls.getFileType().equals(FileTypeConstants.PROCESS_MODELING)) {
 				workModeFilePath = gitDetailPath + File.separator + ls.getFilePath() + ls.getFileName() + ".xml";
 			}
 		}
