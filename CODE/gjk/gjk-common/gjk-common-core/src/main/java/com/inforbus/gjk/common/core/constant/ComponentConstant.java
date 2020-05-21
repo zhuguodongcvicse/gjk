@@ -75,4 +75,14 @@ public interface ComponentConstant {
 	 *  packinfo文件路径（客户自存自取的路径）
 	 */
 	String PACKINFO_XML = "packinfo.xml";
+	
+	/**
+	 * 构件有新版本(已更新)
+	 */
+	String COMP_NEWVERSION = "0";
+	
+	/**
+	 * 构件无新版本(未更新)
+	 */
+	String COMP_NO_NEWVERSION = "1";
 }

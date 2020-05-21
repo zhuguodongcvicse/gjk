@@ -396,12 +396,12 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 				// 最高版本为"+versions.get(versions.size()-1)+"\n";
 //		    	Double version = Double.valueOf(versionMap.get(entry.getKey()));
 //		    	Double versionTmp = Double.valueOf(versions.get(versions.size()-1));
-				if ((Double.valueOf(versionMap.get(entry.getKey()))) < (Double
-						.valueOf(versions.get(versions.size() - 1)))) {
-					compUpdate.put(entry.getKey(), "0");// 已更新
-				} else {
-					compUpdate.put(entry.getKey(), "1");// 未更新
-				}
+//				if ((Double.valueOf(versionMap.get(entry.getKey()))) < (Double
+//						.valueOf(versions.get(versions.size() - 1)))) {
+//					compUpdate.put(entry.getKey(), "0");// 已更新
+//				} else {
+//					compUpdate.put(entry.getKey(), "1");// 未更新
+//				}
 				versions.clear();
 			}
 		}
@@ -994,9 +994,9 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 					+ versions.get(versions.size() - 1) + "\n";
 			if ((Double.valueOf(versionMap.get(entry.getKey()))) < (Double
 					.valueOf(versions.get(versions.size() - 1)))) {
-				compUpdate.put(entry.getKey(), "0");// 已更新
+				compUpdate.put(entry.getKey(), ComponentConstant.COMP_NEWVERSION);// 已更新
 			} else {
-				compUpdate.put(entry.getKey(), "1");// 未更新
+				compUpdate.put(entry.getKey(), ComponentConstant.COMP_NO_NEWVERSION);// 未更新
 			}
 			versions.clear();
 		}
