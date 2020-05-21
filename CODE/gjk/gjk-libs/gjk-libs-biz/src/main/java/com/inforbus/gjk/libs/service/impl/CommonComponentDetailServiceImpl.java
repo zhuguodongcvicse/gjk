@@ -25,10 +25,13 @@ import com.google.common.collect.Maps;
 import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.util.FileUtil;
+import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.UploadFilesUtils;
 import com.inforbus.gjk.common.core.util.XmlFileHandleUtil;
+import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 import com.inforbus.gjk.libs.api.entity.CommonComponent;
 import com.inforbus.gjk.libs.api.entity.CommonComponentDetail;
+import com.inforbus.gjk.libs.api.feign.DataCenterServiceFeign;
 import com.inforbus.gjk.libs.api.vo.CommCompDetailVO;
 import com.inforbus.gjk.libs.mapper.CommonComponentDetailMapper;
 import com.inforbus.gjk.libs.service.CommonComponentDetailService;
@@ -39,6 +42,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +58,9 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 
 	@Value("${git.local.path}")
 	private String gitFilePath;
+
+	@Autowired
+	private DataCenterServiceFeign dataCenterServiceFeign;
 
 	/**
 	 * 公共构件库表简单分页查询
@@ -88,24 +95,31 @@ public class CommonComponentDetailServiceImpl extends ServiceImpl<CommonComponen
 			for (CommonComponentDetail detail : commonComponentDetailList) {
 				String originalFileName = gitFilePath + detail.getFilePath() + File.separator + detail.getFileName();
 				detail.setFilePath(compPath + detail.getFilePath().substring(subStr.length()));
-				File originalFile = new File(originalFileName);
-				if (!originalFile.exists()) {
-					continue;
-				}
-				if (originalFile.isDirectory()) {
-					FileUtil.copyFile(originalFileName, gitFilePath + detail.getFilePath() + detail.getFileName());
+
+				if (!dataCenterServiceFeign.isFile(originalFileName).getData()) {
+					//feign调用复制文件
+					dataCenterServiceFeign.copylocalFile(originalFileName,gitFilePath + detail.getFilePath());
 				} else {
-					FileUtil.copyFile(originalFileName, gitFilePath + detail.getFilePath());
+					//feign调用复制文件
+					dataCenterServiceFeign.copylocalFile(originalFileName,gitFilePath + detail.getFilePath() + detail.getFileName());
 				}
+
 				if ("xml".equals(detail.getFileType())) {
-					File file = new File(gitFilePath + detail.getFilePath() + detail.getFileName());
-					XmlEntityMap entityMap = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file);
-					XmlEntityMap getFunctionName = getXmlMapByLableName(entityMap, "函数路径");
-					if (getFunctionName.getAttributeMap().containsKey("name")) {
-						getFunctionName.getAttributeMap().put("name",
-								compPath + getFunctionName.getAttributeMap().get("name").substring(subStr.length()));
+					String xmlFilePath = gitFilePath + detail.getFilePath() + detail.getFileName();
+					//调用feign根据xml文件的绝对路径解析xml文件为XmlEntityMap对象
+					R<XmlEntityMap> r = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(xmlFilePath);
+					XmlEntityMap entityMap = r.getData();
+					if (entityMap != null){
+						XmlEntityMap getFunctionName = getXmlMapByLableName(entityMap, "函数路径");
+						if (getFunctionName.getAttributeMap().containsKey("name")) {
+							getFunctionName.getAttributeMap().put("name",
+									compPath + getFunctionName.getAttributeMap().get("name").substring(subStr.length()));
+						}
+						XMlEntityMapVO xMlEntityMapVO = new XMlEntityMapVO();
+						xMlEntityMapVO.setLocalPath(xmlFilePath);
+						xMlEntityMapVO.setXmlEntityMap(entityMap);
+						dataCenterServiceFeign.createXMLFile(xMlEntityMapVO);
 					}
-					XmlFileHandleUtil.createXmlFile(entityMap, file);
 				}
 				baseMapper.saveCommonCompDetail(detail);
 			}

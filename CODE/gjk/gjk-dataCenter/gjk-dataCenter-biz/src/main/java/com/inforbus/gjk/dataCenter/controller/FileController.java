@@ -24,13 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -650,5 +644,33 @@ public class FileController {
 		}
 		return ret;
 	}
-	
+
+	/**
+	 * @Author wang
+	 * @Description: 根据绝对路径判断是否是文件
+	 * @Param: [filePath]
+	 * @Return: com.inforbus.gjk.common.core.util.R<java.lang.Boolean>
+	 * @Create: 2020/5/21
+	 */
+	@PostMapping("/isFile")
+	@ResponseBody
+	public R<Boolean> isFile(@RequestParam("filePath") String filePath){
+		R<Boolean> ret = new R<>();
+		try {
+			boolean b = fileService.isFile(filePath);
+			if (b){
+				ret.setData(b);
+				ret.setMsg("是文件夹");
+			}else {
+				ret.setData(b);
+				ret.setMsg("不是文件夹");
+			}
+		} catch (Exception e) {
+			logger.error("文件路径错误" + e);
+			ret.setCode(CommonConstants.FAIL);
+			ret.setData(false);
+			ret.setMsg("文件路径错误");
+		}
+		return ret;
+	}
 }
