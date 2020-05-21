@@ -949,4 +949,18 @@ public class FileServiceImpl implements FileService {
 		}
 		return jsonStr;
 	}
+
+	/**
+	 * @Author wang
+	 * @Description: 根据绝对路径判断是否是文件
+	 * @Param: [filePath]
+	 * @Return: boolean
+	 * @Create: 2020/5/21
+	 */
+    @Override
+    public boolean isFile(String filePath) {
+		File file = new File(filePath);
+		return !file.isFile();
+//		return file.isDirectory();
+    }
 }

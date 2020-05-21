@@ -232,4 +232,6 @@ public interface FileService {
 	 * @return
 	 */
 	public String findJson(String jsonPath);
+
+    boolean isFile(String filePath);
 }
