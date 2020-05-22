@@ -1,6 +1,7 @@
 package com.inforbus.gjk.comp.api.util;
 
 import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -28,7 +29,7 @@ public class XmlAnalysisUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(XmlAnalysisUtil.class);
 
-	public static ComponentDTO xmlFileToComponentDTO(Component component, ComponentDetail comp) {
+	public static ComponentDTO xmlFileToComponentDTO(Component component, ComponentDetail comp,InputStream is) {
 		ComponentDTO componentDTO = new ComponentDTO(comp);
 
 		// 创建解析器工厂
@@ -43,7 +44,7 @@ public class XmlAnalysisUtil {
 			// 由工厂创建一个DocumentBuilder解析器
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			// 创建一个Document对象
-			Document document = builder.parse(file);
+			Document document = builder.parse(is);
 			// 获取所有节点
 			NodeList nodeList = document.getChildNodes();
 			System.out.println(nodeList.getLength());

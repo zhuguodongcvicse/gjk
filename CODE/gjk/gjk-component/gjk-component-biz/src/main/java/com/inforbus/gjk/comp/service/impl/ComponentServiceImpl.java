@@ -107,6 +107,7 @@ import com.inforbus.gjk.libs.api.entity.CommonComponent;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import feign.Response;
 
 /**
  * 构件
@@ -332,8 +333,16 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 							+ fileName;
 					R<XmlEntityMap> rdc = rdcService.analysisXmlFileToXMLEntityMap(filePath);
 					if (rdc.getCode() == CommonConstants.SUCCESS) {
+						Response response = rdcService.downloadStreamFile(filePath);
+						InputStream is = null;
+						try {
+							is = response.body().asInputStream();
+						} catch (IOException e) {
+							logger.error("文件解析异常",e);
+							e.printStackTrace();
+						}
 						// 将构件文件放入map
-						dtos.add(XmlAnalysisUtil.xmlFileToComponentDTO(comp, vo));
+						dtos.add(XmlAnalysisUtil.xmlFileToComponentDTO(comp, vo, is));
 						// 将构件所对应的xml存入xmlEntityMap中
 						xmlEntityMap.put(vo.getCompId(), rdc.getData());
 					}
