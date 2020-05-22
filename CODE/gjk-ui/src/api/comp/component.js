@@ -204,3 +204,10 @@ export function jsplumbToGojs(param) {
     method: 'post'
   })
 }
+
+export function gojsToJsplumb(param) {
+  return request({
+    url: '/comp/component/gojsToJsplumbImg',
+    method: 'post'
+  })
+}
