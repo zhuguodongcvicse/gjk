@@ -29,7 +29,7 @@ public class XmlAnalysisUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(XmlAnalysisUtil.class);
 
-	public static ComponentDTO xmlFileToComponentDTO(Component component, ComponentDetail comp,InputStream is) {
+	public static ComponentDTO xmlFileToComponentDTO(Component component, ComponentDetail comp,File is) {
 		ComponentDTO componentDTO = new ComponentDTO(comp);
 
 		// 创建解析器工厂
