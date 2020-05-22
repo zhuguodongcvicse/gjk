@@ -229,7 +229,8 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		Component comp = baseMapper.listCompByCompId(compId);
 		List<CompDetailVO> tree = Lists.newArrayList();
 //			将构件转成树
-		tree.add(new CompDetailVO(comp.getId(), comp.getCompName(), ComponentConstant.COMP, "", "-1", comp.getVersion()));
+		tree.add(new CompDetailVO(comp.getId(), comp.getCompName(), ComponentConstant.COMP, "", "-1",
+				comp.getVersion()));
 		List<ComponentDetail> vos = compDetailMapper.listCompDetailByCompId(comp.getId());
 		// 如果为true,则显示comp的xml文件，不走if内
 		for (ComponentDetail v : vos) {
@@ -333,22 +334,22 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 							+ fileName;
 					R<XmlEntityMap> rdc = rdcService.analysisXmlFileToXMLEntityMap(filePath);
 					if (rdc.getCode() == CommonConstants.SUCCESS) {
-						Response response = rdcService.downloadStreamFiles(new String[]{filePath});
+						Response response = rdcService.downloadStreamFiles(new String[] { filePath });
 						InputStream is = null;
-					    String tmpPath="./";
+						String tmpPath = "./";
 						try {
 							is = response.body().asInputStream();
-							//解压文件
-							UploadFilesUtils.decompression(is,tmpPath);
-
-						// 将构件文件放入map
-						dtos.add(XmlAnalysisUtil.xmlFileToComponentDTO(comp, vo, new File(tmpPath)));
-						// 将构件所对应的xml存入xmlEntityMap中
-						xmlEntityMap.put(vo.getCompId(), rdc.getData());
-						//删除文件
+							// 解压文件
+							UploadFilesUtils.decompression(is, tmpPath);
+							// 将构件文件放入map
+							dtos.add(XmlAnalysisUtil.xmlFileToComponentDTO(comp, vo, new File(tmpPath+ File.separator
+									+ fileName)));
+							// 将构件所对应的xml存入xmlEntityMap中
+							xmlEntityMap.put(vo.getCompId(), rdc.getData());
+							// 删除文件
 							cn.hutool.core.io.FileUtil.del(tmpPath);
 						} catch (IOException e) {
-							logger.error("文件解析异常",e);
+							logger.error("文件解析异常", e);
 							e.printStackTrace();
 						}
 					}
