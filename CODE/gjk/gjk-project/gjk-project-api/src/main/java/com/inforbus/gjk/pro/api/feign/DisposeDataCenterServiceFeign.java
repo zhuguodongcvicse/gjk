@@ -74,7 +74,7 @@ public interface DisposeDataCenterServiceFeign {
      * @Return: boolean
      * @Create: 2020/4/14
      */
-	 @PostMapping(url + "createXMLFile")
+	 @PostMapping(url + "/createXMLFile")
 	    public R<Boolean> createXMLFile(@RequestBody XMlEntityMapVO xMlEntityMapVO) ;
 	 
 	 /**
@@ -122,7 +122,7 @@ public interface DisposeDataCenterServiceFeign {
 	 * @DateTime 2020年5月07日
 	 *
 	 */
-	@PostMapping(url + "copylocalFile")
+	@PostMapping(url + "/copylocalFile")
 	public R<Boolean> copylocalFile(@RequestParam("source") String source, @RequestParam("destin") String destin);
 
 	/**
@@ -133,7 +133,7 @@ public interface DisposeDataCenterServiceFeign {
 	 * @Author wang
 	 * @DateTime 2020年5月07日
 	 */
-	@PostMapping(url + "delAllFile")
+	@PostMapping(url + "/delAllFile")
 	public R<Boolean> delAllFile(@RequestParam("sourcePath") String sourcePath);
 
 	/**

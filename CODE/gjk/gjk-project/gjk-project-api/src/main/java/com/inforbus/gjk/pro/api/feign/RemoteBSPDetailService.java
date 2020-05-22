@@ -29,6 +29,6 @@ public interface RemoteBSPDetailService {
      * @Return: com.inforbus.gjk.common.core.util.R<java.util.List<com.inforbus.gjk.libs.api.entity.BSPDetail>>
      * @Create: 2020/5/12
      */
-    @GetMapping(url + "getBSPDetailByBSPIdIn/{ids}")
+    @GetMapping(url + "/getBSPDetailByBSPIdIn/{ids}")
     public R<List<BSPDetail>> getBSPDetailByBSPIdIn(@PathVariable("ids") String ids);
 }

@@ -20,7 +20,7 @@ import java.util.List;
 @FeignClient(value = ServiceNameConstants.LIBS_SERVICE,fallbackFactory = RemoteSoftwareServiceFallbackFactory.class)
 public interface RemoteSoftwareService {
 
-    String url = "software";
+    String url = "/software";
 
     /**
      * @Author wang

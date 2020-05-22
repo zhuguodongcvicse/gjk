@@ -30,6 +30,6 @@ public interface RemoteBSPService {
      * @Return: com.inforbus.gjk.common.core.util.R<java.util.List<com.inforbus.gjk.libs.api.entity.BSP>>
      * @Create: 2020/5/12
      */
-    @GetMapping(url + "getAllBSPListByIdIn/{ids}")
+    @GetMapping(url + "/getAllBSPListByIdIn/{ids}")
     public R<List<BSP>> getAllBSPListByIdIn(@PathVariable("ids") String ids);
 }

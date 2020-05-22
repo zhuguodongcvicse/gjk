@@ -20,7 +20,7 @@ import java.util.List;
 @FeignClient(value = ServiceNameConstants.LIBS_SERVICE,fallbackFactory = RemoteStructServiceFallbackFactory.class)
 public interface RemoteStructService {
 
-    String url = "structlibs";
+    String url = "/structlibs";
 
     /**
      * @Author wang

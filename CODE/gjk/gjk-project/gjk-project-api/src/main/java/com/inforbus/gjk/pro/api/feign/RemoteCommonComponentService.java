@@ -20,7 +20,7 @@ import java.util.List;
 @FeignClient(value = ServiceNameConstants.LIBS_SERVICE,fallbackFactory = RemoteCommonComponentServiceFallbackFactory.class)
 public interface RemoteCommonComponentService {
 
-    String url = "commoncomponent";
+    String url = "/commoncomponent";
 
     /**
      * @Author wang
@@ -29,6 +29,6 @@ public interface RemoteCommonComponentService {
      * @Return: com.inforbus.gjk.common.core.util.R<java.util.List<com.inforbus.gjk.libs.api.entity.CommonComponent>>
      * @Create: 2020/5/12
      */
-    @GetMapping(url + "getCommonComponentByIdIn/{ids}")
+    @GetMapping(url + "/getCommonComponentByIdIn/{ids}")
     public R<List<CommonComponent>> getCommonComponentByIdIn(@PathVariable("ids")String ids);
 }

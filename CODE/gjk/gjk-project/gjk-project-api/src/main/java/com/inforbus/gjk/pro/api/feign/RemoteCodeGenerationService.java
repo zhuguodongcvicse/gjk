@@ -21,7 +21,7 @@ import java.util.Map;
 @FeignClient(value = ServiceNameConstants.DATACENDER_SERVICE,fallbackFactory = RemoteCodeGenerationServiceFallbackFactory.class)
 public interface RemoteCodeGenerationService {
 
-    String url = "codeGeneration";
+    String url = "/codeGeneration";
     /**
      * @Author wang
      * @Description: 集成代码生成方法

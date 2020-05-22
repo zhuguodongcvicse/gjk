@@ -23,7 +23,7 @@ import java.util.List;
 @FeignClient(value = ServiceNameConstants.UMPS_SERVICE,fallbackFactory = RemoteSysDictServiceFallbackFatory.class)
 public interface RemoteSysDictService {
 
-    String url = "dict";
+    String url = "/dict";
 
     /**
      * @Author wang
@@ -32,6 +32,6 @@ public interface RemoteSysDictService {
      * @Return: com.inforbus.gjk.common.core.util.R<java.util.List<com.inforbus.gjk.admin.api.entity.SysDict>>
      * @Create: 2020/5/13
      */
-    @PostMapping(url + "getSysDictByRemarksIn")
+    @PostMapping(url + "/getSysDictByRemarksIn")
     public R<List<SysDict>> getSysDictByRemarksIn(@RequestBody List<String> remarksList);
 }

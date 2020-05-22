@@ -20,7 +20,7 @@ import java.util.List;
 @FeignClient(value = ServiceNameConstants.LIBS_SERVICE,fallbackFactory = RemoteCommonComponentDetailServiceFallbackFactory.class)
 public interface RemoteCommonComponentDetailService {
 
-    String url = "commoncomponentdetail";
+    String url = "/commoncomponentdetail";
 
     /**
      * @Author wang

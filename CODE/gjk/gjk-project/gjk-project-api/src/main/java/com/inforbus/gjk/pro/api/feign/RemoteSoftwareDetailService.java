@@ -20,7 +20,7 @@ import java.util.List;
 @FeignClient(value = ServiceNameConstants.LIBS_SERVICE,fallbackFactory = RemoteSoftwareDetailServiceFallbackFactory.class)
 public interface RemoteSoftwareDetailService {
 
-    String url = "softwareDetail";
+    String url = "/softwareDetail";
 
     /**
      * @Author wang
@@ -29,6 +29,6 @@ public interface RemoteSoftwareDetailService {
      * @Return: com.inforbus.gjk.common.core.util.R<java.util.List<com.inforbus.gjk.libs.api.entity.SoftwareDetail>>
      * @Create: 2020/5/12
      */
-    @GetMapping(url + "getSoftwareDetail/{ids}")
+    @GetMapping(url + "/getSoftwareDetail/{ids}")
     public R<List<SoftwareDetail>> getSoftwareDetailBySoftwareIdIn(@PathVariable("ids") String ids);
 }
