@@ -803,6 +803,7 @@ function init() {
 // document.onkeydown=function(){
 //   if((event.ctrlKey)){
 myDiagram.addModelChangedListener(function(evt) {
+ 
   // 忽略不重要的事务事件
   if (!evt.isTransactionFinished) return;
   var txn = evt.object;  // a Transaction
@@ -817,42 +818,44 @@ myDiagram.addModelChangedListener(function(evt) {
     if (e.change === go.ChangedEvent.Insert) {
     //监听鼠标
     var nodeData=myDiagram.model.findNodeDataForKey(e.newValue.key);  
-    //myDiagram.model.removeNodeData(nodeData); 
-    var jsonData = JSON.parse(myDiagram.model.toJson());
-     if(nodeData.type === "new"){
-
-     }else{
-    nodeData.type = "copy";
-    var copyKey1 = nodeData.key;
-    var objClone = JSON.parse(JSON.stringify(copyKey1));
-    var random = ''
-    random = Math.ceil(Math.random() * 10000000000000000000).toString().substr(0, 9 || 4)
-    random = Date.now() + random
-    nodeData.key = random;
-    var uuidList = new Array()
-    for (let leftPort of nodeData.leftArray) {
-      leftPort.portId = leftPort.portId.split("*")[0] + "*" + leftPort.portId.split("*")[1] + "*" + nodeData.key
-      uuidList.push(leftPort.portId)
+    if(nodeData != null){
+  //myDiagram.model.removeNodeData(nodeData); 
+  var jsonData = JSON.parse(myDiagram.model.toJson());
+  console.log("&*&*&*&*&*&*",nodeData);
+   if(nodeData.type != "new" && nodeData.type != null){
+  nodeData.type = "copy";
+  var copyKey1 = nodeData.key;
+  var objClone = JSON.parse(JSON.stringify(copyKey1));
+  var random = ''
+  random = Math.ceil(Math.random() * 10000000000000000000).toString().substr(0, 9 || 4)
+  random = Date.now() + random
+  nodeData.key = random;
+  var uuidList = new Array()
+  for (let leftPort of nodeData.leftArray) {
+    leftPort.portId = leftPort.portId.split("*")[0] + "*" + leftPort.portId.split("*")[1] + "*" + nodeData.key
+    uuidList.push(leftPort.portId)
+  }
+  for (let rightPort of nodeData.rightArray) {
+    rightPort.portId = rightPort.portId.split("*")[0] + "*" + rightPort.portId.split("*")[1] + "*" + nodeData.key
+    uuidList.push(rightPort.portId)
+  }
+  var gjidAndTemid = [];
+    gjidAndTemid.push({
+      //构件ID
+      gjId: nodeData.compId,
+      //构件模板新ID
+      newTmpId: random,
+      //构件模板旧id
+      oldTmpId: objClone.slice(0,objClone.length-1),
+      //状态
+      state: 4,
+      //节点所有锚点uuid
+      uuidList: uuidList
+    });
+    handleMessageToParent("returnFormJson", gjidAndTemid);
+   }
     }
-    for (let rightPort of nodeData.rightArray) {
-      rightPort.portId = rightPort.portId.split("*")[0] + "*" + rightPort.portId.split("*")[1] + "*" + nodeData.key
-      uuidList.push(rightPort.portId)
-    }
-    var gjidAndTemid = [];
-      gjidAndTemid.push({
-        //构件ID
-        gjId: nodeData.compId,
-        //构件模板新ID
-        newTmpId: random,
-        //构件模板旧id
-        oldTmpId: objClone.slice(0,objClone.length-1),
-        //状态
-        state: 4,
-        //节点所有锚点uuid
-        uuidList: uuidList
-      });
-      handleMessageToParent("returnFormJson", gjidAndTemid);
-     }
+  
     } else if (e.change === go.ChangedEvent.Remove) {
       //console.log(evt.propertyName + " 22222222222222removed node with key: " + e.oldValue.key);
     }
