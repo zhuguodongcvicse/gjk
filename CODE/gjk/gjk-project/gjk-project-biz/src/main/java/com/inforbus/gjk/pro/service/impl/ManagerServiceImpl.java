@@ -1079,12 +1079,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			filePath = proDetailPath + projectFile.getFilePath();
 			fileName = projectFile.getFileName() + "__" + name + ".xml";
 		}
-		File file = new File(filePath);
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-		// boolean flag = XmlFileHandleUtil.createXmlFile(entity, new File(filePath +
-		// fileName));
 		XMlEntityMapVO xmlVo = new XMlEntityMapVO();
 		xmlVo.setLocalPath(filePath + fileName);
 		xmlVo.setXmlEntityMap(entity);
@@ -1097,14 +1091,11 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			}
 		}
 		String newFilePath = filePath + "TopicConfig/";
-		File newFile = new File(newFilePath);
-		if (!newFile.exists()) {
-			newFile.mkdirs();
-		}
+		
 //		ExternalIOTransUtils.createUserDefineTopic(flowFilePath, filePath + fileName,
 //				newFilePath + "UserDefineTopicFile.xml");
 		boolean bo = externalInfInvokeService
-				.createUserDefineTopic(flowFilePath, filePath + fileName, newFilePath + ProjectConStant.newFileName)
+				.createUserDefineTopic(flowFilePath, filePath + fileName, newFilePath + ProjectConStant.newFileName,newFilePath)
 				.getData();
 		if (bo) {
 			File topicFile = new File(newFilePath + ProjectConStant.newFileName);
@@ -1115,7 +1106,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			}
 
 		}
-		// JGitUtil.commitAndPush(filePath + fileName, "上传构件相关文件");
 		return flag;
 	}
 
@@ -1671,30 +1661,27 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			}
 		}
 		// 获取部件及部件及部件下构建
-		File flowFile = new File(flowFilePath);
-		if (flowFile.exists()) {
-			// List<Part> partList1 = ProcedureXmlAnalysis.getPartList(new
-			// File(flowFilePath));
+//		File flowFile = new File(flowFilePath);
+		if(dataCenterServiceFeign.judgeFileExist(flowFilePath).getData() != null && (boolean)dataCenterServiceFeign.judgeFileExist(flowFilePath).getData()) {
 			XmlEntityMap xmlMap = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(flowFilePath).getData();
 			List<Part> partList1 = ProcedureXmlAnalysis.getPartList(xmlMap);
 			partList.addAll(partList1);
 		}
 		String themePath = path + ProjectConStant.themeName;
-		File themeFile = new File(themePath);
+		//File themeFile = new File(themePath);
 		XmlEntityMap themeData = null;
 		XmlEntityMap netWorkData = null;
-		if (!themeFile.exists()) {
-			themeData = this.getXmlEntityMap(baseTemplateIDsDTO.getThemeTempId());
-		} else {
-			// themeData = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(themeFile);
+		if(dataCenterServiceFeign.judgeFileExist(themePath).getData() != null && (boolean)dataCenterServiceFeign.judgeFileExist(themePath).getData()) {
 			themeData = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(themePath).getData();
+		}else {
+			themeData = this.getXmlEntityMap(baseTemplateIDsDTO.getThemeTempId());
 		}
 		String netWorkPath = path + ProjectConStant.netWorkName;
-		File netWorkFile = new File(netWorkPath);
-		if (!netWorkFile.exists()) {
-			netWorkData = this.getXmlEntityMap(baseTemplateIDsDTO.getNetworkTempId());
-		} else {
+		//File netWorkFile = new File(netWorkPath);
+		if(dataCenterServiceFeign.judgeFileExist(netWorkPath).getData() != null && (boolean)dataCenterServiceFeign.judgeFileExist(netWorkPath).getData()) {
 			netWorkData = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(netWorkPath).getData();
+		}else {
+			netWorkData = this.getXmlEntityMap(baseTemplateIDsDTO.getNetworkTempId());
 		}
 		JSONObject obj = new JSONObject();
 		obj.put("themeData", themeData);

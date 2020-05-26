@@ -47,11 +47,11 @@ public class ExternalInfController {
 	}
 
 	@RequestMapping("/createUserDefineTopic")
-	public R<Boolean> createUserDefineTopic(String flowFilePath, String ThemeFilePath, String filePath) {
+	public R<Boolean> createUserDefineTopic(String flowFilePath, String ThemeFilePath, String filePath, String newFolder) {
 		R<Boolean> r = new R();
 		boolean flag = false;
 		try {
-			externalInfService.createUserDefineTopic(flowFilePath, ThemeFilePath, filePath);
+			externalInfService.createUserDefineTopic(flowFilePath, ThemeFilePath, filePath,newFolder);
 			flag = true;
 			r.setData(flag);
 			r.setMsg("UserDefineTopicFile.xml生成成功");

@@ -35,7 +35,7 @@ public interface ExternalInfInvokeService {
 	 */
 	@PostMapping(url + "/createUserDefineTopic")
 	public R<Boolean> createUserDefineTopic(@RequestParam("flowFilePath")String flowFilePath, 
-			@RequestParam("ThemeFilePath")String ThemeFilePath, @RequestParam("filePath")String filePath);
+			@RequestParam("ThemeFilePath")String ThemeFilePath, @RequestParam("filePath")String filePath, @RequestParam("newFolder")String newFolder);
 	
 
 	/**

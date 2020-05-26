@@ -121,8 +121,8 @@ public class ExternalInfServiceImpl implements ExternalInfService {
      * 自定义配置调用接口
      */
     @Override
-    public void createUserDefineTopic(String flowFilePath, String ThemeFilePath, String filePath) {
-        File newFile = new File(filePath);
+    public void createUserDefineTopic(String flowFilePath, String ThemeFilePath, String filePath,String newFolder) {
+        File newFile = new File(newFolder);
         if (!newFile.exists()) {
             newFile.mkdirs();
         }

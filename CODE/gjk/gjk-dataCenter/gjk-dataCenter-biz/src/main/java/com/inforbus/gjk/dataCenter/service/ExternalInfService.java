@@ -57,7 +57,7 @@ public interface ExternalInfService {
     /**
      * 自定义配置调用接口
      */
-    public void createUserDefineTopic(String flowFilePath, String ThemeFilePath, String filePath);
+    public void createUserDefineTopic(String flowFilePath, String ThemeFilePath, String filePath,String newFolder);
 
     /**
      * 注册
