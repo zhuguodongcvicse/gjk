@@ -589,10 +589,10 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	public XmlEntityMap getDisposeXmlEntityMap(String proDetailId) {
 		ProjectFile projectFile = getProDetailById(proDetailId);
 		// 项目中是否已经存在的文件路径
-		File hsmLocalFile = new File(gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml");
 		String localFilePath = gitDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml";
 		// 如果该项目中已经有该文件，则读取该文件内容显示在页面上；否则读取基础模板里的最新的软硬件映射配置文件
-		if (hsmLocalFile.exists()) {
+		R fileExist = dataCenterServiceFeign.judgeFileExist(localFilePath);
+		if (fileExist != null && (boolean) fileExist.getData()) {
 			R<XmlEntityMap> r = new R<XmlEntityMap>();
 			r = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(localFilePath);
 			return r.getData();

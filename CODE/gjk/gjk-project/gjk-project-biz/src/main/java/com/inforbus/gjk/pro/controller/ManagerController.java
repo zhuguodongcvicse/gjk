@@ -435,13 +435,8 @@ public class ManagerController {
 
 	@GetMapping("getChipsfromhardwarelibs/{id}")
 	public Chipsfromhardwarelibs getChipsfromhardwarelibs(@PathVariable("id") String id) {
-		long startTime = System.currentTimeMillis(); // 获取开始时间
 
 		Chipsfromhardwarelibs chipsfromhardwarelibs = managerService.getChipsfromhardwarelibs(id);
-
-		long endTime = System.currentTimeMillis(); // 获取结束时间
-
-		System.out.println("程序运行时间：" + (endTime - startTime) + "ms"); // 输出程序运行时间
 
 		return chipsfromhardwarelibs;
 	}

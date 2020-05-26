@@ -10,6 +10,7 @@ import com.inforbus.gjk.dataCenter.service.ExternalInfService;
 import flowModel.*;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -121,6 +122,10 @@ public class ExternalInfServiceImpl implements ExternalInfService {
      */
     @Override
     public void createUserDefineTopic(String flowFilePath, String ThemeFilePath, String filePath) {
+        File newFile = new File(filePath);
+        if (!newFile.exists()) {
+            newFile.mkdirs();
+        }
         try {
             TopicConfig.createUserDefineTopic(flowFilePath, ThemeFilePath, filePath);
         } catch (IOException e) {
