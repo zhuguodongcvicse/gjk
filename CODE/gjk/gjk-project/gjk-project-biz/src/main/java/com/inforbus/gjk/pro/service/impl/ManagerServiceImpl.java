@@ -27,6 +27,7 @@ import com.inforbus.gjk.pro.api.entity.*;
 
 import com.inforbus.gjk.pro.api.entity.BSP;
 import com.inforbus.gjk.pro.api.entity.BSPDetail;
+import com.inforbus.gjk.pro.api.entity.Component;
 import com.inforbus.gjk.pro.api.entity.GjkPlatform;
 import com.inforbus.gjk.pro.api.entity.Software;
 import com.inforbus.gjk.pro.api.entity.SoftwareDetail;
@@ -3281,4 +3282,23 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 		}
 		return retMap;
 	}
+
+	/**
+	 * @Author wang
+	 * @Description: 根据路径获取流程建模xml文件中得数据
+	 * @Param: [workModeFilePath]
+	 * @Return: java.util.List<com.inforbus.gjk.pro.api.entity.Component>
+	 * @Create: 2020/5/26
+	 */
+	@Override
+	public List<Component> getCompList(String workModeFilePath) {
+		R<XmlEntityMap> r = dataCenterServiceFeign.analysisXmlFileToXMLEntityMap(workModeFilePath);
+		XmlEntityMap xmlEntityMap = r.getData();
+		if (xmlEntityMap != null){
+			return ProcedureXmlAnalysis.getComponentList(xmlEntityMap);
+		}
+		return null;
+	}
+
+
 }

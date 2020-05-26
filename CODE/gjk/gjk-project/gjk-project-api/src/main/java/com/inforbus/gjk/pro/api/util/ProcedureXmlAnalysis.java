@@ -71,6 +71,18 @@ public class ProcedureXmlAnalysis {
 		return components;
 	}
 
+	/**
+	 * @Author wang
+	 * @Description: 解析流程建模xml文件获取所需数据
+	 * @Param: [xmlEntityMap]
+	 * @Return: java.util.List<com.inforbus.gjk.pro.api.entity.Component>
+	 * @Create: 2020/5/26
+	 */
+	public List<Component> getComponentList(XmlEntityMap xmlEntityMap) {
+		analysisByProcedureXml(xmlEntityMap);
+		return components;
+	}
+
 	public List<Arrows> getArrowsList(File file) {
 		analysisByProcedureXml(file);
 		return arrowsList;

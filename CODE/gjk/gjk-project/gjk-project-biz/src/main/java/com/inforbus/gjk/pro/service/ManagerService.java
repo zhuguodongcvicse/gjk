@@ -390,4 +390,13 @@ public interface ManagerService extends IService<ProjectFile> {
 	 * @return
 	 */
 	Map<String, Object> importFile(MultipartFile file);
+
+	/**
+	 * @Author wang
+	 * @Description: 根据流程建模xml文件的路径获取流程建模xml文件中的数据
+	 * @Param: [workModeFilePath]
+	 * @Return: java.util.List<com.inforbus.gjk.pro.api.entity.Component>
+	 * @Create: 2020/5/26
+	 */
+	List<Component> getCompList(String workModeFilePath);
 }

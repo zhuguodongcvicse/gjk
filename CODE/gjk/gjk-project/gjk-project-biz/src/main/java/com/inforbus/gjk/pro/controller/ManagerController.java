@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
+import com.inforbus.gjk.common.core.constant.FileTypeConstants;
 import com.inforbus.gjk.pro.api.entity.*;
 
 import org.slf4j.Logger;
@@ -375,24 +376,42 @@ public class ManagerController {
 		}
 	}
 
+	/**
+	 * @Author wang
+	 * @Description: 根据流程id获取流程建模xml文件中的数据，2020年5月26日14点37分晓冬修改，支持分布式系统
+	 * @Param: [id]
+	 * @Return: com.inforbus.gjk.common.core.util.R
+	 * @Create: 2020/5/26
+	 */
 	@GetMapping("/getProcessFilePathById/{id}")
 	public R getProcessFilePathById(@PathVariable("id") String id) {
-		// id：软硬件映射配置的主键id
-		List<ProjectFile> lists = managerService.getFilePathListById(id);
-		// 流程模型文件
-		String workModeFilePath = "";
-		for (ProjectFile ls : lists) {
-			if (ls.getFileType().equals("11")) {
-				workModeFilePath = proDetailPath + ls.getFilePath() + ls.getFileName() + ".xml";
+		R r = new R();
+		try {
+			// id：软硬件映射配置的主键id
+			List<ProjectFile> lists = managerService.getFilePathListById(id);
+			// 流程模型文件
+			String workModeFilePath = "";
+			for (ProjectFile ls : lists) {
+				if (ls.getFileType().equals(FileTypeConstants.PROCESS_MODELING)) {
+					workModeFilePath = proDetailPath + ls.getFilePath() + ls.getFileName() + ".xml";
+				}
 			}
-		}
-		File file = new File(workModeFilePath);
-		if (file.exists()) {
-			return new R<>(ProcedureXmlAnalysis.getComponentList(file));
-		} else {
+			List<Component> compList = managerService.getCompList(workModeFilePath);
+			if (compList != null){
+				r.setData(compList);
+				r.setMsg("解析成功");
+			}else {
+				r.setData(compList);
+				r.setCode(CommonConstants.FAIL);
+				r.setMsg("缺少流程配置文件，请先配置流程。");
+				logger.error("缺少流程配置文件，请先配置流程。");
+			}
+		}catch (Exception e){
+			r.setCode(CommonConstants.FAIL);
+			r.setMsg("缺少流程配置文件，请先配置流程。");
 			logger.error("缺少流程配置文件，请先配置流程。");
-			return new R<>();
 		}
+		return r;
 	}
 
 	/**
