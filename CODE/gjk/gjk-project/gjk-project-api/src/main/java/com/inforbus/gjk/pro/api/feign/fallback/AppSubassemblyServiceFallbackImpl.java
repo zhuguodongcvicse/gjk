@@ -8,6 +8,7 @@ import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 import com.inforbus.gjk.pro.api.dto.CopySoftwareAndBspDTO;
 import com.inforbus.gjk.pro.api.dto.ModifyAssemblyDirDTO;
+import com.inforbus.gjk.pro.api.entity.ProjectFile;
 import com.inforbus.gjk.pro.api.feign.AppSubassemblyServiceFeign;
 import com.inforbus.gjk.pro.api.feign.DisposeDataCenterServiceFeign;
 import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
@@ -92,6 +93,24 @@ public class AppSubassemblyServiceFallbackImpl implements AppSubassemblyServiceF
     @Override
     public R<List<ProjectFileVO>> createAppTree(@RequestParam("appPath") String appPath, @RequestParam("processId") String processId) {
         log.error("调用数据中心的feign接口createAppTree方法失败", cause);
+        R r = new R();
+        r.setCode(CommonConstants.FAIL);
+        r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
+        return r;
+    }
+
+    @Override
+    public R getHardwareNodeList(@RequestParam("proDetailPath") String proDetailPath, @RequestBody List<ProjectFile> projectFiles) {
+        log.error("调用数据中心的feign接口getHardwareNodeList方法失败", cause);
+        R r = new R();
+        r.setCode(CommonConstants.FAIL);
+        r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
+        return r;
+    }
+
+    @Override
+    public R<Map<String, List<String>>> getCmpSysConfigMap(String customizeFileName, String packinfoFileName, String processFileName) {
+        log.error("调用数据中心的feign接口getCmpSysConfigMap方法失败", cause);
         R r = new R();
         r.setCode(CommonConstants.FAIL);
         r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");

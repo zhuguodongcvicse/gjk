@@ -1,10 +1,13 @@
 package com.inforbus.gjk.dataCenter.controller;
 
+import com.inforbus.gjk.common.core.constant.CommonConstants;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.dataCenter.api.dto.CopySoftwareAndBspDTO;
 import com.inforbus.gjk.dataCenter.api.dto.ModifyAssemblyDirDTO;
+import com.inforbus.gjk.dataCenter.api.entity.ProjectFile;
 import com.inforbus.gjk.dataCenter.api.vo.ProjectFileVO;
 import com.inforbus.gjk.dataCenter.service.AppSubassemblyService;
+import com.inforbus.gjk.pro.api.entity.HardwareNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +15,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/appSubassemblyServer")
@@ -153,4 +158,47 @@ public class AppSubassemblyController {
         return r;
     }
 
+    /**
+     * 获取硬件节点列表
+     * @param proDetailPath
+     * @param projectFiles
+     * @return
+     */
+    @PostMapping("/getHardwareNodeList")
+    @ResponseBody
+    public R<List<HardwareNode>> getHardwareNodeList(@RequestParam("proDetailPath") String proDetailPath, @RequestBody List<ProjectFile> projectFiles) {
+        R<List<HardwareNode>> r = new R<>();
+        try {
+            List<HardwareNode> hardwareNodeList = appSubassemblyService.getHardwareNodeList(proDetailPath, projectFiles);
+            r.setData(hardwareNodeList);
+            r.setCode(CommonConstants.SUCCESS);
+        } catch (FileNotFoundException e) {
+            r.setMsg(e.getMessage());
+            r.setCode(CommonConstants.FAIL);
+            return r;
+        }
+        return r;
+    }
+
+    /**
+     * 获取客户api的返回值
+     * @param customizeFileName
+     * @param packinfoFileName
+     * @param processFileName
+     * @return
+     */
+    @PostMapping("/getCmpSysConfigMap")
+    @ResponseBody
+    public R<Map<String, List<String>>> getCmpSysConfigMap(@RequestParam("customizeFileName") String customizeFileName,
+                                                           @RequestParam("packinfoFileName") String packinfoFileName,
+                                                           @RequestParam("processFileName") String processFileName) {
+        R<Map<String, List<String>>> r = new R<>();
+        try {
+            Map<String, List<String>> cmpSysConfigMap = appSubassemblyService.getCmpSysConfigMap(customizeFileName, packinfoFileName, processFileName);
+            r.setData(cmpSysConfigMap);
+        } catch (Exception e) {
+            r.setException(e);
+        }
+        return r;
+    }
 }

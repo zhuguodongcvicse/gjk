@@ -3,6 +3,7 @@ package com.inforbus.gjk.dataCenter.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.inforbus.gjk.common.core.constant.CommonConstants;
+import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
 import com.inforbus.gjk.common.core.util.FileUtil;
 import com.inforbus.gjk.common.core.util.R;
@@ -14,7 +15,10 @@ import com.inforbus.gjk.dataCenter.api.entity.*;
 import com.inforbus.gjk.dataCenter.api.vo.ProjectFileVO;
 import com.inforbus.gjk.dataCenter.controller.AppSubassemblyController;
 import com.inforbus.gjk.dataCenter.service.AppSubassemblyService;
+import com.inforbus.gjk.dataCenter.service.ExternalInfService;
 import com.inforbus.gjk.dataCenter.service.FileService;
+import com.inforbus.gjk.pro.api.entity.HardwareNode;
+import com.inforbus.gjk.pro.api.util.ProcedureXmlAnalysis;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
@@ -34,6 +39,10 @@ public class AppSubassemblyServiceImpl implements AppSubassemblyService {
 
     @Autowired
     private FileService fileService;
+
+    @Autowired
+    private ExternalInfService externalInfService;
+
     /**
      * 判断文件是否存在
      * @param filePath
@@ -430,5 +439,44 @@ public class AppSubassemblyServiceImpl implements AppSubassemblyService {
                     file.getParentFile().getAbsolutePath(), parentId, processId, "1"));
         }
     }
+    @Override
+    public List<HardwareNode> getHardwareNodeList(String proDetailPath, List<ProjectFile> projectFiles) throws FileNotFoundException {
+        File file = null;
+        for (ProjectFile projectFile : projectFiles) {
+            if ("11".equals(projectFile.getFileType())) {
+                file = new File(proDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml");
+                break;
+            }
+        }
+        if (file.exists()) {
+            XmlEntityMap XmlEntityMap = fileService.analysisXmlFileToXMLEntityMap(file.getAbsolutePath());
+            List<HardwareNode> hardwareNodeList = ProcedureXmlAnalysis.getHardwareNodeList(XmlEntityMap);
+            return hardwareNodeList;
+        } else {
+            return null;
+        }
+    }
 
+    @Override
+    public Map<String, List<String>> getCmpSysConfigMap(String customizeFileName, String packinfoFileName, String processFileName) throws Exception {
+        File customizefile = new File(customizeFileName);
+        File packinfofile = new File(packinfoFileName);
+        File processfile = new File(processFileName);
+
+        if (!customizefile.exists()) {
+            throw new Exception("缺少自定义配置文件，请先配置自定义配置。");
+        }
+
+        if (!packinfofile.exists()) {
+            throw new Exception("缺少集成代码的文件，请先生成集成代码。");
+        }
+
+        if (!processfile.exists()) {
+            throw new Exception("缺少流程建模的文件，请先配置流程建模。");
+        }
+
+        // 获取客户api的返回值
+        Map<String, List<String>> cmpSysConfig = externalInfService.getCmpSysConfig(customizeFileName, packinfoFileName, processFileName);
+        return cmpSysConfig;
+    }
 }

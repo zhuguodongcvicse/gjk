@@ -4,6 +4,8 @@ import com.inforbus.gjk.common.core.constant.ServiceNameConstants;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.pro.api.dto.CopySoftwareAndBspDTO;
 import com.inforbus.gjk.pro.api.dto.ModifyAssemblyDirDTO;
+import com.inforbus.gjk.pro.api.entity.HardwareNode;
+import com.inforbus.gjk.pro.api.entity.ProjectFile;
 import com.inforbus.gjk.pro.api.feign.factory.AppSubassemblyServiceFallbackFactory;
 import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -60,4 +62,12 @@ public interface AppSubassemblyServiceFeign {
 
 	@PostMapping(url + "/createAppTree")
 	R<List<ProjectFileVO>> createAppTree(@RequestParam("appPath") String appPath, @RequestParam("processId") String processId);
+
+	@PostMapping(url + "/getHardwareNodeList")
+	R<List<HardwareNode>> getHardwareNodeList(@RequestParam("proDetailPath") String proDetailPath, @RequestBody List<ProjectFile> projectFiles);
+
+	@PostMapping(url + "/getCmpSysConfigMap")
+	R<Map<String, List<String>>> getCmpSysConfigMap(@RequestParam("customizeFileName") String customizeFileName,
+													@RequestParam("packinfoFileName") String packinfoFileName,
+													@RequestParam("processFileName") String processFileName);
 }

@@ -373,8 +373,11 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
 	@Override
 	public List<HardwareNode> getCoeffNodeTree(String proDetailId) {
-		File file = null;
-		for (ProjectFile projectFile : getProFileListByModelId(this.getById(proDetailId).getParentId())) {
+		List<ProjectFile> projectFiles = getProFileListByModelId(this.getById(proDetailId).getParentId());
+		R<List<HardwareNode>> r = appSubassemblyServiceFeign.getHardwareNodeList(proDetailPath, projectFiles);
+		return r.getData();
+		/*File file = null;
+		for (ProjectFile projectFile : projectFiles) {
 			if ("11".equals(projectFile.getFileType())) {
 				file = new File(proDetailPath + projectFile.getFilePath() + projectFile.getFileName() + ".xml");
 				break;
@@ -385,7 +388,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
             return ProcedureXmlAnalysis.getHardwareNodeList(XmlEntityMap);
 		} else {
 			return null;
-		}
+		}*/
 	}
 
 	/**
@@ -421,29 +424,13 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 				Wrappers.<ProjectFile>query().lambda().eq(ProjectFile::getId, this.getById(proDetailId).getParentId()));
 		packinfoFileName = gitDetailPath + processFile.getFilePath() + generateCodeResult + "/packinfo.xml";
 
-		File customizefile = new File(customizeFileName);
-		File packinfofile = new File(packinfoFileName);
-		File processfile = new File(processFileName);
-
-		if (!customizefile.exists()) {
-			return new R<>(new Exception("缺少自定义配置文件，请先配置自定义配置。"));
-		}
-
-		if (!packinfofile.exists()) {
-			return new R<>(new Exception("缺少集成代码的文件，请先生成集成代码。"));
-		}
-
-		if (!processfile.exists()) {
-			return new R<>(new Exception("缺少流程建模的文件，请先配置流程建模。"));
-		}
-
-		// 解析返回值
 		Map<String, List<Object>> map = new HashMap<>();
 		// 获取客户api的返回值
-//		Map<String, List<String>> apiReturnStringList = ExternalIOTransUtils.getCmpSysConfig(customizeFileName, packinfoFileName, processFileName);
-		Map<String, List<String>> apiReturnStringList = externalInfInvokeService
-				.getCmpSysConfig(customizeFileName, packinfoFileName, processFileName).getData();
-		analysisApiReturnStringList(apiReturnStringList, map);
+		R<Map<String, List<String>>> r = appSubassemblyServiceFeign.getCmpSysConfigMap(customizeFileName, packinfoFileName, processFileName);
+		if (r.getCode() == CommonConstants.FAIL) {
+			return r;
+		}
+		analysisApiReturnStringList(r.getData(), map);
 
 		return new R<>(map);
 	}

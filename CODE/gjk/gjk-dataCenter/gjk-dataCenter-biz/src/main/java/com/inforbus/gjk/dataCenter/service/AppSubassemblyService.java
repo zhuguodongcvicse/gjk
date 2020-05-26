@@ -2,11 +2,15 @@ package com.inforbus.gjk.dataCenter.service;
 
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.dataCenter.api.entity.Part;
+import com.inforbus.gjk.dataCenter.api.entity.ProjectFile;
 import com.inforbus.gjk.dataCenter.api.vo.ProjectFileVO;
+import com.inforbus.gjk.pro.api.entity.HardwareNode;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public interface AppSubassemblyService {
 
@@ -84,4 +88,21 @@ public interface AppSubassemblyService {
      * @return
      */
     List<ProjectFileVO> createAppTree(String appPath, String processId);
+
+    /**
+     * 获取硬件节点列表
+     * @param proDetailPath
+     * @param projectFiles
+     * @return
+     */
+    List<HardwareNode> getHardwareNodeList(String proDetailPath, List<ProjectFile> projectFiles) throws FileNotFoundException;
+
+    /**
+     * 获取客户api的返回值
+     * @param customizeFileName
+     * @param packinfoFileName
+     * @param processFileName
+     * @return
+     */
+    Map<String, List<String>> getCmpSysConfigMap(String customizeFileName, String packinfoFileName, String processFileName) throws Exception;
 }
