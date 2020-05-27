@@ -182,10 +182,10 @@ function checkDat() {
       return false;
     }
   })
-  if (dat.length > 0) {
+ // if (dat.length > 0) {
     init();
     //$("#gjk").load();	
-  }
+  //}
 }
 
 function init() {
