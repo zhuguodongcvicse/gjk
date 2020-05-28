@@ -1004,7 +1004,7 @@ export default {
         showName =
           param === undefined
             ? val === undefined
-              ? from.attrName
+              ? attr.attrName
               : val.value
             : param.label;
       } else {

@@ -462,7 +462,7 @@ export default {
       getProcessByProcessId(domain.processId).then(res => {
         //  this.$store.dispatch("setTmpProject", response.data);
         this.$router.push({
-          path: "/comp/manager/process",
+          path: "/comp/manager/gojs",
           query: {
             proId: res.data.projectId,
             processId: res.data.id,
