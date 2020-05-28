@@ -460,6 +460,7 @@ public class CompileTask implements Task {
             flag = this.connection.authenticateWithPassword(this.username, this.password);
         } catch (IOException e) {
             logger.error("连接linux失败,请检查ip,账户,密码是否正确" + e.getMessage());
+            this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n连接linux失败,请检查ip,账户,密码是否正确");
         }
         logger.debug("linuxLogin方法运行结束");
         return flag;
@@ -488,6 +489,7 @@ public class CompileTask implements Task {
                 return true;
             } else {
                 logger.error("连接linux系统失败,请检查ip,账号,密码");
+                this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n连接linux失败,请检查ip,账户,密码是否正确");
             }
         } catch (IOException e) {
             logger.error("IO异常" + e.getMessage());
@@ -567,6 +569,7 @@ public class CompileTask implements Task {
                 }
             } else {
                 logger.error("连接linux系统失败,请检查ip,账号,密码");
+                this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n连接linux失败,请检查ip,账户,密码是否正确");
             }
         } catch (IOException e) {
             logger.error("IO异常" + e.getMessage());
@@ -647,6 +650,7 @@ public class CompileTask implements Task {
                 return true;
             } else {
                 logger.error("连接linux系统失败,请检查ip,账号,密码");
+                this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n连接linux失败,请检查ip,账户,密码是否正确");
             }
         } catch (IOException e) {
             logger.error("IO异常" + e.getMessage());
@@ -693,6 +697,7 @@ public class CompileTask implements Task {
             return true;
         } catch (Exception e) {
             logger.error("上传失败,请检查ip地址,账号,密码是否正确" + e.getMessage());
+            this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n连接linux失败,请检查ip,账户,密码是否正确");
         }
         return false;
     }
