@@ -1,125 +1,102 @@
 <template>
   <div ref="divRef" style="  margin: 2px 15px;">
     <!-- <div> -->
-      <el-button type="primary" :disabled="platformFlag" @click.native="handleSaveComp">提交申请</el-button>
-    <!-- </div> -->
-    <!-- <div> -->
-      <el-tabs v-model="activeName">
-        <el-tab-pane label="基本信息" name="first">
-          <el-form
-            :label-position="labelPosition"
-            label-width="180px"
-            :model="formLabelAlign"
-            :rules="projectRules"
-            ref="formLabelAlignRef"
-          >
-            <div>
-              <el-form-item label="项目名称" prop="projectName">
-                <el-input v-model="formLabelAlign.projectName"></el-input>
-              </el-form-item>
-              <el-form-item label="流程名称" prop="processName">
-                <el-input v-model="formLabelAlign.processName"></el-input>
-              </el-form-item>
-              <el-form-item label="请选择审批人" prop="applyUser">
-                <el-select v-model="formLabelAlign.applyUser" placeholder="请选择">
-                  <el-option
-                    v-for="item in applyUserSelect"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-            </div>
-          </el-form>
-        </el-tab-pane>
+    <el-button type="primary" :disabled="platformFlag" @click.native="handleSaveComp">提交申请</el-button>
+    <el-tabs v-model="activeName">
+      <el-tab-pane label="基本信息" name="first">
+        <el-form
+          :label-position="labelPosition"
+          label-width="180px"
+          :model="formLabelAlign"
+          :rules="projectRules"
+          ref="formLabelAlignRef"
+        >
+          <div>
+            <el-form-item label="项目名称" prop="projectName">
+              <el-input v-model="formLabelAlign.projectName"></el-input>
+            </el-form-item>
+            <el-form-item label="流程名称" prop="processName">
+              <el-input v-model="formLabelAlign.processName"></el-input>
+            </el-form-item>
+            <el-form-item label="请选择审批人" prop="applyUser">
+              <el-select v-model="formLabelAlign.applyUser" placeholder="请选择">
+                <el-option
+                  v-for="item in applyUserSelect"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </div>
+        </el-form>
+      </el-tab-pane>
 
-        <el-tab-pane label="框架信息" name="second">
-          <el-form :label-position="labelPosition" label-width="180px" :model="formLabelAlign">
-            <div>
-              <el-form-item label="软件框架选择">
-                <span style="color: red;" v-show="platformFlag">{{platformNameTs}}未选择</span>
-                <el-select
-                  class="text_align_center_14s"
-                  v-model="softwareSelectString"
-                  size="small"
-                  multiple
-                  placeholder="请选择"
-                  @change="selectSoftwareClk"
+      <el-tab-pane label="框架信息" name="second">
+        <el-form :label-position="labelPosition" label-width="180px" :model="formLabelAlign">
+          <div>
+            <el-form-item label="软件框架选择">
+              <span style="color: red;" v-show="platformFlag">{{platformNameTs}}未选择</span>
+              <el-select
+                class="text_align_center_14s"
+                v-model="softwareSelectString"
+                size="small"
+                multiple
+                placeholder="请选择"
+                @change="selectSoftwareClk"
+              >
+                <el-option
+                  v-for="item in softwareTreeData"
+                  :key="item.id"
+                  :label="item.softwareName"
+                  :value="item.id"
                 >
-                  <el-option
-                    v-for="item in softwareTreeData"
-                    :key="item.id"
-                    :label="item.softwareName"
-                    :value="item.id"
-                  >
-                    <span style="float: left">{{ item.softwareName }}(v{{item.version}}.0)</span>
-                    <span
-                      style="float: right; color: #8492a6; font-size: 13px;margin-right: 30px;"
-                    >{{ item.description }}</span>
-                  </el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="BSP选择">
-                <el-select
-                  class="text_align_center_14s"
-                  size="small"
-                  v-model="bspSelectString"
-                  multiple
-                  placeholder="请选择"
-                  @change="selectBSPClk"
+                  <span style="float: left">{{ item.softwareName }}(v{{item.version}}.0)</span>
+                  <span
+                    style="float: right; color: #8492a6; font-size: 13px;margin-right: 30px;"
+                  >{{ item.description }}</span>
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="BSP选择">
+              <el-select
+                class="text_align_center_14s"
+                size="small"
+                v-model="bspSelectString"
+                multiple
+                placeholder="请选择"
+                @change="selectBSPClk"
+              >
+                <el-option
+                  v-for="item in bspTreeData"
+                  :key="item.id"
+                  :label="item.bspName"
+                  :value="item.id"
                 >
-                  <el-option
-                    v-for="item in bspTreeData"
-                    :key="item.id"
-                    :label="item.bspName"
-                    :value="item.id"
-                  >
-                    <span style="float: left">{{ item.bspName }}(v{{item.version}}.0)</span>
-                    <span
-                      style="float: right; color: #8492a6; font-size: 13px;margin-right: 30px;"
-                    >{{ item.description }}</span>
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </div>
-          </el-form>
-        </el-tab-pane>
+                  <span style="float: left">{{ item.bspName }}(v{{item.version}}.0)</span>
+                  <span
+                    style="float: right; color: #8492a6; font-size: 13px;margin-right: 30px;"
+                  >{{ item.description }}</span>
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </div>
+        </el-form>
+      </el-tab-pane>
 
-        <!-- <el-tab-pane label="构件信息" name="third">
-                  <el-form
-                    :label-position="labelPosition"
-                    label-width="120px"
-                    :model="formLabelAlign"
-                  >
-                    <div class="bsp_tab_14s">
-                      <el-form-item label="构件筛选">
-                        <select-tree
-                          :treeData="screenLibsTree"
-                          multiple
-                          :id.sync="screenLibsIdArray"
-                        />
-                      </el-form-item>
-                      <el-form-item label="构件选择">
-                        <select-tree :treeData="compTreeData" multiple :id.sync="compSelectArray" />
-                        <el-button type="primary" @click="selectAllComp">全选</el-button>
-                      </el-form-item>
-                    </div>
-                  </el-form>
-        </el-tab-pane>-->
-        <!--选择构件-->
-        <el-tab-pane label="构件信息" name="third">
-          <!-- <div class="libs_commoncomponent_14s"> -->
-            <common-component @fromChild="getChild"></common-component>
-          <!-- </div> -->
-        </el-tab-pane>
+      <!--选择构件-->
+      <el-tab-pane label="构件信息" name="third">
+        <!-- <div class="libs_commoncomponent_14s"> -->
+        <common-component @fromChild="getChild"></common-component>
+        <!-- </div> -->
+      </el-tab-pane>
 
-        <!--选择模板-->
-        <el-tab-pane label="模板信息" name="fourth">
-          <choose-temp :formLabelAlign="formLabelAlign"></choose-temp>
-        </el-tab-pane>
-      </el-tabs>
-    </div>
+      <!--选择模板-->
+      <el-tab-pane label="模板信息" name="fourth">
+        <choose-temp :formLabelAlign="formLabelAlign"></choose-temp>
+      </el-tab-pane>
+    </el-tabs>
+  </div>
   <!-- </div> -->
 </template>
 
@@ -278,52 +255,14 @@ export default {
       procedureId: ""
     };
   },
-  watch: {
-    // screenLibsIdArray() {
-    //   for (let item of this.screenLibsIdArray) {
-    //     if (item == "0") {
-    //       this.screenLibsIdArray.splice(
-    //         this.screenLibsIdArray.indexOf(item),
-    //         1
-    //       );
-    //     }
-    //   }
-    //   console.log("screenLibsIdArray", this.screenLibsIdArray);
-    //   this.getTableData();
-    //   this.compSelectArray = [];
-    // }
-  },
+  watch: {},
   methods: {
     //从子组件获取值
     getChild(v) {
       console.log("v", v);
       this.childComData = v;
     },
-    // showStructList() {
-    //   this.getTableData();
-    // },
-    // selectAllComp() {
-    //   let selectArray = [];
-    //   this.setId(this.compTreeData, selectArray);
-    //   this.compSelectArray = selectArray;
-    // },
-    // setId(treeDate, array) {
-    //   for (let item of treeDate) {
-    //     array.push(item.id);
-    //     if (item.children != null && item.children.length != 0) {
-    //       this.setId(item.children, array);
-    //     }
-    //   }
-    // },
-    // getTableData() {
-    //   if (this.screenLibsIdArray.length == 0) {
-    //     this.getCompSelectTree();
-    //   } else {
-    //     screenCompByLibs(this.screenLibsIdArray).then(Response => {
-    //       this.compTreeData = Response.data.data;
-    //     });
-    //   }
-    // },
+
     getCreateData() {
       getProNameListByUserId(this.userInfo.userId).then(Response => {
         this.proNameList = Response.data.data;
@@ -386,10 +325,7 @@ export default {
           };
           //给模板id赋json串值
           this.project.basetemplateIds = JSON.stringify(basetemplate);
-          // console.log(
-          //   "this.project.basetemplateIds",
-          //   this.project.basetemplateIds
-          // );
+
           saveProject(this.project)
             .then(Response => {
               this.project.id = Response.data.data.id;
@@ -458,14 +394,6 @@ export default {
                               type: "success",
                               duration: 2000
                             });
-                            menuTag(
-                              this.$route.path,
-                              "removeOpen",
-                              this.tagList,
-                              {
-                                value: "/pro/project"
-                              }
-                            );
                           });
                         }
                       }
@@ -479,6 +407,9 @@ export default {
                 this.compSelectArray = [];
               }
             });
+          menuTag(this.$route.path, "removeOpen", this.tagList, {
+            value: "/pro/project"
+          });
           this.reload();
         }
       });
@@ -737,25 +668,12 @@ export default {
     },
     changeProcedureSoftwareId() {
       if (this.softwareSelectString.length == 0) {
-        // this.$message({
-        //   message: "请至少选择一个软件框架",
-        //   type: "error"
-        // });
         return;
       }
       let prodetail = {};
       prodetail.id = this.procedureId;
       prodetail.description = this.softwareSelectString.join(";");
-      updatePartSoftwareAndPlatform(prodetail).then(response => {
-        // if (response.data.data) {
-        //   this.$message({
-        //     message: "修改软件框架成功",
-        //     type: "success"
-        //   });
-        // } else {
-        //   this.$message.error("修改软件框架失败");
-        // }
-      });
+      updatePartSoftwareAndPlatform(prodetail).then(response => {});
     },
     changeProcedureBSPId() {
       if (this.bspSelectString.length == 0) {
@@ -765,16 +683,7 @@ export default {
       prodetail.id = this.procedureId;
       prodetail.description = this.bspSelectString.join(";");
       // 保存选择的BSP库
-      updatePartBSPAndPlatform(prodetail).then(response => {
-        // if (response.data.data) {
-        //   this.$message({
-        //     message: "修改BSP库成功",
-        //     type: "success"
-        //   });
-        // } else {
-        //   this.$message.error("修改BSP库失败");
-        // }
-      });
+      updatePartBSPAndPlatform(prodetail).then(response => {});
     }
   },
   created() {
@@ -789,7 +698,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.cc{
+.cc {
   margin: 2px 5px;
 }
 </style>
