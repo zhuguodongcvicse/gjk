@@ -404,23 +404,12 @@ public class AppController {
 	}
 	/**
 	 * 通过yml文件获取平台
+	 * 2020年5月29日17点26分 晓冬修改，此数据不需要从配置文件中获取，从字典表中获取
 	 * @return
 	 */
 	@PutMapping( "/getPlatformName")
 	public R getPlatformNameByYml() {
-		String filePath = ManagerServiceImpl.class.getResource("").getPath();
-		// 找到bootstrap.properties的地址
-		filePath = filePath.substring(0, filePath.indexOf("target/classes/") + "target/classes/".length())
-				+ "platformType.yml";
-		File dumpFile = new File(filePath);
-		String makefileType = "";
-		Map father = null;
-		try {
-			father = Yaml.loadType(dumpFile, HashMap.class);
-//			makefileType = father.get(json.get(fileName)).toString();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		return new R<>(father);
+		Map<String,String> map = appService.getPlatformName();
+		return new R<>(map);
 	}
 }
