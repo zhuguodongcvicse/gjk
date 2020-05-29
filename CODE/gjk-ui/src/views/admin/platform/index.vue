@@ -63,7 +63,7 @@
                   <el-option
                     v-for="item in options"
                     :key="item.value"
-                    :label="item.label"
+                    :label="item.value"
                     :value="item.value">
                   </el-option>
                 </el-select>
@@ -72,11 +72,11 @@
               </el-form-item>
 
               <el-form-item v-if="formStatus == 'create'">
-                <el-select v-model="form.typeValue" placeholder="请选择类型值" v-if="formStatus == 'create'">
+                <el-select v-model="form.typeValue" placeholder="请选择类型值,确保已经在字典添加了新平台类型" v-if="formStatus == 'create'">
                   <el-option
                     v-for="item in options"
                     :key="item.value"
-                    :label="item.label"
+                    :label="item.value"
                     :value="item.value">
                   </el-option>
                 </el-select>

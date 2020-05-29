@@ -37,6 +37,7 @@
 
 <script>
 import { addObj, delObj, fetchList, putObj } from "@/api/admin/dict";
+import { modifyPlatformLibDirectory } from "@/api/admin/platform";
 import { tableOption } from "@/const/crud/admin/dict";
 import { mapGetters } from "vuex";
 
@@ -64,7 +65,6 @@ export default {
   },
   methods: {
     getList(page, params) {
-      console.log("11111");
       this.tableLoading = true;
       fetchList(
         Object.assign(
@@ -131,6 +131,7 @@ export default {
      **/
     handleUpdate: function(row, index, done) {
       putObj(row).then(() => {
+        this.syncModifyPlatformLibDirectory(row);
         this.tableData.splice(index, 1, Object.assign({}, row));
         this.$message({
           showClose: true,
@@ -173,6 +174,14 @@ export default {
       console.log("currentPage", currentPage);
       this.page.currentPage = currentPage;
       this.getList(this.page, this.searchData);
+    },
+    syncModifyPlatformLibDirectory(row) {
+        // console.log("row", row)
+        let PlatformVO = {
+            name: row.label,
+            typeValue: row.value
+        }
+        modifyPlatformLibDirectory(PlatformVO);
     }
   }
 };

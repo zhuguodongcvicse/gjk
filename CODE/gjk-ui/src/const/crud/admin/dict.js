@@ -19,6 +19,7 @@ export const tableOption = {
     width: 150,
     label: '数据值',
     prop: 'value',
+    editDisabled: true,
     rules: [{
       required: true,
       message: '请输入数据值',
@@ -36,6 +37,7 @@ export const tableOption = {
     label: '类型',
     prop: 'type',
     'search': true,
+    editDisabled: true,
     rules: [{
       required: true,
       message: '请输入字典类型',

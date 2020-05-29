@@ -90,7 +90,7 @@ public class GjkPlatformController {
 	 */
 	@GetMapping("/getPlatFormTypeList")
 	public List<GjkPlatform> getPlatFormTypeList() {
-		return gjkPlatformService.list(Wrappers.emptyWrapper());
+		return gjkPlatformService.getPlatFormTypeList();
 	}
 
 	/**
@@ -167,5 +167,16 @@ public class GjkPlatformController {
 	@PostMapping("ownPlatform")
 	public R ownPlatform() {
 		return new R<>(gjkPlatformService.selectOwnPlatform());
+	}
+
+	/**
+	 * 修改平台类型
+	 * @param platformVO
+	 * @return
+	 */
+	@PutMapping("/modifyPlatformLibDirectory")
+	public R modifyPlatformLibDirectory(@RequestBody PlatformVO platformVO) {
+
+		return new R<>(gjkPlatformService.modifyPlatformLibDirectory(platformVO));
 	}
 }

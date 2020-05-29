@@ -66,3 +66,12 @@ export function getPlatFormTypeList () {
     method: 'get'
   })
 }
+
+export function modifyPlatformLibDirectory (obj) {
+  console.log("+++++modifyPlatformLibDirectory")
+  return request({
+    url: '/admin/platform/modifyPlatformLibDirectory',
+    method: 'put',
+    data: obj
+  })
+}
