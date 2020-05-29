@@ -869,7 +869,9 @@ function ChangedSelection(e){//选择事件
         data=nodeOrLink.data;
         data.type= "copy"
 		  }
-	  });
+    });
+    nodeOrLinkList = myDiagram.selection;
+    nodeOrLinkFirst = myDiagram.selection.first()
 };
  // 粘贴到画布
   myDiagram.addDiagramListener("ClipboardPasted", function (e) {
