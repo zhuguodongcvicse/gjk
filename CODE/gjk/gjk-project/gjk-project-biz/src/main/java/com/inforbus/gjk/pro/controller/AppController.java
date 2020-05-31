@@ -151,26 +151,21 @@ public class AppController {
 	 * @Description: 获取图标文件
 	 * @Author xiaohe
 	 * @DateTime 2019年5月23日 上午11:32:09
-	 * @param compId
+	 * @param id
 	 * @return
 	 */
 	@GetMapping("/appImg/{id}")
 	public void getImgFile(@PathVariable String id, HttpServletRequest req, HttpServletResponse res) {
 		OutputStream os = null;
-		FileInputStream fis = appService.getAppImgFile(id);
+		byte[] bytes = appService.getAppImgFile(id);
 		try {
 			os = res.getOutputStream();
-			int count = 0;
-			byte[] buffer = new byte[1024 * 8];
-			while ((count = fis.read(buffer)) != -1) {
-				os.write(buffer, 0, count);
-				os.flush();
-			}
+			os.write(bytes);
+			os.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				fis.close();
 				os.close();
 			} catch (IOException e) {
 				e.printStackTrace();

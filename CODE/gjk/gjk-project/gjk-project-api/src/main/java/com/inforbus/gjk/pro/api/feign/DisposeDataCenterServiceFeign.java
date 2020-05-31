@@ -10,6 +10,7 @@ import com.inforbus.gjk.common.core.config.FeignSpringFormEncoder;
 import feign.codec.Encoder;
 import flowModel.SimpleScheme;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
@@ -30,6 +31,8 @@ import com.inforbus.gjk.pro.api.feign.factory.DisposeDataCenterServiceFallbackFa
 
 import feign.Response;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletResponse;
 
 @FeignClient(value = ServiceNameConstants.DATACENDER_SERVICE,
 		fallbackFactory = DisposeDataCenterServiceFallbackFactory.class,
@@ -212,4 +215,14 @@ public interface DisposeDataCenterServiceFeign {
 	@ResponseBody
 	@PostMapping(value = url + "/downloadStreamFiles")
 	public Response downloadFile(@RequestParam("filePaths") String[] filePaths);
+
+	/**
+	 * @Author wang
+	 * @Description: 根据绝对路径获取图片文件数据流
+	 * @Param: [path, response]
+	 * @Return: void
+	 * @Create: 2020/5/31
+	 */
+	@PostMapping( url + "/getImgFile")
+	public Response getImgFile(@RequestParam("path") String path);
 }
