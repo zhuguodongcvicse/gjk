@@ -219,7 +219,15 @@ public class ProjectController {
 						   @RequestParam("amisPath") String amisPath){
 		R r = new R();
 		try {
-			r = projectService.uploadFolder(files,amisPath);
+			if (files != null && files.length > 0){
+				r = projectService.uploadFolder(files,amisPath);
+				r.setMsg("上传成功");
+				r.setData(true);
+			}else {
+				r.setCode(CommonConstants.FAIL);
+				r.setMsg("请选择文件夹");
+				r.setData(false);
+			}
 		}catch (Exception e){
 			r.setCode(CommonConstants.FAIL);
 			r.setMsg("上传失败");
