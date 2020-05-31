@@ -45,6 +45,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+import com.inforbus.gjk.comp.api.entity.Components;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.apache.poi.ss.formula.functions.T;
@@ -308,66 +309,68 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	 */
 	@Override
 	public Map<String, Object> getCompAndDetailMap(String proId) {
-		Map<String, Object> maps = Maps.newHashMap();
-		List<ComponentDTO> dtos = Lists.newArrayList();
-//		List<XmlEntity> xmls = Lists.newArrayList();
-//		Map<String, XmlEntity> xmlMap = Maps.newHashMap();
-		Map<String, XmlEntityMap> xmlEntityMap = Maps.newHashMap();
-		// 查询流程
-//		String pro = compDetailMapper.selectById(proId).getParaentId();
-		// 查询公共构件的
+		Map<String,String> filePathMap = new HashMap<String,String>();
 		List<Component> comps = baseMapper.selectByComms(proId);
-//		List<Component> comps = baseMapper.selectList(Wrappers.<Component>query().lambda().inSql(Component::getId,
-//				"SELECT comp_id FROM gjk_project_comp a WHERE  a.project_id='" + proId + "' and a.can_use = 0"));
-//		List<Component> comps = baseMapper.listCompByUserId(proId);
-		for (Component comp : comps) {
-			// 查询基本构件中的明细
-//			ComponentDetail vo = compDetailMapper.getCompXMl(comp.getId());
-			// 查询公共构件中的明细
+		List<Components> componentsList = new ArrayList<Components>();
+		for(Component comp : comps){
 			ComponentDetail vo = compDetailMapper.getCommCompXMl(comp.getId());
+			Components components = new Components();
+			components.setComponent(comp);
+			components.setComponentDetail(vo);
+			componentsList.add(components);
 			if (vo != null) {
 				String fileName = vo.getFileName();
-				// p判断是否是满足条件的xml文件
 				if (fileName.startsWith(ComponentConstant.COMP)
 						&& fileName.toUpperCase().endsWith(ComponentConstant.COMP_XML)) {
 					String filePath = this.compDetailPath + File.separator + vo.getFilePath() + File.separator
 							+ fileName;
-					R<XmlEntityMap> rdc = rdcService.analysisXmlFileToXMLEntityMap(filePath);
-					if (rdc.getCode() == CommonConstants.SUCCESS) {
-						Response response = rdcService.downloadStreamFiles(new String[] { filePath });
-						InputStream is = null;
-						String tmpPath = "./";
-						try {
-							is = response.body().asInputStream();
-							// 解压文件
-							UploadFilesUtils.decompression(is, tmpPath);
-							// 将构件文件放入map
-							dtos.add(XmlAnalysisUtil.xmlFileToComponentDTO(comp, vo, new File(tmpPath+ File.separator
-									+ fileName)));
-							// 将构件所对应的xml存入xmlEntityMap中
-							xmlEntityMap.put(vo.getCompId(), rdc.getData());
-							// 删除文件
-							cn.hutool.core.io.FileUtil.del(tmpPath);
-						} catch (IOException e) {
-							logger.error("文件解析异常", e);
-							e.printStackTrace();
-						}
-					}
+					filePathMap.put(vo.getCompId(),filePath);
 				}
-//				File file = null;
-//				if (fileName.startsWith("Component") && fileName.toUpperCase().endsWith(".XML")) {
-//					file = new File(this.compDetailPath + File.separator + vo.getFilePath() + "/" + fileName);
-//				}
-//				if (file.exists()) {
-//					// 将构件文件放入map
-//					dtos.add(XmlAnalysisUtil.xmlFileToComponentDTO(comp, vo));
-//					xmls.add(XmlFileHandleUtil.analysisXmlFile(file));
-//					xmlMap.put(vo.getCompId(), XmlFileHandleUtil.analysisXmlFile(file));
-//					xmlEntityMap.put(vo.getCompId(), XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file));
-//				}
 			}
 		}
-		// 构件编号集合
+		Map<String, XmlEntityMap> xmlEntityMap = rdcService.getCompData(filePathMap).getData();
+		List<ComponentDTO> dtos = rdcService.getCompDetailData(componentsList).getData();
+
+		Map<String, Object> maps = Maps.newHashMap();
+//		List<ComponentDTO> dtos = Lists.newArrayList();
+//		Map<String, XmlEntityMap> xmlEntityMap = Maps.newHashMap();
+//		// 查询公共构件的
+//		List<Component> comps = baseMapper.selectByComms(proId);
+//		for (Component comp : comps) {
+//			// 查询公共构件中的明细
+//			ComponentDetail vo = compDetailMapper.getCommCompXMl(comp.getId());
+//			if (vo != null) {
+//				String fileName = vo.getFileName();
+//				// p判断是否是满足条件的xml文件
+//				if (fileName.startsWith(ComponentConstant.COMP)
+//						&& fileName.toUpperCase().endsWith(ComponentConstant.COMP_XML)) {
+//					String filePath = this.compDetailPath + File.separator + vo.getFilePath() + File.separator
+//							+ fileName;
+//					R<XmlEntityMap> rdc = rdcService.analysisXmlFileToXMLEntityMap(filePath);
+//					if (rdc.getCode() == CommonConstants.SUCCESS) {
+//						Response response = rdcService.downloadStreamFiles(new String[] { filePath });
+//						InputStream is = null;
+//						String tmpPath = "./";
+//						try {
+//							is = response.body().asInputStream();
+//							// 解压文件
+//							UploadFilesUtils.decompression(is, tmpPath);
+//							// 将构件文件放入map
+//							dtos.add(XmlAnalysisUtil.xmlFileToComponentDTO(comp, vo, new File(tmpPath+ File.separator
+//									+ fileName)));
+//							// 将构件所对应的xml存入xmlEntityMap中
+//							xmlEntityMap.put(vo.getCompId(), rdc.getData());
+//							// 删除文件
+//							cn.hutool.core.io.FileUtil.del(tmpPath);
+//						} catch (IOException e) {
+//							logger.error("文件解析异常", e);
+//							e.printStackTrace();
+//						}
+//					}
+//				}
+//			}
+//		}
+//		// 构件编号集合
 		List<String> compIdList = new ArrayList<String>();
 		// 构件id、编号map
 		Map<String, String> compIdMap = new HashMap<String, String>();
@@ -393,38 +396,9 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			}
 			System.out.println("dto.getInputList()=>" + dto.getInputList());
 		}
-		Map<String, String> compUpdate = Maps.newHashMap();
-		// 版本集合
-		List<Double> versions = new ArrayList<Double>();
-		// 获取所有编号的构件集合
-		if (compIdList.size() > 0) {
-			List<Component> compList = baseMapper.checkComp(compIdList);
-			for (Map.Entry<String, String> entry : compIdMap.entrySet()) {
-				for (Component comp : compList) {
-					if (entry.getValue().equals(comp.getCompId())) {
-						versions.add(Double.parseDouble(comp.getVersion()));
-					}
-				}
-				Collections.sort(versions);
-				versions.get(versions.size() - 1);
-				// strJson +=
-				// compNameMap.get(entry.getKey())+"：当前版本"+versionMap.get(entry.getKey())+";
-				// 最高版本为"+versions.get(versions.size()-1)+"\n";
-//		    	Double version = Double.valueOf(versionMap.get(entry.getKey()));
-//		    	Double versionTmp = Double.valueOf(versions.get(versions.size()-1));
-//				if ((Double.valueOf(versionMap.get(entry.getKey()))) < (Double
-//						.valueOf(versions.get(versions.size() - 1)))) {
-//					compUpdate.put(entry.getKey(), "0");// 已更新
-//				} else {
-//					compUpdate.put(entry.getKey(), "1");// 未更新
-//				}
-				versions.clear();
-			}
-		}
 		maps.put("dtos", dtos);
 //		maps.put("xmls", xmlMap);
 		maps.put("xmlMaps", xmlEntityMap);
-		maps.put("compUpdate", compUpdate);
 		return maps;
 	}
 

@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import com.inforbus.gjk.comp.api.dto.ComponentDTO;
+import com.inforbus.gjk.comp.api.entity.Component;
+import com.inforbus.gjk.comp.api.entity.ComponentDetail;
+import com.inforbus.gjk.comp.api.entity.Components;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.inforbus.gjk.common.core.entity.StringRef;
@@ -234,4 +238,19 @@ public interface FileService {
 	public String findJson(String jsonPath);
 
     boolean isFile(String filePath);
+
+	/**
+	 * 解析所有流程建模所需构件xml
+	 * @param filePathMap
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	Map<String, XmlEntityMap> getCompData(Map<String, String> filePathMap) throws FileNotFoundException;
+
+	/**
+	 * 获取流程建模构件明细
+	 * @param vos
+	 * @return
+	 */
+	List<ComponentDTO> fileService(List<Components> componentsList);
 }

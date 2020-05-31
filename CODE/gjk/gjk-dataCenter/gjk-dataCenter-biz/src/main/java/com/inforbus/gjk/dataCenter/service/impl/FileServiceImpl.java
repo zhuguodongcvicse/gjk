@@ -20,8 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -34,6 +33,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
+import com.inforbus.gjk.comp.api.dto.ComponentDTO;
+import com.inforbus.gjk.comp.api.entity.Component;
+import com.inforbus.gjk.comp.api.entity.ComponentDetail;
+import com.inforbus.gjk.comp.api.entity.Components;
+import com.inforbus.gjk.comp.api.util.XmlAnalysisUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.POIXMLDocument;
@@ -963,4 +967,37 @@ public class FileServiceImpl implements FileService {
 		return !file.isFile();
 //		return file.isDirectory();
     }
+
+	/**
+	 * 循环解析构件xml并返回
+	 * @param filePathMap
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	@Override
+	public Map<String, XmlEntityMap> getCompData(Map<String, String> filePathMap) throws FileNotFoundException {
+		Map<String, XmlEntityMap> xmlEntityMapMap = new HashMap<String, XmlEntityMap>();
+		for (Map.Entry<String,String > entrys :filePathMap.entrySet()) {
+			File localFile = new File(entrys.getValue());
+			if (!localFile.exists()) {
+				// 如果xml文件不存在,返回null
+				logger.error(localFile.getName() + "文件不存在");
+				throw new FileNotFoundException(localFile.getName() + "文件不存在");
+			}
+			XmlEntityMap xmlMap = XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(localFile);
+			xmlEntityMapMap.put(entrys.getKey(),xmlMap);
+		}
+		return xmlEntityMapMap;
+	}
+
+	@Override
+	public List<ComponentDTO> fileService(List<Components> componentsList) {
+		List<ComponentDTO> dtos = Lists.newArrayList();
+		for(Components components : componentsList){
+			String compFilePth = this.localBasePath + File.separator + components.getComponentDetail().getFilePath() + File.separator
+					+ components.getComponentDetail().getFileName();
+			dtos.add(XmlAnalysisUtil.xmlFileToComponentDTO(components.getComponent(), components.getComponentDetail(), new File(compFilePth)));
+		}
+		return dtos;
+	}
 }

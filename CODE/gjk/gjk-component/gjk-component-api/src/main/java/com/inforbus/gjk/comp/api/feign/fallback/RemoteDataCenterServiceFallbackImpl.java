@@ -16,8 +16,12 @@
 
 package com.inforbus.gjk.comp.api.feign.fallback;
 
+import java.util.List;
 import java.util.Map;
 
+import com.inforbus.gjk.comp.api.dto.ComponentDTO;
+import com.inforbus.gjk.comp.api.entity.ComponentDetail;
+import com.inforbus.gjk.comp.api.entity.Components;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -190,6 +194,24 @@ public class RemoteDataCenterServiceFallbackImpl implements RemoteDataCenterServ
 	public Response downloadStreamFiles(MultipartFile ufile, String fileTarget, String filePaths) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public R<Map<String, XmlEntityMap>> getCompData(Map<String, String> filePathMap) {
+		R ret = new R();
+		ret.setException(cause);
+		ret.setMsg("数据中心服务异常");
+		log.error("数据中心服务异常---xml解析失败",cause);
+		return ret;
+	}
+
+	@Override
+	public R<List<ComponentDTO>> getCompDetailData(List<Components> componentsList) {
+		R ret = new R();
+		ret.setException(cause);
+		ret.setMsg("数据中心服务异常");
+		log.error("数据中心服务异常---获取构件明细失败",cause);
+		return ret;
 	}
 
 }

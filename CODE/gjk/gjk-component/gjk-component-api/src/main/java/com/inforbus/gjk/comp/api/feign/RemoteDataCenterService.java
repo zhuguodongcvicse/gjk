@@ -1,7 +1,12 @@
 package com.inforbus.gjk.comp.api.feign;
 
+import java.util.List;
 import java.util.Map;
 
+import com.inforbus.gjk.comp.api.dto.ComponentDTO;
+import com.inforbus.gjk.comp.api.entity.Component;
+import com.inforbus.gjk.comp.api.entity.ComponentDetail;
+import com.inforbus.gjk.comp.api.entity.Components;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
@@ -193,4 +198,20 @@ public interface RemoteDataCenterService {
 			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public Response downloadStreamFiles(@RequestPart("file") MultipartFile ufile,
 			@RequestParam("fileTarget") String fileTarget, @RequestParam("filePaths") String filePaths);
+
+	/**
+	 * 解析流程建模所有构件xml
+	 * @param filePathMap
+	 * @return
+	 */
+	@PostMapping(value = serviceName +"/getCompData")
+	public R<Map<String, XmlEntityMap>> getCompData (@RequestBody Map<String,String> filePathMap);
+
+	/**
+	 *获取流程建模所有构件明细
+	 */
+	@PostMapping(value = serviceName + "/getCompDetailData")
+	public R<List<ComponentDTO>> getCompDetailData(@RequestBody List<Components> componentsList);
+
+
 }

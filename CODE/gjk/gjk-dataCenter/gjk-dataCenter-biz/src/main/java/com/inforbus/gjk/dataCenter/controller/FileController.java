@@ -17,6 +17,10 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.inforbus.gjk.comp.api.dto.ComponentDTO;
+import com.inforbus.gjk.comp.api.entity.Component;
+import com.inforbus.gjk.comp.api.entity.ComponentDetail;
+import com.inforbus.gjk.comp.api.entity.Components;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.entity.FileEntity;
@@ -670,6 +674,43 @@ public class FileController {
 			ret.setCode(CommonConstants.FAIL);
 			ret.setData(false);
 			ret.setMsg("文件路径错误");
+		}
+		return ret;
+	}
+
+	/**
+	 * 解析流程建模所需所有xml
+	 * @param filePathMap
+	 * @return
+	 */
+	@PostMapping(value = "/getCompData")
+	public R<Map<String,XmlEntityMap>> getCompData (@RequestBody Map<String,String> filePathMap){
+		R<Map<String,XmlEntityMap>> ret = new R<>();
+		try {
+			Map<String,XmlEntityMap> xmlEntityMapMap = fileService.getCompData(filePathMap);
+			ret.setData(xmlEntityMapMap);
+			ret.setMsg("json文件解析成功");
+		} catch (Exception e) {
+			logger.error("json文件解析失败");
+			ret.setCode(CommonConstants.FAIL);
+			ret.setData(null);
+			ret.setMsg("json文件解析失败");
+		}
+		return ret;
+	}
+
+	@PostMapping(value = "/getCompDetailData")
+	public R<List<ComponentDTO>> fileService(@RequestBody List<Components> componentsList){
+		R<List<ComponentDTO>> ret = new R<>();
+		try {
+			List<ComponentDTO> cpd = fileService.fileService(componentsList);
+			ret.setData(cpd);
+			ret.setMsg("json文件解析成功");
+		} catch (Exception e) {
+			logger.error("json文件解析失败");
+			ret.setCode(CommonConstants.FAIL);
+			ret.setData(null);
+			ret.setMsg("json文件解析失败");
 		}
 		return ret;
 	}
