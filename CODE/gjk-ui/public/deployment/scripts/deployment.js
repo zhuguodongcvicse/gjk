@@ -279,8 +279,8 @@ function creatbakgj(compName, cpux, cpuy, refid, compid, parttype, components, G
 		}
 	}
 	var name = compName;
-	
-	var math = parseInt(100000 * Math.random())+Date.parse(new Date());
+
+	var math = parseInt(100000 * Math.random()) + Date.parse(new Date());
 	//绘画备份组件中的构建
 	var bakgjjson = {
 		"_className": "Q.Text",
@@ -361,7 +361,7 @@ function creatgj(compName, cpux, cpuy, refid, compid, parttype, components, GAT)
 		}
 	}
 	var name = compName;
-	var math = parseInt(100000 * Math.random())+Date.parse(new Date());
+	var math = parseInt(100000 * Math.random()) + Date.parse(new Date());
 	//json
 	var gjjson = {
 		"_className": "Q.Text",
@@ -434,7 +434,7 @@ function initEditor(editor) {
 				json.datas[l].json.properties.checkFlag = true;
 				if (linkArray[i].nodeName == json.datas[l].json.properties.nodeID) {
 					//if (linkArray[i].nodeName == json.datas[l].json.properties.nodeID) {
-					var math = parseInt(100000 * Math.random())+Date.parse(new Date());
+					var math = parseInt(100000 * Math.random()) + Date.parse(new Date());
 					//遍历dataJson取_refId
 					refid = json.datas[l]._refId = math;
 					cpux = json.datas[l].json.location.json.x;
@@ -455,7 +455,7 @@ function initEditor(editor) {
 					parttype = 'part'
 					linkArray[i].rootPart[j]
 					components = linkArray[i].rootPart[j].components[k];
-					GAT = parseInt(100000 * Math.random())+Date.parse(new Date());
+					GAT = parseInt(100000 * Math.random()) + Date.parse(new Date());
 					creatgj(compName, cpux, cpuy, refid, compid, parttype, components, GAT);
 				}
 			}
@@ -471,7 +471,7 @@ function initEditor(editor) {
 					compid = linkArray[i].backupParts[n].components[m].compId;
 					parttype = 'bakpart'
 					components = linkArray[i].backupParts[n].components[m];
-					GAT = parseInt(100000 * Math.random())+Date.parse(new Date());
+					GAT = parseInt(100000 * Math.random()) + Date.parse(new Date());
 					creatbakgj(compName, cpux, cpuy, refid, compid, parttype, components, GAT);
 				}
 			}
@@ -1171,18 +1171,22 @@ function initEditor(editor) {
 				{
 					text: '选中跳转的芯片', action: function () {
 						var data = graph.getElement(evt);
-						if (data.image == "images/Chip.svg") {
+						//选中改变芯片背景颜色
+						data.image = "images/Chip.jpg";
+						console.log("data", data)
+						var data = graph.getElement(evt);
+						if (data.image == "images/Chip.jpg") {
 							console.log(data)
 							if (data.properties.checkFlag == true /* && data.children.datas != 0 */) {
 								CHIPdate.push(data);
 								data.properties.checkFlag = false;
 								showMessage('成功选中跳转芯片' + CHIPdate.length + '个', 'success', 2000);
-							} else /* if(  data.children.datas != 0 )  */{
+							} else /* if(  data.children.datas != 0 )  */ {
 								showMessage('该芯片已被选过', 'error', 2000);
 							}/* else{
 								showMessage('该芯片上不存在构件', 'error', 2000);
 							} */
-							
+
 						} else {
 							showMessage('请确认选择的是否为芯片', 'error', 2000);
 
@@ -1190,10 +1194,24 @@ function initEditor(editor) {
 					}
 				},
 				{
-					text: '取消所有选中元素', action: function () {
-						graph.selectionModel.clear();
-						CHIPdate = [];
-						showMessage('成功取消选择', 'error', 2000)
+					text: '取消跳转该芯片', action: function () {
+						var data = graph.getElement(evt);
+						if (data.properties.checkFlag == false) {
+							//选中改变芯片背景颜色
+							data.image = "images/Chip.svg";
+							data.properties.checkFlag = true;
+							//删除取消选中跳转芯片的数据
+							for (let i = CHIPdate.length - 1; i >= 0; i--) {
+								if (CHIPdate[i].properties.chip_id == data.properties.chip_id) {
+									CHIPdate.splice(i, 1);
+								}
+							}
+							graph.selectionModel.clear();
+							//CHIPdate = [];
+							showMessage('成功取消选择', 'error', 2000)
+						}
+
+
 					}
 
 				}
@@ -1326,26 +1344,26 @@ function showchip() {
 		canvasFlag = false;
 		//获取当前画布数据
 		deploymentsJsonbak = graph.toJSON();
-/* 		for (var i in CHIPdate) {
-			for (var j in deploymentsJsonbak.datas) {
-				if (deploymentsJsonbak.datas[j]._refId == undefined && deploymentsJsonbak.datas[j].json.image == "images/Chip.svg") {
-					console.log("deploymentsJsonbak",deploymentsJsonbak.datas[j] )
-					deploymentsJsonbak.datas[j]._refId = parseInt(100000 * Math.random());
-				} 
-				 if (CHIPdate[i].properties.uniqueId == deploymentsJsonbak.datas[j].json.properties.uniqueId) {
-				} 
-			}
-		} */
+		/* 		for (var i in CHIPdate) {
+					for (var j in deploymentsJsonbak.datas) {
+						if (deploymentsJsonbak.datas[j]._refId == undefined && deploymentsJsonbak.datas[j].json.image == "images/Chip.svg") {
+							console.log("deploymentsJsonbak",deploymentsJsonbak.datas[j] )
+							deploymentsJsonbak.datas[j]._refId = parseInt(100000 * Math.random());
+						} 
+						 if (CHIPdate[i].properties.uniqueId == deploymentsJsonbak.datas[j].json.properties.uniqueId) {
+						} 
+					}
+				} */
 		//获取所有连线关系的refid数据
 		for (var k in deploymentsJsonbak.datas) {
 			if (deploymentsJsonbak.datas[k]._className == "Q.Edge") {
-				console.log("Q.Edge",deploymentsJsonbak.datas[k]);
+				console.log("Q.Edge", deploymentsJsonbak.datas[k]);
 				RefIdArrays.push(deploymentsJsonbak.datas[k]);
-			
+
 			}
 		}
-		console.log("RefIdArrays",RefIdArrays)
-			for (var i in RefIdArrays) {
+		console.log("RefIdArrays", RefIdArrays)
+		for (var i in RefIdArrays) {
 			for (var k in deploymentsJsonbak.datas) {
 				if (deploymentsJsonbak.datas[k]._className == "Q.Text") {
 					if (RefIdArrays[i].json.from._ref == deploymentsJsonbak.datas[k]._refId) {
@@ -1402,23 +1420,23 @@ function showchip() {
 			}
 		}
 		for (var i = 0; i < RefIdArrays.length; i++) {
-				var from = RefIdArrays[i].json.from.fromdata;
-				var to = RefIdArrays[i].json.to.todata;
+			var from = RefIdArrays[i].json.from.fromdata;
+			var to = RefIdArrays[i].json.to.todata;
 			if (RefIdArrays[i].json.from.hasOwnProperty("fromdata") && RefIdArrays[i].json.to.hasOwnProperty("todata")) {
 				createEdge({ from: from, to: to })
 				//如果连线想变成曲线,注释掉上面方法,调用下面的方法
 				//createEdge({ from: from, to: to,edgeType: 'top' })
 			}
 		}
-		gjdata= []
+		gjdata = []
 		CHIPdate = [];
 		RefIdArrays = [];
 		falg = false;
 	} else if (falg == false && CHIPdate.length == 0) {
 		canvasFlag = true;
 		compidArrays = [];
-		var	 skipdata = graph.toJSON();
-			console.log("跳后数据",skipdata);
+		var skipdata = graph.toJSON();
+		console.log("跳后数据", skipdata);
 		var skipArrays = [];
 		for (var i in skipdata.datas) {
 			if (skipdata.datas[i]._className == "Q.Text") {
@@ -1443,14 +1461,14 @@ function showchip() {
 		for (var i in skipArrays) {
 			for (var j in deploymentsJsonbak.datas) {
 				if (deploymentsJsonbak.datas[j]._refId == undefined && deploymentsJsonbak.datas[j].json.image == "images/Chip.svg") {
-					console.log("deploymentsJsonbak",deploymentsJsonbak.datas[j] )
-					deploymentsJsonbak.datas[j]._refId = parseInt(100000 * Math.random())+Date.parse(new Date());
+					console.log("deploymentsJsonbak", deploymentsJsonbak.datas[j])
+					deploymentsJsonbak.datas[j]._refId = parseInt(100000 * Math.random()) + Date.parse(new Date());
 				}
 				if (deploymentsJsonbak.datas[j]._className == "Q.RectElement") {
-						//修改检查判断值
-						deploymentsJsonbak.datas[j].json.properties.checkFlag = true;
+					//修改检查判断值
+					deploymentsJsonbak.datas[j].json.properties.checkFlag = true;
 					if (skipArrays[i].uniqueId == deploymentsJsonbak.datas[j].json.properties.uniqueId/*  && deploymentsJsonbak.datas[j]._refId != undefined */) {
-					
+
 						skipArrays[i].location = deploymentsJsonbak.datas[j].json.location;
 						skipArrays[i]._refId = deploymentsJsonbak.datas[j]._refId;
 					}
@@ -1471,7 +1489,7 @@ function showchip() {
 					//判断构件是否备份
 					if (skipArrays[i].group == "A") {
 						variable += 3
-					//	var x = skipArrays[i].location.x
+						//	var x = skipArrays[i].location.x
 						/* 	if(skipArrays[i].location.x + variable >= skipArrays[i].location.json.x+45){
 								variable = 7;
 								y=13;
@@ -1504,6 +1522,13 @@ function showchip() {
 			}
 		}
 		graph.clear();
+		const datas = deploymentsJsonbak.datas;
+		for (let index = 0; index < datas.length; index++) {
+			const element = datas[index];
+			if (element.json.image != null && element.json.image == "images/Chip.jpg") {
+				element.json.image = "images/Chip.svg";
+			}
+		}
 		graph.parseJSON(deploymentsJsonbak)
 		graph.moveToCenter();
 		falg = true;
