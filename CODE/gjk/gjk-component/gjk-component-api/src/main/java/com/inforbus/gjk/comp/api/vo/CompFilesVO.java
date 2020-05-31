@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.inforbus.gjk.comp.api.entity.CompImg;
 
+import cn.hutool.core.io.FileUtil;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,26 +15,15 @@ import lombok.Setter;
  * @Author xiaohe
  * @DateTime 2019年7月18日 上午10:21:55
  */
+@Data
 public class CompFilesVO {
-	@Getter
-	@Setter
 	private String name;
-	@Getter
 	private String size;
-	@Getter
 	private String relativePath;
-	@Getter
-	@Setter
 	private CompImg compImg;
 
 	public CompFilesVO(String name,  String relativePath) {
 		super();
-		File file = new File(relativePath);
-		if (file.exists() && file.isFile()) {
-			this.size = Long.toString(file.length());
-		} else {
-			this.size = "";
-		}
 		this.name = name;
 		this.relativePath = relativePath;
 	}
@@ -41,16 +31,4 @@ public class CompFilesVO {
 	public CompFilesVO() {
 		super();
 	}
-
-	public void setRelativePath(String relativePath) {
-		this.relativePath = relativePath;
-		File file = new File(relativePath);
-		if (file.exists() && file.isFile()) {
-			this.size = Long.toString(file.length());
-		} else {
-			this.size = "";
-		}
-
-	}
-
 }
