@@ -1189,7 +1189,6 @@ function initEditor(editor) {
 
 						} else {
 							showMessage('请确认选择的是否为芯片', 'error', 2000);
-
 						}
 					}
 				},
