@@ -111,7 +111,7 @@ public class AppSubassemblyController {
         System.out.println(copySoftwareAndBspDTO);
         R<String> r = new R<>();
         appSubassemblyService.copySoftwareAndBsp(r, copySoftwareAndBspDTO.getAppFilePath(), copySoftwareAndBspDTO.getPartName(),
-                copySoftwareAndBspDTO.getLibsType(), copySoftwareAndBspDTO.getPlatformType(), copySoftwareAndBspDTO.getSoftwareFilePath(),
+                copySoftwareAndBspDTO.getLibsType(), copySoftwareAndBspDTO.getSoftwareFilePath(),
                 copySoftwareAndBspDTO.getSoftwareName(), copySoftwareAndBspDTO.getBspFilePath(), copySoftwareAndBspDTO.getProDetailPath());
         return r;
     }

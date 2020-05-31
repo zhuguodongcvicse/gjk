@@ -32,7 +32,19 @@
 		<result property="remarks" column="remarks"/>
 		<result property="delFlag" column="del_flag"/>
 	</resultMap>
-	
+
+<!--	修改平台库目录时同步修改字典表-->
+	<update id="syncModifyDict">
+		UPDATE sys_dict
+		<set>
+			<if test="label != null and !''.equals(label)">
+				label = #{label}
+			</if>
+		</set>
+		<where>
+			value = #{value}
+		</where>
+	</update>
 	<!-- 通过类型模糊查询字典信息列表 -->
     <select id="getDictVosPage" resultMap="sysDictMap">
 		SELECT

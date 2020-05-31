@@ -16,6 +16,7 @@ import java.util.zip.ZipOutputStream;
 
 import com.inforbus.gjk.admin.api.entity.*;
 import com.inforbus.gjk.common.core.constant.DeploymentConstants;
+import com.inforbus.gjk.common.core.constant.PlatformType;
 import com.inforbus.gjk.common.core.entity.*;
 import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
 import com.inforbus.gjk.pro.api.dto.AppDataDTO;
@@ -257,8 +258,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @param entity
 	 * @param proDetailId
 	 * @return
-	 * @see com.inforbus.gjk.pro.service.ManagerService#createXmlFile(com.inforbus.gjk.common.core.entity.XmlEntity,
-	 *      java.lang.String, java.lang.String)
 	 */
 	@Override
 	public boolean createXmlFile(XmlEntity entity, String proDetailId) {
@@ -286,8 +285,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @param entity
 	 * @param proDetailId
 	 * @return
-	 * @see com.inforbus.gjk.pro.service.ManagerService#createXmlFile(com.inforbus.gjk.common.core.entity.XmlEntity,
-	 *      java.lang.String, java.lang.String)
 	 */
 	@Override
 	public synchronized String createXmlFile(XmlEntityMap entity, String proDetailId) {
@@ -613,9 +610,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 	 * @param proDetailId 流程编号
 	 * @param objJson
 	 * @return
-	 * @see com.inforbus.gjk.pro.service.ManagerService#editProJSON(java.lang.String,
-	 *      java.lang.String)
-	 *      20200512修改分布式文件
 	 */
 	@Override
 	public boolean editProJSON(String proDetailId, Object objJson) {
@@ -787,14 +781,14 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
                         for (Part part : hardwareNode.getRootPart()) {
                             String libsType = map.get("hrTypeName").toString();
                             // 读取配置文件中平台类对应的软件平台类型
-                            String platformType = null;
+                            /*String platformType = null;
                             try {
                                 platformType = platformProp.get(libsType).toString();
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 logger.error("读取配置文件失败，请检查配置文件中" + libsType + "配置是否正确");
                                 returnStr += "读取配置文件失败，请检查配置文件中" + libsType + "配置是否正确";
-                            }
+                            }*/
 
                             String softwareFilePath = "";
                             for (PartPlatformSoftware software : partPlatformSoftwares) {
@@ -822,7 +816,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
                                 }
                             }
                             if ("".equals(bspFilePath)) {
-                                if (libsType.equals("Sylixos") || libsType.equals("Workbench")) {
+                                if (libsType.equals(PlatformType.SYLIXOS) || libsType.equals(PlatformType.VXWORKS)) {
                                     if (returnStr.contains("请配置" + libsType + "对应的bsp,")) {
                                         String s = "请配置" + libsType + "对应的bsp,部件";
                                         StringBuilder sb = new StringBuilder(returnStr);
@@ -938,14 +932,14 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
                             String libsType = map.get("hrTypeName").toString();
                             partnamePlatformMap.put(part.getPartName(), libsType);
                             // 读取配置文件中平台类对应的软件平台类型
-                            String platformType = null;
+                            /*String platformType = null;
                             try {
                                 platformType = platformProp.get(libsType).toString();
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 logger.error("读取配置文件失败，请检查配置文件中" + libsType + "配置是否正确");
                                 return new R<>(new Exception("读取配置文件失败，请检查配置文件中" + libsType + "配置是否正确"));
-                            }
+                            }*/
 
                             String softwareFilePath = "";
                             String softwareName = "";
@@ -963,7 +957,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
                             }
 							// 获取Sylixos工程名
                             String sylixosProjectName = null;
-                            if ("Sylixos".equals(platformType)) {
+                            if (PlatformType.SYLIXOS.equals(libsType)) {
 								String fileName = (String) appSubassemblyServiceFeign.getFileProperty(softwareFilePath, "name").getData();
 								JSONArray array = JSONArray.parseArray(fileName);
 								sylixosProjectName = (String) array.get(0);
@@ -973,7 +967,6 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 							copySoftwareAndBspDTO.setAppFilePath(appFilePath);
 							copySoftwareAndBspDTO.setPartName(part.getPartName());
 							copySoftwareAndBspDTO.setLibsType(libsType);
-							copySoftwareAndBspDTO.setPlatformType(platformType);
 							copySoftwareAndBspDTO.setSoftwareFilePath(softwareFilePath);
 							copySoftwareAndBspDTO.setSoftwareName(softwareName);
 							copySoftwareAndBspDTO.setBspFilePath(bspFilePath);
@@ -986,7 +979,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 							ModifyAssemblyDirDTO modifyAssemblyDirDTO = new ModifyAssemblyDirDTO();
                             modifyAssemblyDirDTO.setAssemblyName(appFilePath + part.getPartName());
                             modifyAssemblyDirDTO.setPart(part);
-                            modifyAssemblyDirDTO.setMakefileType(platformType);
+                            modifyAssemblyDirDTO.setMakefileType(libsType);
                             modifyAssemblyDirDTO.setIntegerCodeFilePath(integerCodeFilePath);
                             modifyAssemblyDirDTO.setBspFilePath(bspFilePath);
                             modifyAssemblyDirDTO.setSylixosProjectName(sylixosProjectName);
@@ -1594,7 +1587,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			List<GjkPlatform> platformList = baseMapper.getAllPlatformListBySoftwareId(soft.getId());
 			String platformNames = "";
 			for (GjkPlatform gjkPlatform : platformList) {
-				platformNames += gjkPlatform.getName() + ";";
+				platformNames += gjkPlatform.getTypeValue() + ";";
 			}
 			PartPlatformSoftware partPlatformSoftware = new PartPlatformSoftware();
 			partPlatformSoftware.setId(IdGenerate.uuid());
@@ -1769,7 +1762,7 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 			List<GjkPlatform> platformList = baseMapper.getAllPlatformListByBSPId(item.getId());
 			String platformNames = "";
 			for (GjkPlatform gjkPlatform : platformList) {
-				platformNames += gjkPlatform.getName() + ";";
+				platformNames += gjkPlatform.getTypeValue() + ";";
 			}
 
 			PartPlatformBSP ppBsp = new PartPlatformBSP();

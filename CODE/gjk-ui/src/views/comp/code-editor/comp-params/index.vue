@@ -276,7 +276,7 @@ export default {
               tmpComponent.compFuncname = baseParam.attributeMap.name;
             } else if (baseParam.lableName === "函数路径") {
               let name = baseParam.attributeMap.name;
-              this.functionPathName = name.substring(name.replace(/\\/,"/").lastIndexOf("/") + 1);
+              this.functionPathName = name.substring(name.replace(/\\/g,"/").lastIndexOf("/") + 1);
               // tmpComponent.compName = config.attributeMap.name;
             } else if (baseParam.lableName === "系数文件") {
               // tmpComponent.compName = config.attributeMap.name;
@@ -414,7 +414,7 @@ export default {
                 }
                 //保存结构体 2020年5月6日10:24:22 xiaohe
                 saveStructMap(strcutArr).then(() => {
-                  //清空头文件数据 2020年5月6日10:24:38 
+                  //清空头文件数据 2020年5月6日10:24:38
                   this.$store.dispatch("clearParseHeaderObj");
                 });
               }

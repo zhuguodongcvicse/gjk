@@ -55,4 +55,11 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
     List<SysDict> getDictTypes();
 
     List<DictVO> getDictsByTypeAndRemarks(DictVO dictVO);
+
+	/**
+	 * 修改平台库目录时同步修改字典表
+	 * @param dictVO
+	 * @return
+	 */
+	int syncModifyDict(DictVO dictVO);
 }

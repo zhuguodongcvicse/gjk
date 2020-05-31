@@ -27,9 +27,9 @@
         <el-select v-model="form.hrTypeName" placeholder="请选择平台">
           <el-option
             v-for="item in options"
-            :key="item.name"
-            :label="item.name"
-            :value="item.typeValue"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
           ></el-option>
         </el-select>
       </el-form-item>
@@ -56,11 +56,12 @@
     //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 
     import {mapGetters} from "vuex";
+    import {remote} from "@/api/admin/dict";//获取字典数据
     import {getPlatFormTypeList} from "@/api/admin/platform";
 
     export default {
         //import引入的组件需要注入到对象中才能使用
-        props: ["showInf", "allChips"],
+        props: ["showInf", "allChips", "platformTypes"],
         components: {},
         data() {
             //这里存放数据
@@ -119,7 +120,14 @@
         //监听属性 类似于data概念
         computed: {...mapGetters(["permissions", "refreshListFlag", "userInfo"])},
         //监控data中的数据变化
-        watch: {},
+        watch: {
+            platformTypes: {
+                // immediate: true,
+                handler: function (params) {
+                    this.options = this.platformTypes
+                },
+            },
+        },
         //方法集合
         methods: {
             close(formName) {
@@ -153,17 +161,9 @@
                     }
                 });
             },
-            //获取平台库的数据
-            getPlatformSelectTree() {
-                getPlatFormTypeList().then(response => {
-                    console.log("response",response)
-                    this.options = response.data;
-                })
-            }
         },
         //生命周期 - 创建完成（可以访问当前this实例）
         created() {
-            this.getPlatformSelectTree();
         },
         //生命周期 - 挂载完成（可以访问DOM元素）
         mounted() {

@@ -99,4 +99,14 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 		return sysDictMapper.getDictsByTypeAndRemarks(dictVO);
 	}
 
+	/**
+	 * 修改平台库目录时同步修改字典表
+	 * @param dictVO
+	 * @return
+	 */
+	@Override
+	public int syncModifyDict(DictVO dictVO) {
+		return sysDictMapper.syncModifyDict(dictVO);
+	}
+
 }

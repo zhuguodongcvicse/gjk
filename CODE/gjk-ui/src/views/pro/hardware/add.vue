@@ -150,11 +150,40 @@
                 this.params.link = event.data.params[0].link;
                 this.params.linkRelation = event.data.params[1];
                 this.params.frontCaseForDeployment = event.data.params[3];
-                // console.log("event.data.params[3]",event.data.params[2])
-                this.casesUpdatePlatformType = JSON.parse(JSON.parse(JSON.stringify(this.params.frontJson)))
-                console.log("casesUpdatePlatformType",this.casesUpdatePlatformType)
+                // console.log("event.data.params[2]",event.data.params[2])
+
+                let chipsFromHardwarelibs = {
+                    id: this.params.id,
+                    chips: JSON.stringify(event.data.params[2]),
+                    projectId: "",
+                    flowId: "",
+                    modelId: ""
+                };
+
+                switch (event.data.cmd) {
+                    case "submitCaseJSON":
+                        this.ifSave = 0;
+                        saveHardwarelibs(this.params).then(response => {
+                            // console.log("response",response)
+                            if (response.data === 1) {
+                                this.$message({
+                                    showClose: true,
+                                    message: "添加成功",
+                                    type: "success"
+                                });
+                                saveChipsFromHardwarelibs(chipsFromHardwarelibs).then(res => {
+                                    // console.log("res", res);
+                                    this.createXml();
+                                });
+                            }
+                        });
+                        break;
+                }
+
+                // this.casesUpdatePlatformType = JSON.parse(JSON.parse(JSON.stringify(this.params.frontJson)))
+                // console.log("casesUpdatePlatformType",this.casesUpdatePlatformType)
                 //找到硬件建模中的芯片，将最新的平台类型数据赋值给芯片并保存到数据库，供App组件工程和其他使用
-                getPlatFormTypeList().then(res => {
+                /*getPlatFormTypeList().then(res => {
                     this.listPlatformType = res.data
                     for (let n = 0; n < this.casesUpdatePlatformType.length; n++) {
                         if (this.casesUpdatePlatformType[n].datas[0].json.properties.frontBoardList.length !== 0) {
@@ -190,20 +219,8 @@
                         flowId: "",
                         modelId: ""
                     };
-                    // this.$store.dispatch("setCheckOrigin", ++num);
-                    /* localStorage.setItem(
-                      "chipsOfHardwarelibs",
-                      JSON.stringify(event.data.params[2])
-                    ); */
-                    // console.log("this.params",this.params)
                     switch (event.data.cmd) {
                         case "submitCaseJSON":
-                            // 处理业务逻辑
-                            // console.log("this.params", this.params)
-                            /*if (num !== 1) {
-                                return;
-                            }*/
-                            // console.log("num",num)
                             this.ifSave = 0;
                             saveHardwarelibs(this.params).then(response => {
                                 // console.log("response",response)
@@ -219,14 +236,13 @@
                                     });
                                 }
                             });
-                            // this.$store.dispatch("setCheckOrigin", 0);
                             break;
                     }
-                })
+                })*/
             },
             createXml() {
                 var paramsList = [
-                    JSON.stringify(this.casesUpdatePlatformType),
+                    this.params.frontJson,
                     this.params.backJson,
                     this.params.linkRelation
                 ];

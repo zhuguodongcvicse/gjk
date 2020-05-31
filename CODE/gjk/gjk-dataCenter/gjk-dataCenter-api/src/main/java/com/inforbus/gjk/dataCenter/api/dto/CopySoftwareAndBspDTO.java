@@ -13,7 +13,6 @@ public class CopySoftwareAndBspDTO {
     private String appFilePath;
     private String partName;
     private String libsType;
-    private String platformType;
     private String softwareFilePath;
     private String softwareName;
     private String bspFilePath;

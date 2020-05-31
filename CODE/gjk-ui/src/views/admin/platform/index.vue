@@ -59,14 +59,14 @@
               </el-form-item>
 
               <el-form-item v-if="formStatus == 'update'">
-                <el-select v-model="form.typeValue" placeholder="请选择" v-if="formStatus == 'update'">
+                <!--<el-select v-model="form.typeValue" placeholder="请选择" v-if="formStatus == 'update'">
                   <el-option
                     v-for="item in options"
                     :key="item.value"
                     :label="item.value"
                     :value="item.value">
                   </el-option>
-                </el-select>
+                </el-select>-->
                 <el-button type="primary" @click="update">更新</el-button>
                 <el-button @click="onCancel">取消</el-button>
               </el-form-item>
@@ -102,7 +102,7 @@ import {
   getObj,
   putObj
 } from "@/api/admin/platform";
-import {remote} from "@/api/admin/dict";
+import {remote, syncModifyDict} from "@/api/admin/dict";
 import { findThreeLibsId } from "@/api/libs/threelibs";
 import { mapGetters } from "vuex";
 import importLibs from "@/views/admin/test/importLibs";
@@ -334,7 +334,11 @@ export default {
               return
           }
       }
+      console.log("this.form",this.form)
       putObj(this.form).then(() => {
+        if (this.form.parentId == '-1') {
+            this.syncModifyDict(this.form.name, this.form.typeValue)
+        }
         this.getList();
         this.$notify({
           title: "成功",
@@ -344,6 +348,16 @@ export default {
         });
         this.onCancel();
       });
+    },
+    syncModifyDict(label, value) {
+        if (label === undefined || label === '' || value === undefined || value === '') {
+            alert("输出入非法，请检查输入值")
+        }
+        let dictObj = {
+            label: label,
+            value: value
+        }
+        syncModifyDict(dictObj)
     },
     create() {
       if (this.form.typeValue == null || this.form.typeValue == '') {
