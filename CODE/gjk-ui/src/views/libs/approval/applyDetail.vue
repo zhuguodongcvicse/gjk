@@ -50,7 +50,7 @@
           </div>
           <div v-if="batch">
             <el-table :data="hardwareLibData" v-if="hardwareLibData.length !== 0">
-              //接口表格内容
+<!--              //接口表格内容-->
               <el-table-column prop="infName" label="接口名称" v-if="hardwareLibData[0].infName !== undefined">
                 <!--          <template slot-scope="scope">{{ scope.row.name }}</template>-->
               </el-table-column>
@@ -59,7 +59,7 @@
               <el-table-column prop="opticalNum" label="光纤数量"
                                v-if="hardwareLibData[0].opticalNum !== '' && hardwareLibData[0].opticalNum !== undefined"></el-table-column>
 
-              //芯片表格内容
+<!--              //芯片表格内容-->
               <el-table-column prop="chipName" label="芯片名称"
                                v-if="hardwareLibData[0].chipName !== undefined"></el-table-column>
               <el-table-column prop="coreNum" label="内核数量"
@@ -70,19 +70,19 @@
                                v-if="hardwareLibData[0].recvRate !== undefined"></el-table-column>
               <el-table-column prop="hrTypeName" label="平台类型"
                                v-if="hardwareLibData[0].hrTypeName !== undefined"></el-table-column>
-              //板卡表格内容
+<!--              //板卡表格内容-->
               <el-table-column prop="boardName" label="板卡名称"
                                v-if="hardwareLibData[0].boardName !== undefined"></el-table-column>
               <el-table-column prop="boardType" label="板卡类型"
                                v-if="hardwareLibData[0].boardType !== undefined"></el-table-column>
               <el-table-column prop="cpuNum" label="cpu数量"
                                v-if="hardwareLibData[0].cpuNum !== undefined"></el-table-column>
-              //备注信息
+<!--              //备注信息-->
               <el-table-column prop="backupInfo" label="备注信息"
                                v-if="hardwareLibData[0].backupInfo !== undefined"></el-table-column>
-              //所属用户
-              <el-table-column prop="userId" label="所属用户"
-                               v-if="hardwareLibData[0].userId !== undefined"></el-table-column>
+<!--              //所属用户-->
+              <!--<el-table-column prop="userId" label="所属用户"
+                               v-if="hardwareLibData[0].userId !== undefined"></el-table-column>-->
 
             </el-table>
             <div v-if="hardwareLibData.length === 0">
@@ -695,7 +695,7 @@
             },
             handleCreate() {
                 // Object.assign(this.$data, this.$options.data());
-                console.log(this.applyItemMsg);
+                // console.log(this.applyItemMsg);
                 if (
                     this.applyItemMsg.approvalState != "0" &&
                     this.applyItemMsg.approvalState != "4"
@@ -763,6 +763,7 @@
                             } else {
                                 this.isMessageLost = true;
                             }
+                            console.log("this.hardwareLibData",this.hardwareLibData)
                         })
                         break;
                     case "2-3":
@@ -896,6 +897,7 @@
         //生命周期 - 创建完成（可以访问当前this实例）
         created() {
             this.applyItemMsg = this.$route.query.row;
+            console.log("this.applyItemMsg", this.applyItemMsg)
             this.$nextTick(vm => {
                 this.handleCreate();
             });
