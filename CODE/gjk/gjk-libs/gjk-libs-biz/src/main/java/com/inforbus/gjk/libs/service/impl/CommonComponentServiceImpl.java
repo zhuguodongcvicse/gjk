@@ -330,6 +330,9 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		findStructlibsRecursion(structlibsListSub, structlibsList);
 		createSheet(workbook, structlibsList, "gjk_structlibs");
 		File file = new File(gitFilePath + "gjk" + File.separator + "testExcel" + File.separator + "MySQL.xlsx");
+		if(!file.exists()){
+			file.createNewFile();
+		}
 		FileItem fileItem = UploadFilesUtils.createFileItem(file.getPath(), file.getName());
 		MultipartFile mfile = new CommonsMultipartFile(fileItem);
 		return mfile;

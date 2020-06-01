@@ -455,9 +455,9 @@ export default {
           .then(res => {
             loading.close();
             this.$notify({
-              title: "成功",
+              // title: "成功",
               message: res.data.data,
-              type: "success"
+              // type: "success"
             });
           })
           .catch(error => {
@@ -473,7 +473,7 @@ export default {
       } else if (item == "APP组件工程生成") {
         this.selectPhotoDialogVisible = true;
       } else if (item == "编译") {
-        if (this.currentNodeData.label == "App组件工程") {
+        if (this.currentNodeData.label == "AppPro") {
           for (let i of this.currentNodeData.children) {
             if (i.isComplie) {
               let filePath = { filePath: "" };
