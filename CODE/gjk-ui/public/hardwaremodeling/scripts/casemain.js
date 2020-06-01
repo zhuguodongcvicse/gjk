@@ -532,7 +532,7 @@ function initEditor(editor) {
     checkIPMap = new Map()
   }
   buttonOfSave.onclick = function (evt) {
-    if (graphList.fJson.length === 0) {
+    if (graphList.length === 0 || graphList.fJson.length === 0) {
       alert("请添加机箱")
       return;
     }

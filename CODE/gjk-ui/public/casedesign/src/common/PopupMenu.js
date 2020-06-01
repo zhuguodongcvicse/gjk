@@ -330,7 +330,15 @@
                 }
               }
             }
-
+            //如果是类型2的板卡
+            if (data.properties.boardType == 2) {
+              //移除fBoardList数组中的板卡
+              for (const i in fBoardList) {
+                if (fBoardList[i].uniqueId.indexOf(data.properties.uniqueId) != -1) {
+                  removeByValue(fBoardList, fBoardList[i])
+                }
+              }
+            }
             //如果是后面机箱的板卡
             if (data.properties.boardType == 3) {
               //移除bBoardList数组中此板卡
