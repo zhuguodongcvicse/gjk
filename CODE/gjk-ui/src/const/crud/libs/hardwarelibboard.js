@@ -30,17 +30,6 @@ export const tableOption = {
       label: '板子名称',
       prop: 'boardName'
     },
-    {
-      label: '用户',
-      prop: 'userId',
-      type: 'select',
-      filter: true,
-      props: {
-        label: 'showName',
-        value: 'userId'
-      },
-      dicUrl: '/admin/user/info/getUserDict'
-    },
     /*{
       label: '用户',
       prop: 'userId',
@@ -77,6 +66,17 @@ export const tableOption = {
     {
       label: '备注',
       prop: 'backupInfo'
+    },
+    {
+      label: '用户',
+      prop: 'userId',
+      type: 'select',
+      filter: true,
+      props: {
+        label: 'showName',
+        value: 'userId'
+      },
+      dicUrl: '/admin/user/info/getUserDict'
     },
     {
       label: '版本',

@@ -197,12 +197,12 @@ function ondropLoadJSON(evt, graph, center, options) {
     //找到前板卡中的芯片
     if (frontjson.datas[0].json.properties.frontBoardList[i].chipList != null && frontjson.datas[0].json.properties.frontBoardList[i].chipList.length !== 0) {
       for (const j in frontjson.datas[0].json.properties.frontBoardList[i].chipList) {
-        for (let k = 0; k < platformTypeList.length; k++) {
+        /*for (let k = 0; k < platformTypeList.length; k++) {
           if (frontjson.datas[0].json.properties.frontBoardList[i].chipList[j].hrTypeName === platformTypeList[k].typeValue) {
             frontjson.datas[0].json.properties.frontBoardList[i].chipList[j].hrTypeName = platformTypeList[k].name
             // console.log("frontBoardList[i].chipList[j]",frontjson.datas[0].json.properties.frontBoardList[i].chipList[j])
           }
-        }
+        }*/
         //给芯片赋值唯一标识，拼接上机箱的唯一标识
         frontjson.datas[0].json.properties.frontBoardList[i].chipList[j].uniqueId = uuidRandom + '_' + frontjson.datas[0].json.properties.frontBoardList[i].chipList[j].uniqueId
         if (frontjson.datas[0].json.properties.frontBoardList[i].chipList[j].infOfChipList !== undefined) {
