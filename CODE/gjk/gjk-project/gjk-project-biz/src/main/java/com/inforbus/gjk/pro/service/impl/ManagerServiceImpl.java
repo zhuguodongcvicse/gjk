@@ -1004,10 +1004,9 @@ public class ManagerServiceImpl extends ServiceImpl<ManagerMapper, ProjectFile> 
 
             try {
                 String appDirPath = appFilePath + File.separator + "Image" + File.separator;
-				appSubassemblyServiceFeign.transferFileToDestination(appDirPath, ufile);
-
+				String imagePath = appSubassemblyServiceFeign.transferFileToDestination(appDirPath, ufile).getData();
                 app.setId(IdGenerate.uuid());
-                app.setBackPath(appDirPath.substring(proDetailPath.length()));
+                app.setBackPath(imagePath.substring(proDetailPath.length()));
                 app.setUserId(Integer.parseInt(messageMap.get("userId")));
             } catch (IOException e) {
                 e.printStackTrace();

@@ -58,7 +58,7 @@ public interface AppSubassemblyServiceFeign {
 
 	@PostMapping(value = url +  "/transferFileToDestination", produces = {
 			MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	R transferFileToDestination(@RequestParam("appDirPath") String appDirPath, @RequestPart("file")  MultipartFile file) throws IOException;
+	R<String> transferFileToDestination(@RequestParam("appDirPath") String appDirPath, @RequestPart("file")  MultipartFile file) throws IOException;
 
 	@PostMapping(url + "/createAppTree")
 	R<List<ProjectFileVO>> createAppTree(@RequestParam("appPath") String appPath, @RequestParam("processId") String processId);

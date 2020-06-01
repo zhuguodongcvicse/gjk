@@ -131,10 +131,10 @@ public class AppSubassemblyController {
     @PostMapping(value = "/transferFileToDestination", produces = {
             MediaType.APPLICATION_JSON_UTF8_VALUE }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
-    public R transferFileToDestination(@RequestParam("appDirPath") String appDirPath, @RequestPart("file")  MultipartFile file) {
+    public R<String> transferFileToDestination(@RequestParam("appDirPath") String appDirPath, @RequestPart("file")  MultipartFile file) {
         R<String> r = new R<>();
         try {
-            appSubassemblyService.transferFileToDestination(appDirPath, file);
+            r.setData(appSubassemblyService.transferFileToDestination(appDirPath, file));
         } catch (IOException e) {
             r.setMsg("\"转移文件失败：\" + e.getMessage()");
             logger.error("转移文件失败：" + e.getMessage());

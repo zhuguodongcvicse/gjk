@@ -77,7 +77,7 @@ public interface AppSubassemblyService {
      * @param multipartFile
      * @throws IOException
      */
-    void transferFileToDestination(String appDirPath, MultipartFile multipartFile) throws IOException;
+    String transferFileToDestination(String appDirPath, MultipartFile multipartFile) throws IOException;
 
     /**
      *创建App组件工程树

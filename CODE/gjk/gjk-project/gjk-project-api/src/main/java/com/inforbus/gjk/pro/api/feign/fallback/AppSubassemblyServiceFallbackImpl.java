@@ -82,7 +82,7 @@ public class AppSubassemblyServiceFallbackImpl implements AppSubassemblyServiceF
     }
 
     @Override
-    public R transferFileToDestination(@RequestParam("appDirPath") String appDirPath, @RequestPart("file")  MultipartFile file) throws IOException {
+    public R<String> transferFileToDestination(@RequestParam("appDirPath") String appDirPath, @RequestPart("file")  MultipartFile file) throws IOException {
         log.error("调用数据中心的feign接口transferFileToDestination方法失败", cause);
         R r = new R();
         r.setCode(CommonConstants.FAIL);

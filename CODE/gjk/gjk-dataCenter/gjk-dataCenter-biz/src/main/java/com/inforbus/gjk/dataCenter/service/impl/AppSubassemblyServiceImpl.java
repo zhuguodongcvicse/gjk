@@ -385,7 +385,7 @@ public class AppSubassemblyServiceImpl implements AppSubassemblyService {
      * @throws IOException
      */
     @Override
-    public void transferFileToDestination(String appDirPath, MultipartFile multipartFile) throws IOException {
+    public String transferFileToDestination(String appDirPath, MultipartFile multipartFile) throws IOException {
         File targetFile = new File(appDirPath);
         if (!targetFile.exists()) {
             targetFile.mkdirs();
@@ -394,6 +394,7 @@ public class AppSubassemblyServiceImpl implements AppSubassemblyService {
                 + multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().lastIndexOf("."));
         targetFile = new File(appDirPath);
         multipartFile.transferTo(targetFile);
+        return appDirPath;
     }
 
     /**
