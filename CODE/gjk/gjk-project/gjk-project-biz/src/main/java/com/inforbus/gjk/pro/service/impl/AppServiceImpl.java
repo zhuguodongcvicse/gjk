@@ -519,16 +519,13 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 			BufferedInputStream in = null;
 			BufferedOutputStream out = null;
 			in = new BufferedInputStream(inputStream);
-			out = new BufferedOutputStream(new FileOutputStream(zipFilePath));
 			outStream = new ByteArrayOutputStream();
 			int len = -1;
 			byte[] b = new byte[1024];
 			while ((len = in.read(b)) != -1) {
-				out.write(b, 0, len);
 				outStream.write(b, 0, len);
 			}
 			in.close();
-			out.close();
 
 			byte[] data = outStream.toByteArray();
 
