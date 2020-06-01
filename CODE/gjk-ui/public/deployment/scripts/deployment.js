@@ -1171,10 +1171,14 @@ function initEditor(editor) {
 				{
 					text: '选中跳转的芯片', action: function () {
 						var data = graph.getElement(evt);
-						//选中改变芯片背景颜色
-						data.image = "images/Chip.jpg";
-						console.log("data", data)
-						var data = graph.getElement(evt);
+						if (data.image == "images/Chip.svg") {
+							//选中改变芯片背景颜色
+							data.image = "images/Chip.jpg";
+							console.log("data", data)
+							var data = graph.getElement(evt);
+						}
+
+
 						if (data.image == "images/Chip.jpg") {
 							console.log(data)
 							if (data.properties.checkFlag == true /* && data.children.datas != 0 */) {
@@ -1343,6 +1347,13 @@ function showchip() {
 		canvasFlag = false;
 		//获取当前画布数据
 		deploymentsJsonbak = graph.toJSON();
+		const datas = deploymentsJsonbak.datas;
+		for (let index = 0; index < datas.length; index++) {
+			const element = datas[index];
+			if (element.json.image != null && element.json.image == "images/Chip.jpg") {
+				element.json.image = "images/Chip.svg";
+			}
+		}
 		/* 		for (var i in CHIPdate) {
 					for (var j in deploymentsJsonbak.datas) {
 						if (deploymentsJsonbak.datas[j]._refId == undefined && deploymentsJsonbak.datas[j].json.image == "images/Chip.svg") {
@@ -1521,13 +1532,6 @@ function showchip() {
 			}
 		}
 		graph.clear();
-		const datas = deploymentsJsonbak.datas;
-		for (let index = 0; index < datas.length; index++) {
-			const element = datas[index];
-			if (element.json.image != null && element.json.image == "images/Chip.jpg") {
-				element.json.image = "images/Chip.svg";
-			}
-		}
 		graph.parseJSON(deploymentsJsonbak)
 		graph.moveToCenter();
 		falg = true;
