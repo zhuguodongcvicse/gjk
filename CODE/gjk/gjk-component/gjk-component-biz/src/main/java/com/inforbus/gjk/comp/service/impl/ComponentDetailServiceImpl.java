@@ -293,6 +293,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		// map转成CompImg
 		CompImg img = new JSONObject(map.get("compImg")).toBean(CompImg.class);
 		// 设置默认图片名称 格式为 '构件名称.png'
+		originalFilename = file.getOriginalFilename();
 //		originalFilename = StringUtils.isEmpty(img.getImgShowName()) ? "" : img.getImgShowName() + ".png";
 		// 远程路径
 		String gitRelativePath = compUserFilePath + File.separator + userName + File.separator + comp.getCompId()
@@ -302,7 +303,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		String filePath = this.compDetailPath + File.separator + gitRelativePath + File.separator + originalFilename;
 		if (ObjectUtils.isNotEmpty(file)) {
 			try {
-				rdcService.uploadLocalFile(file, filePath);
+				R<?> localFile = rdcService.uploadLocalFile(file, filePath);
 				String base64 = UploadFilesUtils.getBase64ByInputStream(file.getInputStream());
 				img.setImgPath("data:image/png;base64," + base64);
 				img.setImgHtml(elReplace(img.getImgHtml(), "'/comp/component/comImg/(.*?)'",
@@ -316,7 +317,6 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 			StringBuilder strb = new StringBuilder();
 			// 获取构件编号
 			String imgId = elReplace(img.getImgPath(), "/comp/component/comImg/", "");
-
 			try {
 				if (imgId.equals("1")) {
 					// 得到默认图标的文件
