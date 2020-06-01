@@ -59,13 +59,31 @@
               </el-form-item>
 
               <el-form-item v-if="formStatus == 'update'">
+                <!--<el-select v-model="form.typeValue" placeholder="请选择" v-if="formStatus == 'update'">
+                  <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.value"
+                    :value="item.value">
+                  </el-option>
+                </el-select>-->
                 <el-button type="primary" @click="update">更新</el-button>
                 <el-button @click="onCancel">取消</el-button>
               </el-form-item>
+
               <el-form-item v-if="formStatus == 'create'">
+                <el-select v-model="form.typeValue" placeholder="请选择类型值,确保已经在字典添加了新平台类型" v-if="formStatus == 'create'">
+                  <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.value"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
                 <el-button type="primary" @click="create">保存</el-button>
                 <el-button @click="onCancel">取消</el-button>
               </el-form-item>
+
             </el-form>
           </el-card>
         </el-col>
@@ -84,6 +102,7 @@ import {
   getObj,
   putObj
 } from "@/api/admin/platform";
+import {remote, syncModifyDict} from "@/api/admin/dict";
 import { findThreeLibsId } from "@/api/libs/threelibs";
 import { mapGetters } from "vuex";
 import importLibs from "@/views/admin/test/importLibs";
@@ -95,6 +114,7 @@ export default {
   inject: ["reload"],
   data() {
     return {
+      options: [],
       showInfo: {
         importLibsDialogVisible: false,
         dialogExportVisible: false
@@ -130,6 +150,7 @@ export default {
       labelPosition: "right",
       form: {
         name: undefined,
+        typeValue: undefined,
         platformId: undefined,
         parentId: undefined,
         sort: undefined
@@ -146,6 +167,7 @@ export default {
   },
   components: { importLibs, exportLibs },
   created() {
+    this.getPlatFormTypeValues()
     this.getList();
     this.platformManager_btn_add = this.permissions["sys_platform_add"];
     this.platformManager_btn_edit = this.permissions["sys_platform_edit"];
@@ -158,6 +180,12 @@ export default {
     ...mapGetters(["elements", "permissions"])
   },
   methods: {
+    getPlatFormTypeValues() {
+        remote("platform_type").then(response => {
+            // console.log("response",response)
+            this.options = response.data.data
+        })
+    },
     handleDrop(draggingNode, dropNode, dropType, ev) {
       this.rules.name[0].required = false;
       if (dropType === "inner") {
@@ -296,7 +324,21 @@ export default {
       }
     },
     update() {
+      if (this.form.typeValue == null || this.form.typeValue == '') {
+          alert("请选择类型值")
+          return;
+      }
+      for (const item of this.treeData) {
+          if (item.name == this.form.name) {
+              alert("平台名称已存在")
+              return
+          }
+      }
+      console.log("this.form",this.form)
       putObj(this.form).then(() => {
+        if (this.form.parentId == '-1') {
+            this.syncModifyDict(this.form.name, this.form.typeValue)
+        }
         this.getList();
         this.$notify({
           title: "成功",
@@ -307,7 +349,27 @@ export default {
         this.onCancel();
       });
     },
+    syncModifyDict(label, value) {
+        if (label === undefined || label === '' || value === undefined || value === '') {
+            alert("输出入非法，请检查输入值")
+        }
+        let dictObj = {
+            label: label,
+            value: value
+        }
+        syncModifyDict(dictObj)
+    },
     create() {
+      if (this.form.typeValue == null || this.form.typeValue == '') {
+          alert("请选择类型值")
+          return;
+      }
+      for (const item of this.treeData) {
+          if (item.name == this.form.name) {
+              alert("平台名称已存在")
+              return
+          }
+      }
       var parentId = JSON.parse(JSON.stringify(this.form)).parentId;
       console.log("xswe", parentId, this.currentId);
       //新添加一个根节点

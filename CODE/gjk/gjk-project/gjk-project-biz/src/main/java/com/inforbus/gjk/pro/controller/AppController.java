@@ -387,7 +387,7 @@ public class AppController {
 
 	/**
 	 * 根据流程Id查询是否生成app组件工程
-	 * 
+	 * 2020年5月29日16点52分晓冬修改，此类型不需要从配置文件中获取
 	 * @return
 	 */
 	@PutMapping(value = "/getAppByProcessId")
@@ -398,48 +398,18 @@ public class AppController {
 		App app = appService.getAppByProcessId(procedureId);
 		// 解析json 获取对应文件夹所在平台
 		JSONObject json = JSONObject.parseObject(app.getPartnamePlatform());
-		// 获取当前类的路径
-		String filePath = ManagerServiceImpl.class.getResource("").getPath();
-		try {
-			// 中文乱码问题
-			filePath = URLDecoder.decode(filePath, "utf-8");
-		} catch (UnsupportedEncodingException e1) {
-			e1.printStackTrace();
-		}
-		// 找到bootstrap.properties的地址
-		filePath = filePath.substring(0, filePath.indexOf("target/classes/") + "target/classes/".length())
-				+ "platformType.yml";
-		File dumpFile = new File(filePath);
-
-		Map father;
-		String makefileType = "";
-		try {
-			father = Yaml.loadType(dumpFile, HashMap.class);
-			makefileType = father.get(json.get(fileName)).toString();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		return new R<>(makefileType);
+		//获取到平台类型
+		String plartType = json.get(fileName).toString();
+		return new R<>(plartType);
 	}
 	/**
 	 * 通过yml文件获取平台
+	 * 2020年5月29日17点26分 晓冬修改，此数据不需要从配置文件中获取，从字典表中获取
 	 * @return
 	 */
 	@PutMapping( "/getPlatformName")
 	public R getPlatformNameByYml() {
-		String filePath = ManagerServiceImpl.class.getResource("").getPath();
-		// 找到bootstrap.properties的地址
-		filePath = filePath.substring(0, filePath.indexOf("target/classes/") + "target/classes/".length())
-				+ "platformType.yml";
-		File dumpFile = new File(filePath);
-		String makefileType = "";
-		Map father = null;
-		try {
-			father = Yaml.loadType(dumpFile, HashMap.class);
-//			makefileType = father.get(json.get(fileName)).toString();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		return new R<>(father);
+		Map<String,String> map = appService.getPlatformName();
+		return new R<>(map);
 	}
 }

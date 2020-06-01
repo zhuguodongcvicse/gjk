@@ -85,6 +85,15 @@ public class GjkPlatformController {
 	}
 
 	/**
+	 * 获取平台类型
+	 * @return
+	 */
+	@GetMapping("/getPlatFormTypeList")
+	public List<GjkPlatform> getPlatFormTypeList() {
+		return gjkPlatformService.getPlatFormTypeList();
+	}
+
+	/**
 	 * 返回角色的平台库集合
 	 *
 	 * @param roleId 角色ID
@@ -158,5 +167,16 @@ public class GjkPlatformController {
 	@PostMapping("ownPlatform")
 	public R ownPlatform() {
 		return new R<>(gjkPlatformService.selectOwnPlatform());
+	}
+
+	/**
+	 * 修改平台类型
+	 * @param platformVO
+	 * @return
+	 */
+	@PutMapping("/modifyPlatformLibDirectory")
+	public R modifyPlatformLibDirectory(@RequestBody PlatformVO platformVO) {
+
+		return new R<>(gjkPlatformService.modifyPlatformLibDirectory(platformVO));
 	}
 }

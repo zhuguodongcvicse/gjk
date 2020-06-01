@@ -51,11 +51,7 @@ public class ProjectTree extends TreeNode {
 		this.name = vo.getFileName();
 		this.type = vo.getFileType();
 		this.parentType = vo.getFileType();
-		if (this.type == "app") {
-			this.label = vo.getShowName();
-		} else {
-			this.label = vo.getFileName();
-		}
+		this.label = vo.getFileName();
 		this.processId = vo.getProcedureId();
 		this.softwareId = vo.getSoftwareId();
 		this.bspId = vo.getBspId();

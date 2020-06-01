@@ -163,6 +163,7 @@ import {
 import { tableOption } from "@/const/crud/libs/software";
 import { mapGetters } from "vuex";
 import { fetchPlatformTrees } from "@/api/admin/platform";
+import {remote} from "@/api/admin/dict";
 import Vue from "vue";
 import uploader from "vue-simple-uploader";
 import storageApply from "@/views/libs/software/storageApply";
@@ -247,7 +248,7 @@ export default {
   },
   created() {
     this.getList(this.page);
-
+    this.getPlatformTypeFromDict()
     this.getPlatformSelectTree();
     this.libsSoftware_btn_add = this.permissions["libs_software_add"];
     this.libsSoftware_btn_del = this.permissions["libs_software_del"];
@@ -278,6 +279,11 @@ export default {
   },
 
   methods: {
+      getPlatformTypeFromDict() {
+        remote('platform_type').then(response => {
+            console.log("response",response)
+        })
+      },
     onchange(file, fileList) {
       console.log("description", file);
       this.formLabelAlign.fileName = file.raw.name;

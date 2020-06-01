@@ -101,7 +101,7 @@
         <el-button @click="closeDialog()">取 消</el-button>
       </div>
     </el-dialog>
-    <addChip :showInf="showInf" :allChips="allChips" ref="pram"></addChip>
+    <addChip :showInf="showInf" :allChips="allChips" :platformTypes="platformTypes" ref="pram"></addChip>
     <storage-apply
       :dialog="dialog"
       :infWillToStorage="infWillToStorage"
@@ -112,6 +112,7 @@
 </template>
 
 <script>
+    import {remote} from "@/api/admin/dict";//获取字典数据
     import { getAllUser } from "@/api/libs/hardwarelibinf";
     import {
         fetchList,
@@ -132,6 +133,7 @@
         components: {"addChip": addChip, "storage-apply": chipStorageApply},
         data() {
             return {
+                platformTypes: '',
                 infWillToStorage: '', //要入库的接口
                 clickCopyOrEdit: '', //复制或者编辑操作标志符
                 allUsersOfLibs: [], //用户数据，用来做用户筛选
@@ -198,10 +200,11 @@
             };
         },
         created() {
+            console.log("this.tableOption",this.tableOption)
             // location.reload()
             this.getList();
-            // this.getAllUsers();
             this.getPlatformSelectTree();
+            // this.getAllUsers();
         },
         mounted() {
         },
@@ -315,22 +318,6 @@
                     // console.log("this.approveUsers", this.approveUsers);
                 });
             },
-            //获取平台库的数据
-            getPlatformSelectTree() {
-                fetchPlatformTree().then(response => {
-                    //平台库树结构只展示根节点数据
-                    for (let item of response.data.data) {
-                        let index = response.data.data.indexOf(item);
-                        let plaTreeData = {};
-                        plaTreeData.value = item.name;
-                        plaTreeData.label = item.label;
-                        plaTreeData.id = item.id;
-                        plaTreeData.parentId = item.parentId;
-                        this.pTreeData.push(plaTreeData);
-                    }
-                    this.options = this.pTreeData;
-                });
-            },
             sortKey(array, key) {
                 return array.sort(function (a, b) {
                     let x = Date.parse(a[key])
@@ -342,35 +329,30 @@
                 this.tableLoading = true;
                 this.listQuery.userId = this.userInfo.userId
                 fetchList(this.listQuery).then(response => {
-                    // this.tableData = []
-                    // this.allChips = JSON.parse(JSON.stringify(response.data.data.records));
                     this.tableData = response.data.data.records;
-                    // console.log("response.data.data",response.data.data)
-                    /*this.tableData = this.sortKey(this.tableData, 'createTime')
-                    //所有判断芯片数据是否为空
-                    if (this.allChips.length !== 0) {
-                        //清空数据
-                        this.allChips = []
-                        for (const i in this.tableData) {
-                            //如果用户名和登录用户名相同，则将该芯片放到芯片数据
-                            if (this.tableData[i].userId === this.userInfo.name) {
-                                this.allChips.push(this.tableData[i])
-                            }
-                        }
-                    } else {
-                        //芯片数据为空则将用户名相同的芯片放到芯片数组
-                        for (const i in this.tableData) {
-                            if (this.tableData[i].userId === this.userInfo.name) {
-                                this.allChips.push(this.tableData[i])
-                            }
-                        }
-                    }
-                    this.allChips = JSON.parse(JSON.stringify(this.allChips))*/
                     this.page.total = response.data.data.total;
                     this.tableLoading = false;
                 });
                 getChipList().then(res => {
                     this.allChips = JSON.parse(JSON.stringify(res.data));
+                })
+            },
+            getPlatformSelectTree() {
+                remote("platform_type").then(response => {
+                    this.options = response.data.data;
+                    this.platformTypes = response.data.data;
+                    console.log("++++++++++++++")
+                    let hyTypeNameDict = []
+                    for (let i = 0; i < response.data.data.length; i++) {
+                        let label = response.data.data[i].label
+                        let value = response.data.data[i].value
+                        hyTypeNameDict.push({label, value})
+                    }
+                    for (let i = 0; i < this.tableOption.column.length; i++) {
+                        if (this.tableOption.column[i].prop === 'hrTypeName') {
+                            this.tableOption.column[i].dicData = hyTypeNameDict
+                        }
+                    }
                 })
             },
             getAllUsers() {

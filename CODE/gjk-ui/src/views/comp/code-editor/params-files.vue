@@ -476,6 +476,6 @@ export default {
   height: 75px;
   line-height: 75px;
   text-align: center;
-  
+
 }
 </style>

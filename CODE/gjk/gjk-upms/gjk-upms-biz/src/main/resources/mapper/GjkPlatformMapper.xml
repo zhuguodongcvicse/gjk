@@ -21,6 +21,7 @@
 		type="com.inforbus.gjk.admin.api.vo.PlatformVO">
 		<id column="platform_id" property="platformId" />
 		<result column="name" property="name" />
+		<result column="type_value" property="typeValue" />
 		<result column="permission" property="permission" />
 		<result column="parent_id" property="parentId" />
 		<result column="sort" property="sort" />
@@ -112,7 +113,25 @@
 		<result property="applyDesc" column="apply_desc" />
 		<result property="delFlag" column="del_flag" />
 	</resultMap>
-
+<!--	获取平台类型根节点列表-->
+	<select id="getPlatFormTypeList" resultMap="PlatformVoResultMap">
+		select * from gjk_platform
+		<where>
+			parent_id = -1
+		</where>
+	</select>
+<!--	修改平台库目录-->
+	<update id="modifyPlatformLibDirectory">
+		UPDATE gjk_platform
+		<set>
+			<if test="name != null and !''.equals(name)">
+				name = #{name}
+			</if>
+		</set>
+		<where>
+			type_value = #{typeValue}
+		</where>
+	</update>
 	<!--通过角色查询平台库信息 -->
 	<select id="listPlatformsByRoleId"
 		resultMap="PlatformVoResultMap">

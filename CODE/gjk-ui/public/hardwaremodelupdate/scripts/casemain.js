@@ -61,6 +61,12 @@ function handleMessageFromParent(event) {
 						for (const j in graphList.fJson[n].datas[i].json.properties.frontBoardList) {
 							if (graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList != null) {
 								for (const k in graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList) {
+								  //循环平台库目录根节点，找到名字相同的芯片，将芯片的平台类型重新赋值
+                  /*for (let p = 0; p < platformTypeList.length; p++) {
+                    if (platformTypeList[p].name === graphList.fJson[n].datas[i].json.properties.frontBoardList[j].chipList[k].hrTypeName) {
+
+                    }
+                  }*/
 									//第二次
 									for (const m in graphList.fJson[n].datas) {
 										if (graphList.fJson[n].datas[m].json.properties != null && graphList.fJson[n].datas[m].json.properties.chipName != null
@@ -191,6 +197,12 @@ function ondropLoadJSON(evt, graph, center, options) {
     //找到前板卡中的芯片
     if (frontjson.datas[0].json.properties.frontBoardList[i].chipList != null && frontjson.datas[0].json.properties.frontBoardList[i].chipList.length !== 0) {
       for (const j in frontjson.datas[0].json.properties.frontBoardList[i].chipList) {
+        for (let k = 0; k < platformTypeList.length; k++) {
+          if (frontjson.datas[0].json.properties.frontBoardList[i].chipList[j].hrTypeName === platformTypeList[k].typeValue) {
+            frontjson.datas[0].json.properties.frontBoardList[i].chipList[j].hrTypeName = platformTypeList[k].name
+            // console.log("frontBoardList[i].chipList[j]",frontjson.datas[0].json.properties.frontBoardList[i].chipList[j])
+          }
+        }
         //给芯片赋值唯一标识，拼接上机箱的唯一标识
         frontjson.datas[0].json.properties.frontBoardList[i].chipList[j].uniqueId = uuidRandom + '_' + frontjson.datas[0].json.properties.frontBoardList[i].chipList[j].uniqueId
         if (frontjson.datas[0].json.properties.frontBoardList[i].chipList[j].infOfChipList !== undefined) {

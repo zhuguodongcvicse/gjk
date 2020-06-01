@@ -83,3 +83,11 @@ export function getDictMappingData (dict) {
     data:dict
   })
 }
+
+export function syncModifyDict (obj) {
+  return request({
+    url: '/admin/dict/syncModifyDict',
+    method: 'put',
+    data: obj
+  })
+}
