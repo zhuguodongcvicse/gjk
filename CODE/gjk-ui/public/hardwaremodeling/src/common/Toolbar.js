@@ -334,12 +334,12 @@
                 //     iconClass: 'q-icon toolbar-edge_VH',
                 //     edgeType: Q.Consts.EDGE_TYPE_HORIZONTAL_VERTICAL
                 // },
-                {
-                    name: '创建L型连线',
-                    interactionMode: Q.Consts.INTERACTION_MODE_CREATE_SIMPLE_EDGE,
-                    iconClass: 'q-icon toolbar-edge_VH',
-                    edgeType: Q.Consts.EDGE_TYPE_VERTICAL_HORIZONTAL
-                },
+                // {
+                //     name: '创建L型连线',
+                //     interactionMode: Q.Consts.INTERACTION_MODE_CREATE_SIMPLE_EDGE,
+                //     iconClass: 'q-icon toolbar-edge_VH',
+                //     edgeType: Q.Consts.EDGE_TYPE_VERTICAL_HORIZONTAL
+                // },
             /*     {
                     name: '创建多边形',
                     interactionMode: Q.Consts.INTERACTION_MODE_CREATE_SHAPE,

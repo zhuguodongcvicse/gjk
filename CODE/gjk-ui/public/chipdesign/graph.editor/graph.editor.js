@@ -289,22 +289,23 @@
         },
         //初始化工具栏
         initToolbar: function (toolbar, graph) {
-            var exportButtons = [{
-                    name: getI18NString('Export JSON'), iconClass: 'q-icon toolbar-json', action: this.showJSONPanel.bind(this)
-                }
+            var exportButtons = [
+                // {
+                //     name: getI18NString('Export JSON'), iconClass: 'q-icon toolbar-json', action: this.showJSONPanel.bind(this)
+                // }
             ]
-            if(Q.isFileSupported){
-                exportButtons.push({
-                    iconClass: 'q-icon toolbar-upload',
-                    name: getI18NString('Load File ...'), action: this.loadJSONFile.bind(this), type: 'file'
-                })
-            }
-            if (window.saveAs) {
-                exportButtons.push({
-                    iconClass: 'q-icon toolbar-download',
-                    name: getI18NString('Download File'), action: this.exportJSONFile.bind(this, window.saveAs)
-                })
-            }
+            // if(Q.isFileSupported){
+            //     exportButtons.push({
+            //         iconClass: 'q-icon toolbar-upload',
+            //         name: getI18NString('Load File ...'), action: this.loadJSONFile.bind(this), type: 'file'
+            //     })
+            // }
+            // if (window.saveAs) {
+            //     exportButtons.push({
+            //         iconClass: 'q-icon toolbar-download',
+            //         name: getI18NString('Download File'), action: this.exportJSONFile.bind(this, window.saveAs)
+            //     })
+            // }
             if(this.options.saveService){
                 exportButtons.push({
                     iconClass: 'q-icon toolbar-save',
