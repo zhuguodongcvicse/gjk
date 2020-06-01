@@ -172,4 +172,5 @@ public interface AppService extends IService<App> {
 	void createZipFile(HttpServletRequest request, HttpServletResponse response,
 			 Map<String, String> map);
 
+    Map<String,String> getPlatformName();
 }

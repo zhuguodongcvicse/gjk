@@ -605,4 +605,25 @@ public class GjkPlatformServiceImpl extends ServiceImpl<GjkPlatformMapper, GjkPl
 	public List<GjkPlatform> selectOwnPlatform() {
 		return baseMapper.selectList(Wrappers.<GjkPlatform>query().lambda().eq(GjkPlatform::getParentId, "-1"));
 	}
+
+	/**
+	 * 获取平台类型根节点列表
+	 * @return
+	 */
+	@Override
+	public List<GjkPlatform> getPlatFormTypeList() {
+
+		return baseMapper.getPlatFormTypeList();
+	}
+
+	/**
+	 * 修改平台类型
+	 * @param platformVO
+	 * @return
+	 */
+	@Override
+	public int modifyPlatformLibDirectory(PlatformVO platformVO) {
+
+		return baseMapper.modifyPlatformLibDirectory(platformVO);
+	}
 }

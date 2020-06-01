@@ -62,13 +62,12 @@ public interface AppSubassemblyService {
      * @param appFilePath
      * @param partName
      * @param libsType
-     * @param platformType
      * @param softwareFilePath
      * @param softwareName
      * @param bspFilePath
      * @param proDetailPath
      */
-    void copySoftwareAndBsp(R r, String appFilePath, String partName, String libsType, String platformType,
+    void copySoftwareAndBsp(R r, String appFilePath, String partName, String libsType,
                             String softwareFilePath, String softwareName, String bspFilePath, String proDetailPath);
 
     /**

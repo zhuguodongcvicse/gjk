@@ -44,7 +44,8 @@ export const tableOption = {
     },
 	  {
       label: '平台类型',
-      prop: 'hrTypeName'
+      prop: 'hrTypeName',
+      dicData: []
     },
     {
       label: '用户',

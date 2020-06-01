@@ -11,6 +11,7 @@ import com.inforbus.gjk.common.core.util.compileutil.LinuxUtil;
 import com.inforbus.gjk.common.core.util.compileutil.MakeFileUtil;
 import com.inforbus.gjk.common.core.util.compileutil.SylixosUtil;
 import com.inforbus.gjk.common.core.util.compileutil.WorkbenchUtil;
+import com.inforbus.gjk.common.core.constant.PlatformType;
 import com.inforbus.gjk.dataCenter.api.entity.*;
 import com.inforbus.gjk.dataCenter.api.vo.ProjectFileVO;
 import com.inforbus.gjk.dataCenter.controller.AppSubassemblyController;
@@ -94,7 +95,7 @@ public class AppSubassemblyServiceImpl implements AppSubassemblyService {
                 .collect(Collectors.toList());
         //找到符合条件的路径
         for (Path pathEl : collect) {
-            if (pathEl.toString().contains(selectFileName) && !pathEl.toString().contains("debug")) {
+            if (pathEl.toString().contains(selectFileName) && !pathEl.toString().contains("Debug")) {
                 selectPath = pathEl.toString();
             }
         }
@@ -298,13 +299,13 @@ public class AppSubassemblyServiceImpl implements AppSubassemblyService {
             List<String> linuxCFilePath = (List<String>) getListBySet(linuxCFilePathSet);
 
             try {
-                if (makefileType.trim().toLowerCase().equals("VS2010".toLowerCase())) {
+                if (makefileType.trim().toLowerCase().equals(PlatformType.WINDOWS.toLowerCase())) {
                     modifyVs2010MakeFile(r, assemblyName, hMakeFilePathList, cMakeFilePathList);
-                } else if (makefileType.trim().toLowerCase().equals("Workbench".toLowerCase())) {
+                } else if (makefileType.trim().toLowerCase().equals(PlatformType.VXWORKS.toLowerCase())) {
                     WorkbenchUtil.updateWorkbench(assemblyName);
-                } else if (makefileType.trim().toLowerCase().equals("Sylixos".toLowerCase())) {
+                } else if (makefileType.trim().toLowerCase().equals(PlatformType.SYLIXOS.toLowerCase())) {
                     SylixosUtil.updateSylixos(assemblyName, bspFilePath, sylixosProjectName);
-                } else if (makefileType.trim().toLowerCase().startsWith("Linux".toLowerCase())) {
+                } else if (makefileType.trim().toLowerCase().startsWith(PlatformType.LINUX.toLowerCase())) {
                     LinuxUtil.updateLinux(cFilePathList, assemblyName, ".c");
                     // LinuxUtil.updateLinux(linuxCFilePath, assemblyName, ".c");
                 }
@@ -325,23 +326,22 @@ public class AppSubassemblyServiceImpl implements AppSubassemblyService {
      * @param appFilePath
      * @param partName
      * @param libsType
-     * @param platformType
      * @param softwareFilePath
      * @param softwareName
      * @param bspFilePath
      * @param proDetailPath
      */
     @Override
-    public void copySoftwareAndBsp(R r, String appFilePath, String partName, String libsType, String platformType, String softwareFilePath, String softwareName, String bspFilePath, String proDetailPath) {
+    public void copySoftwareAndBsp(R r, String appFilePath, String partName, String libsType, String softwareFilePath, String softwareName, String bspFilePath, String proDetailPath) {
         if ("".equals(bspFilePath)) {
-            if (libsType.equals("Sylixos") || libsType.equals("Workbench")) {
+            if (libsType.equals(PlatformType.SYLIXOS) || libsType.equals(PlatformType.VXWORKS)) {
                 logger.error("请配置" + libsType + "对应的bsp," + "部件" + partName + "缺少对应的BSP。");
                 r.setException(new Exception("请配置" + libsType + "对应的BSP," + "部件" + partName + "缺少对应的BSP。"));
                 return;
             }
         }
         Thread thread = new Thread(() -> {
-            String bspFilePathStr = appFilePath + "bsp" + File.separator + platformType + File.separator + new File(bspFilePath).getName();
+            String bspFilePathStr = appFilePath + "bsp" + File.separator + libsType + File.separator + new File(bspFilePath).getName();
             File file = new File(bspFilePathStr);
             if (!file.exists()) {
                 // 拷贝bsp对应的文件夹到app组件工程目录下
@@ -355,7 +355,7 @@ public class AppSubassemblyServiceImpl implements AppSubassemblyService {
                 }
             }
         });
-        if (libsType.equals("Sylixos") || libsType.equals("Workbench")) {
+        if (libsType.equals(PlatformType.SYLIXOS) || libsType.equals(PlatformType.VXWORKS)) {
             thread.start();
         }
 

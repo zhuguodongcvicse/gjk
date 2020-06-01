@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
+import com.inforbus.gjk.admin.api.entity.SysDict;
 import com.inforbus.gjk.common.core.constant.CommonConstants;
 import com.inforbus.gjk.common.core.constant.ComponentConstant;
 import com.inforbus.gjk.common.core.idgen.IdGenerate;
@@ -20,6 +21,7 @@ import com.inforbus.gjk.pro.api.feign.DisposeDataCenterServiceFeign;
 import com.inforbus.gjk.pro.api.feign.ExternalInfInvokeService;
 import com.inforbus.gjk.pro.api.vo.ProjectFileVO;
 import com.inforbus.gjk.pro.mapper.AppMapper;
+import com.inforbus.gjk.pro.mapper.DictMapper;
 import com.inforbus.gjk.pro.service.AppService;
 
 import cn.hutool.core.io.IORuntimeException;
@@ -37,6 +39,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -71,6 +74,8 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	@Autowired
 	private AppSubassemblyServiceFeign appSubassemblyServiceFeign;
 
+	@Autowired
+	private DictMapper dictMapper;
 	// git文件路径
 	@Value("${git.local.path}")
 	private String proDetailPath;
@@ -565,6 +570,25 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 			}
 		}
 
+	}
+
+	/**
+	 * @Author wang
+	 * @Description: 获取平台类型的map
+	 * @Param: []
+	 * @Return: java.util.Map<java.lang.String,java.lang.String>
+	 * @Create: 2020/5/29
+	 */
+	@Override
+	public Map<String, String> getPlatformName() {
+		List<SysDict> list = dictMapper.getDictBytype("platform_type");
+		HashMap<String, String> map = new HashMap<>();
+		if (list != null && list.size() > 0){
+			for (SysDict dict : list) {
+				map.put(dict.getLabel(),dict.getValue());
+			}
+		}
+		return map;
 	}
 
 	/**

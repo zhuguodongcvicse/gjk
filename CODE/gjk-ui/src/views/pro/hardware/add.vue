@@ -35,18 +35,12 @@
     //例如：import 《组件名称》 from '《组件路径》';
     import {menuTag} from "@/util/closeRouter";
     import {saveHardwarelibs} from "@/api/pro/project";
+    import {getPlatFormTypeList} from "@/api/admin/platform";
     import {
         createHardwarelibXML,
         saveChipsFromHardwarelibs,
-        getChipsfromhardwarelibs
     } from "@/api/pro/manager";
     import {
-        traverseFrontHardwarelib,
-        traverseBackHardwarelib,
-
-        getFrontBoardOfCaseList,
-        getBackBoardOfCaseList,
-        getChipOfCaseList,
         createXmlEntityMap
     } from "@/util/createXmlWithhardwarelib";
     import {getCaseData} from "@/api/libs/hardwarelibcase";
@@ -79,7 +73,10 @@
                     cmd: "", //用于switch 判断
                     params: [] //具体参数
                 },
-                hrConfigXmlEntityMap: {}
+                hrConfigXmlEntityMap: {},
+                casesUpdatePlatformType: '',
+                chipsUpdatePlatformType: '',
+                listPlatformType: [],
             };
         },
         created() {
@@ -119,12 +116,15 @@
         methods: {
             sendMessage() {
                 let iframeWin = this.$refs.iframe.contentWindow;
-                getCaseData().then(response => {
-                    this.postMessageData.cmd = "getCase";
-                    this.postMessageData.params = response.data;
-                    iframeWin.postMessage(this.postMessageData, "*");
-                    //console.log("postMessageData",this.postMessageData.params)
-                });
+                // getPlatFormTypeList().then(res => {
+                    getCaseData().then(response => {
+                        this.postMessageData.cmd = "getCase";
+                        this.postMessageData.params = [response.data]
+                        iframeWin.postMessage(this.postMessageData, "*");
+                        //console.log("postMessageData",this.postMessageData.params)
+                    });
+                // })
+
             },
             // 接受子页面发来的信息
             handleMessage(event) {
@@ -150,46 +150,95 @@
                 this.params.link = event.data.params[0].link;
                 this.params.linkRelation = event.data.params[1];
                 this.params.frontCaseForDeployment = event.data.params[3];
-                var chipsfromhardwarelibs = {
+                // console.log("event.data.params[2]",event.data.params[2])
+
+                let chipsFromHardwarelibs = {
                     id: this.params.id,
                     chips: JSON.stringify(event.data.params[2]),
                     projectId: "",
                     flowId: "",
                     modelId: ""
                 };
-                // this.$store.dispatch("setCheckOrigin", ++num);
-                /* localStorage.setItem(
-                  "chipsOfHardwarelibs",
-                  JSON.stringify(event.data.params[2])
-                ); */
-                // console.log("this.params",this.params)
+
                 switch (event.data.cmd) {
                     case "submitCaseJSON":
-                        // 处理业务逻辑
-                        // console.log("this.params", this.params)
-                        /*if (num !== 1) {
-                            return;
-                        }*/
-                        // console.log("num",num)
                         this.ifSave = 0;
                         saveHardwarelibs(this.params).then(response => {
-                            console.log("response",response)
+                            // console.log("response",response)
                             if (response.data === 1) {
                                 this.$message({
                                     showClose: true,
                                     message: "添加成功",
                                     type: "success"
                                 });
-                                saveChipsFromHardwarelibs(chipsfromhardwarelibs).then(res => {
+                                saveChipsFromHardwarelibs(chipsFromHardwarelibs).then(res => {
                                     // console.log("res", res);
                                     this.createXml();
                                 });
                             }
                         });
-
-                        // this.$store.dispatch("setCheckOrigin", 0);
                         break;
                 }
+
+                // this.casesUpdatePlatformType = JSON.parse(JSON.parse(JSON.stringify(this.params.frontJson)))
+                // console.log("casesUpdatePlatformType",this.casesUpdatePlatformType)
+                //找到硬件建模中的芯片，将最新的平台类型数据赋值给芯片并保存到数据库，供App组件工程和其他使用
+                /*getPlatFormTypeList().then(res => {
+                    this.listPlatformType = res.data
+                    for (let n = 0; n < this.casesUpdatePlatformType.length; n++) {
+                        if (this.casesUpdatePlatformType[n].datas[0].json.properties.frontBoardList.length !== 0) {
+                            for (let i = 0; i < this.casesUpdatePlatformType[n].datas[0].json.properties.frontBoardList.length; i++) {
+                                if (this.casesUpdatePlatformType[n].datas[0].json.properties.frontBoardList[i].chipList.length !== 0) {
+                                    for (let j = 0; j < this.casesUpdatePlatformType[n].datas[0].json.properties.frontBoardList[i].chipList.length; j++) {
+                                        for (let k = 0; k < this.listPlatformType.length; k++) {
+                                            if (this.casesUpdatePlatformType[n].datas[0].json.properties.frontBoardList[i].chipList[j].hrTypeName === this.listPlatformType[k].typeValue) {
+                                                this.casesUpdatePlatformType[n].datas[0].json.properties.frontBoardList[i].chipList[j].hrTypeName = this.listPlatformType[k].name
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    this.chipsUpdatePlatformType = event.data.params[2]
+                    // console.log("this.chipsUpdatePlatformType",this.chipsUpdatePlatformType)
+                    // console.log("this.listPlatformType",this.listPlatformType)
+                    for (let i = 0; i < this.chipsUpdatePlatformType.length; i++) {
+                        for (let j = 0; j < this.listPlatformType.length; j++) {
+                            if (this.chipsUpdatePlatformType[i].hrTypeName === this.listPlatformType[j].typeValue) {
+                                this.chipsUpdatePlatformType[i].hrTypeName = this.listPlatformType[j].name
+                            }
+                        }
+                    }
+                    console.log("chipsUpdatePlatformType",this.chipsUpdatePlatformType)
+                    var chipsfromhardwarelibs = {
+                        id: this.params.id,
+                        chips: JSON.stringify(this.chipsUpdatePlatformType),
+                        projectId: "",
+                        flowId: "",
+                        modelId: ""
+                    };
+                    switch (event.data.cmd) {
+                        case "submitCaseJSON":
+                            this.ifSave = 0;
+                            saveHardwarelibs(this.params).then(response => {
+                                // console.log("response",response)
+                                if (response.data === 1) {
+                                    this.$message({
+                                        showClose: true,
+                                        message: "添加成功",
+                                        type: "success"
+                                    });
+                                    saveChipsFromHardwarelibs(chipsfromhardwarelibs).then(res => {
+                                        // console.log("res", res);
+                                        this.createXml();
+                                    });
+                                }
+                            });
+                            break;
+                    }
+                })*/
             },
             createXml() {
                 var paramsList = [

@@ -114,10 +114,11 @@ integer:
 ctrl:
   tab:
     file:
-      path: D:xxx/xxx/xxx.h
+      path: D:/14S_GJK_GITBAKBAK/头文件.h
 sonar:
   scanner:
-    path: E:/soft/sonar1024/sonar-scanner-2.8/bin
+    path: D:/14S_GJK_GIT/sonarqube-7.7/bin/windows-x86-64
+    url: http://192.168.2.118:9000/
 ftp:
   host: 192.168.2.225
   port: 21

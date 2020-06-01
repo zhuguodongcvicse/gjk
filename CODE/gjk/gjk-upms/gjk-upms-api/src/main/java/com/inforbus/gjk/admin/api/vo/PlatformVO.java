@@ -28,6 +28,10 @@ public class PlatformVO implements Serializable {
 	 */
 	private String name;
 	/**
+	 * 平台类型标识值
+	 */
+	private String typeValue;
+	/**
 	 * 平台库权限标识
 	 */
 	private String permission;

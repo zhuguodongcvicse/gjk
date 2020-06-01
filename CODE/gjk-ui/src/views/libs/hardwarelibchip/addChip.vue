@@ -56,11 +56,12 @@
     //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 
     import {mapGetters} from "vuex";
-    import {fetchPlatformTree} from "@/api/admin/platform";
+    import {remote} from "@/api/admin/dict";//获取字典数据
+    import {getPlatFormTypeList} from "@/api/admin/platform";
 
     export default {
         //import引入的组件需要注入到对象中才能使用
-        props: ["showInf", "allChips"],
+        props: ["showInf", "allChips", "platformTypes"],
         components: {},
         data() {
             //这里存放数据
@@ -119,7 +120,14 @@
         //监听属性 类似于data概念
         computed: {...mapGetters(["permissions", "refreshListFlag", "userInfo"])},
         //监控data中的数据变化
-        watch: {},
+        watch: {
+            platformTypes: {
+                // immediate: true,
+                handler: function (params) {
+                    this.options = this.platformTypes
+                },
+            },
+        },
         //方法集合
         methods: {
             close(formName) {
@@ -128,6 +136,7 @@
                 this.showInf.dialogFormVisible = false;
             },
             submit(formName) {
+                console.log("this.form", this.form)
                 // console.log("allChips", this.allChips)
                 //芯片名称不能重复
                 for (const i in this.allChips) {
@@ -152,26 +161,9 @@
                     }
                 });
             },
-            //获取平台库的数据
-            getPlatformSelectTree() {
-                fetchPlatformTree().then(response => {
-                    //平台库树结构只展示根节点数据
-                    for (let item of response.data.data) {
-                        let index = response.data.data.indexOf(item);
-                        let plaTreeData = {};
-                        plaTreeData.value = item.name;
-                        plaTreeData.label = item.label;
-                        plaTreeData.id = item.id;
-                        plaTreeData.parentId = item.parentId;
-                        this.pTreeData.push(plaTreeData);
-                    }
-                    this.options = this.pTreeData;
-                });
-            }
         },
         //生命周期 - 创建完成（可以访问当前this实例）
         created() {
-            this.getPlatformSelectTree();
         },
         //生命周期 - 挂载完成（可以访问DOM元素）
         mounted() {

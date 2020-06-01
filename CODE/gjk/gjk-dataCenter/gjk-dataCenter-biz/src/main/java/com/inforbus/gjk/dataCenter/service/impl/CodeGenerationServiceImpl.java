@@ -18,6 +18,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -37,6 +38,18 @@ public class CodeGenerationServiceImpl implements CodeGenerationService {
     @Value("${git.local.generateCodePath}")
     private String generateCodePath;
 
+    /**
+     *
+     * 静态检查服务url http://127.0.0.1:9000
+     */
+    @Value("${sonar.scanner.url}")
+    private String sonarUrl;
+
+    /**
+     * 静态代码启动路径
+     */
+    @Value("${sonar.scanner.path}")
+    private String sonarPath;
     /**
      * @Author wang
      * @Description: 集成代码生成功能方法
@@ -97,7 +110,8 @@ public class CodeGenerationServiceImpl implements CodeGenerationService {
         String projectKey = "s" + fileName.hashCode();
         params.put("name", fileName);
         params.put("project", projectKey);
-        String url = "http://127.0.0.1:9000/api/projects/create";
+        String url = sonarUrl +"api/projects/create";
+       // String url = "http://127.0.0.1:9000/api/projects/create";
         HttpResponse httpResponse = HttpClientUtil.toPost(url, params);
         if (httpResponse == null) {
             return new R<>(CommonConstants.FAIL, "sonar工具未启动", null);
@@ -113,8 +127,8 @@ public class CodeGenerationServiceImpl implements CodeGenerationService {
         // 文件所在盘符
         String diskCharacter = filePath.split(":")[0] + ":";
         String execCommand = "cmd.exe /c cd " + filePath + " && " + diskCharacter + " && "
-                + JGitUtil.getSONAR_SCANNER_PATH() + "\\sonar-scanner.bat -D\"sonar.projectKey=" + projectKey
-                + "\" -D\"sonar.sources=.\" -D\"sonar.host.url=http://localhost:9000\"";
+                + sonarPath + "\\sonar-scanner.bat -D\"sonar.projectKey=" + projectKey
+                + "\" -D\"sonar.sources=.\" -D\"sonar.host.url="+sonarUrl+"";
         try {
             Process execResult = Runtime.getRuntime().exec(execCommand);
             // 出现error时 单个线程会阻塞
@@ -130,6 +144,9 @@ public class CodeGenerationServiceImpl implements CodeGenerationService {
         if (file.exists()) {
             file.renameTo(new File(filePath + "/.sonar/" + fileName + "检查报告.pdf"));
         }
-        return new R<>(CommonConstants.SUCCESS, "filePath + \"/.sonar/\" + fileName + \".pdf\"", projectKey);
+        ArrayList<Object> dataList = new ArrayList<>();
+        dataList.add(projectKey);
+        dataList.add(sonarUrl);
+        return new R<>(CommonConstants.SUCCESS, "filePath + \"/.sonar/\" + fileName + \".pdf\"", dataList);
     }
 }

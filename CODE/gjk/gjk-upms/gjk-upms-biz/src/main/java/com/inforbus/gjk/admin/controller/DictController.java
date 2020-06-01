@@ -149,6 +149,16 @@ public class DictController {
 	}
 
 	/**
+	 * 修改平台库目录时同步修改字典表
+	 * @param dictVO
+	 * @return
+	 */
+	@PutMapping("/syncModifyDict")
+	public R syncModifyDict(@RequestBody DictVO dictVO) {
+		return new R<>(sysDictService.syncModifyDict(dictVO));
+	}
+
+	/**
  * 通过字典类型查找字典
  *
  * @param type 类型

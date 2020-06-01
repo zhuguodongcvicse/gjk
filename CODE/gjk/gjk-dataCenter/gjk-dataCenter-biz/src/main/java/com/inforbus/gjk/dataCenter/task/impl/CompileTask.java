@@ -4,7 +4,7 @@ import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
 import com.inforbus.gjk.common.core.util.FileUtil;
-import com.inforbus.gjk.dataCenter.api.constant.PlatformType;
+import com.inforbus.gjk.common.core.constant.PlatformType;
 import com.inforbus.gjk.dataCenter.api.utils.ChannelSftpSingleton;
 import com.inforbus.gjk.dataCenter.api.utils.SftpUtil;
 import com.inforbus.gjk.dataCenter.task.Task;
@@ -43,7 +43,7 @@ public class CompileTask implements Task {
     @Autowired
     private AmqpTemplate rabbitmqTemplate;
 
-    /*vs2010编译器路径*/
+    /*Windows编译器路径*/
     @Setter
     private String vsPath;
 
@@ -110,8 +110,8 @@ public class CompileTask implements Task {
         boolean isFile = false;
         if (file.exists()) {
             File[] childFiles = file.listFiles();
-            if (this.platformType.equals(PlatformType.VS2010)) {
-                //判断是否是VS2010
+            if (this.platformType.equals(PlatformType.WINDOWS)) {
+                //判断是否是Windows
                 for (File childFile : childFiles) {
                     //判断是否是VS平台
                     if (childFile.getName().endsWith(fileEndName)) {
@@ -123,7 +123,7 @@ public class CompileTask implements Task {
                 //判断是否是Sylixos平台
                 isFile = true;
                 return sylixos(file.getAbsolutePath(), this.fileName, this.token);
-            } else if (this.platformType.equals(PlatformType.WORKBENCH)) {
+            } else if (this.platformType.equals(PlatformType.VXWORKS)) {
                 //判断是否是Workbench平台
                 isFile = true;
                 Set<String> set = new HashSet<String>();
@@ -155,7 +155,7 @@ public class CompileTask implements Task {
 
     /**
      * @Author wang
-     * @Description: 编译windows平台vs2010
+     * @Description: 编译windows平台Windows
      * @Param: [slnpath, fileName, token]
      * @Return: boolean
      * @Create: 2020/4/8
@@ -176,12 +176,12 @@ public class CompileTask implements Task {
             successThread.start();//开启编译正常流线程
             return true;
         } catch (Exception e) {
-            logger.error("vs2010平台编译失败，请检查编译进程。" + e.getMessage());
+            logger.error("Windows平台编译失败，请检查编译进程。" + e.getMessage());
         } finally {
             try {
                 p.waitFor();
             } catch (InterruptedException e) {
-                logger.error("vs2010平台编译失败，请检查编译进程。" + e.getMessage());
+                logger.error("Windows平台编译失败，请检查编译进程。" + e.getMessage());
             }
             if (p != null) {
                 p.destroy();

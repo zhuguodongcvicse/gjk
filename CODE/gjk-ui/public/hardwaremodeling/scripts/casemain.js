@@ -21,6 +21,7 @@ var caseID = -1
 var checkIPMap= new Map()
 var clickChipsList = [] //记录点击的芯片次序
 var linkMap = new Map()
+var platformTypeList = []
 
 Q.registerImage('rack', 'images/Crate.svg'); //这里可以修改成：机箱.svg，但是位置大小需要做调整，你可以自己修改
 Q.registerImage('card', 'images/BeforeTheBoard.svg');
@@ -36,7 +37,8 @@ function handleMessageFromParent(event) {
   // console.log("event.data.params", event.data.params)
   switch (event.data.cmd) {
     case 'getCase':
-      caseArr = event.data.params;
+      caseArr = event.data.params[0];
+      // platformTypeList = event.data.params[1]
       for (const i in caseArr) {
         var caseTemp = JSON.parse(caseArr[i].frontCase)
         caseTemp.datas[0].json.properties.bdNum = caseArr[i].bdNum
@@ -44,7 +46,6 @@ function handleMessageFromParent(event) {
       }
       // console.log("caseArr", caseArr)
       allJson = caseArr;
-      //console.log("event.data.params",event.data.params)
       //console.log(caseArr[0].boardJson)
       //主板json
       for (var i = 0; i < caseArr.length; i++) {
@@ -57,8 +58,7 @@ function handleMessageFromParent(event) {
       }
       init();
   }
-};
-
+}
 function RectElement() {
   Q.doSuperConstructor(this, RectElement, arguments);
   this.resizable = false;
@@ -137,11 +137,18 @@ function ondropLoadJSON(evt, graph, center, options) {
   //机箱赋值唯一标识
   frontjson.datas[0].json.properties.uniqueId = uuidRandom
   frontjson.datas[0].json.properties.id = caseID
+  // console.log("frontjson", frontjson)
   //找到机箱中前板卡
   for (const i in frontjson.datas[0].json.properties.frontBoardList) {
     //找到前板卡中的芯片
     if (frontjson.datas[0].json.properties.frontBoardList[i].chipList != null && frontjson.datas[0].json.properties.frontBoardList[i].chipList.length !== 0) {
       for (const j in frontjson.datas[0].json.properties.frontBoardList[i].chipList) {
+        /*for (let k = 0; k < platformTypeList.length; k++) {
+          if (frontjson.datas[0].json.properties.frontBoardList[i].chipList[j].hrTypeName === platformTypeList[k].typeValue) {
+            frontjson.datas[0].json.properties.frontBoardList[i].chipList[j].hrTypeName = platformTypeList[k].name
+            // console.log("frontBoardList[i].chipList[j]",frontjson.datas[0].json.properties.frontBoardList[i].chipList[j])
+          }
+        }*/
         //给芯片赋值唯一标识，拼接上机箱的唯一标识
         frontjson.datas[0].json.properties.frontBoardList[i].chipList[j].uniqueId = uuidRandom + '_' + frontjson.datas[0].json.properties.frontBoardList[i].chipList[j].uniqueId
         if (frontjson.datas[0].json.properties.frontBoardList[i].chipList[j].infOfChipList !== undefined) {
