@@ -322,7 +322,7 @@ export default {
           name: element1.functionName,
           compName: element1.compName
         }
-        this.nameOptions.push({ label : element1.compName , value: element1.compId, data: data})
+        this.nameOptions.push({ label : element1.compName , value: element1.compId, data: data, rightName: element1.compId})
       }
     }
     remote("netWork_protocolName").then(res => {
