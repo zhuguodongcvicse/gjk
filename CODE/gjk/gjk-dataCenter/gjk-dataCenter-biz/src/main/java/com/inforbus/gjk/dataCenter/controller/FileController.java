@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,8 @@ import com.inforbus.gjk.comp.api.dto.ComponentDTO;
 import com.inforbus.gjk.comp.api.entity.Component;
 import com.inforbus.gjk.comp.api.entity.ComponentDetail;
 import com.inforbus.gjk.comp.api.entity.Components;
+import cn.hutool.core.io.FileUtil;
+import com.inforbus.gjk.comp.api.vo.CompFilesVO;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.entity.FileEntity;
@@ -104,28 +107,31 @@ public class FileController {
 	 * @Author cvics
 	 * @DateTime 2020年4月2日
 	 */
-	@PostMapping("downloadLocalFile")
-	public R<List<FileCenter>> downloadFile(@RequestParam("sourcePath") String sourcePath) {
-		R<List<FileCenter>> ret = new R<List<FileCenter>>();
+    @PostMapping("/loopFiles")
+    public R<List<CompFilesVO>> loopFiles(@RequestParam("sourcePath") String sourcePath) {
+        R<List<CompFilesVO>> r = new R<>();
+        List<CompFilesVO> filesVOs = Lists.newArrayList();
+        logger.debug("获取文件列表。。。。");
 		try {
-			List<FileCenter> list = fileService.downloadFile(sourcePath);
-			// 判断list是否为空
-			if (ObjectUtils.isNotEmpty(list)) {
-				ret.setData(list);
-				ret.setMsg("下载文件成功");
-			} else {
-				ret.setCode(1);
-				ret.setData(null);
-				ret.setMsg("下载文件失败");
-			}
+            List<File> loopFiles = FileUtil.loopFiles(sourcePath);
+            for (File file : loopFiles) {
+                CompFilesVO vo = new CompFilesVO();
+                vo.setName(file.getName());
+                vo.setRelativePath(file.getAbsolutePath());
+                System.out.println(String.valueOf(FileUtil.size(file)));
+                vo.setSize(String.valueOf(FileUtil.size(file)));
+                filesVOs.add(vo);
+            };
+            r.setData(filesVOs);
+            r.setMsg("获取文件列表成功");
 		} catch (Exception e) {
-			logger.error("下载文件上传", e);
-			return new R<>(e);
+            logger.error("获取文件列表失败", e);
+            r.setData(filesVOs);
+            r.setMsg("获取文件列表失败");
+            r.setCode(CommonConstants.FAIL);
 		}
-		return ret;
+        return r;
 	}
-
-	;
 
 	/**
 	 * @param sourcePath 文件路径
@@ -491,19 +497,24 @@ public class FileController {
 	public void downloadFile(@RequestParam("filePaths") String[] filePaths, HttpServletResponse response) {
 		logger.debug("多文件下载开始。。。。");
 		InputStream in = null;
+		OutputStream out = null;
 		try {
 			ByteArrayOutputStream zps = UploadFilesUtils.toZip(filePaths);
-			OutputStream out = response.getOutputStream();
+			out = response.getOutputStream();
 			out.write(zps.toByteArray());
+			out.flush();
 		} catch (Exception e) {
 			logger.error("多文件下载异常", e);
 		} finally {
-			if (in != null) {
-				try {
+			try {
+				if (in != null) {
 					in.close();
-				} catch (IOException e) {
-					logger.error("文件流关闭异常", e);
 				}
+				if (out != null) {
+					out.close();
+				}
+			} catch (IOException e) {
+				logger.error("文件流关闭异常", e);
 			}
 			logger.debug("多文件下载结束。。。。");
 		}
@@ -529,8 +540,9 @@ public class FileController {
 		Map<String, String> bean = JSONUtil.toBean(filePaths, Map.class);
 		logger.debug("多文件下载开始。。。。");
 		InputStream in = null;
+		OutputStream out = null;
 		try {
-			//将MultipartFile文件转成File
+			// 将MultipartFile文件转成File
 			File[] files = new File[ufile.length];
 			for (int i = 0; i < ufile.length; i++) {
 				File savedFile = new File("./" + fileTarget[i] + ufile[i].getOriginalFilename());
@@ -539,27 +551,29 @@ public class FileController {
 				files[i] = savedFile;
 			}
 			ByteArrayOutputStream zps = UploadFilesUtils.toZip(files, fileTarget, bean);
-			OutputStream out = response.getOutputStream();
+			out = response.getOutputStream();
 			out.write(zps.toByteArray());
-			//删除临时文件
+			// 删除临时文件
 			for (File file : files) {
 				Files.deleteIfExists(Paths.get(file.getPath()));
 			}
+			out.flush();
 		} catch (Exception e) {
 			logger.error("多文件下载异常", e);
 		} finally {
-			if (in != null) {
-				try {
+			try {
+				if (in != null) {
 					in.close();
-				} catch (IOException e) {
-					logger.error("文件流关闭异常", e);
 				}
+				if (out != null) {
+					out.close();
+				}
+			} catch (IOException e) {
+				logger.error("文件流关闭异常", e);
 			}
 			logger.debug("多文件下载结束。。。。");
 		}
 	}
-
-
 
 	/**
 	 * @Title: uploadDecompression
@@ -576,8 +590,10 @@ public class FileController {
 			@RequestParam("filePath") String localPath) {
 		return fileService.decompression(file, localPath);
 	}
+
 	/**
 	 * 判断文件是否存在
+	 * 
 	 * @param filePath
 	 * @auther sunchao
 	 * @return
@@ -597,7 +613,8 @@ public class FileController {
 
 	@PostMapping("/getAppPath")
 	@ResponseBody
-	public R getAppPath(@RequestParam("filePath") String filePath, @RequestParam("selectFileName") String selectFileName) {
+	public R getAppPath(@RequestParam("filePath") String filePath,
+			@RequestParam("selectFileName") String selectFileName) {
 		R<String> r = new R<>();
 		try {
 			r.setData(fileService.getAppPath(filePath, selectFileName));
@@ -607,11 +624,12 @@ public class FileController {
 		}
 		return r;
 	}
-	
+
 	/**
 	 * 保存流程建模json文件路径
-	 * @param jsonSring  json字符串
-	 * @param filePath   文件路径 
+	 * 
+	 * @param jsonSring json字符串
+	 * @param filePath  文件路径
 	 * @return
 	 */
 	@PostMapping("editProJSON")
@@ -630,14 +648,16 @@ public class FileController {
 		}
 		return ret;
 	}
+
 	/**
 	 * 解析流程建模json
+	 * 
 	 * @param jsonPath
 	 * @return
 	 */
 	@PostMapping("findJson")
 	@ResponseBody
-	public R<String> findJson(@RequestParam("jsonPath") String jsonPath){
+	public R<String> findJson(@RequestParam("jsonPath") String jsonPath) {
 		R<String> ret = new R<String>();
 		try {
 			String str = fileService.findJson(jsonPath);
@@ -661,14 +681,14 @@ public class FileController {
 	 */
 	@PostMapping("/isFile")
 	@ResponseBody
-	public R<Boolean> isFile(@RequestParam("filePath") String filePath){
+	public R<Boolean> isFile(@RequestParam("filePath") String filePath) {
 		R<Boolean> ret = new R<>();
 		try {
 			boolean b = fileService.isFile(filePath);
-			if (b){
+			if (b) {
 				ret.setData(b);
 				ret.setMsg("是文件夹");
-			}else {
+			} else {
 				ret.setData(b);
 				ret.setMsg("不是文件夹");
 			}
@@ -683,14 +703,15 @@ public class FileController {
 
 	/**
 	 * 解析流程建模所需所有xml
+	 * 
 	 * @param filePathMap
 	 * @return
 	 */
 	@PostMapping(value = "/getCompData")
-	public R<Map<String,XmlEntityMap>> getCompData (@RequestBody Map<String,String> filePathMap){
-		R<Map<String,XmlEntityMap>> ret = new R<>();
+	public R<Map<String, XmlEntityMap>> getCompData(@RequestBody Map<String, String> filePathMap) {
+		R<Map<String, XmlEntityMap>> ret = new R<>();
 		try {
-			Map<String,XmlEntityMap> xmlEntityMapMap = fileService.getCompData(filePathMap);
+			Map<String, XmlEntityMap> xmlEntityMapMap = fileService.getCompData(filePathMap);
 			ret.setData(xmlEntityMapMap);
 			ret.setMsg("json文件解析成功");
 		} catch (Exception e) {
@@ -703,7 +724,7 @@ public class FileController {
 	}
 
 	@PostMapping(value = "/getCompDetailData")
-	public R<List<ComponentDTO>> fileService(@RequestBody List<Components> componentsList){
+	public R<List<ComponentDTO>> fileService(@RequestBody List<Components> componentsList) {
 		R<List<ComponentDTO>> ret = new R<>();
 		try {
 			List<ComponentDTO> cpd = fileService.fileService(componentsList);
@@ -726,9 +747,10 @@ public class FileController {
 	 * @Create: 2020/5/31
 	 */
 	@PostMapping("/getImgFile")
-	public void getImgFile(@RequestParam("path") String path,HttpServletResponse response){
+	public void getImgFile(@RequestParam("path") String path, HttpServletResponse response) {
+		OutputStream out = null;
 		try {
-			OutputStream out = response.getOutputStream();
+			out = response.getOutputStream();
 			byte[] bytes = FileUtil.readBytes(path);
 			out.write(bytes);
 			out.flush();
@@ -736,6 +758,14 @@ public class FileController {
 			logger.error(path + "文件不存在");
 		} catch (IOException e) {
 			logger.error(path + "文件不存在");
+		} finally {
+			try {
+				if (null != out) {
+					out.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

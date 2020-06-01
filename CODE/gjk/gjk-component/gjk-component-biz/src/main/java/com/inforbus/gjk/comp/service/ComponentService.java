@@ -32,7 +32,8 @@
  */
 package com.inforbus.gjk.comp.service;
 
-import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -43,15 +44,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.comp.api.dto.CompTree;
 import com.inforbus.gjk.comp.api.entity.Component;
 import com.inforbus.gjk.comp.api.entity.ComponentDetail;
 import com.inforbus.gjk.comp.api.vo.CompDetailVO;
 import com.inforbus.gjk.comp.api.vo.CompDictVO;
-import com.inforbus.gjk.comp.api.vo.CompVO;
-import com.inforbus.gjk.comp.api.vo.ComponentVO;
 
 /**
  * 构件
@@ -156,7 +154,7 @@ public interface ComponentService extends IService<Component> {
 	 * @param imgId 图片Id
 	 * @return FileInputStream文件流
 	 */
-	FileInputStream getImgFile(String imgId, StringBuilder fileName);
+	InputStream getImgFile(String imgId, StringBuilder fileName) throws IOException;
 
 	/**
 	 * 获取构件ID和构件名称对应的字典

@@ -3,10 +3,6 @@ package com.inforbus.gjk.comp.api.feign;
 import java.util.List;
 import java.util.Map;
 
-import com.inforbus.gjk.comp.api.dto.ComponentDTO;
-import com.inforbus.gjk.comp.api.entity.Component;
-import com.inforbus.gjk.comp.api.entity.ComponentDetail;
-import com.inforbus.gjk.comp.api.entity.Components;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
@@ -16,7 +12,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -28,7 +23,10 @@ import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.vo.HeaderFileTransVO;
 import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
+import com.inforbus.gjk.comp.api.dto.ComponentDTO;
+import com.inforbus.gjk.comp.api.entity.Components;
 import com.inforbus.gjk.comp.api.feign.factory.RemoteDataCenterServiceFallbackFactory;
+import com.inforbus.gjk.comp.api.vo.CompFilesVO;
 
 import feign.Response;
 import feign.codec.Encoder;
@@ -156,6 +154,8 @@ public interface RemoteDataCenterService {
 	 */
 	@PostMapping(serviceName + "/delFolder")
 	public R<Boolean> delFolder(@RequestParam("folderPath") String[] folderPath);
+	@PostMapping(serviceName + "/delFile")
+	public R<Boolean> delAllFile(@RequestParam("absolutePath") String absolutePath);
 
 	/**
 	 * @Title: getHeader
@@ -201,17 +201,47 @@ public interface RemoteDataCenterService {
 
 	/**
 	 * 解析流程建模所有构件xml
+	 * 
 	 * @param filePathMap
 	 * @return
 	 */
-	@PostMapping(value = serviceName +"/getCompData")
-	public R<Map<String, XmlEntityMap>> getCompData (@RequestBody Map<String,String> filePathMap);
+	@PostMapping(value = serviceName + "/getCompData")
+	public R<Map<String, XmlEntityMap>> getCompData(@RequestBody Map<String, String> filePathMap);
 
 	/**
-	 *获取流程建模所有构件明细
+	 * 获取流程建模所有构件明细
 	 */
 	@PostMapping(value = serviceName + "/getCompDetailData")
 	public R<List<ComponentDTO>> getCompDetailData(@RequestBody List<Components> componentsList);
 
+	/**
+	 * 递归遍历目录以及子目录中的所有文件
+	 * 
+	 * @param path 当前遍历文件或目录的路径
+	 * @return 文件列表
+	 */
+	@PostMapping(value = serviceName + "/loopFiles", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public R<List<CompFilesVO>> loopFiles(@RequestParam("sourcePath") String filePath);
+	
+	
+	/**
+	 * @Title: downloadStreamFile
+	 * @Desc 下载单文件流（feign）
+	 * @Author cvics
+	 * @DateTime 2020年5月31日
+	 * @param path
+	 * @param response HttpServletResponse
+	 * @return Response 其中包含 文件流
+	 * 
+	 *         <pre>
+	 *         Response.Body body = response.body();
+	 *         InputStream inputStream = body.asInputStream();
+	 * 
+	 *         </pre>
+	 */
+	@PostMapping(value = serviceName + "/getImgFile")
+	public Response getImgFile(@RequestParam("path") String path);
+	@PostMapping( serviceName +"/copylocalFile")
+	public R<Boolean> copylocalFile(@RequestParam("source") String source, @RequestParam("destin") String destin);
 
 }

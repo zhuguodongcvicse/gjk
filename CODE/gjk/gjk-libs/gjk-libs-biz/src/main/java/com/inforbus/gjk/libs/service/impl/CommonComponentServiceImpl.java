@@ -17,9 +17,6 @@
 package com.inforbus.gjk.libs.service.impl;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -80,8 +77,12 @@ import com.inforbus.gjk.libs.mapper.StructlibsMapper;
 import com.inforbus.gjk.libs.service.BatchApprovalService;
 import com.inforbus.gjk.libs.service.CommonComponentService;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import cn.hutool.poi.excel.BigExcelWriter;
+import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.ExcelWriter;
 import feign.Response;
 
 /**
@@ -206,6 +207,7 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		InputStream inputStream = null;
 		Map<String, String> filePaths = Maps.newHashMap();
 		// 将目标文件打包成zip导出
+//		MultipartFile[] mfs = new MultipartFile[compList.size()];
 		for (CommonComponent comp : compList) {
 			String compFilePath = null;
 			for (CommonComponentDetail detail : details) {
@@ -222,7 +224,7 @@ public class CommonComponentServiceImpl extends ServiceImpl<CommonComponentMappe
 		}
 		try {
 			MultipartFile mf = this.createExcelFileToZipIO(compList, details);
-			// feign文件下载
+//			 feign文件下载
 			JSONObject json = JSONUtil.parseFromMap(filePaths);
 			Response response = rsService.downloadStreamFiles(new MultipartFile[] { mf },
 					new String[] { ComponentConstant.COMP + File.separator }, json.toJSONString(0));

@@ -17,10 +17,8 @@
 package com.inforbus.gjk.comp.service.impl;
 
 import java.beans.PropertyDescriptor;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,9 +41,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
-import com.inforbus.gjk.comp.api.entity.Components;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.apache.poi.ss.formula.functions.T;
@@ -89,9 +85,9 @@ import com.inforbus.gjk.comp.api.dto.ComponentOutput;
 import com.inforbus.gjk.comp.api.entity.CompImg;
 import com.inforbus.gjk.comp.api.entity.Component;
 import com.inforbus.gjk.comp.api.entity.ComponentDetail;
+import com.inforbus.gjk.comp.api.entity.Components;
 import com.inforbus.gjk.comp.api.feign.RemoteDataCenterService;
 import com.inforbus.gjk.comp.api.util.CompTreeUtil;
-import com.inforbus.gjk.comp.api.util.XmlAnalysisUtil;
 import com.inforbus.gjk.comp.api.vo.CompDetailVO;
 import com.inforbus.gjk.comp.api.vo.CompDictVO;
 import com.inforbus.gjk.comp.api.vo.CompFilesVO;
@@ -105,6 +101,7 @@ import com.inforbus.gjk.comp.service.ComponentService;
 import com.inforbus.gjk.comp.service.SysUserService;
 import com.inforbus.gjk.libs.api.entity.CommonComponent;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -168,19 +165,24 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 					+ comp.getCreateTime().toString().replaceAll("[[\\s-T:punct:]]", "") + File.separator;
 
 			// 删除构件
-			this.removeById(compId);
+//			this.removeById(compId);
 			// 删除构件详细信息
 			for (ComponentDetail detail : details) {
 				// 当文件详细信息是图片时删除图片
 				if ("img".equals(detail.getFileType())) {
 					compImgMapper.delete(Wrappers.<CompImg>query().lambda().eq(CompImg::getCompDetid, detail.getId()));
 				}
-				componentDetailService.removeById(detail.getId());
+//				componentDetailService.removeById(detail.getId());
 			}
 			// 删除构件相关文件
-//			cn.hutool.core.io.FileUtil.del(filePath);
-			UploadFilesUtils.delFolder(filePath);
-			return true;
+			R<Boolean> del = rdcService.delFolder(new String[] { filePath });
+			if (del.getCode() == CommonConstants.SUCCESS) {
+				return true;
+			} else {
+				return false;
+			}
+//			UploadFilesUtils.delFolder();
+
 		} catch (Exception e) {
 			logger.error("删除构件 ", e);
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly(); // 手动开启事务回滚
@@ -309,10 +311,10 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	 */
 	@Override
 	public Map<String, Object> getCompAndDetailMap(String proId) {
-		Map<String,String> filePathMap = new HashMap<String,String>();
+		Map<String, String> filePathMap = new HashMap<String, String>();
 		List<Component> comps = baseMapper.selectByComms(proId);
 		List<Components> componentsList = new ArrayList<Components>();
-		for(Component comp : comps){
+		for (Component comp : comps) {
 			ComponentDetail vo = compDetailMapper.getCommCompXMl(comp.getId());
 			Components components = new Components();
 			components.setComponent(comp);
@@ -324,7 +326,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 						&& fileName.toUpperCase().endsWith(ComponentConstant.COMP_XML)) {
 					String filePath = this.compDetailPath + File.separator + vo.getFilePath() + File.separator
 							+ fileName;
-					filePathMap.put(vo.getCompId(),filePath);
+					filePathMap.put(vo.getCompId(), filePath);
 				}
 			}
 		}
@@ -376,26 +378,29 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 		Map<String, String> compIdMap = new HashMap<String, String>();
 		// 构件id、版本map
 		Map<String, String> versionMap = new HashMap<String, String>();
-		for (ComponentDTO dto : dtos) {
-			compIdList.add(dto.getCompId());
-			compIdMap.put(dto.getId(), dto.getCompId());
-			versionMap.put(dto.getId(), dto.getVersion());
-			for (int i = 0; i < dto.getInputList().size(); i++) {
-				ComponentInput input = dto.getInputList().get(i);
-				if (!input.getCategoryName().toUpperCase().equals("DATA")) {
-					dto.getInputList().remove(i);
-					i--;
+		if(dtos != null && dtos.size()>0) {
+			for (ComponentDTO dto : dtos) {
+				compIdList.add(dto.getCompId());
+				compIdMap.put(dto.getId(), dto.getCompId());
+				versionMap.put(dto.getId(), dto.getVersion());
+				for (int i = 0; i < dto.getInputList().size(); i++) {
+					ComponentInput input = dto.getInputList().get(i);
+					if (!input.getCategoryName().toUpperCase().equals("DATA")) {
+						dto.getInputList().remove(i);
+						i--;
+					}
 				}
-			}
-			for (int i = 0; i < dto.getOutputList().size(); i++) {
-				ComponentOutput output = dto.getOutputList().get(i);
-				if (!output.getCategoryName().toUpperCase().equals("DATA")) {
-					dto.getOutputList().remove(i);
-					i--;
+				for (int i = 0; i < dto.getOutputList().size(); i++) {
+					ComponentOutput output = dto.getOutputList().get(i);
+					if (!output.getCategoryName().toUpperCase().equals("DATA")) {
+						dto.getOutputList().remove(i);
+						i--;
+					}
 				}
+				System.out.println("dto.getInputList()=>" + dto.getInputList());
 			}
-			System.out.println("dto.getInputList()=>" + dto.getInputList());
 		}
+	
 		maps.put("dtos", dtos);
 //		maps.put("xmls", xmlMap);
 		maps.put("xmlMaps", xmlEntityMap);
@@ -509,16 +514,18 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			if (ComponentConstant.COMP_ALGORITHM.equals(parent.getFileType())
 					|| ComponentConstant.COMP_TEST.equals(parent.getFileType())
 					|| ComponentConstant.COMP_PLATFORM.equals(parent.getFileType())) {
-				File file = new File(
-						this.compDetailPath + parent.getFilePath() + File.separator + parent.getFileName());
-				if (file.isDirectory()) {
-					File[] childFileList = file.listFiles();
-					for (File childFile : childFileList) {
-						addCompDetailFiles(filesVOs, childFile);
-					}
+				String filePath = this.compDetailPath + parent.getFilePath() + File.separator + parent.getFileName();
+				R<List<CompFilesVO>> loopFiles = rdcService.loopFiles(filePath);
+				if (loopFiles.getCode() == CommonConstants.SUCCESS) {
+					filesVOs = loopFiles.getData();
+				} else {
+					logger.error("文件列表获取失败。。。");
 				}
-				if (parent.getLibsId() != null)
-					map.put("filePath", baseMapper.findLibs(parent.getLibsId(), parent.getFileType()));
+				if (parent.getLibsId() != null) {
+					Map<String, String> findLibs = baseMapper.findLibs(parent.getLibsId(), parent.getFileType());
+					map.put("filePath", findLibs);
+				}
+
 			} else {
 				for (ComponentDetail children : vos) {
 					// 存文件列表
@@ -532,7 +539,6 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 							vo.setCompImg(img);
 							filesVOs.add(vo);
 						}
-
 					}
 				}
 			}
@@ -540,13 +546,13 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 				// 文件列表
 				map.put("filevo", filesVOs);
 				// 文件类型
+				System.out.println(parent.getFileType() + "  " + JSONUtil.toJsonStr(map));
 				fileMap.put(parent.getFileType(), map);
 			}
 			// 解析文件
 			if (parent.getParaentId().equals(compId)) {
 				String path = parent.getFileName();
 				String filePath = "";
-//				File file = null;
 				if (path.startsWith(ComponentConstant.COMP)
 						&& path.toUpperCase().endsWith(ComponentConstant.COMP_XML)) {
 					filePath = this.compDetailPath + File.separator + parent.getFilePath() + File.separator + path;
@@ -558,9 +564,6 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 						fileMap.put("compBasicMap", "");
 					}
 					ret.setMsg(rdc.getMsg());
-//					file = new File(this.compDetailPath + File.separator + parent.getFilePath() + "/" + path);
-//					fileMap.put("compBasic", XmlFileHandleUtil.analysisXmlFile(file));
-//					fileMap.put("compBasicMap", XmlFileHandleUtil.analysisXmlFileToXMLEntityMap(file));
 				}
 			}
 		}
@@ -569,7 +572,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 	}
 
 	@Override
-	public FileInputStream getImgFile(String imgId, StringBuilder sBName) {
+	public InputStream getImgFile(String imgId, StringBuilder sBName) throws IOException {
 		ComponentDetail detail = null;
 		if (imgId.equals("1")) {
 			detail = compDetailMapper.selectById(imgId);
@@ -577,17 +580,15 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			detail = baseMapper.getImgFile(imgId);
 		}
 		String basePath = this.compDetailPath;
-		FileInputStream fis = null;
-		try {
-			String fileName = detail.getFileName();
-			sBName.delete(0, sBName.length());
-			sBName.append(fileName);
-			String filePath = detail.getFilePath();
-			fis = new FileInputStream(basePath + filePath + File.separator + fileName);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		return fis;
+		String fileName = detail.getFileName();
+		sBName.delete(0, sBName.length());
+		sBName.append(fileName);
+		String filePath = detail.getFilePath();
+		// 获取图片字节流
+		Response response = rdcService.getImgFile(basePath + filePath + File.separator + fileName);
+		Response.Body body = response.body();
+
+		return body.asInputStream();
 	}
 
 	public List<CompDictVO> getCompDictList() {

@@ -2,10 +2,10 @@
 <template>
   <!-- <monaco-editor :textContext="textContext"></monaco-editor> -->
   <div style="margin-top:10px">
-    <el-form >
+    <el-form>
       <el-form-item>
         <div style="margin:20px 0px 0px 20px">
-          <div >
+          <div>
             <el-form :model="editorForm" inline="inline">
               <el-form-item>
                 <el-button
@@ -32,7 +32,16 @@
           </div>
           <div class="code-editor-container" style="margin-top:20px">
             <!-- 程序文本编辑器 -->
-            <monaco-editor class="editor" v-model="textContext" language="c"></monaco-editor>
+            <monaco-editor
+              class="editor"
+              v-model="textContext"
+              language="c"
+              v-if="defineOrEditor==='editor'"
+            ></monaco-editor>
+            <div class="block" v-if="defineOrEditor==='image'">
+              <div v-html="src">{{src}}</div>
+              <!-- <el-image :src="src"></el-image> -->
+            </div>
           </div>
         </div>
       </el-form-item>
@@ -46,6 +55,7 @@
 import { mapGetters } from "vuex";
 import { userInfo } from "os";
 import { readAlgorithmfile } from "@/api/libs/threelibs";
+import { getObj } from "@/api/comp/component";
 // import MonacoEditor from "@/page/common/codeEditor";
 import MonacoEditor from "vue-monaco";
 import { saveFileContext } from "@/api/libs/threelibs";
@@ -58,9 +68,11 @@ export default {
   data() {
     //这里存放数据
     return {
+      defineOrEditor: "define",
       editorForm: {
         editorData: ""
       },
+      src: "",
       textContext: "",
       threeLibsFilePathDTO: {},
       fileName: ""
@@ -75,16 +87,30 @@ export default {
     $route: {
       immediate: true,
       handler: function() {
-        //为最新内容时下拉选为空
-        this.editorForm.editorData ="";
-        this.fileName = this.$route.query.compFileName;
-        this.threeLibsFilePathDTO.filePathName = this.$route.query.compFilePath;
-        readAlgorithmfile(this.threeLibsFilePathDTO).then(response => {
-          this.textContext = response.data.data.textContext.split(
-            "@%#@*+-+@"
-          )[1];
-          // this.editorCode = response.data.data.textContext.split("@%#@*+-+@")[2];
-        });
+        console.log("this.$route.query", this.$route.query);
+        let compFileName = this.$route.query.compFileName.toLowerCase();
+        if (
+          compFileName.endsWith("jpeg") ||
+          compFileName.endsWith("png") ||
+          compFileName.endsWith("jpg")
+        ) {
+          this.defineOrEditor = "image";
+          getObj(this.$route.query.compId).then(res => {
+            this.src = res.data.data.compImg;
+          });
+        } else {
+          this.defineOrEditor = "editor";
+          //为最新内容时下拉选为空
+          this.editorForm.editorData = "";
+          this.fileName = this.$route.query.compFileName;
+          this.threeLibsFilePathDTO.filePathName = this.$route.query.compFilePath;
+          readAlgorithmfile(this.threeLibsFilePathDTO).then(response => {
+            this.textContext = response.data.data.textContext.split(
+              "@%#@*+-+@"
+            )[1];
+            // this.editorCode = response.data.data.textContext.split("@%#@*+-+@")[2];
+          });
+        }
       },
       deep: true
     }
@@ -101,7 +127,7 @@ export default {
       console.log(this.threeLibsFilePathDTO);
       readAlgorithmfile(this.threeLibsFilePathDTO).then(response => {
         //文件内容
-          this.textContext = response.data.data.textContext.split("@%#@*+-+@")[1];
+        this.textContext = response.data.data.textContext.split("@%#@*+-+@")[1];
       });
     },
     save() {

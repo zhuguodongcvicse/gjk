@@ -67,6 +67,7 @@ import com.inforbus.gjk.comp.api.feign.RemoteDataCenterService;
 import com.inforbus.gjk.comp.api.util.CompTreeUtil;
 import com.inforbus.gjk.comp.service.ComponentService;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
@@ -232,17 +233,10 @@ public class ComponentController {
 	 */
 	@GetMapping("/comImg/{imgId}")
 	public void getImgFile(@PathVariable String imgId, HttpServletRequest req, HttpServletResponse res) {
-//		FileInputStream fis = null;
 		OutputStream os = null;
-//		URL url = null;
-//		HttpURLConnection httpUrl = null;
-//		String imgId=(String) req.getAttribute("imgId");
-		FileInputStream fis = componentService.getImgFile(imgId, new StringBuilder());
+		InputStream fis = null;
 		try {
-			// url = new URL("");
-			// httpUrl =(HttpURLConnection) url.openConnection();
-			// fis= (FileInputStream) httpUrl.getInputStream();
-//			fis = new FileInputStream("D:/14S_GJK_GIT/gjk/gjk/image/111.png");
+			fis = componentService.getImgFile(imgId, new StringBuilder());
 			os = res.getOutputStream();
 			int count = 0;
 			byte[] buffer = new byte[1024 * 8];
@@ -260,7 +254,6 @@ public class ComponentController {
 				if (null != os) {
 					os.close();
 				}
-//				httpUrl.disconnect();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -437,10 +430,10 @@ public class ComponentController {
 			Map<String, String> filePaths = Maps.newHashMap();
 			filePaths.put("D:\\14S_GJK_GIT\\gjk\\gjk\\common\\component\\xiaohe99\\1.0", "component/xiaohe99/");
 			filePaths.put("D:\\14S_GJK_GIT\\gjk\\gjk\\common\\component\\xiaohe99\\2.0", "component/xiaohe99/");
-			
+
 			//
 			JSONObject json = JSONUtil.parseFromMap(filePaths);
-			Response response = rdcService.downloadStreamFiles(file,"component\\", json.toJSONString(0));
+			Response response = rdcService.downloadStreamFiles(file, "component\\", json.toJSONString(0));
 			Response.Body body = response.body();
 			inputStream = body.asInputStream();
 			BufferedInputStream in = null;

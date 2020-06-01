@@ -109,7 +109,13 @@ export default {
   created() {
     let _this = this;
     this.$nextTick(vm => {
-      let nodeData = ["platformfile","component","imgfile","testfile","algorithmfile"];
+      let nodeData = [
+        "platformfile",
+        "component",
+        "imgfile",
+        "testfile",
+        "algorithmfile"
+      ];
 
       let splitDivWidth = _this.$refs.splitDiv.offsetWidth;
       let compType = _this.$route.query.type;
@@ -215,10 +221,15 @@ export default {
       });
     },
     handleNodeClick(data) {
+      //当前节点为"平台文件", "测试文件", "算法文件", "图标文件"以及构件时不让拖拽
+      if (this.nodeData.includes(data.type)) {
+        return false;
+      }
       console.log("PPPPPPP:", data);
       var reg = new RegExp("\\\\", "g");
-      var a = data.filePath.replace(reg, "#$#");
-      var b = a.split("#$#");
+      var a = data.filePath.replace(reg, "/");
+      console.log("PPPPPPP", a);
+      var b = a.split("/");
       console.log("aaaaaq:", b[5] + "_" + b[7] + "_" + b[8] + "_" + data.label);
       this.currNode = data;
       let parentType = data.parentType;
@@ -246,7 +257,7 @@ export default {
             query: {
               compId: this.$route.query.compId,
               fileType: "comp",
-              compFilePath: data.filePath + "\\" + data.label,
+              compFilePath: data.filePath + "/" + data.label,
               compFileName: data.label,
               proFloName: b[5] + "_" + b[7] + "_" + data.label
             }

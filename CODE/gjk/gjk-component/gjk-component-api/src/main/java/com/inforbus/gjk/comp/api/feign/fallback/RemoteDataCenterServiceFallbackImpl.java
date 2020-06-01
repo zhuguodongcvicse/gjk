@@ -19,9 +19,6 @@ package com.inforbus.gjk.comp.api.feign.fallback;
 import java.util.List;
 import java.util.Map;
 
-import com.inforbus.gjk.comp.api.dto.ComponentDTO;
-import com.inforbus.gjk.comp.api.entity.ComponentDetail;
-import com.inforbus.gjk.comp.api.entity.Components;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,7 +26,10 @@ import com.inforbus.gjk.common.core.entity.XmlEntityMap;
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.vo.HeaderFileTransVO;
 import com.inforbus.gjk.common.core.util.vo.XMlEntityMapVO;
+import com.inforbus.gjk.comp.api.dto.ComponentDTO;
+import com.inforbus.gjk.comp.api.entity.Components;
 import com.inforbus.gjk.comp.api.feign.RemoteDataCenterService;
+import com.inforbus.gjk.comp.api.vo.CompFilesVO;
 
 import feign.Response;
 import lombok.Setter;
@@ -201,7 +201,7 @@ public class RemoteDataCenterServiceFallbackImpl implements RemoteDataCenterServ
 		R ret = new R();
 		ret.setException(cause);
 		ret.setMsg("数据中心服务异常");
-		log.error("数据中心服务异常---xml解析失败",cause);
+		log.error("数据中心服务异常---xml解析失败", cause);
 		return ret;
 	}
 
@@ -210,8 +210,46 @@ public class RemoteDataCenterServiceFallbackImpl implements RemoteDataCenterServ
 		R ret = new R();
 		ret.setException(cause);
 		ret.setMsg("数据中心服务异常");
-		log.error("数据中心服务异常---获取构件明细失败",cause);
+		log.error("数据中心服务异常---获取构件明细失败", cause);
 		return ret;
+	}
+
+	/**
+	 * 递归遍历目录以及子目录中的所有文件
+	 * 
+	 * @param path 当前遍历文件或目录的路径
+	 * @return 文件列表
+	 * @return
+	 * @see com.inforbus.gjk.comp.api.feign.RemoteDataCenterService#loopFiles(java.lang.String)
+	 */
+	@Override
+	public R<List<CompFilesVO>> loopFiles(String filePath) {
+		R ret = new R();
+		ret.setException(cause);
+		ret.setMsg("数据中心服务异常");
+		log.error("数据中心服务异常---获取构件明细失败", cause);
+		return ret;
+	}
+
+	@Override
+	public Response getImgFile(String path) {
+		
+		return null;
+	}
+
+	@Override
+	public R<Boolean> delAllFile(String absolutePath) {
+		R ret = new R();
+		ret.setException(cause);
+		ret.setMsg("数据中心服务异常-删除文件失败");
+		log.error("数据中心服务异常---获取构件明细失败", cause);
+		return ret;
+	}
+
+	@Override
+	public R<Boolean> copylocalFile(String source, String destin) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

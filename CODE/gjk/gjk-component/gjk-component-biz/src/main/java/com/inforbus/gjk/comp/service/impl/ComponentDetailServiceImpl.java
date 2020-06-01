@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -73,6 +72,7 @@ import com.inforbus.gjk.comp.mapper.ComponentMapper;
 import com.inforbus.gjk.comp.service.ComponentDetailService;
 import com.inforbus.gjk.comp.service.ComponentService;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 
@@ -293,51 +293,31 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		// map转成CompImg
 		CompImg img = new JSONObject(map.get("compImg")).toBean(CompImg.class);
 		// 设置默认图片名称 格式为 '构件名称.png'
-		originalFilename = StringUtils.isEmpty(img.getImgShowName()) ? "" : img.getImgShowName() + ".png";
+//		originalFilename = StringUtils.isEmpty(img.getImgShowName()) ? "" : img.getImgShowName() + ".png";
 		// 远程路径
 		String gitRelativePath = compUserFilePath + File.separator + userName + File.separator + comp.getCompId()
 				+ File.separator + createTime.replaceAll("[[\\s-T:punct:]]", "") + File.separator + "图标文件";
+		// 2020年5月6日14:32:27 更改保存 构件图标的上传文件方法 xiaohe
 		// 选择文件后进入的判断
+		String filePath = this.compDetailPath + File.separator + gitRelativePath + File.separator + originalFilename;
 		if (ObjectUtils.isNotEmpty(file)) {
 			try {
-				// 2020年5月6日14:32:27 更改保存 构件图标的上传文件方法 xiaohe
-				String filePath = this.compDetailPath + File.separator + gitRelativePath + File.separator
-						+ originalFilename;
 				rdcService.uploadLocalFile(file, filePath);
-				String base64 = UploadFilesUtils.fileToEncodeBase64(new File(filePath));
-//				File uploadFile = UploadFilesUtils.createFile(
-//						this.compDetailPath + File.separator + gitRelativePath + File.separator + originalFilename);
-//				// 将上传文件保存到路径
-//				if (uploadFile.exists()) {
-//					try {
-//						uploadFile.delete();
-//					} catch (Exception e) {
-//						e.printStackTrace();
-//					}
-//				}
-//				// 上传图标文件
-//				file.transferTo(uploadFile);
-//				String base64 = UploadFilesUtils.fileToEncodeBase64(uploadFile);
+				String base64 = UploadFilesUtils.getBase64ByInputStream(file.getInputStream());
 				img.setImgPath("data:image/png;base64," + base64);
 				img.setImgHtml(elReplace(img.getImgHtml(), "'/comp/component/comImg/(.*?)'",
 						"data:image/png;base64," + base64));
-				// 上传图标文件到 GIT
-				JGitUtil.commitAndPush(gitRelativePath + File.separator + originalFilename, "上传构件xml文件");
 			} catch (Exception e) {
 				e.printStackTrace();
+				logger.error("文件转换异常");
 			}
 		} else {
 			// 没有选择文件进入的判断
 			StringBuilder strb = new StringBuilder();
+			// 获取构件编号
 			String imgId = elReplace(img.getImgPath(), "/comp/component/comImg/", "");
-			File uploadFile = new File(
-					this.compDetailPath + File.separator + gitRelativePath + File.separator + originalFilename);
-			OutputStream os = null;
+
 			try {
-				if (!uploadFile.exists()) {
-					uploadFile = UploadFilesUtils.createFile(
-							this.compDetailPath + File.separator + gitRelativePath + File.separator + originalFilename);
-				}
 				if (imgId.equals("1")) {
 					// 得到默认图标的文件
 					InputStream fis = componentService.getImgFile(imgId, strb);
@@ -347,22 +327,18 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 					img.setImgHtml(elReplace(img.getImgHtml(), "'/comp/component/comImg/(.*?)'",
 							"data:image/png;base64," + base64));
 				} else {
-					UploadFilesUtils.base64ToFile(uploadFile, elReplace(imgId, "data:image/(.*?);base64,", ""));
+					System.out.println("data:image/png;base64,");
+//					FileItem fileItem = UploadFilesUtils.createFileItem(filePath, chipsFile.getName());
+//					MultipartFile multipartFile = new CommonsMultipartFile(fileItem);
+//					UploadFilesUtils.base64ToFile(uploadFile, elReplace(imgId, "data:image/(.*?);base64,", ""));
+//					rdcService.uploadLocalFile(file, filePath);
 				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
-				if (ObjectUtils.isNotEmpty(os)) {
-					try {
-						os.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
 			}
-
 		}
 		// 保存目录数据
 		ComponentDetail detdirs = new ComponentDetail();
@@ -507,6 +483,17 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	 * @see com.inforbus.gjk.comp.service.ComponentDetailService#saveCompfiles(java.util.Map,
 	 *      java.util.List)
 	 */
+	/**
+	 * @Title: saveCompfiles
+	 * @Desc
+	 * @Author cvics
+	 * @DateTime 2020年6月1日
+	 * @param maps
+	 * @param paths
+	 * @return
+	 * @see com.inforbus.gjk.comp.service.ComponentDetailService#saveCompfiles(java.util.Map,
+	 *      java.util.List)
+	 */
 	@Override
 	public String saveCompfiles(Map<String, String> maps, List<CompFilesVO> paths) {
 		// 用于保存文件夹时产生的中间文件夹的名字（保存中间文件夹不重复）
@@ -527,7 +514,8 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		ComponentDetail detdirs = baseMapper.selectOne(Wrappers.<ComponentDetail>query().lambda()
 				.eq(ComponentDetail::getCompId, maps.get("compValue").toString())
 				.eq(ComponentDetail::getFileName, fileType));
-		List<File> files = Lists.newArrayList();
+		//
+		List<CompFilesVO> files = Lists.newArrayList();
 		Boolean isUpdate = false;
 		String oldPath = "";
 		String libsId = StringUtils.isEmpty(maps.get("libsID").toString()) ? "-1" : maps.get("libsID").toString();
@@ -540,12 +528,11 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 			isUpdate = true;
 			detdirs.setLibsId(libsId);
 			oldPath = detdirs.getFilePath() + detdirs.getFileName();
-			File file = new File(this.compDetailPath + oldPath);
-			if (!file.exists()) {
-				file.mkdirs();
+
+			R<List<CompFilesVO>> loopFiles = rdcService.loopFiles(this.compDetailPath + oldPath);
+			if (loopFiles.getCode() == CommonConstants.SUCCESS) {
+				files = loopFiles.getData();
 			}
-			// 得到所有文件
-			showDirectory(file, files);
 			detdirs.setFilePath(newPath);
 		}
 		String detfilesPath = newPath + fileType;
@@ -576,38 +563,34 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 	 * @param detfilesPath 新的文件路径
 	 * @throws IOException
 	 */
-	private void isUpdateFiles(List<CompFilesVO> paths, List<File> files, Boolean isUpdate, String oldPath,
+	private void isUpdateFiles(List<CompFilesVO> paths, List<CompFilesVO> files, Boolean isUpdate, String oldPath,
 			String detfilesPath) throws IOException {
 		logger.debug("开始处理文件列表。。。。。");
+		// 要上传的文件列表
 		for (int i = 0; i < paths.size(); i++) {
 			// 这里是要保存的文件数据
 			CompFilesVO vo = JSONUtil.parseObj(paths.get(i)).toBean(CompFilesVO.class);
-			// 将临时文件考到对应目录下
-			File uploadFile = new File(vo.getRelativePath());//
 			String fileDirPath = vo.getName().replace("/", File.separator);
 			if (fileDirPath.contains(File.separator)) {
 				fileDirPath = fileDirPath.substring(0, fileDirPath.lastIndexOf(File.separator));
 			} else {
 				fileDirPath = "";
 			}
+			//
 			String tmpPath = "";
 			// 判断路径是否相等 没有更改构件编号
 			if (detfilesPath.equals(oldPath)) {
 				// 只考虑文件添加的情况（删除时处理了其他情况）
-				if (!files.contains(uploadFile)) {
+				if (!files.contains(vo)) {
 					tmpPath = this.compDetailPath + File.separator + detfilesPath + File.separator + fileDirPath;// 要上传的文件路径
-					FileItem fileItem = UploadFilesUtils.createFileItem(uploadFile.getPath(), uploadFile.getName());
-					MultipartFile mfile = new CommonsMultipartFile(fileItem);
-					// 调用数据中心上传
-					R rdc = rdcService.uploadLocalFile(mfile, tmpPath);
-					if (rdc.getCode() == CommonConstants.SUCCESS) {
-						logger.debug("{}文件上传成功。。。。。", mfile.getOriginalFilename());
-					} else {
-						logger.error(rdc.getMsg());
+					R<Boolean> copylocalFile = rdcService.copylocalFile(vo.getRelativePath(), tmpPath);
+					if (copylocalFile.getCode() == CommonConstants.FAIL) {
+						throw new IOException("文件上传异常-" + copylocalFile.getMsg());
 					}
 				}
 			} else {
-				String path = uploadFile.getPath();
+				// 要拷贝的文件
+				String path = vo.getRelativePath();
 				// 是否存在以前的路径
 				if (StringUtils.isNotEmpty(oldPath) && path.indexOf(oldPath) != -1) {
 					// 把旧路径换成新路径 //文件的路径（包含文件名字）
@@ -618,23 +601,10 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 				} else {
 					tmpPath = this.compDetailPath + File.separator + detfilesPath + File.separator + fileDirPath;// 要上传的文件路径
 				}
-
-				FileItem fileItem = UploadFilesUtils.createFileItem(uploadFile.getPath(), uploadFile.getName());
-				MultipartFile mfile = new CommonsMultipartFile(fileItem);
-				// 调用数据中心上传
-				R rdc = rdcService.uploadLocalFile(mfile, tmpPath);
-				if (rdc.getCode() == CommonConstants.SUCCESS) {
-					logger.debug("{}文件上传成功。。。。。", mfile.getOriginalFilename());
-					// 删除以前的文件及文件夹
-					if (isUpdate) {
-						String[] delPath = { vo.getRelativePath() };
-						// 调用数据中心删除文件
-						rdcService.delFolder(delPath);
-					}
-				} else {
-					logger.error(rdc.getMsg());
+				R<Boolean> copylocalFile = rdcService.copylocalFile(path, tmpPath);
+				if (copylocalFile.getCode() == CommonConstants.FAIL) {
+					throw new IOException("文件上传异常-" + copylocalFile.getMsg());
 				}
-
 			}
 			logger.debug("处理文件列表结束。。。。。");
 		}
@@ -698,17 +668,6 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 			e.printStackTrace();
 		}
 		return t;
-	}
-
-	public static void showDirectory(File file, List<File> paths) {
-		File[] files = file.listFiles();
-		for (File f : files) {
-			if (f.isDirectory()) {
-				showDirectory(f, paths);
-			} else {
-				paths.add(f);
-			}
-		}
 	}
 
 	/**

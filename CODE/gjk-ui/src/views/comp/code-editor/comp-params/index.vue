@@ -421,7 +421,7 @@ export default {
               let userCurrent = this.userInfo.username;
               handleSaveCompMap(
                 saveComp,
-                "Component",
+                "component",
                 comp.id,
                 userCurrent
               ).then(resComp => {
