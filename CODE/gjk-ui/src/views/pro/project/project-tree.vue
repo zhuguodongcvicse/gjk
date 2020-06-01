@@ -573,6 +573,7 @@ export default {
                 type: "success",
                 duration: 2000
               });
+              this.getProjects();
             } else {
               this.$notify.error({
                 title: "错误",
@@ -828,7 +829,7 @@ export default {
       } else if (node.label == "模型") {
         test = this.website.publicSvg + "icon-svg/model.svg";
         //组件工程
-      } else if (node.label == "App组件工程") {
+      } else if (node.label == "AppPro") {
         test = this.website.publicSvg + "icon-svg/component.svg";
         //文件夹
       } else if (node.data.isDirectory == "0") {

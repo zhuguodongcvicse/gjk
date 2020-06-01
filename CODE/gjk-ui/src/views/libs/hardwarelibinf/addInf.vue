@@ -88,8 +88,8 @@
                     opticalNum: [
                         {required: true, message: "光纤数量不能为空", trigger: "blur"},
                         {
-                            pattern: /^[0-9]{1,10}$/,
-                            message: "请输入整数且长度不能超过十位数字",
+                            pattern: /^[0-9]{1,2}$/,
+                            message: "请输入整数且长度不能超过两位数字",
                             trigger: "blur"
                         }
                     ]

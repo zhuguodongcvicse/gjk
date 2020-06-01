@@ -210,8 +210,8 @@
                     opticalNum: [
                         {required: true, message: "不能为空", trigger: "blur"},
                         {
-                            pattern: /^[0-9]*[1-9][0-9]*$/,
-                            message: "请输入整数",
+                            pattern: /^[0-9]{1,2}$/,
+                            message: "请输入整数且长度不能超过两位数字",
                             trigger: "blur"
                         }
                     ]
