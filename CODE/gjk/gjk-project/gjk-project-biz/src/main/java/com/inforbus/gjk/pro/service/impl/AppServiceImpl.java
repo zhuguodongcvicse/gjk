@@ -43,6 +43,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.tools.ant.taskdefs.Zip;
 import org.apache.tools.ant.types.FileSet;
 import org.slf4j.Logger;
@@ -113,20 +114,26 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 	}
 
 	/**
-	 * 获取app工程图片
+	 * @Author wang
+	 * @Description: 获取app工程图片
+	 * @Param: [id]
+	 * @Return: byte[]
+	 * @Create: 2020/5/31
 	 */
 	@Override
-	public FileInputStream getAppImgFile(String id) {
+	public byte[] getAppImgFile(String id) {
 		App app = baseMapper.getAppImgFile(id);
-		String basePath = JGitUtil.getLOCAL_REPO_PATH();
-		FileInputStream fis = null;
 		try {
 			String filePath = app.getBackPath();
-			fis = new FileInputStream(basePath + filePath);
-		} catch (FileNotFoundException e) {
+			Response response = disposeDataCenterServiceFeign.getImgFile(proDetailPath + filePath);
+			Response.Body body = response.body();
+			InputStream inputStream = body.asInputStream();
+			return IOUtils.toByteArray(inputStream);
+		} catch (Exception e) {
 			e.printStackTrace();
+			logger.error("解析图片数据失败");
 		}
-		return fis;
+		return null;
 	}
 
 	/**

@@ -1044,7 +1044,7 @@ function appendUpdateDiv() {
     for (let key in compUpdateState) {
       if (compUpdateState[key] == "0") { //已更新
         if (dat[i].id == key) {
-          strUpdate += dat[i].compImg
+          strUpdate += dat[i].compImg + "<span >" + dat[i].compName + "_V" + dat[i].compVersion + "</span>"
         }
       } else {
         if (dat[i].id == key) {

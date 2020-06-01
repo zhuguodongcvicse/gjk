@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.File;
 import java.util.Map;
@@ -190,11 +191,25 @@ public class DisposeDataCenterServiceFallbackImpl implements DisposeDataCenterSe
 
     @Override
     public R<Boolean> uploadDecompression(MultipartFile file, String localPath) {
-        return null;
+        log.error("调用数据中心的feign接口uploadDecompression方法失败", cause);
+        R r = new R();
+        r.setCode(CommonConstants.FAIL);
+        r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
+        return r;
     }
 
     @Override
     public Response downloadFile(String[] filePaths) {
+        log.error("调用数据中心的feign接口downloadFile方法失败", cause);
+        R r = new R();
+        r.setCode(CommonConstants.FAIL);
+        r.setMsg(ServiceNameConstants.DATACENDER_SERVICE + "服务器异常，请联系管理员");
+        return null;
+    }
+
+    @Override
+    public Response getImgFile(String path) {
+        log.error("调用数据中心的feign接口getImgFile方法失败", cause);
         return null;
     }
 
