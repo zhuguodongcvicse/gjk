@@ -117,7 +117,7 @@ ctrl:
       path: D:/14S_GJK_GITBAKBAK/头文件.h
 sonar:
   scanner:
-    path: D:/14S_GJK_GIT/sonarqube-7.7/bin/windows-x86-64
+    path: D:\14S_GJK_GIT\sonar-scanner-2.8\bin
     url: http://192.168.2.118:9000/
 ftp:
   host: 192.168.2.225
