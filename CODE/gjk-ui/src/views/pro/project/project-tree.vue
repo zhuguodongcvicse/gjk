@@ -601,9 +601,11 @@ export default {
         filePath.filePath =
           this.fileData.filePath + "\\" + this.fileData.fileName;
         filePath.fileName = this.fileData.fileName;
+        console.log("文件地址    ",filePath)
         staticInspect(filePath).then(response => {
+             console.log("response.data    ",response.data)
           window.open(
-            "http://localhost:9000/dashboard?id=" + response.data.data,
+            response.data.data[1]+"dashboard?id=" + response.data.data[0],
             "_blank"
           );
         });
