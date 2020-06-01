@@ -971,7 +971,7 @@ export default {
     //移动
     slidercDown(ev) {
       let that = this;
-      let boxWidth = that.$refs.box.offsetWidth;
+      let boxWidth = this.$refs.box.$el.clientWidth;
       let oEvent = ev || event;
       let pos = that.getPos(oEvent); //获取鼠标位置
       //获取托拽条当前的left
@@ -1020,7 +1020,8 @@ export default {
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
     this.getCompAndDetail();
-    var boxWidth = this.$refs.box.clientWidth;
+     console.log("boxWidth11111",this.$refs.box.$el.clientWidth)
+    var boxWidth = this.$refs.box.$el.clientWidth;
     //var elementResizeDetectorMaker = require("element-resize-detector");
     var erd = elementResizeDetectorMaker();
     let _this = this;

@@ -70,10 +70,10 @@ public interface AppService extends IService<App> {
 	 * @Description: 获取app图片
 	 * @Author cvics
 	 * @DateTime 2019年5月23日 上午11:34:43
-	 * @param imgId 图片Id
+	 * @param id 图片Id
 	 * @return FileInputStream文件流
 	 */
-	FileInputStream getAppImgFile(String id);
+	byte[] getAppImgFile(String id);
 
 	/**
 	 * 根据app组件名称，模糊查询组件

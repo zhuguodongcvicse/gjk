@@ -53,7 +53,13 @@
         </el-col>
         <el-col :span="16" class="menu_main_right_14s">
           <el-card class="box-card">
-            <el-form :label-position="labelPosition" label-width="80px" :model="form" ref="form">
+            <el-form
+              :label-position="labelPosition"
+              label-width="80px"
+              :model="form"
+              ref="form"
+              :rules="rules"
+            >
               <el-form-item label="平台库名" prop="name">
                 <el-input v-model="form.name" :disabled="formEdit" placeholder="请输入平台库名"></el-input>
               </el-form-item>
@@ -119,7 +125,7 @@ export default {
         importLibsDialogVisible: false,
         dialogExportVisible: false
       },
-      whichLib:"platform",
+      whichLib: "platform",
       list: null,
       total: null,
       formEdit: true,
@@ -161,8 +167,7 @@ export default {
       platformManager_btn_del: false,
       platformManager_btn_sel: false,
       platformManager_btn_export: false,
-      platformManager_btn_import: false,
-
+      platformManager_btn_import: false
     };
   },
   components: { importLibs, exportLibs },
@@ -315,7 +320,7 @@ export default {
             } else {
               this.$message({
                 showClose: true,
-                message: "该节点已被构件\BSP\软件框架库使用，禁止删除！！！",
+                message: "该节点已被构件BSP软件框架库使用，禁止删除！！！",
                 type: "error"
               });
             }
@@ -360,6 +365,8 @@ export default {
         syncModifyDict(dictObj)
     },
     create() {
+      this.$refs.form.validate(valid => {
+        if (valid) {
       if (this.form.typeValue == null || this.form.typeValue == '') {
           alert("请选择类型值")
           return;
@@ -391,6 +398,8 @@ export default {
         Object.assign(this.form, this.$options.data().form);
         //展开当前节点节点。。
         this.aExpandedKeys = [this.currentId];
+      });
+        }
       });
     },
     onCancel() {

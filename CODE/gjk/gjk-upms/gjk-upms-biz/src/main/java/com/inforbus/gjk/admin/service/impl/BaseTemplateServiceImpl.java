@@ -192,8 +192,10 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
         logger.debug("update方法开始运行");
         try {
             //保存的位置,文件名称由模板名称+时间毫秒值组成
-            File oldPath = new File(LOCALPATH + baseTemplate.getTempPath());
-            if (oldPath.exists()) {
+            //File oldPath = new File(LOCALPATH + baseTemplate.getTempPath());
+            String oldPath = LOCALPATH + baseTemplate.getTempPath();
+            R fileExist = remoteBaseTemplateService.judgeFileExist(LOCALPATH + baseTemplate.getTempPath());
+            if (fileExist.getData() != null && (boolean) fileExist.getData()) {
                 long millis = System.currentTimeMillis();
                 //生成新文件的名称
                 String path = "gjk" + File.separator + "baseTemplate" + File.separator + baseTemplate.getTempName() + String.valueOf(millis) + ".xml";
@@ -207,24 +209,24 @@ public class BaseTemplateServiceImpl extends ServiceImpl<BaseTemplateMapper, Bas
                 R result = remoteBaseTemplateService.createXMLFile(xMlEntityMapVO);
                 boolean flag = (boolean) result.getData();
                 //根据模板id查询模板数据
-                BaseTemplate oldBT = baseMapper.selectById(baseTemplate.getTempId());
-                if (flag && oldBT != null) {
-                    if (!oldBT.getTempType().equals(baseTemplate.getTempType())) {
-                        //获取最新版本
-                        Integer version = baseMapper.getMaxVersion(baseTemplate.getTempType());
-                        if (version == null) {
-                            baseTemplate.setTempVersion(1);
-                        } else {
-                            baseTemplate.setTempVersion(version + 1);
-                        }
-                    }
-                }
+//                BaseTemplate oldBT = baseMapper.selectById(baseTemplate.getTempId());
+//                if (flag && oldBT != null) {
+//                    if (!oldBT.getTempType().equals(baseTemplate.getTempType())) {
+//                        //获取最新版本
+//                        Integer version = baseMapper.getMaxVersion(baseTemplate.getTempType());
+//                        if (version == null) {
+//                            baseTemplate.setTempVersion(1);
+//                        } else {
+//                            baseTemplate.setTempVersion(version + 1);
+//                        }
+//                    }
+//                }
                 //更改新的路径
                 baseTemplate.setTempPath(path);
                 baseTemplate.setUpdateTime(LocalDateTime.now());
                 //把新的数据更细至数据库
                 baseMapper.updateById(baseTemplate);
-                remoteBaseTemplateService.delFile(oldPath.getAbsolutePath());
+                remoteBaseTemplateService.delFile(oldPath);
                 return true;
             }
         } catch (Exception e) {

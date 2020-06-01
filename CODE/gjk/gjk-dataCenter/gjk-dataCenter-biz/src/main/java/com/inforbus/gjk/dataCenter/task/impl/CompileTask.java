@@ -375,7 +375,7 @@ public class CompileTask implements Task {
                 executeCommand(cmd, false);//删除流程文件夹
                 return true;
             } else {
-                this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n 文件上传至linux系统失败,请联系管理员");
+                this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n文件上传至linux系统失败,请联系管理员");
             }
         }
         cmd = "rm -rf " + this.linuxPath + "/AppPro";
@@ -676,6 +676,7 @@ public class CompileTask implements Task {
      * @Create: 2020/4/8
      */
     public boolean uploadFileToLinux(String localFilePath, String linuxAmisPath) {
+        logger.info("开始上传文件 ：" + localFilePath);
         try {
             SftpUtil.uploadFilesToServer(localFilePath, linuxAmisPath, this.ip, this.username, this.password, new SftpProgressMonitor() {
                 @Override
@@ -697,8 +698,9 @@ public class CompileTask implements Task {
             return true;
         } catch (Exception e) {
             logger.error("上传失败,请检查ip地址,账号,密码是否正确" + e.getMessage());
-            this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n连接linux失败,请检查ip,账户,密码是否正确");
+            this.rabbitmqTemplate.convertAndSend(token, fileName + "===@@@===\n上传失败 : " + e.getMessage());
         }
+        logger.info("上传文件结束 ：" + localFilePath);
         return false;
     }
 

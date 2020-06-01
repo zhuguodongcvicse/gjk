@@ -53,7 +53,13 @@
         </el-col>
         <el-col :span="16" class="menu_main_right_14s">
           <el-card class="box-card">
-            <el-form :label-position="labelPosition" label-width="80px" :model="form" ref="form">
+            <el-form
+              :label-position="labelPosition"
+              label-width="80px"
+              :model="form"
+              ref="form"
+              :rules="rules"
+            >
               <el-form-item label="算法库名" prop="name">
                 <el-input v-model="form.name" :disabled="formEdit" placeholder="请输入算法库名"></el-input>
               </el-form-item>
@@ -68,10 +74,9 @@
             </el-form>
           </el-card>
         </el-col>
-            
       </el-row>
-      <export-libs :showInfo="showInfo" :whichLib = "whichLib"></export-libs>
-      <import-libs :showInfo="showInfo" :whichLib = "whichLib" @callback="getList"></import-libs>
+      <export-libs :showInfo="showInfo" :whichLib="whichLib"></export-libs>
+      <import-libs :showInfo="showInfo" :whichLib="whichLib" @callback="getList"></import-libs>
     </basic-container>
   </div>
 </template>
@@ -99,7 +104,7 @@ export default {
         importLibsDialogVisible: false,
         dialogExportVisible: false
       },
-      whichLib:"algorithm",
+      whichLib: "algorithm",
       list: null,
       total: null,
       formEdit: true,
@@ -274,28 +279,28 @@ export default {
           type: "warning"
         }).then(() => {
           findThreeLibsId(this.currentId).then(res => {
-          if (!res.data) {
-            //让删
-          delObj(this.currentId).then(() => {
-            this.getList();
-            this.resetForm();
-            this.onCancel();
-            this.$notify({
-              title: "成功",
-              message: "删除成功",
-              type: "success",
-              duration: 2000
-            });
-            this.reload();
-          });
-          } else {
+            if (!res.data) {
+              //让删
+              delObj(this.currentId).then(() => {
+                this.getList();
+                this.resetForm();
+                this.onCancel();
+                this.$notify({
+                  title: "成功",
+                  message: "删除成功",
+                  type: "success",
+                  duration: 2000
+                });
+                this.reload();
+              });
+            } else {
               this.$message({
                 showClose: true,
                 message: "该节点已被构件使用，禁止删除！！！",
                 type: "error"
               });
             }
-        });
+          });
         });
       }
     },
@@ -312,27 +317,31 @@ export default {
       });
     },
     create() {
-      var parentId = JSON.parse(JSON.stringify(this.form)).parentId;
-      console.log("xswe", parentId, this.currentId);
-      //新添加一个根节点
-      if (parentId === undefined) {
-        Vue.set(this.form, "parentId", "-1");
-      } else {
-        Vue.set(this.form, "parentId", this.currentId);
-      }
-      addObj(this.form).then(res => {
-        this.getList();
-        this.$notify({
-          title: "成功",
-          message: "创建成功",
-          type: "success",
-          duration: 2000
-        });
-        this.onCancel();
-        //清空this.form的值
-        Object.assign(this.form,this.$options.data().form)
-        //展开当前节点节点。。
-        this.aExpandedKeys = [this.currentId];
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          var parentId = JSON.parse(JSON.stringify(this.form)).parentId;
+          console.log("xswe", parentId, this.currentId);
+          //新添加一个根节点
+          if (parentId === undefined) {
+            Vue.set(this.form, "parentId", "-1");
+          } else {
+            Vue.set(this.form, "parentId", this.currentId);
+          }
+          addObj(this.form).then(res => {
+            this.getList();
+            this.$notify({
+              title: "成功",
+              message: "创建成功",
+              type: "success",
+              duration: 2000
+            });
+            this.onCancel();
+            //清空this.form的值
+            Object.assign(this.form, this.$options.data().form);
+            //展开当前节点节点。。
+            this.aExpandedKeys = [this.currentId];
+          });
+        }
       });
     },
     onCancel() {

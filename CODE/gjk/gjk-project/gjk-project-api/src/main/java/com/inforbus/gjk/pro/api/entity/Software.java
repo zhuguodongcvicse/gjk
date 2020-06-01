@@ -41,11 +41,16 @@ private static final long serialVersionUID = 1L;
    */
     @TableId
     private String id;
+
+    /**
+     *用户id
+     */
+    private int userId;
     
     /**
      * 软件框架库名字
      */
-      private String softwareName;
+    private String softwareName;
     /**
    * 版本
    */

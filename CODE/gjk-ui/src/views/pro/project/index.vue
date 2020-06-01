@@ -26,135 +26,6 @@
             icon="el-icon-plus"
             v-if="permissions.pro_project_add"
           >新 增</el-button>
-          <el-dialog
-            width="50%"
-            class="libs_bsp_dialog_14s pro_project_index_dialog_14s"
-            :visible.sync="dialogTableVisible"
-            v-if="dialogTableVisible"
-          >
-            <div>
-              <el-tabs v-model="activeName">
-                <el-tab-pane label="基本信息" name="first">
-                  <el-form
-                    :label-position="labelPosition"
-                    label-width="120px"
-                    :model="formLabelAlign"
-                    :rules="projectRules"
-                    ref="formLabelAlignRef"
-                  >
-                    <div class="bsp_tab_14s">
-                      <el-form-item label="项目名称" prop="projectName">
-                        <el-input v-model="formLabelAlign.projectName"></el-input>
-                      </el-form-item>
-                      <el-form-item label="流程名称" prop="processName">
-                        <el-input v-model="formLabelAlign.processName"></el-input>
-                      </el-form-item>
-                      <el-form-item label="请选择审批人" prop="applyUser">
-                        <el-select v-model="formLabelAlign.applyUser" placeholder="请选择">
-                          <el-option
-                            v-for="item in applyUserSelect"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                          ></el-option>
-                        </el-select>
-                      </el-form-item>
-                    </div>
-                  </el-form>
-                </el-tab-pane>
-
-                <el-tab-pane label="框架信息" name="second">
-                  <el-form
-                    :label-position="labelPosition"
-                    label-width="120px"
-                    :model="formLabelAlign"
-                  >
-                    <div class="bsp_tab_14s">
-                      <el-form-item label="软件框架选择">
-                        <span style="color: red;" v-show="platformFlag">{{platformNameTs}}未选择</span>
-                        <el-select
-                          class="text_align_center_14s"
-                          v-model="softwareSelectString"
-                          multiple
-                          placeholder="请选择"
-                          @change="selectSoftwareClk"
-                        >
-                          <el-option
-                            v-for="item in softwareTreeData"
-                            :key="item.id"
-                            :label="item.softwareName"
-                            :value="item.id"
-                          >
-                            <span style="float: left">{{ item.softwareName }}(v{{item.version}}.0)</span>
-                            <span
-                              style="float: right; color: #8492a6; font-size: 13px;margin-right: 30px;"
-                            >{{ item.description }}</span>
-                          </el-option>
-                        </el-select>
-                      </el-form-item>
-                      <el-form-item label="BSP选择">
-                        <el-select
-                          class="text_align_center_14s"
-                          v-model="bspSelectString"
-                          multiple
-                          placeholder="请选择"
-                          @change="selectBSPClk"
-                        >
-                          <el-option
-                            v-for="item in bspTreeData"
-                            :key="item.id"
-                            :label="item.bspName"
-                            :value="item.id"
-                          >
-                            <span style="float: left">{{ item.bspName }}(v{{item.version}}.0)</span>
-                            <span
-                              style="float: right; color: #8492a6; font-size: 13px;margin-right: 30px;"
-                            >{{ item.description }}</span>
-                          </el-option>
-                        </el-select>
-                      </el-form-item>
-                    </div>
-                  </el-form>
-                </el-tab-pane>
-
-                <el-tab-pane label="构件信息" name="third">
-                  <el-form
-                    :label-position="labelPosition"
-                    label-width="120px"
-                    :model="formLabelAlign"
-                  >
-                    <div class="bsp_tab_14s">
-                      <el-form-item label="构件筛选">
-                        <select-tree
-                          :treeData="screenLibsTree"
-                          multiple
-                          :id.sync="screenLibsIdArray"
-                        />
-                      </el-form-item>
-                      <el-form-item label="构件选择">
-                        <select-tree :treeData="compTreeData" multiple :id.sync="compSelectArray" />
-                        <el-button type="primary" @click="selectAllComp">全选</el-button>
-                      </el-form-item>
-                    </div>
-                  </el-form>
-                </el-tab-pane>
-
-                <!-- <el-tab-pane label="构件信息" name="third">
-  <common-component></common-component>
-                </el-tab-pane>-->
-
-                <!--选择模板-->
-                <el-tab-pane label="模板信息" name="fourth">
-                  <choose-temp :formLabelAlign="formLabelAlign"></choose-temp>
-                </el-tab-pane>
-              </el-tabs>
-            </div>
-
-            <div class="control-container bsp_footer_btn_14s text_align_right_14s">
-              <el-button type="primary" :disabled="platformFlag" @click.native="handleSaveComp">提交申请</el-button>
-              <el-button type="button" @click.native="handleCancleComp">取消</el-button>
-            </div>
-          </el-dialog>
           <br />
           <br />
         </template>
@@ -332,10 +203,8 @@ export default {
           this.$delete(this.compSelectArray, index);
         }
       }
-      // console.log("compSelectArray:", this.compSelectArray);
     },
     "formLabelAlign.applyUser": function() {
-      // console.log("formLabelAlign.applyUser:", this.formLabelAlign.applyUser);
     },
     screenLibsIdArray() {
       for (let item of this.screenLibsIdArray) {
@@ -346,7 +215,6 @@ export default {
           );
         }
       }
-      // console.log("screenLibsIdArray", this.screenLibsIdArray);
       this.getTableData();
       this.compSelectArray = [];
     }
@@ -356,7 +224,6 @@ export default {
       this.$router.push({
         path: "/addproject"
       });
-      //this.getTableData();
     },
     selectAllComp() {
       let selectArray = [];
@@ -427,93 +294,6 @@ export default {
       this.visible2 = false;
     },
 
-    handleSaveComp() {
-      this.$refs.formLabelAlignRef.validate((valid, object) => {
-        if (valid) {
-          this.project.projectName = this.formLabelAlign.projectName;
-          this.project.processName = this.formLabelAlign.processName;
-          this.project.userId = this.userInfo.userId;
-          //模板ID赋值
-          var basetemplate = {
-            sysTempId: this.formLabelAlign.sysTempId,
-            themeTempId: this.formLabelAlign.themeTempId,
-            networkTempId: this.formLabelAlign.networkTempId,
-            hsmTempId: this.formLabelAlign.hsmTempId
-          };
-          //给模板id赋json串值
-          this.project.basetemplateIds = JSON.stringify(basetemplate);
-          // console.log(
-          //   "this.project.basetemplateIds",
-          //   this.project.basetemplateIds
-          // );
-          saveProject(this.project)
-            .then(Response => {
-              this.project.id = Response.data.data.id;
-              let projectsTemp = this.$store.state.projectTreeShow
-                .projectTreeShow;
-              if (projectsTemp.length != 0) {
-                for (const i in projectsTemp) {
-                  projectsTemp[i].showFlag = 1;
-                }
-              }
-              this.project.showFlag = 0;
-              projectsTemp.push(this.project);
-              this.$store.dispatch("setProjectTreeShow", projectsTemp);
-              saveProProcess(this.project.id, this.project.processName).then(
-                Response => {
-                  for (var i = 0; i < Response.data.data.length; i++) {
-                    if (Response.data.data[i].fileType == "9") {
-                      this.procedureId = Response.data.data[i].id;
-                    }
-                  }
-                  //保存软件框架
-                  this.changeProcedureSoftwareId();
-                  this.changeProcedureBSPId();
-                  if (
-                    this.compSelectArray != null &&
-                    this.compSelectArray.length > 0
-                  ) {
-                    saveProCompList(this.project.id, this.compSelectArray).then(
-                      Response => {
-                        if (
-                          this.compSelectArray != null &&
-                          this.compSelectArray.length >= 0
-                        ) {
-                          let approval = {};
-                          approval.userId = this.userInfo.userId;
-                          approval.applyId = this.project.id;
-                          approval.applyType = "2";
-                          approval.libraryType = "7";
-                          approval.applyUserId = this.formLabelAlign.applyUser;
-                          approval.approvalState = "0";
-                          //提交记录到审批管理库
-                          saveApproval(approval).then(Response => {
-                            saveApprovalApply(
-                              Response.data.data.id,
-                              this.compSelectArray
-                            );
-                            Object.assign(
-                              this.formLabelAlign,
-                              this.$options.data().formLabelAlign
-                            );
-                            this.dialogTableVisible = false;
-                          });
-                        }
-                      }
-                    );
-                  }
-                }
-              );
-            })
-            .catch(error => {
-              if (this.compSelectArray == null) {
-                this.compSelectArray = [];
-              }
-            });
-          this.reload();
-        }
-      });
-    },
     handleCancleComp() {
       this.dialogTableVisible = false;
       Object.assign(this.formLabelAlign, this.$options.data().formLabelAlign);

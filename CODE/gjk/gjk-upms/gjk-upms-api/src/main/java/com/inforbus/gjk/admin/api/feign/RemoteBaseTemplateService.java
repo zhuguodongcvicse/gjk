@@ -9,6 +9,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * RemoteBaseTemplateService
@@ -51,4 +52,14 @@ public interface RemoteBaseTemplateService {
      */
     @PostMapping(url + "/delFile")
     public R<Boolean> delFile(@RequestParam("absolutePath") String absolutePath);
+
+    /**
+     * 判断文件是否存在
+     * @param filePath
+     * @auther sunchao
+     * @return
+     */
+    @PostMapping(url + "/judgeFileExist")
+    @ResponseBody
+    public R judgeFileExist(@RequestParam("filePath") String filePath);
 }

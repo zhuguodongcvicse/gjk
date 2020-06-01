@@ -80,7 +80,13 @@
             <artifactId>gjk-project-api</artifactId>
             <version>1.0.0</version>
         </dependency>
-    </dependencies>
+		<dependency>
+			<groupId>com.inforbus</groupId>
+			<artifactId>gjk-component-api</artifactId>
+			<version>1.0.0</version>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>

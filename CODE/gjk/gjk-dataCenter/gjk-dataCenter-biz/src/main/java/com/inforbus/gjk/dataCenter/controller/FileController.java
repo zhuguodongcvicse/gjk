@@ -15,11 +15,18 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import cn.hutool.core.io.FileUtil;
+import com.inforbus.gjk.comp.api.dto.ComponentDTO;
+import com.inforbus.gjk.comp.api.entity.Component;
+import com.inforbus.gjk.comp.api.entity.ComponentDetail;
+import com.inforbus.gjk.comp.api.entity.Components;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.entity.FileEntity;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -672,5 +679,63 @@ public class FileController {
 			ret.setMsg("文件路径错误");
 		}
 		return ret;
+	}
+
+	/**
+	 * 解析流程建模所需所有xml
+	 * @param filePathMap
+	 * @return
+	 */
+	@PostMapping(value = "/getCompData")
+	public R<Map<String,XmlEntityMap>> getCompData (@RequestBody Map<String,String> filePathMap){
+		R<Map<String,XmlEntityMap>> ret = new R<>();
+		try {
+			Map<String,XmlEntityMap> xmlEntityMapMap = fileService.getCompData(filePathMap);
+			ret.setData(xmlEntityMapMap);
+			ret.setMsg("json文件解析成功");
+		} catch (Exception e) {
+			logger.error("json文件解析失败");
+			ret.setCode(CommonConstants.FAIL);
+			ret.setData(null);
+			ret.setMsg("json文件解析失败");
+		}
+		return ret;
+	}
+
+	@PostMapping(value = "/getCompDetailData")
+	public R<List<ComponentDTO>> fileService(@RequestBody List<Components> componentsList){
+		R<List<ComponentDTO>> ret = new R<>();
+		try {
+			List<ComponentDTO> cpd = fileService.fileService(componentsList);
+			ret.setData(cpd);
+			ret.setMsg("json文件解析成功");
+		} catch (Exception e) {
+			logger.error("json文件解析失败");
+			ret.setCode(CommonConstants.FAIL);
+			ret.setData(null);
+			ret.setMsg("json文件解析失败");
+		}
+		return ret;
+	}
+
+	/**
+	 * @Author wang
+	 * @Description: 根据绝对路径获取图片文件数据流
+	 * @Param: [path, response]
+	 * @Return: void
+	 * @Create: 2020/5/31
+	 */
+	@PostMapping("/getImgFile")
+	public void getImgFile(@RequestParam("path") String path,HttpServletResponse response){
+		try {
+			OutputStream out = response.getOutputStream();
+			byte[] bytes = FileUtil.readBytes(path);
+			out.write(bytes);
+			out.flush();
+		} catch (FileNotFoundException e) {
+			logger.error(path + "文件不存在");
+		} catch (IOException e) {
+			logger.error(path + "文件不存在");
+		}
 	}
 }

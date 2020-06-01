@@ -182,10 +182,10 @@ function checkDat() {
       return false;
     }
   })
- // if (dat.length > 0) {
+  if (dat.length > 0) {
     init();
     //$("#gjk").load();	
-  //}
+  }
 }
 
 function init() {
@@ -869,7 +869,9 @@ function ChangedSelection(e){//选择事件
         data=nodeOrLink.data;
         data.type= "copy"
 		  }
-	  });
+    });
+    nodeOrLinkList = myDiagram.selection;
+    nodeOrLinkFirst = myDiagram.selection.first()
 };
  // 粘贴到画布
   myDiagram.addDiagramListener("ClipboardPasted", function (e) {
@@ -1042,7 +1044,7 @@ function appendUpdateDiv() {
     for (let key in compUpdateState) {
       if (compUpdateState[key] == "0") { //已更新
         if (dat[i].id == key) {
-          strUpdate += dat[i].compImg
+          strUpdate += dat[i].compImg + "<span >" + dat[i].compName + "_V" + dat[i].compVersion + "</span>"
         }
       } else {
         if (dat[i].id == key) {
