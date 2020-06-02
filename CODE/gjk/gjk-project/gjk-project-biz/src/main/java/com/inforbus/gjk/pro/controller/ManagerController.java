@@ -98,7 +98,7 @@ public class ManagerController {
 		List<ProjectFileVO> proDetailTree = managerService.getTreeByProjectId(projectId);
 		List<ProjectFileVO> appFileTreeList = Lists.newArrayList();
 		for (ProjectFileVO projectFileVO : proDetailTree) {
-			if ("9".equals(projectFileVO.getFileType())) {
+			if (FileTypeConstants.PROCESS_NAME.equals(projectFileVO.getFileType())) {
 				appFileTreeList.addAll(appService.getAppFileTree(projectFileVO.getFileId()));
 			}
 		}
