@@ -165,14 +165,14 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 					+ comp.getCreateTime().toString().replaceAll("[[\\s-T:punct:]]", "") + File.separator;
 
 			// 删除构件
-//			this.removeById(compId);
+			this.removeById(compId);
 			// 删除构件详细信息
 			for (ComponentDetail detail : details) {
 				// 当文件详细信息是图片时删除图片
 				if ("img".equals(detail.getFileType())) {
 					compImgMapper.delete(Wrappers.<CompImg>query().lambda().eq(CompImg::getCompDetid, detail.getId()));
 				}
-//				componentDetailService.removeById(detail.getId());
+				componentDetailService.removeById(detail.getId());
 			}
 			// 删除构件相关文件
 			R<Boolean> del = rdcService.delFolder(new String[] { filePath });

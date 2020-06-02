@@ -293,7 +293,6 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		// map转成CompImg
 		CompImg img = new JSONObject(map.get("compImg")).toBean(CompImg.class);
 		// 设置默认图片名称 格式为 '构件名称.png'
-		originalFilename = file.getOriginalFilename();
 //		originalFilename = StringUtils.isEmpty(img.getImgShowName()) ? "" : img.getImgShowName() + ".png";
 		// 远程路径
 		String gitRelativePath = compUserFilePath + File.separator + userName + File.separator + comp.getCompId()
@@ -303,6 +302,7 @@ public class ComponentDetailServiceImpl extends ServiceImpl<ComponentDetailMappe
 		String filePath = this.compDetailPath + File.separator + gitRelativePath + File.separator + originalFilename;
 		if (ObjectUtils.isNotEmpty(file)) {
 			try {
+				originalFilename = file.getOriginalFilename();
 				R<?> localFile = rdcService.uploadLocalFile(file, filePath);
 				String base64 = UploadFilesUtils.getBase64ByInputStream(file.getInputStream());
 				img.setImgPath("data:image/png;base64," + base64);
