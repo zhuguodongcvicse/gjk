@@ -322,7 +322,7 @@ public class ComponentServiceImpl extends ServiceImpl<ComponentMapper, Component
 			componentsList.add(components);
 			if (vo != null) {
 				String fileName = vo.getFileName();
-				if (fileName.startsWith(ComponentConstant.COMP)
+				if (fileName.toLowerCase().startsWith(ComponentConstant.COMP)
 						&& fileName.toUpperCase().endsWith(ComponentConstant.COMP_XML)) {
 					String filePath = this.compDetailPath + File.separator + vo.getFilePath() + File.separator
 							+ fileName;
