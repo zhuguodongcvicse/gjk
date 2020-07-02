@@ -25,7 +25,7 @@
         <!-- 程序文本编辑器 -->
 <!--        <monaco-editor ref="test" v-model="textContexts" language="c" v-bind:style="editorClass"></monaco-editor>-->
         <monaco-editor ref="monacoEditor"
-                       v-bind:style="editorClass"
+                       v-bind:style="con"
                        v-model="textContexts"
                        :language="language"
                        @change="monacoEditorChange"
@@ -54,13 +54,22 @@ export default {
   props: ["textContext", "tFilePath"],
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
+     window.addEventListener('resize', this.getHeight);
+        this.getHeight()
+
+        
     let _this = this;
     this.$nextTick(r => {
       let width = _this.$refs.editorDiv.offsetWidth;
-      // console.log(" _this.$refs.editorDiv.$el;", width);
+       console.log(" _this.$refs.editorDiv.$el;", width);
+
+    let lengthData =   document.getElementsByClassName("ivu-split-pane right-pane")
+   
+    console.log("++++++++++++++++++++++",  lengthData[0].clientWidth)
+      //  
       // this.editorClass.width = width + "px";
       // this.$refs.monacoEditor.$el.style.height = "calc(";
-      _this.editorClass = { width: width + "px", height: "500px" };
+      _this.editorClass = { width: lengthData[0].clientWidth-200+"px", height: lengthData[0].clientheight+"px" };
       // console.log("monacoEditor", _this.$refs.monacoEditor.$el.offsetHeight);
     });
   },
@@ -91,6 +100,10 @@ export default {
   },
   data() {
     return {
+      con:{
+                height:'',
+                width:''
+            },
       isChange: false,
       editor: null,
       prefix: '',
@@ -122,6 +135,10 @@ export default {
   },
 
   methods: {
+     getHeight(){
+          this.con.height=window.innerHeight-170+'px';
+           this.con.width=window.innerWidth-170+'px';
+       },
     editorChange() {
       console.log("ppppppp");
       //文件内容

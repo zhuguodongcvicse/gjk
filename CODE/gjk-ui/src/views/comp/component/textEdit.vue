@@ -37,6 +37,7 @@
               v-model="textContext"
               language="c"
               v-if="defineOrEditor==='editor'"
+              :style="conheight"
             ></monaco-editor>
             <div class="block" v-if="defineOrEditor==='image'">
               <div v-html="src">{{src}}</div>
@@ -68,6 +69,9 @@ export default {
   data() {
     //这里存放数据
     return {
+      conheight:{
+                height:''
+            },
       defineOrEditor: "define",
       editorForm: {
         editorData: ""
@@ -116,9 +120,15 @@ export default {
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() {
+    window.addEventListener('resize', this.getHeight);
+        this.getHeight()
+  },
   //方法集合
   methods: {
+     getHeight(){
+          this.conheight.height=window.innerHeight-170+'px';
+       },
     //文件编码格式改变时调用后台方法
     editorChange() {
       //文件路徑
@@ -158,8 +168,8 @@ export default {
 </script>
 <style>
 /* 程序文本编辑器的大小 */
-.editor {
-  width: calc(90% - 120px);
-  height: 600px;
-}
+/* .editor {
+  width:1380px;
+  height: 1200px;
+} */
 </style>

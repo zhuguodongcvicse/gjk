@@ -33,7 +33,7 @@
           </div>
           <div class="code-editor-container" style="margin-top:20px">
             <!-- 程序文本编辑器 -->
-            <monaco-editor class="editor" v-model="textContext" language="c"></monaco-editor>
+            <monaco-editor  id = "editor" class="editor" v-model="textContext" language="c" :style="conheight"></monaco-editor>
           </div>
         </div>
       </el-form-item>
@@ -78,7 +78,10 @@ export default {
       fileName: "",
       textContext: "",
       threeLibsFilePathDTO: {},
-      inputText:""
+      inputText:"",
+      　　conheight:{
+                height:''
+            }
     };
   },
   //监听属性 类似于data概念
@@ -102,9 +105,16 @@ export default {
     },
   },
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() {
+  window.addEventListener('resize', this.getHeight);
+        this.getHeight()
+  },
   //方法集合
   methods: {
+       getHeight(){
+          this.conheight.height=window.innerHeight-170+'px';
+       },
+
     //文件编码格式改变时调用后台方法
     editorChange() {
       //文件路徑
@@ -133,7 +143,9 @@ export default {
     },
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
-  mounted() {},
+  mounted() {
+   
+  },
   beforeCreate() {}, //生命周期 - 创建之前
   beforeMount() {}, //生命周期 - 挂载之前
   beforeUpdate() {}, //生命周期 - 更新之前
@@ -167,8 +179,8 @@ export default {
 // }
 </script>
 <style>
-.editor {
+/* .editor {
   width: calc(100% - 20px);
-  height: 600px;
-}
+  height: 1000px;
+} */
 </style>
