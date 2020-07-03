@@ -9,11 +9,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.inforbus.gjk.common.core.util.R;
 import com.inforbus.gjk.common.core.util.vo.HeaderFileTransVO;
@@ -224,5 +220,23 @@ public class ExternalInfController {
 		}
 		return r;
 	}
-	
+
+    /**
+     * 软硬件映射调用c接口
+     *
+     * @param exe
+     * @param hardWareFilePath 硬件模型文件
+     * @param mapConfigPath    软硬件映射配置文件
+     * @param sysParamFilePath 系统参数文件
+     * @param userName         用户名（登录）
+     * @return
+     * @throws IOException
+     */
+    @PutMapping("/mapSoftToHard")
+    public void mapSoftToHard(@RequestParam("exe") String exe,
+                              @RequestParam("hardWareFilePath") String hardWareFilePath,
+                              @RequestParam("mapConfigPath") String mapConfigPath,
+                              @RequestParam("sysParamFilePath") String sysParamFilePath, @RequestParam("userName") String userName) {
+        externalInfService.mapSoftToHard(exe,hardWareFilePath,mapConfigPath,sysParamFilePath,userName);
+    }
 }

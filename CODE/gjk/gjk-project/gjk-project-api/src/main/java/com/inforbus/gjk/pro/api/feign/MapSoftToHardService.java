@@ -1,6 +1,7 @@
 package com.inforbus.gjk.pro.api.feign;
 
 import com.inforbus.gjk.common.core.constant.ServiceNameConstants;
+import com.inforbus.gjk.pro.api.feign.factory.MapSoftToHardServiceImplFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,10 +9,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 
-@RequestMapping("/mapSoftToHardInf")
-@FeignClient(value = ServiceNameConstants.DATACENDER_SERVICE)
+
+@FeignClient(value = ServiceNameConstants.DATACENDER_SERVICE, fallbackFactory = MapSoftToHardServiceImplFallbackFactory.class)
 public interface MapSoftToHardService {
 
+	String url = "/ExternalInfServer";
 	/**
 	 * 软硬件映射调用c接口
 	 * 
@@ -23,7 +25,7 @@ public interface MapSoftToHardService {
 	 * @return
 	 * @throws IOException
 	 */
-	@PutMapping("/mapSoftToHard")
+	@PutMapping(url+"/mapSoftToHard")
 	public void mapSoftToHard(@RequestParam("exe") String exe,
 			@RequestParam("hardWareFilePath") String hardWareFilePath,
 			@RequestParam("mapConfigPath") String mapConfigPath,

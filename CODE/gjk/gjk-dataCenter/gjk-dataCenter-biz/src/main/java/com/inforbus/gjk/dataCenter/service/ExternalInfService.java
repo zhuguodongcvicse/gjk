@@ -212,4 +212,6 @@ public interface ExternalInfService {
      * @param arrowInfo     起始构件ID+“:”+变量名+“|”+结束构件ID+“:”+变量名
      */
     public Map<String, String> getMaxXYZ(String flowFilePath, String packinfoFilePath,Map<String,Object> packDataMap,String arrowInfo);
+
+    void mapSoftToHard(String exe, String hardWareFilePath, String mapConfigPath, String sysParamFilePath, String userName);
 }

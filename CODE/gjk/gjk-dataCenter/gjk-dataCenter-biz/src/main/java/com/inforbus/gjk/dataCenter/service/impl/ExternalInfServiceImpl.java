@@ -10,8 +10,10 @@ import com.inforbus.gjk.dataCenter.service.ExternalInfService;
 import flowModel.*;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,12 +45,12 @@ public class ExternalInfServiceImpl implements ExternalInfService {
     /**
      * 解析性能测试表
      *
+     * @param excelPath 性能测试表路径
+     * @return 通过率
      * @Title: parsePerformanceTable
      * @Description:
      * @Author CVICSE-COMMON
      * @DateTime 2019年6月3日 上午10:33:54
-     * @param excelPath 性能测试表路径
-     * @return 通过率
      */
     @Override
     public Map<Integer, Float> parsePerformanceTable(String excelPath) {
@@ -84,7 +86,7 @@ public class ExternalInfServiceImpl implements ExternalInfService {
      * @param schemeFileList
      */
     @Override
-    public void writeBackDeployScheme(String workModeFilePath, String schemeFile ) {
+    public void writeBackDeployScheme(String workModeFilePath, String schemeFile) {
         try {
             BackNodeInfoForSpb.writeBackDeployScheme(workModeFilePath, schemeFile);
         } catch (IOException e) {
@@ -121,7 +123,7 @@ public class ExternalInfServiceImpl implements ExternalInfService {
      * 自定义配置调用接口
      */
     @Override
-    public void createUserDefineTopic(String flowFilePath, String ThemeFilePath, String filePath,String newFolder) {
+    public void createUserDefineTopic(String flowFilePath, String ThemeFilePath, String filePath, String newFolder) {
         File newFile = new File(newFolder);
         if (!newFile.exists()) {
             newFile.mkdirs();
@@ -254,7 +256,7 @@ public class ExternalInfServiceImpl implements ExternalInfService {
     @Override
     public void appTaskExport(String userName, int appId, String appName, String appPath, String sysconfigPath,
                               String packinfoPath, String cmpDeployPlanFilePath) {
-        AppControl.getAppControl().appTaskExport(userName,appId, appName, appPath, sysconfigPath, packinfoPath, cmpDeployPlanFilePath);
+        AppControl.getAppControl().appTaskExport(userName, appId, appName, appPath, sysconfigPath, packinfoPath, cmpDeployPlanFilePath);
     }
 
     /**
@@ -275,12 +277,12 @@ public class ExternalInfServiceImpl implements ExternalInfService {
     }
 
     /**
+     * @param spbModelXmlFile 构件模型XML文件
+     * @param spbModelDir     保存路径(可以是平台文件路径)
      * @Title: createSpbFrameFile
      * @Description: 生成构件框架
      * @Author xiaohe
      * @DateTime 2019年11月13日 下午2:53:28
-     * @param spbModelXmlFile 构件模型XML文件
-     * @param spbModelDir     保存路径(可以是平台文件路径)
      */
     @Override
     public void createSpbFrameFile(String spbModelXmlFile, String spbModelDir) {
@@ -290,6 +292,7 @@ public class ExternalInfServiceImpl implements ExternalInfService {
 
     /**
      * 完备性检查
+     *
      * @param flowFilePath
      * @return
      */
@@ -303,8 +306,8 @@ public class ExternalInfServiceImpl implements ExternalInfService {
      * 仿真数据
      */
     @Override
-    public MoniRecvDataThread startMoniRecvDataThread(String redisIP, String channelName, List<String> arrowList, String flowFilePath, String ctrlTabFilePath ){
-        MoniRecvDataThread moniRecvDataThread = new MoniRecvDataThread(redisIP,channelName,arrowList,flowFilePath,ctrlTabFilePath);
+    public MoniRecvDataThread startMoniRecvDataThread(String redisIP, String channelName, List<String> arrowList, String flowFilePath, String ctrlTabFilePath) {
+        MoniRecvDataThread moniRecvDataThread = new MoniRecvDataThread(redisIP, channelName, arrowList, flowFilePath, ctrlTabFilePath);
         moniRecvDataThread.start();
         return moniRecvDataThread;
     }
@@ -313,40 +316,72 @@ public class ExternalInfServiceImpl implements ExternalInfService {
      * 停止推送仿真数据
      */
     @Override
-    public void stopMoniRecvDataThread(MoniRecvDataThread thread){
+    public void stopMoniRecvDataThread(MoniRecvDataThread thread) {
         thread.stopRunning();
     }
 
     /**
+     * @param flowFilePath     流程建模文件路径
+     * @param packinfoFilePath packinfo文件路径
+     * @param packDataMap      数据包+页面配置项
+     * @param arrowInfo        起始构件ID+“:”+变量名+“|”+结束构件ID+“:”+变量名
      * @Title: ParseMoniData
      * @Description: 生成构件框架
      * @Author xu
      * @DateTime 2020年1月16日
-     * @param flowFilePath 流程建模文件路径
-     * @param packinfoFilePath     packinfo文件路径
-     * @param packDataMap 数据包+页面配置项
-     * @param arrowInfo     起始构件ID+“:”+变量名+“|”+结束构件ID+“:”+变量名
      */
     @Override
-    public Map<String, Object> parseMoniData(String flowFilePath, String packinfoFilePath, Map<String,Object> packDataMap,
+    public Map<String, Object> parseMoniData(String flowFilePath, String packinfoFilePath, Map<String, Object> packDataMap,
                                              String arrowInfo) {
-        return new ParseMoniData(flowFilePath,packinfoFilePath).parseMoniData(packDataMap, arrowInfo);
+        return new ParseMoniData(flowFilePath, packinfoFilePath).parseMoniData(packDataMap, arrowInfo);
 
     }
 
     /**
+     * @param flowFilePath     流程建模文件路径
+     * @param packinfoFilePath packinfo文件路径
+     * @param packDataMap      数据包+页面配置项
+     * @param arrowInfo        起始构件ID+“:”+变量名+“|”+结束构件ID+“:”+变量名
      * @Title: ParseMoniData
      * @Description: 生成构件框架
      * @Author xu
      * @DateTime 2020年1月16日
-     * @param flowFilePath 流程建模文件路径
-     * @param packinfoFilePath     packinfo文件路径
-     * @param packDataMap 数据包+页面配置项
-     * @param arrowInfo     起始构件ID+“:”+变量名+“|”+结束构件ID+“:”+变量名
      */
     @Override
-    public Map<String, String> getMaxXYZ(String flowFilePath, String packinfoFilePath, Map<String,Object> packDataMap, String arrowInfo) {
+    public Map<String, String> getMaxXYZ(String flowFilePath, String packinfoFilePath, Map<String, Object> packDataMap, String arrowInfo) {
 
-        return new ParseMoniData(flowFilePath,packinfoFilePath).getMaxXYZ(packDataMap, arrowInfo);
+        return new ParseMoniData(flowFilePath, packinfoFilePath).getMaxXYZ(packDataMap, arrowInfo);
+    }
+
+    /**
+     * @param exe
+     * @param hardWareFilePath
+     * @param mapConfigPath
+     * @param sysParamFilePath
+     * @param userName
+     * @Description 软硬件映射调用c接口
+     * @Author ZhangHongXu
+     * @Return void
+     * @Exception
+     * @Date 2020/7/2 16:48
+     */
+    @Override
+    public void mapSoftToHard(String exe, String hardWareFilePath, String mapConfigPath, String sysParamFilePath, String userName) {
+        String[] strArray = new String[]{exe, hardWareFilePath, mapConfigPath, sysParamFilePath, userName};
+        try {
+            Process process = Runtime.getRuntime().exec(strArray);
+            InputStreamReader reader = new InputStreamReader(process.getInputStream());
+            BufferedReader bufferedReader = new BufferedReader(reader);
+
+            StringBuffer stringBuffer = new StringBuffer();
+            String str = null;
+            while ((str = bufferedReader.readLine()) != null) {
+                stringBuffer.append(str);
+            }
+
+            System.out.println(stringBuffer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
