@@ -225,7 +225,9 @@ export default {
         if (this.lableType === "switchComm") {
           // value = Boolean(value);
           //字符串的true、false转换为boolean类型的
-          value = JSON.parse(value);
+          if (value !== "") {
+            value = JSON.parse(value);
+           }
         }
         this.itemParam = value;
       }
