@@ -124,10 +124,10 @@ export default {
       textContexts: "",
       code: "const noop = () => {}",
       options: {
-        //readOnly: false,
+        readOnly: false,
         //编辑器随浏览器窗口自动调整大小
         automaticLayout: true,
-        glyphMargin: true
+        //glyphMargin: true
         // 自动缩进
         //autoIndent: true
       }
@@ -137,7 +137,7 @@ export default {
   methods: {
      getHeight(){
           this.con.height=window.innerHeight-170+'px';
-           this.con.width=window.innerWidth-170+'px';
+           this.con.width=window.innerWidth-565+'px';
        },
     editorChange() {
       console.log("ppppppp");
