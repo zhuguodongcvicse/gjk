@@ -32,7 +32,7 @@
         </template>
       </el-row>
 
-      <div v-if="cmmXml.xmlEntityMaps.length>0">
+      <div v-if="cmmXml.xmlEntityMaps !== undefined && cmmXml.xmlEntityMaps.length !== undefined && cmmXml.xmlEntityMaps.length>0">
         <el-divider>{{parseStrToObj(cmmXml.attributeMap.configureType).lableMappingName}}</el-divider>
         <template v-for="(xml) in cmmXml.xmlEntityMaps">
           <template v-for="(col) in parseStrToObj(xml.attributeMap.configureType).attrs">
@@ -111,10 +111,10 @@
       </el-row>
 
       <el-tabs>
-        <el-tab-pane label="网络配置" v-if="networkArray.length>0">
+        <el-tab-pane label="网络配置" v-if="networkArray.xmlEntityMaps !== undefined && networkArray.xmlEntityMaps.length !== undefined && networkArray.length>0">
           <template v-for="(network) in networkArray">
             <el-divider
-              v-if="network.xmlEntityMaps.length>0"
+              v-if="network.xmlEntityMaps !== undefined && network.xmlEntityMaps.length !== undefined && network.xmlEntityMaps.length>0"
             >{{parseStrToObj(network.attributeMap.configureType).lableMappingName}}</el-divider>
             <el-table
               :data="network.xmlEntityMaps"
