@@ -53,8 +53,8 @@
       </div>
 
       <el-row :gutter="5" v-if="bufXml.length>0">
-        <template v-for="(xml) in bufXml">
-          <el-col :span="24">
+        <template :span="24" v-for="(xml) in bufXml">
+          <el-col :span="4">
             <el-divider>{{parseStrToObj(xml.attributeMap.configureType).lableMappingName}}</el-divider>
           </el-col>
           <template v-for="(col) in parseStrToObj(xml.attributeMap.configureType).attrs">
@@ -70,11 +70,11 @@
         </template>
       </el-row>
 
-      <el-row :gutter="5" v-if="shmComfig!={}">
-        <el-col :span="24">
+      <el-row :span="24" :gutter="5" v-if="shmComfig!={}">
+        <el-col :span="4">
           <el-divider>{{parseStrToObj(shmComfig.attributeMap.configureType).lableMappingName}}</el-divider>
         </el-col>
-        <el-table :data="shmComfig.xmlEntityMaps" border height="250" max-height="250">
+        <el-table :span="24" :data="shmComfig.xmlEntityMaps" border height="250" max-height="250">
           <template v-for="(col) in shmColumn">
             <el-table-column
               :prop="col.attrName"

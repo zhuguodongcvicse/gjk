@@ -864,19 +864,19 @@ export default {
     },
     //树展开后运行方法
     handleNodeExpand(data, node, val) {
-      var el = val.$el;
+      /*var el = val.$el;
       $(el)
         .find("img")
         .eq(0)
-        .attr("src", this.website.publicSvg + "icon-svg/folder.svg");
+        .attr("src", this.website.publicSvg + "icon-svg/folder.svg");*/
     },
     //树关闭后运行方法
     handleNodeCollapse(data, node, val) {
-      var el = val.$el;
+      /*var el = val.$el;
       $(el)
         .find("img")
         .eq(0)
-        .attr("src", this.website.publicSvg + "icon-svg/folderPackup.svg");
+        .attr("src", this.website.publicSvg + "icon-svg/folderPackup.svg");*/
     },
     //修改模板
     handleSaveTemp() {

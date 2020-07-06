@@ -280,6 +280,16 @@ public class AppSubassemblyServiceImpl implements AppSubassemblyService {
                 return;
             }
             FileUtil.getSelectStrFilePathList(linuxCFilePathSet, partIntegerCodeFilePath, selectFileExtensionList);
+            //原始需求调用客户接口，apiFileList中存添加的 .c, .cpp, .h文件不带后缀的文件
+            List<String> apiFileList = new ArrayList<>();
+            apiFileList.addAll(apiNeedStringSet);
+            try {
+
+                externalInfService.modifySpbInclude(apiFileList, new File(appFilePathName).getParentFile().getAbsolutePath());
+            } catch (IOException e) {
+                logger.error("调用客户接口失败，请联系管理员");
+                r.setException(new Exception("调用客户接口失败，请联系管理员"));
+            }
         });
         copyFile.start();
 
