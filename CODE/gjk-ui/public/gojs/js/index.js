@@ -660,6 +660,8 @@ function init() {
             var model = myDiagram.model;
             model.startTransaction("drop");
             model.addNodeData({
+              compName: compName,
+              functionName:value.functionName,
               compId: ui.draggable.attr("id"),  //数据库对应构件id
               key: random,
               text: compNameText,
@@ -1084,6 +1086,7 @@ function save() {
     var tarVariableName = "";
     //结束构件名称
     var tarCompName = ""
+    console.log("================",nodeDataArray);
     for (var nodeData of nodeDataArray) {
       if (linkDataArray[i].fromPort.split("*")[2] == nodeData.key) { //出口点
         if (linkDataArray[i].fromPort.split("*")[1] == "output") {
@@ -1092,7 +1095,7 @@ function save() {
               sourDataTypeName = rightPortData.portDat.dataTypeName
               sourVariableName = rightPortData.portDat.variableName
               sourLength = rightPortData.portDat.lengthName
-              sourCompName = nodeData.text
+              sourCompName = nodeData.functionName
             }
           }
         }
@@ -1103,7 +1106,7 @@ function save() {
             if (linkDataArray[i].toPort == leftPortData.portId) {
               tarDataTypeName = leftPortData.portDat.dataTypeName
               tarVariableName = leftPortData.portDat.variableName
-              tarCompName = nodeData.text
+              tarCompName = nodeData.functionName
             }
           }
         }
