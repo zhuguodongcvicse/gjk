@@ -219,6 +219,9 @@ public class XmlFileHandleUtil {
 
 		if (xmlEntityMap.getAttributeMap() != null) {
 			for (Map.Entry<String, String> entry : xmlEntityMap.getAttributeMap().entrySet()) {
+				if(entry.getValue().contains("&")){
+					entry.setValue(entry.getValue().replace("&","&amp;"));
+				}
 				xmlNode.setAttribute(entry.getKey(), entry.getValue());
 			}
 		}
